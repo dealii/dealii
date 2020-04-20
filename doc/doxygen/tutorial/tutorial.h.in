@@ -465,6 +465,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-50</td>
+ *       <td> Geometric multigrid on adaptive meshes distributed in parallel.
+ *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, FEInterfaceValues, MeshWorker::mesh_loop()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-51</td>
  *       <td> Solving the convection-diffusion equation with a hybridizable
  *       discontinuous Galerkin method using face elements.
@@ -668,9 +674,11 @@
  *       step-31,
  *       step-32,
  *       step-33,
+ *       step-40,
  *       step-41,
  *       step-42,
  *       step-43,
+ *       step-50,
  *       step-55
  *     </td>
  *   </tr>
@@ -682,6 +690,7 @@
  *       step-17,
  *       step-18,
  *       step-40,
+ *       step-50,
  *       step-55
  *     </td>
  *   </tr>
@@ -691,7 +700,9 @@
  *     </td>
  *     <td>
  *       step-32,
+ *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55
  *     </td>
  *   </tr>
@@ -720,6 +731,7 @@
  *       step-37,
  *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55,
  *       step-59,
  *       step-67,
@@ -766,7 +778,8 @@
  *       step-6,
  *       step-9,
  *       step-14,
- *       step-39
+ *       step-39,
+ *       step-50
  *     </td>
  *   </tr>
  *
@@ -937,6 +950,7 @@
  *       step-41,
  *       step-42,
  *       step-43,
+ *       step-50,
  *       step-56,
  *       step-59,
  *       step-63
@@ -953,6 +967,7 @@
  *       step-37,
  *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55,
  *       step-59
  *     </td>

@@ -42,6 +42,9 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/generic_linear_algebra.h>
+#include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/operators.h>
+#include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/multigrid/mg_coarse.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_matrix.h>
@@ -49,6 +52,7 @@
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/multigrid.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/fe_interface_values.h>
@@ -80,6 +84,41 @@ namespace LA
 
 using namespace dealii;
 
+
+
+#ifdef USE_PETSC_LA
+// No ChangeVectorTypes::copy() for PETSc vector types.
+// Vector::import() needs to be implemented.
+#else
+/**
+ * Matrix-free operators must use deal.II defined vectors, rest of the code is
+ * based on Trilinos vectors.
+ */
+namespace ChangeVectorTypes
+{
+  template <typename number>
+  void copy(TrilinosWrappers::MPI::Vector &out,
+            const dealii::LinearAlgebra::distributed::Vector<number> &in)
+  {
+    dealii::LinearAlgebra::ReadWriteVector<double> rwv(
+      out.locally_owned_elements());
+    rwv.import(in, VectorOperation::insert);
+    out.import(rwv, VectorOperation::insert);
+  }
+
+  template <typename number>
+  void copy(dealii::LinearAlgebra::distributed::Vector<number> &out,
+            const TrilinosWrappers::MPI::Vector &in)
+  {
+    dealii::LinearAlgebra::ReadWriteVector<double> rwv;
+    rwv.reinit(in);
+    out.import(rwv, VectorOperation::insert);
+  }
+} // namespace ChangeVectorTypes
+#endif
+
+
+
 template <int dim>
 class RightHandSide : public Function<dim>
 {
@@ -99,6 +138,10 @@ class Coefficient : public Function<dim>
 public:
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
+
+  template <typename number>
+  VectorizedArray<number> value(const Point<dim, VectorizedArray<number>> &p,
+                                const unsigned int component = 0) const;
 };
 
 
@@ -111,6 +154,32 @@ double Coefficient<dim>::value(const Point<dim> &p, const unsigned int) const
         return 100.0;
     }
   return 1.0;
+}
+
+
+template <int dim>
+template <typename number>
+VectorizedArray<number>
+Coefficient<dim>::value(const Point<dim, VectorizedArray<number>> &p,
+                        const unsigned int) const
+{
+  VectorizedArray<number> return_value = VectorizedArray<number>();
+  for (unsigned int i = 0; i < VectorizedArray<number>::size(); ++i)
+    {
+      bool found = false;
+      for (int d = 0; d < dim; ++d)
+        if (p[d][i] < -0.5)
+          {
+            return_value[i] = 100.0;
+            found           = true;
+            break;
+          }
+
+      if (!found)
+        return_value[i] = 1.0;
+    }
+
+  return return_value;
 }
 
 
@@ -128,16 +197,196 @@ void average(std::vector<double> &values)
 
 
 
+/**
+ * Matrix-free Laplace operator
+ */
+template <int dim, int fe_degree, typename number>
+class LaplaceOperator
+  : public MatrixFreeOperators::Base<dim,
+                                     LinearAlgebra::distributed::Vector<number>>
+{
+public:
+  LaplaceOperator();
+
+  void clear() override;
+
+  void evaluate_coefficient(const Coefficient<dim> &coefficient_function);
+  Table<1, VectorizedArray<number>> get_coefficient_table();
+
+  virtual void compute_diagonal() override;
+
+private:
+  virtual void apply_add(
+    LinearAlgebra::distributed::Vector<number> &      dst,
+    const LinearAlgebra::distributed::Vector<number> &src) const override;
+
+  void
+  local_apply(const MatrixFree<dim, number> &                   data,
+              LinearAlgebra::distributed::Vector<number> &      dst,
+              const LinearAlgebra::distributed::Vector<number> &src,
+              const std::pair<unsigned int, unsigned int> &cell_range) const;
+
+  void local_compute_diagonal(
+    const MatrixFree<dim, number> &              data,
+    LinearAlgebra::distributed::Vector<number> & dst,
+    const unsigned int &                         dummy,
+    const std::pair<unsigned int, unsigned int> &cell_range) const;
+
+  Table<1, VectorizedArray<number>> coefficient;
+};
+
+
+template <int dim, int fe_degree, typename number>
+LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
+  : MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>()
+{}
+
+
+template <int dim, int fe_degree, typename number>
+void LaplaceOperator<dim, fe_degree, number>::clear()
+{
+  coefficient.reinit(TableIndices<1>(0));
+  MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::
+    clear();
+}
+
+
+template <int dim, int fe_degree, typename number>
+void LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
+  const Coefficient<dim> &coefficient_function)
+{
+  const unsigned int n_cells = this->data->n_macro_cells();
+  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
+
+  coefficient.reinit(TableIndices<1>(n_cells));
+  for (unsigned int cell = 0; cell < n_cells; ++cell)
+    {
+      phi.reinit(cell);
+
+      VectorizedArray<number> averaged_value(0);
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        averaged_value += coefficient_function.value(phi.quadrature_point(q));
+      averaged_value /= phi.n_q_points;
+
+      coefficient(cell) = averaged_value;
+    }
+}
+
+
+template <int dim, int fe_degree, typename number>
+Table<1, VectorizedArray<number>>
+LaplaceOperator<dim, fe_degree, number>::get_coefficient_table()
+{
+  return coefficient;
+}
+
+
+template <int dim, int fe_degree, typename number>
+void LaplaceOperator<dim, fe_degree, number>::local_apply(
+  const MatrixFree<dim, number> &                   data,
+  LinearAlgebra::distributed::Vector<number> &      dst,
+  const LinearAlgebra::distributed::Vector<number> &src,
+  const std::pair<unsigned int, unsigned int> &     cell_range) const
+{
+  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
+
+  for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
+    {
+      AssertDimension(coefficient.size(0), data.n_macro_cells());
+
+      phi.reinit(cell);
+      phi.read_dof_values(src);
+      phi.evaluate(false, true);
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        phi.submit_gradient(coefficient(cell) * phi.get_gradient(q), q);
+      phi.integrate(false, true);
+      phi.distribute_local_to_global(dst);
+    }
+}
+
+
+template <int dim, int fe_degree, typename number>
+void LaplaceOperator<dim, fe_degree, number>::apply_add(
+  LinearAlgebra::distributed::Vector<number> &      dst,
+  const LinearAlgebra::distributed::Vector<number> &src) const
+{
+  this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src);
+}
+
+
+template <int dim, int fe_degree, typename number>
+void LaplaceOperator<dim, fe_degree, number>::compute_diagonal()
+{
+  this->inverse_diagonal_entries.reset(
+    new DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>());
+  LinearAlgebra::distributed::Vector<number> &inverse_diagonal =
+    this->inverse_diagonal_entries->get_vector();
+  this->data->initialize_dof_vector(inverse_diagonal);
+  unsigned int dummy = 0;
+  this->data->cell_loop(&LaplaceOperator::local_compute_diagonal,
+                        this,
+                        inverse_diagonal,
+                        dummy);
+
+  this->set_constrained_entries_to_one(inverse_diagonal);
+
+  for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
+    {
+      Assert(inverse_diagonal.local_element(i) > 0.,
+             ExcMessage("No diagonal entry in a positive definite operator "
+                        "should be zero"));
+      inverse_diagonal.local_element(i) =
+        1. / inverse_diagonal.local_element(i);
+    }
+}
+
+
+template <int dim, int fe_degree, typename number>
+void LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
+  const MatrixFree<dim, number> &             data,
+  LinearAlgebra::distributed::Vector<number> &dst,
+  const unsigned int &,
+  const std::pair<unsigned int, unsigned int> &cell_range) const
+{
+  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
+
+  AlignedVector<VectorizedArray<number>> diagonal(phi.dofs_per_cell);
+
+  for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
+    {
+      AssertDimension(coefficient.size(0), data.n_macro_cells());
+
+      phi.reinit(cell);
+      for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
+            phi.submit_dof_value(VectorizedArray<number>(), j);
+          phi.submit_dof_value(make_vectorized_array<number>(1.), i);
+
+          phi.evaluate(false, true);
+          for (unsigned int q = 0; q < phi.n_q_points; ++q)
+            phi.submit_gradient(coefficient(cell) * phi.get_gradient(q), q);
+          phi.integrate(false, true);
+          diagonal[i] = phi.get_dof_value(i);
+        }
+      for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
+        phi.submit_dof_value(diagonal[i], i);
+      phi.distribute_local_to_global(dst);
+    }
+}
+
+
+
 struct Settings
 {
   bool try_parse(const std::string &prm_filename);
 
-  enum AssembleEnum
+  enum SolverType
   {
-    gmg,
+    gmg_mb,
+    gmg_mf,
     amg
-  } assembler;
-  std::string assembler_text;
+  } solver;
 
   int          dimension;
   double       smoother_dampen;
@@ -149,10 +398,15 @@ struct Settings
 template <int dim>
 class LaplaceProblem
 {
-  typedef LA::MPI::SparseMatrix       MatrixType;
-  typedef LA::MPI::Vector             VectorType;
-  typedef LA::MPI::PreconditionAMG    PreconditionAMG;
-  typedef LA::MPI::PreconditionJacobi PreconditionJacobi;
+  using MatrixType         = LA::MPI::SparseMatrix;
+  using VectorType         = LA::MPI::Vector;
+  using PreconditionAMG    = LA::MPI::PreconditionAMG;
+  using PreconditionJacobi = LA::MPI::PreconditionJacobi;
+
+  using MatrixFreeLevelMatrix  = LaplaceOperator<dim, 2, float>;
+  using MatrixFreeActiveMatrix = LaplaceOperator<dim, 2, double>;
+  using MatrixFreeLevelVector  = LinearAlgebra::distributed::Vector<float>;
+  using MatrixFreeActiveVector = LinearAlgebra::distributed::Vector<double>;
 
 public:
   LaplaceProblem(const Settings &settings);
@@ -163,6 +417,7 @@ private:
   void setup_multigrid();
   void assemble_system();
   void assemble_multigrid();
+  void assemble_rhs_for_matrix_free();
   void solve();
   void estimate();
   void refine_grid();
@@ -183,14 +438,17 @@ private:
   IndexSet                  locally_relevant_set;
   AffineConstraints<double> constraints;
 
-  MatrixType     system_matrix;
-  VectorType     solution;
-  VectorType     right_hand_side;
-  Vector<double> estimate_vector;
+  MatrixType             system_matrix;
+  MatrixFreeActiveMatrix mf_system_matrix;
+  VectorType             solution;
+  VectorType             right_hand_side;
+  Vector<double>         estimate_vector;
 
   MGLevelObject<MatrixType> mg_matrix;
   MGLevelObject<MatrixType> mg_interface_in;
   MGConstrainedDoFs         mg_constrained_dofs;
+
+  MGLevelObject<MatrixFreeLevelMatrix> mf_mg_matrix;
 
   TimerOutput computing_timer;
 };
@@ -203,16 +461,16 @@ LaplaceProblem<dim>::LaplaceProblem(const Settings &settings)
   , pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
   , triangulation(mpi_communicator,
                   Triangulation<dim>::limit_level_difference_at_vertices,
-                  (settings.assembler == Settings::amg) ?
+                  (settings.solver == Settings::amg) ?
                     parallel::distributed::Triangulation<dim>::default_setting :
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
   , mapping()
   , fe(2)
   , dof_handler(triangulation)
-  , computing_timer(pcout, TimerOutput::summary, TimerOutput::wall_times)
+  , computing_timer(pcout, TimerOutput::never, TimerOutput::wall_times)
 {
-  GridGenerator::hyper_L(triangulation, -1, 1, /*colorize*/ false);
+  GridGenerator::hyper_L(triangulation, -1., 1., /*colorize*/ false);
   triangulation.refine_global(1);
 }
 
@@ -222,7 +480,7 @@ bool Settings::try_parse(const std::string &prm_filename)
   ParameterHandler prm;
   prm.declare_entry("dim", "2", Patterns::Integer(), "The problem dimension.");
   prm.declare_entry("n_steps",
-                    "20",
+                    "10",
                     Patterns::Integer(0),
                     "Number of adaptive refinement steps.");
   prm.declare_entry("smoother dampen",
@@ -230,36 +488,46 @@ bool Settings::try_parse(const std::string &prm_filename)
                     Patterns::Double(0.0),
                     "Dampen factor for the smoother.");
   prm.declare_entry("smoother steps",
-                    "2",
+                    "1",
                     Patterns::Integer(1),
                     "Number of smoother steps.");
-  prm.declare_entry("assembler",
-                    "GMG",
-                    Patterns::Selection("GMG|AMG"),
-                    "Switch between GMG and AMG.");
+  prm.declare_entry(
+    "solver",
+    "MF",
+    Patterns::Selection("MF|MB|AMG"),
+    "Switch between matrix-free GMG,  matrix-based GMG, and AMG.");
   prm.declare_entry("output",
                     "false",
                     Patterns::Bool(),
                     "Output graphical results.");
 
-  try
+  if (prm_filename.size() == 0)
     {
-      prm.parse_input(prm_filename);
-    }
-  catch (...)
-    {
+      // No .prm file provided? Print the default values and exit.
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         prm.print_parameters(std::cout, ParameterHandler::Text);
       return false;
     }
 
-  if (prm.get("assembler") == "GMG")
-    this->assembler = gmg;
-  else if (prm.get("assembler") == "AMG")
-    this->assembler = amg;
+  try
+    {
+      prm.parse_input(prm_filename);
+    }
+  catch (std::exception &e)
+    {
+      if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+        std::cerr << e.what() << std::endl;
+      return false;
+    }
+
+  if (prm.get("solver") == "MF")
+    this->solver = gmg_mf;
+  else if (prm.get("solver") == "MB")
+    this->solver = gmg_mb;
+  else if (prm.get("solver") == "AMG")
+    this->solver = amg;
   else
     AssertThrow(false, ExcNotImplemented());
-  this->assembler_text = prm.get("assembler");
 
   this->dimension       = prm.get_integer("dim");
   this->n_steps         = prm.get_integer("n_steps");
@@ -291,28 +559,48 @@ void LaplaceProblem<dim>::setup_system()
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
+
+  if (settings.solver = Settings::gmg_mf)
+    {
+      typename MatrixFree<dim, double>::AdditionalData additional_data;
+      additional_data.tasks_parallel_scheme =
+        MatrixFree<dim, double>::AdditionalData::none;
+      additional_data.mapping_update_flags =
+        (update_gradients | update_JxW_values | update_quadrature_points);
+      std::shared_ptr<MatrixFree<dim, double>> mf_storage(
+        new MatrixFree<dim, double>());
+      mf_storage->reinit(dof_handler,
+                         constraints,
+                         QGauss<1>(fe.degree + 1),
+                         additional_data);
+      mf_system_matrix.initialize(mf_storage);
+      mf_system_matrix.evaluate_coefficient(Coefficient<dim>());
+    }
+  else
+    {
 #ifdef USE_PETSC_LA
-  DynamicSparsityPattern dsp(locally_relevant_set);
-  DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+      DynamicSparsityPattern dsp(locally_relevant_set);
+      DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
-  SparsityTools::distribute_sparsity_pattern(dsp,
-                                             locally_owned_set,
-                                             mpi_communicator,
-                                             locally_relevant_set);
+      SparsityTools::distribute_sparsity_pattern(dsp,
+                                                 locally_owned_set,
+                                                 mpi_communicator,
+                                                 locally_relevant_set);
 
-  system_matrix.reinit(locally_owned_set,
-                       locally_owned_set,
-                       dsp,
-                       mpi_communicator);
+      system_matrix.reinit(locally_owned_set,
+                           locally_owned_set,
+                           dsp,
+                           mpi_communicator);
 #else
-  TrilinosWrappers::SparsityPattern dsp(locally_owned_set,
-                                        locally_owned_set,
-                                        locally_relevant_set,
-                                        MPI_COMM_WORLD);
-  DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
-  dsp.compress();
-  system_matrix.reinit(dsp);
+      TrilinosWrappers::SparsityPattern dsp(locally_owned_set,
+                                            locally_owned_set,
+                                            locally_relevant_set,
+                                            MPI_COMM_WORLD);
+      DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+      dsp.compress();
+      system_matrix.reinit(dsp);
 #endif
+    }
 }
 
 
@@ -330,77 +618,120 @@ void LaplaceProblem<dim>::setup_multigrid()
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, bset);
 
   const unsigned int n_levels = triangulation.n_global_levels();
-  mg_matrix.resize(0, n_levels - 1);
-  mg_matrix.clear_elements();
-  mg_interface_in.resize(0, n_levels - 1);
-  mg_interface_in.clear_elements();
-
-  for (unsigned int level = 0; level < n_levels; ++level)
+  if (settings.solver = Settings::gmg_mf)
     {
-      IndexSet dofset;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, dofset);
+      mf_mg_matrix.resize(0, n_levels - 1);
 
-      {
+      for (unsigned int level = 0; level < n_levels; ++level)
+        {
+          IndexSet relevant_dofs;
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                        level,
+                                                        relevant_dofs);
+          AffineConstraints<double> level_constraints;
+          level_constraints.reinit(relevant_dofs);
+          level_constraints.add_lines(
+            mg_constrained_dofs.get_boundary_indices(level));
+          level_constraints.close();
+
+          typename MatrixFree<dim, float>::AdditionalData additional_data;
+          additional_data.tasks_parallel_scheme =
+            MatrixFree<dim, float>::AdditionalData::none;
+          additional_data.mapping_update_flags =
+            (update_gradients | update_JxW_values | update_quadrature_points);
+          additional_data.mg_level = level;
+          std::shared_ptr<MatrixFree<dim, float>> mf_storage_level(
+            new MatrixFree<dim, float>());
+          mf_storage_level->reinit(dof_handler,
+                                   level_constraints,
+                                   QGauss<1>(fe.degree + 1),
+                                   additional_data);
+
+          mf_mg_matrix[level].initialize(mf_storage_level,
+                                         mg_constrained_dofs,
+                                         level);
+
+          mf_mg_matrix[level].evaluate_coefficient(Coefficient<dim>());
+          mf_mg_matrix[level].compute_diagonal();
+        }
+    }
+  else
+    {
+      mg_matrix.resize(0, n_levels - 1);
+      mg_matrix.clear_elements();
+      mg_interface_in.resize(0, n_levels - 1);
+      mg_interface_in.clear_elements();
+
+      for (unsigned int level = 0; level < n_levels; ++level)
+        {
+          IndexSet dofset;
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                        level,
+                                                        dofset);
+
+          {
 #ifdef USE_PETSC_LA
-        DynamicSparsityPattern dsp(dofset);
-        MGTools::make_sparsity_pattern(dof_handler, dsp, level);
-        dsp.compress();
-        SparsityTools::distribute_sparsity_pattern(
-          dsp,
-          dof_handler.locally_owned_mg_dofs(level),
-          mpi_communicator,
-          dofset);
+            DynamicSparsityPattern dsp(dofset);
+            MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+            dsp.compress();
+            SparsityTools::distribute_sparsity_pattern(
+              dsp,
+              dof_handler.locally_owned_mg_dofs(level),
+              mpi_communicator,
+              dofset);
 
-        mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                                dof_handler.locally_owned_mg_dofs(level),
-                                dsp,
-                                mpi_communicator);
+            mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                                    dof_handler.locally_owned_mg_dofs(level),
+                                    dsp,
+                                    mpi_communicator);
 #else
-        TrilinosWrappers::SparsityPattern dsp(
-          dof_handler.locally_owned_mg_dofs(level),
-          dof_handler.locally_owned_mg_dofs(level),
-          dofset,
-          mpi_communicator);
-        MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+            TrilinosWrappers::SparsityPattern dsp(
+              dof_handler.locally_owned_mg_dofs(level),
+              dof_handler.locally_owned_mg_dofs(level),
+              dofset,
+              mpi_communicator);
+            MGTools::make_sparsity_pattern(dof_handler, dsp, level);
 
-        dsp.compress();
-        mg_matrix[level].reinit(dsp);
+            dsp.compress();
+            mg_matrix[level].reinit(dsp);
 #endif
-      }
+          }
 
-      {
+          {
 #ifdef USE_PETSC_LA
-        DynamicSparsityPattern dsp(dofset);
-        MGTools::make_interface_sparsity_pattern(dof_handler,
-                                                 mg_constrained_dofs,
-                                                 dsp,
-                                                 level);
-        dsp.compress();
-        SparsityTools::distribute_sparsity_pattern(
-          dsp,
-          dof_handler.locally_owned_mg_dofs(level),
-          mpi_communicator,
-          dofset);
+            DynamicSparsityPattern dsp(dofset);
+            MGTools::make_interface_sparsity_pattern(dof_handler,
+                                                     mg_constrained_dofs,
+                                                     dsp,
+                                                     level);
+            dsp.compress();
+            SparsityTools::distribute_sparsity_pattern(
+              dsp,
+              dof_handler.locally_owned_mg_dofs(level),
+              mpi_communicator,
+              dofset);
 
-        mg_interface_in[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                                      dof_handler.locally_owned_mg_dofs(level),
-                                      dsp,
-                                      mpi_communicator);
+            mg_interface_in[level].reinit(
+              dof_handler.locally_owned_mg_dofs(level),
+              dof_handler.locally_owned_mg_dofs(level),
+              dsp,
+              mpi_communicator);
 #else
-        TrilinosWrappers::SparsityPattern dsp(
-          dof_handler.locally_owned_mg_dofs(level),
-          dof_handler.locally_owned_mg_dofs(level),
-          dofset,
-          mpi_communicator);
+            TrilinosWrappers::SparsityPattern dsp(
+              dof_handler.locally_owned_mg_dofs(level),
+              dof_handler.locally_owned_mg_dofs(level),
+              dofset,
+              mpi_communicator);
 
-        MGTools::make_interface_sparsity_pattern(dof_handler,
-                                                 mg_constrained_dofs,
-                                                 dsp,
-                                                 level);
-        dsp.compress();
-        mg_interface_in[level].reinit(dsp);
+            MGTools::make_interface_sparsity_pattern(dof_handler,
+                                                     mg_constrained_dofs,
+                                                     dsp,
+                                                     level);
+            dsp.compress();
+            mg_interface_in[level].reinit(dsp);
 #endif
-      }
+          }
+        }
     }
 }
 
@@ -551,69 +882,185 @@ void LaplaceProblem<dim>::assemble_multigrid()
 
 
 template <int dim>
+void LaplaceProblem<dim>::assemble_rhs_for_matrix_free()
+{
+  TimerOutput::Scope timing(computing_timer, "Assemble right hand side");
+
+  MatrixFreeActiveVector solution_copy;
+  MatrixFreeActiveVector right_hand_side_copy;
+  mf_system_matrix.initialize_dof_vector(solution_copy);
+  mf_system_matrix.initialize_dof_vector(right_hand_side_copy);
+
+  solution_copy = 0.;
+  constraints.distribute(solution_copy);
+  solution_copy.update_ghost_values();
+  right_hand_side_copy = 0;
+  const Table<1, VectorizedArray<double>> coefficient_table =
+    mf_system_matrix.get_coefficient_table();
+
+  RightHandSide<dim> right_hand_side_function;
+
+  FEEvaluation<dim, 2, 3, 1, double> phi(*mf_system_matrix.get_matrix_free());
+
+  for (unsigned int cell = 0;
+       cell < mf_system_matrix.get_matrix_free()->n_macro_cells();
+       ++cell)
+    {
+      phi.reinit(cell);
+      phi.read_dof_values_plain(solution_copy);
+      phi.evaluate(false, true, false);
+
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        {
+          // Submit gradient
+          phi.submit_gradient(-1.0 *
+                                (coefficient_table(cell) * phi.get_gradient(q)),
+                              q);
+
+          // Submit RHS value
+          VectorizedArray<double> rhs_value =
+            make_vectorized_array<double>(1.0);
+          for (unsigned int i = 0; i < VectorizedArray<double>::size(); ++i)
+            {
+              Point<dim> p;
+              for (unsigned int d = 0; d < dim; ++d)
+                p(d) = phi.quadrature_point(q)(d)[i];
+
+              rhs_value[i] = right_hand_side_function.value(p);
+            }
+          phi.submit_value(rhs_value, q);
+        }
+
+      phi.integrate(true, true);
+      phi.distribute_local_to_global(right_hand_side_copy);
+    }
+
+  right_hand_side_copy.compress(VectorOperation::add);
+#ifdef USE_PETSC_LA
+  AssertThrow(false,
+              ExcMessage("CopyVectorTypes::copy() not implemented for "
+                         "PETSc vector types."));
+#else
+  ChangeVectorTypes::copy(right_hand_side, right_hand_side_copy);
+#endif
+}
+
+
+template <int dim>
 void LaplaceProblem<dim>::solve()
 {
   TimerOutput::Scope timing(computing_timer, "Solve");
 
   SolverControl solver_control(1000, 1.e-10 * right_hand_side.l2_norm());
   solver_control.enable_history_data();
-  SolverCG<VectorType> solver(solver_control);
 
   solution = 0.;
 
-  if (settings.assembler == Settings::amg)
+  if (settings.solver == Settings::gmg_mf)
     {
-      computing_timer.enter_subsection("Solve: AMG preconditioner setup");
+      computing_timer.enter_subsection("Solve: Preconditioner setup");
 
-      PreconditionAMG                 prec;
-      PreconditionAMG::AdditionalData Amg_data;
+      MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
+      mg_transfer.build(dof_handler);
+
+      SolverControl coarse_solver_control(1000, 1e-12, false, false);
+      SolverCG<MatrixFreeLevelVector> coarse_solver(coarse_solver_control);
+      PreconditionIdentity            identity;
+      MGCoarseGridIterativeSolver<MatrixFreeLevelVector,
+                                  SolverCG<MatrixFreeLevelVector>,
+                                  MatrixFreeLevelMatrix,
+                                  PreconditionIdentity>
+        coarse_grid_solver(coarse_solver, mf_mg_matrix[0], identity);
+
+      using Smoother = dealii::PreconditionJacobi<MatrixFreeLevelMatrix>;
+      MGSmootherPrecondition<MatrixFreeLevelMatrix,
+                             Smoother,
+                             MatrixFreeLevelVector>
+        smoother;
+      smoother.initialize(mf_mg_matrix,
+                          typename Smoother::AdditionalData(
+                            settings.smoother_dampen));
+      smoother.set_steps(settings.smoother_steps);
+
+      mg::Matrix<MatrixFreeLevelVector> mg_m(mf_mg_matrix);
+
+      MGLevelObject<
+        MatrixFreeOperators::MGInterfaceOperator<MatrixFreeLevelMatrix>>
+        mg_interface_matrices;
+      mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
+      for (unsigned int level = 0; level < triangulation.n_global_levels();
+           ++level)
+        mg_interface_matrices[level].initialize(mf_mg_matrix[level]);
+      mg::Matrix<MatrixFreeLevelVector> mg_interface(mg_interface_matrices);
+
+      Multigrid<MatrixFreeLevelVector> mg(
+        mg_m, coarse_grid_solver, mg_transfer, smoother, smoother);
+      mg.set_edge_matrices(mg_interface, mg_interface);
+
+      PreconditionMG<dim,
+                     MatrixFreeLevelVector,
+                     MGTransferMatrixFree<dim, float>>
+        preconditioner(dof_handler, mg, mg_transfer);
+
+      MatrixFreeActiveVector solution_copy;
+      MatrixFreeActiveVector right_hand_side_copy;
+      mf_system_matrix.initialize_dof_vector(solution_copy);
+      mf_system_matrix.initialize_dof_vector(right_hand_side_copy);
 
 #ifdef USE_PETSC_LA
-      Amg_data.symmetric_operator = true;
+      AssertThrow(false,
+                  ExcMessage("CopyVectorTypes::copy() not implemented for "
+                             "PETSc vector types."));
 #else
-      Amg_data.elliptic              = true;
-      Amg_data.smoother_type         = "Jacobi";
-      Amg_data.higher_order_elements = true;
-      Amg_data.smoother_sweeps       = settings.smoother_steps;
-      Amg_data.aggregation_threshold = 0.02;
+      ChangeVectorTypes::copy(solution_copy, solution);
+      ChangeVectorTypes::copy(right_hand_side_copy, right_hand_side);
 #endif
+      computing_timer.leave_subsection("Solve: Preconditioner setup");
 
-      Amg_data.output_details = false;
-
-      prec.initialize(system_matrix, Amg_data);
-      computing_timer.leave_subsection("Solve: AMG preconditioner setup");
-
+      // Timing 1 vcycle
       {
-        TimerOutput::Scope timing(computing_timer, "Solve: 1 AMG vcycle");
-        prec.vmult(solution, right_hand_side);
+        TimerOutput::Scope timing(computing_timer, "Solve: 1 multigrid vcycle");
+        preconditioner.vmult(solution_copy, right_hand_side_copy);
       }
-      solution = 0.;
+      solution_copy = 0.;
 
       {
+        SolverCG<MatrixFreeActiveVector> solver(solver_control);
+
         TimerOutput::Scope timing(computing_timer, "Solve: CG");
-        solver.solve(system_matrix, solution, right_hand_side, prec);
+        solver.solve(mf_system_matrix,
+                     solution_copy,
+                     right_hand_side_copy,
+                     preconditioner);
       }
+
+      solution_copy.update_ghost_values();
+#ifdef USE_PETSC_LA
+      AssertThrow(false,
+                  ExcMessage("CopyVectorTypes::copy() not implemented for "
+                             "PETSc vector types."));
+#else
+      ChangeVectorTypes::copy(solution, solution_copy);
+#endif
       constraints.distribute(solution);
     }
-  else
+  else if (settings.solver == Settings::gmg_mb)
     {
-      computing_timer.enter_subsection("Solve: GMG preconditioner setup");
+      computing_timer.enter_subsection("Solve: Preconditioner setup");
 
       MGTransferPrebuilt<VectorType> mg_transfer(mg_constrained_dofs);
       mg_transfer.build(dof_handler);
 
-      MatrixType &         coarse_matrix = mg_matrix[0];
       SolverControl        coarse_solver_control(1000, 1e-12, false, false);
       SolverCG<VectorType> coarse_solver(coarse_solver_control);
       PreconditionIdentity identity;
-
       MGCoarseGridIterativeSolver<VectorType,
                                   SolverCG<VectorType>,
                                   MatrixType,
                                   PreconditionIdentity>
-        coarse_grid_solver(coarse_solver, coarse_matrix, identity);
+        coarse_grid_solver(coarse_solver, mg_matrix[0], identity);
 
-      typedef LA::MPI::PreconditionJacobi                      Smoother;
+      using Smoother = LA::MPI::PreconditionJacobi;
       MGSmootherPrecondition<MatrixType, Smoother, VectorType> smoother;
 
 #ifdef USE_PETSC_LA
@@ -640,31 +1087,62 @@ void LaplaceProblem<dim>::solve()
       PreconditionMG<dim, VectorType, MGTransferPrebuilt<VectorType>>
         preconditioner(dof_handler, mg, mg_transfer);
 
-      computing_timer.leave_subsection("Solve: GMG preconditioner setup");
+      computing_timer.leave_subsection("Solve: Preconditioner setup");
 
       {
-        TimerOutput::Scope timing(computing_timer, "Solve: 1 GMG vcycle");
+        TimerOutput::Scope timing(computing_timer, "Solve: 1 multigrid vcycle");
         preconditioner.vmult(solution, right_hand_side);
       }
       solution = 0.;
 
       {
+        SolverCG<VectorType> solver(solver_control);
+
         TimerOutput::Scope timing(computing_timer, "Solve: CG");
         solver.solve(system_matrix, solution, right_hand_side, preconditioner);
       }
 
       constraints.distribute(solution);
     }
+  else
+    {
+      computing_timer.enter_subsection("Solve: Preconditioner setup");
 
-  double rate = solver_control.final_reduction();
-  {
-    double r0 = right_hand_side.l2_norm();
-    double rn = solver_control.last_value();
-    rate      = 1.0 / solver_control.last_step() * log(r0 / rn) / log(10);
-  }
+      PreconditionAMG                 preconditioner;
+      PreconditionAMG::AdditionalData Amg_data;
 
-  pcout << "   CG iterations: " << solver_control.last_step()
-        << ", iters: " << 10.0 / rate << ", rate: " << rate << std::endl;
+#ifdef USE_PETSC_LA
+      Amg_data.symmetric_operator = true;
+#else
+      Amg_data.elliptic = true;
+      Amg_data.smoother_type = "Jacobi";
+      Amg_data.higher_order_elements = true;
+      Amg_data.smoother_sweeps = settings.smoother_steps;
+      Amg_data.aggregation_threshold = 0.02;
+#endif
+
+      Amg_data.output_details = false;
+
+      preconditioner.initialize(system_matrix, Amg_data);
+      computing_timer.leave_subsection("Solve: Preconditioner setup");
+
+      {
+        TimerOutput::Scope timing(computing_timer, "Solve: 1 multigrid vcycle");
+        preconditioner.vmult(solution, right_hand_side);
+      }
+      solution = 0.;
+
+      {
+        SolverCG<VectorType> solver(solver_control);
+
+        TimerOutput::Scope timing(computing_timer, "Solve: CG");
+        solver.solve(system_matrix, solution, right_hand_side, preconditioner);
+      }
+      constraints.distribute(solution);
+    }
+
+  pcout << "   Number of CG iterations:      " << solver_control.last_step()
+        << std::endl;
 }
 
 
@@ -743,7 +1221,7 @@ void LaplaceProblem<dim>::estimate()
   auto cell_worker = [&](const Iterator &  cell,
                          ScratchData<dim> &scratch_data,
                          CopyData &        copy_data) {
-    // assemble cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$
+    /*assemble cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$*/
 
     FEValues<dim> &fe_values = scratch_data.fe_values;
     fe_values.reinit(cell);
@@ -776,7 +1254,7 @@ void LaplaceProblem<dim>::estimate()
                          const unsigned int &nsf,
                          ScratchData<dim> &  scratch_data,
                          CopyData &          copy_data) {
-    // face term $\sum_F h_F \| [ \epsilon \nabla u \cdot n ] \|_F^2$
+    /* face term $\sum_F h_F \| [ \epsilon \nabla u \cdot n ] \|_F^2$*/
 
     FEInterfaceValues<dim> &fe_interface_values =
       scratch_data.fe_interface_values;
@@ -790,7 +1268,7 @@ void LaplaceProblem<dim>::estimate()
 
     const double nu1 = coefficient.value(cell->center());
     const double nu2 = coefficient.value(ncell->center());
-    const double h   = cell->face(f)->measure(); // TODO: FEIV.measure
+    const double h   = cell->face(f)->measure();
 
     std::vector<Tensor<1, dim>> grad_u[2];
 
@@ -871,14 +1349,13 @@ void LaplaceProblem<dim>::output_results(const unsigned int cycle)
 {
   TimerOutput::Scope timing(computing_timer, "Output results");
 
-  DataOut<dim> data_out;
-
   VectorType temp_solution;
   temp_solution.reinit(locally_owned_set,
                        locally_relevant_set,
                        mpi_communicator);
   temp_solution = solution;
 
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(temp_solution, "solution");
   Vector<float> subdomain(triangulation.n_active_cells());
@@ -896,32 +1373,10 @@ void LaplaceProblem<dim>::output_results(const unsigned int cycle)
 
   data_out.build_patches(0);
 
-  const std::string filename =
-    ("solution-" + Utilities::int_to_string(cycle, 5) + "." +
-     Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4) +
-     ".vtu");
-  std::ofstream output(filename.c_str());
-  data_out.write_vtu(output);
+  const std::string master = data_out.write_vtu_with_pvtu_record(
+    "", "solution", cycle, mpi_communicator, 2 /*n_digits*/, 1 /*n_groups*/);
 
-  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-    {
-      std::vector<std::string> filenames;
-      for (unsigned int i = 0;
-           i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-           ++i)
-        filenames.push_back(std::string("solution-") +
-                            Utilities::int_to_string(cycle, 5) + "." +
-                            Utilities::int_to_string(i, 4) + ".vtu");
-      const std::string pvtu_master_filename =
-        ("solution-" + Utilities::int_to_string(cycle, 5) + ".pvtu");
-      std::ofstream pvtu_master(pvtu_master_filename.c_str());
-      data_out.write_pvtu_record(pvtu_master, filenames);
-
-      const std::string visit_master_filename =
-        ("solution-" + Utilities::int_to_string(cycle, 5) + ".visit");
-      std::ofstream visit_master(visit_master_filename.c_str());
-      DataOutBase::write_visit_record(visit_master, filenames);
-    }
+  pcout << "   Wrote " << master << std::endl;
 }
 
 
@@ -936,7 +1391,7 @@ void LaplaceProblem<dim>::run()
 
       pcout << "   Number of active cells:       "
             << triangulation.n_global_active_cells();
-      if (settings.assembler == Settings::gmg)
+      if (settings.solver != Settings::amg)
         pcout << " (" << triangulation.n_global_levels() << " global levels)"
               << std::endl
               << "   Workload imbalance:           "
@@ -944,11 +1399,11 @@ void LaplaceProblem<dim>::run()
       pcout << std::endl;
 
       setup_system();
-      if (settings.assembler == Settings::gmg)
+      if (settings.solver != Settings::amg)
         setup_multigrid();
 
       pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs();
-      if (settings.assembler != Settings::amg)
+      if (settings.solver != Settings::amg)
         {
           pcout << " (by level: ";
           for (unsigned int level = 0; level < triangulation.n_global_levels();
@@ -959,9 +1414,14 @@ void LaplaceProblem<dim>::run()
         }
       pcout << std::endl;
 
-      assemble_system();
-      if (settings.assembler == Settings::gmg)
-        assemble_multigrid();
+      if (settings.solver == Settings::gmg_mf)
+        assemble_rhs_for_matrix_free();
+      else
+        {
+          assemble_system();
+          if (settings.solver == Settings::gmg_mb)
+            assemble_multigrid();
+        }
 
       solve();
       estimate();
@@ -977,8 +1437,8 @@ void LaplaceProblem<dim>::run()
 
 int main(int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   using namespace dealii;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   Settings settings;
   if (!settings.try_parse((argc > 1) ? (argv[1]) : ""))

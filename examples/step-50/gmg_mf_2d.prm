@@ -16,4 +16,4 @@ set smoother dampen = 1.0
 set smoother steps  = 1
 
 # Switch between GMG and AMG.
-set solver          = AMG
+set solver          = MF

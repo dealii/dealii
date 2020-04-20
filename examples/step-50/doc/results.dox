@@ -1,98 +1,311 @@
 <h1>Results</h1>
 
-The output that this program generates is, of course, the same as that
-of step-6, so you may see there for more results. On the
-other hand, since no tutorial program is a good one unless it has at
-least one colorful picture, here is, again, the solution:
-
-
-When run, the output of this program is
-<pre>
+When you run the program, the screen output should look like the following:
+@code
 Cycle 0:
-   Number of active cells:       20
-   Number of degrees of freedom: 25 (by level: 8, 25)
-   7 CG iterations needed to obtain convergence.
-Cycle 1:
-   Number of active cells:       44
-   Number of degrees of freedom: 57 (by level: 8, 25, 48)
-   8 CG iterations needed to obtain convergence.
-Cycle 2:
-   Number of active cells:       92
-   Number of degrees of freedom: 117 (by level: 8, 25, 80, 60)
-   9 CG iterations needed to obtain convergence.
-Cycle 3:
-   Number of active cells:       188
-   Number of degrees of freedom: 221 (by level: 8, 25, 80, 200)
-   12 CG iterations needed to obtain convergence.
-Cycle 4:
-   Number of active cells:       416
-   Number of degrees of freedom: 485 (by level: 8, 25, 89, 288, 280)
-   13 CG iterations needed to obtain convergence.
-Cycle 5:
-   Number of active cells:       800
-   Number of degrees of freedom: 925 (by level: 8, 25, 89, 288, 784, 132)
-   14 CG iterations needed to obtain convergence.
-Cycle 6:
-   Number of active cells:       1628
-   Number of degrees of freedom: 1865 (by level: 8, 25, 89, 304, 1000, 1164, 72)
-   14 CG iterations needed to obtain convergence.
-Cycle 7:
-   Number of active cells:       3194
-   Number of degrees of freedom: 3603 (by level: 8, 25, 89, 328, 1032, 2200, 1392)
-   16 CG iterations needed to obtain convergence.
-</pre>
-That's not perfect &mdash; we would have hoped for a constant number
-of iterations rather than one that increases as we get more and more
-degrees of freedom &mdash; but it is also not far away. The reason for
-this is easy enough to understand, however: since we have a strongly
-varying coefficient, the operators that we assembly by quadrature on
-the lower levels become worse and worse approximations of the operator
-on the finest level. Consequently, even if we had perfect solvers on
-the coarser levels, they would not be good preconditioners on the
-finest level. This theory is easily tested by comparing results when
-we use a constant coefficient: in that case, the number of iterations
-remains constant at 9 after the first three or four refinement steps.
+   Number of active cells:       56 (2 global levels)
+   Workload imbalance:           1.14286
+   Number of degrees of freedom: 665 (by level: 117, 665)
+   Number of CG iterations:      10
 
-We can also compare what this program produces with how @ref step_5
-"step-5" performed. To solve the same problem as in step-5, the only
-two changes that are necessary are (i) to replace the body of the
-function <code>LaplaceProblem::refine_grid</code> by a call to
-<code>triangulation.refine_global(1)</code>, and (ii) to use the same
-SolverControl object and tolerance as in step-5 &mdash; the rest of the
-program remains unchanged. In that case, here is how the solvers used
-in step-5 and the multigrid solver used in the current program
-compare:
-<table align="center">
-<tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
-<tr><td>20</td>   <td>13</td> <td>6</td> </tr>
-<tr><td>80</td>   <td>17</td> <td>7</td> </tr>
-<tr><td>320</td>  <td>29</td> <td>9</td> </tr>
-<tr><td>1280</td> <td>51</td> <td>10</td> </tr>
-<tr><td>5120</td> <td>94</td> <td>11</td> </tr>
-<tr><td>20480</td><td>180</td><td>13</td></tr>
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0536s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble                        |         1 |    0.0026s |       4.8% |
+| Assemble multigrid              |         1 |   0.00303s |       5.6% |
+| Estimate                        |         1 |    0.0273s |        51% |
+| Setup                           |         1 |   0.00477s |       8.9% |
+| Setup multigrid                 |         1 |   0.00539s |        10% |
+| Solve                           |         1 |   0.00801s |        15% |
+| Solve: 1 GMG vcycle             |         1 |  0.000655s |       1.2% |
+| Solve: CG                       |         1 |   0.00472s |       8.8% |
+| Solve: GMG preconditioner setup |         1 |   0.00232s |       4.3% |
++---------------------------------+-----------+------------+------------+
+
+Cycle 1:
+   Number of active cells:       126 (3 global levels)
+   Workload imbalance:           1.17483
+   Number of degrees of freedom: 1672 (by level: 117, 665, 1100)
+   Number of CG iterations:      11
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0861s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble                        |         1 |   0.00578s |       6.7% |
+| Assemble multigrid              |         1 |   0.00745s |       8.7% |
+| Estimate                        |         1 |    0.0281s |        33% |
+| Refine grid                     |         1 |   0.00992s |        12% |
+| Setup                           |         1 |   0.00878s |        10% |
+| Setup multigrid                 |         1 |    0.0115s |        13% |
+| Solve                           |         1 |    0.0144s |        17% |
+| Solve: 1 GMG vcycle             |         1 |  0.000868s |         1% |
+| Solve: CG                       |         1 |   0.00879s |        10% |
+| Solve: GMG preconditioner setup |         1 |   0.00414s |       4.8% |
++---------------------------------+-----------+------------+------------+
+
+Cycle 2:
+.
+.
+.
+@endcode
+Here, the timing of the `solve()` function is spilt up in 3 parts: setting
+up the multigrid preconditioner, execution of a single multigrid vcycle, and
+the CG solver. The vcycle that is timed is unnecessary for the overall solve
+and only meant to give an insight at the different costs for AMG and GMG.
+Also it should be noted that when using the AMG solver, ``Workload imbalance''
+is not included in the output since the hierarchy of coarse meshes are not
+required.
+
+In addition to the AMG and GMG solvers in this tutorial, included will be timings
+from a 3rd matrix-free (MF) GMG solver on the same problem (see possible extensions
+for a discussion on what is required for the matrix-free solver). We will refer to
+the GMG solver in tutorial as the matrix-based (MB) GMG solver.
+
+The following table gives the timings for setup, assembly, and solve for GMG and AMG
+on up to 256M DoFs and 7168 processors.
+<table align="center" class="doxtable">
+<tr>
+  <th></th>
+  <th>Procs</th>
+  <th>Cycle</th>
+  <th>DoFs</th>
+  <th>Imbalance</th>
+  <th></th>
+  <th>Setup</th>
+  <th>Setup GMG</th>
+  <th>Assemble</th>
+  <th>Assemble GMG</th>
+  <th>Solve</th>
+</tr>
+<tr>
+  <th>MF-GMG</th>
+  <td>112</th>
+  <td>13</th>
+  <td>4M</th>
+  <td>0.37</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>448</th>
+  <td>15</th>
+  <td>16M</th>
+  <td>0.29</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>1792</th>
+  <td>17</th>
+  <td>65M</th>
+  <td>0.22</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>7168</th>
+  <td>19</th>
+  <td>256M</th>
+  <td>0.16</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th>MB-GMG</th>
+  <td>112</th>
+  <td>13</th>
+  <td>4M</th>
+  <td>0.37</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>448</th>
+  <td>15</th>
+  <td>16M</th>
+  <td>0.29</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>1792</th>
+  <td>17</th>
+  <td>65M</th>
+  <td>0.22</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>7168</th>
+  <td>19</th>
+  <td>256M</th>
+  <td>0.16</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th>AMG</th>
+  <td>112</th>
+  <td>13</th>
+  <td>4M</th>
+  <td>-</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>448</th>
+  <td>15</th>
+  <td>16M</th>
+  <td>-</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>1792</th>
+  <td>17</th>
+  <td>65M</th>
+  <td>-</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
+<tr>
+  <th></th>
+  <td>7168</th>
+  <td>19</th>
+  <td>256M</th>
+  <td>-</th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+  <td></th>
+</tr>
 </table>
-This isn't only fewer iterations than in step-5 (each of which
-is, however, much more expensive) but more importantly, the number of
-iterations also grows much more slowly under mesh refinement (again,
-it would be almost constant if the coefficient was constant rather
-than strongly varying as chosen here). This justifies the common
-observation that, whenever possible, multigrid methods should be used
-for second order problems.
+
+The following figure gives the strong scaling for each method for cycle 16 (32M DoFs)
+and 19 (256M DoFs) on between 56 to 28672 processors.
+<img src="https://www.dealii.org/images/steps/developer/step-50-strong-scaling.png" alt="">
 
 
 <h3> Possible extensions </h3>
 
-A close inspection of this program's performance shows that it is mostly
-dominated by matrix-vector operations. step-37 shows one way
-how this can be avoided by working with matrix-free methods.
+<h4>Add matrix-free GMG preconditioner</h4>
+The results above include timings from a matrix-free GMG preconditioner
+which is not currently a part of this tutorial. See step-37 for an example
+of such a preconditioner for the Laplace equation.
 
-Another avenue would be to use algebraic multigrid methods. The
-geometric multigrid method used here can at times be a bit awkward to
-implement because it needs all those additional data structures, and
-it becomes even more difficult if the program is to run in %parallel on
-machines coupled through MPI, for example. In that case, it would be
-simpler if one could use a black-box preconditioner that uses some
-sort of multigrid hierarchy for good performance but can figure out
-level matrices and similar things out by itself. Algebraic multigrid
-methods do exactly this, and we will use them in
-step-31 for the solution of a Stokes problem.
+It should be noted that the MatrixFree class is only compatible with the
+dealii::LinearAlgebra::distributed::Vector class, while this tutorial uses either
+PETSc or Trilinos vectors. It may be of use to define functions which copy between
+two types of vectors, for example, for Trilinos vectors one could use the following:
+@code
+namespace ChangeVectorTypes
+{
+  void import(TrilinosWrappers::MPI::Vector &                       out,
+              const dealii::LinearAlgebra::ReadWriteVector<double> &rwv,
+              const VectorOperation::values                         operation)
+  {
+    Assert(out.size() == rwv.size(),
+           ExcMessage(
+             "Both vectors need to have the same size for import() to work!"));
+
+    Assert(out.locally_owned_elements() == rwv.get_stored_elements(),
+           ExcNotImplemented());
+
+    if (operation == VectorOperation::insert)
+      {
+        for (const auto idx : out.locally_owned_elements())
+          out[idx] = rwv[idx];
+      }
+    else if (operation == VectorOperation::add)
+      {
+        for (const auto idx : out.locally_owned_elements())
+          out[idx] += rwv[idx];
+      }
+    else
+      AssertThrow(false, ExcNotImplemented());
+
+    out.compress(operation);
+  }
+
+
+  void copy(TrilinosWrappers::MPI::Vector &                           out,
+            const dealii::LinearAlgebra::distributed::Vector<double> &in)
+  {
+    dealii::LinearAlgebra::ReadWriteVector<double> rwv(
+      out.locally_owned_elements());
+    rwv.import(in, VectorOperation::insert);
+    // This import function doesn't exist until after dealii 9.0
+    // Implemented above
+    import(out, rwv, VectorOperation::insert);
+  }
+
+  void copy(dealii::LinearAlgebra::distributed::Vector<double> &out,
+            const TrilinosWrappers::MPI::Vector &               in)
+  {
+    dealii::LinearAlgebra::ReadWriteVector<double> rwv;
+    rwv.reinit(in);
+    out.import(rwv, VectorOperation::insert);
+  }
+}
+@endcode
+
