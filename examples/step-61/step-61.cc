@@ -603,8 +603,8 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    solver(solver_control);
+    SolverControl            solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> solver(solver_control);
     solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
     constraints.distribute(solution);
   }

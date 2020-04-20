@@ -308,8 +308,8 @@ namespace Step22
     Vector<double> &      dst,
     const Vector<double> &src) const
   {
-    SolverControl solver_control(src.size(), 1e-6 * src.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(src.size(), 1e-6 * src.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
     dst = 0;
 
@@ -830,9 +830,9 @@ namespace Step22
         system_matrix, A_inverse);
 
       // The usual control structures for the solver call are created...
-      SolverControl solver_control(solution.block(1).size(),
+      SolverControl            solver_control(solution.block(1).size(),
                                    1e-6 * schur_rhs.l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       // Now to the preconditioner to the Schur complement. As explained in
       // the introduction, the preconditioning is done by a mass matrix in the

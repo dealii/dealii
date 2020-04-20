@@ -424,9 +424,9 @@ namespace Step38
   void LaplaceBeltramiProblem<spacedim>::solve()
   {
     SolverControl solver_control(solution.size(), 1e-7 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);

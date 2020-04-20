@@ -531,10 +531,10 @@ namespace Step25
   template <int dim>
   unsigned int SineGordonProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution_update, system_rhs, preconditioner);

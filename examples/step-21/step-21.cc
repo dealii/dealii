@@ -424,7 +424,7 @@ namespace Step21
     {
       SolverControl solver_control(std::max<unsigned int>(src.size(), 200),
                                    1e-8 * src.l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       dst = 0;
 
@@ -933,9 +933,9 @@ namespace Step21
         approximate_schur_complement);
 
 
-      SolverControl solver_control(solution.block(1).size(),
+      SolverControl            solver_control(solution.block(1).size(),
                                    1e-12 * schur_rhs.l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
 
       cg.solve(schur_complement, solution.block(1), schur_rhs, preconditioner);
 
@@ -972,9 +972,9 @@ namespace Step21
     // onto the physically reasonable range:
     assemble_rhs_S();
     {
-      SolverControl solver_control(system_matrix.block(2, 2).m(),
+      SolverControl            solver_control(system_matrix.block(2, 2).m(),
                                    1e-8 * system_rhs.block(2).l2_norm());
-      SolverCG<>    cg(solver_control);
+      SolverCG<Vector<double>> cg(solver_control);
       cg.solve(system_matrix.block(2, 2),
                solution.block(2),
                system_rhs.block(2),

@@ -724,10 +724,10 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);

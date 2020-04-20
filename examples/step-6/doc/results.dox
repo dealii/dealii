@@ -128,17 +128,17 @@ up for grabs.
 In deal.II, it is relatively simple to change the preconditioner. For
 example, by changing the existing lines of code
 @code
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 @endcode
 into
 @code
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.0);
 @endcode
 we can try out different relaxation parameters for SSOR. By using
 @code
-  PreconditionJacobi<> preconditioner;
+  PreconditionJacobi<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix);
 @endcode
 we can use Jacobi as a preconditioner. And by using

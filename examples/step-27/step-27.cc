@@ -374,11 +374,11 @@ namespace Step27
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
-    SolverControl solver_control(system_rhs.size(),
+    SolverControl            solver_control(system_rhs.size(),
                                  1e-12 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);

@@ -969,9 +969,9 @@ namespace Step51
   template <int dim>
   void HDG<dim>::solve()
   {
-    SolverControl    solver_control(system_matrix.m() * 10,
+    SolverControl                  solver_control(system_matrix.m() * 10,
                                  1e-11 * system_rhs.l2_norm());
-    SolverBicgstab<> solver(solver_control);
+    SolverBicgstab<Vector<double>> solver(solver_control);
     solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
     std::cout << "   Number of BiCGStab iterations: "

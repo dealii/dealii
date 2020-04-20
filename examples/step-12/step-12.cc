@@ -469,8 +469,8 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl      solver_control(1000, 1e-12);
-    SolverRichardson<> solver(solver_control);
+    SolverControl                    solver_control(1000, 1e-12);
+    SolverRichardson<Vector<double>> solver(solver_control);
 
     // Here we create the preconditioner,
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;

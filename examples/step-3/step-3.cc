@@ -552,7 +552,7 @@ void Step3::solve()
   // class is the type of the vectors, but the empty angle brackets indicate
   // that we simply take the default argument (which is
   // <code>Vector@<double@></code>):
-  SolverCG<> solver(solver_control);
+  SolverCG<Vector<double>> solver(solver_control);
 
   // Now solve the system of equations. The CG solver takes a preconditioner
   // as its fourth argument. We don't feel ready to delve into this yet, so we

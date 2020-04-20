@@ -273,10 +273,10 @@ namespace Step26
   template <int dim>
   void HeatEquation<dim>::solve_time_step()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);

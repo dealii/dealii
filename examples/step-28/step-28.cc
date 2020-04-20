@@ -1014,11 +1014,11 @@ namespace Step28
                                        solution,
                                        system_rhs);
 
-    SolverControl solver_control(system_matrix.m(),
+    SolverControl            solver_control(system_matrix.m(),
                                  1e-12 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -1525,7 +1525,7 @@ namespace Step28
     BlockVector<float> group_error_indicators(n_cells);
 
     {
-      Threads::ThreadGroup<> threads;
+      Threads::ThreadGroup<void> threads;
       for (unsigned int group = 0; group < parameters.n_groups; ++group)
         threads += Threads::new_thread(&EnergyGroup<dim>::estimate_errors,
                                        *energy_groups[group],
@@ -1538,7 +1538,7 @@ namespace Step28
     const float coarsen_threshold = 0.01 * max_error;
 
     {
-      Threads::ThreadGroup<> threads;
+      Threads::ThreadGroup<void> threads;
       for (unsigned int group = 0; group < parameters.n_groups; ++group)
         threads += Threads::new_thread(&EnergyGroup<dim>::refine_grid,
                                        *energy_groups[group],
@@ -1612,7 +1612,7 @@ namespace Step28
         std::cout << std::endl << std::endl;
 
 
-        Threads::ThreadGroup<> threads;
+        Threads::ThreadGroup<void> threads;
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
           threads +=
             Threads::new_thread(&EnergyGroup<dim>::assemble_system_matrix,

@@ -1117,8 +1117,9 @@ namespace Step35
   NavierStokesProjection<dim>::diffusion_component_solve(const unsigned int d)
   {
     SolverControl solver_control(vel_max_its, vel_eps * force[d].l2_norm());
-    SolverGMRES<> gmres(solver_control,
-                        SolverGMRES<>::AdditionalData(vel_Krylov_size));
+    SolverGMRES<Vector<double>> gmres(
+      solver_control,
+      SolverGMRES<Vector<double>>::AdditionalData(vel_Krylov_size));
     gmres.solve(vel_it_matrix[d], u_n[d], force[d], prec_velocity[d]);
   }
 
@@ -1236,7 +1237,7 @@ namespace Step35
                                      vel_diag_strength, vel_off_diagonals));
 
     SolverControl solvercontrol(vel_max_its, vel_eps * pres_tmp.l2_norm());
-    SolverCG<>    cg(solvercontrol);
+    SolverCG<Vector<double>> cg(solvercontrol);
     cg.solve(pres_iterative, phi_n, pres_tmp, prec_pres_Laplace);
 
     phi_n *= 1.5 / dt;
