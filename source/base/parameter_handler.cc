@@ -2007,7 +2007,7 @@ ParameterHandler::get_entries_wrongly_not_set() const
 {
   std::set<std::string> entries_wrongly_not_set;
 
-  for (auto it : entries_set_status)
+  for (const auto &it : entries_set_status)
     if (it.second.first == true && it.second.second == false)
       entries_wrongly_not_set.insert(it.first);
 

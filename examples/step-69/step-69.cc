@@ -945,12 +945,14 @@ namespace Step69
     // primarily used to write the updated nodal values, stored as
     // <code>Tensor<1,problem_dimension></code>, into the global objects.
 
-    template <std::size_t k>
+    template <std::size_t k, int k2>
     DEAL_II_ALWAYS_INLINE inline void
     scatter(std::array<LinearAlgebra::distributed::Vector<double>, k> &U,
-            const Tensor<1, ((identity<std::size_t>::type)k)> &        tensor,
+            const Tensor<1, k2> &                                      tensor,
             const unsigned int                                         i)
     {
+      static_assert(k == k2,
+                    "The dimensions of the input arguments must agree");
       for (unsigned int j = 0; j < k; ++j)
         U[j].local_element(i) = tensor[j];
     }
@@ -2530,8 +2532,8 @@ namespace Step69
   namespace
   {
     void print_head(ConditionalOStream &pcout,
-                    std::string         header,
-                    std::string         secondary = "")
+                    const std::string & header,
+                    const std::string & secondary = "")
     {
       const auto header_size   = header.size();
       const auto padded_header = std::string((34 - header_size) / 2, ' ') +

@@ -61,7 +61,7 @@ public:
   /**
    * Number type.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
 
   /**

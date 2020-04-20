@@ -133,8 +133,8 @@ namespace TrilinosWrappers
     const Epetra_Map &domain_map = matrix.OperatorDomainMap();
 
     const size_type constant_modes_dimension = constant_modes.size();
-    ptr_distributed_constant_modes.reset(new Epetra_MultiVector(
-      domain_map, constant_modes_dimension > 0 ? constant_modes_dimension : 1));
+    ptr_distributed_constant_modes = std_cxx14::make_unique<Epetra_MultiVector>(
+      domain_map, constant_modes_dimension > 0 ? constant_modes_dimension : 1);
     Assert(ptr_distributed_constant_modes, ExcNotInitialized());
     Epetra_MultiVector &distributed_constant_modes =
       *ptr_distributed_constant_modes;
