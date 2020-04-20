@@ -14,11 +14,10 @@
 
 
 In this tutorial we consider the case of two domains, $\Omega$ in
-$R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$ The domain $\Gamma$ is
-embedded (i.e. non-matching) in $\Omega$ ($\Gamma \subseteq \Omega$). We want to solve a partial
+$R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$. The domain $\Gamma$ is
+embedded in $\Omega$ ($\Gamma \subseteq \Omega$) and is not-matching. We want to solve a partial
 differential equation on $\Omega$, enforcing some conditions on the solution of
-the problem *on the embedded domain* $\Gamma$ using the Nitsche method
-(Freund, 1995).
+the problem on the embedded domain $\Gamma$ using the Nitsche method.
 
 The technique we describe here is presented in the literature using one of many names:
 the <b>immersed finite element method</b> and the <b>fictitious boundary method</b> among others. The main principle is
@@ -46,7 +45,7 @@ zero; for example it is a curve embedded in a two dimensional domain, or a
 surface embedded in a three-dimensional domain.
 
 In this tutorial program we are not interested in further details on $\Gamma$: we
-take the extension $\Gamma$ for granted, assuming that the dimension of the
+assume that the dimension of the
 embedded domain (`dim`) is always smaller by one or equal with respect to the
 dimension of the embedding domain $\Omega$ (`spacedim`).
 
@@ -70,7 +69,7 @@ Nitsche method. The application of Nitsche's method will be discussed
 furthermore once the variational formulation has been introduced.
 
 
-The weak form of the Stokes equations is obtained by writing it in vector form as
+The weak form of the Stokes equations is obtained by first writing it in vector form as
 
 @f{eqnarray*}
   \begin{pmatrix}
@@ -116,30 +115,30 @@ following modified formulation :
 
 @f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
- + (q, \nabla \cdot \textbf{u})_{\Omega} - (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
- + \beta (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma} &=&  -(\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
- + \beta (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} - (\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ + \beta (\textbf{v}},\textbf{u})_{\Gamma} &=&  -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+ + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
-It can be shown (e.g. see Freund, 1995) that there exist a positive constant
+It can be shown (see  Freund, 1995) that there exist a positive constant
 $C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
 be consistent and stable. We note that the additional terms on the left-hand
 and right-hand side are equal since $\textbf{u}=\textbf{g}\text{ in } \Gamma$.
 It follows that :
 
 @f{eqnarray*}{
-(\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
-+ \beta (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma} &=& -(\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
-+ \beta (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
++ \beta (\textbf{v},\textbf{u})_{\Gamma} &=& -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
++ \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
 We note that an alternative formulation can be used :
 
 @f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
- + (q, \nabla \cdot \textbf{u})_{\Omega} + (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
- + \beta (\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma} &=&  (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
- + \beta (\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} + (\nabla \textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ + \beta (\textbf{v},\textbf{u})_{\Gamma} &=&  (\nabla \textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+ + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
 in which case the stability and consistency condition becomes $\beta > 0$.
@@ -155,28 +154,39 @@ step-60, we still need to integrate over the non-matching embedded grid in order
 to construct the boundary term necessary to impose the boundary condition
 over $\Gamma$.
 
+<h3>Representation of $\Omega$ and $\Gamma$</h3>
+
+In this tutorial, both the embedded grid $\Gamma$ and the embedding
+grid are described using a parallel::distributed::Triangulation. These two
+triangulations can be built from deal.II GridGenerators or by reading a
+mesh file produced with another application (e.g. GMSH). This is slightly
+more general than what has previously done step-60.
+
+The main challenge in the application of the Nitsche method lies in the
+integrals that are computed on $\Gamma$. As usual in finite elements we split this
+integral into contributions from all cells of the triangulation used to
+discretize $\Gamma$, we transform the integral on $K$ to an integral on the
+reference element $\hat K$, where $F_{K}$ is the mapping from $\hat K$ to $K$,
+and compute the integral on $\hat K$ using a quadrature formula. For example:
 
 ---- Here now ----
 
-In this tutorial program we keep things a little simpler, and we assume that the
-configuration of the embedded domain is given in one of two possible ways:
 
-- as a deformation mapping $\psi: \Gamma_0 \mapsto \Gamma \subseteq \Omega$,
-defined on a continuous finite dimensional space on $\Gamma_0$ and representing,
-for any point $x \in \Gamma_0$, its coordinate $\psi(x)$ in $\Omega$;
+\f[
+\beta (\textbf{v},\textbf{u})_{\Gamma} = (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
+\hat{\textbf{u}}(\hat x) (\textbf{v} \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
+\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat \textbf{u}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
+\f]
 
-- as a displacement mapping $\delta \psi(x) = \psi(x)-x$ for $x\in \Gamma_0$,
-representing for any point $x$ the displacement vector applied in order to
-deform $x$ to its actual configuration $\psi(x) = x +\delta\psi(x)$.
+Computing this sum is non-trivial because we have to evaluate $(v_j \circ F_{K})
+(\hat x_i)$. In general, if $\Gamma$ and $\Omega$ are not aligned, the point
+$F_{K}(\hat x_i)$ is completely arbitrary with respect to $\Omega$, and unless
+we figure out a way to interpolate all basis functions of $V_h(\Omega)$ on an
+arbitrary point on $\Omega$, we cannot compute the integral needed for an entry
+of the matrix $C$.
 
-We define the embedded reference domain $\Gamma_0$ `embedded_grid`: on
-this triangulation we construct a finite dimensional space (`embedded_configuration_dh`)
-to describe either the deformation or the displacement through a FiniteElement
-system of FE_Q objects (`embedded_configuration_fe`). This finite dimensional
-space is used only to interpolate a user supplied function
-(`embedded_configuration_function`) representing either $\psi$ (if the
-parameter `use_displacement` is set to @p false) or $\delta\psi$ (if the
-parameter `use_displacement` is set to @p true).
+
+
 
 The Lagrange multiplier $\lambda$ and the user supplied function $g$ are
 defined through another finite dimensional space `embedded_dh`, and through
@@ -199,40 +209,6 @@ Q_h(\Gamma) = \text{span} \{q_i\}_{i=1}^m
 \f]
 respectively, where $n$ is the dimension of `space_dh`, and $m$
 the dimension of `embedded_dh`.
-
-Once all the finite dimensional spaces are defined, the variational formulation
-of the problem above leaves us with the following finite dimensional system
-of equations:
-
-\f[
-\begin{pmatrix}
-K & C^T \\
-C & 0
-\end{pmatrix}
-\begin{pmatrix}
-u \\
-\lambda
-\end{pmatrix}
-=
-\begin{pmatrix}
-0 \\
-G
-\end{pmatrix}
-\f]
-
-where
-
-@f{eqnarray*}{
-K_{ij} &\dealcoloneq& (\nabla v_j, \nabla v_i)_\Omega   \qquad i,j=1,\dots,n \\
-C_{\alpha j} &\dealcoloneq& (v_j, q_\alpha)_\Gamma  \qquad j=1,\dots,n, \alpha = 1,\dots, m \\\\
-G_{\alpha} &\dealcoloneq& (g, q_\alpha)_\Gamma \qquad \alpha = 1,\dots, m.
-@f}
-
-While the matrix $K$ is the standard stiffness matrix for the Poisson problem on
-$\Omega$, and the vector $G$ is a standard right-hand-side vector for a finite
-element problem with forcing term $g$ on $\Gamma$, (see, for example, step-3),
-the matrix $C$ or its transpose $C^T$ are non-standard since they couple
-information on two non-matching grids.
 
 In particular, the integral that appears in the computation of a single entry of
 $C$, is computed on $\Gamma$. As usual in finite elements we split this
