@@ -32,7 +32,8 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_common.h>
+#include <deal.II/numerics/vector_tools_point_gradient.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -38,7 +38,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 #include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_boundary.h>
 
 
 DEAL_II_NAMESPACE_OPEN

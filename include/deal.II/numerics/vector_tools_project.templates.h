@@ -33,7 +33,9 @@
 #include <deal.II/matrix_free/operators.h>
 
 #include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_boundary.h>
+#include <deal.II/numerics/vector_tools_project.h>
+#include <deal.II/numerics/vector_tools_rhs.h>
 
 DEAL_II_NAMESPACE_OPEN
 

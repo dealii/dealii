@@ -28,7 +28,7 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_rhs.h>
 
 
 DEAL_II_NAMESPACE_OPEN
