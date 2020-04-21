@@ -27,6 +27,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/numerics/vector_tools.h>
+
 #include <map>
 
 #include "../tests.h"
