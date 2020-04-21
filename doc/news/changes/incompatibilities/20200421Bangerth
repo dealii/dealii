@@ -1,0 +1,4 @@
+Removed: The deprecated class Threads::PosixThreadBarrier has been
+removed.
+<br>
+(Wolfgang Bangerth, 2020/04/21)
