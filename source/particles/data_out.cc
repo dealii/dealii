@@ -26,7 +26,7 @@ namespace Particles
     const Particles::ParticleHandler<dim, spacedim> &particles)
   {
     dataset_names.clear();
-    dataset_names.push_back("id");
+    dataset_names.emplace_back("id");
     patches.resize(particles.n_locally_owned_particles());
 
     auto particle = particles.begin();
