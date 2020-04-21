@@ -515,6 +515,9 @@ namespace LinearAlgebra
        * warning to prevent this situation.
        *
        * Must follow a call to the @p compress_start function.
+       *
+       * When the MemorySpace is CUDA and MPI is not CUDA-aware, data changed on
+       * the device after the call to compress_start will be lost.
        */
       void
       compress_finish(::dealii::VectorOperation::values operation);
