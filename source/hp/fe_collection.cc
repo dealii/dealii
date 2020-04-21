@@ -371,6 +371,7 @@ namespace hp
     for (unsigned int c = 1; c < size(); ++c)
       Assert(mask == (*this)[c].component_mask(scalar), ExcInternalError());
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -391,6 +392,7 @@ namespace hp
     for (unsigned int c = 1; c < size(); ++c)
       Assert(mask == (*this)[c].component_mask(vector), ExcInternalError());
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -411,6 +413,7 @@ namespace hp
     for (unsigned int c = 1; c < size(); ++c)
       Assert(mask == (*this)[c].component_mask(sym_tensor), ExcInternalError());
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -432,6 +435,7 @@ namespace hp
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -454,6 +458,7 @@ namespace hp
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -476,6 +481,7 @@ namespace hp
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -498,6 +504,7 @@ namespace hp
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 
@@ -521,6 +528,7 @@ namespace hp
              ExcMessage("Not all elements of this collection agree on what "
                         "the appropriate mask should be."));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return mask;
   }
 

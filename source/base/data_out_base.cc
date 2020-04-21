@@ -7072,6 +7072,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
       this->write_pvtu_record(master_output, filename_vector);
     }
 
+  // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
   return filename_master;
 }
 

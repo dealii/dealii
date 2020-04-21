@@ -871,6 +871,7 @@ namespace GridTools
     Assert(contains_artificial_cells<MeshType>(active_halo_layer) == false,
            ExcMessage("Halo layer contains artificial cells"));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return active_halo_layer;
   }
 
@@ -1053,6 +1054,7 @@ namespace GridTools
         "is probably called while using parallel::distributed::Triangulation. "
         "In such case please refer to the description of this function."));
 
+    // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
     return ghost_cell_layer_within_distance;
   }
 

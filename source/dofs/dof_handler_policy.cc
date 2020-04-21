@@ -3799,6 +3799,7 @@ namespace internal
           for (unsigned int index = 0; cell != endc; cell++, index++)
             cell->set_subdomain_id(current_subdomain_ids[index]);
 
+        // NOLINTNEXTLINE(performance-no-automatic-move) for clang-tidy
         return number_cache;
 #endif
       }
