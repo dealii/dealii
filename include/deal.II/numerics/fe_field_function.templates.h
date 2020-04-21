@@ -33,7 +33,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/numerics/fe_field_function.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_common.h>
 
 #include <tuple>
 

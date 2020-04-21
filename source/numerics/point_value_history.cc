@@ -26,7 +26,7 @@
 #include <deal.II/lac/vector_element_access.h>
 
 #include <deal.II/numerics/point_value_history.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_point_value.h>
 
 #include <algorithm>
 
