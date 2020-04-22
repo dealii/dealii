@@ -1294,10 +1294,10 @@ namespace Threads
       TaskDescriptor();
 
       /**
-       * Copy constructor. Throws an exception since we want to make sure that
-       * each TaskDescriptor object corresponds to exactly one task.
+       * Copy constructor. Objects of this type can not be copied, and so this
+       * constructor is `delete`d and can't be called.
        */
-      TaskDescriptor(const TaskDescriptor &);
+      TaskDescriptor(const TaskDescriptor &) = delete;
 
       /**
        * Destructor.
@@ -1305,11 +1305,11 @@ namespace Threads
       ~TaskDescriptor();
 
       /**
-       * Copy operator. Throws an exception since we want to make sure that
-       * each TaskDescriptor object corresponds to exactly one task.
+       * Copy operator. Objects of this type can not be copied, and so this
+       * operator is `delete`d and can't be called.
        */
       TaskDescriptor &
-      operator=(const TaskDescriptor &);
+      operator=(const TaskDescriptor &) = delete;
 
       /**
        * Queue up the task to the scheduler. We need to do this in a separate
@@ -1372,17 +1372,6 @@ namespace Threads
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &)
-      : task_is_done(false)
-    {
-      // we shouldn't be getting here -- task descriptors
-      // can't be copied
-      Assert(false, ExcInternalError());
-    }
-
-
-
-    template <typename RT>
     inline TaskDescriptor<RT>::~TaskDescriptor()
     {
       // wait for the task to complete for sure
@@ -1401,17 +1390,6 @@ namespace Threads
       AssertNothrow(task != nullptr, ExcInternalError());
       AssertNothrow(task->ref_count() == 0, ExcInternalError());
       task->destroy(*task);
-    }
-
-
-    template <typename RT>
-    TaskDescriptor<RT> &
-    TaskDescriptor<RT>::operator=(const TaskDescriptor &)
-    {
-      // we shouldn't be getting here -- task descriptors
-      // can't be copied
-      Assert(false, ExcInternalError());
-      return *this;
     }
 
 
