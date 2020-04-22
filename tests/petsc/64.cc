@@ -72,7 +72,6 @@ main(int argc, char **argv)
         IndexSet           locally_owned_dofs(n_dofs);
         locally_owned_dofs.add_range(my_id * n_dofs / n_mpi_processes,
                                      (my_id + 1) * n_dofs / n_mpi_processes);
-        locally_relevant_dofs.add_index(0);
         DynamicSparsityPattern dsp(n_dofs);
         dsp.add(0, 0);
         PETScWrappers::MPI::SparseMatrix v2;
