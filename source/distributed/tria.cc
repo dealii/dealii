@@ -2622,16 +2622,12 @@ namespace parallel
       //
       // The problem is that we cannot just ask for the first active cell, but
       // instead need to filter over locally owned cells.
-      bool have_coarser_cell = false;
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active(this->n_global_levels() - 2);
-           cell != this->end(this->n_global_levels() - 2);
-           ++cell)
-        if (cell->is_locally_owned())
-          {
-            have_coarser_cell = true;
-            break;
-          }
+      const bool have_coarser_cell =
+        std::any_of(this->begin_active(this->n_global_levels() - 2),
+                    this->end_active(this->n_global_levels() - 2),
+                    [](const CellAccessor<dim, spacedim> &cell) {
+                      return cell.is_locally_owned();
+                    });
 
       // return true if at least one process has a coarser cell
       return 0 < Utilities::MPI::max(have_coarser_cell ? 1 : 0,
@@ -3632,13 +3628,13 @@ namespace parallel
           this->prepare_coarsening_and_refinement();
 
           // see if any flags are still set
-          mesh_changed = false;
-          for (const auto &cell : this->active_cell_iterators())
-            if (cell->refine_flag_set() || cell->coarsen_flag_set())
-              {
-                mesh_changed = true;
-                break;
-              }
+          mesh_changed =
+            std::any_of(this->begin_active(),
+                        active_cell_iterator{this->end()},
+                        [](const CellAccessor<dim, spacedim> &cell) {
+                          return cell.refine_flag_set() ||
+                                 cell.coarsen_flag_set();
+                        });
 
           // actually do the refinement to change the local mesh by
           // calling the base class refinement function directly

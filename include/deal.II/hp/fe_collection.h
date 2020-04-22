@@ -1006,13 +1006,12 @@ namespace hp
   FECollection<dim, spacedim>::hp_constraints_are_implemented() const
   {
     Assert(finite_elements.size() > 0, ExcNoFiniteElements());
-
-    bool hp_constraints = true;
-    for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      hp_constraints =
-        hp_constraints && finite_elements[i]->hp_constraints_are_implemented();
-
-    return hp_constraints;
+    return std::all_of(
+      finite_elements.cbegin(),
+      finite_elements.cend(),
+      [](const std::shared_ptr<const FiniteElement<dim, spacedim>> &fe) {
+        return fe->hp_constraints_are_implemented();
+      });
   }
 
 

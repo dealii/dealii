@@ -4013,23 +4013,21 @@ AffineConstraints<number>::add_entries_local_to_global(
   Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
          ExcNotQuadratic());
 
-  const size_type n_local_dofs       = local_dof_indices.size();
-  bool            dof_mask_is_active = false;
-  if (dof_mask.n_rows() == n_local_dofs)
-    {
-      dof_mask_is_active = true;
-      AssertDimension(dof_mask.n_cols(), n_local_dofs);
-    }
-
+  const size_type n_local_dofs = local_dof_indices.size();
   typename internals::AffineConstraintsData<number>::ScratchDataAccessor
     scratch_data;
 
-  // if the dof mask is not active, all we have to do is to add some indices
-  // in a matrix format. To do this, we first create an array of all the
-  // indices that are to be added. these indices are the local dof indices
-  // plus some indices that come from constraints.
-  if (dof_mask_is_active == false)
+  const bool dof_mask_is_active = (dof_mask.n_rows() == n_local_dofs);
+  if (dof_mask_is_active == true)
     {
+      AssertDimension(dof_mask.n_cols(), n_local_dofs);
+    }
+  else
+    {
+      // if the dof mask is not active, all we have to do is to add some indices
+      // in a matrix format. To do this, we first create an array of all the
+      // indices that are to be added. these indices are the local dof indices
+      // plus some indices that come from constraints.
       std::vector<size_type> &actual_dof_indices = scratch_data->columns;
       actual_dof_indices.resize(n_local_dofs);
       make_sorted_row_list(local_dof_indices, actual_dof_indices);
@@ -4107,11 +4105,8 @@ AffineConstraints<number>::add_entries_local_to_global(
   const bool                    keep_constrained_entries,
   const Table<2, bool> &        dof_mask) const
 {
-  const size_type n_local_rows       = row_indices.size();
-  const size_type n_local_cols       = col_indices.size();
-  bool            dof_mask_is_active = false;
-  if (dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols)
-    dof_mask_is_active = true;
+  const size_type n_local_rows = row_indices.size();
+  const size_type n_local_cols = col_indices.size();
 
   // if constrained entries should be kept, need to add rows and columns of
   // those to the sparsity pattern
@@ -4131,6 +4126,8 @@ AffineConstraints<number>::add_entries_local_to_global(
   // in a matrix format. To do this, we first create an array of all the
   // indices that are to be added. these indices are the local dof indices
   // plus some indices that come from constraints.
+  const bool dof_mask_is_active =
+    dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols;
   if (dof_mask_is_active == false)
     {
       std::vector<size_type> actual_row_indices(n_local_rows);
@@ -4176,14 +4173,12 @@ AffineConstraints<number>::add_entries_local_to_global(
   typename internals::AffineConstraintsData<number>::ScratchDataAccessor
     scratch_data;
 
-  bool dof_mask_is_active = false;
-  if (dof_mask.n_rows() == n_local_dofs)
+  const bool dof_mask_is_active = (dof_mask.n_rows() == n_local_dofs);
+  if (dof_mask_is_active == true)
     {
-      dof_mask_is_active = true;
       AssertDimension(dof_mask.n_cols(), n_local_dofs);
     }
-
-  if (dof_mask_is_active == false)
+  else
     {
       std::vector<size_type> &actual_dof_indices = scratch_data->columns;
       actual_dof_indices.resize(n_local_dofs);

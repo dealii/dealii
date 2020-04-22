@@ -1459,23 +1459,18 @@ namespace FETools
                                       fe2.dofs_per_cell,
                                       fe1.dofs_per_cell));
 
-    // first try the easy way: maybe
-    // the FE wants to implement things
-    // itself:
-    bool fe_implements_interpolation = true;
+    // first try the easy way: maybe the FE wants to implement things itself:
     try
       {
         internal::FEToolsGetInterpolationMatrixHelper::gim_forwarder(
           fe1, fe2, interpolation_matrix);
+        return;
       }
     catch (
       typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented &)
       {
         // too bad....
-        fe_implements_interpolation = false;
       }
-    if (fe_implements_interpolation == true)
-      return;
 
     // uh, so this was not the
     // case. hm. then do it the hard

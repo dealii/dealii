@@ -1536,15 +1536,14 @@ namespace internal
       bool
       uses_both_endpoints(const Quadrature<1> &base_quadrature)
       {
-        bool at_left = false, at_right = false;
-        for (unsigned int i = 0; i < base_quadrature.size(); ++i)
-          {
-            if (base_quadrature.point(i) == Point<1>(0.0))
-              at_left = true;
-            if (base_quadrature.point(i) == Point<1>(1.0))
-              at_right = true;
-          }
-
+        const bool at_left =
+          std::any_of(base_quadrature.get_points().cbegin(),
+                      base_quadrature.get_points().cend(),
+                      [](const Point<1> &p) { return p == Point<1>{0.}; });
+        const bool at_right =
+          std::any_of(base_quadrature.get_points().cbegin(),
+                      base_quadrature.get_points().cend(),
+                      [](const Point<1> &p) { return p == Point<1>{1.}; });
         return (at_left && at_right);
       }
     } // namespace

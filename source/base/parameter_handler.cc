@@ -1440,15 +1440,13 @@ ParameterHandler::recursively_print_parameters(
 
       // if there are any parameters in this section then print them
       // as an itemized list
-      bool parameters_exist_here = false;
-      for (const auto &p : current_section)
-        if ((is_parameter_node(p.second) == true) ||
-            (is_alias_node(p.second) == true))
-          {
-            parameters_exist_here = true;
-            break;
-          }
-
+      const bool parameters_exist_here =
+        std::any_of(current_section.begin(),
+                    current_section.end(),
+                    [](const boost::property_tree::ptree::value_type &p) {
+                      return is_parameter_node(p.second) ||
+                             is_alias_node(p.second);
+                    });
       if (parameters_exist_here)
         {
           out << "\\begin{itemize}" << '\n';
