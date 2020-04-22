@@ -75,7 +75,7 @@ MACRO(SETUP_THREADING)
   MARK_AS_ADVANCED(pthread_LIBRARY)
 
   #
-  # Change -lphtread to -pthread for better compatibility on non linux
+  # Change -lpthread to -pthread for better compatibility on non linux
   # platforms:
   #
   IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
