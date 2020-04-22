@@ -20,6 +20,7 @@
 // PETScWrappers::MatrixBase::operator=
 
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -61,14 +62,24 @@ main(int argc, char **argv)
 
         // check
         // PETScWrappers::MPI::SparseMatrix
-        MPI_Comm mpi_communicator(MPI_COMM_WORLD);
-        int      n_jobs = 1;
-        MPI_Comm_size(mpi_communicator, &n_jobs);
-        const unsigned int n_mpi_processes = static_cast<unsigned int>(n_jobs);
+        MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
+        const unsigned int n_mpi_processes =
+          Utilities::MPI::n_mpi_processes(mpi_communicator);
+        const unsigned int my_id =
+          Utilities::MPI::this_mpi_process(mpi_communicator);
         Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
         const unsigned int n_local_dofs = n_dofs / n_mpi_processes;
-        PETScWrappers::MPI::SparseMatrix v2(
-          mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
+        IndexSet           locally_owned_dofs(n_dofs);
+        locally_owned_dofs.add_range(my_id * n_dofs / n_mpi_processes,
+                                     (my_id + 1) * n_dofs / n_mpi_processes);
+        locally_relevant_dofs.add_index(0);
+        DynamicSparsityPattern dsp(n_dofs);
+        dsp.add(0, 0);
+        PETScWrappers::MPI::SparseMatrix v2;
+        v2.reinit(locally_owned_dofs,
+                  locally_owned_dofs,
+                  dsp,
+                  mpi_communicator);
         test(v2);
       }
     }
