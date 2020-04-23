@@ -410,6 +410,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         std::map<unsigned int, std::vector<unsigned int>> &,
         std::map<unsigned int, unsigned int> &);
+
+      template std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+      compute_vertices_with_ghost_neighbors(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
     \}
 #endif
   }

@@ -4550,7 +4550,7 @@ namespace internal
           // to exchange DoF indices
           const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
             vertices_with_ghost_neighbors =
-              triangulation->compute_vertices_with_ghost_neighbors();
+              GridTools::compute_vertices_with_ghost_neighbors(*triangulation);
 
           // mark all cells that either have to send data (locally
           // owned cells that are adjacent to ghost neighbors in some
@@ -5102,7 +5102,8 @@ namespace internal
               const std::map<unsigned int,
                              std::set<dealii::types::subdomain_id>>
                 vertices_with_ghost_neighbors =
-                  triangulation->compute_vertices_with_ghost_neighbors();
+                  GridTools::compute_vertices_with_ghost_neighbors(
+                    *triangulation);
 
 
               // Send and receive cells. After this, only the local cells
