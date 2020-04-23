@@ -52,7 +52,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_integrate_difference.h>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
