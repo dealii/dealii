@@ -530,20 +530,6 @@ namespace TrilinosWrappers
 
 
   BlockSparsityPattern::BlockSparsityPattern(
-    const std::vector<Epetra_Map> &parallel_partitioning)
-    : BlockSparsityPatternBase<SparsityPattern>(parallel_partitioning.size(),
-                                                parallel_partitioning.size())
-  {
-    for (size_type i = 0; i < parallel_partitioning.size(); ++i)
-      for (size_type j = 0; j < parallel_partitioning.size(); ++j)
-        this->block(i, j).reinit(parallel_partitioning[i],
-                                 parallel_partitioning[j]);
-    this->collect_sizes();
-  }
-
-
-
-  BlockSparsityPattern::BlockSparsityPattern(
     const std::vector<IndexSet> &parallel_partitioning,
     const MPI_Comm &             communicator)
     : BlockSparsityPatternBase<SparsityPattern>(parallel_partitioning.size(),
@@ -588,21 +574,6 @@ namespace TrilinosWrappers
     for (size_type i = 0; i < row_block_sizes.size(); ++i)
       for (size_type j = 0; j < col_block_sizes.size(); ++j)
         this->block(i, j).reinit(row_block_sizes[i], col_block_sizes[j]);
-    this->collect_sizes();
-  }
-
-
-
-  void
-  BlockSparsityPattern::reinit(
-    const std::vector<Epetra_Map> &parallel_partitioning)
-  {
-    dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(
-      parallel_partitioning.size(), parallel_partitioning.size());
-    for (size_type i = 0; i < parallel_partitioning.size(); ++i)
-      for (size_type j = 0; j < parallel_partitioning.size(); ++j)
-        this->block(i, j).reinit(parallel_partitioning[i],
-                                 parallel_partitioning[j]);
     this->collect_sizes();
   }
 

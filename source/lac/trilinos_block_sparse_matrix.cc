@@ -71,20 +71,24 @@ namespace TrilinosWrappers
   template <typename BlockSparsityPatternType>
   void
   BlockSparseMatrix::reinit(
-    const std::vector<Epetra_Map> & parallel_partitioning,
+    const std::vector<IndexSet> &   parallel_partitioning,
     const BlockSparsityPatternType &block_sparsity_pattern,
+    const MPI_Comm &                communicator,
     const bool                      exchange_data)
   {
-    Assert(parallel_partitioning.size() ==
-             block_sparsity_pattern.n_block_rows(),
-           ExcDimensionMismatch(parallel_partitioning.size(),
+    std::vector<Epetra_Map> epetra_maps;
+    for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
+      epetra_maps.push_back(
+        parallel_partitioning[i].make_trilinos_map(communicator, false));
+
+    Assert(epetra_maps.size() == block_sparsity_pattern.n_block_rows(),
+           ExcDimensionMismatch(epetra_maps.size(),
                                 block_sparsity_pattern.n_block_rows()));
-    Assert(parallel_partitioning.size() ==
-             block_sparsity_pattern.n_block_cols(),
-           ExcDimensionMismatch(parallel_partitioning.size(),
+    Assert(epetra_maps.size() == block_sparsity_pattern.n_block_cols(),
+           ExcDimensionMismatch(epetra_maps.size(),
                                 block_sparsity_pattern.n_block_cols()));
 
-    const size_type n_block_rows = parallel_partitioning.size();
+    const size_type n_block_rows = epetra_maps.size();
     (void)n_block_rows;
 
     Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
@@ -111,6 +115,7 @@ namespace TrilinosWrappers
           this->sub_objects[r][c]->reinit(parallel_partitioning[r],
                                           parallel_partitioning[c],
                                           block_sparsity_pattern.block(r, c),
+                                          communicator,
                                           exchange_data);
         }
   }
@@ -120,33 +125,12 @@ namespace TrilinosWrappers
   template <typename BlockSparsityPatternType>
   void
   BlockSparseMatrix::reinit(
-    const std::vector<IndexSet> &   parallel_partitioning,
-    const BlockSparsityPatternType &block_sparsity_pattern,
-    const MPI_Comm &                communicator,
-    const bool                      exchange_data)
-  {
-    std::vector<Epetra_Map> epetra_maps;
-    for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
-      epetra_maps.push_back(
-        parallel_partitioning[i].make_trilinos_map(communicator, false));
-
-    reinit(epetra_maps, block_sparsity_pattern, exchange_data);
-  }
-
-
-
-  template <typename BlockSparsityPatternType>
-  void
-  BlockSparseMatrix::reinit(
     const BlockSparsityPatternType &block_sparsity_pattern)
   {
-    std::vector<Epetra_Map> parallel_partitioning;
+    std::vector<IndexSet> parallel_partitioning;
     for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
       parallel_partitioning.emplace_back(
-        static_cast<TrilinosWrappers::types::int_type>(
-          block_sparsity_pattern.block(i, 0).n_rows()),
-        0,
-        Utilities::Trilinos::comm_self());
+        complete_index_set(block_sparsity_pattern.block(i, 0).n_rows()));
 
     reinit(parallel_partitioning, block_sparsity_pattern);
   }
@@ -178,41 +162,6 @@ namespace TrilinosWrappers
 
   void
   BlockSparseMatrix::reinit(
-    const std::vector<Epetra_Map> &            parallel_partitioning,
-    const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
-    const double                               drop_tolerance)
-  {
-    const size_type n_block_rows = parallel_partitioning.size();
-
-    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
-           ExcDimensionMismatch(n_block_rows,
-                                dealii_block_sparse_matrix.n_block_rows()));
-    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_cols(),
-           ExcDimensionMismatch(n_block_rows,
-                                dealii_block_sparse_matrix.n_block_cols()));
-
-    // Call the other basic reinit function ...
-    reinit(n_block_rows, n_block_rows);
-
-    // ... and then assign the correct
-    // data to the blocks.
-    for (size_type r = 0; r < this->n_block_rows(); ++r)
-      for (size_type c = 0; c < this->n_block_cols(); ++c)
-        {
-          this->sub_objects[r][c]->reinit(parallel_partitioning[r],
-                                          parallel_partitioning[c],
-                                          dealii_block_sparse_matrix.block(r,
-                                                                           c),
-                                          drop_tolerance);
-        }
-
-    collect_sizes();
-  }
-
-
-
-  void
-  BlockSparseMatrix::reinit(
     const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
     const double                               drop_tolerance)
   {
@@ -224,23 +173,15 @@ namespace TrilinosWrappers
            ExcDimensionMismatch(dealii_block_sparse_matrix.m(),
                                 dealii_block_sparse_matrix.n()));
 
-    // produce a dummy local map and pass it
-    // off to the other function
-#  ifdef DEAL_II_WITH_MPI
-    Epetra_MpiComm trilinos_communicator(MPI_COMM_SELF);
-#  else
-    Epetra_SerialComm trilinos_communicator;
-#  endif
-
-    std::vector<Epetra_Map> parallel_partitioning;
+    std::vector<IndexSet> parallel_partitioning;
     for (size_type i = 0; i < dealii_block_sparse_matrix.n_block_rows(); ++i)
       parallel_partitioning.emplace_back(
-        static_cast<TrilinosWrappers::types::int_type>(
-          dealii_block_sparse_matrix.block(i, 0).m()),
-        0,
-        trilinos_communicator);
+        complete_index_set(dealii_block_sparse_matrix.block(i, 0).m()));
 
-    reinit(parallel_partitioning, dealii_block_sparse_matrix, drop_tolerance);
+    reinit(parallel_partitioning,
+           dealii_block_sparse_matrix,
+           MPI_COMM_SELF,
+           drop_tolerance);
   }
 
 
@@ -375,15 +316,6 @@ namespace TrilinosWrappers
   BlockSparseMatrix::reinit(const dealii::BlockSparsityPattern &);
   template void
   BlockSparseMatrix::reinit(const dealii::BlockDynamicSparsityPattern &);
-
-  template void
-  BlockSparseMatrix::reinit(const std::vector<Epetra_Map> &,
-                            const dealii::BlockSparsityPattern &,
-                            const bool);
-  template void
-  BlockSparseMatrix::reinit(const std::vector<Epetra_Map> &,
-                            const dealii::BlockDynamicSparsityPattern &,
-                            const bool);
 
   template void
   BlockSparseMatrix::reinit(const std::vector<IndexSet> &,
