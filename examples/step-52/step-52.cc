@@ -467,7 +467,6 @@ namespace Step52
     static std::string pvd_filename;
     if (method_name_prev != method_name)
       {
-        std::cout << "Starting a new time-stepping scheme ..." << std::endl;
         times_and_names.clear();
         method_name_prev = method_name;
         pvd_filename     = "solution_" + method_name + ".pvd";
