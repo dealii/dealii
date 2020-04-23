@@ -205,7 +205,8 @@ check(const unsigned int orientation, bool reverse)
   constraints.print(deallog.get_file_stream());
 
   const std::vector<IndexSet> locally_owned_dofs_vector =
-    dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
   AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs_vector,

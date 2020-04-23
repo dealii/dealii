@@ -84,7 +84,8 @@ check(parallel::distributed::Triangulation<dim> &tria)
   constraints.print(deallog.get_file_stream());
   deallog << "consistent? "
           << constraints.is_consistent_in_parallel(
-               dof_handler.compute_locally_owned_dofs_per_processor(),
+               Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                          dof_handler.locally_owned_dofs()),
                locally_active_dofs,
                MPI_COMM_WORLD,
                true)

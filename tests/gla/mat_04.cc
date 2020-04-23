@@ -85,7 +85,8 @@ test()
                                     MPI_COMM_WORLD));
   SparsityTools::distribute_sparsity_pattern(
     sp,
-    dof_handler.compute_n_locally_owned_dofs_per_processor(),
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.n_locally_owned_dofs()),
     MPI_COMM_WORLD,
     relevant);
   sp.compress();

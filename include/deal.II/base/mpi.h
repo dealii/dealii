@@ -1200,6 +1200,9 @@ namespace Utilities
     std::vector<T>
     all_gather(const MPI_Comm &comm, const T &object)
     {
+      if (job_supports_mpi() == false)
+        return {object};
+
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
       std::vector<T> v(1, object);
