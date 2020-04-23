@@ -57,8 +57,8 @@ main()
   prm.leave_subsection();
 
   prm.print_parameters(deallog.get_file_stream(),
-                       ParameterHandler::Text,
-                       false);
+                       ParameterHandler::Text |
+                         ParameterHandler::KeepDeclarationOrder);
 
   deallog << std::boolalpha;
   deallog << "Subsection \"Section 3\" of root exists: "
