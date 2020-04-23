@@ -802,7 +802,7 @@ ParameterHandler::create_default_input_file(const std::string filename,
                   ExcMessage("OutputStyle does not fit to filename ending."));
       print_parameters(out, style);
     }
- else
+  else
     {
       AssertThrow(
         false,

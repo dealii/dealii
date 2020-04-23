@@ -1085,14 +1085,8 @@ public:
    * type of input file specified (prm, xml, json).
    */
   void
-<<<<<<< 20b4164047452179eab3f55314f2a886428e31a0
   create_default_input_file(const std::string filename,
                             const OutputStyle style) const;
-=======
-  create_default_input_file(const std::string &filename,
-                            const bool         sort_alphabetical = true,
-                            const bool         short_version     = true) const;
->>>>>>> use a reference instead of copy
 
   /**
    * Clear all contents.
