@@ -1,5 +1,11 @@
 <h1>Results</h1>
 
+The code as presented here does not actually compute the results
+found on the web page. The reason is, that even on a decent
+computer it runs more than a day. If you want to reproduce these
+results, modify the end time of the DiscreteTime object to `250` within the
+constructor of TwoPhaseFlowProblem.
+
 If we run the program, we get the following kind of output:
 @code
 Number of active cells: 1024
