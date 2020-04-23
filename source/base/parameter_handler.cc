@@ -775,13 +775,13 @@ ParameterHandler::parse_input_from_json(std::istream &in,
 
 
 void
-ParameterHandler::create_default_input_file(const std::string filename,
-                                            const OutputStyle style) const
+ParameterHandler::create_default_input_file(const std::string &filename,
+                                            const OutputStyle  style) const
 {
   std::ofstream out(filename);
   Assert(out, ExcIO());
 
-  std::string file_ending = filename.substr(filename.find_last_of(".") + 1);
+  std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
   boost::algorithm::to_lower(file_ending);
 
   if (file_ending == "prm")

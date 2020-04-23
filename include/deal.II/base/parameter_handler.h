@@ -1085,8 +1085,8 @@ public:
    * type of input file specified (prm, xml, json).
    */
   void
-  create_default_input_file(const std::string filename,
-                            const OutputStyle style) const;
+  create_default_input_file(const std::string &filename,
+                            const OutputStyle  style) const;
 
   /**
    * Clear all contents.
