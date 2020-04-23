@@ -467,7 +467,7 @@
  *   <tr valign="top">
  *       <td>step-50</td>
  *       <td> Geometric multigrid on adaptive meshes distributed in parallel.
- *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, FEInterfaceValues, MeshWorker::mesh_loop()
+ *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
  *       </td></tr>
  *
  *   <tr valign="top">

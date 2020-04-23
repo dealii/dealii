@@ -17,7 +17,7 @@
  * Author: Thomas C. Clevenger, Clemson University
  *         Timo Heister, Clemson University
  *         Guido Kanschat, Heidelberg University
- *         Martin Kronbichler, TU Munich
+ *         Martin Kronbichler, Technical University of Munich
  */
 
 #include <deal.II/base/conditional_ostream.h>
@@ -64,8 +64,8 @@
 #include <memory>
 
 
-// uncomment the following #define if you have PETSc and Trilinos installed
-// and you prefer using Trilinos in this example:
+// Comment the following \#define if you have PETSc and Trilinos installed
+// and you prefer using PETSc in this example:
 #define FORCE_USE_OF_TRILINOS
 
 namespace LA
@@ -85,11 +85,6 @@ namespace LA
 using namespace dealii;
 
 
-
-#ifdef USE_PETSC_LA
-// No ChangeVectorTypes::copy() for PETSc vector types.
-// Vector::import() needs to be implemented.
-#else
 /**
  * Matrix-free operators must use deal.II defined vectors, rest of the code is
  * based on Trilinos vectors.
@@ -97,25 +92,37 @@ using namespace dealii;
 namespace ChangeVectorTypes
 {
   template <typename number>
-  void copy(TrilinosWrappers::MPI::Vector &out,
+  void copy(LA::MPI::Vector &                                         out,
             const dealii::LinearAlgebra::distributed::Vector<number> &in)
   {
     dealii::LinearAlgebra::ReadWriteVector<double> rwv(
       out.locally_owned_elements());
     rwv.import(in, VectorOperation::insert);
+#ifdef USE_PETSC_LA
+    AssertThrow(false,
+                ExcMessage("CopyVectorTypes::copy() not implemented for "
+                           "PETSc vector types."));
+#else
     out.import(rwv, VectorOperation::insert);
+#endif
   }
 
   template <typename number>
   void copy(dealii::LinearAlgebra::distributed::Vector<number> &out,
-            const TrilinosWrappers::MPI::Vector &in)
+            const LA::MPI::Vector &                             in)
   {
     dealii::LinearAlgebra::ReadWriteVector<double> rwv;
+#ifdef USE_PETSC_LA
+    (void)in;
+    AssertThrow(false,
+                ExcMessage("CopyVectorTypes::copy() not implemented for "
+                           "PETSc vector types."));
+#else
     rwv.reinit(in);
+#endif
     out.import(rwv, VectorOperation::insert);
   }
 } // namespace ChangeVectorTypes
-#endif
 
 
 
@@ -128,6 +135,14 @@ public:
   {
     return 1.0;
   }
+
+  template <typename number>
+  VectorizedArray<number>
+  value(const Point<dim, VectorizedArray<number>> & /*p*/,
+        const unsigned int /*component*/ = 0) const
+  {
+    return VectorizedArray<number>(1.0);
+  }
 };
 
 
@@ -136,12 +151,19 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  virtual double value(const Point<dim> & p,
-                       const unsigned int component = 0) const override;
+  virtual double value(const Point<dim> &p,
+                       const unsigned int /*component*/ = 0) const override;
 
   template <typename number>
   VectorizedArray<number> value(const Point<dim, VectorizedArray<number>> &p,
-                                const unsigned int component = 0) const;
+                                const unsigned int /*component*/ = 0) const;
+
+  template <typename number>
+  number average_value(const std::vector<Point<dim, number>> &points) const;
+
+  template <typename number>
+  std::shared_ptr<Table<2, VectorizedArray<number>>> create_coefficient_table(
+    const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const;
 };
 
 
@@ -183,196 +205,49 @@ Coefficient<dim>::value(const Point<dim, VectorizedArray<number>> &p,
 }
 
 
-
-void average(std::vector<double> &values)
+template <int dim>
+template <typename number>
+number Coefficient<dim>::average_value(
+  const std::vector<Point<dim, number>> &points) const
 {
-  double sum = 0.0;
-  for (unsigned int i = 0; i < values.size(); ++i)
-    sum += values[i];
-  sum /= values.size();
+  number average(0);
+  for (unsigned int i = 0; i < points.size(); ++i)
+    average += value(points[i]);
+  average /= points.size();
 
-  for (unsigned int i = 0; i < values.size(); ++i)
-    values[i] = sum;
+  return average;
 }
 
 
 
-/**
- * Matrix-free Laplace operator
- */
-template <int dim, int fe_degree, typename number>
-class LaplaceOperator
-  : public MatrixFreeOperators::Base<dim,
-                                     LinearAlgebra::distributed::Vector<number>>
+template <int dim>
+template <typename number>
+std::shared_ptr<Table<2, VectorizedArray<number>>>
+Coefficient<dim>::create_coefficient_table(
+  const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const
 {
-public:
-  LaplaceOperator();
+  std::shared_ptr<Table<2, VectorizedArray<number>>> coefficient_table;
+  coefficient_table = std::make_shared<Table<2, VectorizedArray<number>>>();
 
-  void clear() override;
+  FEEvaluation<dim, -1, 0, 1, number> fe_eval(mf_storage);
 
-  void evaluate_coefficient(const Coefficient<dim> &coefficient_function);
-  Table<1, VectorizedArray<number>> get_coefficient_table();
+  const unsigned int n_cells    = mf_storage.n_macro_cells();
+  const unsigned int n_q_points = fe_eval.n_q_points;
 
-  virtual void compute_diagonal() override;
-
-private:
-  virtual void apply_add(
-    LinearAlgebra::distributed::Vector<number> &      dst,
-    const LinearAlgebra::distributed::Vector<number> &src) const override;
-
-  void
-  local_apply(const MatrixFree<dim, number> &                   data,
-              LinearAlgebra::distributed::Vector<number> &      dst,
-              const LinearAlgebra::distributed::Vector<number> &src,
-              const std::pair<unsigned int, unsigned int> &cell_range) const;
-
-  void local_compute_diagonal(
-    const MatrixFree<dim, number> &              data,
-    LinearAlgebra::distributed::Vector<number> & dst,
-    const unsigned int &                         dummy,
-    const std::pair<unsigned int, unsigned int> &cell_range) const;
-
-  Table<1, VectorizedArray<number>> coefficient;
-};
-
-
-template <int dim, int fe_degree, typename number>
-LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
-  : MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>()
-{}
-
-
-template <int dim, int fe_degree, typename number>
-void LaplaceOperator<dim, fe_degree, number>::clear()
-{
-  coefficient.reinit(TableIndices<1>(0));
-  MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::
-    clear();
-}
-
-
-template <int dim, int fe_degree, typename number>
-void LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
-  const Coefficient<dim> &coefficient_function)
-{
-  const unsigned int n_cells = this->data->n_macro_cells();
-  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
-
-  coefficient.reinit(TableIndices<1>(n_cells));
+  coefficient_table->reinit(n_cells, 1);
   for (unsigned int cell = 0; cell < n_cells; ++cell)
     {
-      phi.reinit(cell);
+      fe_eval.reinit(cell);
 
-      VectorizedArray<number> averaged_value(0);
-      for (unsigned int q = 0; q < phi.n_q_points; ++q)
-        averaged_value += coefficient_function.value(phi.quadrature_point(q));
-      averaged_value /= phi.n_q_points;
+      std::vector<Point<dim, VectorizedArray<number>>> points(n_q_points);
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        points[q] = fe_eval.quadrature_point(q);
+      VectorizedArray<number> averaged_value = average_value(points);
 
-      coefficient(cell) = averaged_value;
+      (*coefficient_table)(cell, 0) = averaged_value;
     }
-}
 
-
-template <int dim, int fe_degree, typename number>
-Table<1, VectorizedArray<number>>
-LaplaceOperator<dim, fe_degree, number>::get_coefficient_table()
-{
-  return coefficient;
-}
-
-
-template <int dim, int fe_degree, typename number>
-void LaplaceOperator<dim, fe_degree, number>::local_apply(
-  const MatrixFree<dim, number> &                   data,
-  LinearAlgebra::distributed::Vector<number> &      dst,
-  const LinearAlgebra::distributed::Vector<number> &src,
-  const std::pair<unsigned int, unsigned int> &     cell_range) const
-{
-  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-
-  for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-    {
-      AssertDimension(coefficient.size(0), data.n_macro_cells());
-
-      phi.reinit(cell);
-      phi.read_dof_values(src);
-      phi.evaluate(false, true);
-      for (unsigned int q = 0; q < phi.n_q_points; ++q)
-        phi.submit_gradient(coefficient(cell) * phi.get_gradient(q), q);
-      phi.integrate(false, true);
-      phi.distribute_local_to_global(dst);
-    }
-}
-
-
-template <int dim, int fe_degree, typename number>
-void LaplaceOperator<dim, fe_degree, number>::apply_add(
-  LinearAlgebra::distributed::Vector<number> &      dst,
-  const LinearAlgebra::distributed::Vector<number> &src) const
-{
-  this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src);
-}
-
-
-template <int dim, int fe_degree, typename number>
-void LaplaceOperator<dim, fe_degree, number>::compute_diagonal()
-{
-  this->inverse_diagonal_entries.reset(
-    new DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>());
-  LinearAlgebra::distributed::Vector<number> &inverse_diagonal =
-    this->inverse_diagonal_entries->get_vector();
-  this->data->initialize_dof_vector(inverse_diagonal);
-  unsigned int dummy = 0;
-  this->data->cell_loop(&LaplaceOperator::local_compute_diagonal,
-                        this,
-                        inverse_diagonal,
-                        dummy);
-
-  this->set_constrained_entries_to_one(inverse_diagonal);
-
-  for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
-    {
-      Assert(inverse_diagonal.local_element(i) > 0.,
-             ExcMessage("No diagonal entry in a positive definite operator "
-                        "should be zero"));
-      inverse_diagonal.local_element(i) =
-        1. / inverse_diagonal.local_element(i);
-    }
-}
-
-
-template <int dim, int fe_degree, typename number>
-void LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
-  const MatrixFree<dim, number> &             data,
-  LinearAlgebra::distributed::Vector<number> &dst,
-  const unsigned int &,
-  const std::pair<unsigned int, unsigned int> &cell_range) const
-{
-  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-
-  AlignedVector<VectorizedArray<number>> diagonal(phi.dofs_per_cell);
-
-  for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-    {
-      AssertDimension(coefficient.size(0), data.n_macro_cells());
-
-      phi.reinit(cell);
-      for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-        {
-          for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
-            phi.submit_dof_value(VectorizedArray<number>(), j);
-          phi.submit_dof_value(make_vectorized_array<number>(1.), i);
-
-          phi.evaluate(false, true);
-          for (unsigned int q = 0; q < phi.n_q_points; ++q)
-            phi.submit_gradient(coefficient(cell) * phi.get_gradient(q), q);
-          phi.integrate(false, true);
-          diagonal[i] = phi.get_dof_value(i);
-        }
-      for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-        phi.submit_dof_value(diagonal[i], i);
-      phi.distribute_local_to_global(dst);
-    }
+  return coefficient_table;
 }
 
 
@@ -395,7 +270,7 @@ struct Settings
   bool         output;
 };
 
-template <int dim>
+template <int dim, int degree>
 class LaplaceProblem
 {
   using MatrixType         = LA::MPI::SparseMatrix;
@@ -403,8 +278,19 @@ class LaplaceProblem
   using PreconditionAMG    = LA::MPI::PreconditionAMG;
   using PreconditionJacobi = LA::MPI::PreconditionJacobi;
 
-  using MatrixFreeLevelMatrix  = LaplaceOperator<dim, 2, float>;
-  using MatrixFreeActiveMatrix = LaplaceOperator<dim, 2, double>;
+  using MatrixFreeLevelMatrix = MatrixFreeOperators::LaplaceOperator<
+    dim,
+    degree,
+    degree + 1,
+    1,
+    LinearAlgebra::distributed::Vector<float>>;
+  using MatrixFreeActiveMatrix = MatrixFreeOperators::LaplaceOperator<
+    dim,
+    degree,
+    degree + 1,
+    1,
+    LinearAlgebra::distributed::Vector<double>>;
+
   using MatrixFreeLevelVector  = LinearAlgebra::distributed::Vector<float>;
   using MatrixFreeActiveVector = LinearAlgebra::distributed::Vector<double>;
 
@@ -417,7 +303,7 @@ private:
   void setup_multigrid();
   void assemble_system();
   void assemble_multigrid();
-  void assemble_rhs_for_matrix_free();
+  void assemble_rhs();
   void solve();
   void estimate();
   void refine_grid();
@@ -454,8 +340,8 @@ private:
 };
 
 
-template <int dim>
-LaplaceProblem<dim>::LaplaceProblem(const Settings &settings)
+template <int dim, int degree>
+LaplaceProblem<dim, degree>::LaplaceProblem(const Settings &settings)
   : settings(settings)
   , mpi_communicator(MPI_COMM_WORLD)
   , pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
@@ -466,7 +352,7 @@ LaplaceProblem<dim>::LaplaceProblem(const Settings &settings)
                     parallel::distributed::Triangulation<
                       dim>::construct_multigrid_hierarchy)
   , mapping()
-  , fe(2)
+  , fe(degree)
   , dof_handler(triangulation)
   , computing_timer(pcout, TimerOutput::never, TimerOutput::wall_times)
 {
@@ -540,8 +426,8 @@ bool Settings::try_parse(const std::string &prm_filename)
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::setup_system()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::setup_system()
 {
   TimerOutput::Scope timing(computing_timer, "Setup");
 
@@ -559,8 +445,7 @@ void LaplaceProblem<dim>::setup_system()
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
-
-  if (settings.solver = Settings::gmg_mf)
+  if (settings.solver == Settings::gmg_mf)
     {
       typename MatrixFree<dim, double>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
@@ -571,12 +456,16 @@ void LaplaceProblem<dim>::setup_system()
         new MatrixFree<dim, double>());
       mf_storage->reinit(dof_handler,
                          constraints,
-                         QGauss<1>(fe.degree + 1),
+                         QGauss<1>(degree + 1),
                          additional_data);
+
       mf_system_matrix.initialize(mf_storage);
-      mf_system_matrix.evaluate_coefficient(Coefficient<dim>());
+
+      const Coefficient<dim> coefficient;
+      mf_system_matrix.set_coefficient(
+        coefficient.create_coefficient_table(*mf_storage));
     }
-  else
+  else /*gmg_mb or amg*/
     {
 #ifdef USE_PETSC_LA
       DynamicSparsityPattern dsp(locally_relevant_set);
@@ -604,8 +493,9 @@ void LaplaceProblem<dim>::setup_system()
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::setup_multigrid()
+
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::setup_multigrid()
 {
   TimerOutput::Scope timing(computing_timer, "Setup multigrid");
 
@@ -618,7 +508,7 @@ void LaplaceProblem<dim>::setup_multigrid()
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, bset);
 
   const unsigned int n_levels = triangulation.n_global_levels();
-  if (settings.solver = Settings::gmg_mf)
+  if (settings.solver == Settings::gmg_mf)
     {
       mf_mg_matrix.resize(0, n_levels - 1);
 
@@ -644,18 +534,21 @@ void LaplaceProblem<dim>::setup_multigrid()
             new MatrixFree<dim, float>());
           mf_storage_level->reinit(dof_handler,
                                    level_constraints,
-                                   QGauss<1>(fe.degree + 1),
+                                   QGauss<1>(degree + 1),
                                    additional_data);
 
           mf_mg_matrix[level].initialize(mf_storage_level,
                                          mg_constrained_dofs,
                                          level);
 
-          mf_mg_matrix[level].evaluate_coefficient(Coefficient<dim>());
+          const Coefficient<dim> coefficient;
+          mf_mg_matrix[level].set_coefficient(
+            coefficient.create_coefficient_table(*mf_storage_level));
+
           mf_mg_matrix[level].compute_diagonal();
         }
     }
-  else
+  else /*gmg_mb*/
     {
       mg_matrix.resize(0, n_levels - 1);
       mg_matrix.clear_elements();
@@ -736,12 +629,12 @@ void LaplaceProblem<dim>::setup_multigrid()
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::assemble_system()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::assemble_system()
 {
   TimerOutput::Scope timing(computing_timer, "Assemble");
 
-  const QGauss<dim> quadrature_formula(fe.degree + 1);
+  const QGauss<dim> quadrature_formula(degree + 1);
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
@@ -757,7 +650,6 @@ void LaplaceProblem<dim>::assemble_system()
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
   const Coefficient<dim> coefficient;
-  std::vector<double>    coefficient_values(n_q_points);
   RightHandSide<dim>     rhs;
   std::vector<double>    rhs_values(n_q_points);
 
@@ -769,11 +661,8 @@ void LaplaceProblem<dim>::assemble_system()
 
         fe_values.reinit(cell);
 
-        coefficient.value_list(fe_values.get_quadrature_points(),
-                               coefficient_values);
-        average(coefficient_values);
-        const double coefficient_value = coefficient_values[0];
-
+        const double coefficient_value =
+          coefficient.average_value(fe_values.get_quadrature_points());
         rhs.value_list(fe_values.get_quadrature_points(), rhs_values);
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -803,12 +692,12 @@ void LaplaceProblem<dim>::assemble_system()
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::assemble_multigrid()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::assemble_multigrid()
 {
   TimerOutput::Scope timing(computing_timer, "Assemble multigrid");
 
-  QGauss<dim> quadrature_formula(1 + fe.degree);
+  QGauss<dim> quadrature_formula(degree + 1);
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
@@ -823,7 +712,6 @@ void LaplaceProblem<dim>::assemble_multigrid()
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
   const Coefficient<dim> coefficient;
-  std::vector<double>    coefficient_values(n_q_points);
 
   std::vector<AffineConstraints<double>> boundary_constraints(
     triangulation.n_global_levels());
@@ -846,10 +734,8 @@ void LaplaceProblem<dim>::assemble_multigrid()
         cell_matrix = 0;
         fe_values.reinit(cell);
 
-        coefficient.value_list(fe_values.get_quadrature_points(),
-                               coefficient_values);
-        average(coefficient_values);
-        const double coefficient_value = coefficient_values[0];
+        const double coefficient_value =
+          coefficient.average_value(fe_values.get_quadrature_points());
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -881,10 +767,10 @@ void LaplaceProblem<dim>::assemble_multigrid()
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::assemble_rhs_for_matrix_free()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::assemble_rhs()
 {
-  TimerOutput::Scope timing(computing_timer, "Assemble right hand side");
+  TimerOutput::Scope timing(computing_timer, "Assemble right-hand side");
 
   MatrixFreeActiveVector solution_copy;
   MatrixFreeActiveVector right_hand_side_copy;
@@ -895,8 +781,8 @@ void LaplaceProblem<dim>::assemble_rhs_for_matrix_free()
   constraints.distribute(solution_copy);
   solution_copy.update_ghost_values();
   right_hand_side_copy = 0;
-  const Table<1, VectorizedArray<double>> coefficient_table =
-    mf_system_matrix.get_coefficient_table();
+  const Table<2, VectorizedArray<double>> &coefficient =
+    *(mf_system_matrix.get_coefficient());
 
   RightHandSide<dim> right_hand_side_function;
 
@@ -914,40 +800,24 @@ void LaplaceProblem<dim>::assemble_rhs_for_matrix_free()
         {
           // Submit gradient
           phi.submit_gradient(-1.0 *
-                                (coefficient_table(cell) * phi.get_gradient(q)),
+                                (coefficient(cell, 0) * phi.get_gradient(q)),
                               q);
 
           // Submit RHS value
-          VectorizedArray<double> rhs_value =
-            make_vectorized_array<double>(1.0);
-          for (unsigned int i = 0; i < VectorizedArray<double>::size(); ++i)
-            {
-              Point<dim> p;
-              for (unsigned int d = 0; d < dim; ++d)
-                p(d) = phi.quadrature_point(q)(d)[i];
-
-              rhs_value[i] = right_hand_side_function.value(p);
-            }
-          phi.submit_value(rhs_value, q);
+          phi.submit_value(
+            right_hand_side_function.value(phi.quadrature_point(q)), q);
         }
 
-      phi.integrate(true, true);
-      phi.distribute_local_to_global(right_hand_side_copy);
+      phi.integrate_scatter(true, true, right_hand_side_copy);
     }
 
   right_hand_side_copy.compress(VectorOperation::add);
-#ifdef USE_PETSC_LA
-  AssertThrow(false,
-              ExcMessage("CopyVectorTypes::copy() not implemented for "
-                         "PETSc vector types."));
-#else
   ChangeVectorTypes::copy(right_hand_side, right_hand_side_copy);
-#endif
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::solve()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::solve()
 {
   TimerOutput::Scope timing(computing_timer, "Solve");
 
@@ -1007,14 +877,8 @@ void LaplaceProblem<dim>::solve()
       mf_system_matrix.initialize_dof_vector(solution_copy);
       mf_system_matrix.initialize_dof_vector(right_hand_side_copy);
 
-#ifdef USE_PETSC_LA
-      AssertThrow(false,
-                  ExcMessage("CopyVectorTypes::copy() not implemented for "
-                             "PETSc vector types."));
-#else
       ChangeVectorTypes::copy(solution_copy, solution);
       ChangeVectorTypes::copy(right_hand_side_copy, right_hand_side);
-#endif
       computing_timer.leave_subsection("Solve: Preconditioner setup");
 
       // Timing 1 vcycle
@@ -1035,13 +899,7 @@ void LaplaceProblem<dim>::solve()
       }
 
       solution_copy.update_ghost_values();
-#ifdef USE_PETSC_LA
-      AssertThrow(false,
-                  ExcMessage("CopyVectorTypes::copy() not implemented for "
-                             "PETSc vector types."));
-#else
       ChangeVectorTypes::copy(solution, solution_copy);
-#endif
       constraints.distribute(solution);
     }
   else if (settings.solver == Settings::gmg_mb)
@@ -1104,7 +962,7 @@ void LaplaceProblem<dim>::solve()
 
       constraints.distribute(solution);
     }
-  else
+  else /*amg*/
     {
       computing_timer.enter_subsection("Solve: Preconditioner setup");
 
@@ -1114,10 +972,10 @@ void LaplaceProblem<dim>::solve()
 #ifdef USE_PETSC_LA
       Amg_data.symmetric_operator = true;
 #else
-      Amg_data.elliptic = true;
-      Amg_data.smoother_type = "Jacobi";
+      Amg_data.elliptic              = true;
+      Amg_data.smoother_type         = "Jacobi";
       Amg_data.higher_order_elements = true;
-      Amg_data.smoother_sweeps = settings.smoother_steps;
+      Amg_data.smoother_sweeps       = settings.smoother_steps;
       Amg_data.aggregation_threshold = 0.02;
 #endif
 
@@ -1201,8 +1059,8 @@ struct CopyData
 };
 
 
-template <int dim>
-void LaplaceProblem<dim>::estimate()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::estimate()
 {
   TimerOutput::Scope timing(computing_timer, "Estimate");
 
@@ -1218,11 +1076,10 @@ void LaplaceProblem<dim>::estimate()
 
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
+  // assembler for cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$
   auto cell_worker = [&](const Iterator &  cell,
                          ScratchData<dim> &scratch_data,
                          CopyData &        copy_data) {
-    /*assemble cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$*/
-
     FEValues<dim> &fe_values = scratch_data.fe_values;
     fe_values.reinit(cell);
 
@@ -1246,6 +1103,8 @@ void LaplaceProblem<dim>::estimate()
     copy_data.value = std::sqrt(value);
   };
 
+  // assembler for face term $\sum_F h_F \| [ \epsilon \nabla u \cdot n ]
+  // \|_F^2$
   auto face_worker = [&](const Iterator &    cell,
                          const unsigned int &f,
                          const unsigned int &sf,
@@ -1254,8 +1113,6 @@ void LaplaceProblem<dim>::estimate()
                          const unsigned int &nsf,
                          ScratchData<dim> &  scratch_data,
                          CopyData &          copy_data) {
-    /* face term $\sum_F h_F \| [ \epsilon \nabla u \cdot n ] \|_F^2$*/
-
     FEInterfaceValues<dim> &fe_interface_values =
       scratch_data.fe_interface_values;
     fe_interface_values.reinit(cell, f, sf, ncell, nf, nsf);
@@ -1305,7 +1162,7 @@ void LaplaceProblem<dim>::estimate()
         estimate_vector[cdf.cell_indices[j]] += cdf.values[j];
   };
 
-  const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
+  const unsigned int n_gauss_points = degree + 1;
   ScratchData<dim>   scratch_data(mapping,
                                 fe,
                                 n_gauss_points,
@@ -1330,8 +1187,8 @@ void LaplaceProblem<dim>::estimate()
 
 
 
-template <int dim>
-void LaplaceProblem<dim>::refine_grid()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::refine_grid()
 {
   TimerOutput::Scope timing(computing_timer, "Refine grid");
 
@@ -1344,8 +1201,8 @@ void LaplaceProblem<dim>::refine_grid()
 
 
 
-template <int dim>
-void LaplaceProblem<dim>::output_results(const unsigned int cycle)
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
 {
   TimerOutput::Scope timing(computing_timer, "Output results");
 
@@ -1380,8 +1237,8 @@ void LaplaceProblem<dim>::output_results(const unsigned int cycle)
 }
 
 
-template <int dim>
-void LaplaceProblem<dim>::run()
+template <int dim, int degree>
+void LaplaceProblem<dim, degree>::run()
 {
   for (unsigned int cycle = 0; cycle < settings.n_steps; ++cycle)
     {
@@ -1391,19 +1248,22 @@ void LaplaceProblem<dim>::run()
 
       pcout << "   Number of active cells:       "
             << triangulation.n_global_active_cells();
-      if (settings.solver != Settings::amg)
+      if (settings.solver == Settings::gmg_mf ||
+          settings.solver == Settings::gmg_mb)
         pcout << " (" << triangulation.n_global_levels() << " global levels)"
               << std::endl
-              << "   Workload imbalance:           "
-              << MGTools::workload_imbalance(triangulation);
+              << "   Partition efficiency:         "
+              << 1.0 / MGTools::workload_imbalance(triangulation);
       pcout << std::endl;
 
       setup_system();
-      if (settings.solver != Settings::amg)
+      if (settings.solver == Settings::gmg_mf ||
+          settings.solver == Settings::gmg_mb)
         setup_multigrid();
 
       pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs();
-      if (settings.solver != Settings::amg)
+      if (settings.solver == Settings::gmg_mf ||
+          settings.solver == Settings::gmg_mb)
         {
           pcout << " (by level: ";
           for (unsigned int level = 0; level < triangulation.n_global_levels();
@@ -1415,8 +1275,8 @@ void LaplaceProblem<dim>::run()
       pcout << std::endl;
 
       if (settings.solver == Settings::gmg_mf)
-        assemble_rhs_for_matrix_free();
-      else
+        assemble_rhs();
+      else /*gmg_mb or amg*/
         {
           assemble_system();
           if (settings.solver == Settings::gmg_mb)
@@ -1448,12 +1308,12 @@ int main(int argc, char *argv[])
     {
       if (settings.dimension == 2)
         {
-          LaplaceProblem<2> test(settings);
+          LaplaceProblem<2, 2> test(settings);
           test.run();
         }
       else if (settings.dimension == 3)
         {
-          LaplaceProblem<3> test(settings);
+          LaplaceProblem<3, 2> test(settings);
           test.run();
         }
     }

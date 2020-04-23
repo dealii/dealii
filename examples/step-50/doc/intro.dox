@@ -19,12 +19,11 @@ libraries is described in the <a href="../../readme.html" target="body">README</
 <h1>Introduction</h1>
 
 
-This example shows the usage of the multilevel functions in deal.II on distributed meshes
-and gives a comparison between geometric and algebraic multigrid methods. The algebraic
-multigrid (AMG) preconditioner is the same used in step-40, and the geometric multigrid
-(GMG) preconditioner is based on the one used in step-16. Here we discuss the
-necessary changes needed for parallel computations.
-
+This example shows the usage of the multilevel functions in deal.II on distributed
+meshes and gives a comparison between geometric and algebraic multigrid methods.
+The algebraic multigrid (AMG) preconditioner is the same used in step-40. Two geometric
+multigrid (GMG) preconditioners are considered: a matrix-based version similar to that
+in step-16 (but for parallel computations) and a matrix-free version discussed in step-37.
 
 <h3>The testcase</h3>
 
@@ -32,30 +31,31 @@ We consider the variable-coefficient Laplacian weak formulation
 @f{align*}
  (\epsilon \nabla u, \nabla v) = (f,v) \quad \forall v \in V_h
 @f}
-on the domain $\Omega = [-1,1]^\text{dim} \setminus [0,1]^\text{dim}$ (an L-shaped domain for 2D and a Fichera corner for 3D) with
-$\epsilon = 1$ if $\min(x,y,z)>-\frac{1}{2}$ and $\epsilon = 100$ otherwise. The
-boundary conditions are $u=0$ on the whole boundary and the right-hand side is $f=1$.
-We use continuous Q2 elements to discretize $V_h$ and use a residual-based, cell-wise a
-posteriori error estimator $e(K) = e_{\text{cell}}(K) + e_{\text{face}}(K)$ from
-_CITE EST PAPER_ with
+on the domain $\Omega = [-1,1]^\text{dim} \setminus [0,1]^\text{dim}$ (an L-shaped domain
+for 2D and a Fichera corner for 3D) with $\epsilon = 1$ if $\min(x,y,z)>-\frac{1}{2}$ and
+$\epsilon = 100$ otherwise. The boundary conditions are $u=0$ on the whole boundary and
+the right-hand side is $f=1$. We use continuous Q2 elements to discretize $V_h$ and use a
+residual-based, cell-wise a posteriori error estimator
+$e(K) = e_{\text{cell}}(K) + e_{\text{face}}(K)$ from _CITE EST PAPER_ with
 @f{align*}
  e_{\text{cell}}(K) = h^2 \| f + \epsilon \triangle u \|_K^2, \qquad
  e_{\text{face}}(K) = \sum_F h_F \| [ \epsilon \nabla u \cdot n ] \|_F^2.
 @f}
-The following figure visualizes the solution and refinement for 2D
-<img src="https://www.dealii.org/images/steps/developer/step-50-2d-solution.png" alt="">
-and for 3D, the solution(left) and a slice for $x$ close to the
-center of the domain showing the adaptively refined mesh (right) are depicted here
+The following figure visualizes the solution and refinement for 2D:
+<img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-2d-solution.png" alt="">
+In 3D, the solution looks similar (see below). On the left you can see the solution and on the right we show a slice for $x$ close to the
+center of the domain showing the adaptively refined mesh.
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-50-3d-solution.png" alt="">
+      <img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-3d-solution.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-50-refinement.png" alt="">
+      <img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-refinement.png" alt="">
     </td>
   </tr>
 </table>
+Both in 2D and 3D you can see the adaptive refinement picking up the corner singularity and the inner singularity where the viscosity jumps, while the interface along the line that separates the two viscosities is (correctly) not refined as it is resolved adequately.
 
 
 <h3>Workload imbalance</h3>
@@ -72,21 +72,24 @@ of the active mesh, and the right image gives the multilevel hierarchy of cells.
 colors and numbers represent the different processors. The circular nodes in the tree
 are the non-active cells which are distributed using the ``first-child rule''.
 
-<img src="https://www.dealii.org/images/steps/developer/step-50-workload-example.png" alt="">
+<img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-workload-example.png" alt="">
 
-Included among the output to screen in this example is a value ``Workload imbalance''
-given by the function MGTools::workload_imbalance(). This value, which will be denoted
+Included among the output to screen in this example is a value ``Partition efficiency''
+given by 1/MGTools::workload_imbalance(). This value, which will be denoted
 by $\mathbb{E}$,  quantifies the overhead produced by not having a perfect work balance
 on each level of the multigrid hierarchy (as is evident from the example above).
 
-For defining $\mathbb{E}$, let $N_{\ell}$ be the number of cells on level $\ell$
-(both active and non-active cells) and $N_{\ell,p}$ of the subset owned by processor
+For defining $\mathbb{E}$, it is important to note that, as we are using local smoothing
+to define the multigrid hierarchy (see the @ref mg_paper "multigrid paper" for a description of
+local smoothing), the refinement level of a cell corresponds to that cell's multigrid
+level. Now, let $N_{\ell}$ be the number of cells on level $\ell$
+(both active and non-active cells) and $N_{\ell,p}$ be the subset owned by process
 $p$. Assuming that the workload for any one processor is proportional to the number
 of cells owned by that processor, the optimal workload per processor is given by
 @f{align*}
-W_{\text{opt}}=\frac1{n_{p}}\sum_{\ell}\sum_{p}N_{\ell,p}=\frac1{n_{p}}\sum_{\ell} N_{\ell}.
+W_{\text{opt}} = \sum_{\ell}\frac1{n_{p}}\sum_{p}N_{\ell,p}=\frac1{n_{p}}\sum_{\ell} N_{\ell}.
 @f}
-Next, assuming a synchronization of work on each level (i.e., on each level of a vcycle,
+Next, assuming a synchronization of work on each level (i.e., on each level of a V-cycle,
 work must be completed by all processors before moving on to the next level), the
 limiting effort on each level is given by
 @f{align*}
@@ -109,14 +112,25 @@ W &= \sum_\ell W_\ell = 1 + 2 + 3 = 6
 \\
 \mathbb{E} &= \frac{W_{\text{opt}}}{W} = \frac12.
 @f}
+The value MGTools::workload_imbalance()$= 1/\mathbb{E}$ then represents the factor increase
+in timings we expect for GMG methods (vmults, assembly, etc.) due to the imbalance of the
+mesh partition.
 
 _CITE MG PAPER_ contains a full discussion of the partition efficiency model
-and the effect the imbalance has on the GMG vcycle timing. In summary, the value
-of $\mathbb{E}$ is highly dependent on the type a mesh refinement used and has
-optimal value $\mathbb{E} = 1$ for globally refined meshes. Typically for adaptively
+and the effect the imbalance has on the GMG V-cycle timing. In summary, the value
+of $\mathbb{E}$ is highly dependent on the degree of local mesh refinement used and has
+an optimal value $\mathbb{E} \approx 1$ for globally refined meshes. Typically for adaptively
 refined meshes, the number of processors used to distribute a single mesh has a
 negative impact on $\mathbb{E}$ but only up to a leveling off point, where the imbalance
 remains relatively constant for an increasing number of processors, and further refinement
 has very little impact on $\mathbb{E}$. Finally, $1/\mathbb{E}$ was shown to give an
 accurate representation of the slowdown in parallel scaling expected for the timing of
-a vcycle.
+a V-cycle.
+
+It should be noted that there is potential for some asynchronous work between multigrid
+levels, specifically with purely nearest neighbor MPI communication, and an adaptive mesh
+could be constructed such that the efficiency model would far overestimate the V-cycle slowdown
+due to the asynchronous work ``covering up'' the imbalance (which assumes synchronization over levels).
+However, for most realistic adaptive meshes the expectation is that this asynchronous work will
+only cover up a very small portion of the imbalance and the efficiency model will describe the
+slowdown very well.
