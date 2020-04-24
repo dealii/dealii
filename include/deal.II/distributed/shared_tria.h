@@ -341,7 +341,7 @@ namespace parallel
       bool
       with_artificial_cells() const;
 
-    protected:
+    private:
       /**
        * Override the function to update the number cache so we can fill data
        * like @p level_ghost_owners.
@@ -349,7 +349,6 @@ namespace parallel
       virtual void
       update_number_cache() override;
 
-    private:
       /**
        * Settings
        */
