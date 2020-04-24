@@ -80,6 +80,7 @@ ParameterAcceptor::initialize(
       prm.parse_input(filename);
     }
 
+  // TODO refactor this part
   if (!output_filename.empty())
     {
       std::ofstream outfile(output_filename.c_str());
@@ -96,15 +97,29 @@ ParameterAcceptor::initialize(
             output_style_for_output_filename == ParameterHandler::Text ||
               output_style_for_output_filename == ParameterHandler::ShortText,
             ExcMessage(
-              "Only Text or ShortText can be specified in output_style_for_prm_format."))
-            prm.print_parameters(outfile, output_style_for_output_filename);
+              "Only Text or ShortText can be specified in output_style_for_output_filename "
+              "in combination with prm filename extension."))
         }
       else if (extension == "xml")
-        prm.print_parameters(outfile, output_style_for_output_filename);
+        {
+          Assert(
+            output_style_for_output_filename == ParameterHandler::XML,
+            ExcMessage(
+              "Only XML can be specified in output_style_for_output_filename "
+              "in combination with xml filename extension."))
+        }
       else if (extension == "latex" || extension == "tex")
-        prm.print_parameters(outfile, output_style_for_output_filename);
+        {
+          Assert(
+            output_style_for_output_filename == ParameterHandler::LaTeX,
+            ExcMessage(
+              "Only LaTeX can be specified in output_style_for_output_filename "
+              "in combination with latex or tex filename extension."))
+        }
       else
         AssertThrow(false, ExcNotImplemented());
+
+      prm.print_parameters(outfile, output_style_for_output_filename);
     }
 
   // Finally do the parsing.
