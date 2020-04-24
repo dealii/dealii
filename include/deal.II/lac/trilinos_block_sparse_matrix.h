@@ -148,17 +148,6 @@ namespace TrilinosWrappers
     reinit(const size_type n_block_rows, const size_type n_block_columns);
 
     /**
-     * Resize the matrix, by using an array of Epetra maps to determine the
-     * %parallel distribution of the individual matrices. This function
-     * assumes that a quadratic block matrix is generated.
-     */
-    template <typename BlockSparsityPatternType>
-    void
-    reinit(const std::vector<Epetra_Map> & input_maps,
-           const BlockSparsityPatternType &block_sparsity_pattern,
-           const bool                      exchange_data = false);
-
-    /**
      * Resize the matrix, by using an array of index sets to determine the
      * %parallel distribution of the individual matrices. This function
      * assumes that a quadratic block matrix is generated.
@@ -178,20 +167,6 @@ namespace TrilinosWrappers
     template <typename BlockSparsityPatternType>
     void
     reinit(const BlockSparsityPatternType &block_sparsity_pattern);
-
-    /**
-     * This function initializes the Trilinos matrix using the deal.II sparse
-     * matrix and the entries stored therein. It uses a threshold to copy only
-     * elements whose modulus is larger than the threshold (so zeros in the
-     * deal.II matrix can be filtered away).
-     *
-     * @deprecated Use the respective method with IndexSet arguments instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    reinit(const std::vector<Epetra_Map> &            input_maps,
-           const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-           const double                               drop_tolerance = 1e-13);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse

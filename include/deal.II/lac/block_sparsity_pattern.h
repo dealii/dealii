@@ -651,19 +651,6 @@ namespace TrilinosWrappers
                          const std::vector<size_type> &col_block_sizes);
 
     /**
-     * Initialize the pattern with an array Epetra_Map that specifies both
-     * rows and columns of the matrix (so the final matrix will be a square
-     * matrix), where the Epetra_Map specifies the parallel distribution of
-     * the degrees of freedom on the individual block.  This function is
-     * equivalent to calling the second constructor with the length of the
-     * mapping vector and then entering the index values.
-     *
-     * @deprecated Use the respective method with IndexSet arguments instead.
-     */
-    DEAL_II_DEPRECATED
-    BlockSparsityPattern(const std::vector<Epetra_Map> &parallel_partitioning);
-
-    /**
      * Initialize the pattern with an array of index sets that specifies both
      * rows and columns of the matrix (so the final matrix will be a square
      * matrix), where the size() of the IndexSets specifies the size of the
@@ -702,17 +689,6 @@ namespace TrilinosWrappers
     void
     reinit(const std::vector<size_type> &row_block_sizes,
            const std::vector<size_type> &col_block_sizes);
-
-    /**
-     * Resize the matrix to a square tensor product of matrices with parallel
-     * distribution according to the specifications in the array of
-     * Epetra_Maps.
-     *
-     * @deprecated Use the respective method with IndexSet arguments instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    reinit(const std::vector<Epetra_Map> &parallel_partitioning);
 
     /**
      * Resize the matrix to a square tensor product of matrices. See the

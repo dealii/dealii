@@ -25,19 +25,6 @@ for (S : REAL_SCALARS)
                            const bool,
                            const dealii::SparsityPattern *);
       template void
-      SparseMatrix::reinit(const Epetra_Map &,
-                           const dealii::SparseMatrix<S> &,
-                           const double,
-                           const bool,
-                           const dealii::SparsityPattern *);
-      template void
-      SparseMatrix::reinit(const Epetra_Map &,
-                           const Epetra_Map &,
-                           const dealii::SparseMatrix<S> &,
-                           const double,
-                           const bool,
-                           const dealii::SparsityPattern *);
-      template void
       SparseMatrix::reinit(const IndexSet &,
                            const IndexSet &,
                            const dealii::SparseMatrix<S> &,

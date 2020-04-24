@@ -1,0 +1,4 @@
+Removed: The deprecated TrilinosWrappers matrix and sparsity patterns and
+reinitialization functions have been removed.
+<br>
+(Daniel Arndt, 2020/04/22)
