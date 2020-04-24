@@ -775,32 +775,33 @@ ParameterHandler::parse_input_from_json(std::istream &in,
 
 
 void
-ParameterHandler::create_default_input_file(const std::string &filename,
-                                            const OutputStyle  style) const
+ParameterHandler::create_default_input_file(
+  const std::string &filename,
+  const bool         short_version,
+  const bool         keep_declaration_order) const
 {
   std::ofstream out(filename);
   Assert(out, ExcIO());
 
+  const OutputStyle style_short =
+    (short_version ? Short : static_cast<OutputStyle>(0));
+  const OutputStyle style_order =
+    (keep_declaration_order ? KeepDeclarationOrder :
+                              static_cast<OutputStyle>(0));
+
   std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
   boost::algorithm::to_lower(file_ending);
-
   if (file_ending == "prm")
     {
-      AssertThrow(style & PRM,
-                  ExcMessage("OutputStyle does not fit to filename ending."));
-      print_parameters(out, style);
+      print_parameters(out, PRM | style_short | style_order);
     }
   else if (file_ending == "xml")
     {
-      AssertThrow(style & XML,
-                  ExcMessage("OutputStyle does not fit to filename ending."));
-      print_parameters(out, style);
+      print_parameters(out, XML | style_short | style_order);
     }
   else if (file_ending == "json")
     {
-      AssertThrow(style & JSON,
-                  ExcMessage("OutputStyle does not fit to filename ending."));
-      print_parameters(out, style);
+      print_parameters(out, JSON | style_short | style_order);
     }
   else
     {

@@ -1086,7 +1086,8 @@ public:
    */
   void
   create_default_input_file(const std::string &filename,
-                            const OutputStyle  style) const;
+                            const bool         short_version  = true,
+                            const bool keep_declaration_order = true) const;
 
   /**
    * Clear all contents.

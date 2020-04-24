@@ -67,7 +67,10 @@ ParameterAcceptor::initialize(
       std::ifstream is(filename);
       if (!is)
         {
-          prm.create_default_input_file(filename, output_style_for_filename);
+          std::ofstream out(filename);
+          Assert(out, ExcIO());
+          prm.print_parameters(out, output_style_for_filename);
+          out.close();
           AssertThrow(false,
                       ExcMessage(
                         "You specified <" + filename + "> as input file, " +
