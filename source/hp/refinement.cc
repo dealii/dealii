@@ -511,30 +511,93 @@ namespace hp
       Assert(0 < gamma_h, dealii::GridRefinement::ExcInvalidParameterValue());
       Assert(0 < gamma_n, dealii::GridRefinement::ExcInvalidParameterValue());
 
+      // auxiliary variables
+      unsigned int future_fe_degree       = numbers::invalid_unsigned_int;
+      unsigned int parent_future_fe_index = numbers::invalid_unsigned_int;
+      // store all determined future finite element indices on parent cells for
+      // coarsening
+      std::map<typename hp::DoFHandler<dim, spacedim>::cell_iterator,
+               unsigned int>
+        future_fe_indices_on_coarsened_cells;
+
+      // deep copy error indicators
+      predicted_errors = error_indicators;
+
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            if (cell->future_fe_index_set()) // p adaptation
+            // current cell will not be adapted
+            if (!(cell->future_fe_index_set()) && !(cell->refine_flag_set()) &&
+                !(cell->coarsen_flag_set()))
               {
-                Assert(cell->future_fe_index_set() && !cell->refine_flag_set(),
-                       ExcMessage(
-                         "For error prediction, a cell marked for p-adaptation "
-                         "should not also be flagged for h-refinement!"));
-                Assert(cell->future_fe_index_set() && !cell->coarsen_flag_set(),
-                       ExcMessage(
-                         "For error prediction, a cell marked for p-adaptation "
-                         "should not also be flagged for h-coarsening!"));
-
-                const int degree_difference =
-                  dof_handler.get_fe_collection()[cell->future_fe_index()]
-                    .degree -
-                  cell->get_fe().degree;
-
-                predicted_errors[cell->active_cell_index()] =
-                  error_indicators[cell->active_cell_index()] *
-                  std::pow(gamma_p, degree_difference);
+                predicted_errors[cell->active_cell_index()] *= gamma_n;
+                continue;
               }
-            else if (cell->refine_flag_set()) // h refinement
+
+            // current cell will be adapted
+            // determine degree of its future finite element
+            if (cell->coarsen_flag_set())
+              {
+                // cell will be coarsened, thus determine future finite element
+                // on parent cell
+                const auto &parent = cell->parent();
+                if (future_fe_indices_on_coarsened_cells.find(parent) ==
+                    future_fe_indices_on_coarsened_cells.end())
+                  {
+                    std::set<unsigned int> fe_indices_children;
+                    for (unsigned int child_index = 0;
+                         child_index < parent->n_children();
+                         ++child_index)
+                      {
+                        const auto &child = parent->child(child_index);
+                        Assert(child->is_active() && child->coarsen_flag_set(),
+                               typename dealii::Triangulation<
+                                 dim>::ExcInconsistentCoarseningFlags());
+
+                        fe_indices_children.insert(child->future_fe_index());
+                      }
+                    Assert(!fe_indices_children.empty(), ExcInternalError());
+
+                    parent_future_fe_index =
+                      dof_handler.get_fe_collection()
+                        .find_dominated_fe_extended(fe_indices_children,
+                                                    /*codim=*/0);
+
+                    Assert(
+                      parent_future_fe_index != numbers::invalid_unsigned_int,
+                      typename dealii::hp::FECollection<
+                        dim>::ExcNoDominatedFiniteElementAmongstChildren());
+
+                    future_fe_indices_on_coarsened_cells.insert(
+                      {parent, parent_future_fe_index});
+                  }
+                else
+                  {
+                    parent_future_fe_index =
+                      future_fe_indices_on_coarsened_cells[parent];
+                  }
+
+                future_fe_degree =
+                  dof_handler.get_fe_collection()[parent_future_fe_index]
+                    .degree;
+              }
+            else
+              {
+                // future finite element on current cell is already set
+                future_fe_degree =
+                  dof_handler.get_fe_collection()[cell->future_fe_index()]
+                    .degree;
+              }
+
+            // step 1: exponential decay with p-adaptation
+            if (cell->future_fe_index_set())
+              {
+                predicted_errors[cell->active_cell_index()] *=
+                  std::pow(gamma_p, future_fe_degree - cell->get_fe().degree);
+              }
+
+            // step 2: algebraic decay with h-adaptation
+            if (cell->refine_flag_set())
               {
                 Assert(
                   cell->refine_flag_set() ==
@@ -542,20 +605,19 @@ namespace hp
                   ExcMessage(
                     "Error prediction is only valid for isotropic refinement!"));
 
-                predicted_errors[cell->active_cell_index()] =
-                  error_indicators[cell->active_cell_index()] *
-                  (gamma_h * std::pow(.5, dim + cell->get_fe().degree));
+                predicted_errors[cell->active_cell_index()] *=
+                  (gamma_h * std::pow(.5, future_fe_degree));
+
+                // predicted error will be split on children cells
+                // after adaptation via CellDataTransfer
               }
-            else if (cell->coarsen_flag_set()) // h coarsening
+            else if (cell->coarsen_flag_set())
               {
-                predicted_errors[cell->active_cell_index()] =
-                  error_indicators[cell->active_cell_index()] /
-                  (gamma_h * std::pow(.5, cell->get_fe().degree));
-              }
-            else // no changes
-              {
-                predicted_errors[cell->active_cell_index()] =
-                  error_indicators[cell->active_cell_index()] * gamma_n;
+                predicted_errors[cell->active_cell_index()] /=
+                  (gamma_h * std::pow(.5, future_fe_degree));
+
+                // predicted error will be summed up on parent cell
+                // after adaptation via CellDataTransfer
               }
           }
     }
