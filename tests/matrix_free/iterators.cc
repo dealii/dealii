@@ -85,6 +85,8 @@ public:
         additional_data.mapping_update_flags_inner_faces    = update_values;
         additional_data.mapping_update_flags_boundary_faces = update_values;
         additional_data.mg_level                            = level;
+        additional_data.tasks_parallel_scheme =
+          MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData::none;
 
         MatrixFree<dim, Number, VectorizedArrayType> matrix_free;
         matrix_free.reinit(
