@@ -17,6 +17,8 @@
 
 // check VectorTools::subtract_mean_value() for Trilinos vectors
 
+#include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
