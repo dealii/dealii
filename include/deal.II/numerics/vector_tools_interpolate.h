@@ -18,13 +18,14 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/fe/component_mask.h>
+
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 class AffineConstraints;
-class ComponentMask;
 template <int dim, int spacedim>
 class DoFHandler;
 template <typename number>
