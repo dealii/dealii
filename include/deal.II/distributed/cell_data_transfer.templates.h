@@ -73,11 +73,18 @@ namespace parallel
     template <int dim, int spacedim, typename VectorType>
     CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
       const parallel::distributed::Triangulation<dim, spacedim> &triangulation,
-      const bool transfer_variable_size_data,
+      const bool                        transfer_variable_size_data,
+      const std::function<std::vector<value_type>(
+        const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+          &              parent,
+        const value_type parent_value)> refinement_strategy,
       const std::function<value_type(
+        const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+          &                            parent,
         const std::vector<value_type> &children_values)> coarsening_strategy)
       : triangulation(&triangulation, typeid(*this).name())
       , transfer_variable_size_data(transfer_variable_size_data)
+      , refinement_strategy(refinement_strategy)
       , coarsening_strategy(coarsening_strategy)
       , handle(numbers::invalid_unsigned_int)
     {}
@@ -93,6 +100,8 @@ namespace parallel
                    const VectorType &input_vector)> coarsening_strategy)
       : triangulation(&triangulation, typeid(*this).name())
       , transfer_variable_size_data(transfer_variable_size_data)
+      , refinement_strategy(&dealii::AdaptationStrategies::Refinement::
+                              preserve<dim, spacedim, value_type>)
       , handle(numbers::invalid_unsigned_int)
     {
       value_type (*const *old_strategy)(
@@ -105,20 +114,23 @@ namespace parallel
                          const VectorType &)>();
 
       if (*old_strategy == CoarseningStrategies::check_equality)
-        const_cast<
-          std::function<value_type(const std::vector<value_type> &)> &>(
-          this->coarsening_strategy) =
-          &dealii::CoarseningStrategies::check_equality<value_type>;
+        const_cast<std::function<value_type(
+          const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+          const std::vector<value_type> &)> &>(this->coarsening_strategy) =
+          &dealii::AdaptationStrategies::Coarsening::
+            check_equality<dim, spacedim, value_type>;
       else if (*old_strategy == CoarseningStrategies::sum)
-        const_cast<
-          std::function<value_type(const std::vector<value_type> &)> &>(
-          this->coarsening_strategy) =
-          &dealii::CoarseningStrategies::sum<value_type>;
+        const_cast<std::function<value_type(
+          const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+          const std::vector<value_type> &)> &>(this->coarsening_strategy) =
+          &dealii::AdaptationStrategies::Coarsening::
+            sum<dim, spacedim, value_type>;
       else if (*old_strategy == CoarseningStrategies::mean)
-        const_cast<
-          std::function<value_type(const std::vector<value_type> &)> &>(
-          this->coarsening_strategy) =
-          &dealii::CoarseningStrategies::mean<value_type>;
+        const_cast<std::function<value_type(
+          const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+          const std::vector<value_type> &)> &>(this->coarsening_strategy) =
+          &dealii::AdaptationStrategies::Coarsening::
+            mean<dim, spacedim, value_type>;
       else
         Assert(
           false,
@@ -313,7 +325,7 @@ namespace parallel
                        child_index < cell->n_children();
                        ++child_index)
                     {
-                      const auto child = cell->child(child_index);
+                      const auto &child = cell->child(child_index);
                       Assert(child->is_active() && child->coarsen_flag_set(),
                              typename dealii::Triangulation<
                                dim>::ExcInconsistentCoarseningFlags());
@@ -322,7 +334,7 @@ namespace parallel
                         (**it_input)[child->active_cell_index()];
                     }
 
-                  *it_output = coarsening_strategy(children_values);
+                  *it_output = coarsening_strategy(cell, children_values);
                   break;
                 }
 
@@ -384,19 +396,23 @@ namespace parallel
                                                       spacedim>::CELL_COARSEN:
               // Cell either persists, or has been coarsened.
               // Thus, cell has no (longer) children.
-              (**it_output)[cell->active_cell_index()] = std::move(*it_input);
+              (**it_output)[cell->active_cell_index()] = *it_input;
               break;
 
             case parallel::distributed::Triangulation<dim,
                                                       spacedim>::CELL_REFINE:
-              // Cell has been refined, and is now parent of its children.
-              // Thus, distribute parent's data on its children.
-              for (unsigned int child_index = 0;
-                   child_index < cell->n_children();
-                   ++child_index)
-                (**it_output)[cell->child(child_index)->active_cell_index()] =
-                  std::move(*it_input);
-              break;
+              {
+                // Cell has been refined, and is now parent of its children.
+                // Thus, distribute parent's data on its children.
+                const std::vector<value_type> children_values =
+                  refinement_strategy(cell, *it_input);
+                for (unsigned int child_index = 0;
+                     child_index < cell->n_children();
+                     ++child_index)
+                  (**it_output)[cell->child(child_index)->active_cell_index()] =
+                    children_values[child_index];
+                break;
+              }
 
             default:
               Assert(false, ExcInternalError());

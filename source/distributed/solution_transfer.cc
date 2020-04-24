@@ -336,7 +336,7 @@ namespace parallel
                        child_index < cell->n_children();
                        ++child_index)
                     {
-                      const auto child = cell->child(child_index);
+                      const auto &child = cell->child(child_index);
                       Assert(child->is_active() && child->coarsen_flag_set(),
                              typename dealii::Triangulation<
                                dim>::ExcInconsistentCoarseningFlags());
