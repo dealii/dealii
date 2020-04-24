@@ -373,22 +373,18 @@ public:
    * default values, and don't want to read external files to use a class
    * derived from ParameterAcceptor.
    *
-   * If outfilename is not the empty string, then write the content that was
-   * read in to the outfilename. The format of both input and output files are
-   * selected using the extensions of the files themselves. This can be either
-   * `prm` or `xml` for input, and `prm`, `xml`, or `tex/latex` for output. If
-   * the output format is `prm`, then `output_style_for_prm_format` is used to
-   * decide whether we write the full documentation as well, or only the
-   * parameters.
+   * If `output_filename` is not the empty string, then write the content that
+   * was read in to `output_filename`. The format of both input and output files
+   * are selected using the extensions of the files themselves.
    *
    * If the input file does not exist, a default one with the same name is
-   * created for you, and an exception is thrown.
+   * created, and an exception is thrown.
    *
    * @param filename Input file name
    * @param output_filename Output file name
-   * @param output_style_for_prm_format How to write the output file if format
-   * is `prm`
+   * @param output_style_for_output_filename Defines style of output file
    * @param prm The ParameterHandler to use
+   * @param output_style_for_filename Defines style of default input file (if created)
    */
   static void
   initialize(
