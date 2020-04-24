@@ -273,23 +273,6 @@ namespace numbers
   {};
 
   /**
-   * Check whether a value is not a number.
-   *
-   * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
-   * <code>_isnan</code>, whichever is available on the system and returns the
-   * result.
-   *
-   * If none of the functions detecting NaN is available, this function
-   * returns false.
-   *
-   * @deprecated This function has been deprecated in favor of the C++11
-   * function <code>std::isnan</code>.
-   */
-  DEAL_II_DEPRECATED
-  bool
-  is_nan(const double x);
-
-  /**
    * Return @p true if the given value is a finite floating point number, i.e.
    * is neither plus or minus infinity nor NaN (not a number).
    *
