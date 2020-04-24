@@ -3310,36 +3310,6 @@ public:
     std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
   get_periodic_face_map() const;
 
-  /**
-   * Translate the unique id of a coarse cell to its index. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
-   *
-   * @note For serial and shared triangulation both id and index are the same.
-   *       For distributed triangulations setting both might differ, since the
-   *       id might correspond to a global id and the index to a local id.
-   *
-   * @param coarse_cell_id Unique id of the coarse cell.
-   * @return Index of the coarse cell within the current triangulation.
-   */
-  virtual unsigned int
-  coarse_cell_id_to_coarse_cell_index(
-    const types::coarse_cell_id coarse_cell_id) const;
-
-
-  /**
-   * Translate the index of coarse cell to its unique id. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
-   *
-   * @note See the note of the method
-   * coarse_cell_id_to_coarse_cell_index().
-   *
-   * @param coarse_cell_index Index of the coarse cell.
-   * @return Id of the coarse cell.
-   */
-  virtual types::coarse_cell_id
-  coarse_cell_index_to_coarse_cell_id(
-    const unsigned int coarse_cell_index) const;
-
 #ifdef DOXYGEN
   /**
    * Write and read the data of this object from a stream for the purpose
@@ -3822,6 +3792,36 @@ private:
   fix_coarsen_flags();
 
   /**
+   * Translate the unique id of a coarse cell to its index. See the glossary
+   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
+   *
+   * @note For serial and shared triangulation both id and index are the same.
+   *       For distributed triangulations setting both might differ, since the
+   *       id might correspond to a global id and the index to a local id.
+   *
+   * @param coarse_cell_id Unique id of the coarse cell.
+   * @return Index of the coarse cell within the current triangulation.
+   */
+  virtual unsigned int
+  coarse_cell_id_to_coarse_cell_index(
+    const types::coarse_cell_id coarse_cell_id) const;
+
+
+  /**
+   * Translate the index of coarse cell to its unique id. See the glossary
+   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
+   *
+   * @note See the note of the method
+   * coarse_cell_id_to_coarse_cell_index().
+   *
+   * @param coarse_cell_index Index of the coarse cell.
+   * @return Id of the coarse cell.
+   */
+  virtual types::coarse_cell_id
+  coarse_cell_index_to_coarse_cell_id(
+    const unsigned int coarse_cell_index) const;
+
+  /**
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
@@ -3935,6 +3935,8 @@ private:
 
   template <typename>
   friend class dealii::internal::TriangulationImplementation::TriaObjects;
+
+  friend class CellId;
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
