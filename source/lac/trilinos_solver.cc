@@ -185,9 +185,9 @@ namespace TrilinosWrappers
     Assert(A.trilinos_matrix().Filled(),
            ExcMessage("Matrix is not compressed. Call compress() method."));
 
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
@@ -229,12 +229,14 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(x.local_size(), A.domain_partitioner().NumMyElements());
-    AssertDimension(b.local_size(), A.range_partitioner().NumMyElements());
+    AssertDimension(x.local_size(),
+                    A.trilinos_matrix().DomainMap().NumMyElements());
+    AssertDimension(b.local_size(),
+                    A.trilinos_matrix().RangeMap().NumMyElements());
 
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
@@ -883,9 +885,9 @@ namespace TrilinosWrappers
     Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
     Assert(A.local_range().second == A.m(),
            ExcMessage("Can only work in serial when using deal.II vectors."));
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
@@ -904,11 +906,13 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(x.local_size(), A.domain_partitioner().NumMyElements());
-    AssertDimension(b.local_size(), A.range_partitioner().NumMyElements());
-    Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
+    AssertDimension(x.local_size(),
+                    A.trilinos_matrix().DomainMap().NumMyElements());
+    AssertDimension(b.local_size(),
+                    A.trilinos_matrix().RangeMap().NumMyElements());
+    Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
-                       A.range_partitioner(),
+                       A.trilinos_matrix().RangeMap(),
                        const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know

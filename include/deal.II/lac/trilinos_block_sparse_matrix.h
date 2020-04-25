@@ -216,32 +216,6 @@ namespace TrilinosWrappers
     get_mpi_communicator() const;
 
     /**
-     * Return a vector of the underlying Trilinos Epetra_Map that sets the
-     * partitioning of the domain space of this block matrix, i.e., the
-     * partitioning of the individual block vectors this matrix has to be
-     * multiplied with.
-     *
-     * @deprecated Use the methods of the individual matrices based on
-     * IndexSet arguments.
-     */
-    DEAL_II_DEPRECATED
-    std::vector<Epetra_Map>
-    domain_partitioner() const;
-
-    /**
-     * Return a vector of the underlying Trilinos Epetra_Map that sets the
-     * partitioning of the range space of this block matrix, i.e., the
-     * partitioning of the individual block vectors that are the result from
-     * matrix-vector products.
-     *
-     * @deprecated Use the methods of the individual matrices based on
-     * IndexSet arguments.
-     */
-    DEAL_II_DEPRECATED
-    std::vector<Epetra_Map>
-    range_partitioner() const;
-
-    /**
      * Return the partitioning of the domain space for the individual blocks of
      * this matrix, i.e., the partitioning of the block vectors this matrix has
      * to be multiplied with.

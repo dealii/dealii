@@ -430,7 +430,7 @@ namespace TrilinosWrappers
     if (needs_deep_copy)
       {
         column_space_map =
-          std_cxx14::make_unique<Epetra_Map>(rhs.domain_partitioner());
+          std_cxx14::make_unique<Epetra_Map>(rhs.trilinos_matrix().DomainMap());
 
         // release memory before reallocation
         matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(*rhs.matrix);
@@ -856,8 +856,8 @@ namespace TrilinosWrappers
     if (this == &sparse_matrix)
       return;
 
-    column_space_map =
-      std_cxx14::make_unique<Epetra_Map>(sparse_matrix.domain_partitioner());
+    column_space_map = std_cxx14::make_unique<Epetra_Map>(
+      sparse_matrix.trilinos_matrix().DomainMap());
     matrix.reset();
     nonlocal_matrix_exporter.reset();
     matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(
@@ -2150,16 +2150,16 @@ namespace TrilinosWrappers
         {
           Assert(inputleft.n() == inputright.m(),
                  ExcDimensionMismatch(inputleft.n(), inputright.m()));
-          Assert(inputleft.domain_partitioner().SameAs(
-                   inputright.range_partitioner()),
+          Assert(inputleft.trilinos_matrix().DomainMap().SameAs(
+                   inputright.trilinos_matrix().RangeMap()),
                  ExcMessage("Parallel partitioning of A and B does not fit."));
         }
       else
         {
           Assert(inputleft.m() == inputright.m(),
                  ExcDimensionMismatch(inputleft.m(), inputright.m()));
-          Assert(inputleft.range_partitioner().SameAs(
-                   inputright.range_partitioner()),
+          Assert(inputleft.trilinos_matrix().RangeMap().SameAs(
+                   inputright.trilinos_matrix().RangeMap()),
                  ExcMessage("Parallel partitioning of A and B does not fit."));
         }
 
@@ -2183,8 +2183,8 @@ namespace TrilinosWrappers
           mod_B = Teuchos::rcp(
             new Epetra_CrsMatrix(Copy, inputright.trilinos_sparsity_pattern()),
             true);
-          mod_B->FillComplete(inputright.domain_partitioner(),
-                              inputright.range_partitioner());
+          mod_B->FillComplete(inputright.trilinos_matrix().DomainMap(),
+                              inputright.trilinos_matrix().RangeMap());
           Assert(inputright.local_range() == V.local_range(),
                  ExcMessage("Parallel distribution of matrix B and vector V "
                             "does not match."));
@@ -2298,38 +2298,6 @@ namespace TrilinosWrappers
       (sizeof(TrilinosScalar) + sizeof(TrilinosWrappers::types::int_type)) *
         matrix->NumMyNonzeros() +
       sizeof(int) * local_size() + static_memory);
-  }
-
-
-
-  const Epetra_Map &
-  SparseMatrix::domain_partitioner() const
-  {
-    return matrix->DomainMap();
-  }
-
-
-
-  const Epetra_Map &
-  SparseMatrix::range_partitioner() const
-  {
-    return matrix->RangeMap();
-  }
-
-
-
-  const Epetra_Map &
-  SparseMatrix::row_partitioner() const
-  {
-    return matrix->RowMap();
-  }
-
-
-
-  const Epetra_Map &
-  SparseMatrix::col_partitioner() const
-  {
-    return matrix->ColMap();
   }
 
 

@@ -1,0 +1,5 @@
+Removed: The deprecated member functions domain_partitioner(),
+vector_partitioner() and range_partitioner() in TrilinosWrappers classes have
+been removed.
+<br>
+(Daniel Arndt, 2020/04/24)

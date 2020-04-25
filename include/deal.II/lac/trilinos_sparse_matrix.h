@@ -1641,52 +1641,6 @@ namespace TrilinosWrappers
     const Epetra_CrsGraph &
     trilinos_sparsity_pattern() const;
 
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the domain space of this matrix, i.e., the
-     * partitioning of the vectors this matrix has to be multiplied with.
-     *
-     * @deprecated Use locally_owned_domain_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    domain_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the range space of this matrix, i.e., the
-     * partitioning of the vectors that are result from matrix-vector
-     * products.
-     *
-     * @deprecated Use locally_owned_range_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    range_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the matrix rows. Equal to the partitioning of
-     * the range.
-     *
-     * @deprecated Use locally_owned_range_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    row_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the matrix columns. This is in general not
-     * equal to the partitioner Epetra_Map for the domain because of overlap
-     * in the matrix.
-     *
-     * @deprecated Usually not necessary. If desired, access it via the
-     * Epetra_CrsMatrix.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    col_partitioner() const;
     //@}
 
     /**
