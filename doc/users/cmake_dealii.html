@@ -798,28 +798,28 @@ cmake -DLAPACK_FOUND=true \
           (default), <acronym>deal.II</acronym> will perform platform
           introspection for the given CPU.
 
-	<li>
+        <li>
           <code>BUILD_SHARED_LIBS</code>: If set (default),
           <acronym>deal.II</acronym> will be linked as a shared library
 
         <li>
-        <code>DEAL_II_PREFER_STATIC_LIBS</code> (defaults to off): If set
-        to true, static archives will be preferred over dynamic libraries when
-        searching for features and corresponding link interface.
+          <code>DEAL_II_PREFER_STATIC_LIBS</code> (defaults to off): If set
+          to true, static archives will be preferred over dynamic libraries when
+          searching for features and corresponding link interface.
 
-	<li>
+        <li>
           <code>DEAL_II_STATIC_EXECUTABLE</code> (defaults to off):
           If set to true, <acronym>deal.II</acronym> will be configured in
           a way to provide a link interface that is suitable for static
           linkage of executables. Enabling this option forces
           <code>BUILD_SHARED_LIBS=OFF</code> and
           <code>DEAL_II_PREFER_STATIC_LIBS=ON</code>.
-
-	<li>
-	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
-	  (default), the <acronym>deal.II</acronym> library will be
-	  installed with rpaths  set for all libraries outside of the
-	  system search paths
+          
+        <li>
+          <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
+          (default), the <acronym>deal.II</acronym> library will be
+          installed with rpaths  set for all libraries outside of the
+          system search paths
       </ul>
     </p>
 
