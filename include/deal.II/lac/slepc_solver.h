@@ -211,13 +211,6 @@ namespace SLEPcWrappers
           const unsigned int               n_eigenpairs = 1);
 
     /**
-     * Set the initial vector for the solver.
-     */
-    DEAL_II_DEPRECATED
-    void
-    set_initial_vector(const PETScWrappers::VectorBase &this_initial_vector);
-
-    /**
      * Set the initial vector space for the solver.
      *
      * By default, SLEPc initializes the starting vector or the initial

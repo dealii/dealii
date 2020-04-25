@@ -1431,22 +1431,6 @@ namespace Differentiation
 
 #endif // DOXYGEN
 
-
-namespace numbers
-{
-  template <typename ADNumberType>
-  bool
-  is_nan(const typename std::enable_if<
-         Differentiation::AD::is_ad_number<ADNumberType>::value,
-         ADNumberType>::type &x)
-  {
-    return is_nan(
-      Differentiation::AD::ADNumberTraits<ADNumberType>::get_value(x));
-  }
-
-} // namespace numbers
-
-
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
