@@ -2946,6 +2946,10 @@ namespace parallel
 
 
 
+    // Note: this has been added here to prevent that these functions
+    // appear in the Doxygen documentation of dealii::Triangulation
+#  ifndef DOXYGEN
+
     template <>
     void
     Triangulation<2, 2>::copy_new_triangulation_to_p4est(
@@ -2974,11 +2978,11 @@ namespace parallel
       // arrays. set vertex information only in debug mode (saves a few bytes
       // in optimized mode)
       const bool set_vertex_info
-#  ifdef DEBUG
+#    ifdef DEBUG
         = true
-#  else
+#    else
         = false
-#  endif
+#    endif
         ;
 
       connectivity = dealii::internal::p4est::functions<2>::connectivity_new(
@@ -3041,11 +3045,11 @@ namespace parallel
       // arrays. set vertex information only in debug mode (saves a few bytes
       // in optimized mode)
       const bool set_vertex_info
-#  ifdef DEBUG
+#    ifdef DEBUG
         = true
-#  else
+#    else
         = false
-#  endif
+#    endif
         ;
 
       connectivity = dealii::internal::p4est::functions<2>::connectivity_new(
@@ -3111,11 +3115,11 @@ namespace parallel
 
       // now create a connectivity object with the right sizes for all arrays
       const bool set_vertex_info
-#  ifdef DEBUG
+#    ifdef DEBUG
         = true
-#  else
+#    else
         = false
-#  endif
+#    endif
         ;
 
       connectivity = dealii::internal::p4est::functions<3>::connectivity_new(
@@ -3216,6 +3220,7 @@ namespace parallel
         /* user_data_constructor = */ nullptr,
         /* user_pointer */ this);
     }
+#  endif
 
 
 
