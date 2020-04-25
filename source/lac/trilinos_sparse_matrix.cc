@@ -648,8 +648,7 @@ namespace TrilinosWrappers
       // check whether the relevant rows correspond to exactly the same map as
       // the owned rows. In that case, do not create the nonlocal graph and
       // fill the columns by demand
-      bool have_ghost_rows = false;
-      {
+      const bool have_ghost_rows = [&]() {
         std::vector<dealii::types::global_dof_index> indices;
         relevant_rows.fill_index_vector(indices);
         Epetra_Map relevant_map(
@@ -661,11 +660,8 @@ namespace TrilinosWrappers
                indices.data())),
           0,
           row_space_map.Comm());
-        if (relevant_map.SameAs(row_space_map))
-          have_ghost_rows = false;
-        else
-          have_ghost_rows = true;
-      }
+        return !relevant_map.SameAs(row_space_map);
+      }();
 
       const unsigned int n_rows = relevant_rows.n_elements();
       std::vector<TrilinosWrappers::types::int_type> ghost_rows;

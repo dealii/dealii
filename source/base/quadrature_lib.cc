@@ -608,21 +608,22 @@ template <>
 unsigned int
 QGaussOneOverR<2>::quad_size(const Point<2> singularity, const unsigned int n)
 {
-  double eps       = 1e-8;
-  bool   on_edge   = false;
-  bool   on_vertex = false;
-  for (unsigned int i = 0; i < 2; ++i)
-    if ((std::abs(singularity[i]) < eps) ||
-        (std::abs(singularity[i] - 1) < eps))
-      on_edge = true;
-  if (on_edge &&
-      (std::abs((singularity - Point<2>(.5, .5)).norm_square() - .5) < eps))
-    on_vertex = true;
+  const double eps = 1e-8;
+  const bool   on_edge =
+    std::any_of(singularity.begin_raw(),
+                singularity.end_raw(),
+                [eps](double coord) {
+                  return std::abs(coord) < eps || std::abs(coord - 1.) < eps;
+                });
+  const bool on_vertex =
+    on_edge &&
+    std::abs((singularity - Point<2>(.5, .5)).norm_square() - .5) < eps;
   if (on_vertex)
-    return (2 * n * n);
-  if (on_edge)
-    return (4 * n * n);
-  return (8 * n * n);
+    return 2 * n * n;
+  else if (on_edge)
+    return 4 * n * n;
+  else
+    return 8 * n * n;
 }
 
 template <>

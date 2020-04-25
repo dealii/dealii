@@ -227,15 +227,12 @@ namespace internal
     {
       for (unsigned int dataset = 0; dataset < dof_data.size(); ++dataset)
         {
-          bool duplicate = false;
-          for (unsigned int j = 0; j < dataset; ++j)
-            if (finite_elements[dataset].get() == finite_elements[j].get())
-              {
-                duplicate = true;
-                break;
-              }
-
-          if (duplicate == false)
+          const bool is_duplicate = std::any_of(
+            finite_elements.cbegin(),
+            finite_elements.cbegin() + dataset,
+            [&](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                  &fe) { return finite_elements[dataset].get() == fe.get(); });
+          if (is_duplicate == false)
             {
               if (cell->active())
                 {

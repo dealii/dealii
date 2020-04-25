@@ -1729,26 +1729,14 @@ namespace DoFTools
                                 dof_handler.get_fe(0).n_components()));
     std::fill(n_dofs_on_subdomain.begin(), n_dofs_on_subdomain.end(), 0);
 
-    // in debug mode, make sure that there are some cells at least with
-    // this subdomain id
-#ifdef DEBUG
-    {
-      bool found = false;
-      for (typename Triangulation<
-             DoFHandlerType::dimension,
-             DoFHandlerType::space_dimension>::active_cell_iterator cell =
-             dof_handler.get_triangulation().begin_active();
-           cell != dof_handler.get_triangulation().end();
-           ++cell)
-        if (cell->subdomain_id() == subdomain)
-          {
-            found = true;
-            break;
-          }
-      Assert(found == true,
-             ExcMessage("There are no cells for the given subdomain!"));
-    }
-#endif
+    // Make sure there are at least some cells with this subdomain id
+    Assert(std::any_of(
+             dof_handler.begin_active(),
+             typename DoFHandlerType::active_cell_iterator{dof_handler.end()},
+             [subdomain](const typename DoFHandlerType::cell_accessor &cell) {
+               return cell.subdomain_id() == subdomain;
+             }),
+           ExcMessage("There are no cells for the given subdomain!"));
 
     std::vector<types::subdomain_id> subdomain_association(
       dof_handler.n_dofs());

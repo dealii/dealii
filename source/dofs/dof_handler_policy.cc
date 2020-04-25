@@ -4909,13 +4909,13 @@ namespace internal
         // ranks changed. In that case, we can apply the renumbering with some
         // local renumbering only (this is similar to the renumber_mg_dofs()
         // function below)
-        bool locally_owned_set_changes = false;
-        for (types::global_dof_index i : new_numbers)
-          if (dof_handler->locally_owned_dofs().is_element(i) == false)
-            {
-              locally_owned_set_changes = true;
-              break;
-            }
+        const bool locally_owned_set_changes =
+          std::any_of(new_numbers.cbegin(),
+                      new_numbers.cend(),
+                      [this](const types::global_dof_index i) {
+                        return dof_handler->locally_owned_dofs().is_element(
+                                 i) == false;
+                      });
 
         if (Utilities::MPI::sum(static_cast<unsigned int>(
                                   locally_owned_set_changes),

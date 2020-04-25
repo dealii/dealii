@@ -764,16 +764,15 @@ namespace internal
               if (!cell->has_children())
                 continue;
 
-              bool consider_cell = false;
-              if (tria.locally_owned_subdomain() ==
-                    numbers::invalid_subdomain_id ||
-                  cell->level_subdomain_id() == tria.locally_owned_subdomain())
-                consider_cell = true;
+              bool consider_cell =
+                (tria.locally_owned_subdomain() ==
+                   numbers::invalid_subdomain_id ||
+                 cell->level_subdomain_id() == tria.locally_owned_subdomain());
 
               // due to the particular way we store DoF indices (via children),
               // we also need to add the DoF indices for coarse cells where we
               // own at least one child
-              bool cell_is_remote = !consider_cell;
+              const bool cell_is_remote = !consider_cell;
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
