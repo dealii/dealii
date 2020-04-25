@@ -34,7 +34,6 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "*.inp"
     PATTERN "*.ipynb"
     PATTERN "step*/CMakeLists.txt"
-    PATTERN "doxygen/CMakeLists.txt"
     #
     # Special files:
     #
