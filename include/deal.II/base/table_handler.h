@@ -129,7 +129,19 @@ namespace internal
     void
     load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization.
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   private:
     /**
@@ -631,16 +643,34 @@ protected:
     pad_column_below(const unsigned int length);
 
     /**
-     * Read or write the data of this object to or from a stream for the
-     * purpose of serialization.
+     * Write the data of this object to a stream for the purpose of
+     * serialization.
      */
     template <class Archive>
     void
     save(Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization.
+     */
     template <class Archive>
     void
     load(Archive &ar, const unsigned int version);
+
+#ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization.
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
 
     /**

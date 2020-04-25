@@ -3030,7 +3030,19 @@ namespace GridTools
     void
     load(Archive &ar, const unsigned int version);
 
+#  ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization.
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#  else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#  endif
   };
 
   /**
