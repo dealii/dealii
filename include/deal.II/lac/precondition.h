@@ -2165,13 +2165,7 @@ namespace internal
         1 + (n_local_elements - 1) / CUDAWrappers::block_size;
       set_initial_guess_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
         first_local_range, n_local_elements, vector.get_values());
-
-#    ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaPeekAtLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#    endif
+      AssertCudaKernel();
 
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
