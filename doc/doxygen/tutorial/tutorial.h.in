@@ -504,6 +504,11 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-58</td>
+ *       <td> The nonlinear Schr&ouml;dinger equation.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-59</td>
  *       <td> Solving a Poisson problem discretized with an interior penalty DG
  *       method and a multilevel preconditioner in a matrix-free fashion using
@@ -566,6 +571,7 @@
  *       </td></tr>
  *
  * </table>
+ *
  *
  * <a name="topic"></a>
  * <h3>Tutorial programs grouped by topics</h3>
@@ -817,6 +823,12 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> Operator splitting
+ *     </td>
+ *     <td>step-21, step-31, step-32, step-58</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Boundary element methods, curved manifolds
  *     </td>
  *     <td>
@@ -907,6 +919,7 @@
  *       step-44,
  *       step-47,
  *       step-46,
+ *       step-58,
  *       step-62
  *     </td>
  *   </tr>
@@ -996,6 +1009,8 @@
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Other equations</b></h4>
  * <table align="center" width="90%">
  *
@@ -1100,7 +1115,8 @@
  *       step-23,
  *       step-24,
  *       step-25,
- *       step-48
+ *       step-48,
+ *       step-58
  *     </td>
  *   </tr>
  *
@@ -1138,12 +1154,21 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> The nonlinear Schr&ouml;dinger equation
+ *     </td>
+ *     <td>step-58</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     </td>
  *     <td>step-46</td>
  *   </tr>
  *
  * </table>
+ *
+ *
+ *
  * <h4><b>%Vector problems</b></h4>
  * <table align="center" width="90%">
  *
@@ -1207,6 +1232,7 @@
  * </table>
  *
  *
+ *
  * <h4><b>Time dependent problems</b></h4>
  * <table align="center" width="90%">
  *
@@ -1240,7 +1266,8 @@
  *     <td>step-23,
  *         step-24,
  *         step-25,
- *         step-48
+ *         step-48,
+ *         step-58
  *     </td>
  *   </tr>
  *
@@ -1260,6 +1287,12 @@
  *       step-67,
  *       step-69
  *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> The nonlinear Schr&ouml;dinger equation
+ *     </td>
+ *     <td>step-58</td>
  *   </tr>
  *
  *   <tr valign="top">
