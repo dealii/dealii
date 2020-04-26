@@ -1362,16 +1362,8 @@ namespace parallel
       std::vector<types::global_dof_index>
         p4est_tree_to_coarse_cell_permutation;
 
-
-      // TODO: The following variable should really be private, but it is used
-      // in dof_handler_policy.cc ...
       /**
-       * dummy settings object
-       */
-      Settings settings;
-
-      /**
-       * Like above, this method, which is only implemented for dim = 2 or 3,
+       * This method, which is only implemented for dim = 2 or 3,
        * needs a stub because it is used in dof_handler_policy.cc
        */
       virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
