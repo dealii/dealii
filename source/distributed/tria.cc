@@ -2915,18 +2915,6 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
-    {
-      parallel::TriangulationBase<dim, spacedim>::update_number_cache();
-
-      if (settings & construct_multigrid_hierarchy)
-        parallel::TriangulationBase<dim, spacedim>::fill_level_ghost_owners();
-    }
-
-
-
-    template <int dim, int spacedim>
     typename dealii::internal::p4est::types<dim>::tree *
     Triangulation<dim, spacedim>::init_tree(
       const int dealii_coarse_cell_index) const
