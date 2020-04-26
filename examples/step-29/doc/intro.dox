@@ -17,20 +17,23 @@ href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
 
 A question that comes up frequently is how to solve problems involving complex
 valued functions with deal.II. For many problems, instead of working with
-complex valued finite elements directly, which are not readily available in
-the library, it is often much more convenient to split complex valued
+complex valued finite elements directly, it is often more convenient to split complex valued
 functions into their real and imaginary parts and use separate scalar finite
 element fields for discretizing each one of them. Basically this amounts to
 viewing a single complex valued equation as a system of two real valued
 equations. This short example demonstrates how this can be implemented in
 deal.II by using an <code>FE_system</code> object to stack two finite element
-fields representing real and imaginary parts. We also discuss the
-ParameterHandler class, which provides a convenient way for reading parameters
-from a configuration file at runtime without the need to recompile the
-program code.
+fields representing real and imaginary parts. (The opposite approach,
+keeping everything complex-valued, is demonstrated in a different
+tutorial program: see step-58 for this.)
+When split into real and imaginary parts, the equations covered here
+fall into the class of vector-valued problems. A toplevel overview of
+this topic can be found in the @ref vector_valued module.
 
-The equations covered here fall into the class of vector-valued problems. A
-top level overview of this topic can be found in the @ref vector_valued module.
+In addition to this discussion, we also discuss the ParameterHandler
+class, which provides a convenient way for reading parameters from a
+configuration file at runtime without the need to recompile the
+program code.
 
 
 <h3>Problem setting</h3>

@@ -304,7 +304,8 @@ namespace DataPostprocessorInputs
    * and `solution_hessians` fields: First the gradients/Hessians of
    * the real components, then all the gradients/Hessians of the
    * imaginary components. There is more information about the subject in the
-   * documentation of the DataPostprocessor class itself.
+   * documentation of the DataPostprocessor class itself. step-58 provides an
+   * example of how this class is used in a complex-valued situation.
    *
    * Through the fields in the CommonInputs base class, this class also
    * makes available access to the locations of evaluations points,
@@ -379,11 +380,12 @@ namespace DataPostprocessorInputs
  * and possibly the first and second derivatives of the solution. Examples are
  * the calculation of Mach numbers from velocity and density in supersonic
  * flow computations, or the computation of the magnitude of a complex-valued
- * solution as demonstrated in step-29. Other uses are shown in step-32 and
- * step-33. This class offers the interface to perform such postprocessing.
- * Given the values and derivatives of the solution at those points where we
- * want to generated output, the functions of this class can be overloaded to
- * compute new quantities.
+ * solution as demonstrated in step-29 and step-58 (where it is actually
+ * the *square* of the magnitude). Other uses are shown in
+ * step-32 and step-33. This class offers the interface to perform such
+ * postprocessing. Given the values and derivatives of the solution at those
+ * points where we want to generated output, the functions of this class can be
+ * overloaded to compute new quantities.
  *
  * A data vector and an object of a class derived from the current one can be
  * given to the DataOut::add_data_vector() function (and similarly for
@@ -454,11 +456,11 @@ namespace DataPostprocessorInputs
  *
  * <h3>Complex-valued solutions</h3>
  *
- * There are PDEs whose solutions are complex-valued. For example, step-62
- * solves a problem whose solution at each point consists of a complex number
- * represented by a `std::complex<double>` variable. (step-29 also solves such
- * a problem, but there we choose to represent the solution by two real-valued
- * fields.) In such cases, the vector that is handed to
+ * There are PDEs whose solutions are complex-valued. For example, step-58 and
+ * step-62 solve problems whose solutions at each point consists of a complex
+ * number represented by a `std::complex<double>` variable. (step-29 also solves
+ * such a problem, but there we choose to represent the solution by two
+ * real-valued fields.) In such cases, the vector that is handed to
  * DataOut::build_patches() is of type `Vector<std::complex<double>>`, or
  * something essentially equivalent to this. The issue with this, as also
  * discussed in the documentation of DataOut itself, is that the most widely
@@ -490,6 +492,8 @@ namespace DataPostprocessorInputs
  *   parts of all solution components, and then the values (or gradients,
  *   or Hessians) of the imaginary parts of all solution components.
  *
+ * step-58 provides an example of how this class (or, rather, the derived
+ * DataPostprocessorScalar class) is used in a complex-valued situation.
  *
  * @ingroup output
  * @author Tobias Leicht, 2007; Wolfgang Bangerth, 2016, 2019
@@ -605,7 +609,14 @@ public:
  * DataPostprocessor::evaluate_vector_field() as discussed in the
  * DataPostprocessor class's documentation.
  *
- * An example of how this class can be used can be found in step-29.
+ * An example of how this class can be used can be found in step-29 for the case
+ * where we are interested in computing the magnitude (a scalar) of a
+ * complex-valued solution. While in step-29, the solution vector consists of
+ * separate real and imaginary parts of the solution, step-58 computes the
+ * solution vector as a vector with complex entries and the
+ * DataPostprocessorScalar class is used there to compute the magnitude and
+ * phase of the solution in a different way there.
+ *
  * An example of how the closely related DataPostprocessorVector
  * class can be used is found in the documentation of that class.
  * The same is true for the DataPostprocessorTensor class.
