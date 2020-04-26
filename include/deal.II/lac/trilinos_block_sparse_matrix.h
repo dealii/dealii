@@ -172,6 +172,19 @@ namespace TrilinosWrappers
      * This function initializes the Trilinos matrix using the deal.II sparse
      * matrix and the entries stored therein. It uses a threshold to copy only
      * elements whose modulus is larger than the threshold (so zeros in the
+     * deal.II matrix can be filtered away).
+     */
+    void
+    reinit(
+      const std::vector<IndexSet> &              parallel_partitioning,
+      const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+      const MPI_Comm &                           communicator = MPI_COMM_WORLD,
+      const double                               drop_tolerance = 1e-13);
+
+    /**
+     * This function initializes the Trilinos matrix using the deal.II sparse
+     * matrix and the entries stored therein. It uses a threshold to copy only
+     * elements whose modulus is larger than the threshold (so zeros in the
      * deal.II matrix can be filtered away). Since no Epetra_Map is given, all
      * the elements will be locally stored.
      */

@@ -162,6 +162,43 @@ namespace TrilinosWrappers
 
   void
   BlockSparseMatrix::reinit(
+    const std::vector<IndexSet> &              parallel_partitioning,
+    const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+    const MPI_Comm &                           communicator,
+    const double                               drop_tolerance)
+  {
+    const size_type n_block_rows = parallel_partitioning.size();
+
+    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
+           ExcDimensionMismatch(n_block_rows,
+                                dealii_block_sparse_matrix.n_block_rows()));
+    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_cols(),
+           ExcDimensionMismatch(n_block_rows,
+                                dealii_block_sparse_matrix.n_block_cols()));
+
+    // Call the other basic reinit function ...
+    reinit(n_block_rows, n_block_rows);
+
+    // ... and then assign the correct
+    // data to the blocks.
+    for (size_type r = 0; r < this->n_block_rows(); ++r)
+      for (size_type c = 0; c < this->n_block_cols(); ++c)
+        {
+          this->sub_objects[r][c]->reinit(parallel_partitioning[r],
+                                          parallel_partitioning[c],
+                                          dealii_block_sparse_matrix.block(r,
+                                                                           c),
+                                          communicator,
+                                          drop_tolerance);
+        }
+
+    collect_sizes();
+  }
+
+
+
+  void
+  BlockSparseMatrix::reinit(
     const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
     const double                               drop_tolerance)
   {
