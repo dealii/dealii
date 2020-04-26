@@ -353,52 +353,7 @@ namespace parallel
   TriangulationBase<dim, spacedim>::compute_vertices_with_ghost_neighbors()
     const
   {
-    // 1) collect for each vertex on periodic faces all vertices it coincides
-    //    with
-    std::map<unsigned int, std::vector<unsigned int>> coinciding_vertex_groups;
-    std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex_group;
-
-    GridTools::collect_coinciding_vertices(*this,
-                                           coinciding_vertex_groups,
-                                           vertex_to_coinciding_vertex_group);
-
-    // 2) collect vertices belonging to local cells
-    std::vector<bool> vertex_of_own_cell(this->n_vertices(), false);
-    for (const auto &cell : this->active_cell_iterators())
-      if (cell->is_locally_owned())
-        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-          vertex_of_own_cell[cell->vertex_index(v)] = true;
-
-    // 3) for each vertex belonging to a locally owned cell all ghost
-    //    neighbors (including the periodic own)
-    std::map<unsigned int, std::set<types::subdomain_id>> result;
-
-    // loop over all active ghost cells
-    for (const auto &cell : this->active_cell_iterators())
-      if (cell->is_ghost())
-        {
-          const types::subdomain_id owner = cell->subdomain_id();
-
-          // loop over all its vertices
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            {
-              // set owner if vertex belongs to a local cell
-              if (vertex_of_own_cell[cell->vertex_index(v)])
-                result[cell->vertex_index(v)].insert(owner);
-
-              // mark also nodes coinciding due to periodicity
-              auto coinciding_vertex_group =
-                vertex_to_coinciding_vertex_group.find(cell->vertex_index(v));
-              if (coinciding_vertex_group !=
-                  vertex_to_coinciding_vertex_group.end())
-                for (auto coinciding_vertex :
-                     coinciding_vertex_groups[coinciding_vertex_group->second])
-                  if (vertex_of_own_cell[coinciding_vertex])
-                    result[coinciding_vertex].insert(owner);
-            }
-        }
-
-    return result;
+    return GridTools::compute_vertices_with_ghost_neighbors(*this);
   }
 
 

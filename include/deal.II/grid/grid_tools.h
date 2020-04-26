@@ -2987,6 +2987,17 @@ namespace GridTools
     std::map<unsigned int, unsigned int> &vertex_to_coinciding_vertex_group);
 
   /**
+   * Return a map that, for each vertex, lists all the processes whose
+   * subdomains are adjacent to that vertex.
+   *
+   * @param[in] tria Triangulation.
+   */
+  template <int dim, int spacedim>
+  std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+  compute_vertices_with_ghost_neighbors(
+    const Triangulation<dim, spacedim> &tria);
+
+  /**
    * A structure that allows the transfer of cell data of type @p T from one processor
    * to another. It corresponds to a packed buffer that stores a vector of
    * CellId and a vector of type @p T.
@@ -3939,7 +3950,7 @@ namespace GridTools
 
     std::map<unsigned int, std::set<dealii::types::subdomain_id>>
       vertices_with_ghost_neighbors =
-        tria->compute_vertices_with_ghost_neighbors();
+        GridTools::compute_vertices_with_ghost_neighbors(*tria);
 
     for (const auto &cell : tria->active_cell_iterators())
       if (cell->is_locally_owned())

@@ -473,58 +473,6 @@ namespace internal
     std::size_t (&functions<2>::connectivity_memory_used)(
       types<2>::connectivity *p4est) = p4est_connectivity_memory_used;
 
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors(
-      const typename dealii::parallel::distributed::Triangulation<dim, spacedim>
-        &                                                   tria,
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-      typename dealii::internal::p4est::types<dim>::ghost * parallel_ghost)
-    {
-      std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-        vertices_with_ghost_neighbors;
-
-      dealii::internal::p4est::FindGhosts<dim, spacedim> fg;
-      fg.subids        = sc_array_new(sizeof(dealii::types::subdomain_id));
-      fg.triangulation = &tria;
-      fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
-
-      switch (dim)
-        {
-          case 2:
-            p4est_iterate(
-              reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(
-                parallel_forest),
-              reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(
-                parallel_ghost),
-              static_cast<void *>(&fg),
-              nullptr,
-              find_ghosts_face<2, spacedim>,
-              find_ghosts_corner<2, spacedim>);
-            break;
-
-          case 3:
-            p8est_iterate(
-              reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(
-                parallel_forest),
-              reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(
-                parallel_ghost),
-              static_cast<void *>(&fg),
-              nullptr,
-              find_ghosts_face<3, 3>,
-              find_ghosts_edge<3, 3>,
-              find_ghosts_corner<3, 3>);
-            break;
-
-          default:
-            Assert(false, ExcNotImplemented());
-        }
-
-      sc_array_destroy(fg.subids);
-
-      return vertices_with_ghost_neighbors;
-    }
-
     constexpr unsigned int functions<2>::max_level;
 
     void (&functions<2>::transfer_fixed)(const types<2>::gloidx *dest_gfq,

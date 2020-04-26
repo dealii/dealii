@@ -4199,7 +4199,7 @@ namespace parallel
       // at that boundary.
       const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
         vertices_with_ghost_neighbors =
-          this->compute_vertices_with_ghost_neighbors();
+          GridTools::compute_vertices_with_ghost_neighbors(*this);
 
       // now collect cells and their vertices
       // for the interested neighbors
