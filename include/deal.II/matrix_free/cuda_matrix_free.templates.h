@@ -785,8 +785,11 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
   {
     for (unsigned int i = 0; i < n_colors; ++i)
-      internal::evaluate_coeff<dim, Number, Functor>
-        <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
+      {
+        internal::evaluate_coeff<dim, Number, Functor>
+          <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
+        AssertCudaKernel();
+      }
   }
 
 
@@ -1039,11 +1042,14 @@ namespace CUDAWrappers
   {
     // Execute the loop on the cells
     for (unsigned int i = 0; i < n_colors; ++i)
-      internal::apply_kernel_shmem<dim, Number, Functor>
-        <<<grid_dim[i], block_dim[i]>>>(func,
-                                        get_data(i),
-                                        src.get_values(),
-                                        dst.get_values());
+      {
+        internal::apply_kernel_shmem<dim, Number, Functor>
+          <<<grid_dim[i], block_dim[i]>>>(func,
+                                          get_data(i),
+                                          src.get_values(),
+                                          dst.get_values());
+        AssertCudaKernel();
+      }
   }
 
 
@@ -1065,11 +1071,14 @@ namespace CUDAWrappers
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
-          internal::apply_kernel_shmem<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func,
-                                            get_data(i),
-                                            src.get_values(),
-                                            dst.get_values());
+          {
+            internal::apply_kernel_shmem<dim, Number, Functor>
+              <<<grid_dim[i], block_dim[i]>>>(func,
+                                              get_data(i),
+                                              src.get_values(),
+                                              dst.get_values());
+            AssertCudaKernel();
+          }
         dst.compress(VectorOperation::add);
         src.zero_out_ghosts();
       }
@@ -1084,11 +1093,14 @@ namespace CUDAWrappers
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
-          internal::apply_kernel_shmem<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func,
-                                            get_data(i),
-                                            ghosted_src.get_values(),
-                                            ghosted_dst.get_values());
+          {
+            internal::apply_kernel_shmem<dim, Number, Functor>
+              <<<grid_dim[i], block_dim[i]>>>(func,
+                                              get_data(i),
+                                              ghosted_src.get_values(),
+                                              ghosted_dst.get_values());
+            AssertCudaKernel();
+          }
 
         // Add the ghosted values
         ghosted_dst.compress(VectorOperation::add);
@@ -1125,6 +1137,7 @@ namespace CUDAWrappers
                                                       src.size(),
                                                       src.get_values(),
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
@@ -1143,6 +1156,7 @@ namespace CUDAWrappers
                                                       src.local_size(),
                                                       src.get_values(),
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
@@ -1170,6 +1184,7 @@ namespace CUDAWrappers
                                                       dst.size(),
                                                       val,
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
@@ -1186,6 +1201,7 @@ namespace CUDAWrappers
                                                       dst.local_size(),
                                                       val,
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
