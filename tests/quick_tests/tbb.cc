@@ -74,7 +74,7 @@ test2()
   WorkStream::run(v.begin(),
                   v.end(),
                   &assemble,
-                  std::bind(&copy, std::ref(result), std::placeholders::_1),
+                  [&result](const copy_data &data) { copy(result, data); },
                   scratch_data(),
                   copy_data());
   std::cout << "result: " << result << std::endl;
