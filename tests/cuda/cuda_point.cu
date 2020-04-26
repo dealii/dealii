@@ -86,7 +86,7 @@ test_gpu()
   // Miscellaneous
   miscellaneous_kernel<dim, Number><<<1, 1>>>(check);
   // Check that the kernel was launched correctly
-  AssertCuda(cudaGetLastError());
+  AssertCuda(cudaPeekAtLastError());
   // Check that there was no problem during the execution of the kernel
   AssertCuda(cudaDeviceSynchronize());
 

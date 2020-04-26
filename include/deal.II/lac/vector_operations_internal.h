@@ -2096,7 +2096,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2121,7 +2121,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2146,7 +2146,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2167,7 +2167,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2193,7 +2193,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2224,7 +2224,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2248,7 +2248,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2273,7 +2273,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2306,7 +2306,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2327,7 +2327,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2351,7 +2351,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2377,7 +2377,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2408,7 +2408,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif
@@ -2441,7 +2441,7 @@ namespace internal
 
 #  ifdef DEBUG
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        AssertCuda(cudaPeekAtLastError());
         // Check that there was no problem during the execution of the kernel
         AssertCuda(cudaDeviceSynchronize());
 #  endif

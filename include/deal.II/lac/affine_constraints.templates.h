@@ -1926,7 +1926,7 @@ namespace internal
         constrained_local_dofs_device, n_constraints, vec.get_values());
 #  ifdef DEBUG
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      AssertCuda(cudaPeekAtLastError());
       // Check that there was no problem during the execution of the kernel
       AssertCuda(cudaDeviceSynchronize());
 #  endif
