@@ -63,7 +63,7 @@ class TensorFunction;
  * // return all components at one point
  * void
  * vector_value(const Point<dim> &p,
- *              Vector<double> &  value) const;
+ *              Vector<double>   &value) const;
  * @endcode
  *
  * For more efficiency, there are other functions returning one or all
@@ -72,13 +72,13 @@ class TensorFunction;
  * // access to one component at several points
  * void
  * value_list(const std::vector<Point<dim>> &point_list,
- *            std::vector<double> &          value_list,
+ *            std::vector<double>           &value_list,
  *            const unsigned int             component = 0) const;
  *
  * // return all components at several points
  * void
  * vector_value_list(const std::vector<Point<dim>> &point_list,
- *                   std::vector<Vector<double>> &  value_list) const;
+ *                   std::vector<Vector<double>>   &value_list) const;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the function or
@@ -132,6 +132,7 @@ class TensorFunction;
  * argument of this class: it describes the scalar type to be used for each
  * component of your return values. It defaults to @p double, but in the
  * example above, it could be set to <code>std::complex@<double@></code>.
+ * step-58 is an example of this.
  *
  * @tparam dim The space dimension of the range space within which the domain
  *   $\Omega$ of the function lies. Consequently, the function will be
