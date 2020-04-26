@@ -301,12 +301,6 @@ namespace parallel
      */
     virtual void
     update_number_cache();
-
-    /**
-     * Store MPI ranks of level ghost owners of this processor on all levels.
-     */
-    void
-    fill_level_ghost_owners();
   };
 
   /**

@@ -343,13 +343,6 @@ namespace parallel
 
     private:
       /**
-       * Override the function to update the number cache so we can fill data
-       * like @p level_ghost_owners.
-       */
-      virtual void
-      update_number_cache() override;
-
-      /**
        * Settings
        */
       const Settings settings;

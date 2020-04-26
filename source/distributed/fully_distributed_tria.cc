@@ -173,7 +173,7 @@ namespace parallel
             }
         }
 
-      update_number_cache();
+      this->update_number_cache();
     }
 
 
@@ -261,19 +261,6 @@ namespace parallel
     {
       this->partitioner = partitioner;
       this->settings    = settings;
-    }
-
-
-
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
-    {
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
-
-      if (settings &
-          TriangulationDescription::Settings::construct_multigrid_hierarchy)
-        parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
     }
 
 

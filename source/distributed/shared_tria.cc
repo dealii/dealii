@@ -419,18 +419,6 @@ namespace parallel
       partition();
       this->update_number_cache();
     }
-
-
-
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
-    {
-      parallel::TriangulationBase<dim, spacedim>::update_number_cache();
-
-      if (settings & construct_multigrid_hierarchy)
-        parallel::TriangulationBase<dim, spacedim>::fill_level_ghost_owners();
-    }
   } // namespace shared
 } // namespace parallel
 
