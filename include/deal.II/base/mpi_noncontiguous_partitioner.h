@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_mpi_noncontiguous_vector_h
-#define dealii_mpi_noncontiguous_vector_h
+#ifndef dealii_mpi_noncontiguous_partitioner_h
+#define dealii_mpi_noncontiguous_partitioner_h
 
 #include <deal.II/base/config.h>
 
