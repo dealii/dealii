@@ -365,12 +365,12 @@ private:
   /**
    * The beginning of the time interval.
    */
-  const double start_time;
+  double start_time;
 
   /**
    *The end of the time interval.
    */
-  const double end_time;
+  double end_time;
 
   /**
    * The current time.
@@ -399,7 +399,7 @@ private:
   /**
    * The size of the first step.
    */
-  const double start_step_size;
+  double start_step_size;
 
   /**
    * The step number i.e. the number of times the simulation time ha been
