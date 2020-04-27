@@ -733,6 +733,11 @@ public:
    * @note The actual type for the vector argument may be any vector type from
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
+   *
+   * @note When working in parallel, the vector to be written needs to be ghosted
+   * with read access to all degrees of freedom on the locally owned cells, see
+   * the step-40 or step-37 tutorial programs for details, i.e., it might be
+   * necessary to call data.update_ghost_values().
    */
   template <class VectorType>
   void
