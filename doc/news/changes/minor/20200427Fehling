@@ -1,0 +1,4 @@
+New: All FEValues objects in a hp::FEValues collection can now be
+pre-computed with hp::FEValues::precalculate_fe_values().
+<br>
+(Marc Fehling, 2020/04/27)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,8 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
+
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/mapping_q1.h>
 
@@ -91,6 +93,64 @@ namespace hp
 
     // now there definitely is one!
     return *fe_values_table(present_fe_values_index);
+  }
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  void
+  FEValuesBase<dim, q_dim, FEValuesType>::precalculate_fe_values(
+    const std::vector<unsigned int> &fe_indices,
+    const std::vector<unsigned int> &mapping_indices,
+    const std::vector<unsigned int> &q_indices)
+  {
+    AssertDimension(fe_indices.size(), mapping_indices.size());
+    AssertDimension(fe_indices.size(), q_indices.size());
+
+    Threads::TaskGroup<> task_group;
+    for (unsigned int i = 0; i < fe_indices.size(); ++i)
+      {
+        const unsigned int fe_index      = fe_indices[i],
+                           mapping_index = mapping_indices[i],
+                           q_index       = q_indices[i];
+
+        AssertIndexRange(fe_index, fe_collection->size());
+        AssertIndexRange(mapping_index, mapping_collection->size());
+        AssertIndexRange(q_index, q_collection.size());
+
+        task_group +=
+          Threads::new_task([&, fe_index, mapping_index, q_index]() {
+            fe_values_table(TableIndices<3>(fe_index, mapping_index, q_index)) =
+              std::make_shared<FEValuesType>(
+                (*mapping_collection)[mapping_index],
+                (*fe_collection)[fe_index],
+                q_collection[q_index],
+                update_flags);
+          });
+      }
+
+    task_group.join_all();
+  }
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  void
+  FEValuesBase<dim, q_dim, FEValuesType>::precalculate_fe_values()
+  {
+    const unsigned int        size = fe_collection->size();
+    std::vector<unsigned int> indices(size);
+    std::iota(indices.begin(), indices.end(), 0);
+
+    precalculate_fe_values(/*fe_indices=*/indices,
+                           /*mapping_indices=*/
+                           (mapping_collection->size() > 1) ?
+                             indices :
+                             std::vector<unsigned int>(size, 0),
+                           /*q_indices=*/
+                           (q_collection.size() > 1) ?
+                             indices :
+                             std::vector<unsigned int>(size, 0));
   }
 } // namespace hp
 
