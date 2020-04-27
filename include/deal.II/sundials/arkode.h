@@ -325,7 +325,7 @@ namespace SUNDIALS
        * @param initial_time Initial time
        * @param final_time Final time
        * @param initial_step_size Initial step size
-       * @param output_period Time interval between each output
+       * @param output_period Desired time interval between each output
        *
        * Running parameters:
        *
@@ -475,7 +475,8 @@ namespace SUNDIALS
       unsigned int maximum_order;
 
       /**
-       * Time period between each output.
+       * Desired time period between each output. The actual output time period
+       * may be adjusted by Arkode.
        */
       double output_period;
 

@@ -20,6 +20,7 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
+#  include <deal.II/base/discrete_time.h>
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/block_vector.h>
@@ -270,18 +271,9 @@ namespace SUNDIALS
   unsigned int
   ARKode<VectorType>::solve_ode(VectorType &solution)
   {
-    unsigned int system_size = solution.size();
+    const unsigned int system_size = solution.size();
 
-    double       t           = data.initial_time;
-    double       h           = data.initial_step_size;
-    unsigned int step_number = 0;
-
-    int status;
-    (void)status;
-
-    // The solution is stored in
-    // solution. Here we take only a
-    // view of it.
+    // The solution is stored in solution. Here we take only a view of it.
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
@@ -302,33 +294,38 @@ namespace SUNDIALS
         yy        = N_VNew_Serial(system_size);
         abs_tolls = N_VNew_Serial(system_size);
       }
-    reset(data.initial_time, data.initial_step_size, solution);
 
-    double next_time = data.initial_time;
+    DiscreteTime time(data.initial_time,
+                      data.final_time,
+                      data.initial_step_size);
+    reset(time.get_current_time(), time.get_next_step_size(), solution);
 
     if (output_step)
-      output_step(0, solution, 0);
+      output_step(time.get_current_time(), solution, time.get_step_number());
 
-    while (t < data.final_time)
+    while (time.is_at_end() == false)
       {
-        next_time += data.output_period;
-
-        status = SundialsARKode(arkode_mem, next_time, yy, &t, ARK_NORMAL);
-
-        AssertARKode(status);
-
-        status = ARKodeGetLastStep(arkode_mem, &h);
+        time.set_desired_next_step_size(data.output_period);
+        double     actual_next_time;
+        const auto status = SundialsARKode(
+          arkode_mem, time.get_next_time(), yy, &actual_next_time, ARK_NORMAL);
+        (void)status;
         AssertARKode(status);
 
         copy(solution, yy);
 
-        while (solver_should_restart(t, solution))
-          reset(t, h, solution);
+        time.set_next_step_size(actual_next_time - time.get_current_time());
+        time.advance_time();
 
-        step_number++;
+        while (solver_should_restart(time.get_current_time(), solution))
+          reset(time.get_current_time(),
+                time.get_previous_step_size(),
+                solution);
 
         if (output_step)
-          output_step(t, solution, step_number);
+          output_step(time.get_current_time(),
+                      solution,
+                      time.get_step_number());
       }
 
       // Free the vectors which are no longer used.
@@ -345,7 +342,7 @@ namespace SUNDIALS
         N_VDestroy_Serial(abs_tolls);
       }
 
-    return step_number;
+    return time.get_step_number();
   }
 
   template <typename VectorType>
