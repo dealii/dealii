@@ -836,13 +836,13 @@ as an integer multiple of
 @f[
   \left(\int_\Omega e^{-\frac{r_k^2}{R^2}}\right)^{-1}
   =
-  \left(R^d\sqrt{\pi^d}}\right)^{-1},
+  \left(R^d\sqrt{\pi^d}\right)^{-1},
 @f]
 assuming for the moment that $\Omega={\mathbb R}^d$ -- which is
 of course not the case, but we'll ignore the small difference in
 integral.
 
-Thus, we choose $\alpha_k=\left(R^d\sqrt{\pi^d}}\right)^{-1}$ for all, and
+Thus, we choose $\alpha_k=\left(R^d\sqrt{\pi^d}\right)^{-1}$ for all, and
 $R=0.1$. This $R$ is small enough that the difference between the
 exact (infinite) integral and the integral over $\Omega$ should not be
 too concerning.
