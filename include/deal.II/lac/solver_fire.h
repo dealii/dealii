@@ -136,11 +136,6 @@ public:
              const AdditionalData &data = AdditionalData());
 
   /**
-   * Virtual destructor.
-   */
-  virtual ~SolverFIRE();
-
-  /**
    * Obtain a set of variables @p x that minimize an objective function
    * described by the polymorphic function wrapper @p compute, with a given
    * preconditioner @p inverse_mass_matrix and initial @p x values.
@@ -225,12 +220,6 @@ SolverFIRE<VectorType>::SolverFIRE(SolverControl &       solver_control,
                                    const AdditionalData &data)
   : SolverBase<VectorType>(solver_control)
   , additional_data(data)
-{}
-
-
-
-template <typename VectorType>
-SolverFIRE<VectorType>::~SolverFIRE()
 {}
 
 
