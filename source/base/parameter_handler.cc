@@ -1339,6 +1339,33 @@ ParameterHandler::print_parameters(std::ostream &    out,
   return out;
 }
 
+
+
+void
+ParameterHandler::print_parameters(
+  const std::string &                 filename,
+  const ParameterHandler::OutputStyle style) const
+{
+  std::string extension = filename.substr(filename.find_last_of('.') + 1);
+  boost::algorithm::to_lower(extension);
+
+  ParameterHandler::OutputStyle output_style = style;
+  if (extension == "prm")
+    output_style = style | PRM;
+  else if (extension == "xml")
+    output_style = style | XML;
+  else if (extension == "json")
+    output_style = style | JSON;
+  else if (extension == "tex")
+    output_style = style | LaTeX;
+
+  std::ofstream out(filename);
+  AssertThrow(out, ExcIO());
+  print_parameters(out, output_style);
+}
+
+
+
 void
 ParameterHandler::recursively_print_parameters(
   const boost::property_tree::ptree &tree,

@@ -1475,6 +1475,32 @@ public:
   std::ostream &
   print_parameters(std::ostream &out, const OutputStyle style) const;
 
+
+
+  /**
+   * Print all parameters with the given @p style to the file given by
+   * @p filename.
+   *
+   * This function deduces the output format from the extension of the specified
+   * filename. Supported extensions are `prm`, `xml`, `tex`, and `json`.
+   * If a different extensions is used, then an output style is deduced from the
+   * @p style argument.
+   *
+   * Notice that specifying a supported file extension is equivalent to
+   * specifying the corresponding ParameterHandler::OutputStyle format. In
+   * particular, any  (optional) format specification specified in the @p style
+   * parameter  must be compatible with the given extension.
+   *
+   * If the format is not supported, and @p output_style does not contain a
+   * format specification, an assertion is thrown.
+   *
+   * @param filename The output file name.
+   * @param style The style with which output is produced.
+   */
+  void
+  print_parameters(const std::string &filename,
+                   const OutputStyle  style = DefaultStyle) const;
+
   /**
    * Print parameters to a logstream. This function allows to print all
    * parameters into a log-file. Sections will be indented in the usual log-
