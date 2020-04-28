@@ -58,8 +58,6 @@
 #endif
 
 
-#include <deal.II/base/config.h>
-
 #include <algorithm>
 #include <cmath>
 #include <set>

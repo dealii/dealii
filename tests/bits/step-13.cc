@@ -17,11 +17,6 @@
 
 // a un-hp-ified version of hp/step-13
 
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
@@ -800,6 +795,7 @@ solve_problem(const std::string &solver_name)
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

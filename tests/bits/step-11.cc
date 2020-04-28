@@ -17,10 +17,6 @@
 
 // a un-hp-ified version of hp/step-11
 
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
@@ -224,6 +220,7 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

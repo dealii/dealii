@@ -36,7 +36,6 @@
 #  ifdef DEAL_II_WITH_MPI
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
-#    include <deal.II/lac/vector_memory.h>
 
 #    include <Epetra_MpiComm.h>
 #  endif

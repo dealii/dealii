@@ -32,7 +32,6 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/sparse_direct.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>

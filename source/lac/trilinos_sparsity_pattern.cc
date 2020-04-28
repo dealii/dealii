@@ -23,7 +23,6 @@
 
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/trilinos_index_access.h>
 
 #  include <Epetra_Export.h>
 

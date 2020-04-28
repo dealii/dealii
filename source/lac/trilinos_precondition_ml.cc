@@ -19,7 +19,6 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/sparse_matrix.h>
-#  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 

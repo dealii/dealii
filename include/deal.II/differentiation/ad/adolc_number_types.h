@@ -82,7 +82,6 @@ DEAL_II_NAMESPACE_CLOSE
 #  include <adolc/internal/adubfunc.h> // Taped double math functions
 
 #  include <complex>
-#  include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 

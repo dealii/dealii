@@ -31,7 +31,6 @@
 #    include <deal.II/lac/petsc_block_vector.h>
 #    include <deal.II/lac/petsc_vector.h>
 #  endif
-#  include <deal.II/base/utilities.h>
 
 #  include <deal.II/sundials/copy.h>
 

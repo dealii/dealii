@@ -28,8 +28,6 @@
 #  include <deal.II/base/thread_management.h>
 
 #  ifdef DEAL_II_WITH_THREADS
-#    include <deal.II/base/thread_management.h>
-
 #    include <tbb/pipeline.h>
 #  endif
 
