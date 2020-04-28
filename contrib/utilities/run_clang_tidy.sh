@@ -67,7 +67,7 @@ cmake --build . --target expand_all_instantiations || (echo "make expand_all_ins
 run-clang-tidy.py -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
 
 # grep interesting errors and make sure we remove duplicates:
-grep -E '(warning|error): ' output.txt output2.txt | sort | uniq >clang-tidy.log
+grep -E '(warning|error): ' output.txt | sort | uniq >clang-tidy.log
 
 # if we have errors, report them and set exit status to failure
 if [ -s clang-tidy.log ]; then
