@@ -342,11 +342,8 @@ namespace
        ((style & ParameterHandler::Description) != 0) +
        ((style & ParameterHandler::LaTeX) != 0)) == 1,
       ExcMessage(
-        "You have chosen either no or multiple style formats. You can choose between: PRM, Description, LaTeX, XML, JSON."));
-
-    AssertThrow(((style & ParameterHandler::LaTeX) &&
-                 (style & ParameterHandler::Short)) == false,
-                ExcMessage("It is not possible to request short LaTex."));
+        "You have chosen either no or multiple style formats. You can choose "
+        "between: PRM, Description, LaTeX, XML, JSON."));
   }
 
 } // namespace
@@ -534,10 +531,7 @@ ParameterHandler::parse_input(const std::string &filename,
                               const bool assert_mandatory_entries_are_found)
 {
   std::ifstream is(filename);
-  AssertThrow(is,
-              ExcMessage("Invalid filename " + filename +
-                         " provided. File does not exist or "
-                         "can not be read from."));
+  AssertThrow(is, PathSearch::ExcFileNotFound(filename, "ParameterHandler"));
 
   std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
   boost::algorithm::to_lower(file_ending);
@@ -672,8 +666,7 @@ namespace
   //
   // This function is strongly based on read_xml_recursively().
   void
-  recursively_remove_documentation_from_tree(
-    boost::property_tree::ptree &source)
+  recursively_compress_tree(boost::property_tree::ptree &source)
   {
     for (auto &p : source)
       {
@@ -691,7 +684,7 @@ namespace
         else
           {
             // it must be a subsection
-            recursively_remove_documentation_from_tree(p.second);
+            recursively_compress_tree(p.second);
           }
       }
   }
@@ -1272,11 +1265,11 @@ ParameterHandler::print_parameters(std::ostream &    out,
   // done recursively in our own code. take care of the two special formats
   // first
 
-  // explicity eliminate the documentation from the tree if requested
-  if (style & Short)
+  // explicity compress the tree if requested
+  if ((style & Short) && (style & (XML | JSON)))
     {
       // modify the copy of the tree
-      recursively_remove_documentation_from_tree(current_entries);
+      recursively_compress_tree(current_entries);
     }
 
   if (style & XML)
@@ -1436,8 +1429,6 @@ ParameterHandler::recursively_print_parameters(
                       << "# " << doc_line << '\n';
               }
 
-
-
             // print name and value of this entry
             out << std::setw(overall_indent_level * 2) << ""
                 << "set " << demangle(p.first)
@@ -1525,20 +1516,22 @@ ParameterHandler::recursively_print_parameters(
 
                 // if there is a documenting string, print it as well but
                 // don't escape to allow formatting/formulas
-                if (!(style & Short))
-                  if (!p.second.get<std::string>("documentation").empty())
-                    out << "{\\it Description:} "
-                        << p.second.get<std::string>("documentation") << "\n\n"
-                        << '\n';
-
-                // also output possible values, do not escape because the
-                // description internally will use LaTeX formatting
-                const unsigned int pattern_index =
-                  p.second.get<unsigned int>("pattern");
-                const std::string desc_str =
-                  patterns[pattern_index]->description(
-                    Patterns::PatternBase::LaTeX);
-                out << "{\\it Possible values:} " << desc_str << '\n';
+                if (!is_short &&
+                    !p.second.get<std::string>("documentation").empty())
+                  out << "{\\it Description:} "
+                      << p.second.get<std::string>("documentation") << "\n\n"
+                      << '\n';
+                if (!is_short)
+                  {
+                    // also output possible values, do not escape because the
+                    // description internally will use LaTeX formatting
+                    const unsigned int pattern_index =
+                      p.second.get<unsigned int>("pattern");
+                    const std::string desc_str =
+                      patterns[pattern_index]->description(
+                        Patterns::PatternBase::LaTeX);
+                    out << "{\\it Possible values:} " << desc_str << '\n';
+                  }
               }
             else if (is_alias_node(p.second) == true)
               {
@@ -1630,7 +1623,8 @@ ParameterHandler::recursively_print_parameters(
               out << '\n';
 
             // if there is a documenting string, print it as well
-            if (p.second.get<std::string>("documentation").length() != 0)
+            if (!is_short &&
+                p.second.get<std::string>("documentation").length() != 0)
               out << std::setw(overall_indent_level * 2 + longest_name + 10)
                   << ""
                   << "(" << p.second.get<std::string>("documentation") << ")"
@@ -1726,11 +1720,11 @@ ParameterHandler::recursively_print_parameters(
             if (overall_indent_level == 0)
               out << '\n';
           }
-        else if (style == Description)
+        else if (style & Description)
           {
             // nothing to do
           }
-        else if (style == LaTeX)
+        else if (style & LaTeX)
           {
             // nothing to do
           }
