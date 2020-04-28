@@ -320,9 +320,7 @@ JxWError<dim>::setup_matrices()
       cell_rhs    = 0.0;
       fe_values.reinit(cell);
 
-      for (unsigned int q_point_n = 0;
-           q_point_n < fe_values.n_quadrature_points;
-           ++q_point_n)
+      for (const auto q_point_n : fe_values.quadrature_point_indices())
         {
           const double point_forcing =
             manufactured_forcing->value(fe_values.quadrature_point(q_point_n));

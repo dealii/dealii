@@ -144,7 +144,7 @@ test5()
         fe_values.get_function_values(solution, solution_values);
 
         deallog << " cell=" << cell->center() << std::endl;
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // find non-zero shape_value
             deallog << " qp=" << q_points[q_point]

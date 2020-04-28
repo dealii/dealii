@@ -155,7 +155,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
           function_vals, selected_vector_values);
         deallog << "component=" << c << std::endl;
 
-        for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           for (unsigned int d = 0; d < dim; ++d)
             {
               for (unsigned int e = 0; e < dim; ++e)

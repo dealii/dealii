@@ -229,7 +229,7 @@ test(const FiniteElement<dim> & fe1,
 
       // check shape functions
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values_system.quadrature_point_indices())
           check_consistency(
             q_points[q_point],
             function,
@@ -252,7 +252,8 @@ test(const FiniteElement<dim> & fe1,
             fe_face_values_system.get_quadrature_points();
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int q_point = 0; q_point < n_q_points_face; ++q_point)
+            for (const auto q_point :
+                 fe_face_values_system.quadrature_point_indices())
               check_consistency(
                 q_points[q_point],
                 function,

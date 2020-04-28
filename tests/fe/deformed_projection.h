@@ -151,7 +151,7 @@ void EvaluateDerivative(DoFHandler<2> *dof_handler, Vector<double> &solution)
         n_q_points, std::vector<Tensor<1, 2>>(n_components));
       fe_values.get_function_gradients(solution, grads_here);
 
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         {
           //   double u0 = this_value[q_point](0);
           // double v0 = this_value[q_point](1);
@@ -243,7 +243,7 @@ create_mass_matrix(const Mapping<dim> &       mapping,
             {
               coefficient->value_list(fe_values.get_quadrature_points(),
                                       coefficient_values);
-              for (unsigned int point = 0; point < n_q_points; ++point)
+              for (auto point : fe_values.quadrature_point_indices())
                 {
                   const double weight = fe_values.JxW(point);
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -266,7 +266,7 @@ create_mass_matrix(const Mapping<dim> &       mapping,
             {
               coefficient->vector_value_list(fe_values.get_quadrature_points(),
                                              coefficient_vector_values);
-              for (unsigned int point = 0; point < n_q_points; ++point)
+              for (auto point : fe_values.quadrature_point_indices())
                 {
                   const double weight = fe_values.JxW(point);
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -316,7 +316,7 @@ create_mass_matrix(const Mapping<dim> &       mapping,
                 }
             }
 
-          for (unsigned int point = 0; point < n_q_points; ++point)
+          for (auto point : fe_values.quadrature_point_indices())
             {
               const double weight = fe_values.JxW(point);
               //     const double weight = q.weight(point);
@@ -425,7 +425,7 @@ create_right_hand_side(const Mapping<dim> &   mapping,
                                   rhs_values);
 
           cell_vector = 0;
-          for (unsigned int point = 0; point < n_q_points; ++point)
+          for (auto point : fe_values.quadrature_point_indices())
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_vector(i) += rhs_values[point] *
                                 fe_values.shape_value(i, point) *
@@ -451,7 +451,7 @@ create_right_hand_side(const Mapping<dim> &   mapping,
                                          rhs_values);
 
           cell_vector = 0;
-          for (unsigned int point = 0; point < n_q_points; ++point)
+          for (auto point : fe_values.quadrature_point_indices())
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               for (unsigned int comp_i = 0; comp_i < fe.n_components();
                    ++comp_i)

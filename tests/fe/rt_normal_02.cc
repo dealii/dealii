@@ -136,7 +136,7 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
                 n_q_proj, Vector<double>(n_components));
               fe_v_n.get_function_values(solution, this_value_n);
 
-              for (unsigned int q_point = 0; q_point < n_q_face; ++q_point)
+              for (const auto q_point : fe_v_face.quadrature_point_indices())
                 {
                   Tensor<1, 2> vn = fe_v_face.normal_vector(q_point);
                   double       nx = vn[0];
@@ -218,7 +218,7 @@ void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
                 n_q_face, Vector<double>(n_components));
               fe_v_face_n.get_function_values(solution, this_value_n);
 
-              for (unsigned int q_point = 0; q_point < n_q_face; ++q_point)
+              for (const auto q_point : fe_v_face.quadrature_point_indices())
                 {
                   Tensor<1, 2> vn = fe_v_face.normal_vector(q_point);
                   double       nx = vn[0];
