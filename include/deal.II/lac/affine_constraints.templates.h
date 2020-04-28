@@ -1924,12 +1924,7 @@ namespace internal
       const int n_blocks = 1 + (n_constraints - 1) / CUDAWrappers::block_size;
       set_zero_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
         constrained_local_dofs_device, n_constraints, vec.get_values());
-#  ifdef DEBUG
-      // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
-      // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
-#  endif
+      AssertCudaKernel();
 
       Utilities::CUDA::free(constrained_local_dofs_device);
 

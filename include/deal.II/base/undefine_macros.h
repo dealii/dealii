@@ -30,6 +30,10 @@
 #  undef AssertCuda
 #endif // #ifdef AssertCuda
 
+#ifdef AssertCudaKernel
+#  undef AssertCudaKernel
+#endif // #ifdef AssertCudaKernel
+
 #ifdef AssertCusolver
 #  undef AssertCusolver
 #endif // #ifdef AssertCusolver

@@ -2093,13 +2093,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2118,13 +2112,7 @@ namespace internal
                                      1.,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2143,13 +2131,7 @@ namespace internal
                                      -1.,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2164,13 +2146,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2190,13 +2166,7 @@ namespace internal
                                      a,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2221,13 +2191,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2245,13 +2209,7 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2270,13 +2228,7 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), a, v_data.values_dev.get(), size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2303,13 +2255,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2324,13 +2270,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2348,13 +2288,7 @@ namespace internal
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     v_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2374,13 +2308,7 @@ namespace internal
                                                     a,
                                                     v_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2405,13 +2333,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static Number
@@ -2438,13 +2360,7 @@ namespace internal
                                                     v_data.values_dev.get(),
                                                     static_cast<unsigned int>(
                                                       size));
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
 
         // Copy the result back to the host
         Number result;
