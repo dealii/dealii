@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/mapping_q1.h>
@@ -65,6 +66,38 @@ namespace hp
 
 
   template <int dim, int q_dim, class FEValuesType>
+  FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
+    const FEValuesBase<dim, q_dim, FEValuesType> &other)
+    : fe_collection(other.fe_collection)
+    , mapping_collection(other.mapping_collection)
+    , q_collection(other.q_collection)
+    , fe_values_table(fe_collection->size(),
+                      mapping_collection->size(),
+                      q_collection.size())
+    , present_fe_values_index(other.present_fe_values_index)
+    , update_flags(other.update_flags)
+  {
+    // We've already resized the `fe_values_table` correctly above, but right
+    // now it just contains nullptrs. Create copies of the objects that
+    // `other.fe_values_table` stores
+    for (unsigned int fe_index = 0; fe_index < fe_collection->size();
+         ++fe_index)
+      for (unsigned int m_index = 0; m_index < mapping_collection->size();
+           ++m_index)
+        for (unsigned int q_index = 0; q_index < q_collection.size(); ++q_index)
+          if (other.fe_values_table[fe_index][m_index][q_index].get() !=
+              nullptr)
+            fe_values_table[fe_index][m_index][q_index] =
+              std_cxx14::make_unique<FEValuesType>(
+                (*mapping_collection)[m_index],
+                (*fe_collection)[fe_index],
+                q_collection[q_index],
+                update_flags);
+  }
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
   FEValuesType &
   FEValuesBase<dim, q_dim, FEValuesType>::select_fe_values(
     const unsigned int fe_index,
@@ -86,10 +119,11 @@ namespace hp
     // of indices
     if (fe_values_table(present_fe_values_index).get() == nullptr)
       fe_values_table(present_fe_values_index) =
-        std::make_shared<FEValuesType>((*mapping_collection)[mapping_index],
-                                       (*fe_collection)[fe_index],
-                                       q_collection[q_index],
-                                       update_flags);
+        std_cxx14::make_unique<FEValuesType>(
+          (*mapping_collection)[mapping_index],
+          (*fe_collection)[fe_index],
+          q_collection[q_index],
+          update_flags);
 
     // now there definitely is one!
     return *fe_values_table(present_fe_values_index);
@@ -121,7 +155,7 @@ namespace hp
         task_group +=
           Threads::new_task([&, fe_index, mapping_index, q_index]() {
             fe_values_table(TableIndices<3>(fe_index, mapping_index, q_index)) =
-              std::make_shared<FEValuesType>(
+              std_cxx14::make_unique<FEValuesType>(
                 (*mapping_collection)[mapping_index],
                 (*fe_collection)[fe_index],
                 q_collection[q_index],
