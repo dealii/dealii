@@ -26,9 +26,6 @@
 
 #include <deal.II/numerics/history.h>
 
-#include <errno.h>
-#include <sys/stat.h>
-
 #include <fstream>
 #include <string>
 
