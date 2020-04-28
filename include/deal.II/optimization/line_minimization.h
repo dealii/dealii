@@ -26,9 +26,9 @@
 
 #include <deal.II/numerics/history.h>
 
-#include <errno.h>
 #include <sys/stat.h>
 
+#include <cerrno>
 #include <fstream>
 #include <string>
 
