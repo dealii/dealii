@@ -31,7 +31,7 @@ DEAL:0:3d::total active cells = 11702
 DEAL:0:3d::* cycle 3
 DEAL:0:3d::ghost owners: 1 2 
 DEAL:0:3d::level ghost owners: 1 2 
-DEAL:0:3d::total active cells = 37868
+DEAL:0:3d::total active cells = 37833
 DEAL:0:3d::OK
 
 DEAL:1:2d::* cycle 0
