@@ -129,7 +129,7 @@ test()
 
       Assert(neighbors == ghost_owners, ExcInternalError());
 
-      parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+      parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
         tr, indicators, 0.3, 0.0);
       tr.execute_coarsening_and_refinement();
       if (myid == 0)

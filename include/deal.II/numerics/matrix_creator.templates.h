@@ -1427,7 +1427,7 @@ namespace MatrixCreator
     create_hp_boundary_mass_matrix_1(
       typename hp::DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
       MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-      MatrixCreator::internal::AssemblerBoundary ::
+      MatrixCreator::internal::AssemblerBoundary::
         CopyData<hp::DoFHandler<dim, spacedim>, number> &copy_data,
       hp::MappingCollection<dim, spacedim> const &       mapping,
       hp::FECollection<dim, spacedim> const &            fe_collection,
@@ -1682,7 +1682,7 @@ namespace MatrixCreator
     template <int dim, int spacedim, typename number>
     void
     copy_hp_boundary_mass_matrix_1(
-      MatrixCreator::internal::AssemblerBoundary ::
+      MatrixCreator::internal::AssemblerBoundary::
         CopyData<hp::DoFHandler<dim, spacedim>, number> const &copy_data,
       std::map<types::boundary_id, const Function<spacedim, number> *> const
         &                                         boundary_functions,
@@ -1870,7 +1870,7 @@ namespace MatrixCreator
         typename hp::DoFHandler<dim, spacedim>::active_cell_iterator const
           &                                                        cell,
         MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch_data,
-        MatrixCreator::internal::AssemblerBoundary ::
+        MatrixCreator::internal::AssemblerBoundary::
           CopyData<hp::DoFHandler<dim, spacedim>, number> &copy_data) {
         internal::create_hp_boundary_mass_matrix_1(cell,
                                                    scratch_data,
@@ -1883,7 +1883,7 @@ namespace MatrixCreator
                                                    component_mapping);
       },
       [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
-        MatrixCreator::internal::AssemblerBoundary ::
+        MatrixCreator::internal::AssemblerBoundary::
           CopyData<hp::DoFHandler<dim, spacedim>, number> const &copy_data) {
         internal::copy_hp_boundary_mass_matrix_1(copy_data,
                                                  boundary_functions,

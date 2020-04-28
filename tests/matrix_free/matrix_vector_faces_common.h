@@ -708,13 +708,13 @@ MatrixIntegrator<dim>::face(
               info1.fe_values(0).normal_vector(0)));
   double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
                    std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::ip_matrix(dinfo1.matrix(0, false).matrix,
-                                        dinfo1.matrix(0, true).matrix,
-                                        dinfo2.matrix(0, true).matrix,
-                                        dinfo2.matrix(0, false).matrix,
-                                        info1.fe_values(0),
-                                        info2.fe_values(0),
-                                        penalty);
+  LocalIntegrators::Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
+                                       dinfo1.matrix(0, true).matrix,
+                                       dinfo2.matrix(0, true).matrix,
+                                       dinfo2.matrix(0, false).matrix,
+                                       info1.fe_values(0),
+                                       info2.fe_values(0),
+                                       penalty);
 }
 
 
@@ -733,9 +733,9 @@ MatrixIntegrator<dim>::boundary(
                 [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
               info.fe_values(0).normal_vector(0)));
   double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::nitsche_matrix(dinfo.matrix(0, false).matrix,
-                                             info.fe_values(0),
-                                             penalty);
+  LocalIntegrators::Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
+                                            info.fe_values(0),
+                                            penalty);
 }
 
 

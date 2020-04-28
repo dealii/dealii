@@ -2257,8 +2257,8 @@ namespace parallel
             return sizeof(unsigned int) +
                    tree_index.size() * sizeof(unsigned int) +
                    quadrants.size() *
-                     sizeof(typename dealii::internal::p4est ::types<
-                            dim>::quadrant) +
+                     sizeof(
+                       typename dealii::internal::p4est::types<dim>::quadrant) +
                    vertex_indices.size() * sizeof(unsigned int) +
                    vertices.size() * sizeof(dealii::Point<spacedim>);
           }

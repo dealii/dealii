@@ -1016,7 +1016,7 @@ namespace internal
             // get here
             reinterpret_cast<
               std::vector<Tensor<2,
-                                 DoFHandlerType ::space_dimension,
+                                 DoFHandlerType::space_dimension,
                                  typename VectorType::value_type>> &>(
               patch_hessians));
         }

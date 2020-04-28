@@ -1827,7 +1827,7 @@ namespace internal
               ++next_free_line;
 
             next_free_line->set(
-              internal::TriangulationImplementation ::TriaObject<1>(
+              internal::TriangulationImplementation::TriaObject<1>(
                 cells[cell].vertices[0], cells[cell].vertices[1]));
             next_free_line->set_used_flag();
             next_free_line->set_material_id(cells[cell].material_id);
@@ -2939,7 +2939,7 @@ namespace internal
 
               // make the cell out of
               // these iterators
-              cell->set(internal::TriangulationImplementation ::TriaObject<3>(
+              cell->set(internal::TriangulationImplementation::TriaObject<3>(
                 face_iterator[0]->index(),
                 face_iterator[1]->index(),
                 face_iterator[2]->index(),
@@ -4824,7 +4824,7 @@ namespace internal
                   cell->set_children(0, first_child->index());
                   first_child->clear_children();
                   first_child->set(
-                    internal::TriangulationImplementation ::TriaObject<1>(
+                    internal::TriangulationImplementation::TriaObject<1>(
                       cell->vertex_index(0), next_unused_vertex));
                   first_child->set_material_id(cell->material_id());
                   first_child->set_manifold_id(cell->manifold_id());
@@ -4875,7 +4875,7 @@ namespace internal
                   // insert second child
                   second_child->clear_children();
                   second_child->set(
-                    internal::TriangulationImplementation ::TriaObject<1>(
+                    internal::TriangulationImplementation::TriaObject<1>(
                       next_unused_vertex, cell->vertex_index(1)));
                   second_child->set_neighbor(0, first_child);
                   second_child->set_material_id(cell->material_id());
@@ -5152,10 +5152,10 @@ namespace internal
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                 children[0]->set(
-                  internal::TriangulationImplementation ::TriaObject<1>(
+                  internal::TriangulationImplementation::TriaObject<1>(
                     line->vertex_index(0), next_unused_vertex));
                 children[1]->set(
-                  internal::TriangulationImplementation ::TriaObject<1>(
+                  internal::TriangulationImplementation::TriaObject<1>(
                     next_unused_vertex, line->vertex_index(1)));
 
                 children[0]->set_used_flag();
@@ -5621,10 +5621,10 @@ namespace internal
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                 children[0]->set(
-                  internal::TriangulationImplementation ::TriaObject<1>(
+                  internal::TriangulationImplementation::TriaObject<1>(
                     line->vertex_index(0), next_unused_vertex));
                 children[1]->set(
-                  internal::TriangulationImplementation ::TriaObject<1>(
+                  internal::TriangulationImplementation::TriaObject<1>(
                     next_unused_vertex, line->vertex_index(1)));
 
                 children[0]->set_used_flag();
@@ -5804,7 +5804,7 @@ namespace internal
                     if (aniso_quad_ref_case == RefinementCase<dim - 1>::cut_x)
                       {
                         new_quads[0]->set(
-                          internal::TriangulationImplementation ::TriaObject<2>(
+                          internal::TriangulationImplementation::TriaObject<2>(
                             quad->line_index(0),
                             new_line->index(),
                             quad->line(2)
@@ -5814,7 +5814,7 @@ namespace internal
                               ->child(index[0][quad->line_orientation(3)])
                               ->index()));
                         new_quads[1]->set(
-                          internal::TriangulationImplementation ::TriaObject<2>(
+                          internal::TriangulationImplementation::TriaObject<2>(
                             new_line->index(),
                             quad->line_index(1),
                             quad->line(2)
@@ -5827,7 +5827,7 @@ namespace internal
                     else
                       {
                         new_quads[0]->set(
-                          internal::TriangulationImplementation ::TriaObject<2>(
+                          internal::TriangulationImplementation::TriaObject<2>(
                             quad->line(0)
                               ->child(index[0][quad->line_orientation(0)])
                               ->index(),
@@ -5837,7 +5837,7 @@ namespace internal
                             quad->line_index(2),
                             new_line->index()));
                         new_quads[1]->set(
-                          internal::TriangulationImplementation ::TriaObject<2>(
+                          internal::TriangulationImplementation::TriaObject<2>(
                             quad->line(0)
                               ->child(index[1][quad->line_orientation(0)])
                               ->index(),
@@ -6526,7 +6526,7 @@ namespace internal
                     quad->set_children(0, new_quads[0]->index());
                     quad->set_children(2, new_quads[2]->index());
                     new_quads[0]->set(
-                      internal::TriangulationImplementation ::TriaObject<2>(
+                      internal::TriangulationImplementation::TriaObject<2>(
                         line_indices[0],
                         line_indices[8],
                         line_indices[4],
@@ -6535,25 +6535,25 @@ namespace internal
                     quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
                     new_quads[0]->set(
-                      internal::TriangulationImplementation ::TriaObject<2>(
+                      internal::TriangulationImplementation::TriaObject<2>(
                         line_indices[0],
                         line_indices[8],
                         line_indices[4],
                         line_indices[10]));
                     new_quads[1]->set(
-                      internal::TriangulationImplementation ::TriaObject<2>(
+                      internal::TriangulationImplementation::TriaObject<2>(
                         line_indices[8],
                         line_indices[2],
                         line_indices[5],
                         line_indices[11]));
                     new_quads[2]->set(
-                      internal::TriangulationImplementation ::TriaObject<2>(
+                      internal::TriangulationImplementation::TriaObject<2>(
                         line_indices[1],
                         line_indices[9],
                         line_indices[10],
                         line_indices[6]));
                     new_quads[3]->set(
-                      internal::TriangulationImplementation ::TriaObject<2>(
+                      internal::TriangulationImplementation::TriaObject<2>(
                         line_indices[9],
                         line_indices[3],
                         line_indices[11],
@@ -6971,7 +6971,7 @@ namespace internal
                           // set up the new quad, line numbering is as
                           // indicated above
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[0],
                                  line_indices[1],
                                  line_indices[2],
@@ -7059,7 +7059,7 @@ namespace internal
                           };
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[1],
                                  quad_indices[0],
                                  quad_indices[3],
@@ -7067,7 +7067,7 @@ namespace internal
                                  quad_indices[7],
                                  quad_indices[9]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[0],
                                  quad_indices[2],
                                  quad_indices[4],
@@ -7200,7 +7200,7 @@ namespace internal
                           // set up the new quad, line numbering is as
                           // indicated above
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[2],
                                  line_indices[3],
                                  line_indices[0],
@@ -7288,7 +7288,7 @@ namespace internal
                           };
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[1],
                                  quad_indices[3],
                                  quad_indices[5],
@@ -7296,7 +7296,7 @@ namespace internal
                                  quad_indices[7],
                                  quad_indices[9]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[2],
                                  quad_indices[4],
                                  quad_indices[0],
@@ -7431,7 +7431,7 @@ namespace internal
                           // set up the new quad, line numbering is as
                           // indicated above
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[0],
                                  line_indices[1],
                                  line_indices[2],
@@ -7519,7 +7519,7 @@ namespace internal
                           };
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[1],
                                  quad_indices[3],
                                  quad_indices[5],
@@ -7527,7 +7527,7 @@ namespace internal
                                  quad_indices[9],
                                  quad_indices[0]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[2],
                                  quad_indices[4],
                                  quad_indices[6],
@@ -7800,25 +7800,25 @@ namespace internal
                           //  *---*---*y     *-6-*-7-*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[2],
                                  line_indices[12],
                                  line_indices[4],
                                  line_indices[8]));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[12],
                                  line_indices[3],
                                  line_indices[5],
                                  line_indices[9]));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[6],
                                  line_indices[10],
                                  line_indices[0],
                                  line_indices[12]));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[7],
                                  line_indices[11],
                                  line_indices[12],
@@ -7948,7 +7948,7 @@ namespace internal
                                 3, f_or[5], f_fl[5], f_ro[5]))};
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[4],
                                  quad_indices[0],
                                  quad_indices[8],
@@ -7956,7 +7956,7 @@ namespace internal
                                  quad_indices[12],
                                  quad_indices[16]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[0],
                                  quad_indices[6],
                                  quad_indices[9],
@@ -7964,7 +7964,7 @@ namespace internal
                                  quad_indices[13],
                                  quad_indices[17]));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[5],
                                  quad_indices[1],
                                  quad_indices[2],
@@ -7972,7 +7972,7 @@ namespace internal
                                  quad_indices[14],
                                  quad_indices[18]));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[1],
                                  quad_indices[7],
                                  quad_indices[3],
@@ -8245,25 +8245,25 @@ namespace internal
                           //  *----*----*x     *--6-*--7-*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[0],
                                  line_indices[12],
                                  line_indices[6],
                                  line_indices[10]));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[12],
                                  line_indices[1],
                                  line_indices[7],
                                  line_indices[11]));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[4],
                                  line_indices[8],
                                  line_indices[2],
                                  line_indices[12]));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[5],
                                  line_indices[9],
                                  line_indices[12],
@@ -8403,7 +8403,7 @@ namespace internal
                           // | 0 | 2 |
                           // *---*---*
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[4],
                                  quad_indices[2],
                                  quad_indices[8],
@@ -8411,7 +8411,7 @@ namespace internal
                                  quad_indices[16],
                                  quad_indices[0]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[5],
                                  quad_indices[3],
                                  quad_indices[9],
@@ -8419,7 +8419,7 @@ namespace internal
                                  quad_indices[0],
                                  quad_indices[18]));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[2],
                                  quad_indices[6],
                                  quad_indices[10],
@@ -8427,7 +8427,7 @@ namespace internal
                                  quad_indices[17],
                                  quad_indices[1]));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[3],
                                  quad_indices[7],
                                  quad_indices[11],
@@ -8697,25 +8697,25 @@ namespace internal
                           //  *---------*x     *----0----*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[6],
                                  line_indices[10],
                                  line_indices[0],
                                  line_indices[12]));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[7],
                                  line_indices[11],
                                  line_indices[12],
                                  line_indices[1]));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[2],
                                  line_indices[12],
                                  line_indices[4],
                                  line_indices[8]));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[12],
                                  line_indices[3],
                                  line_indices[5],
@@ -8846,7 +8846,7 @@ namespace internal
                                               1][f_fl[5]][f_ro[5]])};
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[4],
                                  quad_indices[8],
                                  quad_indices[12],
@@ -8854,7 +8854,7 @@ namespace internal
                                  quad_indices[16],
                                  quad_indices[0]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[5],
                                  quad_indices[9],
                                  quad_indices[2],
@@ -8862,7 +8862,7 @@ namespace internal
                                  quad_indices[17],
                                  quad_indices[1]));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[6],
                                  quad_indices[10],
                                  quad_indices[13],
@@ -8870,7 +8870,7 @@ namespace internal
                                  quad_indices[0],
                                  quad_indices[18]));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[7],
                                  quad_indices[11],
                                  quad_indices[3],
@@ -9289,73 +9289,73 @@ namespace internal
                           //  *----*----*x     *--8-*--9-*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[10],
                                  line_indices[28],
                                  line_indices[16],
                                  line_indices[24]));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[28],
                                  line_indices[14],
                                  line_indices[17],
                                  line_indices[25]));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[11],
                                  line_indices[29],
                                  line_indices[24],
                                  line_indices[20]));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[29],
                                  line_indices[15],
                                  line_indices[25],
                                  line_indices[21]));
                           new_quads[4]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[18],
                                  line_indices[26],
                                  line_indices[0],
                                  line_indices[28]));
                           new_quads[5]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[26],
                                  line_indices[22],
                                  line_indices[1],
                                  line_indices[29]));
                           new_quads[6]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[19],
                                  line_indices[27],
                                  line_indices[28],
                                  line_indices[4]));
                           new_quads[7]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[27],
                                  line_indices[23],
                                  line_indices[29],
                                  line_indices[5]));
                           new_quads[8]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[2],
                                  line_indices[24],
                                  line_indices[8],
                                  line_indices[26]));
                           new_quads[9]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[24],
                                  line_indices[6],
                                  line_indices[9],
                                  line_indices[27]));
                           new_quads[10]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[3],
                                  line_indices[25],
                                  line_indices[26],
                                  line_indices[12]));
                           new_quads[11]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               2>(line_indices[25],
                                  line_indices[7],
                                  line_indices[27],
@@ -9557,7 +9557,7 @@ namespace internal
 
                           // bottom children
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[12],
                                  quad_indices[0],
                                  quad_indices[20],
@@ -9565,7 +9565,7 @@ namespace internal
                                  quad_indices[28],
                                  quad_indices[8]));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[0],
                                  quad_indices[16],
                                  quad_indices[22],
@@ -9573,7 +9573,7 @@ namespace internal
                                  quad_indices[29],
                                  quad_indices[9]));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[13],
                                  quad_indices[1],
                                  quad_indices[4],
@@ -9581,7 +9581,7 @@ namespace internal
                                  quad_indices[30],
                                  quad_indices[10]));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[1],
                                  quad_indices[17],
                                  quad_indices[6],
@@ -9591,7 +9591,7 @@ namespace internal
 
                           // top children
                           new_hexes[4]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[14],
                                  quad_indices[2],
                                  quad_indices[21],
@@ -9599,7 +9599,7 @@ namespace internal
                                  quad_indices[8],
                                  quad_indices[32]));
                           new_hexes[5]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[2],
                                  quad_indices[18],
                                  quad_indices[23],
@@ -9607,7 +9607,7 @@ namespace internal
                                  quad_indices[9],
                                  quad_indices[33]));
                           new_hexes[6]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[15],
                                  quad_indices[3],
                                  quad_indices[5],
@@ -9615,7 +9615,7 @@ namespace internal
                                  quad_indices[10],
                                  quad_indices[34]));
                           new_hexes[7]->set(
-                            internal::TriangulationImplementation ::TriaObject<
+                            internal::TriangulationImplementation::TriaObject<
                               3>(quad_indices[3],
                                  quad_indices[19],
                                  quad_indices[7],
@@ -10543,7 +10543,7 @@ Triangulation<dim, spacedim>::create_triangulation(
 
   // update our counts of the various elements of a triangulation, and set
   // active_cell_indices of all cells
-  internal::TriangulationImplementation::Implementation ::compute_number_cache(
+  internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
   reset_active_cell_indices();
 
@@ -13527,7 +13527,7 @@ Triangulation<dim, spacedim>::execute_refinement()
 
 
   // re-compute number of lines
-  internal::TriangulationImplementation::Implementation ::compute_number_cache(
+  internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
 
 #ifdef DEBUG
@@ -13606,12 +13606,12 @@ Triangulation<dim, spacedim>::execute_coarsening()
           // inform all listeners that cell coarsening is going to happen
           signals.pre_coarsening_on_cell(cell);
           // use a separate function, since this is dimension specific
-          internal::TriangulationImplementation::Implementation ::
+          internal::TriangulationImplementation::Implementation::
             delete_children(*this, cell, line_cell_count, quad_cell_count);
         }
 
   // re-compute number of lines and quads
-  internal::TriangulationImplementation::Implementation ::compute_number_cache(
+  internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
 
   // in principle no user flags should be set any more at this point

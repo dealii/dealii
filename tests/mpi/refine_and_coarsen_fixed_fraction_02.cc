@@ -88,7 +88,7 @@ test()
   // set the thresholds slightly
   // above or below what we'd really
   // like
-  parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_fraction(
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
     tr,
     indicators,
     30.00000000001 / total_error * std::pow(2, (double)16),

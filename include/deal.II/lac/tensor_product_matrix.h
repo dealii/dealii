@@ -691,7 +691,7 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit_impl(
       this->eigenvectors[dir].reinit(mass_matrices[dir].n_cols(),
                                      mass_matrices[dir].n_rows());
       this->eigenvalues[dir].resize(mass_matrices[dir].n_cols());
-      internal::TensorProductMatrix ::spectral_assembly<Number>(
+      internal::TensorProductMatrix::spectral_assembly<Number>(
         &(mass_matrices[dir](0, 0)),
         &(derivative_matrices[dir](0, 0)),
         mass_matrices[dir].n_rows(),
@@ -851,7 +851,7 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
       Number *      eigenvec_begin = eigenvectors_flat.data();
       Number *      eigenval_begin = eigenvalues_flat.data();
       for (unsigned int lane = 0; lane < macro_size; ++lane)
-        internal::TensorProductMatrix ::spectral_assembly<Number>(
+        internal::TensorProductMatrix::spectral_assembly<Number>(
           mass_cbegin + nm * lane,
           deriv_cbegin + nm * lane,
           n_rows,
