@@ -40,7 +40,7 @@ namespace Utilities
      */
     template <typename Number = double>
     class NoncontiguousPartitioner
-      : public LinearAlgebra::CommunicationPatternBase
+      : public dealii::LinearAlgebra::CommunicationPatternBase
     {
     public:
       /**
