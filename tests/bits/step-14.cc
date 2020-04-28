@@ -17,11 +17,6 @@
 
 // a un-hp-ified version of hp/step-14
 
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
@@ -2060,6 +2055,7 @@ Framework<dim>::run(const ProblemDescription &descriptor)
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

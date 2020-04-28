@@ -17,11 +17,6 @@
 
 // a un-hp-ified version of hp/step-7
 
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -59,7 +54,6 @@ std::ofstream logfile("output");
 #include <typeinfo>
 
 #include "../tests.h"
-
 
 
 template <int dim>
@@ -674,6 +668,7 @@ HelmholtzProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
 
