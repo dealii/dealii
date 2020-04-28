@@ -39,6 +39,8 @@
 
 #include <deal.II/hp/dof_handler.h>
 
+#include <boost/range/irange.hpp>
+
 #include <algorithm>
 #include <memory>
 #include <type_traits>
@@ -2913,6 +2915,27 @@ public:
   //@{
 
   /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `n_quadrature_points`. This allows to write code
+   * using range-based for loops of the following kind:
+   * @code
+   *   FEValues<dim> fe_values (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       fe_values.reinit(cell);
+   *       for (const auto q_point : fe_values.quadrature_point_indices())
+   *         ... do something at the quadrature point ...
+   *     }
+   * @endcode
+   * Here, we are looping over all quadrature points on all cells, with
+   * `q_point` taking on all valid indices for quadrature points, as defined
+   * by the quadrature rule passed to `fe_values`.
+   */
+  boost::integer_range<unsigned int>
+  quadrature_point_indices() const;
+
+  /**
    * Position of the <tt>q</tt>th quadrature point in real space.
    *
    * @dealiiRequiresUpdateFlags{update_quadrature_points}
@@ -5402,6 +5425,15 @@ FEValuesBase<dim, spacedim>::get_inverse_jacobians() const
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.inverse_jacobians;
+}
+
+
+
+template <int dim, int spacedim>
+inline boost::integer_range<unsigned int>
+FEValuesBase<dim, spacedim>::quadrature_point_indices() const
+{
+  return boost::irange(0U, n_quadrature_points);
 }
 
 
