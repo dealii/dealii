@@ -477,6 +477,14 @@ namespace Functions
       std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients)
       const override;
 
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & point,
+            const unsigned int component = 0) const override;
+
+    virtual RangeNumberType
+    laplacian(const Point<dim> & point,
+              const unsigned int component = 0) const override;
+
     std::size_t
     memory_consumption() const;
 
