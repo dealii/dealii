@@ -22,6 +22,8 @@
 
 #include <iostream>
 
+#include <experimental/simd>
+
 DEAL_II_NAMESPACE_OPEN
 
 #include "matrix_free.inst"

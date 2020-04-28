@@ -30,6 +30,8 @@
 #include <cstddef>
 #include <type_traits>
 
+#include <experimental/simd>
+
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 #  define DEAL_II_CUDA_HOST_DEV __host__ __device__
 #else
@@ -794,6 +796,22 @@ namespace internal
     {
       return std::complex<T>(NumberType<T>::value(t.real()),
                              NumberType<T>::value(t.imag()));
+    }
+  };
+
+  template <typename T, typename X>
+  struct NumberType<std::experimental::parallelism_v2::simd<T, X>>
+  {
+    static const std::experimental::parallelism_v2::simd<T, X> &
+    value(const std::experimental::parallelism_v2::simd<T, X> &t)
+    {
+      return t;
+    }
+
+    static const std::experimental::parallelism_v2::simd<T, X>
+    value(const T &t)
+    {
+      return std::experimental::parallelism_v2::simd<T, X>(t);
     }
   };
 

@@ -36,6 +36,8 @@
 #include <ostream>
 #include <vector>
 
+#include <experimental/simd>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -818,6 +820,38 @@ namespace internal
 
     static DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE Tensor<rank, dim, T>
                                                    value(const T &t)
+    {
+      Tensor<rank, dim, T> tmp;
+      tmp = t;
+      return tmp;
+    }
+  };
+
+  template <int rank, int dim, typename T, typename X>
+  struct NumberType<
+    Tensor<rank, dim, std::experimental::parallelism_v2::simd<T, X>>>
+  {
+    static constexpr DEAL_II_ALWAYS_INLINE const
+      Tensor<rank, dim, std::experimental::parallelism_v2::simd<T, X>> &
+      value(
+        const Tensor<rank, dim, std::experimental::parallelism_v2::simd<T, X>>
+          &t)
+    {
+      return t;
+    }
+
+    static DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
+                             Tensor<rank, dim, std::experimental::parallelism_v2::simd<T, X>>
+                             value(const std::experimental::parallelism_v2::simd<T, X> &t)
+    {
+      Tensor<rank, dim, std::experimental::parallelism_v2::simd<T, X>> tmp;
+      tmp = t;
+      return tmp;
+    }
+
+    static DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
+                             Tensor<rank, dim, std::experimental::parallelism_v2::simd<T, X>>
+                             value(const T &t)
     {
       Tensor<rank, dim, T> tmp;
       tmp = t;
@@ -2427,12 +2461,17 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
         for (unsigned int j = 0; j < dim - 1; ++j)
           minor[i][j] = t[i][j < k ? j : j + 1];
 
-      const Number cofactor = ((k % 2 == 0) ? -1. : 1.) * determinant(minor);
+      Number temp =
+        internal::NumberType<Number>::value((k % 2 == 0) ? -1. : 1.);
+
+      const Number cofactor = temp * determinant(minor);
 
       det += t[dim - 1][k] * cofactor;
     }
 
-  return ((dim % 2 == 0) ? 1. : -1.) * det;
+  Number temp = internal::NumberType<Number>::value((dim % 2 == 0) ? 1. : -1.);
+
+  return temp * det;
 }
 
 /**
@@ -2497,8 +2536,9 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 1, Number>
                                                invert(const Tensor<2, 1, Number> &t)
 {
   Tensor<2, 1, Number> return_tensor;
+  Number               temp = internal::NumberType<Number>::value(1.0);
 
-  return_tensor[0][0] = internal::NumberType<Number>::value(1.0 / t[0][0]);
+  return_tensor[0][0] = internal::NumberType<Number>::value(temp / t[0][0]);
 
   return return_tensor;
 }
@@ -2510,10 +2550,11 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
 {
   Tensor<2, 2, Number> return_tensor;
 
+  Number temp = internal::NumberType<Number>::value(1.0);
   // this is Maple output,
   // thus a bit unstructured
   const Number inv_det_t = internal::NumberType<Number>::value(
-    1.0 / (t[0][0] * t[1][1] - t[1][0] * t[0][1]));
+    temp / (t[0][0] * t[1][1] - t[1][0] * t[0][1]));
   return_tensor[0][0] = t[1][1];
   return_tensor[0][1] = -t[0][1];
   return_tensor[1][0] = -t[1][0];
@@ -2530,15 +2571,16 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
 {
   Tensor<2, 3, Number> return_tensor;
 
-  const Number t4  = internal::NumberType<Number>::value(t[0][0] * t[1][1]),
-               t6  = internal::NumberType<Number>::value(t[0][0] * t[1][2]),
-               t8  = internal::NumberType<Number>::value(t[0][1] * t[1][0]),
-               t00 = internal::NumberType<Number>::value(t[0][2] * t[1][0]),
-               t01 = internal::NumberType<Number>::value(t[0][1] * t[2][0]),
-               t04 = internal::NumberType<Number>::value(t[0][2] * t[2][0]),
+  Number       temp = internal::NumberType<Number>::value(1.0);
+  const Number t4   = internal::NumberType<Number>::value(t[0][0] * t[1][1]),
+               t6   = internal::NumberType<Number>::value(t[0][0] * t[1][2]),
+               t8   = internal::NumberType<Number>::value(t[0][1] * t[1][0]),
+               t00  = internal::NumberType<Number>::value(t[0][2] * t[1][0]),
+               t01  = internal::NumberType<Number>::value(t[0][1] * t[2][0]),
+               t04  = internal::NumberType<Number>::value(t[0][2] * t[2][0]),
                inv_det_t = internal::NumberType<Number>::value(
-                 1.0 / (t4 * t[2][2] - t6 * t[2][1] - t8 * t[2][2] +
-                        t00 * t[2][1] + t01 * t[1][2] - t04 * t[1][1]));
+                 temp / (t4 * t[2][2] - t6 * t[2][1] - t8 * t[2][2] +
+                         t00 * t[2][1] + t01 * t[1][2] - t04 * t[1][1]));
   return_tensor[0][0] = internal::NumberType<Number>::value(t[1][1] * t[2][2]) -
                         internal::NumberType<Number>::value(t[1][2] * t[2][1]);
   return_tensor[0][1] = internal::NumberType<Number>::value(t[0][2] * t[2][1]) -

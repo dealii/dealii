@@ -24,6 +24,8 @@
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/type_traits.h>
 
+#include <experimental/simd>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -218,11 +220,12 @@ namespace internal
   {
     template <typename VectorType>
     void
-    process_dof(const unsigned int index,
-                const VectorType & vec,
-                Number &           res) const
+    process_dof(const unsigned int   index,
+                const VectorType &   vec,
+                VectorizedArrayType &res,
+                const unsigned int   v) const
     {
-      res = vector_access(vec, index);
+      res[v] = vector_access(vec, index);
     }
 
 
@@ -325,9 +328,10 @@ namespace internal
     void
     process_dof_global(const types::global_dof_index index,
                        const VectorType &            vec,
-                       Number &                      res) const
+                       VectorizedArrayType &         res,
+                       const unsigned int            v) const
     {
-      res = vec(index);
+      res[v] = vec(index);
     }
 
 
@@ -353,9 +357,11 @@ namespace internal
 
 
     void
-    post_constraints(const Number &sum, Number &write_pos) const
+    post_constraints(const Number &       sum,
+                     VectorizedArrayType &write_pos,
+                     const unsigned int   v) const
     {
-      write_pos = sum;
+      write_pos[v] = sum;
     }
 
 
@@ -376,9 +382,12 @@ namespace internal
   {
     template <typename VectorType>
     void
-    process_dof(const unsigned int index, VectorType &vec, Number &res) const
+    process_dof(const unsigned int   index,
+                VectorType &         vec,
+                VectorizedArrayType &res,
+                const unsigned int   v) const
     {
-      vector_access_add(vec, index, res);
+      vector_access_add(vec, index, res[v]);
     }
 
 
@@ -494,9 +503,10 @@ namespace internal
     void
     process_dof_global(const types::global_dof_index index,
                        VectorType &                  vec,
-                       Number &                      res) const
+                       VectorizedArrayType &         res,
+                       const unsigned int            v) const
     {
-      vector_access_add_global(vec, index, res);
+      vector_access_add_global(vec, index, res[v]);
     }
 
 
@@ -522,7 +532,9 @@ namespace internal
 
 
     void
-    post_constraints(const Number &, Number &) const
+    post_constraints(const Number &,
+                     VectorizedArrayType &,
+                     const unsigned int) const
     {}
 
 
@@ -540,9 +552,12 @@ namespace internal
   {
     template <typename VectorType>
     void
-    process_dof(const unsigned int index, VectorType &vec, Number &res) const
+    process_dof(const unsigned int   index,
+                VectorType &         vec,
+                VectorizedArrayType &res,
+                const unsigned int   v) const
     {
-      vector_access(vec, index) = res;
+      vector_access(vec, index) = res[v];
     }
 
 
@@ -639,9 +654,10 @@ namespace internal
     void
     process_dof_global(const types::global_dof_index index,
                        VectorType &                  vec,
-                       Number &                      res) const
+                       VectorizedArrayType &         res,
+                       const unsigned int            v) const
     {
-      vec(index) = res;
+      vec(index) = res[v];
     }
 
 
@@ -663,7 +679,562 @@ namespace internal
 
 
     void
-    post_constraints(const Number &, Number &) const
+    post_constraints(const Number &,
+                     VectorizedArrayType &,
+                     const unsigned int) const
+    {}
+
+
+
+    void
+    process_empty(VectorizedArrayType &) const
+    {}
+  };
+
+
+  template <typename Number, typename X>
+  void
+  vectorized_load_and_transpose(
+    const unsigned int                                  n_entries,
+    const Number *                                      in,
+    const unsigned int *                                offsets,
+    std::experimental::parallelism_v2::simd<Number, X> *out)
+  {
+    for (unsigned int i = 0; i < n_entries; ++i)
+      for (unsigned int v = 0;
+           v < std::experimental::parallelism_v2::simd<Number, X>::size();
+           ++v)
+        out[i][v] = in[offsets[v] + i];
+  }
+
+  template <typename Number, typename X>
+  void
+  vectorized_transpose_and_store(
+    const bool                                                add_into,
+    const unsigned int                                        n_entries,
+    const std::experimental::parallelism_v2::simd<Number, X> *in,
+    const unsigned int *                                      offsets,
+    Number *                                                  out)
+  {
+    if (add_into)
+      for (unsigned int i = 0; i < n_entries; ++i)
+        for (unsigned int v = 0;
+             v < std::experimental::parallelism_v2::simd<Number, X>::size();
+             ++v)
+          out[offsets[v] + i] += in[i][v];
+    else
+      for (unsigned int i = 0; i < n_entries; ++i)
+        for (unsigned int v = 0;
+             v < std::experimental::parallelism_v2::simd<Number, X>::size();
+             ++v)
+          out[offsets[v] + i] = in[i][v];
+  }
+
+  template <typename Number, typename X>
+  void
+  gather(std::experimental::parallelism_v2::simd<Number, X> &vec,
+         const Number *                                      base_ptr,
+         const unsigned int *                                offsets)
+  {
+    for (unsigned int v = 0;
+         v < std::experimental::parallelism_v2::simd<Number, X>::size();
+         ++v)
+      vec[v] = base_ptr[offsets[v]];
+  }
+
+  template <typename Number, typename X>
+  void
+  scatter(const std::experimental::parallelism_v2::simd<Number, X> &vec,
+          const unsigned int *                                      offsets,
+          Number *                                                  base_ptr)
+  {
+    for (unsigned int v = 0;
+         v < std::experimental::parallelism_v2::simd<Number, X>::size();
+         ++v)
+      base_ptr[offsets[v]] = vec[v];
+  }
+
+
+  template <typename Number, typename X>
+  struct VectorReader<Number,
+                      std::experimental::parallelism_v2::simd<Number, X>>
+  {
+    using VectorizedArrayType =
+      std::experimental::parallelism_v2::simd<Number, X>;
+
+    template <typename VectorType>
+    void
+    process_dof(const unsigned int   index,
+                const VectorType &   vec,
+                VectorizedArrayType &res,
+                const unsigned int   v) const
+    {
+      res[v] = vector_access(vec, index);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized(const unsigned int   dofs_per_cell,
+                            const unsigned int   dof_index,
+                            VectorType &         vec,
+                            VectorizedArrayType *dof_values,
+                            std::integral_constant<bool, true>) const
+    {
+      const Number *vec_ptr = vec.begin() + dof_index;
+      for (unsigned int i = 0; i < dofs_per_cell;
+           ++i, vec_ptr += VectorizedArrayType::size())
+        dof_values[i].copy_from(vec_ptr,
+                                std::experimental::element_aligned_tag());
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized(const unsigned int   dofs_per_cell,
+                            const unsigned int   dof_index,
+                            const VectorType &   vec,
+                            VectorizedArrayType *dof_values,
+                            std::integral_constant<bool, false>) const
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          dof_values[i][v] =
+            vector_access(vec, dof_index + v + i * VectorizedArrayType::size());
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized_transpose(const unsigned int   dofs_per_cell,
+                                      const unsigned int * dof_indices,
+                                      VectorType &         vec,
+                                      VectorizedArrayType *dof_values,
+                                      std::integral_constant<bool, true>) const
+    {
+      vectorized_load_and_transpose(dofs_per_cell,
+                                    vec.begin(),
+                                    dof_indices,
+                                    dof_values);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized_transpose(const unsigned int   dofs_per_cell,
+                                      const unsigned int * dof_indices,
+                                      const VectorType &   vec,
+                                      VectorizedArrayType *dof_values,
+                                      std::integral_constant<bool, false>) const
+    {
+      for (unsigned int d = 0; d < dofs_per_cell; ++d)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          dof_values[d][v] = vector_access(vec, dof_indices[v] + d);
+    }
+
+
+
+    // variant where VectorType::value_type is the same as Number -> can call
+    // gather
+    template <typename VectorType>
+    void
+    process_dof_gather(const unsigned int * indices,
+                       VectorType &         vec,
+                       const unsigned int   constant_offset,
+                       VectorizedArrayType &res,
+                       std::integral_constant<bool, true>) const
+    {
+      gather(res, vec.begin() + constant_offset, indices);
+    }
+
+
+
+    // variant where VectorType::value_type is not the same as Number -> must
+    // manually load the data
+    template <typename VectorType>
+    void
+    process_dof_gather(const unsigned int * indices,
+                       const VectorType &   vec,
+                       const unsigned int   constant_offset,
+                       VectorizedArrayType &res,
+                       std::integral_constant<bool, false>) const
+    {
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+        res[v] = vector_access(vec, indices[v] + constant_offset);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dof_global(const types::global_dof_index index,
+                       const VectorType &            vec,
+                       VectorizedArrayType &         res,
+                       const unsigned int            v) const
+    {
+      res[v] = vec(index);
+    }
+
+
+
+    void
+    pre_constraints(const Number &, Number &res) const
+    {
+      res = Number();
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_constraint(const unsigned int index,
+                       const Number       weight,
+                       const VectorType & vec,
+                       Number &           res) const
+    {
+      res += weight * vector_access(vec, index);
+    }
+
+
+
+    void
+    post_constraints(const Number &       sum,
+                     VectorizedArrayType &write_pos,
+                     const unsigned int   v) const
+    {
+      write_pos[v] = sum;
+    }
+
+
+
+    void
+    process_empty(VectorizedArrayType &res) const
+    {
+      res = VectorizedArrayType();
+    }
+  };
+
+
+
+  // 2. A class to add values to the vector during
+  // FEEvaluation::distribute_local_to_global() call
+  template <typename Number, typename X>
+  struct VectorDistributorLocalToGlobal<
+    Number,
+    std::experimental::parallelism_v2::simd<Number, X>>
+  {
+    using VectorizedArrayType =
+      std::experimental::parallelism_v2::simd<Number, X>;
+
+    template <typename VectorType>
+    void
+    process_dof(const unsigned int   index,
+                VectorType &         vec,
+                VectorizedArrayType &res,
+                const unsigned int   v) const
+    {
+      vector_access_add(vec, index, res[v]);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized(const unsigned int   dofs_per_cell,
+                            const unsigned int   dof_index,
+                            VectorType &         vec,
+                            VectorizedArrayType *dof_values,
+                            std::integral_constant<bool, true>) const
+    {
+      Number *vec_ptr = vec.begin() + dof_index;
+      for (unsigned int i = 0; i < dofs_per_cell;
+           ++i, vec_ptr += VectorizedArrayType::size())
+        {
+          VectorizedArrayType tmp;
+          tmp.copy_from(vec_ptr, std::experimental::element_aligned_tag());
+          tmp += dof_values[i];
+          tmp.copy_to(vec_ptr, std::experimental::element_aligned_tag());
+        }
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized(const unsigned int   dofs_per_cell,
+                            const unsigned int   dof_index,
+                            VectorType &         vec,
+                            VectorizedArrayType *dof_values,
+                            std::integral_constant<bool, false>) const
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          vector_access_add(vec,
+                            dof_index + v + i * VectorizedArrayType::size(),
+                            dof_values[i][v]);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized_transpose(const unsigned int   dofs_per_cell,
+                                      const unsigned int * dof_indices,
+                                      VectorType &         vec,
+                                      VectorizedArrayType *dof_values,
+                                      std::integral_constant<bool, true>) const
+    {
+      vectorized_transpose_and_store(
+        true, dofs_per_cell, dof_values, dof_indices, vec.begin());
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized_transpose(const unsigned int   dofs_per_cell,
+                                      const unsigned int * dof_indices,
+                                      VectorType &         vec,
+                                      VectorizedArrayType *dof_values,
+                                      std::integral_constant<bool, false>) const
+    {
+      for (unsigned int d = 0; d < dofs_per_cell; ++d)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          vector_access_add(vec, dof_indices[v] + d, dof_values[d][v]);
+    }
+
+
+
+    // variant where VectorType::value_type is the same as Number -> can call
+    // scatter
+    template <typename VectorType>
+    void
+    process_dof_gather(const unsigned int * indices,
+                       VectorType &         vec,
+                       const unsigned int   constant_offset,
+                       VectorizedArrayType &res,
+                       std::integral_constant<bool, true>) const
+    {
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+        vector_access(vec, indices[v] + constant_offset) += res[v];
+#else
+      // only use gather in case there is also scatter.
+      VectorizedArrayType tmp;
+      gather(tmp, vec.begin() + constant_offset, indices);
+      tmp += res;
+      scatter(tmp, indices, vec.begin() + constant_offset);
+#endif
+    }
+
+
+
+    // variant where VectorType::value_type is not the same as Number -> must
+    // manually append all data
+    template <typename VectorType>
+    void
+    process_dof_gather(const unsigned int * indices,
+                       VectorType &         vec,
+                       const unsigned int   constant_offset,
+                       VectorizedArrayType &res,
+                       std::integral_constant<bool, false>) const
+    {
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+        vector_access_add(vec, indices[v] + constant_offset, res[v]);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dof_global(const types::global_dof_index index,
+                       VectorType &                  vec,
+                       VectorizedArrayType &         res,
+                       const unsigned int            v) const
+    {
+      vector_access_add_global(vec, index, res[v]);
+    }
+
+
+
+    void
+    pre_constraints(const Number &input, Number &res) const
+    {
+      res = input;
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_constraint(const unsigned int index,
+                       const Number       weight,
+                       VectorType &       vec,
+                       Number &           res) const
+    {
+      vector_access_add(vec, index, weight * res);
+    }
+
+
+
+    void
+    post_constraints(const Number &,
+                     VectorizedArrayType &,
+                     const unsigned int) const
+    {}
+
+
+
+    void
+    process_empty(VectorizedArrayType &) const
+    {}
+  };
+
+
+
+  // 3. A class to set elements of the vector
+  template <typename Number, typename X>
+  struct VectorSetter<Number, std::experimental::simd<Number, X>>
+  {
+    using VectorizedArrayType =
+      std::experimental::parallelism_v2::simd<Number, X>;
+
+    template <typename VectorType>
+    void
+    process_dof(const unsigned int   index,
+                VectorType &         vec,
+                VectorizedArrayType &res,
+                const unsigned int   v) const
+    {
+      vector_access(vec, index) = res[v];
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized(const unsigned int   dofs_per_cell,
+                            const unsigned int   dof_index,
+                            VectorType &         vec,
+                            VectorizedArrayType *dof_values,
+                            std::integral_constant<bool, true>) const
+    {
+      Number *vec_ptr = vec.begin() + dof_index;
+      for (unsigned int i = 0; i < dofs_per_cell;
+           ++i, vec_ptr += VectorizedArrayType::size())
+        dof_values[i].store(vec_ptr);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized(const unsigned int   dofs_per_cell,
+                            const unsigned int   dof_index,
+                            VectorType &         vec,
+                            VectorizedArrayType *dof_values,
+                            std::integral_constant<bool, false>) const
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          vector_access(vec, dof_index + v + i * VectorizedArrayType::size()) =
+            dof_values[i][v];
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dofs_vectorized_transpose(const unsigned int   dofs_per_cell,
+                                      const unsigned int * dof_indices,
+                                      VectorType &         vec,
+                                      VectorizedArrayType *dof_values,
+                                      std::integral_constant<bool, true>) const
+    {
+      vectorized_transpose_and_store(
+        false, dofs_per_cell, dof_values, dof_indices, vec.begin());
+    }
+
+
+
+    template <typename VectorType, bool booltype>
+    void
+    process_dofs_vectorized_transpose(const unsigned int   dofs_per_cell,
+                                      const unsigned int * dof_indices,
+                                      VectorType &         vec,
+                                      VectorizedArrayType *dof_values,
+                                      std::integral_constant<bool, false>) const
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          vector_access(vec, dof_indices[v] + i) = dof_values[i][v];
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dof_gather(const unsigned int * indices,
+                       VectorType &         vec,
+                       const unsigned int   constant_offset,
+                       VectorizedArrayType &res,
+                       std::integral_constant<bool, true>) const
+    {
+      res.scatter(indices, vec.begin() + constant_offset);
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dof_gather(const unsigned int * indices,
+                       VectorType &         vec,
+                       const unsigned int   constant_offset,
+                       VectorizedArrayType &res,
+                       std::integral_constant<bool, false>) const
+    {
+      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+        vector_access(vec, indices[v] + constant_offset) = res[v];
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_dof_global(const types::global_dof_index index,
+                       VectorType &                  vec,
+                       VectorizedArrayType &         res,
+                       const unsigned int            v) const
+    {
+      vec(index) = res[v];
+    }
+
+
+
+    void
+    pre_constraints(const Number &, Number &) const
+    {}
+
+
+
+    template <typename VectorType>
+    void
+    process_constraint(const unsigned int,
+                       const Number,
+                       VectorType &,
+                       Number &) const
+    {}
+
+
+
+    void
+    post_constraints(const Number &,
+                     VectorizedArrayType &,
+                     const unsigned int) const
     {}
 
 

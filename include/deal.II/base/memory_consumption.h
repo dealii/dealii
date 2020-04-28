@@ -28,6 +28,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <experimental/simd>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -131,6 +133,10 @@ namespace MemoryConsumption
   template <typename T, std::size_t width>
   inline std::size_t
   memory_consumption(const VectorizedArray<T, width> &);
+
+  template <typename T, typename X>
+  inline std::size_t
+  memory_consumption(const std::experimental::parallelism_v2::simd<T, X> &);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
@@ -301,6 +307,15 @@ namespace MemoryConsumption
   memory_consumption(const VectorizedArray<T, width> &)
   {
     return sizeof(VectorizedArray<T, width>);
+  }
+
+
+
+  template <typename T, typename X>
+  inline std::size_t
+  memory_consumption(const std::experimental::parallelism_v2::simd<T, X> &)
+  {
+    return sizeof(std::experimental::parallelism_v2::simd<T, X>);
   }
 
 
