@@ -134,18 +134,30 @@ namespace
   {
     Assert(interesting_range[0] <= interesting_range[1], ExcInternalError());
 
-    Assert(interesting_range[0] >= 0, ExcInternalError());
-
-    // adjust the lower bound only if the end point is not equal to zero,
-    // otherwise it could happen, that the result becomes negative
     if (interesting_range[0] > 0)
-      interesting_range[0] *= 0.99;
-
-    if (interesting_range[1] > 0)
-      interesting_range[1] *= 1.01;
+      {
+        // In this case, we calculate the first interval split point `m` in the
+        // `compute_threshold` functions in the optimized way: We exploit that
+        // the logarithms of all criteria are more uniformly distributed than
+        // their actual values, i.e. m=sqrt(b*e).
+        //
+        // Both factors will modify the split point only slightly by a factor of
+        // sqrt(1.01*0.99) = sqrt(0.9999) ~ 0.9950.
+        interesting_range[0] *= 0.99;
+        interesting_range[1] *= 1.01;
+      }
     else
-      interesting_range[1] +=
-        0.01 * (interesting_range[1] - interesting_range[0]);
+      {
+        // In all other cases, we begin with an the arithmetic mean as the
+        // standard interval split point, i.e. m=(b+e)/2.
+        //
+        // Both increments will add up to zero when calculating the initial
+        // split point in the `compute_threshold` functions.
+        const double difference =
+          std::abs(interesting_range[1] - interesting_range[0]);
+        interesting_range[0] -= 0.01 * difference;
+        interesting_range[1] += 0.01 * difference;
+      }
   }
 
 
@@ -468,8 +480,8 @@ namespace parallel
                                                   tria.n_global_active_cells()),
             mpi_communicator);
 
-        // compute bottom threshold only if necessary. otherwise use a threshold
-        // lower than the smallest value we have locally
+        // compute bottom threshold only if necessary. otherwise use the lowest
+        // threshold possible
         if (adjusted_fractions.second > 0)
           bottom_threshold = dealii::internal::parallel::distributed::
             GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
@@ -480,11 +492,7 @@ namespace parallel
                           tria.n_global_active_cells())),
               mpi_communicator);
         else
-          {
-            bottom_threshold =
-              *std::min_element(criteria.begin(), criteria.end());
-            bottom_threshold -= std::fabs(bottom_threshold);
-          }
+          bottom_threshold = std::numeric_limits<Number>::lowest();
 
         // now refine the mesh
         mark_cells(tria, criteria, top_threshold, bottom_threshold);
@@ -535,8 +543,9 @@ namespace parallel
             global_min_and_max,
             top_fraction_of_error * total_error,
             mpi_communicator);
-        // compute bottom threshold only if necessary. otherwise use a threshold
-        // lower than the smallest value we have locally
+
+        // compute bottom threshold only if necessary. otherwise use the lowest
+        // threshold possible
         if (bottom_fraction_of_error > 0)
           bottom_threshold = dealii::internal::parallel::distributed::
             GridRefinement::RefineAndCoarsenFixedFraction::compute_threshold(
@@ -545,11 +554,7 @@ namespace parallel
               (1. - bottom_fraction_of_error) * total_error,
               mpi_communicator);
         else
-          {
-            bottom_threshold =
-              *std::min_element(criteria.begin(), criteria.end());
-            bottom_threshold -= std::fabs(bottom_threshold);
-          }
+          bottom_threshold = std::numeric_limits<Number>::lowest();
 
         // now refine the mesh
         mark_cells(tria, criteria, top_threshold, bottom_threshold);
