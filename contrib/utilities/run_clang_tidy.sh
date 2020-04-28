@@ -60,7 +60,7 @@ cmake --build . --target expand_all_instantiations || (echo "make expand_all_ins
 # generate allheaders.h
 (cd include; find . -name '*.h'; cd $SRC/include/; find . -name '*.h') | grep -v allheaders.h | grep -v undefine_macros.h | sed 's|^./|#include <|' | sed 's|$|>|' >include/deal.II/allheaders.h
 
-# finally run it clang-tidy on deal.II
+# finally run clang-tidy on deal.II
 #
 # pipe away stderr (just contains nonsensical "x warnings generated")
 # pipe output to output.txt
