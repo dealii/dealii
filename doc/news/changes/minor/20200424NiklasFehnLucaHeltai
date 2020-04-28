@@ -1,0 +1,3 @@
+New: ParameterAcceptor::initialize() now uses ParameterHandler::print_parameters() internally.
+<br>
+(Niklas Fehn, Luca Heltai, 2020/04/24)
