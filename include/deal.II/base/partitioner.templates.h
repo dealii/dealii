@@ -629,7 +629,7 @@ namespace Utilities
                              100000. *
                              std::numeric_limits<typename numbers::NumberTraits<
                                Number>::real_type>::epsilon(),
-                       typename LinearAlgebra::distributed::Vector<
+                       typename dealii::LinearAlgebra::distributed::Vector<
                          Number>::ExcNonMatchingElements(*read_position,
                                                          locally_owned_array[j],
                                                          my_pid));
