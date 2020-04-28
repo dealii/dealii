@@ -46,7 +46,7 @@ namespace internal
               typename Number,
               typename VectorizedArrayType>
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor ::QuadratureDescriptor()
+      QuadratureDescriptor::QuadratureDescriptor()
       : n_q_points(numbers::invalid_unsigned_int)
     {}
 
@@ -58,7 +58,7 @@ namespace internal
               typename VectorizedArrayType>
     void
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor ::initialize(
+      QuadratureDescriptor::initialize(
         const Quadrature<1> &quadrature_1d,
         const UpdateFlags    update_flags_inner_faces)
     {
@@ -116,7 +116,7 @@ namespace internal
               typename VectorizedArrayType>
     std::size_t
     MappingInfoStorage<structdim, spacedim, Number, VectorizedArrayType>::
-      QuadratureDescriptor ::memory_consumption() const
+      QuadratureDescriptor::memory_consumption() const
     {
       std::size_t memory = sizeof(this) + quadrature.memory_consumption() +
                            quadrature_weights.memory_consumption() +

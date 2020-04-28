@@ -81,7 +81,7 @@ test()
   // use one strategy to compute
   // thresholds and obtain those
   // thresholds
-  parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_fraction(
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
     tr, indicators, 0.6, 0.2);
   {
     float coarsen_indicator = min_indicator - 1,
@@ -115,10 +115,10 @@ test()
   // only works because we are
   // working on only a single
   // processor
-  dealii::GridRefinement ::refine_and_coarsen_fixed_fraction(tr,
-                                                             indicators,
-                                                             0.6,
-                                                             0.2);
+  dealii::GridRefinement::refine_and_coarsen_fixed_fraction(tr,
+                                                            indicators,
+                                                            0.6,
+                                                            0.2);
   {
     float coarsen_indicator = min_indicator - 1,
           refine_indicator  = max_indicator + 1;

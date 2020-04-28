@@ -69,7 +69,7 @@ test()
   }
 
 
-  parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
     tr, indicators, 0.2, 0.2);
 
   // now count number of cells

@@ -254,7 +254,7 @@ namespace internal
 
     template <typename number>
     void
-    DoFInfo ::read_dof_indices(
+    DoFInfo::read_dof_indices(
       const std::vector<types::global_dof_index> &local_indices,
       const std::vector<unsigned int> &           lexicographic_inv,
       const AffineConstraints<number> &           constraints,
@@ -425,7 +425,7 @@ namespace internal
 
 
     void
-    DoFInfo ::assign_ghosts(const std::vector<unsigned int> &boundary_cells)
+    DoFInfo::assign_ghosts(const std::vector<unsigned int> &boundary_cells)
     {
       Assert(boundary_cells.size() < row_starts.size(), ExcInternalError());
 
@@ -544,7 +544,7 @@ namespace internal
 
 
     void
-    DoFInfo ::reorder_cells(
+    DoFInfo::reorder_cells(
       const TaskInfo &                  task_info,
       const std::vector<unsigned int> & renumbering,
       const std::vector<unsigned int> & constraint_pool_row_index,
@@ -1631,7 +1631,7 @@ namespace internal
 
 
     void
-    DoFInfo ::compute_dof_renumbering(
+    DoFInfo::compute_dof_renumbering(
       std::vector<types::global_dof_index> &renumbering)
     {
       const unsigned int local_size = vector_partitioner->local_size();

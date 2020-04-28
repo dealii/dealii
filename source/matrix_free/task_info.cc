@@ -772,7 +772,7 @@ namespace internal
 
 
     void
-    TaskInfo ::create_blocks_serial(
+    TaskInfo::create_blocks_serial(
       const std::vector<unsigned int> &boundary_cells,
       const unsigned int               dofs_per_cell,
       const std::vector<unsigned int> &cell_vectorization_categories,
@@ -956,7 +956,7 @@ namespace internal
 
 
     void
-    TaskInfo ::initial_setup_blocks_tasks(
+    TaskInfo::initial_setup_blocks_tasks(
       const std::vector<unsigned int> &boundary_cells,
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)

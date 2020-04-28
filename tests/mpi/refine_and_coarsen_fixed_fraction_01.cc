@@ -79,7 +79,7 @@ test()
   // 4 cells with the highest error
   // have 20+19+18+17=74, for a total
   // fraction of 74/210
-  parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_fraction(
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
     tr, indicators, 74. / 210 + 1e-5, 10. / 210 - 1e-5);
 
   // now count number of cells
