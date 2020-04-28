@@ -80,6 +80,7 @@ namespace hp
     // We've already resized the `fe_values_table` correctly above, but right
     // now it just contains nullptrs. Create copies of the objects that
     // `other.fe_values_table` stores
+    Threads::TaskGroup<> task_group;
     for (unsigned int fe_index = 0; fe_index < fe_collection->size();
          ++fe_index)
       for (unsigned int m_index = 0; m_index < mapping_collection->size();
@@ -87,12 +88,16 @@ namespace hp
         for (unsigned int q_index = 0; q_index < q_collection.size(); ++q_index)
           if (other.fe_values_table[fe_index][m_index][q_index].get() !=
               nullptr)
-            fe_values_table[fe_index][m_index][q_index] =
-              std_cxx14::make_unique<FEValuesType>(
-                (*mapping_collection)[m_index],
-                (*fe_collection)[fe_index],
-                q_collection[q_index],
-                update_flags);
+            task_group += Threads::new_task([&, fe_index, m_index, q_index]() {
+              fe_values_table[fe_index][m_index][q_index] =
+                std_cxx14::make_unique<FEValuesType>(
+                  (*mapping_collection)[m_index],
+                  (*fe_collection)[fe_index],
+                  q_collection[q_index],
+                  update_flags);
+            });
+
+    task_group.join_all();
   }
 
 
