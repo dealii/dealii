@@ -50,7 +50,7 @@ void
 test()
 {
   Triangulation<dim> triangulation;
-  GridGenerator ::hyper_cube(triangulation, -1, 1);
+  GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(1);
 
   hp::FECollection<dim> fe_collection;

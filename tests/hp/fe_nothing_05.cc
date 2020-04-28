@@ -68,7 +68,7 @@ void
 test()
 {
   Triangulation<dim> triangulation;
-  GridGenerator ::hyper_cube(triangulation, -0.5, 0.5);
+  GridGenerator::hyper_cube(triangulation, -0.5, 0.5);
   triangulation.refine_global(1);
 
   {
