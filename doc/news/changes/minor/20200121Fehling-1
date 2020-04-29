@@ -1,4 +1,0 @@
-New: Both classes FESeries::Fourier and FESeries::Legendre now offer a
-default constructor and can be initialized after their instantiation.
-<br>
-(Marc Fehling, 2020/01/21)

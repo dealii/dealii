@@ -225,29 +225,18 @@ namespace SmoothnessEstimator
       const bool           only_flagged_cells       = false);
 
     /**
-     * Number of modes for the default configuration of the Legendre series
-     * expansion FESeries::Legendre.
+     * Returns a FESeries::Legendre object for Legendre series expansions with
+     * the default configuration for smoothness estimation purposes.
      *
-     * We use as many modes as the highest polynomial of all finite elements
-     * used plus one, since we start with the first Legendre polynomial which is
-     * just a constant.
-     */
-    template <int dim, int spacedim>
-    std::vector<unsigned int>
-    default_number_of_coefficients_per_direction(
-      const hp::FECollection<dim, spacedim> &fe_collection);
-
-    /**
-     * Quadrature collection for the default configuration of the Legendre
-     * series expansion FESeries::Legendre.
-     *
-     * We use Gaussian quadrature designed to yield exact results for the
+     * For each finite element of the provided @p fe_collection, we use as many
+     * modes as its polynomial degree plus one, since we start with the first
+     * Legendre polynomial which is just a constant. Further for each element,
+     * we use a Gaussian quadrature designed to yield exact results for the
      * highest order Legendre polynomial used.
      */
     template <int dim, int spacedim>
-    hp::QCollection<dim>
-    default_quadrature_collection(
-      const hp::FECollection<dim, spacedim> &fe_collection);
+    FESeries::Legendre<dim, spacedim>
+    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection);
   } // namespace Legendre
 
 
@@ -465,29 +454,18 @@ namespace SmoothnessEstimator
       const bool           only_flagged_cells       = false);
 
     /**
-     * Number of modes for the default configuration of the Fourier series
-     * expansion FESeries::Fourier.
+     * Returns a FESeries::Fourier object for Fourier series expansions with
+     * the default configuration for smoothness estimation purposes.
      *
-     * We use as many modes as the highest polynomial degree of all finite
-     * elements used plus one, and at least three modes.
+     * For each finite element of the provided @p fe_collection, we use as many
+     * modes as its polynomial degree plus one, and at least three modes.
+     * Further for each element, we use a 4-point Gaussian quarature iterated in
+     * each dimension by the maximal wave number, which is the number of modes
+     * decreased by one since we start with $k = 0$.
      */
     template <int dim, int spacedim>
-    std::vector<unsigned int>
-    default_number_of_coefficients_per_direction(
-      const hp::FECollection<dim, spacedim> &fe_collection);
-
-    /**
-     * Quadrature collection for the default configuration of the Fourier series
-     * expansion FESeries::Fourier.
-     *
-     * We use a 4-point Gaussian quarature iterated in each dimension by the
-     * maximal wave number, which is the number of modes decresed by one since
-     * we start with $k = 0$.
-     */
-    template <int dim, int spacedim>
-    hp::QCollection<dim>
-    default_quadrature_collection(
-      const hp::FECollection<dim, spacedim> &fe_collection);
+    FESeries::Fourier<dim, spacedim>
+    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection);
   } // namespace Fourier
 } // namespace SmoothnessEstimator
 

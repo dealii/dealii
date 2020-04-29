@@ -107,8 +107,8 @@ namespace Step27
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
 
-    hp::QCollection<dim>   fourier_q_collection;
-    FESeries::Fourier<dim> fourier;
+    hp::QCollection<dim>                    fourier_q_collection;
+    std::unique_ptr<FESeries::Fourier<dim>> fourier;
 
     AffineConstraints<double> constraints;
 
@@ -188,9 +188,8 @@ namespace Step27
 
     const std::vector<unsigned int> n_coefficients_per_direction(
       fe_collection.size(), max_degree);
-    fourier.initialize(n_coefficients_per_direction,
-                       fe_collection,
-                       fourier_q_collection);
+    fourier = std_cxx14::make_unique<FESeries::Fourier<dim>>(
+      n_coefficients_per_direction, fe_collection, fourier_q_collection);
   }
 
 
@@ -377,7 +376,7 @@ namespace Step27
 
     Vector<float> smoothness_indicators(triangulation.n_active_cells());
     SmoothnessEstimator::Fourier::coefficient_decay(
-      fourier,
+      *fourier,
       dof_handler,
       solution,
       smoothness_indicators,

@@ -286,27 +286,16 @@ namespace SmoothnessEstimator
 
 
     template <int dim, int spacedim>
-    std::vector<unsigned int>
-    default_number_of_coefficients_per_direction(
-      const hp::FECollection<dim, spacedim> &fe_collection)
+    FESeries::Legendre<dim, spacedim>
+    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection)
     {
+      // Default number of coefficients per direction.
       std::vector<unsigned int> n_coefficients_per_direction;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 1);
 
-      return n_coefficients_per_direction;
-    }
-
-
-
-    template <int dim, int spacedim>
-    hp::QCollection<dim>
-    default_quadrature_collection(
-      const hp::FECollection<dim, spacedim> &fe_collection)
-    {
-      const std::vector<unsigned int> n_modes =
-        default_number_of_coefficients_per_direction(fe_collection);
-
+      // Default quadrature collection.
+      //
       // We initialize a FESeries::Legendre expansion object object which will
       // be used to calculate the expansion coefficients. In addition to the
       // hp::FECollection, we need to provide quadrature rules hp::QCollection
@@ -317,18 +306,20 @@ namespace SmoothnessEstimator
       // rule. As a default, we use the same quadrature formula for each finite
       // element, namely a Gauss formula that yields exact results for the
       // highest order Legendre polynomial used.
-
+      //
       // We start with the zeroth Legendre polynomial which is just a constant,
       // so the highest Legendre polynomial will be of order (n_modes - 1).
       hp::QCollection<dim> q_collection;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         {
-          const QGauss<dim>  quadrature(n_modes[i]);
+          const QGauss<dim>  quadrature(n_coefficients_per_direction[i]);
           const QSorted<dim> quadrature_sorted(quadrature);
           q_collection.push_back(quadrature_sorted);
         }
 
-      return q_collection;
+      return FESeries::Legendre<dim, spacedim>(n_coefficients_per_direction,
+                                               fe_collection,
+                                               q_collection);
     }
   } // namespace Legendre
 
@@ -578,28 +569,17 @@ namespace SmoothnessEstimator
 
 
     template <int dim, int spacedim>
-    std::vector<unsigned int>
-    default_number_of_coefficients_per_direction(
-      const hp::FECollection<dim, spacedim> &fe_collection)
+    FESeries::Fourier<dim, spacedim>
+    default_fe_series(const hp::FECollection<dim, spacedim> &fe_collection)
     {
+      // Default number of coefficients per direction.
       std::vector<unsigned int> n_coefficients_per_direction;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(
           std::max<unsigned int>(3, fe_collection[i].degree + 1));
 
-      return n_coefficients_per_direction;
-    }
-
-
-
-    template <int dim, int spacedim>
-    hp::QCollection<dim>
-    default_quadrature_collection(
-      const hp::FECollection<dim, spacedim> &fe_collection)
-    {
-      const std::vector<unsigned int> n_modes =
-        default_number_of_coefficients_per_direction(fe_collection);
-
+      // Default quadrature collection.
+      //
       // We initialize a series expansion object object which will be used to
       // calculate the expansion coefficients. In addition to the
       // hp::FECollection, we need to provide quadrature rules hp::QCollection
@@ -616,12 +596,15 @@ namespace SmoothnessEstimator
       hp::QCollection<dim> q_collection;
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         {
-          const QIterated<dim> quadrature(base_quadrature, n_modes[i] - 1);
+          const QIterated<dim> quadrature(base_quadrature,
+                                          n_coefficients_per_direction[i] - 1);
           const QSorted<dim>   quadrature_sorted(quadrature);
           q_collection.push_back(quadrature_sorted);
         }
 
-      return q_collection;
+      return FESeries::Fourier<dim, spacedim>(n_coefficients_per_direction,
+                                              fe_collection,
+                                              q_collection);
     }
   } // namespace Fourier
 } // namespace SmoothnessEstimator

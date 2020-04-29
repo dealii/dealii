@@ -94,14 +94,6 @@ namespace FESeries
     using CoefficientType = typename std::complex<double>;
 
     /**
-     * Default constructor.
-     *
-     * Leaves all members in an empty or uninitialized state. Please call
-     * initialize() once you have all data structures ready.
-     */
-    Fourier() = default;
-
-    /**
      * Constructor that initializes all required data structures.
      *
      * The @p n_coefficients_per_direction defines the number of coefficients in
@@ -126,17 +118,6 @@ namespace FESeries
     Fourier(const unsigned int                     n_coefficients_per_direction,
             const hp::FECollection<dim, spacedim> &fe_collection,
             const hp::QCollection<dim> &           q_collection);
-
-    /**
-     * Initialize and overwrite all mandatory data structures for the
-     * calculation calculation of transformation matrices.
-     *
-     * All previously calculated transformation matrices will be cleared.
-     */
-    void
-    initialize(const std::vector<unsigned int> &n_coefficients_per_direction,
-               const hp::FECollection<dim, spacedim> &fe_collection,
-               const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p fourier_coefficients of the cell vector field given by
@@ -201,7 +182,7 @@ namespace FESeries
      * Number of coefficients in each direction for each finite element in the
      * registered hp::FECollection.
      */
-    std::vector<unsigned int> n_coefficients_per_direction;
+    const std::vector<unsigned int> n_coefficients_per_direction;
 
     /**
      * hp::FECollection for which transformation matrices will be calculated.
@@ -211,7 +192,7 @@ namespace FESeries
     /**
      * hp::QCollection used in calculation of transformation matrices.
      */
-    SmartPointer<const hp::QCollection<dim>> q_collection;
+    const hp::QCollection<dim> q_collection;
 
     /**
      * Angular frequencies $ 2 \pi {\bf k} $ .
@@ -281,14 +262,6 @@ namespace FESeries
     using CoefficientType = double;
 
     /**
-     * Default constructor.
-     *
-     * Leaves all members in an empty or uninitialized state. Please call
-     * initialize() once you have all data structures ready.
-     */
-    Legendre() = default;
-
-    /**
      * Constructor that initializes all required data structures.
      *
      * The @p n_coefficients_per_direction defines the number of coefficients in
@@ -312,17 +285,6 @@ namespace FESeries
     Legendre(const unsigned int n_coefficients_per_direction,
              const hp::FECollection<dim, spacedim> &fe_collection,
              const hp::QCollection<dim> &           q_collection);
-
-    /**
-     * Initialize and overwrite all mandatory data structures for the
-     * calculation of transformation matrices.
-     *
-     * All previously calculated transformation matrices will be cleared.
-     */
-    void
-    initialize(const std::vector<unsigned int> &n_coefficients_per_direction,
-               const hp::FECollection<dim, spacedim> &fe_collection,
-               const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p legendre_coefficients of the cell vector field given by
@@ -387,7 +349,7 @@ namespace FESeries
      * Number of coefficients in each direction for each finite element in the
      * registered hp::FECollection.
      */
-    std::vector<unsigned int> n_coefficients_per_direction;
+    const std::vector<unsigned int> n_coefficients_per_direction;
 
     /**
      * hp::FECollection for which transformation matrices will be calculated.
@@ -397,7 +359,7 @@ namespace FESeries
     /**
      * hp::QCollection used in calculation of transformation matrices.
      */
-    SmartPointer<const hp::QCollection<dim>> q_collection;
+    const hp::QCollection<dim> q_collection;
 
     /**
      * Transformation matrices for each FiniteElement.

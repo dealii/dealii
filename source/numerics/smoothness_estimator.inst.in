@@ -64,20 +64,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-    template std::vector<unsigned int> SmoothnessEstimator::Legendre::
-      default_number_of_coefficients_per_direction<deal_II_dimension,
-                                                   deal_II_space_dimension>(
-        const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
-    template hp::QCollection<deal_II_dimension> SmoothnessEstimator::Legendre::
-      default_quadrature_collection<deal_II_dimension, deal_II_space_dimension>(
-        const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
+    template FESeries::Legendre<deal_II_dimension, deal_II_space_dimension>
+    SmoothnessEstimator::Legendre::default_fe_series<deal_II_dimension,
+                                                     deal_II_space_dimension>(
+      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
 
-    template std::vector<unsigned int> SmoothnessEstimator::Fourier::
-      default_number_of_coefficients_per_direction<deal_II_dimension,
-                                                   deal_II_space_dimension>(
-        const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
-    template hp::QCollection<deal_II_dimension> SmoothnessEstimator::Fourier::
-      default_quadrature_collection<deal_II_dimension, deal_II_space_dimension>(
-        const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
+    template FESeries::Fourier<deal_II_dimension, deal_II_space_dimension>
+    SmoothnessEstimator::Fourier::default_fe_series<deal_II_dimension,
+                                                    deal_II_space_dimension>(
+      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &);
 #endif
   }

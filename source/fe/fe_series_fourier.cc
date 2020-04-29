@@ -179,7 +179,7 @@ namespace FESeries
     const hp::QCollection<dim> &           q_collection)
     : n_coefficients_per_direction(n_coefficients_per_direction)
     , fe_collection(&fe_collection)
-    , q_collection(&q_collection)
+    , q_collection(q_collection)
     , fourier_transform_matrices(fe_collection.size())
   {
     Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
@@ -219,7 +219,7 @@ namespace FESeries
     return (
       (n_coefficients_per_direction == fourier.n_coefficients_per_direction) &&
       (*fe_collection == *(fourier.fe_collection)) &&
-      (*q_collection == *(fourier.q_collection)) &&
+      (q_collection == fourier.q_collection) &&
       (k_vectors == fourier.k_vectors) &&
       (fourier_transform_matrices == fourier.fourier_transform_matrices));
   }
@@ -235,48 +235,13 @@ namespace FESeries
       task_group += Threads::new_task([&, fe]() {
         ensure_existence(n_coefficients_per_direction,
                          *fe_collection,
-                         *q_collection,
+                         q_collection,
                          k_vectors,
                          fe,
                          fourier_transform_matrices);
       });
 
     task_group.join_all();
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  Fourier<dim, spacedim>::initialize(
-    const std::vector<unsigned int> &      n_coefficients_per_direction,
-    const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection)
-  {
-    Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
-             n_coefficients_per_direction.size() == q_collection.size(),
-           ExcMessage("All parameters are supposed to have the same size."));
-
-    // set members
-    this->n_coefficients_per_direction = n_coefficients_per_direction;
-    this->fe_collection =
-      SmartPointer<const hp::FECollection<dim, spacedim>>(&fe_collection);
-    this->q_collection =
-      SmartPointer<const hp::QCollection<dim>>(&q_collection);
-
-    // clean up auxiliary members
-    k_vectors.reset_values();
-    const unsigned int max_n_coefficients_per_direction =
-      *std::max_element(n_coefficients_per_direction.cbegin(),
-                        n_coefficients_per_direction.cend());
-    set_k_vectors(k_vectors, max_n_coefficients_per_direction);
-
-    fourier_transform_matrices.clear();
-    fourier_transform_matrices.resize(fe_collection.size());
-
-    unrolled_coefficients.clear();
-    // reserve sufficient memory
-    unrolled_coefficients.reserve(k_vectors.n_elements());
   }
 
 
@@ -299,15 +264,13 @@ namespace FESeries
     const unsigned int           cell_active_fe_index,
     Table<dim, CoefficientType> &fourier_coefficients)
   {
-    Assert(fe_collection != nullptr && q_collection != nullptr,
-           ExcMessage("Initialize this FESeries object first!"));
     for (unsigned int d = 0; d < dim; ++d)
       AssertDimension(fourier_coefficients.size(d),
                       n_coefficients_per_direction[cell_active_fe_index]);
 
     ensure_existence(n_coefficients_per_direction,
                      *fe_collection,
-                     *q_collection,
+                     q_collection,
                      k_vectors,
                      cell_active_fe_index,
                      fourier_transform_matrices);

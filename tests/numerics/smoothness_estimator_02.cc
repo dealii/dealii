@@ -193,11 +193,12 @@ test(const unsigned int poly_degree)
   for (unsigned int p = 1; p <= max_poly; ++p)
     fe_collection.push_back(FE_Q<dim>(p));
 
-  const unsigned int              fe_index = poly_degree - 1;
-  const std::vector<unsigned int> n_coefficients_per_direction =
-    SmoothnessEstimator::Fourier::default_number_of_coefficients_per_direction(
-      fe_collection);
-  const unsigned int n_modes = n_coefficients_per_direction[fe_index];
+  FESeries::Fourier<dim> fourier =
+    SmoothnessEstimator::Fourier::default_fe_series(fe_collection);
+
+  const unsigned int fe_index = poly_degree - 1;
+  const unsigned int n_modes =
+    fourier.get_n_coefficients_per_direction(fe_index);
 
   Assert((poly_degree >= 1) && (poly_degree <= max_poly), ExcInternalError());
   Assert((n_modes >= 3) && (n_modes <= max_poly + 1), ExcInternalError());
@@ -276,12 +277,6 @@ test(const unsigned int poly_degree)
   auto           cell = dof_handler.begin_active();
   local_dof_values.reinit(cell->get_fe().dofs_per_cell);
   cell->get_dof_values(values, local_dof_values);
-
-  hp::QCollection<dim> q_collection =
-    SmoothnessEstimator::Fourier::default_quadrature_collection(fe_collection);
-  FESeries::Fourier<dim> fourier(n_coefficients_per_direction,
-                                 fe_collection,
-                                 q_collection);
 
   Table<dim, std::complex<double>> coeff_out;
   coeff_out.reinit(size);

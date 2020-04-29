@@ -111,9 +111,7 @@ private:
 
   hp::QCollection<dim - 1> quadrature_face;
 
-  std::vector<unsigned int> n_coefficients_per_direction;
-  hp::QCollection<dim>      expansion_q_collection;
-  FESeries::Legendre<dim>   legendre;
+  std::unique_ptr<FESeries::Legendre<dim>> legendre;
 };
 
 template <int dim>
@@ -143,15 +141,8 @@ Problem4<dim>::Problem4(const Function<dim> &force_function,
 
   // after the FECollection has been generated, create a corresponding legendre
   // series expansion object
-  n_coefficients_per_direction =
-    SmoothnessEstimator::Legendre::default_number_of_coefficients_per_direction(
-      Laplace<dim>::fe);
-  expansion_q_collection =
-    SmoothnessEstimator::Legendre::default_quadrature_collection(
-      Laplace<dim>::fe);
-  legendre.initialize(n_coefficients_per_direction,
-                      Laplace<dim>::fe,
-                      expansion_q_collection);
+  legendre = std_cxx14::make_unique<FESeries::Legendre<dim>>(
+    SmoothnessEstimator::Legendre::default_fe_series(Laplace<dim>::fe));
 }
 
 
@@ -163,7 +154,7 @@ Problem4<dim>::substitute_h_for_p()
   Vector<float> smoothness_indicators(
     Laplace<dim>::triangulation.n_active_cells());
   SmoothnessEstimator::Legendre::coefficient_decay_per_direction(
-    legendre,
+    *legendre,
     Laplace<dim>::dof_handler,
     Laplace<dim>::solution,
     smoothness_indicators);

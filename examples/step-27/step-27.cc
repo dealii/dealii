@@ -110,10 +110,10 @@ namespace Step27
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
 
-    hp::QCollection<dim>             fourier_q_collection;
-    FESeries::Fourier<dim>           fourier;
-    std::vector<double>              ln_k;
-    Table<dim, std::complex<double>> fourier_coefficients;
+    hp::QCollection<dim>                    fourier_q_collection;
+    std::unique_ptr<FESeries::Fourier<dim>> fourier;
+    std::vector<double>                     ln_k;
+    Table<dim, std::complex<double>>        fourier_coefficients;
 
     AffineConstraints<double> constraints;
 
@@ -232,9 +232,8 @@ namespace Step27
     // Now we are ready to set-up the FESeries::Fourier object
     const std::vector<unsigned int> n_coefficients_per_direction(
       fe_collection.size(), N);
-    fourier.initialize(n_coefficients_per_direction,
-                       fe_collection,
-                       fourier_q_collection);
+    fourier = std_cxx14::make_unique<FESeries::Fourier<dim>>(
+      n_coefficients_per_direction, fe_collection, fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.
@@ -679,9 +678,9 @@ namespace Step27
         local_dof_values.reinit(cell->get_fe().dofs_per_cell);
         cell->get_dof_values(solution, local_dof_values);
 
-        fourier.calculate(local_dof_values,
-                          cell->active_fe_index(),
-                          fourier_coefficients);
+        fourier->calculate(local_dof_values,
+                           cell->active_fe_index(),
+                           fourier_coefficients);
 
         // The next thing, as explained in the introduction, is that we wanted
         // to only fit our exponential decay of Fourier coefficients to the
