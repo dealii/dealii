@@ -400,8 +400,8 @@ namespace Step18
           cell_matrix = 0;
           cell_rhs    = 0;
           fe_values.reinit(cell);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
               for (const unsigned int q_point :
                    fe_values.quadrature_point_indices())
                 {
@@ -415,7 +415,7 @@ namespace Step18
             reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
           body_force.vector_value_list(fe_values.get_quadrature_points(),
                                        body_force_values);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             {
               const unsigned int component_i =
                 fe.system_to_component_index(i).first;

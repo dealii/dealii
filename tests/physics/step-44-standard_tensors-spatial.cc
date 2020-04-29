@@ -1497,12 +1497,13 @@ namespace Step44
           scratch.symm_grad_Nx[q_point];
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
-            for (unsigned int j = 0; j <= i; ++j)
+            for (const unsigned int j :
+                 scratch.fe_values_ref.dof_indices_ending_at(i))
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
@@ -1536,8 +1537,9 @@ namespace Step44
               }
           }
       }
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
+    for (const unsigned int i : scratch.fe_values_ref.dof_indices())
+      for (const unsigned int j :
+           scratch.fe_values_ref.dof_indices_starting_at(i + 1))
         data.cell_matrix(i, j) = data.cell_matrix(j, i);
   }
   template <int dim>
@@ -1620,7 +1622,7 @@ namespace Step44
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
             if (i_group == u_dof)
@@ -1648,7 +1650,7 @@ namespace Step44
               const double         time_ramp = (time.current() / time.end());
               const double         pressure  = p0 * parameters.p_p0 * time_ramp;
               const Tensor<1, dim> traction  = pressure * N;
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (const unsigned int i : scratch.fe_values_ref.dof_indices())
                 {
                   const unsigned int i_group =
                     fe.system_to_base_index(i).first.first;
