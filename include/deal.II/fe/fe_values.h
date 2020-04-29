@@ -2911,13 +2911,112 @@ public:
     bool quadrature_points_fastest = false) const;
   //@}
 
+  /// @name Cell degrees of freedom
+  //@{
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero (inclusive) to `dofs_per_cell` (exclusive). This allows
+   * one to write code using range-based `for` loops of the following kind:
+   * @code
+   *   FEValues<dim>      fe_values (...);
+   *   FullMatrix<double> cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       fe_values.reinit(cell);
+   *       for (const auto q : fe_values.quadrature_point_indices())
+   *         for (const auto i : fe_values.dof_indices())
+   *           for (const auto j : fe_values.dof_indices())
+   *             cell_matrix(i,j) += ...; // Do something for DoF indices (i,j)
+   *                                      // at quadrature point q
+   *     }
+   * @endcode
+   * Here, we are looping over all degrees of freedom on all cells, with
+   * `i` and `j` taking on all valid indices for cell degrees of freedom, as
+   * defined by the finite element passed to `fe_values`.
+   */
+  boost::integer_range<unsigned int>
+  dof_indices() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from @p start_dof_index (inclusive) to `dofs_per_cell` (exclusive).
+   * This allows one to write code using range-based `for` loops of the
+   * following kind:
+   * @code
+   *   FEValues<dim>      fe_values (...);
+   *   FullMatrix<double> cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       fe_values.reinit(cell);
+   *       for (const auto q : fe_values.quadrature_point_indices())
+   *         for (const auto i : fe_values.dof_indices())
+   *           for (const auto j : fe_values.dof_indices_starting_at(i))
+   *             cell_matrix(i,j) += ...; // Do something for DoF indices (i,j)
+   *                                      // at quadrature point q
+   *     }
+   * @endcode
+   * Here, we are looping over all local degrees of freedom on all cells, with
+   * `i` taking on all valid indices for cell degrees of freedom, as
+   * defined by the finite element passed to `fe_values`, and `j` taking
+   * on a specified subset of `i`'s range, starting at `i` itself and ending at
+   * the number of cell degrees of freedom. In this way, we can construct the
+   * upper half and the diagonal of a stiffness matrix contribution (assuming it
+   * is symmetric, and that only one half of it needs to be computed), for
+   * example.
+   *
+   * @note If the @p start_dof_index is equal to the number of DoFs in the cell,
+   * then the returned index range is empty.
+   */
+  boost::integer_range<unsigned int>
+  dof_indices_starting_at(const unsigned int start_dof_index) const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero (inclusive) to @p end_dof_index (inclusive). This allows
+   * one to write code using range-based `for` loops of the following kind:
+   * @code
+   *   FEValues<dim>      fe_values (...);
+   *   FullMatrix<double> cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       fe_values.reinit(cell);
+   *       for (const auto q : fe_values.quadrature_point_indices())
+   *         for (const auto i : fe_values.dof_indices())
+   *           for (const auto j : fe_values.dof_indices_ending_at(i))
+   *             cell_matrix(i,j) += ...; // Do something for DoF indices (i,j)
+   *                                      // at quadrature point q
+   *     }
+   * @endcode
+   * Here, we are looping over all local degrees of freedom on all cells, with
+   * `i` taking on all valid indices for cell degrees of freedom, as
+   * defined by the finite element passed to `fe_values`, and `j` taking
+   * on a specified subset of `i`'s range, starting at zero and ending at
+   * `i` itself. In this way, we can construct the lower half and the
+   * diagonal of a stiffness matrix contribution (assuming it is symmetric, and
+   * that only one half of it needs to be computed), for example.
+   *
+   * @note If the @p end_dof_index is equal to zero, then the returned index
+   * range is empty.
+   */
+  boost::integer_range<unsigned int>
+  dof_indices_ending_at(const unsigned int end_dof_index) const;
+
+  //@}
+
   /// @name Geometry of the cell
   //@{
 
   /**
    * Return an object that can be thought of as an array containing all
    * indices from zero to `n_quadrature_points`. This allows to write code
-   * using range-based for loops of the following kind:
+   * using range-based `for` loops of the following kind:
    * @code
    *   FEValues<dim> fe_values (...);
    *
@@ -5425,6 +5524,39 @@ FEValuesBase<dim, spacedim>::get_inverse_jacobians() const
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.inverse_jacobians;
+}
+
+
+
+template <int dim, int spacedim>
+inline boost::integer_range<unsigned int>
+FEValuesBase<dim, spacedim>::dof_indices() const
+{
+  return boost::irange(0U, dofs_per_cell);
+}
+
+
+
+template <int dim, int spacedim>
+inline boost::integer_range<unsigned int>
+FEValuesBase<dim, spacedim>::dof_indices_starting_at(
+  const unsigned int start_dof_index) const
+{
+  Assert(start_dof_index <= dofs_per_cell,
+         ExcIndexRange(start_dof_index, 0, dofs_per_cell + 1));
+  return boost::irange(start_dof_index, dofs_per_cell);
+}
+
+
+
+template <int dim, int spacedim>
+inline boost::integer_range<unsigned int>
+FEValuesBase<dim, spacedim>::dof_indices_ending_at(
+  const unsigned int end_dof_index) const
+{
+  Assert(end_dof_index < dofs_per_cell,
+         ExcIndexRange(end_dof_index, 0, dofs_per_cell));
+  return boost::irange(0U, end_dof_index + 1);
 }
 
 
