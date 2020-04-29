@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,9 +44,12 @@ namespace hp
    * that is common to them. The main task of this class is to provide a
    * table where for every combination of finite element, mapping, and
    * quadrature object from their corresponding collection objects there is
-   * a matching ::FEValues, ::FEFaceValues, or ::FESubfaceValues object. To
-   * make things more efficient, however, these FE*Values objects are only
-   * created once requested (lazy allocation).
+   * a matching ::FEValues, ::FEFaceValues, or ::FESubfaceValues object.
+   *
+   * To make things more efficient, however, these FE*Values objects are only
+   * created once requested (lazy allocation). Alternatively if desired, this
+   * can be bypassed by computing all objects in advance with the corresponding
+   * precalculate_fe_values() function.
    *
    * The first template parameter denotes the space dimension we are in, the
    * second the dimensionality of the object that we integrate on, i.e. for
@@ -73,6 +76,7 @@ namespace hp
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
       const QCollection<q_dim> &                              q_collection,
       const UpdateFlags                                       update_flags);
+
     /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
@@ -82,6 +86,35 @@ namespace hp
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
       const QCollection<q_dim> &                              q_collection,
       const UpdateFlags                                       update_flags);
+
+    /**
+     * For timing purposes it may be useful to create all required FE*Values
+     * objects in advance, rather than computing them on request via lazy
+     * allocation as usual in this class.
+     *
+     * This function precalculates the FE*Values objects corresponding to the
+     * provided parameters: The total of all vector entries corresponding to the
+     * same index describes an FE*Values object similarly to select_fe_values().
+     */
+    void
+    precalculate_fe_values(const std::vector<unsigned int> &fe_indices,
+                           const std::vector<unsigned int> &mapping_indices,
+                           const std::vector<unsigned int> &q_indices);
+
+    /**
+     * Same as above, geared to the most common use of hp::FEValues objects in
+     * which FE, quadrature and mapping indices are similar on each individual
+     * cell.
+     *
+     * FE*Values objects are created for every FE in the FECollection, with
+     * quadrature and mapping corresponding to the same index from the
+     * QuadratureCollection and MappingCollection, respectively.
+     *
+     * If QuadratureCollection or MappingCollection contains only one object, it
+     * is used for all FE*Values objects.
+     */
+    void
+    precalculate_fe_values();
 
     /**
      * Get a reference to the collection of finite element objects used
@@ -161,7 +194,7 @@ namespace hp
      * within the q_collection.
      *
      * Initially, all entries have zero pointers, and we will allocate them
-     * lazily as needed in select_fe_values().
+     * lazily as needed in select_fe_values() or precalculate_fe_values().
      */
     Table<3, std::shared_ptr<FEValuesType>> fe_values_table;
 
@@ -222,7 +255,9 @@ namespace hp
    * Note that ::FEValues objects are created on the fly, i.e. only as they
    * are needed. This ensures that we do not create objects for every
    * combination of finite element, quadrature formula and mapping, but only
-   * those that will actually be needed.
+   * those that will actually be needed. Alternatively if desired, this
+   * can be bypassed by computing all objects in advance with the corresponding
+   * hp::FEValuesBase::precalculate_fe_values() function.
    *
    * This class has not yet been implemented for the use in the codimension
    * one case (<tt>spacedim != dim </tt>).
