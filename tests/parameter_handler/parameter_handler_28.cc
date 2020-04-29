@@ -25,7 +25,7 @@
 int
 main()
 {
-  initlog(1);
+  initlog();
 
   double a = 1.0;
   double b = 2.0;

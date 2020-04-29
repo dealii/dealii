@@ -15,7 +15,8 @@ DEAL::ShortJSON format:
 DEAL::========================================
 {
     "A_20double": "1",
-    "Section_20two": {
+    "Section_20two":
+    {
         "Another_20double": "2"
     }
 }
