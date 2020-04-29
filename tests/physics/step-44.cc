@@ -1239,7 +1239,8 @@ namespace Step44
       scratch.solution_total, scratch.solution_values_p_total);
     scratch.fe_values_ref[J_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_J_total);
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       lqph[q_point]->update_values(scratch.solution_grads_u_total[q_point],
                                    scratch.solution_values_p_total[q_point],
                                    scratch.solution_values_J_total[q_point]);
@@ -1348,7 +1349,8 @@ namespace Step44
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point :
+             fe_values_ref.quadrature_point_indices())
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
             const double JxW      = fe_values_ref.JxW(q_point);
@@ -1373,7 +1375,8 @@ namespace Step44
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point :
+             fe_values_ref.quadrature_point_indices())
           {
             const double det_F_qp   = lqph[q_point]->get_det_F();
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
@@ -1471,7 +1474,8 @@ namespace Step44
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
@@ -1494,7 +1498,8 @@ namespace Step44
               Assert(k_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim>          tau = lqph[q_point]->get_tau();
         const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
@@ -1594,7 +1599,8 @@ namespace Step44
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
@@ -1613,7 +1619,8 @@ namespace Step44
               Assert(k_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
         const double                  det_F   = lqph[q_point]->get_det_F();
@@ -1642,8 +1649,8 @@ namespace Step44
           cell->face(face)->boundary_id() == 6)
         {
           scratch.fe_face_values_ref.reinit(cell, face);
-          for (unsigned int f_q_point = 0; f_q_point < n_q_points_f;
-               ++f_q_point)
+          for (const unsigned int f_q_point :
+               scratch.fe_face_values_ref.quadrature_point_indices())
             {
               const Tensor<1, dim> &N =
                 scratch.fe_face_values_ref.normal_vector(f_q_point);

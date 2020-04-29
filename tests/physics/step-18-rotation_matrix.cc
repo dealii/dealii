@@ -402,7 +402,8 @@ namespace Step18
           fe_values.reinit(cell);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const unsigned int q_point :
+                   fe_values.quadrature_point_indices())
                 {
                   const SymmetricTensor<2, dim>
                     eps_phi_i = get_strain(fe_values, i, q_point),
@@ -418,7 +419,8 @@ namespace Step18
             {
               const unsigned int component_i =
                 fe.system_to_component_index(i).first;
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const unsigned int q_point :
+                   fe_values.quadrature_point_indices())
                 {
                   const SymmetricTensor<2, dim> &old_stress =
                     local_quadrature_points_data[q_point].old_stress;
