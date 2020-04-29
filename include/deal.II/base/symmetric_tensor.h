@@ -1068,7 +1068,8 @@ SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   static_assert(rank == 2, "This function is only implemented for rank==2");
   for (unsigned int d = 0; d < dim; ++d)
     for (unsigned int e = 0; e < d; ++e)
-      Assert(t[d][e] == t[e][d], ExcInternalError());
+      Assert(t[d][e] == t[e][d],
+             ExcMessage("The incoming Tensor must be exactly symmetric."));
 
   for (unsigned int d = 0; d < dim; ++d)
     data[d] = t[d][d];
