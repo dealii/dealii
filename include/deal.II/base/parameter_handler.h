@@ -852,20 +852,13 @@ public:
    * - format options: PRM, LaTeX, Description, XML, JSON
    * - stylistic options: Short, KeepDeclarationOrder
    *
-   * A valid combination of options is given in the following table:
+   * Only one format option may be specified at the time. Any function that
+   * accepts an OutputStyle as an option will throw if you specify more than
+   * one.
    *
-   * Stylistic options    | Default | PRM | LaTeX | Description | XML | JSON
-   * -------------------- | ------- | --- | ----- | ----------- | --- | ----
-   * Default              |    X    |  X  |   X   |      X      |  X  |  X
-   * Short                |    X    |  X  |   -   |      X      |  X  |  X
-   * KeepDeclarationOrder |    X    |  X  |   X   |      X      |  X  |  X
-   *
-   * Valid combinations are checked at the beginning of the functions that
-   * accept an OutputStyle as an input argument.
-   *
-   * Furthermore, a number of shortcuts of commonly used option combinations are
-   * provided. E.g., ShortPRM prints the parameters in the PRM
-   * format, while skipping the documentation.
+   * A number of shortcuts of commonly used option combinations are provided.
+   * E.g., ShortPRM prints the parameters in the PRM format, while skipping the
+   * documentation.
    */
   enum OutputStyle
   {
@@ -929,13 +922,13 @@ public:
     JSON = 0x0100,
 
     /**
-     * Write input for ParameterHandler without comments or changed default
+     * Write the content of ParameterHandler without comments or changed default
      * values.
      */
     ShortPRM = PRM | Short,
 
     /**
-     * Write input for ParameterHandler without comments or changed default
+     * Write the content of ParameterHandler without comments or changed default
      * values.
      *
      * @deprecated Use `ShortPRM` instead of `ShortText`.
@@ -943,16 +936,22 @@ public:
     ShortText = ShortPRM,
 
     /**
-     * Write input for ParameterHandler without comments or changed default
+     * Write the content of ParameterHandler without comments or changed default
      * values as a XML file.
      */
     ShortXML = XML | Short,
 
     /**
-     * Write input for ParameterHandler without comments or changed default
+     * Write the content of ParameterHandler without comments or changed default
      * values as a JSON file.
      */
     ShortJSON = JSON | Short,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values as a LaTeX file.
+     */
+    ShortLaTeX = LaTeX | Short,
   };
 
 
@@ -1422,10 +1421,10 @@ public:
    * available.
    *
    * By using the flag <tt>Short</tt> in combination with <tt>PRM</tt>,
-   * <tt>XML</tt>, or <tt>JSON</tt> (or by using the shortcuts
-   * <tt>ShortPRM</tt>, <tt>ShortXML</tt>, or <tt>ShortJSON</tt>), a reduced
-   * output can be generated, only containing the values and skipping the
-   * documentation.
+   * <tt>XML</tt>, <tt>JSON</tt>, or <tt>LaTeX</tt> (or by using the shortcuts
+   * <tt>ShortPRM</tt>, <tt>ShortXML</tt>, <tt>ShortJSON</tt>, or
+   * <tt>ShortLaTeX</tt>), a reduced output can be generated, only containing
+   * the values and skipping the documentation.
    *
    * In <tt>XML</tt> format, the output starts with one root element
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
@@ -1474,6 +1473,32 @@ public:
    */
   std::ostream &
   print_parameters(std::ostream &out, const OutputStyle style) const;
+
+
+
+  /**
+   * Print all parameters with the given @p style to the file given by
+   * @p filename.
+   *
+   * This function deduces the output format from the extension of the specified
+   * filename. Supported extensions are `prm`, `xml`, `tex`, and `json`.
+   * If a different extensions is used, then an output style is deduced from the
+   * @p style argument.
+   *
+   * Notice that specifying a supported file extension is equivalent to
+   * specifying the corresponding ParameterHandler::OutputStyle format. In
+   * particular, any  (optional) format specification specified in the @p style
+   * parameter  must be compatible with the given extension.
+   *
+   * If the format is not supported, and @p output_style does not contain a
+   * format specification, an assertion is thrown.
+   *
+   * @param filename The output file name.
+   * @param style The style with which output is produced.
+   */
+  void
+  print_parameters(const std::string &filename,
+                   const OutputStyle  style = DefaultStyle) const;
 
   /**
    * Print parameters to a logstream. This function allows to print all

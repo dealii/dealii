@@ -1,0 +1,117 @@
+
+DEAL::PRM format: 
+DEAL::========================================
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  set A bool   = true
+  set A double = 1
+  set A string = Ciao
+end
+
+
+
+DEAL::XML format: 
+DEAL::========================================
+<?xml version="1.0" encoding="utf-8"?>
+<ParameterHandler><Testing><A_20bool><value>true</value><default_value>true</default_value><documentation/><pattern>1</pattern><pattern_description>[Bool]</pattern_description><actions>1</actions></A_20bool><A_20double><value>1</value><default_value>1</default_value><documentation/><pattern>0</pattern><pattern_description>[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]</pattern_description><actions>0</actions></A_20double><A_20string><value>Ciao</value><default_value>Ciao</default_value><documentation/><pattern>2</pattern><pattern_description>[Anything]</pattern_description><actions>2</actions></A_20string></Testing></ParameterHandler>
+
+DEAL::JSON format: 
+DEAL::========================================
+{
+    "Testing":
+    {
+        "A_20bool":
+        {
+            "value": "true",
+            "default_value": "true",
+            "documentation": "",
+            "pattern": "1",
+            "pattern_description": "[Bool]",
+            "actions": "1"
+        },
+        "A_20double":
+        {
+            "value": "1",
+            "default_value": "1",
+            "documentation": "",
+            "pattern": "0",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "0"
+        },
+        "A_20string":
+        {
+            "value": "Ciao",
+            "default_value": "Ciao",
+            "documentation": "",
+            "pattern": "2",
+            "pattern_description": "[Anything]",
+            "actions": "2"
+        }
+    }
+}
+
+DEAL::LaTeX format: 
+DEAL::========================================
+\subsection{Global parameters}
+\label{parameters:global}
+
+
+
+\subsection{Parameters in section \tt Testing}
+\label{parameters:Testing}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt A bool}
+\phantomsection\label{parameters:Testing/A bool}
+\label{parameters:Testing/A_20bool}
+
+
+\index[prmindex]{A bool}
+\index[prmindexfull]{Testing!A bool}
+{\it Value:} true
+
+
+{\it Default:} true
+
+
+{\it Possible values:} A boolean value (true or false)
+\item {\it Parameter name:} {\tt A double}
+\phantomsection\label{parameters:Testing/A double}
+\label{parameters:Testing/A_20double}
+
+
+\index[prmindex]{A double}
+\index[prmindexfull]{Testing!A double}
+{\it Value:} 1
+
+
+{\it Default:} 1
+
+
+{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
+\item {\it Parameter name:} {\tt A string}
+\phantomsection\label{parameters:Testing/A string}
+\label{parameters:Testing/A_20string}
+
+
+\index[prmindex]{A string}
+\index[prmindexfull]{Testing!A string}
+{\it Value:} Ciao
+
+
+{\it Default:} Ciao
+
+
+{\it Possible values:} Any string
+\end{itemize}
+
+DEAL::Description format: 
+DEAL::========================================
+Listing of Parameters:
+
+subsection Testing
+  set A bool    =   A boolean value (true or false)
+  set A double  =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
+  set A string  =   Any string
+
