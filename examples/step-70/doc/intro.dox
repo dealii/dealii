@@ -66,7 +66,6 @@ We are going to solve the following differential problem: given a sufficiently
 regular function $g$ on $\Gamma$, find the solution $(\textbf{u},p)$ to
 
 @f{eqnarray*}
-{
   -\Delta \mathbf{u} + \nabla p &=& 0,\\
   -\nabla \cdot \textbf{u} &=& 0,\\
   \textbf{u} &=& \textbf{g}  \text{ in } \Gamma,\\
@@ -92,7 +91,7 @@ The weak form of the Stokes equations is obtained by first writing it in vector 
   \end{pmatrix}
   =
   \begin{pmatrix}
-  {0
+  0
   \\
   0
   \end{pmatrix},
@@ -136,7 +135,7 @@ or a surface in a three-dimensional domain. The weak imposition of the Dirichlet
 boundary condition on $\Gamma$ is done through Nitsche method. This is achieved by using the following modified formulation :
 
 
-@f{eqnarray*}{
+@f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
  + (q, \nabla \cdot \textbf{u})_{\Omega} - (\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
  + \beta (\textbf{v}},\textbf{u})_{\Gamma} &=&  -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
@@ -150,7 +149,7 @@ be consistent and stable. We note that the additional terms on the left-hand
 and right-hand side are equal since $\textbf{u}=\textbf{g}\text{ in } \Gamma$.
 It follows that :
 
-@f{eqnarray*}{
+@f{eqnarray*}
 (\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
 + \beta (\textbf{v},\textbf{u})_{\Gamma} &=& -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
 + \beta (\textbf{v},\textbf{g})_{\Gamma}
@@ -158,7 +157,7 @@ It follows that :
 
 We note that an alternative formulation can be used :
 
-@f{eqnarray*}{
+@f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
  + (q, \nabla \cdot \textbf{u})_{\Omega} + (\nabla \textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
  + \beta (\textbf{v},\textbf{u})_{\Gamma} &=&  (\nabla \textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
@@ -186,7 +185,7 @@ In this case, $\Gamma$ has the same dimension, but is imbedded into $\Omega$.
 In the case of $\mathcal{L}^2$ penalization, an additional Darcy term is added
 within $\Gamma$ resulting in :
 
-@f{eqnarray*}{
+@f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
  + (q, \nabla \cdot \textbf{u})_{\Omega} 
  + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma} &=& 
