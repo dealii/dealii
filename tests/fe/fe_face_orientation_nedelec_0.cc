@@ -129,7 +129,7 @@ evaluate(const FE_Nedelec<3> & fe,
                                           values);
       std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
       cell->get_dof_indices(dof_indices);
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         {
           for (unsigned int d = 0; d < 3; ++d)
             deallog << values_ref[q_point][d] - values[q_point](d) << "  ";

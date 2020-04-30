@@ -556,7 +556,7 @@ namespace Step22
 
         right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                           rhs_values);
-        for (unsigned int q = 0; q < n_q_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           {
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
@@ -604,7 +604,7 @@ namespace Step22
                     const std::vector<Point<dim>> &quad_points =
                       fe_v_face.get_quadrature_points();
 
-                    for (unsigned int q = 0; q < n_q_face; ++q)
+                    for (const auto q : fe_v_face.quadrature_point_indices())
                       {
                         double jump =
                           jumpfunction.jump(quad_points[q], normals[q]);
@@ -932,7 +932,7 @@ namespace Step22
         fe_v.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int q = 0; q < n_q_points; ++q)
+        for (const auto q : fe_v.quadrature_point_indices())
           {
             double div = 0;
             for (unsigned int i = 0; i < dofs_per_cell - 1; ++i)

@@ -79,7 +79,7 @@ test(const unsigned int degree)
         fe_values.reinit(cell);
 
         deallog << "Jacobians: ";
-        for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           {
             deallog << "[ ";
             for (unsigned int d = 0; d < dim; ++d)
@@ -89,7 +89,7 @@ test(const unsigned int degree)
           }
         deallog << std::endl;
         deallog << "Derivatives of shape function: ";
-        for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           {
             deallog << "[ ";
             for (unsigned int d = 0; d < dim; ++d)

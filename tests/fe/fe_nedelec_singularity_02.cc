@@ -437,7 +437,7 @@ namespace nedelec_singularity
             right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                               rhs_values);
 
-            for (unsigned int q = 0; q < n_q_points; ++q)
+            for (const auto q : fe_values.quadrature_point_indices())
               {
                 Tensor<1, dim> rhs;
 

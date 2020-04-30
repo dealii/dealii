@@ -1,0 +1,5 @@
+New: There is a new function FEValuesBase::quadrature_point_indices()
+that makes writing range-based for loops over all quadrature points of a 
+cell or face much simpler.
+<br>
+(Jean-Paul Pelteret, 2020/04/29)

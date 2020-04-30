@@ -111,7 +111,7 @@ test1()
         fe_values.get_quadrature_points();
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           deallog << "dof=" << i << " qp=" << q_points[q_point]
                   << " f(qp)=" << function.value(q_points[q_point])
                   << " N(qp)=" << fe_values.shape_value(i, q_point)
