@@ -88,6 +88,18 @@ namespace hp
       const UpdateFlags                                       update_flags);
 
     /**
+     * Copy constructor.
+     */
+    FEValuesBase(const FEValuesBase<dim, q_dim, FEValuesType> &other);
+
+    /**
+     * Copy operator. While objects of this type can be copy-constructed,
+     * they cannot be copied and consequently this operator is disabled.
+     */
+    FEValuesBase &
+    operator=(const FEValuesBase &) = delete;
+
+    /**
      * For timing purposes it may be useful to create all required FE*Values
      * objects in advance, rather than computing them on request via lazy
      * allocation as usual in this class.
@@ -196,7 +208,7 @@ namespace hp
      * Initially, all entries have zero pointers, and we will allocate them
      * lazily as needed in select_fe_values() or precalculate_fe_values().
      */
-    Table<3, std::shared_ptr<FEValuesType>> fe_values_table;
+    Table<3, std::unique_ptr<FEValuesType>> fe_values_table;
 
     /**
      * Set of indices pointing at the fe_values object selected last time
