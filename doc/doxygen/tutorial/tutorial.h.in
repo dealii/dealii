@@ -576,6 +576,13 @@
  *        stepping.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-70</td>
+ *       <td> A fluid structure interaction problem on fully distributed
+ *       non-matching grids, using penalty methods, and a coupling constructed
+ *       through a ParticleHandler object.
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -663,7 +670,9 @@
  *       step-44,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -703,7 +712,9 @@
  *       step-40,
  *       step-42,
  *       step-50,
- *       step-55
+ *       step-55,
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -735,7 +746,8 @@
  *       step-55,
  *       step-59,
  *       step-67,
- *       step-69
+ *       step-69,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -754,7 +766,8 @@
  *       step-44,
  *       step-60,
  *       step-62,
- *       step-69
+ *       step-69,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -794,7 +807,8 @@
  *       step-33,
  *       step-42,
  *       step-43,
- *       step-57
+ *       step-57,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -890,7 +904,8 @@
  *     <td> Non matching algorithms
  *     </td>
  *     <td>
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -969,7 +984,7 @@
  *       step-42,
  *       step-50,
  *       step-55,
- *       step-59
+ *       step-59,
  *     </td>
  *   </tr>
  *
@@ -986,7 +1001,8 @@
  *       step-55,
  *       step-56,
  *       step-57,
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -1019,7 +1035,8 @@
  *     </td>
  *     <td>
  *       step-44,
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -1119,7 +1136,8 @@
  *       step-46,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -1219,7 +1237,8 @@
  *         step-35,
  *         step-55,
  *         step-56,
- *         step-57
+ *         step-57,
+ *         step-70
  *    </td>
  *   </tr>
  *
@@ -1314,6 +1333,12 @@
  *     <td> Time dependent neutron diffusion equation
  *     </td>
  *     <td>step-52</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Time dependent fluid structure interaction problems
+ *     </td>
+ *     <td>step-70</td>
  *   </tr>
  * </table>
  */
