@@ -1117,6 +1117,7 @@ namespace Threads
              typename identity<C>::type &c,
              typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1133,6 +1134,7 @@ namespace Threads
              typename identity<const C>::type &c,
              typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1753,6 +1755,7 @@ namespace Threads
            typename identity<C>::type &c,
            typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1769,6 +1772,7 @@ namespace Threads
            typename identity<const C>::type &c,
            typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
