@@ -1,0 +1,6 @@
+Removed: The function `MeshWorker::CopyData::operator=(const double)` has been
+removed, as resetting the state of the `copier` from within a `boundary_worker`
+or `face_worker` is not permitted and can lead to hard to trace bugs within a
+user's code.
+<br>
+(Jean-Paul Pelteret, 2020/04/30)

@@ -72,19 +72,6 @@ namespace MeshWorker
       default;
 
     /**
-     * Allow resetting of all elements of the struct to zero, by simply
-     * calling `(*this) = 0;`
-     *
-     * Notice that the only allowed number here is really `0`. Calling this
-     * function with any other number will trigger an assertion.
-     *
-     * The elements of the arrays of local degrees of freedom indices are
-     * all set to numbers::invalid_dof_index.
-     */
-    void
-    operator=(const double number);
-
-    /**
      * An array of local matrices.
      */
     std::array<FullMatrix<double>, n_matrices> matrices;
@@ -134,25 +121,6 @@ namespace MeshWorker
 
     for (unsigned int i = 0; i < n_dof_indices; ++i)
       local_dof_indices[i].resize(dof_indices_sizes[i++]);
-  }
-
-
-
-  template <int n_matrices, int n_vectors, int n_dof_indices>
-  void
-  CopyData<n_matrices, n_vectors, n_dof_indices>::operator=(const double number)
-  {
-    Assert(number == 0.0,
-           ExcMessage("You should only call this method with "
-                      "argument 0.0"));
-
-    for (auto &m : matrices)
-      m = number;
-    for (auto &v : vectors)
-      v = number;
-    for (auto &d : local_dof_indices)
-      for (auto &val : d)
-        val = numbers::invalid_dof_index;
   }
 
 #endif // DOXYGEN
