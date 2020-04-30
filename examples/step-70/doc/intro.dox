@@ -101,11 +101,11 @@ function $\phi = \begin{pmatrix}\textbf{v} \\ q\end{pmatrix}$ and integrating
 over the domain $\Omega$, yielding the following set of equations:
 @f{eqnarray*}
   (\mathrm v,
-   -\Delta \textbf{u}} + \nabla p)_{\Omega}
+   -\Delta \textbf{u} + \nabla p)_{\Omega}
   -
   (q,\textrm{div}\; \textbf{u})_{\Omega}
   =
-  (\textbf{v}, 0)_\Omega,
+  (\textbf{v}, 0)_{\Omega}
 @f}
 which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
 \\ q\end{pmatrix}$.
@@ -114,7 +114,7 @@ which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
 By integrating by parts when possible, and exploiting the boundary
 conditions on $\partial\Omega$, we obtain the following variational problem:
 @f{eqnarray*}{
-(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\nabla \cdot \textbf{v}, p)_{\Omega}
  + (q, \nabla \cdot \textbf{u})_{\Omega}&=& 0
 @f}
 
@@ -136,21 +136,23 @@ boundary condition on $\Gamma$ is done through Nitsche method. This is achieved 
 
 
 @f{eqnarray*}
-(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
- + (q, \nabla \cdot \textbf{u})_{\Omega} - (\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
- + \beta (\textbf{v}},\textbf{u})_{\Gamma} &=&  -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} +(\textbf{v}\cdot \textbf{n},p)_{\Gamma} -(q, \textbf{u} \cdot n)_{\Gamma}
+ - (\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma} - (\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ + \beta (\textbf{v},\textbf{u})_{\Gamma} &=&  -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
  + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
 The integrals over $\Gamma$ are face integrals. It can be shown (see  Freund, 1995)
 that there exist a positive constant
 $C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
-be consistent and stable. We note that the additional terms on the left-hand
+be consistent and stable. The first three additional integrals on $\Gamma$ appear
+naturally as part of the weak form of the equation. The final two additional terms on the left-hand
 and right-hand side are equal since $\textbf{u}=\textbf{g}\text{ in } \Gamma$.
 It follows that :
 
 @f{eqnarray*}
-(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+-(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
 + \beta (\textbf{v},\textbf{u})_{\Gamma} &=& -(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
 + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
@@ -158,8 +160,10 @@ It follows that :
 We note that an alternative formulation can be used :
 
 @f{eqnarray*}
-(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
- + (q, \nabla \cdot \textbf{u})_{\Omega} + (\nabla \textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} +(\textbf{v}\cdot \textbf{n},p)_{\Gamma} -(q, \textbf{u} \cdot n)_{\Gamma}
+ - (\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma}
++ (\nabla \textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
  + \beta (\textbf{v},\textbf{u})_{\Gamma} &=&  (\nabla \textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma}
  + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
@@ -168,7 +172,7 @@ in which case the stability and consistency condition becomes $\beta > 0$. In ge
 the value of $\beta$ is chosen such that $\beta = C h^{-1} $ with $h$ a measure of
 size of the face being integrated and $C$ a constant such that $1 \leq C \leq 10$.
 
-In step-60, the imposition of the constraint in the strong form
+In step-60, the imposition of the constraint
 required the addition of new variables in the form of the Lagrange multipliers.
 This is not the case for this tutorial program. The imposition of the
 boundary condition using Nitsche's method only modifies the system matrix
@@ -188,7 +192,7 @@ within $\Gamma$ resulting in :
 @f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
  + (q, \nabla \cdot \textbf{u})_{\Omega}
- + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma} &=&
+ + \beta_1 (\textbf{v},\textbf{u})_{\Gamma} &=&
   \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
@@ -205,7 +209,7 @@ within $\Gamma$:
 @f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
  + (q, \nabla \cdot \textbf{u})_{\Omega}
- + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma}
+ + \beta_1 (\textbf{v},\textbf{u})_{\Gamma}
  - \beta_2 (\nabla\textbf{v},\nabla \textbf{u})_{\Gamma}
  &=&
  \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
@@ -237,7 +241,7 @@ and compute the integral on $\hat K$ using a quadrature formula. For example:
 \f[
 \beta (\textbf{v},\textbf{u})_{\Gamma} =  \sum_{K\in \Gamma} \int_{\hat K}
 \hat{\textbf{u}}(\hat x) (\textbf{v} \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
-\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat \textbf{u}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
+\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat{\textbf{u}}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
 \f]
 
 Computing this sum is non-trivial because we have to evaluate $(v_j \circ F_{K})
@@ -296,7 +300,7 @@ The approach taken in this step it is as follow:
 - Create a parallel::distributed::Triangulation for the domain $\Gamma$
 - Create Particles::Particle at the position of the quadrature points on $\Gamma$
   by using the Particles::Generators::quadrature_points generator. Since the quadrature_points generator
-  uses Particles::ParticleHandler::insert_particles_global, the particles
+  uses Particles::ParticleHandler::insert_particle_global function, the particles
   will be automatically distributed across the processors.
 - Attach the necessary information to the particles. In the case of penalization
   method this is only JxW, whereas for the Nitsche method it is JxW and the
