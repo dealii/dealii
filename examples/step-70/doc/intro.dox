@@ -10,39 +10,52 @@
 
 <h1>Introduction</h1>
 
-<h3>Non-matching grid simulations through a massively parallel and distributed Nitsche method</h3>
+<h3>Massively parallel non-matching grid simulations of fluid motion</h3>
 
 
 In this tutorial we consider the case of two domains, $\Omega$ in
 $R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$. The domain $\Gamma$ is
-embedded in $\Omega$ ($\Gamma \subseteq \Omega$) and is not-matching. We want to solve a partial
-differential equation on $\Omega$, enforcing some conditions on the solution of
-the problem on the embedded domain $\Gamma$ using the Nitsche method.
+embedded in $\Omega$ ($\Gamma \subseteq \Omega$) and is not-matching. We want to
+solve a partial differential equation on $\Omega$, enforcing some conditions
+on the solution of the problem on the embedded domain $\Gamma$.
 
-The technique we describe here is presented in the literature using one of many names:
-the <b>immersed finite element method</b> and the <b>fictitious boundary method</b> among others. The main principle is
-that the discretization of the two grids and of the two finite element spaces
-are kept completely independent. In the present tutorial, this approach is used to solve for the motion of a
-viscous fluid, described by the Stokes equation, that is agitated by a rigid (non-deformable) impeller.
- Thus, the equations solved in $\Omega$ are the Stokes equations for a creeping
+The technique we describe here is presented in the literature using one of many
+names: the <b>immersed finite element method</b> and the <b>fictitious boundary
+method</b> among others.  The main principle is that the discretization of the
+two grids are kept completely independent. In the present tutorial, this approach is used to solve for the motion of a
+viscous fluid, described by the Stokes equation, that is agitated by a rigid non-deformable impeller.
+Thus, the equations solved in $\Omega$ are the Stokes equations for a creeping
 flow (i.e. a flow where $\text{Re}\rightarrow 0$) and a no-slip boundary
-condition is applied on the moving *embedded domain* associated with
-the impeller : $\Gamma$. However, this tutorial could be readily extended
+condition is applied on the moving *embedded domain* $\Gamma$ associated with
+the impeller. However, this tutorial could be readily extended
 to other equations (e.g. the Navier-Stokes equations, linear elasticity equation, etc.). It can
 can be seen as a natural extension of step-60 that enables the solution
 of large problems using distributed parallel computing architecture via MPI.
+However, countrary to step-60, the Dirichlet boundary conditions on $\Gamma$
+are imposed weakly instead of through the use of Lagrange multipliers.
 
 There are two interesting scenarios that occur when one wants to enforce
 conditions on the embedded domain $\Gamma$:
 
 - the geometrical dimension `dim` of the embedded domain $\Gamma$ is the same of
 the domain $\Omega$ (`spacedim`), that is, the spacedim-dimensional measure of
-$\Gamma$ is not zero, or
+$\Gamma$ is not zero. In this case, the imposition of the Dirichlet boundary
+boundary condition on $\Gamma$ is done through a volumetric penalization. If the
+applied penalization only depends on the velocity, this is often referred
+to as $\mathcal{L}^2$ penalization whereas if the penalization depends
+on both the velocity and its gradient, it is an $\mathcal{H}^1$ penalization.
+The case of the $\mathcal{L}^2$ penalization is very similar to a Darcy-type
+of approach. Both $\mathcal{L}^2$ an $\mathcal{H}^1$ penalizations have been analyzed
+extensively (ex: see Angot 1999).
 
 - the embedded domain $\Gamma$ has an intrinsic dimension `dim` which is smaller
 than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
 zero; for example it is a curve embedded in a two dimensional domain, or a
-surface embedded in a three-dimensional domain.
+surface embedded in a three-dimensional domain. In this case, the boundary
+condition is imposed weekly on $\Gamma$ by applying Nitsche method (see Freund, 1995).
+
+Both approaches have very similar requirement and results in highly
+similar formulations.
 
 In this tutorial program we are not interested in further details on $\Gamma$: we
 assume that the dimension of the
@@ -64,9 +77,9 @@ We are looking for a velocity field
  $\mathbf{u}$ and a pressure field $p$ that satisfies the Stokes equations
  on $\Omega$ and homogeneous boundary conditions on $\partial\Omega$.
   Additionally,  the velocity field is subject to the condition
-  $\mathbf{u} = \mathbf{g}$ on  $\Gamma$ that is imposed weakly using
-Nitsche method. The application of Nitsche's method will be discussed
-furthermore once the variational formulation has been introduced.
+  $\mathbf{u} = \mathbf{g}$ on  $\Gamma$ that is imposed weakly.
+  The application of penalization or of Nitsche's method will be discussed
+ once the variational formulation has been introduced.
 
 
 The weak form of the Stokes equations is obtained by first writing it in vector form as
@@ -110,8 +123,18 @@ where $(\cdot, \cdot)_{\Omega}$ represents the $L^2$ scalar product.
 
 This variational formulation does not take into account the embedded domain. Contrarily
 to step-60, we do not enforce strongly the constraints of $\textbf{u}$ on $\Gamma$,
-but enforce them weakly through Nitsche's method. This is achieved by using the
-following modified formulation :
+but enforce them weakly. 
+
+The analysis of this weak imposition of the boundary condition depends on the spacedim-dimensional measure
+of $\Gamma$. We discuss both scenario.
+
+<h4>Zero Spacedim-dimensional measure of $\Gamma$ (dim=spacedim-1)</h4>
+
+
+In this case, $\Gamma$ is a curve embedded in a two-dimensional domain
+or a surface in a three-dimensional domain. The weak imposition of the Dirichlet
+boundary condition on $\Gamma$ is done through Nitsche method. This is achieved by using the following modified formulation :
+
 
 @f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
@@ -120,7 +143,8 @@ following modified formulation :
  + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
-It can be shown (see  Freund, 1995) that there exist a positive constant
+The integrals over $\Gamma$ are face integrals. It can be shown (see  Freund, 1995)
+that there exist a positive constant
 $C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
 be consistent and stable. We note that the additional terms on the left-hand
 and right-hand side are equal since $\textbf{u}=\textbf{g}\text{ in } \Gamma$.
@@ -141,7 +165,9 @@ We note that an alternative formulation can be used :
  + \beta (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
-in which case the stability and consistency condition becomes $\beta > 0$.
+in which case the stability and consistency condition becomes $\beta > 0$. In general,
+the value of $\beta$ is chosen such that $\beta = C h^{-1} $ with $h$ a measure of
+size of the face being integrated and $C$ a constant such that $1 \leq C \leq 10$.
 
 In step-60, the imposition of the constraint in the strong form
 required the addition of new variables in the form of the Lagrange multipliers.
@@ -154,26 +180,63 @@ step-60, we still need to integrate over the non-matching embedded grid in order
 to construct the boundary term necessary to impose the boundary condition
 over $\Gamma$.
 
-<h3>Representation of $\Omega$ and $\Gamma$</h3>
+<h4>Non-zero Spacedim-dimensional measure $\Gamma$ (dim=spacedim)</h4>
+
+In this case, $\Gamma$ has the same dimension, but is imbedded into $\Omega$.
+In the case of $\mathcal{L}^2$ penalization, an additional Darcy term is added
+within $\Gamma$ resulting in :
+
+@f{eqnarray*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega} 
+ + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma} &=& 
+  \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
+@f}
+
+$\mathcal{L}^2$ penalization consists in adding a volumetric term that constrains
+the velocity of the fluid to adhere to the velocity of the rigid body
+within $\Gamma$. In this case, $\beta_1$ must be chosen sufficient high to ensure that
+the Dirichlet boundary condition in $\Gamma$ is sufficiently respected, but not too
+high in order to maintain proper conditioning of the system matrix.
+
+$\mathcal{H}^1$ penalization is constructed in a similar manner, with the addition
+of a viscous component to the penalization that dampens the velocity gradient
+within $\Gamma$:
+
+@f{eqnarray*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
+ + (q, \nabla \cdot \textbf{u})_{\Omega}
+ + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma}
+ - \beta_2 (\nabla\textbf{v},\nabla \textbf{u})_{\Gamma}
+ &=&  
+ \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
+@f}
+
+
+<h4>Representation of $\Omega$ and $\Gamma$</h4>
 
 In this tutorial, both the embedded grid $\Gamma$ and the embedding
 grid are described using a parallel::distributed::Triangulation. These two
-triangulations can be built from deal.II GridGenerators or by reading a
+triangulations can be built from deal.II GridGenerators namespace or by reading a
 mesh file produced with another application (e.g. GMSH). This is slightly
-more general than what has previously done step-60.
+more general than what has previously done in step-60.
 
-The main challenge in the application of the Nitsche method lies in the
-integrals that are computed on $\Gamma$. As usual in finite elements we split this
-integral into contributions from all cells of the triangulation used to
+As we have seen, the addition of the immersed boundary method, whether
+it is in the dim=spacedim or dim<spacedim case, only introduces
+additional terms in the system matrix and the right-hand side of the
+system which result from the integration over $\Gamma$. This does not
+modify the number of variables for which the problem
+must be solved. The challenge is thus related to the integrals
+that must be carried over $\Gamma$.
+
+As usual in finite elements we split this integral into contributions from all
+cells of the triangulation used to
 discretize $\Gamma$, we transform the integral on $K$ to an integral on the
 reference element $\hat K$, where $F_{K}$ is the mapping from $\hat K$ to $K$,
 and compute the integral on $\hat K$ using a quadrature formula. For example:
 
----- Here now ----
-
-
 \f[
-\beta (\textbf{v},\textbf{u})_{\Gamma} = (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
+\beta (\textbf{v},\textbf{u})_{\Gamma} =  \sum_{K\in \Gamma} \int_{\hat K}
 \hat{\textbf{u}}(\hat x) (\textbf{v} \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
 \sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat \textbf{u}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
 \f]
@@ -182,53 +245,8 @@ Computing this sum is non-trivial because we have to evaluate $(v_j \circ F_{K})
 (\hat x_i)$. In general, if $\Gamma$ and $\Omega$ are not aligned, the point
 $F_{K}(\hat x_i)$ is completely arbitrary with respect to $\Omega$, and unless
 we figure out a way to interpolate all basis functions of $V_h(\Omega)$ on an
-arbitrary point on $\Omega$, we cannot compute the integral needed for an entry
-of the matrix $C$.
+arbitrary point on $\Omega$, we cannot compute the integral needed.
 
-
-
-
-The Lagrange multiplier $\lambda$ and the user supplied function $g$ are
-defined through another finite dimensional space `embedded_dh`, and through
-another FiniteElement `embedded_fe`, using the same reference domain. In
-order to take into account the deformation of the domain, either a MappingFEField
-or a MappingQEulerian object are initialized with the `embedded_configuration`
-vector.
-
-In the embedding space, a standard finite dimensional space `space_dh` is
-constructed on the embedding grid `space_grid`, using the
-FiniteElement `space_fe`, following almost verbatim the approach taken in step-6.
-
-We represent the discretizations of the spaces $V$ and $Q$ with
-\f[
-V_h(\Omega) = \text{span} \{v_i\}_{i=1}^n
-\f]
-and
-\f[
-Q_h(\Gamma) = \text{span} \{q_i\}_{i=1}^m
-\f]
-respectively, where $n$ is the dimension of `space_dh`, and $m$
-the dimension of `embedded_dh`.
-
-In particular, the integral that appears in the computation of a single entry of
-$C$, is computed on $\Gamma$. As usual in finite elements we split this
-integral into contributions from all cells of the triangulation used to
-discretize $\Gamma$, we transform the integral on $K$ to an integral on the
-reference element $\hat K$, where $F_{K}$ is the mapping from $\hat K$ to $K$,
-and compute the integral on $\hat K$ using a quadrature formula:
-
-\f[
-C_{\alpha j} \dealcoloneq (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
-\hat q_\alpha(\hat x) (v_j \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
-\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat q_\alpha(\hat x_i)  (v_j \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
-\f]
-
-Computing this sum is non-trivial because we have to evaluate $(v_j \circ F_{K})
-(\hat x_i)$. In general, if $\Gamma$ and $\Omega$ are not aligned, the point
-$F_{K}(\hat x_i)$ is completely arbitrary with respect to $\Omega$, and unless
-we figure out a way to interpolate all basis functions of $V_h(\Omega)$ on an
-arbitrary point on $\Omega$, we cannot compute the integral needed for an entry
-of the matrix $C$.
 
 To evaluate $(v_j \circ F_{K}) (\hat x_i)$ the following steps needs to be
 taken (as shown in the picture below):
@@ -247,7 +265,7 @@ v_j \circ G^{-1}_{T} (y_i)$.
   src="https://www.dealii.org/images/steps/developer/step-60.C_interpolation.png"
   alt=""> </p>
 
-The three steps above can be computed by calling, in turn,
+In step-60, the three steps above were computed by calling, in turn,
 
 - GridTools::find_active_cell_around_point(), followed by
 
@@ -259,20 +277,49 @@ The three steps above can be computed by calling, in turn,
 - construct an FEValues object, with the given quadrature formula, and
  initialized with the cell obtained in the first step.
 
-This is what the deal.II function VectorTools::point_value() does when
-evaluating a finite element field (not just a single shape function) at an
-arbitrary point; but this would be inefficient in this case.
+Although this approach could work for the present case, it does not lends itself
+readily to parallel simulations using distributed triangulations. Indeed,
+since the position of the quadrature points on the cells of the
+embedded domain $\Gamma$ do not match that of the embedding triangulation
+and since $\Gamma$ is constantly moving, this would require that the triangulation representing
+$\Gamma$ be stored in it's entirety for all of the processors. As the number
+of processor and the number of cells in $\Gamma$ increases, this leads
+to a severe bottleneck in terms of memory. Consequently, an alternative strategy is sought
+in this step.
 
-A better solution is to use a convenient wrapper to perform the first three
-steps on a collection of points: GridTools::compute_point_locations(). If one is
-actually interested in computing the full coupling matrix, then it is possible
-to call the method NonMatching::create_coupling_mass_matrix(), that performs the
-above steps in an efficient way, reusing all possible data structures, and
-gathering expensive steps together. This is the function we'll be using later in
-this tutorial.
+When looking at the formulation for both the penalization approach ($\mathcal{L}^2$ or $\mathcal{H}^1$)
+and the Nitsche method, we can come to the conclusion that we only require limited information
+related to $\Gamma$ on its quadrature points that is:
+- The weights times the jacobian of the transformation, i.e JxW.
+- In the case of the Nitsche method, the normal vector of the face.
 
-We solve the final saddle point problem by an iterative solver, applied to the
-Schur complement $S$ (whose construction is described, for example, in step-20),
+The approach taken in this step it is as follow:
+- Create a parallel::distributed::Triangulation for the domain $\Gamma$
+- Create Particles::Particle at the position of the quadrature points on $\Gamma$
+  by using the Particles::Generators::quadrature_points generator. Since the quadrature_points generator
+  uses Particles::ParticleHandler::insert_particles_global, the particles
+  will be automatically distributed across the processors.
+- Attach the necessary information to the particles. In the case of penalization
+  method this is only JxW, whereas for the Nitsche method it is JxW and the
+  face normal.
+
+This structure is relatively expensive to generate, but must only be generated
+once per simulation. Once the ParticleHandler is generated and the required
+information is attached to the particle, the integrals over $\Gamma$ can
+be carried out by :
+- Looping over the cells of $\Omega$.
+- Looping over all particles present in a cell.
+- Interpolating the necessary information at the position of the particles within that cell.
+
+
+Since the Particles::ParticleHandler can manage the exchange of particles from one processor to the other, the embedded
+triangulation can be moved or deformed by displacing the particles. The only constraint
+associated with this displacement is that particles are not displaced by a distance
+no larger than the size of a cell.
+
+Once the entire problem (the Stokes problem and the immersed boundary imposition) are assembled,
+the final saddle point problem by an iterative solver, applied to the
+Schur complement $S$ (whose construction is described, for example, in step-22),
 and we construct $S$ using LinearOperator classes.
 
 
@@ -295,15 +342,16 @@ and which return to their original position, thus demonstrating the time-reversi
 of the flow.
 
 
-In the default scenario, $\Gamma$ has co-dimension zero, and this tutorial
-program imposes motion of $\Gamma$ through Nitsche method. As it turns out,
-very similar approaches are used in other fictitious boundary method. Consequently,
-this step could be easily extended to account for a deformable embedded grid
-by using a Lagrange multiplier approach and by solving the complete fluid-structure interaction problem.
-
-
 
 <h3>References</h3>
+
+- Freund, J., Stenberg, R. (1995). "On weakly imposed boundary conditions for
+  second order problems". Proceedings of the Ninth International Conference on
+  Finite Elements in Fluids. 327-336.
+
+- Angot, Philippe, Charles-Henri Bruneau and Pierre Fabrie. 1999. "A penalization
+  method to take into account obstacles in incompressible viscous flows."
+  Numerische Mathematik 81.4 : 497-520.
 
 - Glowinski, R., T.-W. Pan, T.I. Hesla, and D.D. Joseph. 1999. “A Distributed
   Lagrange Multiplier/fictitious Domain Method for Particulate Flows.”
@@ -316,7 +364,3 @@ by using a Lagrange multiplier approach and by solving the complete fluid-struct
 - Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
   Finite Element Methods.” Computer Methods in Applied Mechanics and Engineering
   229–232.
-
-- Freund, J., Stenberg, R. (1995). On weakly imposed boundary conditions for
-  second order problems. Proceedings of the Ninth International Conference on
-  Finite Elements in Fluids. 327-336.
