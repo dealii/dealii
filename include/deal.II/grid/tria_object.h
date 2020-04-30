@@ -19,10 +19,21 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+namespace internal
+{
+  namespace TriangulationImplementation
+  {
+    class TriaObjectView;
+  }
+} // namespace internal
+#endif
 
 namespace internal
 {
@@ -34,6 +45,9 @@ namespace internal
      * lower dimensional objects of higher dimensions.  They are characterized
      * by the (global) indices of their faces, which are cells of dimension
      * <tt>structdim-1</tt> or vertices if <tt>structdim=1</tt>.
+     *
+     * @note This class is only used during setup of the Triangulation and its
+     *   content is saved into a single long vector inside of `TriaObjects`.
      *
      * @author Guido Kanschat, 2007
      */
@@ -104,12 +118,70 @@ namespace internal
       void
       serialize(Archive &ar, const unsigned int version);
 
-    protected:
+    private:
       /**
        * Global indices of the face iterators bounding this cell if dim@>1,
        * and the two vertex indices in 1d.
        */
       int faces[GeometryInfo<structdim>::faces_per_cell];
+
+      friend TriaObjectView;
+    };
+
+    /**
+     * View onto the current geometric object and its faces.
+     *
+     * @note The geometric objects are not saved as separate instances of
+     * TriaObject but in a single vector in TriaObjects.
+     */
+    class TriaObjectView
+    {
+    public:
+      /**
+       * Constructor.
+       *
+       * @param faces ArrayView inside of the vector in TriaObjects.
+       */
+      TriaObjectView(const ArrayView<int> &faces)
+        : faces(faces)
+      {}
+
+      /**
+       * Store the content of @p other in the vector of TriaObjects.
+       */
+      template <int structdim>
+      TriaObjectView &
+      operator=(const TriaObject<structdim> &other)
+      {
+        for (unsigned int i = 0; i < faces.size(); ++i)
+          faces[i] = other.faces[i];
+
+        return *this;
+      }
+
+      /**
+       * Return index of the @p i-th face.
+       */
+      int
+      face(const unsigned int i) const
+      {
+        return faces[i];
+      }
+
+      /**
+       * Set index of the @p i-th face.
+       */
+      void
+      set_face(const unsigned int i, const int index)
+      {
+        faces[i] = index;
+      }
+
+    private:
+      /**
+       * List of face this object is made up.
+       */
+      const ArrayView<int> faces;
     };
 
     //----------------------------------------------------------------------//
