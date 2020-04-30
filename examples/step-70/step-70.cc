@@ -126,6 +126,10 @@ namespace LA
 #include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
 
+// For non-matching co-dimension one surfaces, we use a special quadrature
+// formula, that allows one to compute integrals on immersed surfaces
+#include <deal.II/non_matching/immersed_surface_quadrature.h>
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -469,7 +473,7 @@ namespace Step70
     // with the exception of the Nistche restriction part, which exploits one of
     // the particle handlers to integrate on a non-matching part of the fluid
     // domain, corresponding to the position of the solid.
-    void assemble_nitche_restriction();
+    void assemble_nitsche_restriction();
 
     void solve();
 
@@ -979,19 +983,26 @@ namespace Step70
   }
 
 
-
+  // This method is the heart of the tutorial. Here we exploit the
+  // solid_particle_handler to compute the Nitsche restriction.
   template <int dim, int spacedim>
-  void StokesImmersedProblem<dim, spacedim>::assemble_nitche_restriction()
+  void StokesImmersedProblem<dim, spacedim>::assemble_nitsche_restriction()
   {
     TimerOutput::Scope t(computing_timer, "Nitsche_assembly");
 
+    const FEValuesExtractors::Vector velocities(0);
+    const FEValuesExtractors::Scalar pressure(spacedim);
+
     SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
 
-    std::vector<types::global_dof_index> dof_indices1(fluid_fe->dofs_per_cell);
+    std::vector<types::global_dof_index> fluid_dof_indices(
+      fluid_fe->dofs_per_cell);
 
     FullMatrix<double>     local_matrix(fluid_fe->dofs_per_cell,
                                     fluid_fe->dofs_per_cell);
     dealii::Vector<double> local_rhs(fluid_fe->dofs_per_cell);
+
+    const auto k = 1.0 / GridTools::minimal_cell_diameter(fluid_tria);
 
     auto particle = solid_particle_handler.begin();
     while (particle != solid_particle_handler.end())
@@ -1001,39 +1012,116 @@ namespace Step70
         const auto &cell = particle->get_surrounding_cell(fluid_tria);
         const auto &dh_cell =
           typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &fluid_dh);
-        dh_cell->get_dof_indices(dof_indices1);
+        dh_cell->get_dof_indices(fluid_dof_indices);
 
         const auto pic = solid_particle_handler.particles_in_cell(cell);
+
         Assert(pic.begin() == particle, ExcInternalError());
-        for (const auto &p : pic)
+
+        if (dim == spacedim)
+          for (const auto &p : pic)
+            {
+              const auto  ref_q      = p.get_reference_location();
+              const auto  real_q     = p.get_location();
+              const auto  properties = p.get_properties();
+              const auto &JxW        = properties[0];
+              for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
+                {
+                  const auto comp_i =
+                    fluid_fe->system_to_component_index(i).first;
+                  if (comp_i < spacedim)
+                    {
+                      for (unsigned int j = 0; j < fluid_fe->dofs_per_cell; ++j)
+                        {
+                          const auto comp_j =
+                            fluid_fe->system_to_component_index(j).first;
+                          if (comp_i == comp_j)
+                            local_matrix(i, j) +=
+                              k * par.penalty_term *
+                              fluid_fe->shape_value(i, ref_q) *
+                              fluid_fe->shape_value(j, ref_q) * JxW;
+                        }
+                      local_rhs(i) += k * par.penalty_term *
+                                      solid_velocity.value(real_q, comp_i) *
+                                      fluid_fe->shape_value(i, ref_q) * JxW;
+                    }
+                }
+            }
+        else if (dim == spacedim - 1)
           {
-            const auto  ref_q      = p.get_reference_location();
-            const auto  real_q     = p.get_location();
-            const auto  properties = p.get_properties();
-            const auto &JxW        = properties[0];
-            for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
+            NonMatching::ImmersedSurfaceQuadrature<spacedim> surface_quadrature;
+            std::vector<Point<spacedim>>                     quadrature_points;
+            for (const auto &p : pic)
               {
-                const auto comp_i =
-                  fluid_fe->system_to_component_index(i).first;
-                if (comp_i < spacedim)
+                const auto          ref_q      = p.get_reference_location();
+                const auto          properties = p.get_properties();
+                const auto &        JxW        = properties[0];
+                Tensor<1, spacedim> normal;
+                for (unsigned int i = 0; i < spacedim; ++i)
+                  normal[i] = properties[i + 1];
+
+                surface_quadrature.push_back(ref_q, JxW, normal);
+                quadrature_points.push_back(p.get_location());
+              }
+
+            FEValues<spacedim> fe_values(*fluid_fe,
+                                         surface_quadrature,
+                                         update_values | update_gradients);
+
+            fe_values.reinit(cell);
+
+            for (unsigned int q_point = 0; q_point < surface_quadrature.size();
+                 ++q_point)
+              {
+                const auto &normal_vector =
+                  surface_quadrature.normal_vector(q_point);
+                const auto &JxW = surface_quadrature.weight(q_point);
+
+                for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
                   {
+                    const auto grad_phi =
+                      fe_values[velocities].gradient(i, q_point);
+                    const auto phi = fe_values[velocities].value(i, q_point);
+                    const auto q   = fe_values[pressure].value(i, q_point);
+
                     for (unsigned int j = 0; j < fluid_fe->dofs_per_cell; ++j)
                       {
-                        const auto comp_j =
-                          fluid_fe->system_to_component_index(j).first;
-                        if (comp_i == comp_j)
-                          local_matrix(i, j) +=
-                            par.penalty_term * fluid_fe->shape_value(i, ref_q) *
-                            fluid_fe->shape_value(j, ref_q) * JxW;
+                        const auto grad_u =
+                          fe_values[velocities].gradient(j, q_point);
+                        const auto u = fe_values[velocities].value(j, q_point);
+                        const auto p = fe_values[pressure].value(j, q_point);
+
+                        local_matrix(i, j) +=
+                          ((-grad_phi * normal_vector + q * normal_vector) * u +
+                           (-grad_u * normal_vector + p * normal_vector) * phi +
+                           k * par.penalty_term * u * phi) *
+                          JxW;
                       }
-                    local_rhs(i) += par.penalty_term *
-                                    solid_velocity.value(real_q, comp_i) *
-                                    fluid_fe->shape_value(i, ref_q) * JxW;
+                    const auto comp_i =
+                      fluid_fe->system_to_component_index(i).first;
+
+                    Tensor<1, spacedim> g;
+                    if (comp_i < spacedim)
+                      g[comp_i] =
+                        solid_velocity.value(quadrature_points[q_point],
+                                             comp_i);
+
+                    local_rhs(i) +=
+                      ((-grad_phi * normal_vector + q * normal_vector) * g +
+                       k * par.penalty_term * g * phi) *
+                      JxW;
                   }
               }
           }
-        constraints.distribute_local_to_global(
-          local_matrix, local_rhs, dof_indices1, system_matrix, system_rhs);
+        else
+          {
+            Assert(false, ExcNotImplemented());
+          }
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_rhs,
+                                               fluid_dof_indices,
+                                               system_matrix,
+                                               system_rhs);
         particle = pic.end();
       }
   }
@@ -1308,7 +1396,7 @@ namespace Step70
             relevant_tracer_particle_displacements);
         }
         assemble_stokes_system();
-        assemble_nitche_restriction();
+        assemble_nitsche_restriction();
         solve();
 
         if (cycle % par.output_frequency == 0)
@@ -1345,9 +1433,9 @@ namespace Step70
     , angular_velocity("Angular velocity", spacedim == 3 ? spacedim : 1)
   {
     // We split the parameters in various cathegories, by putting them in
-    // different sections of the ParameterHandler class. We begin by declaring
-    // all the global parameters used by StokesImmersedProblem in the global
-    // scope:
+    // different sections of the ParameterHandler class. We begin by
+    // declaring all the global parameters used by StokesImmersedProblem
+    // in the global scope:
     add_parameter(
       "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
 
@@ -1378,11 +1466,12 @@ namespace Step70
       homogeneous_dirichlet_ids,
       "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
 
-    // Next section is dedicated to the parameters used to create the various
-    // grids. We will need three different triangulations: `Grid one` is used
-    // to define the fluid domain, `Grid two` defines the solid domain, and
-    // `Particle grid` is used to distribute some tracer particles, that are
-    // advected with the velocity and only used as passive tracers.
+    // Next section is dedicated to the parameters used to create the
+    // various grids. We will need three different triangulations: `Grid
+    // one` is used to define the fluid domain, `Grid two` defines the
+    // solid domain, and `Particle grid` is used to distribute some tracer
+    // particles, that are advected with the velocity and only used as
+    // passive tracers.
     enter_my_subsection(this->prm);
     this->prm.enter_subsection("Grid generation");
     this->prm.add_parameter("Grid one generator", name_of_grid1);
