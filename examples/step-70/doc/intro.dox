@@ -122,7 +122,7 @@ where $(\cdot, \cdot)_{\Omega}$ represents the $L^2$ scalar product.
 
 This variational formulation does not take into account the embedded domain. Contrarily
 to step-60, we do not enforce strongly the constraints of $\textbf{u}$ on $\Gamma$,
-but enforce them weakly. 
+but enforce them weakly.
 
 The analysis of this weak imposition of the boundary condition depends on the spacedim-dimensional measure
 of $\Gamma$. We discuss both scenario.
@@ -187,8 +187,8 @@ within $\Gamma$ resulting in :
 
 @f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} + (\nabla \cdot \textbf{v}, p)_{\Omega}
- + (q, \nabla \cdot \textbf{u})_{\Omega} 
- + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma} &=& 
+ + (q, \nabla \cdot \textbf{u})_{\Omega}
+ + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma} &=&
   \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 
@@ -207,7 +207,7 @@ within $\Gamma$:
  + (q, \nabla \cdot \textbf{u})_{\Omega}
  + \beta_1 (\textbf{v}},\textbf{u})_{\Gamma}
  - \beta_2 (\nabla\textbf{v},\nabla \textbf{u})_{\Gamma}
- &=&  
+ &=&
  \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
 @f}
 

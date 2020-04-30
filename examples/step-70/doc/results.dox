@@ -39,7 +39,7 @@ subsection Stokes Immersed Problem
   set Velocity degree                    = 2
   set Viscosity                          = 1
   subsection Angular velocity
-    set Function constants  = 
+    set Function constants  =
     set Function expression = t < .5 ? 5 : -5
     set Variable names      = x,y,t
   end
@@ -52,7 +52,7 @@ subsection Stokes Immersed Problem
     set Particle grid generator arguments = 0.3, 0.3: 0.1: false
   end
   subsection Right hand side
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 0; 0; 0
     set Variable names      = x,y,t
   end
@@ -74,7 +74,7 @@ subsection Stokes Immersed Problem
   set Velocity degree                    = 2
   set Viscosity                          = 1
   subsection Angular velocity
-    set Function constants  = 
+    set Function constants  =
     set Function expression = t < .5 ? 5 : -5
     set Variable names      = x,y,t
   end
@@ -87,7 +87,7 @@ subsection Stokes Immersed Problem
     set Particle grid generator arguments = 0.3, 0.3: 0.1: false
   end
   subsection Right hand side
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 0; 0; 0
     set Variable names      = x,y,t
   end
