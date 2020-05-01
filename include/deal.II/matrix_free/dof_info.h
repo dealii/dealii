@@ -30,6 +30,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/face_info.h>
+#include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
 #include <array>
@@ -42,11 +43,38 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    // Forward declaration
-#ifndef DOXYGEN
+    /**
+     * A struct that takes entries describing a constraint and puts them into
+     * a sorted list where duplicates are filtered out
+     */
     template <typename Number>
-    struct ConstraintValues;
-#endif
+    struct ConstraintValues
+    {
+      ConstraintValues();
+
+      /**
+       * This function inserts some constrained entries to the collection of
+       * all values. It stores the (reordered) numbering of the dofs
+       * (according to the ordering that matches with the function) in
+       * new_indices, and returns the storage position the double array for
+       * access later on.
+       */
+      template <typename number2>
+      unsigned short
+      insert_entries(
+        const std::vector<std::pair<types::global_dof_index, number2>>
+          &entries);
+
+      std::vector<std::pair<types::global_dof_index, double>>
+                                           constraint_entries;
+      std::vector<types::global_dof_index> constraint_indices;
+
+      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
+      std::map<std::vector<Number>,
+               types::global_dof_index,
+               FPArrayComparator<Number>>
+        constraints;
+    };
 
     /**
      * The class that stores the indices of the degrees of freedom for all the

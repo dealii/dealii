@@ -37,54 +37,12 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    struct ConstraintComparator
-    {
-      bool
-      operator()(const std::pair<types::global_dof_index, double> &p1,
-                 const std::pair<types::global_dof_index, double> &p2) const
-      {
-        return p1.second < p2.second;
-      }
-    };
-
-    /**
-     * A struct that takes entries describing a constraint and puts them into
-     * a sorted list where duplicates are filtered out
-     */
-    template <typename Number>
-    struct ConstraintValues
-    {
-      ConstraintValues();
-
-      /**
-       * This function inserts some constrained entries to the collection of
-       * all values. It stores the (reordered) numbering of the dofs
-       * (according to the ordering that matches with the function) in
-       * new_indices, and returns the storage position the double array for
-       * access later on.
-       */
-      template <typename number2>
-      unsigned short
-      insert_entries(
-        const std::vector<std::pair<types::global_dof_index, number2>>
-          &entries);
-
-      std::vector<std::pair<types::global_dof_index, double>>
-                                           constraint_entries;
-      std::vector<types::global_dof_index> constraint_indices;
-
-      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
-      std::map<std::vector<Number>,
-               types::global_dof_index,
-               FPArrayComparator<double>>
-        constraints;
-    };
-
-
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues()
-      : constraints(FPArrayComparator<double>(1.))
+      : constraints(FPArrayComparator<Number>(1.))
     {}
+
+
 
     template <typename Number>
     template <typename number2>
@@ -101,7 +59,10 @@ namespace internal
           constraint_entries.assign(entries.begin(), entries.end());
           std::sort(constraint_entries.begin(),
                     constraint_entries.end(),
-                    ConstraintComparator());
+                    [](const std::pair<types::global_dof_index, double> &p1,
+                       const std::pair<types::global_dof_index, double> &p2) {
+                      return p1.second < p2.second;
+                    });
           for (types::global_dof_index j = 0; j < constraint_entries.size();
                j++)
             {
@@ -121,11 +82,7 @@ namespace internal
       // equal. this was quite lengthy and now we use a std::map with a
       // user-defined comparator to compare floating point arrays to a
       // tolerance 1e-13.
-      std::pair<typename std::map<std::vector<double>,
-                                  types::global_dof_index,
-                                  FPArrayComparator<double>>::iterator,
-                bool>
-        it = constraints.insert(next_constraint);
+      const auto it = constraints.insert(next_constraint);
 
       types::global_dof_index insert_position = numbers::invalid_dof_index;
       if (it.second == false)

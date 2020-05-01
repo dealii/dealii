@@ -1,0 +1,42 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
+  {
+    template void internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
+      reinit<deal_II_dimension>(
+        const Quadrature<1> &,
+        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+        const unsigned int);
+  }
+
+
+
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    template void internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::reinit<deal_II_dimension>(
+        const Quadrature<1> &,
+        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+        const unsigned int);
+  }
+
+for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    template struct internal::MatrixFreeFunctions::ShapeInfo<
+      deal_II_scalar_vectorized>;
+  }

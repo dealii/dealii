@@ -1010,7 +1010,7 @@ namespace internal
      * face number, subface index and orientation are the same. This is used
      * to batch similar faces together for vectorization.
      */
-    bool
+    inline bool
     compare_faces_for_vectorization(const FaceToCellTopology<1> &face1,
                                     const FaceToCellTopology<1> &face2)
     {
