@@ -996,10 +996,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
             std::vector<types::global_dof_index> dof_indices;
             if (additional_data.mg_level + 1 <
                 dof_handler.get_triangulation().n_global_levels())
-              for (typename DoFHandler<dim>::cell_iterator cell =
-                     dof_handler.begin(additional_data.mg_level + 1);
-                   cell != dof_handler.end(additional_data.mg_level + 1);
-                   ++cell)
+              for (const auto &cell : dof_handler.cell_iterators_on_level(
+                     additional_data.mg_level + 1))
                 if (cell->level_subdomain_id() == task_info.my_pid)
                   for (const unsigned int f : GeometryInfo<dim>::face_indices())
                     if ((cell->at_boundary(f) == false ||
@@ -1292,6 +1290,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           dof_handlers.hp_dof_handler[0]->get_triangulation(),
         cell_level_index,
         task_info);
+      if (additional_data.mapping_update_flags_inner_faces != update_default)
+        Assert(face_setup.refinement_edge_faces.empty(),
+               ExcNotImplemented("Setting up data structures on MG levels with "
+                                 "hanging nodes is currently not supported."));
       face_info.faces.clear();
 
       std::vector<bool> hard_vectorization_boundary(
