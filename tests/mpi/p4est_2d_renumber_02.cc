@@ -81,7 +81,7 @@ test()
     DoFTools::extract_locally_active_dofs(dofh, dof_set);
 
     const std::vector<IndexSet> owned_dofs =
-      dofh.compute_locally_owned_dofs_per_processor();
+      Utilities::MPI::all_gather(MPI_COMM_WORLD, dofh.locally_owned_dofs());
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         dof_set.print(deallog);

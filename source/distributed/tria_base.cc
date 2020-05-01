@@ -134,35 +134,6 @@ namespace parallel
   }
 
   template <int dim, int spacedim>
-  std::vector<unsigned int>
-  TriangulationBase<dim, spacedim>::
-    compute_n_locally_owned_active_cells_per_processor() const
-  {
-    ;
-#ifdef DEAL_II_WITH_MPI
-    std::vector<unsigned int> n_locally_owned_active_cells_per_processor(
-      Utilities::MPI::n_mpi_processes(this->mpi_communicator), 0);
-
-    if (this->n_levels() > 0)
-      {
-        const int ierr =
-          MPI_Allgather(&number_cache.n_locally_owned_active_cells,
-                        1,
-                        MPI_UNSIGNED,
-                        n_locally_owned_active_cells_per_processor.data(),
-                        1,
-                        MPI_UNSIGNED,
-                        this->mpi_communicator);
-        AssertThrowMPI(ierr);
-      }
-
-    return n_locally_owned_active_cells_per_processor;
-#else
-    return {number_cache.n_locally_owned_active_cells};
-#endif
-  }
-
-  template <int dim, int spacedim>
   const MPI_Comm &
   TriangulationBase<dim, spacedim>::get_communicator() const
   {

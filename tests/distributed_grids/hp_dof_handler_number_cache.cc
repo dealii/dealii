@@ -106,10 +106,12 @@ test()
 
       AssertThrow(dof_handler.n_locally_owned_dofs() == N, ExcInternalError());
       AssertThrow(dof_handler.locally_owned_dofs() == all, ExcInternalError());
-      AssertThrow(dof_handler.compute_n_locally_owned_dofs_per_processor() ==
+      AssertThrow(Utilities::MPI::all_gather(
+                    MPI_COMM_SELF, dof_handler.n_locally_owned_dofs()) ==
                     std::vector<types::global_dof_index>(1, N),
                   ExcInternalError());
-      AssertThrow(dof_handler.compute_locally_owned_dofs_per_processor() ==
+      AssertThrow(Utilities::MPI::all_gather(
+                    MPI_COMM_SELF, dof_handler.locally_owned_dofs()) ==
                     std::vector<IndexSet>(1, all),
                   ExcInternalError());
     }

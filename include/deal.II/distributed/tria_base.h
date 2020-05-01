@@ -115,17 +115,6 @@ namespace parallel
       const dealii::Triangulation<dim, spacedim> &old_tria) override;
 
     /**
-     * Return the number of active cells owned by each of the MPI processes
-     * that contribute to this triangulation. The element of this vector
-     * indexed by locally_owned_subdomain() equals the result of
-     * n_locally_owned_active_cells().
-     *
-     * @note This function involves global communication!
-     */
-    std::vector<unsigned int>
-    compute_n_locally_owned_active_cells_per_processor() const;
-
-    /**
      * Return the number of active cells in the triangulation that are locally
      * owned, i.e. that have a subdomain_id equal to
      * locally_owned_subdomain(). Note that there may be more active cells in
