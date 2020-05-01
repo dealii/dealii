@@ -166,8 +166,4 @@ DEAL::Using Tensor within constexpr functions
 DEAL::15.2000
 DEAL::116.000
 DEAL::Used memory: 72
-DEAL::Determinant before orthogonalization: 1.00000
-DEAL::Determinant after  orthogonalization: 1.00000
-DEAL::Determinant before orthogonalization: -1.50000
-DEAL::Determinant after  orthogonalization: -1.00000
 DEAL::OK

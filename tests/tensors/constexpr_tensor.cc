@@ -17,8 +17,6 @@
 
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/lac/full_matrix.h>
-
 #include "../tests.h"
 
 template <int rank, int dim, typename Number>
@@ -179,38 +177,6 @@ main()
     DEAL_II_CONSTEXPR const auto dummy_6 = contract3(a, middle, a);
     DEAL_II_CONSTEXPR const auto dummy_7 = adjugate(a);
     DEAL_II_CONSTEXPR const auto dummy_8 = cofactor(a);
-    deallog << "Determinant before orthogonalization: " << determinant(a)
-            << std::endl;
-    const auto dummy_9 = project_onto_orthogonal_tensors(a, 0);
-    deallog << "Determinant after  orthogonalization: " << determinant(dummy_9)
-            << std::endl;
-    Assert(determinant(dummy_9) - 1. < 1e-8, ExcInternalError());
-
-    // check wheter the output is the same as the input. For example, it could
-    // have been transposed.
-    Vector<double> unrolled_a(9);
-    a.unroll<double>(unrolled_a);
-    Vector<double> unrolled_dummy_9(9);
-    dummy_9.unroll<double>(unrolled_dummy_9);
-    for (size_t i = 0; i < unrolled_a.size(); i++)
-      {
-        Assert(std::fabs(unrolled_a[i] - unrolled_dummy_9[i]) < 1e-8,
-               ExcInternalError());
-      }
-
-
-
-    constexpr double       non_orthogonal_init[3][3] = {{1., 2., 3.},
-                                                  {1., 1.5, 2.},
-                                                  {2., 0., 1}};
-    constexpr Tensor<2, 3> non_orthogonal{non_orthogonal_init};
-
-    deallog << "Determinant before orthogonalization: "
-            << determinant(non_orthogonal) << std::endl;
-    const auto dummy_10 = project_onto_orthogonal_tensors(non_orthogonal, 1e-8);
-    deallog << "Determinant after  orthogonalization: " << determinant(dummy_10)
-            << std::endl;
-    Assert(determinant(dummy_10) - 1. < 1e-8, ExcInternalError());
   }
 
   {
