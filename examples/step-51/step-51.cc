@@ -647,6 +647,15 @@ namespace Step51
   // manner.  The @p trace_reconstruct input parameter is used to decide
   // whether we are solving for the global skeleton solution (false) or the
   // local solution (true).
+  //
+  // One thing worth noting for the multi-threaded execution of assembly is
+  // the fact that the local computations in `assemble_system_one_cell()` call
+  // into BLAS and LAPACK functions if those are available in deal.II. Thus,
+  // the underlying BLAS/LAPACK library must support calls from multiple
+  // threads at the same time. Most implementations do support this, but some
+  // libraries need to be built in a specific way to avoid problems. For
+  // example, OpenBLAS compiled without multithreading inside the BLAS/LAPACK
+  // calls needs to built with a flag called `USE_LOCKING` set to true.
   template <int dim>
   void HDG<dim>::assemble_system(const bool trace_reconstruct)
   {
