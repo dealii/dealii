@@ -29,15 +29,16 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_poly.h>
+#include <deal.II/fe/fe_q_dg0.h>
 
 #include <deal.II/hp/q_collection.h>
 
-#include <deal.II/matrix_free/dof_info.templates.h>
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/face_setup_internal.h>
 #include <deal.II/matrix_free/matrix_free.h>
-#include <deal.II/matrix_free/shape_info.templates.h>
 
 #ifdef DEAL_II_WITH_THREADS
 #  include <deal.II/base/parallel.h>
@@ -1248,19 +1249,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   }
 
   // set constraint pool from the std::map and reorder the indices
-  typename std::map<std::vector<double>,
-                    types::global_dof_index,
-                    internal::MatrixFreeFunctions::FPArrayComparator<double>>::
-    iterator it  = constraint_values.constraints.begin(),
-             end = constraint_values.constraints.end();
   std::vector<const std::vector<double> *> constraints(
     constraint_values.constraints.size());
   unsigned int length = 0;
-  for (; it != end; ++it)
+  for (const auto &it : constraint_values.constraints)
     {
-      AssertIndexRange(it->second, constraints.size());
-      constraints[it->second] = &it->first;
-      length += it->first.size();
+      AssertIndexRange(it.second, constraints.size());
+      constraints[it.second] = &it.first;
+      length += it.first.size();
     }
   constraint_pool_data.clear();
   constraint_pool_data.reserve(length);
@@ -1813,7 +1809,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::clear()
 
 namespace internal
 {
-  void
+  inline void
   fill_index_subrange(
     const unsigned int                                        begin,
     const unsigned int                                        end,
@@ -1832,7 +1828,7 @@ namespace internal
   }
 
   template <int dim>
-  void
+  inline void
   fill_connectivity_subrange(
     const unsigned int                                        begin,
     const unsigned int                                        end,
@@ -1875,7 +1871,7 @@ namespace internal
       }
   }
 
-  void
+  inline void
   fill_connectivity_indirect_subrange(
     const unsigned int            begin,
     const unsigned int            end,

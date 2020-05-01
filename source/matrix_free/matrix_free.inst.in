@@ -14,17 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
-  {
-    template void internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
-      reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
-  }
-
-
-
 for (deal_II_dimension : DIMENSIONS;
      deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
@@ -78,12 +67,6 @@ for (deal_II_dimension : DIMENSIONS;
                   deal_II_scalar_vectorized>::
         get_dof_handler<hp::DoFHandler<deal_II_dimension>>(const unsigned int)
           const;
-
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<deal_II_scalar_vectorized>::reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
   }
 
 
@@ -124,10 +107,4 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       is_supported(
         const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
-  }
-
-for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
-  {
-    template struct internal::MatrixFreeFunctions::ShapeInfo<
-      deal_II_scalar_vectorized>;
   }
