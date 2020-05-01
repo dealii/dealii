@@ -616,9 +616,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
     dof_info[no].vectorization_length = VectorizedArrayType::size();
 
-  // Go through cells on zeroth level and then successively step down into
-  // children. This gives a z-ordering of the cells, which is beneficial when
-  // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = task_info.n_procs;
   const unsigned int my_pid      = task_info.my_pid;
 
@@ -629,15 +626,18 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
     {
       if (n_mpi_procs == 1)
         cell_level_index.reserve(tria.n_active_cells());
-      typename Triangulation<dim>::cell_iterator cell     = tria.begin(0),
-                                                 end_cell = tria.end(0);
       // For serial Triangulations always take all cells
       const unsigned int subdomain_id =
         (dynamic_cast<const parallel::TriangulationBase<dim> *>(
            &dof_handler[0]->get_triangulation()) != nullptr) ?
           my_pid :
           numbers::invalid_subdomain_id;
-      for (; cell != end_cell; ++cell)
+
+      // Go through cells on zeroth level and then successively step down into
+      // children. This gives a z-ordering of the cells, which is beneficial
+      // when setting up neighboring relations between cells for thread
+      // parallelization
+      for (const auto &cell : tria.cell_iterators_on_level(0))
         internal::MatrixFreeFunctions::resolve_cell(cell,
                                                     cell_level_index,
                                                     subdomain_id);
@@ -652,9 +652,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
       if (level < tria.n_levels())
         {
           cell_level_index.reserve(tria.n_cells(level));
-          typename Triangulation<dim>::cell_iterator cell = tria.begin(level),
-                                                     end_cell = tria.end(level);
-          for (; cell != end_cell; ++cell)
+          for (const auto &cell : tria.cell_iterators_on_level(level))
             if (cell->level_subdomain_id() == my_pid)
               cell_level_index.emplace_back(cell->level(), cell->index());
         }
@@ -688,9 +686,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
     dof_info[no].vectorization_length = VectorizedArrayType::size();
 
-  // go through cells on zeroth level and then successively step down into
-  // children. This gives a z-ordering of the cells, which is beneficial when
-  // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = task_info.n_procs;
   const unsigned int my_pid      = task_info.my_pid;
 
@@ -699,18 +694,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   const Triangulation<dim> &tria = dof_handler[0]->get_triangulation();
 
   if (n_mpi_procs == 1)
-    {
-      cell_level_index.reserve(tria.n_active_cells());
-    }
-  typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler[0]->begin(0),
-                                              end_cell = dof_handler[0]->end(0);
+    cell_level_index.reserve(tria.n_active_cells());
+
   // For serial Triangulations always take all cells
   const unsigned int subdomain_id =
     (dynamic_cast<const parallel::TriangulationBase<dim> *>(
        &dof_handler[0]->get_triangulation()) != nullptr) ?
       my_pid :
       numbers::invalid_subdomain_id;
-  for (; cell != end_cell; ++cell)
+
+  // go through cells on zeroth level and then successively step down into
+  // children. This gives a z-ordering of the cells, which is beneficial when
+  // setting up neighboring relations between cells for thread parallelization
+  for (const auto &cell : tria.cell_iterators_on_level(0))
     internal::MatrixFreeFunctions::resolve_cell(cell,
                                                 cell_level_index,
                                                 subdomain_id);
