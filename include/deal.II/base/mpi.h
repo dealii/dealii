@@ -428,8 +428,8 @@ namespace Utilities
      * process p.
      */
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &           comm,
-                                  const IndexSet::size_type &local_size);
+    create_ascending_partitioning(const MPI_Comm &          comm,
+                                  const IndexSet::size_type local_size);
 
 #ifdef DEAL_II_WITH_MPI
     /**

@@ -222,8 +222,8 @@ namespace Utilities
 
 
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &           comm,
-                                  const IndexSet::size_type &local_size)
+    create_ascending_partitioning(const MPI_Comm &          comm,
+                                  const IndexSet::size_type local_size)
     {
       const unsigned int                     n_proc = n_mpi_processes(comm);
       const std::vector<IndexSet::size_type> sizes =
@@ -659,7 +659,7 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(const MPI_Comm & /*comm*/,
-                                  const IndexSet::size_type &local_size)
+                                  const IndexSet::size_type local_size)
     {
       return std::vector<IndexSet>(1, complete_index_set(local_size));
     }
