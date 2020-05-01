@@ -309,7 +309,12 @@ namespace Step70
     //
     // In the example below, we set reasonable default values, but these can be
     // changed at run time by selecting any other supported function of the
-    // GridGenerator namespace.
+    // GridGenerator namespace. If the GridGenerator function fails, this
+    // program will interpret the name of the grid as a vtk grid filename, and
+    // the arguments as a map from manifold_id to the cad files describing the
+    // geometry of the domain. Every CAD file will be analysed and a Manifold of
+    // the OpenCASCADE namespace will be generated according to the content of
+    // the CAD file itself.
     //
     // We do this for each of the generated grids, to be as generic as possible:
     std::string name_of_grid1       = "hyper_cube";
@@ -454,10 +459,10 @@ namespace Step70
     void make_grid();
 
     // These two methods are new w.r.t. previous examples, and initiliaze the
-    // ParticleHandler objects used in this class. We have two such objects: one
-    // is a passive tracer, used to plot the trajectories of fluid particles,
-    // while the the other is composed of the actual solid quadrature points,
-    // and represent material particles of the solid.
+    // Particles::ParticleHandler objects used in this class. We have two such
+    // objects: one is a passive tracer, used to plot the trajectories of fluid
+    // particles, while the the other is composed of the actual solid quadrature
+    // points, and represent material particles of the solid.
     void setup_tracer_particles();
     void setup_solid_particles();
 
@@ -468,13 +473,14 @@ namespace Step70
     // step.
     void setup_dofs();
 
-    // The assembly rutine is identical to other Stokes assembly rutines,
+    // The assembly rutine is very similar to other Stokes assembly rutines,
     void assemble_stokes_system();
     // with the exception of the Nistche restriction part, which exploits one of
     // the particle handlers to integrate on a non-matching part of the fluid
     // domain, corresponding to the position of the solid.
     void assemble_nitsche_restriction();
 
+    // Nothing new in the solve routine, which is almost identical to step-60
     void solve();
 
     // The refine_and_transfer() method is called only every
@@ -483,8 +489,13 @@ namespace Step70
     // correctly to the new grid. This includes vector fields, as well as
     // particle information.
     void refine_and_transfer();
+
+    // Similarly, we call the output_results() method only every
+    // `output_frequency` steps. This method takes care of outputting both the
+    // fields variables,
     void output_results(const unsigned int cycle, const double time) const;
 
+    // and the tracers:
     void
     output_particles(const Particles::ParticleHandler<dim, spacedim> &particles,
                      std::string                                      fprefix,
@@ -497,15 +508,14 @@ namespace Step70
 
     MPI_Comm mpi_communicator;
 
-    // For the current implemenation, only `fluid_fe` would be really necessary.
-    // For completeness, and to allow easy extension, we keep also the
+    // For the current implemenation, only `fluid_fe` would is really necessary.
+    // For completeness, and to allow easy extensions, we keep also the
     // `solid_fe` around, which is however initialized to a FE_Nothing finite
     // element space, i.e., one that has no degrees of freedom.
     //
     // We declare both finite element spaces as unique pointers, to allow their
     // generation after StokesImmersedProblemParameters has been initialized. In
-    // particular, we assume that they are filled only after initial_setup() has
-    // been called.
+    // particular, they will be initialized in te initial_setup() method
     std::unique_ptr<FiniteElement<spacedim>>      fluid_fe;
     std::unique_ptr<FiniteElement<dim, spacedim>> solid_fe;
 
@@ -518,6 +528,21 @@ namespace Step70
     // the various subdomains. In particular, we assume that ever process owns
     // only a part of the solid_tria, and only a part of the fluid_tria, not
     // necessarily in the same physical region, and not necessarily overlapping.
+    //
+    // We could in principle try to create the initial subdivisions in such a
+    // way that they overlap between the solid and the fluid regions. However,
+    // this overlap would be destroyed during the simulation, and we would have
+    // to redistribute the dofs again and again. The approach we follow in this
+    // tutorial is more flexible, and not much more expensive. We make two
+    // all-to-all communications at the beginning of the simulation to exchange
+    // information about an (approximate) information of the geometrical
+    // occupancy of each processor (done through a collection of bounding
+    // boxes).
+    //
+    // This information is used by the Particles::ParticleHandler class
+    // to exchange (using a some-to-some communication pattern) all particles,
+    // so that every process knows about the particles that live on the
+    // region occupied by the fluid subdomain that it owns.
     //
     // In order to couple the overlapping regions, we exploit the facilities
     // implemented in the ParticleHandler class.
@@ -584,6 +609,8 @@ namespace Step70
     // domain.
     std::unique_ptr<Quadrature<dim>> quadrature_formula;
 
+    // Finally, these are the two Particles::ParticleHandler classes used to
+    // couple the solid with the fluid, and to describe the passive tracers.
     Particles::ParticleHandler<dim, spacedim> tracer_particle_handler;
     Particles::ParticleHandler<dim, spacedim> solid_particle_handler;
 
@@ -617,6 +644,10 @@ namespace Step70
   {}
 
 
+
+  // In this method, we show how to use the
+  // GridGenerator::generate_from_name_and_arguments() method to initialize the
+  // grids. Since both the name of the function and the grids
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::make_grid()
   {
