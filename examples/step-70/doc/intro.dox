@@ -429,9 +429,13 @@ flow. This is often illustrated in science vulgarization experiments with a
 Taylor-Couette flow and dye droplets that revert back to their original shape
 after the fluid has been displaced in a periodic manner.
 
+@htmlonly
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/p08_KlTKP50" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-In the present problem, a very viscous fluid is agitated by the rotation of
+@endhtmlonly
+
+In the present problem, a very viscous fluid is agitated by the rotation of 
 an impeller, which, in 2D, is modeled by a rectangular grid. The impeller
 rotates for a given number of revolutions and than, the flow is reversed such
 that the same number of revolutions is carried out in the opposite direction. We
