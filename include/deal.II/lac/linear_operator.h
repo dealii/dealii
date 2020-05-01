@@ -370,8 +370,8 @@ public:
  * @relatesalso LinearOperator
  *
  * Addition of two linear operators @p first_op and @p second_op given by
- * $(\text{first\_op}+\text{second\_op})x \dealcoloneq \text{first\_op}(x) +
- * \text{second\_op}(x)$
+ * $(\text{first_op}+\text{second_op})x \dealcoloneq \text{first_op}(x) +
+ * \text{second_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -429,8 +429,8 @@ operator+(const LinearOperator<Range, Domain, Payload> &first_op,
  * @relatesalso LinearOperator
  *
  * Subtraction of two linear operators @p first_op and @p second_op given by
- * $(\text{first\_op}-\text{second\_op})x \dealcoloneq \text{first\_op}(x) -
- * \text{second\_op}(x)$
+ * $(\text{first_op}-\text{second_op})x \dealcoloneq \text{first_op}(x) -
+ * \text{second_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -564,8 +564,8 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
  * @relatesalso LinearOperator
  *
  * Composition of two linear operators @p first_op and @p second_op given by
- * $(\text{first\_op}*\text{second\_op})x \dealcoloneq
- * \text{first\_op}(\text{second\_op}(x))$
+ * $(\text{first_op}*\text{second_op})x \dealcoloneq
+ * \text{first_op}(\text{econd_op}(x))$
  *
  * @ingroup LAOperators
  */
