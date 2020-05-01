@@ -708,15 +708,28 @@ namespace Step70
                                         "extension. Bailing out."));
 
         // Now we check how many faces are contained in the Shape. OpenCASCADE
-        // is intrinsically 3D, so if this number is nonzero If the number is
-        // zero, we interpret this as a line manifold, otherwise as a
-        // NURBSPatchManifold
+        // is intrinsically 3D, so if this number is zero, we interpret this as
+        // a line manifold, otherwise as a NormalToMeshProjectionManifold in
+        // spacedim = 3, or NURBSPatchManifold in spacedim = 2.
         const auto n_elements = OpenCASCADE::count_elements(shape);
-        if ((std::get<0>(n_elements) == 0 && spacedim == 3))
+        if ((std::get<0>(n_elements) == 0))
           tria.set_manifold(
             manifold_id,
             OpenCASCADE::ArclengthProjectionLineManifold<dim, spacedim>(shape));
+        else if (spacedim == 3)
+          {
+            // We use this trick, because NormalToMeshProjectionManifold
+            // is only implemented for spacedim = 3. The check above makes
+            // sure that things actually work correctly.
+            const auto t = reinterpret_cast<Triangulation<dim, 3> *>(&tria);
+            t->set_manifold(manifold_id,
+                            OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(
+                              shape));
+          }
         else
+          // We also allow surface descriptions in two dimensional spaces based
+          // on single NURBS patches. For this to work, the CAD file must
+          // contain a single TopoDS_Face.
           tria.set_manifold(manifold_id,
                             OpenCASCADE::NURBSPatchManifold<dim, spacedim>(
                               TopoDS::Face(shape)));
@@ -726,7 +739,7 @@ namespace Step70
 #endif
   }
 
-  // Now let's put things together
+  // Now let's put things together, and make all the necessary grids
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::make_grid()
   {
@@ -761,6 +774,41 @@ namespace Step70
     solid_tria.refine_global(par.initial_solid_refinement);
   }
 
+  // Once the solid and fluid grids have been created, we start filling the
+  // Particles::ParticleHandler objects. The first one we take care of is the
+  // one we use to keep track of passive tracers in the fluid. No other role is
+  // given to these particles, so their initialization is standard.
+  //
+  // In this implementation, we create tracers using the support points of a
+  // FE_Q finite element space defined on a temporary grid, which is then
+  // discarded. Of this grid, we only keep around the Particles::Particle
+  // objects (stored in a Particles::ParticleHandler class) associated to the
+  // support points.
+  //
+  // The Particles::ParticleHandler class offers the possibility to insert a set
+  // of particles that live physically in the part of the domain owned by the
+  // active process. However, in this case this function would not suffice. The
+  // particles generated as the locally owned support points of an FE_Q object
+  // on an arbitrary grid (non-matching w.r.t. to the fluid grid) have no
+  // reasons to lie in the same physical region of the locally owned subdomain
+  // of the fluid grid. In fact this will almost never be the case, specially
+  // since we want to keep track of what is happening to the particles
+  // themselves.
+  //
+  // In particle in cell methods (PIC), it is often customary to assign
+  // ownership of the particles to the process where the particles lie. In this
+  // tutorial we illustrate a different approach, which is useful if one wants
+  // to keep track of information related to the particles (for example, if a
+  // particle is associated to a given degree of freedom, which is owned by a
+  // specific process and not necessarily the same process that owns the fluid
+  // cell where the particle happens to be at any given time).
+  //
+  // In the approach used here, ownership of the particles is assigned once at
+  // the beginning, and one-to-one communication happen whenever the original
+  // owner needs information from the process that owns the cell where the
+  // particle lives. We make sure that we set ownership of the particles using
+  // the initial particles distribution, and keep the same ownership throughout
+  // the execution of the program.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_tracer_particles()
   {
@@ -784,29 +832,81 @@ namespace Step70
     tracer_particle_handler.initialize(fluid_tria,
                                        StaticMappingQ1<spacedim>::mapping);
 
+    // This is where things start to get complicated. In fully distributed
+    // triangulations, the active process only knows about the locally owned
+    // cells, and has no idea of how other processes have distributed their own
+    // cells. On the other hand, by design we assign to the active process also
+    // the particles that were generated as support points of the locally owned
+    // parts of a non matching and arbitrary grid.
+    //
+    // The location of these particles is arbitrary, and may fall within a
+    // region that we don't have access to (i.e., a region of the fluid domain
+    // where cells are artificial). In order to understand who to send those
+    // particles to, we need to have a (rough) idea of how the fluid grid is
+    // distributed among processors.
+    //
+    // The following method computes a small collection of axis aligned
+    // bounding boxes that represent well the locally owned part of the fluid
+    // domain.
+    auto bounding_boxes_of_locally_owned_cells =
+      GridTools::compute_mesh_predicate_bounding_box(
+        fluid_tria, IteratorFilters::LocallyOwnedCell());
 
-    // Generate the necessary local and global bounding boxes for the generator.
-    // The generation of the global bounding boxes requires an all-to-all
-    // communication
-    auto my_bounding_box = GridTools::compute_mesh_predicate_bounding_box(
-      fluid_tria, IteratorFilters::LocallyOwnedCell());
+    // These bounding boxes are then exchanged with all other processes, so
+    // that now every active process has a rough idea (based on bounding boxes
+    // that overlap with the locally owned part of the domain) of who they
+    // should send particles to.
     auto global_bounding_boxes =
-      Utilities::MPI::all_gather(MPI_COMM_WORLD, my_bounding_box);
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 bounding_boxes_of_locally_owned_cells);
 
 
     // Finally generate the particles from the support point of the
-    // particle_insert_tria triangulation
+    // tracer particles triangulation. This function call uses the
+    // global_bounding_boxes object we just constructed. At the end of this
+    // call, every particle will have been distributed to the correct process
+    // (i.e., the process that owns the cell where the particle lives).
     Particles::Generators::dof_support_points(particles_dof_handler,
                                               global_bounding_boxes,
                                               tracer_particle_handler);
 
+    // As soon as we have initialized the particles in each process, we set
+    // their ownership to the current distribution. Since we will need this
+    // information to initialize a vector containing velocity information for
+    // each particle, we query the tracer_particle_handler for its locally
+    // relevant ids, and construct the indices that would be needed to store in
+    // a (parallel distributed) vector the position and velocity of all
+    // particles.
     owned_tracer_particles =
       tracer_particle_handler.locally_relevant_ids().tensor_product(
         complete_index_set(spacedim));
 
+    // At the beginning of the simulation, all particles are in their original
+    // position. When particles move, they may jump to a part of the domain
+    // which is owned by another process. If this happens, the current process
+    // keeps formally "ownership" of the particles, but may need read access
+    // from the process where the particle has landed. We keep this information
+    // in another index set, which stores the indices of all particles that are
+    // currently on my subdomain, independently if they have always been here or
+    // not.
+    //
+    // Keeping this index set around allows us to leverage linear algebra
+    // classes for all communications regarding positions and velocities of the
+    // particles.
     relevant_tracer_particles = owned_tracer_particles;
 
-    // Now make sure that upon refinement, particles are correctly transferred
+    // Now make sure that upon refinement, particles are correctly transferred.
+    // When performing local refinement or coarsening, particles will land in
+    // another cell. We could in principle redistribute all particles after
+    // refining, however this would be overly expensive.
+    //
+    // The Particles::ParticleHandler class has a way to transfer information
+    // from a cell to its children or to its parent upon refinement, without the
+    // need to reconstruct the entire data structure. This is done by
+    // "registering" two callback functions to the triangulation. These
+    // functions will receive a signal when refinement is about to happen, and
+    // when it has just happened, and will take care of transferring all
+    // information to the newly refined grid with minimal computational cost.
     fluid_tria.signals.pre_distributed_refinement.connect(std::bind(
       &Particles::ParticleHandler<spacedim>::register_store_callback_function,
       &tracer_particle_handler));
@@ -821,17 +921,38 @@ namespace Step70
           << tracer_particle_handler.n_global_particles() << std::endl;
   }
 
+
+  // Similarly to what we have done for passive tracers, we now setup the solid
+  // particles. The main difference here is that we want to attach also a weight
+  // value to each of the quadrature points, so that we can compute integrals
+  // even without direct access to the original solid grid.
+  //
+  // This is achieved by leveraging the "properties" concept of the
+  // Particles::ParticleHandler class. It is possible to store (in a memory
+  // efficient way) an arbitrary number of doubles alongside with a
+  // Particles::Particle, inside a Particles::ParticleHandler object. We use
+  // this possibility to store the JxW values of the quadrature points of the
+  // solid grid.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
   {
     QGauss<dim> quadrature(fluid_fe->degree + 1);
-    // In codimension one case, we store also the normal, else only the
-    // quadrature weight.
-    const unsigned int n_properties = (dim == spacedim) ? 1 : spacedim + 1;
+
+    // We only need to store one property per particle: the JxW value of the
+    // integration on the solid grid. This is passed at construction time to the
+    // solid_particle_handler object as the last argument
+    const unsigned int n_properties = 1;
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<dim>::mapping,
                                       n_properties);
 
+    // The number of particles that we generate locally is equal to the total
+    // number of cells times the number of quadrature points used in each cell.
+    // We store all these points in a vector, and their corresponding properties
+    // in a vector of vectors, which we fill with the actual position of the
+    // quadrature points, and their JxW values (the only information that is
+    // needed to perform integration on the solid cells, even with a
+    // non-matching grid).
     std::vector<Point<spacedim>> quadrature_points_vec(
       quadrature.size() * solid_tria.n_locally_owned_active_cells());
 
@@ -839,12 +960,12 @@ namespace Step70
       quadrature.size() * solid_tria.n_locally_owned_active_cells(),
       std::vector<double>(n_properties));
 
-    UpdateFlags flags = update_JxW_values | update_quadrature_points;
-    if (spacedim > dim)
-      flags |= update_normal_vectors;
-    FEValues<dim, spacedim> fe_v(*solid_fe, quadrature, flags);
+    FEValues<dim, spacedim> fe_v(*solid_fe,
+                                 quadrature,
+                                 update_JxW_values | update_quadrature_points);
 
-    unsigned int cell_index = 0;
+    unsigned int cell_index  = 0;
+    unsigned int point_index = 0;
     for (const auto &cell : solid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
@@ -854,20 +975,14 @@ namespace Step70
 
           for (unsigned int q = 0; q < points.size(); ++q)
             {
-              const auto i             = cell_index * points.size() + q;
-              quadrature_points_vec[i] = points[q];
-              properties[i][0]         = JxW[q];
-              if (dim < spacedim)
-                for (unsigned int d = 0; d < spacedim; ++d)
-                  {
-                    properties[i][d + 1] = fe_v.normal_vector(q)[d];
-                  }
+              quadrature_points_vec[point_index] = points[q];
+              properties[point_index][0]         = JxW[q];
+              ++point_index;
             }
           ++cell_index;
         }
 
-    // Distribute the local points to the processor that owns
-    // them on the triangulation
+    // We proceed in the same way we did with the tracer particles
     auto my_bounding_box = GridTools::compute_mesh_predicate_bounding_box(
       fluid_tria, IteratorFilters::LocallyOwnedCell());
 
@@ -895,6 +1010,7 @@ namespace Step70
           << std::endl;
   }
 
+  // Setup finite elements and quadrature formulas.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::initial_setup()
   {
@@ -914,7 +1030,7 @@ namespace Step70
   }
 
 
-
+  // Distribute dofs and initialize LAC objects.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_dofs()
   {
@@ -1150,10 +1266,10 @@ namespace Step70
 
         for (const auto &p : pic)
           {
-            const auto  ref_q      = p.get_reference_location();
-            const auto  real_q     = p.get_location();
-            const auto  properties = p.get_properties();
-            const auto &JxW        = properties[0];
+            const auto &ref_q  = p.get_reference_location();
+            const auto &real_q = p.get_location();
+            const auto &JxW    = p.get_properties()[0];
+
             for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
               {
                 const auto comp_i =
