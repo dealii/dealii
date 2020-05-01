@@ -170,7 +170,6 @@ void Step5<dim>::assemble_system()
                             update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -189,7 +188,7 @@ void Step5<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           const double current_coefficient =
             coefficient<dim>(fe_values.quadrature_point(q_index));
