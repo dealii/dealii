@@ -68,6 +68,7 @@ namespace LA
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -126,9 +127,16 @@ namespace LA
 #include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
 
-// For non-matching co-dimension one surfaces, we use a special quadrature
-// formula, that allows one to compute integrals on immersed surfaces
-#include <deal.II/non_matching/immersed_surface_quadrature.h>
+// When generating the grids, we allow reading it from a file, and if deal.II
+// has been built with OpenCASCADE support, we allow reading also cad files and
+// use them as manifold descriptors for the grid (see step-54 for a detailed
+// description of the various Manifold descriptors that are available in the
+// OpenCASCADE namespace)
+#include <deal.II/opencascade/manifold_lib.h>
+#include <deal.II/opencascade/utilities.h>
+#ifdef DEAL_II_WITH_OPENCASCADE
+#  include <TopoDS.hxx>
+#endif
 
 #include <cmath>
 #include <fstream>
@@ -317,10 +325,10 @@ namespace Step70
     // the CAD file itself.
     //
     // We do this for each of the generated grids, to be as generic as possible:
-    std::string name_of_grid1       = "hyper_cube";
-    std::string arguments_for_grid1 = "-1: 1: false";
-    std::string name_of_grid2       = "hyper_rectangle";
-    std::string arguments_for_grid2 =
+    std::string name_of_fluid_grid       = "hyper_cube";
+    std::string arguments_for_fluid_grid = "-1: 1: false";
+    std::string name_of_solid_grid       = "hyper_rectangle";
+    std::string arguments_for_solid_grid =
       dim == 2 ? "-.5, -.1: .5, .1: false" : "-.5, -.1, -.1: .5, .1, .1: false";
     std::string name_of_particle_grid = "hyper_ball";
     std::string arguments_for_particle_grid =
@@ -644,21 +652,112 @@ namespace Step70
   {}
 
 
+  // In order to generate the grid, we first try to use the functions in the
+  // deal.II GridGenerator namespace, by leveraging the
+  // GridGenerator::generate_from_name_and_argument(), if this function fails,
+  // then we use the following method, where the name is interpreted as a
+  // filename, and the arguments are interpreted as a map from manifold ids to
+  // CAD files, and are converted to Manifold descriptors using the OpenCASCADE
+  // namespace facilities:
+  template <int dim, int spacedim>
+  void read_grid_and_cad_files(const std::string &grid_file_name,
+                               const std::string &ids_and_cad_file_names,
+                               Triangulation<dim, spacedim> &tria)
+  {
+    // Try to read the grid using GridIn facilities. Let the GridIn class
+    // automatically detect the file format:
+    GridIn<dim, spacedim> grid_in;
+    grid_in.attach_triangulation(tria);
+    grid_in.read(grid_file_name);
 
-  // In this method, we show how to use the
-  // GridGenerator::generate_from_name_and_arguments() method to initialize the
-  // grids. Since both the name of the function and the grids
+    // If we got to this point, then the Triangulation has been read, and we are
+    // ready to attach to it the correct manifold descriptions. We perform the
+    // next lines of codes only if deal.II has been built with OpenCASCADE
+    // support. For each entry in the map, we try to open the corresponding CAD
+    // file, we analyse it, and according to its content, opt for either a
+    // ArchLengthProjectionLineManifold (if the CAD file contains a single
+    // TopoDS_Edge or a single TopoDS_Wire) or a NURBSPatchManifold, if the file
+    // contains a single face. Notice that if the CAD files do not contain
+    // single wires, edges, or faces, an assertion will be throw in the
+    // generation of the Manifold.
+    //
+    // We use the Patterns::Tools::Convert class to do the convertion from the
+    // string to a map between manifold ids and file names for us:
+
+#ifdef DEAL_II_WITH_OPENCASCADE
+    using map_type  = std::map<types::manifold_id, std::string>;
+    using Converter = Patterns::Tools::Convert<map_type>;
+
+    for (const auto pair : Converter::to_value(ids_and_cad_file_names))
+      {
+        const auto &manifold_id   = pair.first;
+        const auto &cad_file_name = pair.second;
+
+        const auto extension = boost::algorithm::to_lower_copy(
+          cad_file_name.substr(cad_file_name.find_last_of('.') + 1));
+
+        TopoDS_Shape shape;
+        if (extension == "iges" || extension == "igs")
+          shape = OpenCASCADE::read_IGES(cad_file_name);
+        else if (extension == "step" || extension == "stp")
+          shape = OpenCASCADE::read_STEP(cad_file_name);
+        else
+          AssertThrow(false,
+                      ExcNotImplemented("We found an extension that we "
+                                        "do not recognize as a CAD file "
+                                        "extension. Bailing out."));
+
+        // Now we check how many faces are contained in the Shape. OpenCASCADE
+        // is intrinsically 3D, so if this number is nonzero If the number is
+        // zero, we interpret this as a line manifold, otherwise as a
+        // NURBSPatchManifold
+        const auto n_elements = OpenCASCADE::count_elements(shape);
+        if ((std::get<0>(n_elements) == 0 && spacedim == 3))
+          tria.set_manifold(
+            manifold_id,
+            OpenCASCADE::ArclengthProjectionLineManifold<dim, spacedim>(shape));
+        else
+          tria.set_manifold(manifold_id,
+                            OpenCASCADE::NURBSPatchManifold<dim, spacedim>(
+                              TopoDS::Face(shape)));
+      }
+#else
+    (void)ids_and_cad_file_names;
+#endif
+  }
+
+  // Now let's put things together
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::make_grid()
   {
-    GridGenerator::generate_from_name_and_arguments(fluid_tria,
-                                                    par.name_of_grid1,
-                                                    par.arguments_for_grid1);
+    try
+      {
+        // we first try to generate the grid internally
+        GridGenerator::generate_from_name_and_arguments(
+          fluid_tria, par.name_of_fluid_grid, par.arguments_for_fluid_grid);
+      }
+    catch (...)
+      {
+        // and if we fail, we proceed with the above function call
+        read_grid_and_cad_files(par.name_of_fluid_grid,
+                                par.arguments_for_fluid_grid,
+                                fluid_tria);
+      }
     fluid_tria.refine_global(par.initial_fluid_refinement);
 
-    GridGenerator::generate_from_name_and_arguments(solid_tria,
-                                                    par.name_of_grid2,
-                                                    par.arguments_for_grid2);
+    // The same is done for the solid grid:
+    try
+      {
+        GridGenerator::generate_from_name_and_arguments(
+          solid_tria, par.name_of_solid_grid, par.arguments_for_solid_grid);
+      }
+    catch (...)
+      {
+        read_grid_and_cad_files(par.name_of_solid_grid,
+                                par.arguments_for_solid_grid,
+                                solid_tria);
+      }
+
     solid_tria.refine_global(par.initial_solid_refinement);
   }
 
@@ -1049,105 +1148,35 @@ namespace Step70
 
         Assert(pic.begin() == particle, ExcInternalError());
 
-        if (dim == spacedim)
-          for (const auto &p : pic)
-            {
-              const auto  ref_q      = p.get_reference_location();
-              const auto  real_q     = p.get_location();
-              const auto  properties = p.get_properties();
-              const auto &JxW        = properties[0];
-              for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
-                {
-                  const auto comp_i =
-                    fluid_fe->system_to_component_index(i).first;
-                  if (comp_i < spacedim)
-                    {
-                      for (unsigned int j = 0; j < fluid_fe->dofs_per_cell; ++j)
-                        {
-                          const auto comp_j =
-                            fluid_fe->system_to_component_index(j).first;
-                          if (comp_i == comp_j)
-                            local_matrix(i, j) +=
-                              k * par.penalty_term *
-                              fluid_fe->shape_value(i, ref_q) *
-                              fluid_fe->shape_value(j, ref_q) * JxW;
-                        }
-                      local_rhs(i) += k * par.penalty_term *
-                                      solid_velocity.value(real_q, comp_i) *
-                                      fluid_fe->shape_value(i, ref_q) * JxW;
-                    }
-                }
-            }
-        else if (dim == spacedim - 1)
+        for (const auto &p : pic)
           {
-            NonMatching::ImmersedSurfaceQuadrature<spacedim> surface_quadrature;
-            std::vector<Point<spacedim>>                     quadrature_points;
-            for (const auto &p : pic)
+            const auto  ref_q      = p.get_reference_location();
+            const auto  real_q     = p.get_location();
+            const auto  properties = p.get_properties();
+            const auto &JxW        = properties[0];
+            for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
               {
-                const auto          ref_q      = p.get_reference_location();
-                const auto          properties = p.get_properties();
-                const auto &        JxW        = properties[0];
-                Tensor<1, spacedim> normal;
-                for (unsigned int i = 0; i < spacedim; ++i)
-                  normal[i] = properties[i + 1];
-
-                surface_quadrature.push_back(ref_q, JxW, normal);
-                quadrature_points.push_back(p.get_location());
-              }
-
-            FEValues<spacedim> fe_values(*fluid_fe,
-                                         surface_quadrature,
-                                         update_values | update_gradients);
-
-            fe_values.reinit(cell);
-
-            for (unsigned int q_point = 0; q_point < surface_quadrature.size();
-                 ++q_point)
-              {
-                const auto &normal_vector =
-                  surface_quadrature.normal_vector(q_point);
-                const auto &JxW = surface_quadrature.weight(q_point);
-
-                for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
+                const auto comp_i =
+                  fluid_fe->system_to_component_index(i).first;
+                if (comp_i < spacedim)
                   {
-                    const auto grad_phi =
-                      fe_values[velocities].gradient(i, q_point);
-                    const auto phi = fe_values[velocities].value(i, q_point);
-                    const auto q   = fe_values[pressure].value(i, q_point);
-
                     for (unsigned int j = 0; j < fluid_fe->dofs_per_cell; ++j)
                       {
-                        const auto grad_u =
-                          fe_values[velocities].gradient(j, q_point);
-                        const auto u = fe_values[velocities].value(j, q_point);
-                        const auto p = fe_values[pressure].value(j, q_point);
-
-                        local_matrix(i, j) +=
-                          ((-grad_phi * normal_vector + q * normal_vector) * u +
-                           (-grad_u * normal_vector + p * normal_vector) * phi +
-                           k * par.penalty_term * u * phi) *
-                          JxW;
+                        const auto comp_j =
+                          fluid_fe->system_to_component_index(j).first;
+                        if (comp_i == comp_j)
+                          local_matrix(i, j) +=
+                            k * par.penalty_term *
+                            fluid_fe->shape_value(i, ref_q) *
+                            fluid_fe->shape_value(j, ref_q) * JxW;
                       }
-                    const auto comp_i =
-                      fluid_fe->system_to_component_index(i).first;
-
-                    Tensor<1, spacedim> g;
-                    if (comp_i < spacedim)
-                      g[comp_i] =
-                        solid_velocity.value(quadrature_points[q_point],
-                                             comp_i);
-
-                    local_rhs(i) +=
-                      ((-grad_phi * normal_vector + q * normal_vector) * g +
-                       k * par.penalty_term * g * phi) *
-                      JxW;
+                    local_rhs(i) += k * par.penalty_term *
+                                    solid_velocity.value(real_q, comp_i) *
+                                    fluid_fe->shape_value(i, ref_q) * JxW;
                   }
               }
           }
-        else
-          {
-            Assert(false, ExcNotImplemented());
-          }
+
         constraints.distribute_local_to_global(local_matrix,
                                                local_rhs,
                                                fluid_dof_indices,
@@ -1505,13 +1534,13 @@ namespace Step70
     // passive tracers.
     enter_my_subsection(this->prm);
     this->prm.enter_subsection("Grid generation");
-    this->prm.add_parameter("Grid one generator", name_of_grid1);
+    this->prm.add_parameter("Grid one generator", name_of_fluid_grid);
     this->prm.add_parameter("Grid one generator arguments",
-                            arguments_for_grid1);
+                            arguments_for_fluid_grid);
 
-    this->prm.add_parameter("Grid two generator", name_of_grid2);
+    this->prm.add_parameter("Grid two generator", name_of_solid_grid);
     this->prm.add_parameter("Grid two generator arguments",
-                            arguments_for_grid2);
+                            arguments_for_solid_grid);
 
     this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
     this->prm.add_parameter("Particle grid generator arguments",
