@@ -937,9 +937,6 @@ namespace internal
           task_info.boundary_partition_data[partition + 1] =
             task_info.boundary_partition_data[partition] + boundary_counter;
         }
-      Assert(refinement_edge_faces.empty(),
-             ExcNotImplemented("Setting up data structures on MG levels with "
-                               "hanging nodes is currently not supported."));
       task_info.ghost_face_partition_data.resize(2);
       task_info.ghost_face_partition_data[0] = 0;
       task_info.ghost_face_partition_data[1] = inner_ghost_faces.size();
