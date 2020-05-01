@@ -1824,7 +1824,7 @@ namespace internal
 
         template <typename U>
         static decltype(std::declval<U>().initialize_dof_vector(
-          LinearAlgebra::distributed::Vector<double>()))
+          std::declval<LinearAlgebra::distributed::Vector<Number> &>()))
         detect(const U &);
 
       public:
@@ -1840,7 +1840,7 @@ namespace internal
                   MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
-                           LinearAlgebra::distributed::Vector<double> &vec,
+                           LinearAlgebra::distributed::Vector<Number> &vec,
                            bool /*omit_zeroing_entries*/)
       {
         vec.reinit(mat.locally_owned_domain_indices(),
@@ -1854,7 +1854,7 @@ namespace internal
                                 MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
-                           LinearAlgebra::distributed::Vector<double> &vec,
+                           LinearAlgebra::distributed::Vector<Number> &vec,
                            bool omit_zeroing_entries)
       {
         mat.initialize_dof_vector(vec);
@@ -1870,7 +1870,7 @@ namespace internal
                   MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,
-                          LinearAlgebra::distributed::Vector<double> &vec,
+                          LinearAlgebra::distributed::Vector<Number> &vec,
                           bool /*omit_zeroing_entries*/)
       {
         vec.reinit(mat.locally_owned_range_indices(),
@@ -1884,7 +1884,7 @@ namespace internal
                                 MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,
-                          LinearAlgebra::distributed::Vector<double> &vec,
+                          LinearAlgebra::distributed::Vector<Number> &vec,
                           bool omit_zeroing_entries)
       {
         mat.initialize_dof_vector(vec);
