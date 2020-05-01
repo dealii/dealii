@@ -12,7 +12,7 @@
 
 <h3>Massively parallel non-matching grid simulations of fluid structure interaction problems</h3>
 
-In this tutorial we consider a mixing problem for laminar flows. Mixing 
+In this tutorial we consider a mixing problem for laminar flows. Mixing
 problems are particularly hard to solve numerically, because they often involve
 a container (with fixed boundaries, and possibly complex geometries),
 represented by the domain $\Omega$, and one (or more) immersed and rotating
@@ -24,7 +24,7 @@ $\Omega\setminus\Omega^{\text{imp}}$.
 
 For rotating impellers, the use of Arbitrary Lagrangian Eulerian formulations
 (in which the fluid domain is smoothly deformed to follow the deformations
-of the immersed solid) would not be possible, unless only small times (i.e., 
+of the immersed solid) would not be possible, unless only small times (i.e.,
 small fluid domain deformations) are considered. If one wants to track the
 evolution of the flow across a few turns of the impellers, the resulting
 deformed grid would simply be too distorted to be useful.
@@ -39,10 +39,10 @@ denote the domain in $R^{\text{spacedim}}$ representing the container of both
 the fluid and the impeller, and we use $\Gamma$ in $R^{\text{dim}}$ to denote
 either the full empeller (when its `spacedim` measure is non-negligible, i.e.,
 when we can represent it as a grid of dimension `dim` equal to `spacedim`),
-a co-dimension one representation of a thin empeller, or just the boundary of
-the full empeller.
+a co-dimension one representation of a thin impeller, or just the boundary of
+the full impeller.
 
-The domain $\Gamma$ is embedded in $\Omega$ ($\Gamma \subseteq \Omega$) and it 
+The domain $\Gamma$ is embedded in $\Omega$ ($\Gamma \subseteq \Omega$) and it
 is non-matching. We solve a partial differential equation on $\Omega$,
 enforcing some conditions on the solution of the problem on the embedded
 domain $\Gamma$ by some penalization techniques.
@@ -92,7 +92,7 @@ condition is imposed weekly on $\Gamma$ by applying Nitsche method (see Freund, 
 Both approaches have very similar requirement and results in highly
 similar formulations, therefore we treat them almost in the same way.
 
-In this tutorial program we are not interested in further details on $\Gamma$: 
+In this tutorial program we are not interested in further details on $\Gamma$:
 we assume that the dimension of the embedded domain (`dim`) is always smaller by
 one or equal with respect to the dimension of the embedding domain $\Omega$
 (`spacedim`).
@@ -156,7 +156,7 @@ we obtain the following variational problem:
 where $(\cdot, \cdot)_{\Omega}$ represents the $L^2$ scalar product.
 
 This variational formulation does not take into account the embedded domain.
-Contrarily to step-60, we do not enforce strongly the constraints of 
+Contrarily to step-60, we do not enforce strongly the constraints of
 $\textbf{u}$ on $\Gamma$, but enforce them weakly via a penalization term.
 
 The analysis of this weak imposition of the boundary condition depends on the spacedim-dimensional measure of $\Gamma$. We discuss both scenario.
@@ -172,8 +172,8 @@ on the fluid domain, where no strong conditions on the test functions on $\Gamma
 
 @f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega\setminus\Omega^{\text{imp}}}
-  - (q, \textrm{div}\; \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} \\ 
-  - &(\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma} 
+  - (q, \textrm{div}\; \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} \\
+  - &(\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma}
   + (\textbf{v}\cdot \textbf{n},p)_{\Gamma} \\
  -  &(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
  + (q, \textbf{u} \cdot n)_{\Gamma}
@@ -185,14 +185,14 @@ on the fluid domain, where no strong conditions on the test functions on $\Gamma
 The integrals over $\Gamma$ are face integrals. It can be shown (see  Freund,
 1995) that there exist a positive constant
 $C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
-be consistent and stable. The first two additional integrals on $\Gamma$ (the 
+be consistent and stable. The first two additional integrals on $\Gamma$ (the
 second line in the equation above) appear naturally after integrating by parts,
 when one does not assume that $\mathbf{v}$ is zero on $\Gamma$.
 
 The third line in the equation above contains two terms that are added to ensure
 consistency of the weak form, and a stabilization term, that is there to enforce
 the boundary condition with an error which is consistent with the approximation error. The consistency terms and the stabilization term are added to the
-right hand side with the actual boundary data $\mathbf{g}$. 
+right hand side with the actual boundary data $\mathbf{g}$.
 
 When $\mathbf{u}$ satisfies the condition $\mathbf{u}=\mathbf{g}$ on $\Gamma$,
 all the consistency and stabilty integrals on $\Gamma$ cancel out, and one is
@@ -203,10 +203,10 @@ We note that an alternative (non-symmetric) formulation can be used :
 
 @f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega\setminus\Omega^{\text{imp}}}
-  - (q, \textrm{div}\; \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} \\ 
-  - &(\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma} 
+  - (q, \textrm{div}\; \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} \\
+  &-(\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma}
   + (\textbf{v}\cdot \textbf{n},p)_{\Gamma} \\
-   &(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+   &+(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
  - (q, \textbf{u} \cdot n)_{\Gamma}
  + \beta (\textbf{v},\textbf{u})_{\Gamma} \\
 =   &(\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma} - (q, \textbf{g} \cdot n)_{\Gamma}
@@ -216,11 +216,11 @@ in which case the stability and consistency conditions become $\beta > 0$. In
 the symmetric case, the value of $\beta$ is dependent on $h$, and it is in
 general chosen such that $\beta = C h^{-1} $ with $h$
 a measure of size of the face being integrated and $C$ a constant such that
-$1 \leq C \leq 10$. 
+$1 \leq C \leq 10$.
 
 Even if the non-symmetric case seems advantageous w.r.t.
 to possible choices of stabilization parameters, we opt for the symmetric
-discretization, since in this case it can be shown that the dual problem is 
+discretization, since in this case it can be shown that the dual problem is
 also consistent, leading to a solution where not only the energy norm of the
 solution converges with the correct order, but also its $L^2$ norm.
 
@@ -229,15 +229,15 @@ exactly. However, if the deformation of the impeller is a rigid body
 motion, it is possible to artificially extend the solution of the Stokes
 problem inside the propeller itself, since a rigid body motion is also a
 solution to the Stokes problem. The idea is then to solve the same problem,
-inside $\Omega^{\text{imp}}$, imposing the same boundary conditions on 
+inside $\Omega^{\text{imp}}$, imposing the same boundary conditions on
 $\Gamma$, using the same penalization technique, and testing with test
 functions $\mathbf{v}$ which are globally continuous over $\Omega$.
 
 This results in the following (intermediate) formulation:
 @f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
-  - (q, \textrm{div}\; \textbf{u})_{\Omega} \\ 
-  - &(\textbf{v},  \lbrack \nabla \textbf{u} \rbrack \cdot \textbf{n})_{\Gamma} 
+  - (q, \textrm{div}\; \textbf{u})_{\Omega} \\
+  - &(\textbf{v},  \lbrack \nabla \textbf{u} \rbrack \cdot \textbf{n})_{\Gamma}
   + (\textbf{v}\cdot \textbf{n},\lbrack p \rbrack )_{\Gamma} \\
  -  &(\lbrack \nabla\textbf{v} \rbrack \cdot \textbf{n},\textbf{u})_{\Gamma}
  + (\lbrack q \rbrack, \textbf{u} \cdot n)_{\Gamma}
@@ -253,7 +253,7 @@ and trial functions are continuous across $\Gamma$. Moreover, if $\Gamma$ is
 not aligned with cell boundaries, all the jump terms are also zero, since, in
 general, finite element function spaces are smooth inside each cell, and if
 $\Gamma$ cuts through an element intersecting its boundary only at a finite
-number of points, all the contributions on $\Gamma$, with the exception of 
+number of points, all the contributions on $\Gamma$, with the exception of
 the stabilization ones, can be neglected from the formulation, resulting in
 the following final form of the variational formulation:
 
@@ -276,12 +276,12 @@ method. Furthermore, as in step-60, we still need to integrate over the non-matc
 <h4>Co-dimension zero case</h4>
 
 In this case, $\Gamma$ has the same dimension, but is imbedded into $\Omega$.
-In the case of $\mathcal{L}^2$ penalization, the additional penalization 
+In the case of $\mathcal{L}^2$ penalization, the additional penalization
 term, can be interpreted as a Darcy term within $\Gamma$, resulting in:
 
 @f{eqnarray*}
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
-  - (q, \textrm{div}\; \textbf{u})_{\Omega}  + \beta (\textbf{v},\textbf{u})_{\Gamma} 
+  - (q, \textrm{div}\; \textbf{u})_{\Omega}  + \beta (\textbf{v},\textbf{u})_{\Gamma}
 =  \beta (\textbf{v},\textbf{g})_{\Gamma}.
 @f}
 
@@ -298,14 +298,14 @@ gradient within $\Gamma$:
 
 @f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
-  - (q, \textrm{div}\; \textbf{u})_{\Omega}  
-  + \beta_1 (\textbf{v},\textbf{u})_{\Gamma} 
-  + \beta_2 (\nabla \textbf{v}, \nabla \textbf{u})_{\Gamma} 
-=  \beta_1 (\textbf{v},\textbf{g})_{\Gamma} 
+  - (q, \textrm{div}\; \textbf{u})_{\Omega}
+  + \beta_1 (\textbf{v},\textbf{u})_{\Gamma}
+  + \beta_2 (\nabla \textbf{v}, \nabla \textbf{u})_{\Gamma}
+=  \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
 + \beta_2 (\nabla \textbf{v}, \nabla \textbf{g})_{\Gamma}.
 @f}
 
-Notice that the $L^2$ penalization (`dim` equal to `spacedim`) and the Nitsche 
+Notice that the $L^2$ penalization (`dim` equal to `spacedim`) and the Nitsche
 penalization (`dim` equal to `spacedim-1`) result in the exact same numerical
 implementation, thanks to the dimension independent capabilities of deal.II.
 
@@ -394,8 +394,8 @@ The approach taken in this step it is as follow:
 - Create Particles::Particle at the position of the quadrature points on $\Gamma$
   by using the Particles::Generators::quadrature_points() generator. Since the quadrature_points generator
   uses Particles::ParticleHandler::insert_global_particles() function, the particles
-  will be automatically distributed across the processors, <emph>following 
-  the solid Triangulation</emph>
+  will be automatically distributed across the processors, *following
+  the solid Triangulation*
 - Attach the necessary information to the particles, i.e., the quadrature
   weight
 
@@ -409,9 +409,9 @@ inside ParticleHandler, allowing us to:
 - Compute the integrals and fill the global matrix
 
 
-Since the Particles::ParticleHandler can manage the exchange of particles from 
+Since the Particles::ParticleHandler can manage the exchange of particles from
 one processor to the other, the embedded
-triangulation can be moved or deformed by displacing the particles. 
+triangulation can be moved or deformed by displacing the particles.
 The only constraint associated with this displacement is that particles should
 be displaced by a distance that is no larger than the size of a cell.
 
@@ -431,7 +431,7 @@ after the fluid has been displaced in a periodic manner.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/p08_KlTKP50" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-In the present problem, a very viscous fluid is agitated by the rotation of 
+In the present problem, a very viscous fluid is agitated by the rotation of
 an impeller, which, in 2D, is modeled by a rectangular grid. The impeller
 rotates for a given number of revolutions and than, the flow is reversed such
 that the same number of revolutions is carried out in the opposite direction. We
