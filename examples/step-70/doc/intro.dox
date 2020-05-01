@@ -435,7 +435,7 @@ after the fluid has been displaced in a periodic manner.
 
 @endhtmlonly
 
-In the present problem, a very viscous fluid is agitated by the rotation of 
+In the present problem, a very viscous fluid is agitated by the rotation of
 an impeller, which, in 2D, is modeled by a rectangular grid. The impeller
 rotates for a given number of revolutions and than, the flow is reversed such
 that the same number of revolutions is carried out in the opposite direction. We
