@@ -22,7 +22,6 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/differentiation/ad/ad_number_traits.h>
