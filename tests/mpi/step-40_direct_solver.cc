@@ -307,7 +307,7 @@ namespace Step40
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
           pcout << Utilities::MPI::all_gather(
-                     mpi_communicator, dof_handler.locally_owned_dofs())[i]
+                     mpi_communicator, dof_handler.n_locally_owned_dofs())[i]
                 << '+';
         pcout << std::endl;
 
