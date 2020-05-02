@@ -1250,16 +1250,6 @@ namespace Step69
     // to carry out (computation and storage of normals, and normalization
     // of the $\mathbf{c}_{ij}$ of entries) threads cannot conflict
     // attempting to write the same entry (we do not need a scheduler).
-    //
-    // We have one more difficulty to overcome: In order to implement the
-    // <code>on_subranges</code> lambda we need to name the iterator type
-    // of the object returned by <code>std_cxx20::ranges::iota_view%<unsigned
-    // int%>()</code>. This is unfortunately a very convoluted name exposing
-    // implementation details about <code>std_cxx20::ranges::iota_view</code>.
-    // For this reason we resort to the <a
-    // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
-    // specifier, a C++11 feature that returns the type of an entity, or
-    // expression.
     {
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - compute |c_ij|, and n_ij");
