@@ -1666,8 +1666,6 @@ namespace Step70
   }
 
 
-  // The remainder of the code that parameter parsing and the main function is
-  // standard.
   template <int dim, int spacedim>
   StokesImmersedProblemParameters<dim,
                                   spacedim>::StokesImmersedProblemParameters()
@@ -1675,7 +1673,7 @@ namespace Step70
     , rhs("Right hand side", spacedim + 1)
     , angular_velocity("Angular velocity", spacedim == 3 ? spacedim : 1)
   {
-    // We split the parameters in various cathegories, by putting them in
+    // We split the parameters in various categories, by putting them in
     // different sections of the ParameterHandler class. We begin by
     // declaring all the global parameters used by StokesImmersedProblem
     // in the global scope:
@@ -1764,7 +1762,7 @@ namespace Step70
 } // namespace Step70
 
 
-
+// The remainder of the code, the main function, is standard.
 int main(int argc, char *argv[])
 {
   using namespace Step70;
