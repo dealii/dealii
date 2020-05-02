@@ -23,6 +23,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
@@ -38,8 +39,6 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/hp/dof_handler.h>
-
-#include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -3031,7 +3030,7 @@ public:
    * `q_point` taking on all valid indices for quadrature points, as defined
    * by the quadrature rule passed to `fe_values`.
    */
-  boost::integer_range<unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int>
   quadrature_point_indices() const;
 
   /**
@@ -5562,10 +5561,10 @@ FEValuesBase<dim, spacedim>::dof_indices_ending_at(
 
 
 template <int dim, int spacedim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int>
 FEValuesBase<dim, spacedim>::quadrature_point_indices() const
 {
-  return boost::irange(0U, n_quadrature_points);
+  return std_cxx20::ranges::iota_view<unsigned int>(0U, n_quadrature_points);
 }
 
 

@@ -21,8 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-
-#include <boost/range/irange.hpp>
+#include <deal.II/base/std_cxx20/iota_view.h>
 
 #include <array>
 #include <cstdint>
@@ -1947,7 +1946,7 @@ struct GeometryInfo
    * taking on all valid indices for faces (zero and one in 1d, zero
    * through three in 2d, and zero through 5 in 3d).
    */
-  static boost::integer_range<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int>
   face_indices();
 
   /**
@@ -1978,7 +1977,7 @@ struct GeometryInfo
    * Here, we are looping over all vertices of all cells, with `vertex_index`
    * taking on all valid indices.
    */
-  static boost::integer_range<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int>
   vertex_indices();
 
   /**
@@ -2833,19 +2832,19 @@ GeometryInfo<0>::vertex_indices()
 
 
 template <int dim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int>
 GeometryInfo<dim>::face_indices()
 {
-  return boost::irange(0U, faces_per_cell);
+  return std_cxx20::ranges::iota_view<unsigned int>(0U, faces_per_cell);
 }
 
 
 
 template <int dim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int>
 GeometryInfo<dim>::vertex_indices()
 {
-  return boost::irange(0U, vertices_per_cell);
+  return std_cxx20::ranges::iota_view<unsigned int>(0U, vertices_per_cell);
 }
 
 
