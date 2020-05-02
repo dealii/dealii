@@ -2102,8 +2102,8 @@ namespace Step69
                                "time_stepping - 3 perform update");
 
       const auto on_subranges =
-        [&](typename decltype(indices_owned)::iterator       i1,
-            const typename decltype(indices_owned)::iterator i2) {
+        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
+            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
@@ -2352,8 +2352,8 @@ namespace Step69
     // global maxima and minima of the gradients.
     {
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
+        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
+            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
           double r_i_max_on_subrange = 0.;
           double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
@@ -2437,8 +2437,8 @@ namespace Step69
 
     {
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
+        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
+            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
