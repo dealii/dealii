@@ -27,7 +27,9 @@
 #ifdef DEAL_II_WITH_THREADS
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
+#  define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #  include <tbb/task.h>
+#  undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #  include <tbb/task_scheduler_init.h>
 #endif
 
