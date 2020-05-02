@@ -135,14 +135,11 @@ namespace internal
       loop(MFWorkerInterface &worker) const;
 
       /**
-       * Determines the position of cells with ghosts for distributed-memory
-       * calculations.
+       * Make the number of cells which can only be treated in the
+       * communication overlap divisible by the vectorization length.
        */
       void
-      collect_boundary_cells(const unsigned int n_active_cells,
-                             const unsigned int n_active_and_ghost_cells,
-                             const unsigned int vectorization_length,
-                             std::vector<unsigned int> &boundary_cells);
+      make_boundary_cells_divisible(std::vector<unsigned int> &boundary_cells);
 
       /**
        * Sets up the blocks for running the cell loop based on the options
@@ -166,6 +163,10 @@ namespace internal
        * strictly or whether it is allowed to insert lower categories into the
        * next high one(s).
        *
+       * @param parent_relation This data field is used to specify which cells
+       * have the same parent cell. Cells with the same ancestor are grouped
+       * together into the same batch(es) with vectorization across cells.
+       *
        * @param renumbering When leaving this function, the vector contains a
        * new numbering of the cells that aligns with the grouping stored in
        * this class.
@@ -182,6 +183,7 @@ namespace internal
         const unsigned int               dofs_per_cell,
         const std::vector<unsigned int> &cell_vectorization_categories,
         const bool                       cell_vectorization_categories_strict,
+        const std::vector<unsigned int> &parent_relation,
         std::vector<unsigned int> &      renumbering,
         std::vector<unsigned char> &     incompletely_filled_vectorization);
 

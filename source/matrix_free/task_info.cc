@@ -695,16 +695,9 @@ namespace internal
 
 
     void
-    TaskInfo::collect_boundary_cells(
-      const unsigned int         n_active_cells_in,
-      const unsigned int         n_active_and_ghost_cells,
-      const unsigned int         vectorization_length_in,
+    TaskInfo::make_boundary_cells_divisible(
       std::vector<unsigned int> &boundary_cells)
     {
-      vectorization_length = vectorization_length_in;
-      n_active_cells       = n_active_cells_in;
-      n_ghost_cells        = n_active_and_ghost_cells - n_active_cells;
-
       // try to make the number of boundary cells divisible by the number of
       // vectors in vectorization
       unsigned int fillup_needed =
@@ -779,6 +772,7 @@ namespace internal
       const unsigned int               dofs_per_cell,
       const std::vector<unsigned int> &cell_vectorization_categories,
       const bool                       cell_vectorization_categories_strict,
+      const std::vector<unsigned int> &parent_relation,
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
@@ -786,7 +780,6 @@ namespace internal
         (n_active_cells + vectorization_length - 1) / vectorization_length;
       const unsigned int n_ghost_slots =
         (n_ghost_cells + vectorization_length - 1) / vectorization_length;
-      const unsigned int n_boundary_cells = boundary_cells.size();
 
       incompletely_filled_vectorization.resize(n_macro_cells + n_ghost_slots);
       renumbering.resize(n_active_cells + n_ghost_cells,
@@ -799,28 +792,115 @@ namespace internal
       else
         partition_row_index.resize(5);
 
-      // Initially mark the cells according to the MPI ranking
+      int max_parent_index = -1;
+      for (unsigned int i : parent_relation)
+        if (i != numbers::invalid_unsigned_int)
+          max_parent_index = std::max(static_cast<int>(i), max_parent_index);
+      unsigned int expected_group_size =
+        max_parent_index != -1 ?
+          std::count(parent_relation.begin(), parent_relation.end(), 0) :
+          1;
+
       std::vector<unsigned char> cell_marked(n_active_cells + n_ghost_cells, 0);
       if (n_procs > 1)
         {
-          for (unsigned int i = 0; i < n_boundary_cells; ++i)
-            cell_marked[boundary_cells[i]] = 2;
+          // This lambda is used to mark the siblings (belong to the same
+          // parent) if a particular cell was touched in a pass as well
+          const auto mark_siblings =
+            [&](const unsigned int       mark,
+                const std::vector<bool> &relevant_parents) {
+              for (unsigned int i = 0; i < n_active_cells; ++i)
+                if (cell_marked[i] == 0 &&
+                    parent_relation[i] != numbers::invalid_unsigned_int &&
+                    relevant_parents[parent_relation[i]])
+                  cell_marked[i] = mark;
+            };
 
-          Assert(boundary_cells.size() % vectorization_length == 0 ||
-                   boundary_cells.size() == n_active_cells,
-                 ExcInternalError());
+          // This lambda makes the cells at the processor boundary divisible
+          // by the vectorization length; we start the fillup with the more
+          // unstructured cells without a parent to increase chances that the
+          // cells sharing the parent get placed together
+          const auto fill_up_vectorization = [&](const unsigned int mark) {
+            unsigned int n_marked_cells =
+              std::count(cell_marked.begin(),
+                         cell_marked.begin() + n_active_cells,
+                         mark);
+            unsigned int n_available_cells =
+              std::count(cell_marked.begin(),
+                         cell_marked.begin() + n_active_cells,
+                         0);
+            if (n_marked_cells % vectorization_length > 0 &&
+                n_available_cells > 0)
+              {
+                unsigned int n_missing =
+                  vectorization_length -
+                  (n_marked_cells % vectorization_length);
+                for (unsigned int i = 0; i < n_active_cells; ++i)
+                  if (cell_marked[i] == 0 &&
+                      parent_relation[i] == numbers::invalid_unsigned_int)
+                    {
+                      cell_marked[i] = mark;
+                      --n_missing;
+                      --n_available_cells;
+                      ++n_marked_cells;
+                      if (n_missing == 0)
+                        break;
+                    }
+                for (unsigned int i = 0; i < n_active_cells; ++i)
+                  if (cell_marked[n_active_cells - 1 - i] == 0)
+                    {
+                      cell_marked[n_active_cells - 1 - i] = mark;
+                      --n_missing;
+                      --n_available_cells;
+                      ++n_marked_cells;
+                      if (n_missing == 0)
+                        break;
+                    }
+              }
 
+            Assert(n_marked_cells % vectorization_length == 0 ||
+                     n_available_cells == 0,
+                   ExcInternalError("error " + std::to_string(n_marked_cells) +
+                                    " " + std::to_string(n_available_cells)));
+            return n_marked_cells;
+          };
+
+          // Mark all cells needing data exchange as well as those belonging
+          // to the same parent with a special number
+          {
+            std::vector<bool> parent_at_boundary(max_parent_index + 1);
+            for (const unsigned int cell : boundary_cells)
+              {
+                cell_marked[cell] = 2;
+                if (parent_relation[cell] != numbers::invalid_unsigned_int)
+                  parent_at_boundary[parent_relation[cell]] = true;
+              }
+            mark_siblings(2, parent_at_boundary);
+          }
+          const unsigned int n_boundary_cells = fill_up_vectorization(2);
+
+          // Mark the cells that get placed before the cells at processor
+          // boundaries
           const unsigned int n_second_slot =
             ((n_active_cells - n_boundary_cells) / 2 / vectorization_length) *
             vectorization_length;
-          unsigned int count = 0;
-          unsigned int c     = 0;
-          for (; c < n_active_cells && count < n_second_slot; ++c)
-            if (cell_marked[c] == 0)
-              {
-                cell_marked[c] = 1;
-                ++count;
-              }
+          unsigned int c = 0;
+          {
+            unsigned int      count = 0;
+            std::vector<bool> parent_marked(max_parent_index + 1, false);
+            for (; c < n_active_cells && count < n_second_slot; ++c)
+              if (cell_marked[c] == 0)
+                {
+                  if (parent_relation[c] != numbers::invalid_unsigned_int)
+                    parent_marked[parent_relation[c]] = true;
+                  cell_marked[c] = 1;
+                  ++count;
+                }
+            mark_siblings(1, parent_marked);
+            fill_up_vectorization(1);
+          }
+
+          // Finally, mark the remaining cells
           for (; c < n_active_cells; ++c)
             if (cell_marked[c] == 0)
               cell_marked[c] = 3;
@@ -912,8 +992,78 @@ namespace internal
           // step 3: append cells according to categories
           for (unsigned int j = 0; j < n_categories; ++j)
             {
-              for (const unsigned int cell : renumbering_category[j])
-                renumbering[counter++] = cell;
+              {
+                // Among the current category, we need to distinguish cells
+                // which we want to have grouped together and other cells. We
+                // first start by setting up these two categories
+                std::vector<std::pair<unsigned int, unsigned int>>
+                                          grouped_cells_tmp;
+                std::vector<unsigned int> other_cells;
+                for (const unsigned int cell : renumbering_category[j])
+                  if (parent_relation[cell] == numbers::invalid_unsigned_int)
+                    other_cells.push_back(cell);
+                  else
+                    grouped_cells_tmp.emplace_back(parent_relation[cell], cell);
+
+                // Create a CRS data structure to identify each of the chunks
+                std::sort(grouped_cells_tmp.begin(), grouped_cells_tmp.end());
+                std::vector<unsigned int> crs_group(1);
+                for (unsigned int i = 1; i < grouped_cells_tmp.size(); ++i)
+                  if (grouped_cells_tmp[i].first !=
+                      grouped_cells_tmp[i - 1].first)
+                    crs_group.push_back(i);
+                crs_group.push_back(grouped_cells_tmp.size());
+
+                // Move groups that do not have the complete size (due to
+                // categories) to the 'other_cells'
+                std::vector<unsigned int> grouped_cells;
+                for (unsigned int i = 0; i < crs_group.size() - 1; ++i)
+                  if (crs_group[i + 1] - crs_group[i] < expected_group_size)
+                    for (unsigned int j = crs_group[i]; j < crs_group[i + 1];
+                         ++j)
+                      other_cells.push_back(grouped_cells_tmp[j].second);
+                  else
+                    for (unsigned int j = crs_group[i]; j < crs_group[i + 1];
+                         ++j)
+                      grouped_cells.push_back(grouped_cells_tmp[j].second);
+
+                // Sort the remaining cells
+                std::sort(other_cells.begin(), other_cells.end());
+
+                // Now fill in the cells from the two slots, the one with
+                // groups and the one without
+                auto regular = grouped_cells.begin();
+                auto fillup  = other_cells.begin();
+                while (regular != grouped_cells.end() ||
+                       fillup != other_cells.end())
+                  {
+                    // Case 1: Fill up until the next expected group size
+                    while (counter % expected_group_size &&
+                           fillup != other_cells.end())
+                      renumbering[counter++] = *fillup++;
+
+                    // Case 2: If the start of the next group has a larger
+                    // index than all indices we have queued from the
+                    // irregular
+                    if (fillup + expected_group_size <= other_cells.end() &&
+                        (regular == grouped_cells.end() ||
+                         *(fillup + expected_group_size - 1) < *regular))
+                      for (unsigned int j = 0; j < expected_group_size; ++j)
+                        renumbering[counter++] = *fillup++;
+
+                    // Case 3: Add a group at once
+                    if (regular != grouped_cells.end())
+                      for (unsigned int j = 0; j < expected_group_size; ++j)
+                        renumbering[counter++] = *regular++;
+
+                    // Case 4: The groups are empty, so fill up from the other
+                    // chunk
+                    else
+                      while (fillup != other_cells.end())
+                        renumbering[counter++] = *fillup++;
+                  }
+              }
+
               unsigned int remainder =
                 renumbering_category[j].size() % vectorization_length;
               if (remainder)
