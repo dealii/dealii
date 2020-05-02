@@ -465,14 +465,13 @@ namespace hp
      * both meshes.
      *
      * In the context, we assume that the local error on a cell that will be
-     * h-refined, will lead to errors on the $2^\text{dim}$ children that are
-     * all equal, whereas local errors on siblings will be summed up on the
-     * parent cell in case of h-coarsening. This assumption is often not
-     * satisfied in practice: For example, if a cell is at a corner singularity,
-     * then the one child cell that ends up closest to the singularity will
-     * inherit the majority of the remaining error -- but this function can not
-     * know where the singularity will be, and consequently assumes equal
-     * distribution.
+     * h-refined, will be divided equally on all $n_{K_c}$ children, whereas
+     * local errors on siblings will be summed up on the parent cell in case of
+     * h-coarsening. This assumption is often not satisfied in practice: For
+     * example, if a cell is at a corner singularity, then the one child cell
+     * that ends up closest to the singularity will inherit the majority of the
+     * remaining error -- but this function can not know where the singularity
+     * will be, and consequently assumes equal distribution.
      *
      * Incorporating the transfer from the old to the adapted mesh, the complete
      * error prediction algorithm reads as follows:
@@ -487,7 +486,7 @@ namespace hp
      *            \gamma_\text{p}^{(p_{K,\text{future}} - p_K)}$
      *       <td>$\gamma_\text{p} \in (0,1)$
      *   <tr><td>hp-refinement
-     *       <td>$\left( \eta_{K_c,\text{pred}} \right)^2 = 0.5^{\text{dim}}
+     *       <td>$\left( \eta_{K_c,\text{pred}} \right)^2 = n_{K_c}^{-1}
      *            \left( \eta_{K_p} \,
      *            \gamma_\text{h} \, 0.5^{p_{K_c,\text{future}}} \,
      *            \gamma_\text{p}^{(p_{K_c,\text{future}} - p_{K_p})} \right)^2
