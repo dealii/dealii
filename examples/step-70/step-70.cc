@@ -102,8 +102,8 @@ namespace LA
 // Deal.II offers these facilities on the Particles namespace, through the
 // ParticleHandler class. ParticleHandler is a class that allows you to manage
 // a collection of particles (objects of type Particles::Particle), representing
-// a collection of points with some attached properties floating on a
-// parallel::distributed::Triangulation. The methods and classes on the
+// a collection of points with some attached properties (e.g. an id) floating on
+// a parallel::distributed::Triangulation. The methods and classes on the
 // namespace Particles allows one to easily implement Particle In Cell methods
 // and particle tracing on distributed triangulations.
 //
@@ -119,7 +119,7 @@ namespace LA
 // and any other information that may be required to couple the two problems.
 //
 // Ownership of the solid quadrature points is inherited by the MPI partitioning
-// on the solid mesh itslef. The Particles so generated are later distributed to
+// on the solid mesh itself. The Particles so generated are later distributed to
 // the fluid mesh using the methods of the ParticleHandler class. This allows
 // transparent exchange of information between MPI processes about the
 // overlapping pattern between fluid cells and solid quadrature points.
@@ -128,7 +128,7 @@ namespace LA
 #include <deal.II/particles/particle_handler.h>
 
 // When generating the grids, we allow reading it from a file, and if deal.II
-// has been built with OpenCASCADE support, we allow reading also cad files and
+// has been built with OpenCASCADE support, we also allow reading cad files and
 // use them as manifold descriptors for the grid (see step-54 for a detailed
 // description of the various Manifold descriptors that are available in the
 // OpenCASCADE namespace)
@@ -224,7 +224,7 @@ namespace Step70
   //
   // The ParameterAcceptor paradigm requires all parameters to be writeable by
   // the ParameterAcceptor methods. In order to avoid bugs that would be very
-  // difficult to trace down (such as witing things like `time = 0` instead of
+  // difficult to trace down (such as writing things like `time = 0` instead of
   // `time == 0`), we declare all the parameters in an external class, which is
   // initialized before the actual StokesImmersedProblem class, and pass it to
   // the main class as a const reference.
@@ -280,7 +280,7 @@ namespace Step70
     // The only two parameters used in the equations are the viscosity of the
     // fluid, and the penalty term used in the Nitsche formulation:
     double viscosity    = 1.0;
-    double penalty_term = 1e3;
+    double penalty_term = 2e2;
 
     // By default, we create a hyper_cube without colorisation, and we use
     // homogenous Dirichlet boundary conditions. In this set we store the
@@ -324,7 +324,9 @@ namespace Step70
     // the OpenCASCADE namespace will be generated according to the content of
     // the CAD file itself.
     //
-    // We do this for each of the generated grids, to be as generic as possible:
+    // To be as generic as possible, we do this for each of the generated grids:
+    // the fluid grid, the solid grid, but also the tracer particles which are
+    // also generated using a triangulation.
     std::string name_of_fluid_grid       = "hyper_cube";
     std::string arguments_for_fluid_grid = "-1: 1: false";
     std::string name_of_solid_grid       = "hyper_rectangle";
@@ -337,8 +339,8 @@ namespace Step70
     // Similarly, we allow for different local refinement strategies. In
     // particular, we limit the maximum number of refinement levels, in order
     // to control the minimum size of the fluid grid, and guarantee that it is
-    // compatible with the solid grid, and we perform local refinement based
-    // on standard error estimators on the fluid velocity field.
+    // compatible with the solid grid. Additionnaly, we perform local refinement
+    // based on standard error estimators on the fluid velocity field.
     //
     // We permit the user to choose between the
     // two most common refinement strategies, namely `fixed_number` or
@@ -346,7 +348,7 @@ namespace Step70
     // GridRefinement::refine_and_coarsen_fixed_fraction() and
     // GridRefinement::refine_and_coarsen_fixed_number().
     //
-    // Refinement may be done every few time steps, instead of continuosly, and
+    // Refinement may be done every few time steps, instead of continuously, and
     // we control this value by the `refinement_frequency` parameter:
     int          max_level_refinement = 5;
     std::string  refinement_strategy  = "fixed_fraction";
@@ -356,20 +358,22 @@ namespace Step70
     int          refinement_frequency = 5;
 
     // These two functions are used to control the source term of Stokes flow
-    // and the angular velocity at which we move solid. In a more realistic
-    // simulation, the solid velocity or its deformation would come from the
-    // solution of an auxiliary problem on the solid domain. In this example
-    // step we leave this part aside, and simply impose a fixed rotational
-    // velocity field on the immersed solid, governed by function that can be
-    // specified in the parameter file:
+    // and the angular velocity at which we move the solid body. In a more
+    // realistic simulation, the solid velocity or its deformation would come
+    // from the solution of an auxiliary problem on the solid domain. In this
+    // example step we leave this part aside, and simply impose a fixed
+    // rotational velocity field on the immersed solid, governed by function
+    // that can be specified in the parameter file:
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>> rhs;
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
       angular_velocity;
-  }; // namespace Step70
+  };
 
 
   // Once the angular velocity is provided as a Function object, we reconstruct
-  // the pointwise solid velocity thrugh the following class.
+  // the pointwise solid velocity through the following class which derives
+  // from the Function class. It derives the value of the velocity of
+  // the solid body using the position of the points.
   template <int spacedim>
   class SolidVelocity : public Function<spacedim>
   {
@@ -378,11 +382,11 @@ namespace Step70
       : angular_velocity(angular_velocity)
     {
       static_assert(spacedim > 1,
-                    "Cannot instatiate SolidVelocity for spacedim == 1");
+                    "Cannot instantiate SolidVelocity for spacedim == 1");
     }
 
     virtual double value(const Point<spacedim> &p,
-                         unsigned int           component = 0) const
+                         unsigned int           component = 0) const override
     {
       Tensor<1, spacedim> velocity;
       if (spacedim == 3)
@@ -424,11 +428,11 @@ namespace Step70
       , time_step(time_step)
     {
       static_assert(spacedim > 1,
-                    "Cannot instatiate SolidDisplacement for spacedim == 1");
+                    "Cannot instantiate SolidDisplacement for spacedim == 1");
     }
 
     virtual double value(const Point<spacedim> &p,
-                         unsigned int           component = 0) const
+                         unsigned int           component = 0) const override
     {
       Tensor<1, spacedim> displacement;
 
@@ -464,6 +468,9 @@ namespace Step70
     void run();
 
   private:
+    // This method is similar to what is present in previous example. However
+    // it not only takes care of generating the grid for the fluid, but also
+    // the grid for the solid.
     void make_grid();
 
     // These two methods are new w.r.t. previous examples, and initiliaze the
@@ -481,7 +488,7 @@ namespace Step70
     // step.
     void setup_dofs();
 
-    // The assembly rutine is very similar to other Stokes assembly rutines,
+    // The assembly routine is very similar to other Stokes assembly routines,
     void assemble_stokes_system();
     // with the exception of the Nistche restriction part, which exploits one of
     // the particle handlers to integrate on a non-matching part of the fluid
@@ -510,13 +517,13 @@ namespace Step70
                      const unsigned int                               iter,
                      const double time) const;
 
-    // As noted before, make sure we cannot modify this object from within this
-    // class, by making it a const reference.
+    // As noted before, we make sure we cannot modify this object from within
+    // this class, by making it a const reference.
     const StokesImmersedProblemParameters<dim, spacedim> &par;
 
     MPI_Comm mpi_communicator;
 
-    // For the current implemenation, only `fluid_fe` would is really necessary.
+    // For the current implementation, only `fluid_fe` is really necessary.
     // For completeness, and to allow easy extensions, we keep also the
     // `solid_fe` around, which is however initialized to a FE_Nothing finite
     // element space, i.e., one that has no degrees of freedom.
@@ -533,7 +540,7 @@ namespace Step70
     // of degrees of freedom, at the cost of communicating all the overlapping
     // regions between non matching triangulations. This is especially tricky,
     // since we make no assumptions on the relative position or distribution of
-    // the various subdomains. In particular, we assume that ever process owns
+    // the various subdomains. In particular, we assume that every process owns
     // only a part of the solid_tria, and only a part of the fluid_tria, not
     // necessarily in the same physical region, and not necessarily overlapping.
     //
@@ -627,7 +634,10 @@ namespace Step70
   };
 
 
-
+  // In the constructor, we create the mpi_communicator as well as
+  // the triangulations and dof_handler for both the fluid and the solid.
+  // Using the mpi_communicator, both the ConditionalOSStream and TimerOutput
+  // are constructed.
   template <int dim, int spacedim>
   StokesImmersedProblem<dim, spacedim>::StokesImmersedProblem(
     const StokesImmersedProblemParameters<dim, spacedim> &par)
@@ -917,13 +927,15 @@ namespace Step70
       &tracer_particle_handler,
       false));
 
+    // Finally, we display to the terminal the number of total tracer particles
+    // that were generated
     pcout << "Tracer particles: "
           << tracer_particle_handler.n_global_particles() << std::endl;
   }
 
 
   // Similarly to what we have done for passive tracers, we now setup the solid
-  // particles. The main difference here is that we want to attach also a weight
+  // particles. The main difference here is that we also want to attach a weight
   // value to each of the quadrature points, so that we can compute integrals
   // even without direct access to the original solid grid.
   //
@@ -964,7 +976,6 @@ namespace Step70
                                  quadrature,
                                  update_JxW_values | update_quadrature_points);
 
-    unsigned int cell_index  = 0;
     unsigned int point_index = 0;
     for (const auto &cell : solid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
@@ -979,7 +990,6 @@ namespace Step70
               properties[point_index][0]         = JxW[q];
               ++point_index;
             }
-          ++cell_index;
         }
 
     // We proceed in the same way we did with the tracer particles
@@ -989,6 +999,10 @@ namespace Step70
     auto global_bounding_boxes =
       Utilities::MPI::all_gather(mpi_communicator, my_bounding_box);
 
+    // Since we have already stored the position of the quadrature point,
+    // we can use these positions to insert the particles directly using
+    // the solid_particle_handler instead of having to go through a
+    // Particles::Generators
     auto cpu_to_index =
       solid_particle_handler.insert_global_particles(quadrature_points_vec,
                                                      global_bounding_boxes,
@@ -1010,10 +1024,19 @@ namespace Step70
           << std::endl;
   }
 
-  // Setup finite elements and quadrature formulas.
+  // We set up the finite element space and the quadrature formula to be
+  // used throughout the step. For the fluid, we use Taylor-Hood elements (e.g.
+  // Q2-Q1). Since we do not solve any equation on the solid domain, an empty
+  // finite element space is generated. A natural extension of this program
+  // would be to solve a fluid structure interaction problem, which would
+  // require that the solid_fe use a non-empty FiniteElement.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::initial_setup()
   {
+    // We store the time necessary to carry-out the initial_setup under the
+    // label "initial setup" Numerous other calls to this timer are made in
+    // various functions. They allow to monitor the absolute and relative load
+    // of each individual function to identify the bottlenecks.
     TimerOutput::Scope t(computing_timer, "initial setup");
 
     fluid_fe =
@@ -1030,7 +1053,9 @@ namespace Step70
   }
 
 
-  // Distribute dofs and initialize LAC objects.
+  // We construct the distributed block matrices and vectors which are used to
+  // solve the linear equations that arise from the problem. This function is
+  // adapted from step-55 and we refer to this step for a thorough explanation.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_dofs()
   {
@@ -1135,7 +1160,8 @@ namespace Step70
   }
 
 
-
+  // We assemble the system matrix, the preconditioner matrix, and the right
+  // hand side. The code is adapted from step-55 and is pretty standard.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::assemble_stokes_system()
   {
@@ -1229,8 +1255,9 @@ namespace Step70
   }
 
 
-  // This method is the heart of the tutorial. Here we exploit the
-  // solid_particle_handler to compute the Nitsche restriction.
+  // This method is the heart of the tutorial, but it is relatively
+  // straightforward. Here we exploit the solid_particle_handler to compute the
+  // Nitsche restriction or the penalization in the embedded domain.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::assemble_nitsche_restriction()
   {
@@ -1250,11 +1277,17 @@ namespace Step70
 
     const auto k = 1.0 / GridTools::minimal_cell_diameter(fluid_tria);
 
+    // We loop over all the local particles instead of looping over
+    // through the cells to apply the Nitsche restriction
     auto particle = solid_particle_handler.begin();
     while (particle != solid_particle_handler.end())
       {
-        local_matrix     = 0;
-        local_rhs        = 0;
+        local_matrix = 0;
+        local_rhs    = 0;
+
+        // We get the refence to the cell within which the particle lies from
+        // the particle itself. Consequently, we can assemble the additional
+        // terms in the system matrix the rhs as we would normally.
         const auto &cell = particle->get_surrounding_cell(fluid_tria);
         const auto &dh_cell =
           typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &fluid_dh);
@@ -1266,10 +1299,19 @@ namespace Step70
 
         for (const auto &p : pic)
           {
+            // From the particle we gather the location and the reference
+            // location of the particle as well as the additional information
+            // that is attached to the particle. In the present case, this
+            // information is the JxW of the quadrature points which were used
+            // to generate the particles.
             const auto &ref_q  = p.get_reference_location();
             const auto &real_q = p.get_location();
             const auto &JxW    = p.get_properties()[0];
 
+            // We add the contribution of the quadrature point to the
+            // local_matrix and local_rhs. We can evaluate the value of the
+            // shape function at the position of each particle easily by using
+            // its reference location.
             for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
               {
                 const auto comp_i =
@@ -1303,7 +1345,10 @@ namespace Step70
   }
 
 
-
+  // This function solves the linear system with MINRES with a block diagonal
+  // preconditioner and AMG for the two diagonal blocks as used in step-55. The
+  // preconditioner applies a v cycle to the 0,0 block and a CG with the mass
+  // matrix for the 1,1 block (the Schur complement).
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::solve()
   {
@@ -1336,7 +1381,7 @@ namespace Step70
       linear_operator<LA::MPI::Vector>(preconditioner_matrix.block(1, 1));
     const auto amgS = linear_operator(S, prec_S);
 
-    ReductionControl          inner_solver_control(10,
+    ReductionControl          inner_solver_control(100,
                                           1e-8 * system_rhs.l2_norm(),
                                           1.e-2);
     SolverCG<LA::MPI::Vector> cg(inner_solver_control);
@@ -1372,7 +1417,7 @@ namespace Step70
   }
 
 
-
+  // We deal with mesh refinement in a standard way.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::refine_and_transfer()
   {
@@ -1422,6 +1467,11 @@ namespace Step70
 
 
 
+  // We output the results (velocity and pressure) on the fluid domain
+  // using the standard parallel capacities of deal.II. A single compressed vtu
+  // file is written that agglomerates the information of all processors. An
+  // additional .pvd record is written to associate the physical time to the vtu
+  // files.
   template <int dim, int spacedim>
   void
   StokesImmersedProblem<dim, spacedim>::output_results(const unsigned int cycle,
@@ -1481,6 +1531,10 @@ namespace Step70
     DataOutBase::write_pvd_record(ofile, times_and_names);
   }
 
+  // We write the particles (either from the solid or the tracers)
+  // as a single compressed vtu file through the Particles::DataOut object.
+  // This simple object does not write the additional information
+  // attached to the particles, but only writes their id.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::output_particles(
     const Particles::ParticleHandler<dim, spacedim> &particles,
@@ -1506,6 +1560,8 @@ namespace Step70
   }
 
 
+  // This function orchestrates the entire simulation. It is very similar
+  // to the other transient steps.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::run()
   {
@@ -1527,6 +1583,7 @@ namespace Step70
         pcout << "Cycle " << cycle << ':' << std::endl
               << "Time : " << time << ", time step: " << time_step << std::endl;
 
+        // We initialize all the elements of the simulation in the first cycle
         if (cycle == 0)
           {
             make_grid();
@@ -1537,6 +1594,8 @@ namespace Step70
             tracer_particle_velocities.reinit(owned_tracer_particles,
                                               mpi_communicator);
           }
+        // On the other cycle, we displace the solid body to take into account
+        // the fact that is has moved.
         else
           {
             TimerOutput::Scope t(computing_timer,
@@ -1548,6 +1607,9 @@ namespace Step70
                                                           false);
           }
         {
+          // We interpolate the fluid velocity at the position of the tracer
+          // particles and, with a naive explicit Euler scheme, we advect the
+          // massless tracer particles.
           TimerOutput::Scope t(computing_timer, "Set tracer particle motion");
           interpolate_field_on_particles(fluid_dh,
                                          tracer_particle_handler,
@@ -1575,6 +1637,8 @@ namespace Step70
         assemble_nitsche_restriction();
         solve();
 
+        // At every output frequency, we write the information of the solid
+        // particles, the tracer particles and the fluid domain.
         if (cycle % par.output_frequency == 0)
           {
             static unsigned int output_cycle = 0;
@@ -1601,6 +1665,9 @@ namespace Step70
       }
   }
 
+
+  // The remainder of the code that parameter parsing and the main function is
+  // standard.
   template <int dim, int spacedim>
   StokesImmersedProblemParameters<dim,
                                   spacedim>::StokesImmersedProblemParameters()

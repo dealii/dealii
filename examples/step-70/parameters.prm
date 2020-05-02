@@ -4,13 +4,13 @@ subsection Stokes Immersed Problem
   set Initial fluid refinement           = 4
   set Initial solid refinement           = 4
   set Particle insertion refinement      = 4
-  set Nitsche penalty term               = 1000
+  set Nitsche penalty term               = 200
   set Number of time steps               = 501
   set Velocity degree                    = 2
   set Viscosity                          = 1
   subsection Angular velocity
     set Function constants  = 
-    set Function expression = t < .5 ? 5 : -5
+    set Function expression = t < .500001 ? 5 : -5
     set Variable names      = x,y,t
   end
   subsection Grid generation
