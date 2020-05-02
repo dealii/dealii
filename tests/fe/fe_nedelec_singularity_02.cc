@@ -585,11 +585,19 @@ namespace nedelec_singularity
       // approach to send solution_a and solution_b to all the processes.
       Utilities::MPI::sum(solution_a, mpi_communicator, solution_a);
       Utilities::MPI::sum(solution_b, mpi_communicator, solution_b);
-      deallog << " Solution(point_a) : " << solution_a << std::endl;
-      deallog << " Solution(point_b) : " << solution_b << std::endl;
+      deallog << " Solution(point_a) : ";
+      for (const auto v : solution_a)
+        deallog << v << ' ';
+      deallog << std::endl << std::endl;
+      deallog << " Solution(point_b) : ";
+      for (const auto v : solution_b)
+        deallog << v << ' ';
+      deallog << std::endl << std::endl;
       // Vector does not provide operator-
-      deallog << " Solution(point_b) - solution (point_a): "
-              << (solution_b -= solution_a) << std::endl;
+      deallog << " Solution(point_b) - solution (point_a): ";
+      for (const auto v : (solution_b -= solution_a))
+        deallog << v << ' ';
+      deallog << std::endl << std::endl;
     }
 
     {
