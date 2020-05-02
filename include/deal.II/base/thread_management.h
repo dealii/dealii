@@ -39,7 +39,9 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    ifdef DEAL_II_USE_MT_POSIX
 #      include <pthread.h>
 #    endif
+#    define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #    include <tbb/task.h>
+#    undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #    include <tbb/tbb_stddef.h>
 #  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
