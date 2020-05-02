@@ -280,7 +280,7 @@ namespace Step70
     // The only two parameters used in the equations are the viscosity of the
     // fluid, and the penalty term used in the Nitsche formulation:
     double viscosity    = 1.0;
-    double penalty_term = 2e2;
+    double penalty_term = 10;
 
     // By default, we create a hyper_cube without colorisation, and we use
     // homogenous Dirichlet boundary conditions. In this set we store the
@@ -330,11 +330,12 @@ namespace Step70
     std::string name_of_fluid_grid       = "hyper_cube";
     std::string arguments_for_fluid_grid = "-1: 1: false";
     std::string name_of_solid_grid       = "hyper_rectangle";
-    std::string arguments_for_solid_grid =
-      dim == 2 ? "-.5, -.1: .5, .1: false" : "-.5, -.1, -.1: .5, .1, .1: false";
+    std::string arguments_for_solid_grid = spacedim == 2 ?
+                                             "-.5, -.1: .5, .1: false" :
+                                             "-.5, -.1, -.1: .5, .1, .1: false";
     std::string name_of_particle_grid = "hyper_ball";
     std::string arguments_for_particle_grid =
-      dim == 2 ? "0.3, 0.3: 0.1: false" : "0.3, 0.3, 0.3 : 0.1: false";
+      spacedim == 2 ? "0.3, 0.3: 0.1: false" : "0.3, 0.3, 0.3 : 0.1: false";
 
     // Similarly, we allow for different local refinement strategies. In
     // particular, we limit the maximum number of refinement levels, in order
@@ -511,11 +512,10 @@ namespace Step70
     void output_results(const unsigned int cycle, const double time) const;
 
     // and the tracers:
-    void
-    output_particles(const Particles::ParticleHandler<dim, spacedim> &particles,
-                     std::string                                      fprefix,
-                     const unsigned int                               iter,
-                     const double time) const;
+    void output_particles(const Particles::ParticleHandler<spacedim> &particles,
+                          std::string                                 fprefix,
+                          const unsigned int                          iter,
+                          const double time) const;
 
     // As noted before, we make sure we cannot modify this object from within
     // this class, by making it a const reference.
@@ -620,14 +620,15 @@ namespace Step70
     LA::MPI::Vector tracer_particle_velocities;
     LA::MPI::Vector relevant_tracer_particle_displacements;
 
-    // We fix once the quadrature formula that is used to integrate the solid
-    // domain.
-    std::unique_ptr<Quadrature<dim>> quadrature_formula;
+    // We fix once the quadrature formula that is used to integrate on the fluid
+    // and on the solid domains.
+    std::unique_ptr<Quadrature<spacedim>> fluid_quadrature_formula;
+    std::unique_ptr<Quadrature<dim>>      solid_quadrature_formula;
 
     // Finally, these are the two Particles::ParticleHandler classes used to
     // couple the solid with the fluid, and to describe the passive tracers.
-    Particles::ParticleHandler<dim, spacedim> tracer_particle_handler;
-    Particles::ParticleHandler<dim, spacedim> solid_particle_handler;
+    Particles::ParticleHandler<spacedim> tracer_particle_handler;
+    Particles::ParticleHandler<spacedim> solid_particle_handler;
 
     ConditionalOStream  pcout;
     mutable TimerOutput computing_timer;
@@ -834,8 +835,8 @@ namespace Step70
 
     // Generate the support point on the triangulation that will be used as
     // particle insertion point
-    DoFHandler<dim, spacedim> particles_dof_handler(particle_insert_tria);
-    FE_Q<dim, spacedim>       particles_fe(1);
+    DoFHandler<spacedim> particles_dof_handler(particle_insert_tria);
+    FE_Q<spacedim>       particles_fe(1);
     particles_dof_handler.distribute_dofs(particles_fe);
 
     // Create the particle handler associated with the fluid triangulation
@@ -922,8 +923,7 @@ namespace Step70
       &tracer_particle_handler));
 
     fluid_tria.signals.post_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<dim,
-                                  spacedim>::register_load_callback_function,
+      &Particles::ParticleHandler<spacedim>::register_load_callback_function,
       &tracer_particle_handler,
       false));
 
@@ -955,7 +955,7 @@ namespace Step70
     // solid_particle_handler object as the last argument
     const unsigned int n_properties = 1;
     solid_particle_handler.initialize(fluid_tria,
-                                      StaticMappingQ1<dim>::mapping,
+                                      StaticMappingQ1<spacedim>::mapping,
                                       n_properties);
 
     // The number of particles that we generate locally is equal to the total
@@ -1015,8 +1015,7 @@ namespace Step70
       &solid_particle_handler));
 
     fluid_tria.signals.post_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<dim,
-                                  spacedim>::register_load_callback_function,
+      &Particles::ParticleHandler<spacedim>::register_load_callback_function,
       &solid_particle_handler,
       false));
 
@@ -1049,7 +1048,11 @@ namespace Step70
 
     solid_fe = std::make_unique<FE_Nothing<dim, spacedim>>();
     solid_dh.distribute_dofs(*solid_fe);
-    quadrature_formula = std::make_unique<QGauss<dim>>(par.velocity_degree + 1);
+
+    fluid_quadrature_formula =
+      std::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
+    solid_quadrature_formula =
+      std::make_unique<QGauss<dim>>(par.velocity_degree + 1);
   }
 
 
@@ -1063,8 +1066,8 @@ namespace Step70
 
     fluid_dh.distribute_dofs(*fluid_fe);
 
-    std::vector<unsigned int> stokes_sub_blocks(dim + 1, 0);
-    stokes_sub_blocks[dim] = 1;
+    std::vector<unsigned int> stokes_sub_blocks(spacedim + 1, 0);
+    stokes_sub_blocks[spacedim] = 1;
     DoFRenumbering::component_wise(fluid_dh, stokes_sub_blocks);
 
     auto dofs_per_block =
@@ -1105,12 +1108,12 @@ namespace Step70
     {
       system_matrix.clear();
 
-      Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
-      for (unsigned int c = 0; c < dim + 1; ++c)
-        for (unsigned int d = 0; d < dim + 1; ++d)
-          if (c == dim && d == dim)
+      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+      for (unsigned int c = 0; c < spacedim + 1; ++c)
+        for (unsigned int d = 0; d < spacedim + 1; ++d)
+          if (c == spacedim && d == spacedim)
             coupling[c][d] = DoFTools::none;
-          else if (c == dim || d == dim || c == d)
+          else if (c == spacedim || d == spacedim || c == d)
             coupling[c][d] = DoFTools::always;
           else
             coupling[c][d] = DoFTools::none;
@@ -1132,10 +1135,10 @@ namespace Step70
     {
       preconditioner_matrix.clear();
 
-      Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
-      for (unsigned int c = 0; c < dim + 1; ++c)
-        for (unsigned int d = 0; d < dim + 1; ++d)
-          if (c == dim && d == dim)
+      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+      for (unsigned int c = 0; c < spacedim + 1; ++c)
+        for (unsigned int d = 0; d < spacedim + 1; ++d)
+          if (c == spacedim && d == spacedim)
             coupling[c][d] = DoFTools::always;
           else
             coupling[c][d] = DoFTools::none;
@@ -1173,13 +1176,13 @@ namespace Step70
 
 
     FEValues<spacedim> fe_values(*fluid_fe,
-                                 *quadrature_formula,
+                                 *fluid_quadrature_formula,
                                  update_values | update_gradients |
                                    update_quadrature_points |
                                    update_JxW_values);
 
     const unsigned int dofs_per_cell = fluid_fe->dofs_per_cell;
-    const unsigned int n_q_points    = quadrature_formula->size();
+    const unsigned int n_q_points    = fluid_quadrature_formula->size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     FullMatrix<double> cell_matrix2(dofs_per_cell, dofs_per_cell);
@@ -1290,7 +1293,7 @@ namespace Step70
         // terms in the system matrix the rhs as we would normally.
         const auto &cell = particle->get_surrounding_cell(fluid_tria);
         const auto &dh_cell =
-          typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &fluid_dh);
+          typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
         dh_cell->get_dof_indices(fluid_dof_indices);
 
         const auto pic = solid_particle_handler.particles_in_cell(cell);
@@ -1425,12 +1428,13 @@ namespace Step70
     const FEValuesExtractors::Vector velocity(0);
 
     Vector<float> error_per_cell(fluid_tria.n_active_cells());
-    KellyErrorEstimator<dim>::estimate(fluid_dh,
-                                       QGauss<dim - 1>(par.velocity_degree + 1),
-                                       {},
-                                       locally_relevant_solution,
-                                       error_per_cell,
-                                       fluid_fe->component_mask(velocity));
+    KellyErrorEstimator<spacedim>::estimate(fluid_dh,
+                                            QGauss<spacedim - 1>(
+                                              par.velocity_degree + 1),
+                                            {},
+                                            locally_relevant_solution,
+                                            error_per_cell,
+                                            fluid_fe->component_mask(velocity));
 
     if (par.refinement_strategy == "fixed_fraction")
       {
@@ -1454,8 +1458,8 @@ namespace Step70
       if (cell->refine_flag_set() && cell->level() == par.max_level_refinement)
         cell->clear_refine_flag();
 
-    parallel::distributed::SolutionTransfer<dim, LA::MPI::BlockVector> transfer(
-      fluid_dh);
+    parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
+      transfer(fluid_dh);
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);
     fluid_tria.execute_coarsening_and_refinement();
@@ -1483,7 +1487,7 @@ namespace Step70
     solution_names.emplace_back("pressure");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       data_component_interpretation(
-        dim, DataComponentInterpretation::component_is_part_of_vector);
+        spacedim, DataComponentInterpretation::component_is_part_of_vector);
     data_component_interpretation.push_back(
       DataComponentInterpretation::component_is_scalar);
 
@@ -1505,7 +1509,7 @@ namespace Step70
                                                MPI_COMM_WORLD);
     interpolated_relevant = interpolated;
     {
-      std::vector<std::string> solution_names(dim, "ref_u");
+      std::vector<std::string> solution_names(spacedim, "ref_u");
       solution_names.emplace_back("ref_p");
       data_out.add_data_vector(interpolated_relevant,
                                solution_names,
@@ -1537,12 +1541,12 @@ namespace Step70
   // attached to the particles, but only writes their id.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::output_particles(
-    const Particles::ParticleHandler<dim, spacedim> &particles,
-    std::string                                      fprefix,
-    const unsigned int                               iter,
-    const double                                     time) const
+    const Particles::ParticleHandler<spacedim> &particles,
+    std::string                                 fprefix,
+    const unsigned int                          iter,
+    const double                                time) const
   {
-    Particles::DataOut<dim, spacedim> particles_out;
+    Particles::DataOut<spacedim, spacedim> particles_out;
     particles_out.build_patches(particles);
     const std::string filename =
       (fprefix + "-" + Utilities::int_to_string(iter) + ".vtu");
@@ -1593,6 +1597,15 @@ namespace Step70
             setup_solid_particles();
             tracer_particle_velocities.reinit(owned_tracer_particles,
                                               mpi_communicator);
+            output_results(0, time);
+            {
+              TimerOutput::Scope t(computing_timer, "Output tracer particles");
+              output_particles(tracer_particle_handler, "tracer", 0, time);
+            }
+            {
+              TimerOutput::Scope t(computing_timer, "Output solid particles");
+              output_particles(solid_particle_handler, "solid", 0, time);
+            }
           }
         // On the other cycle, we displace the solid body to take into account
         // the fact that is has moved.
@@ -1772,10 +1785,11 @@ int main(int argc, char *argv[])
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      StokesImmersedProblemParameters<2> par;
-      ParameterAcceptor::initialize("parameters.prm", "used_parameters.prm");
+      StokesImmersedProblemParameters<2, 3> par;
+      ParameterAcceptor::initialize("parameters_23.prm",
+                                    "used_parameters_23.prm");
 
-      StokesImmersedProblem<2> problem(par);
+      StokesImmersedProblem<2, 3> problem(par);
       problem.run();
     }
   catch (std::exception &exc)
