@@ -443,8 +443,8 @@ namespace Functions
   {
     for (unsigned int i = 0; i < dim; ++i)
       out << coordinate_symbols[i] << ", ";
-    for (const auto it : additional_function_arguments)
-      out << it.first << ", ";
+    for (const auto &argument_pair : additional_function_arguments)
+      out << argument_pair.first << ", ";
     out << time_symbol << " -> " << user_function[0];
     for (unsigned int i = 1; i < user_function.size(); ++i)
       out << "; " << user_function[i];
@@ -452,9 +452,9 @@ namespace Functions
       {
         out << " # ( ";
         std::string sep = "";
-        for (const auto it : user_substitution_map)
+        for (const auto &substitution : user_substitution_map)
           {
-            out << sep << it.first << " = " << it.second;
+            out << sep << substitution.first << " = " << substitution.second;
             sep = ", ";
           }
         out << " )";
