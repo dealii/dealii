@@ -576,23 +576,24 @@
  * Being focused on numerical simulation of PDEs, the functionality of the CAS that is exposed
  * within deal.II focuses on symbolic expression creation, manipulation, and differentiation.
  *
- * As a final note, it is important to recognize a major deficiency in deal.II's current implementation
- * of the interface to the supported symbolic library.
- * To date, convenience wrappers to SymEngine functionality is focused on manipulations that solely
- * involve dictionary-based (i.e., something reminiscent of "string-based") operations.
+ * The convenience wrappers to SymEngine functionality are primarily focused on manipulations that
+ * solely involve dictionary-based (i.e., something reminiscent of "string-based") operations.
  * Although SymEngine performs these operations in an efficient manner, they are still known to be
  * computationally expensive, especially when the operations are performed on large expressions.
  * It should therefore be expected that the performance of the parts of code that perform
  * differentiation, symbolic substitution, etc., @b may be a limiting factor when using this in
  * production code.
- * In the future, deal.II will provide an interface to accelerate the evaluation of lengthy symbolic
- * expression through the @p BatchOptimizer class (which is already referenced in several places in
- * the documentation).
- * In particular, the @p BatchOptimizer will simultaneously optimize a collection of symbolic
+ * deal.II therefore provides an interface to accelerate the evaluation of lengthy symbolic
+ * expression through the @p BatchOptimizer class (itself often leveraging functionality provided
+ * by SymEngine).
+ * In particular, the @p BatchOptimizer simultaneously optimizes a collection of symbolic
  * expressions using methods such as common subexpression elimination (CSE), as well as by generating
  * high performance code-paths to evaluate these expressions through the use of a custom-generated
  * `std::function` or by compiling the expression using the LLVM JIT compiler.
- * Additionally, the level of functionality currently implemented effectively limits the use of
+ *
+ * As a final note, it is important to recognize the remaining major deficiencies in deal.II's current
+ * implementation of the interface to the supported symbolic library.
+ * The level of functionality currently implemented effectively limits the use of
  * symbolic algebra to the traditional use case (i.e. scalar and tensor algebra, as might be useful to
  * define constitutive relations or complex functions for application as boundary conditions or
  * source terms).
@@ -612,6 +613,9 @@
  *   This Expression class has been given a full set of operators overloaded for all mathematical
  *   and logical operations that are supported by the SymEngine library and are considered useful
  *   within the context of numerical modeling.
+ * - symengine_optimizer.h: Implementation of the Differentiation::SD::BatchOptimizer class that
+ *   can be used to accelerate (in some cases, significantly) evaluation of the symbolic
+ *   expressions using an assortment of techniques.
  * - symengine_product_types.h: Defines some product and scalar types that allow the use of symbolic
  *   expressions in conjunction with the Tensor and SymmetricTensor classes.
  * - symengine_scalar_operations.h: Defines numerous operations that can be performed either on or
