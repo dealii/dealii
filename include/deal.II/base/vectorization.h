@@ -742,11 +742,11 @@ template <typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                              make_vectorized_array(const typename VectorizedArrayType::value_type &u)
 {
-  static_assert(
-    std::is_same<VectorizedArrayType,
-                 VectorizedArray<typename VectorizedArrayType::value_type,
-                                 VectorizedArrayType::size()>>::value,
-    "VectorizedArrayType is not a VectorizedArray.");
+  // static_assert(
+  //  std::is_same<VectorizedArrayType,
+  //               VectorizedArray<typename VectorizedArrayType::value_type,
+  //                               VectorizedArrayType::size()>>::value,
+  //  "VectorizedArrayType is not a VectorizedArray.");
 
   VectorizedArrayType result = u;
   return result;
