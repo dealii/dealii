@@ -842,16 +842,20 @@ namespace MatrixFreeOperators
     compute_diagonal();
 
     /**
-     * Set the heterogeneous scalar coefficient @p scalar_coefficient to be used at
-     * the quadrature points. The Table should be of correct size, consistent
-     * with the total number of quadrature points in
-     * <code>dim</code>-dimensions,
-     * controlled by the @p n_q_points_1d template parameter. Here,
-     * <code>(*scalar_coefficient)(cell,q)</code> corresponds to the value of
-     * the coefficient, where <code>cell</code> is an index into a set of cell
-     * batches as administered by the MatrixFree framework (which does not work
-     * on individual cells, but instead of batches of cells at once), and
-     * <code>q</code> is the number of the quadrature point within this batch.
+     * Set the heterogeneous scalar coefficient @p scalar_coefficient to be
+     * used at the quadrature points. The Table needs to have as many rows as
+     * there are cell batches in the underlying MatrixFree object,
+     * MatrixFree::n_cell_batches(). The number of batches is related to the
+     * fact that the matrix-free operators do not work on individual cells,
+     * but instead of batches of cells at once due to vectorization. The Table
+     * can take two different numbers of columns.  One case is to select it
+     * equal to the total number of quadrature points in `dim` dimensions,
+     * which is the `dim`th power of the `n_q_points_1d` template
+     * parameter. Here, `(*scalar_coefficient)(cell,q)` corresponds to the
+     * value of the coefficient on cell batch `cell` and quadrature point
+     * index `q`. The second supported variant is a Table with a single
+     * column, in which case the same variable coefficient value is used at
+     * all quadrature points of a cell.
      *
      * Such tables can be initialized by
      * @code
@@ -891,6 +895,10 @@ namespace MatrixFreeOperators
     set_coefficient(
       const std::shared_ptr<Table<2, VectorizedArrayType>> &scalar_coefficient);
 
+    /**
+     * Resets all data structures back to the same state as for a newly
+     * constructed object.
+     */
     virtual void
     clear();
 
@@ -2069,13 +2077,31 @@ namespace MatrixFreeOperators
     phi.evaluate(false, true, false);
     if (scalar_coefficient.get())
       {
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        Assert(scalar_coefficient->size(1) == 1 ||
+                 scalar_coefficient->size(1) == phi.n_q_points,
+               ExcMessage("The number of columns in the coefficient table must "
+                          "be either 1 or the number of quadrature points " +
+                          std::to_string(phi.n_q_points) +
+                          ", but the given value was " +
+                          std::to_string(scalar_coefficient->size(1))));
+        if (scalar_coefficient->size(1) == phi.n_q_points)
+          for (unsigned int q = 0; q < phi.n_q_points; ++q)
+            {
+              Assert(Implementation::non_negative(
+                       (*scalar_coefficient)(cell, q)),
+                     ExcMessage("Coefficient must be non-negative"));
+              phi.submit_gradient((*scalar_coefficient)(cell, q) *
+                                    phi.get_gradient(q),
+                                  q);
+            }
+        else
           {
-            Assert(Implementation::non_negative((*scalar_coefficient)(cell, q)),
+            Assert(Implementation::non_negative((*scalar_coefficient)(cell, 0)),
                    ExcMessage("Coefficient must be non-negative"));
-            phi.submit_gradient((*scalar_coefficient)(cell, q) *
-                                  phi.get_gradient(q),
-                                q);
+            const VectorizedArrayType coefficient =
+              (*scalar_coefficient)(cell, 0);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              phi.submit_gradient(coefficient * phi.get_gradient(q), q);
           }
       }
     else
