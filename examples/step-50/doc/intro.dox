@@ -63,19 +63,19 @@ For the active mesh, we use the parallel::distributed::Triangulation class as do
 in step-40 which uses functionality in the external library
 <a href="http://www.p4est.org/">p4est</a> for the distribution of the active cells
 among processors. For the non-active cells in the multilevel hierarchy, deal.II
-implements what we will refer to as the ``first-child rule'' where, for each cell
+implements what we will refer to as the "first-child rule" where, for each cell
 in the hierarchy, we recursively assign the parent of a cell to the owner of the
 first child cell. The following figures give an example of such a distribution. Here
 the left image represents the active cells for a sample 2D mesh partitioned using a
 space-filling curve (similar to p4est), the center image gives the tree representation
 of the active mesh, and the right image gives the multilevel hierarchy of cells. The
 colors and numbers represent the different processors. The circular nodes in the tree
-are the non-active cells which are distributed using the ``first-child rule''.
+are the non-active cells which are distributed using the "first-child rule".
 
 <img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-workload-example.png" alt="">
 
-Included among the output to screen in this example is a value ``Partition efficiency''
-given by 1/MGTools::workload_imbalance(). This value, which will be denoted
+Included among the output to screen in this example is a value "Partition efficiency"
+given by one over MGTools::workload_imbalance(). This value, which will be denoted
 by $\mathbb{E}$,  quantifies the overhead produced by not having a perfect work balance
 on each level of the multigrid hierarchy (as is evident from the example above).
 
@@ -130,7 +130,7 @@ a V-cycle.
 It should be noted that there is potential for some asynchronous work between multigrid
 levels, specifically with purely nearest neighbor MPI communication, and an adaptive mesh
 could be constructed such that the efficiency model would far overestimate the V-cycle slowdown
-due to the asynchronous work ``covering up'' the imbalance (which assumes synchronization over levels).
+due to the asynchronous work "covering up" the imbalance (which assumes synchronization over levels).
 However, for most realistic adaptive meshes the expectation is that this asynchronous work will
 only cover up a very small portion of the imbalance and the efficiency model will describe the
 slowdown very well.

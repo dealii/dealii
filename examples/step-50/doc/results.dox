@@ -21,7 +21,7 @@ Cycle 0:
 | Setup                           |         1 |   0.00264s |       5.8% |
 | Setup multigrid                 |         1 |   0.00261s |       5.7% |
 | Solve                           |         1 |   0.00355s |       7.8% |
-| Solve: 1 multigrid vcycle       |         1 |  0.000315s |      0.69% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000315s |      0.69% |
 | Solve: CG                       |         1 |   0.00186s |       4.1% |
 | Solve: Preconditioner setup     |         1 |  0.000968s |       2.1% |
 +---------------------------------+-----------+------------+------------+
@@ -46,7 +46,7 @@ Cycle 1:
 | Setup                           |         1 |    0.0023s |       5.3% |
 | Setup multigrid                 |         1 |   0.00262s |         6% |
 | Solve                           |         1 |   0.00549s |        13% |
-| Solve: 1 multigrid vcycle       |         1 |  0.000343s |      0.79% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000343s |      0.79% |
 | Solve: CG                       |         1 |   0.00293s |       6.8% |
 | Solve: Preconditioner setup     |         1 |   0.00174s |         4% |
 +---------------------------------+-----------+------------+------------+
@@ -57,10 +57,10 @@ Cycle 2:
 .
 @endcode
 Here, the timing of the `solve()` function is split up in 3 parts: setting
-up the multigrid preconditioner, execution of a single multigrid vcycle, and
-the CG solver. The vcycle that is timed is unnecessary for the overall solve
+up the multigrid preconditioner, execution of a single multigrid V-cycle, and
+the CG solver. The V-cycle that is timed is unnecessary for the overall solve
 and only meant to give an insight at the different costs for AMG and GMG.
-Also it should be noted that when using the AMG solver, ``Workload imbalance''
+Also it should be noted that when using the AMG solver, "Workload imbalance"
 is not included in the output since the hierarchy of coarse meshes is not
 required.
 
@@ -72,9 +72,9 @@ computations). The code is compiled using gcc 7.1.0 with intel-mpi 17.0.3. Trili
 
 The following table gives weak scale timings for this program on up to 256M DoFs
 and 7168 processors. Here, $\mathbb{E}$ is the partition efficiency from the
- introduction (also equal to 1.0/workload imbalance), ``Setup'' is a combination
+ introduction (also equal to 1.0/workload imbalance), "Setup" is a combination
 of setup, setup multigrid, assemble, and assemble multigrid from the timing blocks,
-and ``Prec'' is the preconditioner setup. Ideally all times would stay constant
+and "Prec" is the preconditioner setup. Ideally all times would stay constant
 over each problem size for the individual solvers, but since the partition
 efficiency decreases from 0.371 to 0.161 from largest to smallest problem size,
 we expect to see an approximately $0.371/0.161=2.3$ times increase in timings
