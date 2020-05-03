@@ -59,7 +59,7 @@ main()
   deallog << "Test<1,2>" << std::endl;
   test<1, 2>(SOURCE_DIR "/grids/circle_1.inp");
 
-  deallog << std::endl << "Test<1,2>" << std::endl;
+  deallog << std::endl << "Test<2,3>" << std::endl;
   test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;

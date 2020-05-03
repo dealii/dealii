@@ -1,0 +1,5 @@
+Changed: Compute middle vertices during mesh refinement of Triangulation<2,3>
+using transfinite interpolation to be consistent with what happens to quads
+for Triangulation<3,3>
+<br>
+(Sebastian Stark, 2020/05/04)

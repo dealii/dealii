@@ -4411,9 +4411,11 @@ namespace internal
                 // user flag is set or not
                 cell->clear_user_flag();
 
-                // new vertex is placed on the surface according to
-                // the information stored in the boundary class
-                triangulation.vertices[next_unused_vertex] = cell->center(true);
+                // determine middle vertex by transfinite interpolation to be
+                // consistent with what happens to quads in a Triangulation<3,
+                // 3> when they are refined
+                triangulation.vertices[next_unused_vertex] =
+                  cell->center(true, true);
               }
           }
 
