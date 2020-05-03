@@ -654,7 +654,6 @@ namespace Step32
       struct StokesSystem : public StokesPreconditioner<dim>
       {
         StokesSystem(const FiniteElement<dim> &stokes_fe);
-        StokesSystem(const StokesSystem<dim> &data);
 
         Vector<double> local_rhs;
       };
@@ -665,19 +664,12 @@ namespace Step32
         , local_rhs(stokes_fe.dofs_per_cell)
       {}
 
-      template <int dim>
-      StokesSystem<dim>::StokesSystem(const StokesSystem<dim> &data)
-        : StokesPreconditioner<dim>(data)
-        , local_rhs(data.local_rhs)
-      {}
-
 
 
       template <int dim>
       struct TemperatureMatrix
       {
         TemperatureMatrix(const FiniteElement<dim> &temperature_fe);
-        TemperatureMatrix(const TemperatureMatrix &data);
 
         FullMatrix<double>                   local_mass_matrix;
         FullMatrix<double>                   local_stiffness_matrix;
@@ -694,20 +686,12 @@ namespace Step32
         , local_dof_indices(temperature_fe.dofs_per_cell)
       {}
 
-      template <int dim>
-      TemperatureMatrix<dim>::TemperatureMatrix(const TemperatureMatrix &data)
-        : local_mass_matrix(data.local_mass_matrix)
-        , local_stiffness_matrix(data.local_stiffness_matrix)
-        , local_dof_indices(data.local_dof_indices)
-      {}
-
 
 
       template <int dim>
       struct TemperatureRHS
       {
         TemperatureRHS(const FiniteElement<dim> &temperature_fe);
-        TemperatureRHS(const TemperatureRHS &data);
 
         Vector<double>                       local_rhs;
         std::vector<types::global_dof_index> local_dof_indices;
@@ -721,13 +705,6 @@ namespace Step32
         , local_dof_indices(temperature_fe.dofs_per_cell)
         , matrix_for_bc(temperature_fe.dofs_per_cell,
                         temperature_fe.dofs_per_cell)
-      {}
-
-      template <int dim>
-      TemperatureRHS<dim>::TemperatureRHS(const TemperatureRHS &data)
-        : local_rhs(data.local_rhs)
-        , local_dof_indices(data.local_dof_indices)
-        , matrix_for_bc(data.matrix_for_bc)
       {}
     } // namespace CopyData
   }   // namespace Assembly
