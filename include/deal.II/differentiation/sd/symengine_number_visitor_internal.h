@@ -793,11 +793,6 @@ namespace Differentiation
       /* ------------------ DictionarySubstitutionVisitor ------------------ */
 
 
-      // Perform some extra checks in debug mode. This will give some verbose
-      // output if something goes wrong.
-      // #define DEBUG_EXTRA_CSE
-
-
       template <typename ReturnType, typename ExpressionType>
       void
       DictionarySubstitutionVisitor<ReturnType, ExpressionType>::init(
@@ -860,12 +855,6 @@ namespace Differentiation
         else
           {
             cse.init(outputs);
-
-#    if defined(DEBUG) && defined(DEBUG_EXTRA_CSE)
-            // Check the result of CSE by directly evaluating
-            // the dependent variables on an individual basis
-            dependent_variables = outputs;
-#    endif
           }
       }
 
@@ -902,51 +891,6 @@ namespace Differentiation
         if (cse.executed())
           {
             cse.call(output_values, independent_symbols, substitution_values);
-
-#    if defined(DEBUG) && defined(DEBUG_EXTRA_CSE)
-            // Directly check the result of the CSE calculations
-            Assert(dependent_variables.size() > 0, ExcInternalError());
-            SymEngine::map_basic_basic substitution_value_map;
-            for (unsigned i = 0; i < independent_variables.size(); ++i)
-              substitution_value_map[independent_variables[i]] =
-                static_cast<const SymEngine::RCP<const SymEngine::Basic> &>(
-                  ExpressionType(substitution_values[i]));
-            const ReturnType tol =
-              dealii::internal::NumberType<ReturnType>::value(1e-9);
-
-            for (unsigned i = 0; i < dependent_variables.size(); ++i)
-              {
-                const ReturnType result =
-                  ExpressionType(dependent_variables[i])
-                    .template substitute_and_evaluate<ReturnType>(
-                      substitution_value_map);
-
-                // Note: Need to do an abs() on the tolerance to cater for
-                // the complex value case.
-                const bool value_correct =
-                  (std::abs(output_values[i] - result) / std::abs(result) <
-                   std::abs(tol));
-                if (value_correct == false)
-                  {
-                    std::ostringstream stream;
-                    stream
-                      << "A CSE based evaluation is incorrect. The result should have been "
-                      << result << " but was rather calculated to be "
-                      << output_values[i] << ".\n Substitution map: \n";
-                    for (typename SymEngine::map_basic_basic::const_iterator
-                           it = substitution_value_map.begin();
-                         it != substitution_value_map.end();
-                         ++it)
-                      {
-                        stream << *(it->first) << " = " << *(it->second)
-                               << "\n";
-                      }
-                    stream << std::endl;
-                    const std::string msg = stream.str();
-                    Assert(value_correct, ExcMessage(msg));
-                  }
-              }
-#    endif
           }
         else
           {
@@ -1002,9 +946,6 @@ namespace Differentiation
         Archive &          ar,
         const unsigned int version)
       {
-#    if !(defined(DEBUG) && defined(DEBUG_EXTRA_CSE))
-        Assert(dependent_variables.empty(), ExcInternalError());
-#    endif
         Assert(cse.executed() == false, ExcInternalError());
         Assert(cse.n_intermediate_expressions() == 0, ExcInternalError());
         Assert(cse.n_reduced_expressions() == 0, ExcInternalError());
