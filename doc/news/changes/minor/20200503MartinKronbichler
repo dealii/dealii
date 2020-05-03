@@ -1,0 +1,5 @@
+Improved: MatrixFreeOperators::LaplaceOperator now also supports cell-wise
+constant coefficient, which can be used by a Table with a single column
+per cell.
+<br>
+(Martin Kronbichler, 2020/05/03)
