@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,8 @@
 
 
 
-// This is the same as mass_operator_01.cc, but tests Laplace operator instead.
+// the same as laplace_operator_01, but heterogeneous Laplace operator with a
+// single constant coefficient per cell
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -44,7 +45,6 @@
 #include "../tests.h"
 
 
-
 template <int dim, int fe_degree>
 void
 test()
@@ -54,10 +54,7 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
-  for (; cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
         cell->set_refine_flag();
@@ -71,14 +68,12 @@ test()
   if (tria.last()->is_locally_owned())
     tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  cell = tria.begin_active();
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {
-      cell                 = tria.begin_active();
       unsigned int counter = 0;
-      for (; cell != endc; ++cell, ++counter)
+      for (const auto &cell : tria.active_cell_iterators())
         if (cell->is_locally_owned())
-          if (counter % (7 - i) == 0)
+          if (counter++ % (7 - i) == 0)
             cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
@@ -112,7 +107,22 @@ test()
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.tasks_block_size      = 7;
+    data.mapping_update_flags =
+      update_quadrature_points | update_gradients | update_JxW_values;
     mf_data->reinit(dof, constraints, quad, data);
+  }
+
+  std::shared_ptr<Table<2, VectorizedArray<number>>> coefficient;
+  coefficient = std::make_shared<Table<2, VectorizedArray<number>>>();
+  {
+    coefficient->reinit(mf_data->n_cell_batches(), 1);
+    for (unsigned int cell = 0; cell < mf_data->n_cell_batches(); ++cell)
+      for (unsigned int v = 0;
+           v < mf_data->n_active_entries_per_cell_batch(cell);
+           ++v)
+        (*coefficient)(cell, 0)[v] =
+          1. + std::sqrt(static_cast<double>(
+                 mf_data->get_cell_iterator(cell, v)->active_cell_index()));
   }
 
   MatrixFreeOperators::LaplaceOperator<
@@ -123,6 +133,7 @@ test()
     LinearAlgebra::distributed::Vector<number>>
     mf;
   mf.initialize(mf_data);
+  mf.set_coefficient(coefficient);
   mf.compute_diagonal();
   LinearAlgebra::distributed::Vector<number> in, out, ref;
   mf_data->initialize_dof_vector(in);
@@ -159,7 +170,8 @@ test()
 
     FEValues<dim> fe_values(dof.get_fe(),
                             quadrature_formula,
-                            update_gradients | update_JxW_values);
+                            update_gradients | update_JxW_values |
+                              update_quadrature_points);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -175,13 +187,16 @@ test()
           cell_matrix = 0;
           fe_values.reinit(cell);
 
+          const double coefficient =
+            1. + std::sqrt(static_cast<double>(cell->active_cell_index()));
+
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
                                         fe_values.shape_grad(j, q_point)) *
-                                       fe_values.JxW(q_point);
+                                       coefficient * fe_values.JxW(q_point);
               }
 
           cell->get_dof_indices(local_dof_indices);
@@ -206,7 +221,8 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   mpi_initlog();
-  deallog.push("0");
+
+  deallog << std::setprecision(4);
 
   deallog.push("2d");
   test<2, 1>();
