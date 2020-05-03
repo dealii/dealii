@@ -235,6 +235,12 @@ namespace MeshWorker
     DoFInfoBox(const DoFInfoBox<dim, DOFINFO> &);
 
     /**
+     * Copy assignment operator, taking another object as seed.
+     */
+    DoFInfoBox &
+    operator=(const DoFInfoBox<dim, DOFINFO> &);
+
+    /**
      * Reset all the availability flags.
      */
     void
@@ -450,6 +456,23 @@ namespace MeshWorker
         interior_face_available[i] = false;
         exterior_face_available[i] = false;
       }
+  }
+
+
+  template <int dim, class DOFINFO>
+  inline DoFInfoBox<dim, DOFINFO> &
+  DoFInfoBox<dim, DOFINFO>::operator=(const DoFInfoBox<dim, DOFINFO> &other)
+  {
+    cell       = other.cell;
+    cell_valid = other.cell_valid;
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
+      {
+        exterior[i]                = other.exterior[i];
+        interior[i]                = other.interior[i];
+        interior_face_available[i] = false;
+        exterior_face_available[i] = false;
+      }
+    return *this;
   }
 
 
