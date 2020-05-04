@@ -1797,7 +1797,7 @@ namespace Step69
     // velocity $u$, and pressure $p$) into a conserved n-dimensional state
     // (density $\rho$, momentum $\mathbf{m}$, and total energy $E$).
 
-    initial_state = [=](const Point<dim> & /*point*/, double /*t*/) {
+    initial_state = [this](const Point<dim> & /*point*/, double /*t*/) {
       const double            rho   = initial_1d_state[0];
       const double            u     = initial_1d_state[1];
       const double            p     = initial_1d_state[2];
