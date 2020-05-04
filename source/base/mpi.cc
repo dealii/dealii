@@ -67,6 +67,24 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
 {
+  IndexSet
+  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
+                                         const unsigned int n_partitions,
+                                         const IndexSet::size_type total_size)
+  {
+    const unsigned int remain = total_size % n_partitions;
+
+    const IndexSet::size_type min_size = total_size / n_partitions;
+
+    const IndexSet::size_type begin =
+      min_size * my_partition_id + std::min(my_partition_id, remain);
+    const IndexSet::size_type end =
+      min_size * (my_partition_id + 1) + std::min(my_partition_id + 1, remain);
+    IndexSet result(total_size);
+    result.add_range(begin, end);
+    return result;
+  }
+
   namespace MPI
   {
     MinMaxAvg
@@ -221,8 +239,8 @@ namespace Utilities
 
 
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &           comm,
-                                  const IndexSet::size_type &local_size)
+    create_ascending_partitioning(const MPI_Comm &          comm,
+                                  const IndexSet::size_type local_size)
     {
       const unsigned int                     n_proc = n_mpi_processes(comm);
       const std::vector<IndexSet::size_type> sizes =
@@ -240,6 +258,18 @@ namespace Utilities
         }
 
       return res;
+    }
+
+    IndexSet
+    create_evenly_distributed_partitioning(const MPI_Comm &          comm,
+                                           const IndexSet::size_type total_size)
+    {
+      const unsigned int this_proc = this_mpi_process(comm);
+      const unsigned int n_proc    = n_mpi_processes(comm);
+
+      return Utilities::create_evenly_distributed_partitioning(this_proc,
+                                                               n_proc,
+                                                               total_size);
     }
 
 
@@ -658,9 +688,16 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(const MPI_Comm & /*comm*/,
-                                  const IndexSet::size_type &local_size)
+                                  const IndexSet::size_type local_size)
     {
       return std::vector<IndexSet>(1, complete_index_set(local_size));
+    }
+
+    IndexSet
+    create_evenly_distributed_partitioning(const MPI_Comm & /*comm*/,
+                                           const IndexSet::size_type total_size)
+    {
+      return complete_index_set(total_size);
     }
 
 

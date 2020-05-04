@@ -105,6 +105,23 @@ class IndexSet;
 namespace Utilities
 {
   /**
+   * Given the total number of elements @p total_size, create an evenly
+   * distributed 1:1 partitioning of the elements for across @p n_partitions.
+   * The local sizes will be equal to the @p total_size divided by the number
+   * of partitions plus the remainder being divided amongst the first
+   * processes. Each process will store a contiguous subset of indices, and the
+   * index set on process p+1 starts at the index one larger than the last one
+   * stored on process p.
+   * For example, a @p total_size of 11 with 3 processes will result
+   * in the IndexSets { [0,4), [4,8), [8,11)] }, and this function will
+   * return the @p my_partition_id 's IndexSet.
+   */
+  IndexSet
+  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
+                                         const unsigned int n_partitions,
+                                         const IndexSet::size_type total_size);
+
+  /**
    * A namespace for utility functions that abstract certain operations using
    * the Message Passing Interface (MPI) or provide fallback operations in
    * case deal.II is configured not to use MPI at all.
@@ -428,8 +445,20 @@ namespace Utilities
      * process p.
      */
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &           comm,
-                                  const IndexSet::size_type &local_size);
+    create_ascending_partitioning(const MPI_Comm &          comm,
+                                  const IndexSet::size_type local_size);
+
+    /**
+     * Given the total number of elements @p total_size, create an evenly
+     * distributed 1:1 partitioning of the elements across the
+     * MPI communicator @p comm.
+     * Uses @p comm to determine number of partitions and processor ID to call the
+     * @p create_evenly_distributed_partitioning() function above.
+     */
+    IndexSet
+    create_evenly_distributed_partitioning(
+      const MPI_Comm &          comm,
+      const IndexSet::size_type total_size);
 
 #ifdef DEAL_II_WITH_MPI
     /**
