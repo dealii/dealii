@@ -1223,7 +1223,7 @@ namespace Step63
 } // namespace Step63
 
 
-// @sect4{The <code>main</code> function}
+// @sect3{The <code>main</code> function}
 
 // Finally, the main function is like most tutorials. The only
 // interesting bit is that we require the user to pass a `.prm` file
