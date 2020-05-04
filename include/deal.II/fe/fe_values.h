@@ -3030,7 +3030,7 @@ public:
    * `q_point` taking on all valid indices for quadrature points, as defined
    * by the quadrature rule passed to `fe_values`.
    */
-  std_cxx20::ranges::iota_view<unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   quadrature_point_indices() const;
 
   /**
@@ -5561,10 +5561,10 @@ FEValuesBase<dim, spacedim>::dof_indices_ending_at(
 
 
 template <int dim, int spacedim>
-inline std_cxx20::ranges::iota_view<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::quadrature_point_indices() const
 {
-  return std_cxx20::ranges::iota_view<unsigned int>(0U, n_quadrature_points);
+  return {0U, n_quadrature_points};
 }
 
 

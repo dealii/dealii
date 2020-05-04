@@ -1254,14 +1254,17 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - compute |c_ij|, and n_ij");
 
-      const std_cxx20::ranges::iota_view<unsigned int> indices(
+      const std_cxx20::ranges::iota_view<unsigned int, unsigned int> indices(
         0, n_locally_relevant);
 
       const auto on_subranges = //
-        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
-            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           for (const auto row_index :
-               std_cxx20::ranges::iota_view<unsigned int>(*i1, *i2))
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               // First column-loop: we compute and store the entries of the
               // matrix norm_matrix and write normalized entries into the
@@ -1863,10 +1866,10 @@ namespace Step69
     const auto &n_locally_owned    = offline_data->n_locally_owned;
     const auto &n_locally_relevant = offline_data->n_locally_relevant;
 
-    const std_cxx20::ranges::iota_view<unsigned int> indices_owned(
-      0, n_locally_owned);
-    const std_cxx20::ranges::iota_view<unsigned int> indices_relevant(
-      0, n_locally_relevant);
+    const std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+      indices_owned(0, n_locally_owned);
+    const std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+      indices_relevant(0, n_locally_relevant);
 
     const auto &sparsity = offline_data->sparsity_pattern;
 
@@ -1920,10 +1923,13 @@ namespace Step69
                                "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = //
-        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
-            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           for (const auto i :
-               std_cxx20::ranges::iota_view<unsigned int>(*i1, *i2))
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               const auto U_i = gather(U, i);
 
@@ -2016,12 +2022,15 @@ namespace Step69
       // locally.
 
       const auto on_subranges = //
-        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
-            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
           for (const auto i :
-               std_cxx20::ranges::iota_view<unsigned int>(*i1, *i2))
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               double d_sum = 0.;
 
@@ -2102,8 +2111,10 @@ namespace Step69
                                "time_stepping - 3 perform update");
 
       const auto on_subranges =
-        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
-            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
@@ -2341,7 +2352,8 @@ namespace Step69
     const auto &n_locally_owned     = offline_data->n_locally_owned;
 
     const auto indices =
-      std_cxx20::ranges::iota_view<unsigned int>(0, n_locally_owned);
+      std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0,
+                                                               n_locally_owned);
 
     // We define the r_i_max and r_i_min in the current MPI process as
     // atomic doubles in order to avoid race conditions between threads:
@@ -2352,8 +2364,10 @@ namespace Step69
     // global maxima and minima of the gradients.
     {
       const auto on_subranges = //
-        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
-            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           double r_i_max_on_subrange = 0.;
           double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
@@ -2437,8 +2451,10 @@ namespace Step69
 
     {
       const auto on_subranges = //
-        [&](std_cxx20::ranges::iota_view<unsigned int>::iterator       i1,
-            const std_cxx20::ranges::iota_view<unsigned int>::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());

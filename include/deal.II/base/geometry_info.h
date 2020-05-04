@@ -1946,7 +1946,7 @@ struct GeometryInfo
    * taking on all valid indices for faces (zero and one in 1d, zero
    * through three in 2d, and zero through 5 in 3d).
    */
-  static std_cxx20::ranges::iota_view<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   face_indices();
 
   /**
@@ -1977,7 +1977,7 @@ struct GeometryInfo
    * Here, we are looping over all vertices of all cells, with `vertex_index`
    * taking on all valid indices.
    */
-  static std_cxx20::ranges::iota_view<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   vertex_indices();
 
   /**
@@ -2832,19 +2832,19 @@ GeometryInfo<0>::vertex_indices()
 
 
 template <int dim>
-inline std_cxx20::ranges::iota_view<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::face_indices()
 {
-  return std_cxx20::ranges::iota_view<unsigned int>(0U, faces_per_cell);
+  return {0U, faces_per_cell};
 }
 
 
 
 template <int dim>
-inline std_cxx20::ranges::iota_view<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::vertex_indices()
 {
-  return std_cxx20::ranges::iota_view<unsigned int>(0U, vertices_per_cell);
+  return {0U, vertices_per_cell};
 }
 
 
