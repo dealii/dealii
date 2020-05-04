@@ -145,13 +145,19 @@ namespace internal
        * Sets up the blocks for running the cell loop based on the options
        * controlled by the input arguments.
        *
-       * @param boundary_cells A list of cells that need to exchange data prior
-       * to performing computations. These will be given a certain id in the
-       * partitioning.
+       * @param cells_with_comm A list of cells that need to exchange data
+       * prior to performing computations. These will be given a certain id in
+       * the partitioning to make sure cell loops that overlap communication
+       * with communication have the ghost data ready.
        *
        * @param dofs_per_cell Gives an expected value for the number of degrees
        * of freedom on a cell, which is used to determine the block size for
        * interleaving cell and face integrals.
+       *
+       * @param categories_are_hp Defines whether
+       * `cell_vectorization_categories` is originating from a hp adaptive
+       * computation with variable polynomial degree or a user-defined
+       * variant.
        *
        * @param cell_vectorization_categories This set of categories defines
        * the cells that should be grouped together inside the lanes of a
@@ -179,8 +185,9 @@ namespace internal
        */
       void
       create_blocks_serial(
-        const std::vector<unsigned int> &boundary_cells,
+        const std::vector<unsigned int> &cells_with_comm,
         const unsigned int               dofs_per_cell,
+        const bool                       categories_are_hp,
         const std::vector<unsigned int> &cell_vectorization_categories,
         const bool                       cell_vectorization_categories_strict,
         const std::vector<unsigned int> &parent_relation,

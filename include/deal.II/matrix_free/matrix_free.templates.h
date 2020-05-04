@@ -463,7 +463,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.vectorization_length = VectorizedArrayType::size();
       task_info.n_active_cells       = cell_level_index.size();
       task_info.create_blocks_serial(
-        dummy, 1, dummy, false, dummy, dummy, dummy2);
+        dummy, 1, false, dummy, false, dummy, dummy, dummy2);
 
       for (unsigned int i = 0; i < dof_info.size(); ++i)
         {
@@ -1058,6 +1058,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           }
       task_info.create_blocks_serial(subdomain_boundary_cells,
                                      dofs_per_cell,
+                                     dof_handlers.active_dof_handler ==
+                                       DoFHandlers::hp,
                                      dof_info[0].cell_active_fe_index,
                                      strict_categories,
                                      parent_relation,
