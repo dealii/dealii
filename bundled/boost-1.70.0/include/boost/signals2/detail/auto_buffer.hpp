@@ -142,7 +142,11 @@ namespace detail
         typedef typename Allocator::size_type            size_type;
         typedef typename Allocator::difference_type      difference_type;
         typedef T*                                       pointer;
+#ifdef BOOST_NO_CXX11_ALLOCATOR
         typedef typename Allocator::pointer              allocator_pointer;
+#else
+        typedef typename std::allocator_traits<Allocator>::pointer allocator_pointer;
+#endif
         typedef const T*                                 const_pointer;
         typedef T&                                       reference;
         typedef const T&                                 const_reference;
