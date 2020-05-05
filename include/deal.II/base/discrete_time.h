@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * simulation to ensure that the simulation time hits the end time exactly. The
  * adjustment is useful for the following reasons:
  *
- * Let's say that you loop over all of the time steps by using a for loop
+ * Let's say that you loop over all of the time steps by using a `for` loop
  * @code
  *   for (DiscreteTime time(0., 1., 0.3);
  *        time.is_at_end() == false;
@@ -53,6 +53,17 @@ DEAL_II_NAMESPACE_OPEN
  *     // Insert simulation code here
  *   }
  * @endcode
+ * or, if you like this better, the equivalent `while` loop:
+ * @code
+ *   DiscreteTime time(0., 1., 0.3);
+ *   while (time.is_at_end() == false)
+ *   {
+ *     // Insert simulation code here
+ *
+ *     time.advance_time();
+ *   }
+ * @endcode
+ *
  * In the above example the time starts at $T_{\text{start}} = 0$ until
  * $T_{\text{end}}=1$. Assuming the time step $dt = 0.3$ is not modified inside
  * the loop, the time is advanced from $t = 0$ to $t = 0.3$, $t = 0.6$, $t =
@@ -103,11 +114,12 @@ DEAL_II_NAMESPACE_OPEN
  *   size $t_{n+1} - t_n$ and *previous* time step size $t_n - t_{n-1}$. In
  *   this stage, it is a perfect occasion to generate text output using print
  *   commands within the user's code. Additionally, post-processed outputs can
- *   be prepared here which can be viewed later by visualization programs such
- *   as `Tecplot`, `Paraview`, and `VisIt`. Additionally, during the snapshot
- *   stage, the code can assess the quality of the previous step and decide
- *   whether it wants to increase or decrease the time step size. The step
- *   size for the next time step can be modified here.
+ *   be prepared here, which can then later be viewed by visualization programs
+ *   such as `Tecplot`, `Paraview`, and `VisIt`. Additionally, during the
+ *   snapshot stage, the code can assess the quality of the previous step and
+ *   decide whether it wants to increase or decrease the time step size. The
+ *   step size for the next time step can be modified here, by calling
+ *   set_desired_next_step_size().
  * * The **update** stage (the **transition** stage, the **inconsistent**
  *   stage): In this section of the program, the internal state of the
  *   simulation is getting updated from $t_n$ to $t_{n+1}$. All of the
@@ -128,7 +140,7 @@ DEAL_II_NAMESPACE_OPEN
  *   The question arises whether time should be incremented before updating
  *   state quantities. Multiple possibilities exist, depending on program and
  *   formulation requirements, and possibly the programmer's preferences:
- *   * Time is incremented before the rest of the updates. In this case, even
+ *   * Time is incremented *before* the rest of the updates. In this case, even
  *     though time is incremented to $t_{n+1}$, not all variables are updated
  *     yet. During this update phase, $dt$ equals the *previous* time step
  *     size. *Previous* means that it is referring to the $dt$ of the
@@ -141,7 +153,11 @@ DEAL_II_NAMESPACE_OPEN
  *       b = update_b(a, b, time.get_previous_step_size());
  *       a = new_a;
  *     @endcode
- *   * Time is incremented from $t_n$ to $t_{n+1}$ after all variables have
+ *     Here, the code starts in a consistent state, but once advance_time()
+ *     is called, the time variable, `a`, and `b` are no longer consistent
+ *     with each other until after the last statement. At that point,
+ *     the variables are all consistent again.
+ *   * Time is incremented from $t_n$ to $t_{n+1}$ *after* all variables have
  *     already been updated for $t_{n+1}$. During the update stage, $dt$ is
  *     denoted as the *next* time step size. *Next* means that $dt$ of the
  *     step corresponds to the `advance_time()` command that will happen
@@ -163,8 +179,8 @@ DEAL_II_NAMESPACE_OPEN
  *     @endcode
  *
  * One thing to note is that, during the update phase, $dt$ is referred to
- * either **next** or **previous** time step size, depending on whether the
- * command `advance_time()` has been called yet. The notion of *current* time
+ * either **next** or **previous** time step size, depending on whether
+ * advance_time() has been called yet. The notion of *current* time
  * step size is ill-defined. In fact, in the update stage the definition of
  * every variable depends on whether it has been updated yet or not, hence the
  * name **the inconsistent stage**.
@@ -182,7 +198,7 @@ DEAL_II_NAMESPACE_OPEN
  * for (DiscreteTime time(0., 1., 0.1);  // } end pre-processing/setup stage
  *      time.is_at_end() == false;
  *      time.advance_time())             // part of the update stage, runs at
- *                                       // the end of loop body
+ *                                       // the end of the loop body
  * {
  *   // snapshot stage {
  *   const double time_of_simulation = time.get_next_time();
