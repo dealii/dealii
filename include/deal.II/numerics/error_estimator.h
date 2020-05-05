@@ -105,7 +105,7 @@ namespace hp
  * esoteric, stemming from interpolation estimates and stability constants which
  * may hold for the Poisson problem, but may not hold for more general
  * situations. Alternatively, we consider the case when $c_F=\frac {h_F}{2p_F}$,
- * where $h_F$ is face diagonal and $p_F=max(p^+,p^-)$ is the maximum
+ * where $h_F$ is the diameter of the face and $p_F=max(p^+,p^-)$ is the maximum
  * polynomial degree of adjacent elements; or $c_F=h_K$. The choice between
  * these factors is done by means of the enumerator, provided as the last
  * argument in all functions.
