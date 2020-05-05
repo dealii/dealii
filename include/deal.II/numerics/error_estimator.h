@@ -47,9 +47,9 @@ namespace hp
 
 /**
  * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz
- * and Babuska and its modification for the hp-FEM. This error indicator tries
- * to approximate the error per cell by integration of the jump of the
- * gradient of the solution along the faces of each cell.  It can be
+ * and Babuska (see @cite KGZB83) and its modification for the hp-FEM. This
+ * error indicator tries to approximate the error per cell by integration of the
+ * jump of the gradient of the solution along the faces of each cell.  It can be
  * understood as a gradient recovery estimator; see the survey of Ainsworth
  * and Oden, "A Posteriori Error Estimation in Finite Element Analysis"
  * (Wiley, 2000) for a complete discussion.
@@ -78,21 +78,6 @@ namespace hp
  * GridRefinement::refine_and_coarsen_fixed_number(), and similar functions.
  * This vector contains elements of data type @p float, rather than @p double,
  * since accuracy is not important in the current context.
- *
- * The full reference for the paper in which this error estimator is defined
- * is as follows:
- * @code{.bib}
- * @article{KGZB83,
- *   author  = {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
- *              and Babu\v{s}ka, I.},
- *   title   = {A posteriori error analysis and adaptive processes in the
- *              finite element method: Part {I}--Error Analysis},
- *   journal = {Int. J. Num. Meth. Engrg.},
- *   year    = {1983},
- *   volume  = {19},
- *   pages   = {1593--1619}
- * }
- * @endcode
  *
  *
  * <h3>Implementation</h3>
