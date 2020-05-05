@@ -41,7 +41,7 @@ test(const Tensor<2, dim, number> &A)
   deallog << "original tensor A = " << A << std::endl;
   deallog << "det A = " << determinant(A) << std::endl;
   deallog << "A A^T = " << (A * transpose(A)) << std::endl;
-  const Tensor<2, dim, number> Q = project_onto_orthogonal_tensors(A, 1.e-10);
+  const Tensor<2, dim, number> Q = project_onto_orthogonal_tensors(A);
   deallog << "projected to Q = " << Q << std::endl;
   deallog << "det Q = " << determinant(Q) << std::endl;
   deallog << "Q Q^T = " << (Q * transpose(Q)) << std::endl;
@@ -56,6 +56,8 @@ main()
   test(Tensor<2, 3, double>{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}});
   // already orthogonal
   test(Tensor<2, 3, double>{{{1, 0, 0}, {0, 0, 1}, {0, 1, 0}}});
+  // not orthogonal, but det = 1
+  test(Tensor<2, 3, double>{{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}}});
   // 2D not orthogonal
   test(Tensor<2, 2, double>{{{1, 2}, {3, 4}}});
   // 2D already orthogonal
