@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,6 @@ namespace Particles
       const auto &fe   = space_dh.get_fe();
       const auto  max_particles_per_cell =
         particle_handler.n_global_max_particles_per_cell();
-
 
       // Take care of components
       const ComponentMask comps =

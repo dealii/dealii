@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,12 +49,12 @@ namespace Particles
     /**
      * Create an interpolation sparsity pattern for particles.
      *
-     * Given a triangulation representing the domains $\Omega$, a particle
+     * Given a triangulation representing the domain $\Omega$, a particle
      * handler of particles in $\Omega$, and a scalar finite element space
      * $V(\Omega) = \text{span}\{v_j\}_{j=0}^n$, compute the sparsity pattern
      * that would be necessary to assemble the matrix
      * \f[
-     * M_{ij} \dealcoloneq v_j(x_i) ,
+     * M_{i,j} \dealcoloneq v_j(x_i) ,
      * \f]
      * where $V(\Omega)$ is the finite element space associated with the
      * `space_dh`, and the index `i` is given by the particle id whose position
