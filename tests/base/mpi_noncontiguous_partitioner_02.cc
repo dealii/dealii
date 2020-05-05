@@ -114,9 +114,9 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
   if (do_revert)
     std::reverse(indices_want.begin(), indices_want.end());
 
-  Utilities::MPI::NoncontiguousPartitioner<double> vector(indices_has,
-                                                          indices_want,
-                                                          comm);
+  Utilities::MPI::NoncontiguousPartitioner vector(indices_has,
+                                                  indices_want,
+                                                  comm);
 
   AlignedVector<double> src(indices_has.size());
   for (unsigned int i = 0; i < indices_has.size(); i++)
@@ -125,7 +125,9 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
   AlignedVector<double> dst(indices_want.size());
 
-  vector.update_values(dst, src);
+  vector.export_to_ghosted_array(ArrayView<const double>(src.data(),
+                                                         src.size()),
+                                 ArrayView<double>(dst.data(), dst.size()));
 
   for (size_t i = 0; i < src.size(); i++)
     deallog << static_cast<int>(src[i]) << " ";

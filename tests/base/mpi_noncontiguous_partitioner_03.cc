@@ -27,7 +27,7 @@ test(const MPI_Comm                       comm,
      std::vector<types::global_dof_index> index_set_has,
      std::vector<types::global_dof_index> index_set_want)
 {
-  Utilities::MPI::NoncontiguousPartitioner<double> vector;
+  Utilities::MPI::NoncontiguousPartitioner vector;
   vector.reinit(index_set_has, index_set_want, comm);
 
   AlignedVector<double> src(index_set_has.size(), 0);
@@ -36,7 +36,9 @@ test(const MPI_Comm                       comm,
   for (unsigned int i = 0; i < index_set_has.size(); i++)
     src[i] = Utilities::MPI::this_mpi_process(comm) * 100 + i;
 
-  vector.update_values(dst, src);
+  vector.export_to_ghosted_array(ArrayView<const double>(src.data(),
+                                                         src.size()),
+                                 ArrayView<double>(dst.data(), dst.size()));
 
   for (size_t i = 0; i < src.size(); i++)
     deallog << static_cast<int>(src[i]) << " ";
