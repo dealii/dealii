@@ -43,8 +43,8 @@ if (eof)
 {
     print '<!--Extra macros for MathJax:-->', "\n";
     print '<div style="display:none">', "\n";
-    print '\(\newcommand{\vcentcolon}{\mathrel{\mathop{:}}}\)', "\n";
-    print '\(\newcommand{\dealcoloneq}{\vcentcolon\mathrel{\mkern-1.2mu}=}\)', "\n";
+    print '\(\newcommand{\dealvcentcolon}{\mathrel{\mathop{:}}}\)', "\n";
+    print '\(\newcommand{\dealcoloneq}{\dealvcentcolon\mathrel{\mkern-1.2mu}=}\)', "\n";
     print '\(\newcommand{\jump}[1]{\left[\!\left[ #1 \right]\!\right]}\)', "\n";
     print '\(\newcommand{\average}[1]{\left\{\!\left\{ #1 \right\}\!\right\}}\)', "\n";
     print '</div>', "\n";
