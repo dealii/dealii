@@ -130,8 +130,6 @@ test()
     const auto &u      = s.get_values("solution", scalar, dummy);
     const auto &grad_u = s.get_gradients("solution", scalar, dummy);
 
-    c = 0;
-
     c.local_dof_indices[0] = s.get_local_dof_indices();
 
     for (unsigned int i = 0; i < fev.dofs_per_cell; ++i)

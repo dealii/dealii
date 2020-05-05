@@ -77,7 +77,6 @@ test()
   auto cell_worker = [](const Iterator &cell, ScratchData &s, CopyData &c) {
     const auto &fev = s.reinit(cell);
     const auto &JxW = s.get_JxW_values();
-    c               = 0;
     for (auto w : JxW)
       c.vectors[0][0] += w;
   };

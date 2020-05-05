@@ -132,8 +132,6 @@ test()
     const auto &u                = s.get_values("solution", scalar, energy);
     const auto &grad_u           = s.get_gradients("solution", scalar, energy);
 
-    c = 0;
-
     c.local_dof_indices[0] = s.get_local_dof_indices();
 
     for (unsigned int q = 0; q < p.size(); ++q)
