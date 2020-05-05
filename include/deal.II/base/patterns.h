@@ -2255,7 +2255,7 @@ namespace Patterns
       {
         std::tuple<Key, Value> m;
         m = Convert<decltype(m)>::to_value(s, pattern);
-        return m;
+        return std::make_pair(std::get<0>(m), std::get<1>(m));
       }
     };
 
