@@ -1,40 +1,40 @@
 
 DEAL::Block vector: move constructor:
-DEAL::[block 0 ]  0.000e+00 0.000e+00 
-[block 1 ]  0.000e+00 0.000e+00 
-[block 2 ]  0.000e+00 0.000e+00 
-[block 3 ]  0.000e+00 0.000e+00 
-[block 4 ]  0.000e+00 0.000e+00 
-
+DEAL::[block 0 ]  0.00000 0.00000
+DEAL::[block 1 ]  0.00000 0.00000
+DEAL::[block 2 ]  0.00000 0.00000
+DEAL::[block 3 ]  0.00000 0.00000
+DEAL::[block 4 ]  0.00000 0.00000
+DEAL::
 DEAL::Block vector: BlockVector:
-DEAL::[block 0 ]  0.000e+00 1.000e+00 
-[block 1 ]  1.000e+01 1.100e+01 
-[block 2 ]  2.000e+01 2.100e+01 
-[block 3 ]  3.000e+01 3.100e+01 
-[block 4 ]  4.000e+01 4.100e+01 
-Block vector: copy assignment:
-DEAL::[block 0 ]  0.000e+00 1.000e+00 
-[block 1 ]  1.000e+01 1.100e+01 
-[block 2 ]  2.000e+01 2.100e+01 
-[block 3 ]  3.000e+01 3.100e+01 
-[block 4 ]  4.000e+01 4.100e+01 
-Block vector: old object:
-DEAL::[block 0 ]  0.000e+00 1.000e+00 
-[block 1 ]  1.000e+01 1.100e+01 
-[block 2 ]  2.000e+01 2.100e+01 
-[block 3 ]  3.000e+01 3.100e+01 
-[block 4 ]  4.000e+01 4.100e+01 
-Block vector: move assignment:
-DEAL::[block 0 ]  0.000e+00 1.000e+00 
-[block 1 ]  1.000e+01 1.100e+01 
-[block 2 ]  2.000e+01 2.100e+01 
-[block 3 ]  3.000e+01 3.100e+01 
-[block 4 ]  4.000e+01 4.100e+01 
-old object size: 0
+DEAL::[block 0 ]  0.00000 1.00000
+DEAL::[block 1 ]  10.0000 11.0000
+DEAL::[block 2 ]  20.0000 21.0000
+DEAL::[block 3 ]  30.0000 31.0000
+DEAL::[block 4 ]  40.0000 41.0000
+DEAL::Block vector: copy assignment:
+DEAL::[block 0 ]  0.00000 1.00000
+DEAL::[block 1 ]  10.0000 11.0000
+DEAL::[block 2 ]  20.0000 21.0000
+DEAL::[block 3 ]  30.0000 31.0000
+DEAL::[block 4 ]  40.0000 41.0000
+DEAL::Block vector: old object:
+DEAL::[block 0 ]  0.00000 1.00000
+DEAL::[block 1 ]  10.0000 11.0000
+DEAL::[block 2 ]  20.0000 21.0000
+DEAL::[block 3 ]  30.0000 31.0000
+DEAL::[block 4 ]  40.0000 41.0000
 DEAL::Block vector: move assignment:
-DEAL::[block 0 ]  0.000e+00 1.000e+00 
-[block 1 ]  1.000e+01 1.100e+01 
-[block 2 ]  2.000e+01 2.100e+01 
-[block 3 ]  3.000e+01 3.100e+01 
-[block 4 ]  4.000e+01 4.100e+01 
-old object size: 0
+DEAL::[block 0 ]  0.00000 1.00000
+DEAL::[block 1 ]  10.0000 11.0000
+DEAL::[block 2 ]  20.0000 21.0000
+DEAL::[block 3 ]  30.0000 31.0000
+DEAL::[block 4 ]  40.0000 41.0000
+DEAL::old object size: 0
+DEAL::Block vector: move assignment:
+DEAL::[block 0 ]  0.00000 1.00000
+DEAL::[block 1 ]  10.0000 11.0000
+DEAL::[block 2 ]  20.0000 21.0000
+DEAL::[block 3 ]  30.0000 31.0000
+DEAL::[block 4 ]  40.0000 41.0000
+DEAL::old object size: 0
