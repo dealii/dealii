@@ -55,12 +55,12 @@ namespace MeshWorker
      * Initialize everything with the same @p size. This is usually the number
      * of local degrees of freedom.
      */
-    CopyData(const unsigned int size);
+    explicit CopyData(const unsigned int size);
 
     /**
      * For every object, specify the size they should have.
      */
-    CopyData(
+    explicit CopyData(
       const std::array<std::array<unsigned int, 2>, n_matrices> &matrix_sizes,
       const std::array<unsigned int, n_vectors> &                vector_sizes,
       const std::array<unsigned int, n_dof_indices> &dof_indices_sizes);
