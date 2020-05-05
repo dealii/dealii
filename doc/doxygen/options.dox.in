@@ -134,7 +134,7 @@ GENERATE_LATEX         = NO
 
 # but set a few flags for when processing formulas embedded
 # in the documentation.
-PAPER_TYPE             = a4wide
+PAPER_TYPE             = a4
 EXTRA_PACKAGES         = amsmath amsfonts mathtools @_extra_packages@
 LATEX_BATCHMODE        = YES
 
