@@ -29,8 +29,8 @@
 #  include <tbb/parallel_for.h>
 #  define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #  include <tbb/task.h>
-#  undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #  include <tbb/task_scheduler_init.h>
+#  undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #endif
 
 #include <iostream>

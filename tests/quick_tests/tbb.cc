@@ -18,7 +18,9 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 
+#define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #include <tbb/task_scheduler_init.h>
+#undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 
 #include <iostream>
 
