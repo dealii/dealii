@@ -1,0 +1,5 @@
+New: Added Particles::Utilities::create_interpolation_sparsity_pattern() and 
+Particles::Utilities::create_interpolation_matrix() that create interpolation sparsities and 
+matrices between ParticleHandler and DoFHandler objects.
+<br>
+(Bruno Blais, Luca Heltai, 2020/03/31)
