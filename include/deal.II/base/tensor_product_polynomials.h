@@ -409,7 +409,7 @@ private:
   const std::vector<std::vector<Polynomials::Polynomial<double>>> polynomials;
 
   /**
-   * Each tensor product polynomial @þ{i} is a product of one-dimensional
+   * Each tensor product polynomial $p_i$ is a product of one-dimensional
    * polynomials in each space direction. Compute the indices of these one-
    * dimensional polynomials for each space direction, given the index
    * <tt>i</tt>.
