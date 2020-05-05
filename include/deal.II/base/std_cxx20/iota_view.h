@@ -30,8 +30,7 @@ namespace std_cxx20
   namespace ranges
   {
 #if defined __cpp_lib_ranges && __cpp_lib_ranges >= 201911
-    template <typename IncrementableType, typename BoundType>
-    using iota_view = std::ranges::iota_view<IncrementableType, BoundType>;
+    using std::ranges::iota_view;
 #else
     /**
      * A poor-man's implementation of std::ranges::iota_view using
