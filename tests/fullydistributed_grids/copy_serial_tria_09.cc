@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Create a distributed triangulation with multigrid levels, copy it,
-// and show that the CellIds have not changed.
+// Create a serial triangulations with different mesh-smoothing flags
+// and copy them.
 
 #include <deal.II/base/mpi.h>
 
@@ -29,6 +29,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
 
 #include "./tests.h"
 
@@ -36,61 +37,74 @@ using namespace dealii;
 
 template <int dim>
 void
-test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
+test(int                                              n_refinements,
+     const typename Triangulation<dim>::MeshSmoothing flag,
+     MPI_Comm                                         comm)
 {
-  // create pdt
-  parallel::distributed::Triangulation<dim> tria_pdt(
-    comm,
-    dealii::Triangulation<dim>::none,
-    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::subdivided_hyper_cube(tria_pdt, n_subdivisions);
-  tria_pdt.refine_global(n_refinements);
+  // create serial triangulation
+  Triangulation<dim> basetria(flag);
+  GridGenerator::hyper_cube(basetria);
+  basetria.refine_global(1);
+
+  for (int i = 1; i < n_refinements; i++)
+    {
+      for (auto &cell : basetria.active_cell_iterators())
+        {
+          bool refinement_flag = true;
+          for (int d = 0; d < dim; d++)
+            refinement_flag &= cell->center()[d] < 0.5;
+
+          if (refinement_flag)
+            cell->set_refine_flag();
+        }
+      basetria.execute_coarsening_and_refinement();
+    }
+
+  // partition
+  GridTools::partition_triangulation_zorder(
+    Utilities::MPI::n_mpi_processes(comm), basetria);
+  GridTools::partition_multigrid_levels(basetria);
 
   // create instance of pft
   parallel::fullydistributed::Triangulation<dim> tria_pft(comm);
 
-  // extract relevant information form pdt
-  auto construction_data =
+  // extract relevant information form serial triangulation
+  const auto construction_data =
     TriangulationDescription::Utilities::create_description_from_triangulation(
-      tria_pdt,
-      comm,
-      TriangulationDescription::Settings::construct_multigrid_hierarchy);
+      basetria, comm);
 
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);
 
-  // copare centers of cells
   for (auto &cell : tria_pft.active_cell_iterators())
     {
       CellId id        = cell->id();
-      auto   cell_base = id.to_cell(tria_pdt);
+      auto   cell_base = id.to_cell(basetria);
       for (unsigned int d = 0; d < dim; d++)
         Assert(std::abs(cell->center()[d] - cell_base->center()[d]) < 1e-9,
                ExcMessage("Cells do not match"));
     }
+
+  deallog << "OK!" << std::endl;
 }
 
 int
 main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  mpi_initlog();
+  MPILogInitAll                    all;
 
-  const int      dim  = 2;
   const MPI_Comm comm = MPI_COMM_WORLD;
 
-  {
-    deallog.push("2d");
-    const int n_refinements  = 3;
-    const int n_subdivisions = 5;
-    test<2>(n_refinements, n_subdivisions, comm);
-    deallog.pop();
-  }
-  {
-    deallog.push("3d");
-    const int n_refinements  = 3;
-    const int n_subdivisions = 4;
-    test<3>(n_refinements, n_subdivisions, comm);
-    deallog.pop();
-  }
+  std::vector<typename Triangulation<2>::MeshSmoothing> flags{
+    Triangulation<2>::none,
+    Triangulation<2>::limit_level_difference_at_vertices};
+
+  for (auto flag : flags)
+    {
+      deallog.push("2d");
+      const int n_refinements = 3;
+      test<2>(n_refinements, flag, comm);
+      deallog.pop();
+    }
 }

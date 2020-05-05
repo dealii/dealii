@@ -27,8 +27,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
           const dealii::Triangulation<deal_II_dimension,
                                       deal_II_space_dimension> &tria,
           const MPI_Comm                                        comm,
-          const bool         construct_multilevel_hierarchy,
-          const unsigned int my_rank_in);
+          const TriangulationDescription::Settings              settings,
+          const unsigned int                                    my_rank_in);
 
         template Description<deal_II_dimension, deal_II_space_dimension>
         create_description_from_triangulation_in_groups(
@@ -41,7 +41,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
             const unsigned int)> &serial_grid_partitioner,
           const MPI_Comm          comm,
           const int               group_size,
-          const bool              construct_multilevel_hierarchy);
+          const typename Triangulation<deal_II_dimension,
+                                       deal_II_space_dimension>::MeshSmoothing
+            smoothing,
+          const TriangulationDescription::Settings);
 #endif
       \}
     \}

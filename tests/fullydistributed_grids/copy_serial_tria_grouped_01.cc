@@ -55,7 +55,9 @@ test(int n_refinements, MPI_Comm comm)
 
   auto construction_data_1 =
     TriangulationDescription::Utilities::create_description_from_triangulation(
-      basetria, comm, true);
+      basetria,
+      comm,
+      TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
   // 2) create TriangulationDescription::Description with
   // create_description_from_triangulation_in_groups
@@ -73,7 +75,8 @@ test(int n_refinements, MPI_Comm comm)
       },
       comm,
       3 /* group size */,
-      true);
+      dealii::Triangulation<dim, spacedim>::none,
+      TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
   // 3a) serialize first TriangulationDescription::Description and print
   {

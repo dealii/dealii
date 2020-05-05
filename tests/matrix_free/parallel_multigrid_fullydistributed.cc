@@ -457,7 +457,10 @@ test()
 
       // extract relevant information form pdt
       auto construction_data = TriangulationDescription::Utilities::
-        create_description_from_triangulation(tria, MPI_COMM_WORLD, true);
+        create_description_from_triangulation(
+          tria,
+          MPI_COMM_WORLD,
+          TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
       // actually create triangulation
       tria_pft.create_triangulation(construction_data);
@@ -485,7 +488,10 @@ test()
 
         // extract relevant information form pdt
         auto construction_data = TriangulationDescription::Utilities::
-          create_description_from_triangulation(tria, MPI_COMM_WORLD, true);
+          create_description_from_triangulation(
+            tria,
+            MPI_COMM_WORLD,
+            TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
         // actually create triangulation
         tria_pft.create_triangulation(construction_data);

@@ -1,112 +1,112 @@
 
-DEAL:0:1d::n_levels:                  1
-DEAL:0:1d::n_cells:                   28
-DEAL:0:1d::n_active_cells:            28
+DEAL:0:1d::n_levels:                  5
+DEAL:0:1d::n_cells:                   248
+DEAL:0:1d::n_active_cells:            128
 DEAL:0:1d::
 DEAL:0:1d::n_dofs:                             257
 DEAL:0:1d::n_locally_owned_dofs:               53
 DEAL:0:1d::
-DEAL:0:2d::n_levels:                  1
-DEAL:0:2d::n_cells:                   952
-DEAL:0:2d::n_active_cells:            952
+DEAL:0:2d::n_levels:                  4
+DEAL:0:2d::n_cells:                   5440
+DEAL:0:2d::n_active_cells:            4096
 DEAL:0:2d::
 DEAL:0:2d::n_dofs:                             16641
 DEAL:0:2d::n_locally_owned_dofs:               3409
 DEAL:0:2d::
-DEAL:0:3d::n_levels:                  1
-DEAL:0:3d::n_cells:                   8888
-DEAL:0:3d::n_active_cells:            8888
+DEAL:0:3d::n_levels:                  4
+DEAL:0:3d::n_cells:                   37440
+DEAL:0:3d::n_active_cells:            32768
 DEAL:0:3d::
 DEAL:0:3d::n_dofs:                             274625
 DEAL:0:3d::n_locally_owned_dofs:               57409
 DEAL:0:3d::
 
-DEAL:1:1d::n_levels:                  1
-DEAL:1:1d::n_cells:                   28
-DEAL:1:1d::n_active_cells:            28
+DEAL:1:1d::n_levels:                  5
+DEAL:1:1d::n_cells:                   63
+DEAL:1:1d::n_active_cells:            33
 DEAL:1:1d::
 DEAL:1:1d::n_dofs:                             257
 DEAL:1:1d::n_locally_owned_dofs:               52
 DEAL:1:1d::
-DEAL:1:2d::n_levels:                  1
-DEAL:1:2d::n_cells:                   984
-DEAL:1:2d::n_active_cells:            984
+DEAL:1:2d::n_levels:                  4
+DEAL:1:2d::n_cells:                   1720
+DEAL:1:2d::n_active_cells:            1299
 DEAL:1:2d::
 DEAL:1:2d::n_dofs:                             16641
 DEAL:1:2d::n_locally_owned_dofs:               3344
 DEAL:1:2d::
-DEAL:1:3d::n_levels:                  1
-DEAL:1:3d::n_cells:                   9672
-DEAL:1:3d::n_active_cells:            9672
+DEAL:1:3d::n_levels:                  4
+DEAL:1:3d::n_cells:                   16280
+DEAL:1:3d::n_active_cells:            14253
 DEAL:1:3d::
 DEAL:1:3d::n_dofs:                             274625
 DEAL:1:3d::n_locally_owned_dofs:               55264
 DEAL:1:3d::
 
 
-DEAL:2:1d::n_levels:                  1
-DEAL:2:1d::n_cells:                   26
-DEAL:2:1d::n_active_cells:            26
+DEAL:2:1d::n_levels:                  5
+DEAL:2:1d::n_cells:                   58
+DEAL:2:1d::n_active_cells:            30
 DEAL:2:1d::
 DEAL:2:1d::n_dofs:                             257
 DEAL:2:1d::n_locally_owned_dofs:               48
 DEAL:2:1d::
-DEAL:2:2d::n_levels:                  1
-DEAL:2:2d::n_cells:                   1008
-DEAL:2:2d::n_active_cells:            1008
+DEAL:2:2d::n_levels:                  4
+DEAL:2:2d::n_cells:                   1780
+DEAL:2:2d::n_active_cells:            1344
 DEAL:2:2d::
 DEAL:2:2d::n_dofs:                             16641
 DEAL:2:2d::n_locally_owned_dofs:               3296
 DEAL:2:2d::
-DEAL:2:3d::n_levels:                  1
-DEAL:2:3d::n_cells:                   9856
-DEAL:2:3d::n_active_cells:            9856
+DEAL:2:3d::n_levels:                  4
+DEAL:2:3d::n_cells:                   17120
+DEAL:2:3d::n_active_cells:            14988
 DEAL:2:3d::
 DEAL:2:3d::n_dofs:                             274625
 DEAL:2:3d::n_locally_owned_dofs:               54944
 DEAL:2:3d::
 
 
-DEAL:3:1d::n_levels:                  1
-DEAL:3:1d::n_cells:                   28
-DEAL:3:1d::n_active_cells:            28
+DEAL:3:1d::n_levels:                  5
+DEAL:3:1d::n_cells:                   63
+DEAL:3:1d::n_active_cells:            33
 DEAL:3:1d::
 DEAL:3:1d::n_dofs:                             257
 DEAL:3:1d::n_locally_owned_dofs:               52
 DEAL:3:1d::
-DEAL:3:2d::n_levels:                  1
-DEAL:3:2d::n_cells:                   984
-DEAL:3:2d::n_active_cells:            984
+DEAL:3:2d::n_levels:                  4
+DEAL:3:2d::n_cells:                   1720
+DEAL:3:2d::n_active_cells:            1299
 DEAL:3:2d::
 DEAL:3:2d::n_dofs:                             16641
 DEAL:3:2d::n_locally_owned_dofs:               3312
 DEAL:3:2d::
-DEAL:3:3d::n_levels:                  1
-DEAL:3:3d::n_cells:                   9672
-DEAL:3:3d::n_active_cells:            9672
+DEAL:3:3d::n_levels:                  4
+DEAL:3:3d::n_cells:                   16280
+DEAL:3:3d::n_active_cells:            14253
 DEAL:3:3d::
 DEAL:3:3d::n_dofs:                             274625
 DEAL:3:3d::n_locally_owned_dofs:               54080
 DEAL:3:3d::
 
 
-DEAL:4:1d::n_levels:                  1
-DEAL:4:1d::n_cells:                   28
-DEAL:4:1d::n_active_cells:            28
+DEAL:4:1d::n_levels:                  5
+DEAL:4:1d::n_cells:                   65
+DEAL:4:1d::n_active_cells:            34
 DEAL:4:1d::
 DEAL:4:1d::n_dofs:                             257
 DEAL:4:1d::n_locally_owned_dofs:               52
 DEAL:4:1d::
-DEAL:4:2d::n_levels:                  1
-DEAL:4:2d::n_cells:                   952
-DEAL:4:2d::n_active_cells:            952
+DEAL:4:2d::n_levels:                  4
+DEAL:4:2d::n_cells:                   1600
+DEAL:4:2d::n_active_cells:            1208
 DEAL:4:2d::
 DEAL:4:2d::n_dofs:                             16641
 DEAL:4:2d::n_locally_owned_dofs:               3280
 DEAL:4:2d::
-DEAL:4:3d::n_levels:                  1
-DEAL:4:3d::n_cells:                   8888
-DEAL:4:3d::n_active_cells:            8888
+DEAL:4:3d::n_levels:                  4
+DEAL:4:3d::n_cells:                   14352
+DEAL:4:3d::n_active_cells:            12566
 DEAL:4:3d::
 DEAL:4:3d::n_dofs:                             274625
 DEAL:4:3d::n_locally_owned_dofs:               52928

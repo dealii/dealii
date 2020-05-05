@@ -1,13 +1,13 @@
 
-DEAL:0:2d::n_levels:                  1
-DEAL:0:2d::n_cells:                   4096
+DEAL:0:2d::n_levels:                  7
+DEAL:0:2d::n_cells:                   5461
 DEAL:0:2d::n_active_cells:            4096
 DEAL:0:2d::
 DEAL:0:2d::n_dofs:                             16641
 DEAL:0:2d::n_locally_owned_dofs:               16641
 DEAL:0:2d::
-DEAL:0:3d::n_levels:                  1
-DEAL:0:3d::n_cells:                   4096
+DEAL:0:3d::n_levels:                  5
+DEAL:0:3d::n_cells:                   4681
 DEAL:0:3d::n_active_cells:            4096
 DEAL:0:3d::
 DEAL:0:3d::n_dofs:                             35937
