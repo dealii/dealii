@@ -1,0 +1,14 @@
+Changed: The operator `std::ostream << Vector` was implemented by
+calling Vector::print() with default arguments. This implies a
+particular formatting of the output that was independent of the flags
+set on the output stream (in particular relating to how floating point
+numbers are to be formatted), and also added a newline to the end of
+the output. Both the formatting and the newline are decisions that are
+better made by the user at the location where the output is
+requested. As a consequence, the behavior has now been changed:
+`operator<<` now simply outputs all elements of the vector as
+individual numbers for which the output stream flags are respected,
+and separated by a single space; no endline is appended to the output
+any more.
+<br>
+(Wolfgang Bangerth, 2020/05/05)
