@@ -609,7 +609,7 @@ namespace VectorTools
    * L2-projection method used has been taken from the paper "Electromagnetic
    * scattering simulation using an H (curl) conforming hp finite element
    * method in three dimensions" by PD Ledger, K Morgan and O Hassan ( Int. J.
-   * Num. Meth. Fluids, Volume 53, Issue 8, pages 1267–1296).
+   * Num. Meth. Fluids, Volume 53, Issue 8, pages 1267-1296).
    *
    * This function will compute constraints that correspond to Dirichlet
    * boundary conditions of the form

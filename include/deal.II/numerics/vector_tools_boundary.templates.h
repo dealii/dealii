@@ -2887,7 +2887,7 @@ namespace VectorTools
       // Electromagnetic scattering simulation using an H (curl) conforming hp
       // finite element method in three dimensions, PD Ledger, K Morgan, O
       // Hassan, Int. J.  Num. Meth. Fluids, Volume 53, Issue 8, pages
-      // 1267–1296, 20 March 2007:
+      // 1267-1296, 20 March 2007:
       // http://onlinelibrary.wiley.com/doi/10.1002/fld.1223/abstract
 
       // Create hp FEcollection, dof_handler can be either hp or standard type.

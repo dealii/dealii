@@ -445,11 +445,11 @@ namespace Utilities
       // algorithm verbatim:
       //
       // [Y]=chebyshev_filter_scaled(X, m, a, b, aL).
-      // e=(b−a)/2; c=(a+b)/2; σ=e/(c−aL); τ=2/σ;
-      // Y=(H∗X−c∗X)∗(σ/e);
+      // e=(b-a)/2; c=(a+b)/2; σ=e/(c-aL); τ=2/σ;
+      // Y=(H∗X-c∗X)∗(σ/e);
       // for i=2 to m do
-      //   σnew =1/(τ −σ);
-      //   Yt =(H∗Y−c∗Y)∗(2∗σnew/e)−(σ∗σnew)∗X;
+      //   σnew =1/(τ - σ);
+      //   Yt =(H∗Y - c∗Y)∗(2∗σnew/e)-(σ∗σnew)∗X;
       //   X =Y; Y =Yt; σ =σnew;
 
       const double e     = (b - a) / 2.;

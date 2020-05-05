@@ -77,7 +77,7 @@ DEAL_II_NAMESPACE_OPEN
  * This is done by inheriting abstract topology classes from the TopoDS
  * package by those implementing a boundary representation model (from the
  * BRep package). Only 3 types of topological objects have geometric
- * representations – vertex, edge, and face.
+ * representations - vertex, edge, and face.
  *
  * Every TopoDS_Shape can be queried to figure out what type of shape it is,
  * and actual geometrical objects, like surfaces, curves or points, can be
