@@ -41,8 +41,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   /**
-   * A namespace for functions offering tools to handle ParticleHandlers and
-   * their coupling with DoFHandlers
+   * A namespace for functions offering tools to handle ParticleHandler objects
+   * and their coupling with DoFHandler objects.
    */
   namespace Utilities
   {
@@ -72,8 +72,9 @@ namespace Particles
      *  M_{(i*n_comps+k),j} \dealcoloneq v_j(x_i) \cdot e_{comp_j},
      * \f]
      * where `comp_j` is the only non zero component of the vector valued basis
-     * function `v_j` (equal to `fe.system_to_component_index(j).first`), and
-     * `k` corresponds to its index within the selected components of the mask.
+     * function `v_j` (equal to `fe.system_to_component_index(j).first`),
+     * `k` corresponds to its index within the selected components of the mask,
+     * and $e_{comp_j}$ is the unit vector in the direction `comp_j`.
      *
      * The `sparsity` is filled by locating the position of the particle with
      * index `i` within the particle handler with respect to the embedding
@@ -129,8 +130,9 @@ namespace Particles
      *  M_{(i*n_comps+k),j} \dealcoloneq v_j(x_i) \cdot e_{comp_j},
      * \f]
      * where `comp_j` is the only non zero component of the vector valued basis
-     * function `v_j` (equal to `fe.system_to_component_index(j).first`), and
-     * `k` corresponds to its index within the selected components of the mask.
+     * function `v_j` (equal to `fe.system_to_component_index(j).first`),
+     * `k` corresponds to its index within the selected components of the mask,
+     * and $e_{comp_j}$ is the unit vector in the direction `comp_j`.
      *
      * The matrix is filled by locating the position of the particle with
      * index `i` within the particle handler with respect to the embedding
