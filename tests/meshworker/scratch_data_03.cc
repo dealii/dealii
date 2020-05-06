@@ -116,8 +116,6 @@ test()
       const auto &JxW = s.get_JxW_values();
       const auto &p   = s.get_quadrature_points();
 
-      c = 0;
-
       c.local_dof_indices[0] = s.get_local_dof_indices();
 
       for (unsigned int q = 0; q < p.size(); ++q)

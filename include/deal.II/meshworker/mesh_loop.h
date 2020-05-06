@@ -162,7 +162,55 @@ namespace MeshWorker
    * `copier` on one cell and the `cell_worker`/`face_worker`/`boundary_worker`
    * functions on the next cell, and user code needs not reset the copy
    * object either at the beginning of the cell integration or end of the
-   * copy operation.
+   * copy operation. Resetting the state of the `copier ` inside of a
+   * `face_worker` or `boundary_worker` constitutes a bug, and may lead to
+   * some unexpected results. The following example shows what is not
+   * permissible, as the copier is potentially shared among numerous faces
+   * on a cell:
+   * @code
+   *
+   * using ScratchData      = MeshWorker::ScratchData<dim, spacedim>;
+   * using CopyData         = MeshWorker::CopyData<1, 1, 1>;
+   * using CellIteratorType = decltype(dof_handler.begin_active());
+   *
+   * ScratchData            scratch(...);
+   * CopyData               copy(...);
+   *
+   * std::function<void(const CellIteratorType &, ScratchData &, CopyData &)>
+   *   empty_cell_worker;
+   *
+   * auto boundary_worker = [...] (
+   *   const CellIteratorType &cell,
+   *   const unsigned int      face,
+   *   ScratchData            &scratch_data,
+   *   CopyData               &copy_data)
+   * {
+   *  const auto &fe_face_values = scratch_data.reinit(cell, face);
+   *  copy_data = CopyData(...); // This is an error, as we lose the
+   *                             // accumulation that has been performed on
+   *                             // other boundary faces of the same cell.
+   *
+   *  for (unsigned int q_point = 0;
+   *       q_point < fe_face_values.n_quadrature_points;
+   *       ++q_point)
+   *    {
+   *      copy_data.vectors[0][0] += 1.0 * fe_face_values.JxW(q_point);
+   *    }
+   * };
+   *
+   * double value = 0;
+   * auto copier = [...](const CopyData &copy_data)
+   * {
+   *   value += copy_data.vectors[0][0]; // Contributions from some faces may
+   *                                     // be missing.
+   * };
+   *
+   * MeshWorker::mesh_loop(dof_handler.active_cell_iterators(),
+   *                       empty_cell_worker, copier,
+   *                       scratch, copy,
+   *                       MeshWorker::assemble_boundary_faces,
+   *                       boundary_worker);
+   * @endcode
    *
    * The queue_length argument indicates the number of items that can be live at
    * any given time. Each item consists of chunk_size elements of the input
