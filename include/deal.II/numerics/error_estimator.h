@@ -82,15 +82,30 @@ namespace hp
  *
  * <h3>Implementation</h3>
  *
- * In principle, the implementation of the error estimation is simple: let \f[
- * \eta_K^2 = \sum_{F\in\partial K} c_F \int_{\partial K_F} \left[a
- * \frac{\partial u_h}{\partial n}\right]^2 do \f] be the error estimator for
- * cell $K$. $[\cdot]$ denotes the jump of the argument at the face. In the
- * paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
+ * In principle, the implementation of the error estimation is simple: let
+ * @f[
+ *   \eta_K^2
+ *   =
+ *   \sum_{F\in\partial K}
+ *     c_F \int_{\partial K_F} \jump{a \frac{\partial u_h}{\partial n}}^2
+ * @f]
+ * be the error estimator for cell $K$. $\jump{\cdot}$ denotes the jump of the
+ * function in square brackets at the face, and $c_F$ is a factor discussed
+ * below. This is the general form of the interface terms of the error
+ * estimator derived by Kelly et al. in the paper referenced above. The overall
+ * error estimate is then computed as
+ * @f[
+ *   \eta^2 = \sum_K \eta_K^2
+ * @f]
+ * so that $\eta \approx \|\nabla (u-u_h)\|$ for the Laplace equation. The
+ * functions of this class compute a vector of values that corresponds to
+ * $\eta_K$ (i.e., the square root of the quantity above).
+ *
+ * In the paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
  * esoteric, stemming from interpolation estimates and stability constants which
  * may hold for the Poisson problem, but may not hold for more general
- * situations. Alternatively, we consider the case when $ c_F=\frac {h_F}{2p_F}
- * $, where $ h_F $ is face diagonal and $ p_F=max(p^+,p^-) $ is the maximum
+ * situations. Alternatively, we consider the case when $c_F=\frac {h_F}{2p_F}$,
+ * where $h_F$ is the diameter of the face and $p_F=max(p^+,p^-)$ is the maximum
  * polynomial degree of adjacent elements; or $c_F=h_K$. The choice between
  * these factors is done by means of the enumerator, provided as the last
  * argument in all functions.
