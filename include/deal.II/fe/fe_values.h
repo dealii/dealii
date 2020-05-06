@@ -2931,6 +2931,8 @@ public:
    * Here, we are looping over all quadrature points on all cells, with
    * `q_point` taking on all valid indices for quadrature points, as defined
    * by the quadrature rule passed to `fe_values`.
+   *
+   * @see CPP11
    */
   boost::integer_range<unsigned int>
   quadrature_point_indices() const;

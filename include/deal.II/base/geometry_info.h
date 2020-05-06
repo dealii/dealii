@@ -1946,6 +1946,8 @@ struct GeometryInfo
    * Here, we are looping over all faces of all cells, with `face_index`
    * taking on all valid indices for faces (zero and one in 1d, zero
    * through three in 2d, and zero through 5 in 3d).
+   *
+   * @see CPP11
    */
   static boost::integer_range<unsigned int>
   face_indices();
@@ -1977,6 +1979,8 @@ struct GeometryInfo
    * @endcode
    * Here, we are looping over all vertices of all cells, with `vertex_index`
    * taking on all valid indices.
+   *
+   * @see CPP11
    */
   static boost::integer_range<unsigned int>
   vertex_indices();
