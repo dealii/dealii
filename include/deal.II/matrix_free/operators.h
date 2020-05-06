@@ -839,7 +839,7 @@ namespace MatrixFreeOperators
      * approximation to be used in preconditioners.
      */
     virtual void
-    compute_diagonal();
+    compute_diagonal() override;
 
     /**
      * Set the heterogeneous scalar coefficient @p scalar_coefficient to be
