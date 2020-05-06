@@ -592,22 +592,7 @@ template <int dim, int spacedim>
 std::vector<unsigned int>
 FE_Poly<dim, spacedim>::get_poly_space_numbering_inverse() const
 {
-  auto *const space_tensor_prod =
-    dynamic_cast<TensorProductPolynomials<dim, ScalarPolynomialsBase<dim>> *>(
-      this->poly_space.get());
-
-  if (space_tensor_prod != nullptr)
-    return space_tensor_prod->get_numbering_inverse();
-
-  auto *const space_tensor_prod_const =
-    dynamic_cast<TensorProductPolynomials<dim, ScalarPolynomialsBase<dim>> *>(
-      this->poly_space.get());
-
-  if (space_tensor_prod_const != nullptr)
-    return space_tensor_prod_const->get_numbering_inverse();
-
-  Assert(false, ExcNotImplemented());
-  return std::vector<unsigned int>();
+  return Utilities::invert_permutation(get_poly_space_numbering());
 }
 
 
