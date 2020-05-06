@@ -1477,21 +1477,21 @@ public:
 
 
   /**
-   * Print all parameters with the given @p style to the file given by
-   * @p filename.
+   * Print all parameters to the file given by @p filename with the given output
+   * style @p style.
    *
    * This function deduces the output format from the extension of the specified
-   * filename. Supported extensions are `prm`, `xml`, `tex`, and `json`.
-   * If a different extensions is used, then an output style is deduced from the
-   * @p style argument.
+   * filename. Supported extensions are `prm`, `xml`, `tex`, and `json`. Hence,
+   * it is not necessary to specify an output format via the @p style argument
+   * as long as one of these extensions is added to the filename. If an output
+   * format is specified in the @p style parameter nevertheless, the output
+   * format has to be consistent with the filename extension.
    *
-   * Notice that specifying a supported file extension is equivalent to
-   * specifying the corresponding ParameterHandler::OutputStyle format. In
-   * particular, any  (optional) format specification specified in the @p style
-   * parameter  must be compatible with the given extension.
+   * If no extension is specified or the extension is not supported, the
+   * output format is deduced from the @p style argument.
    *
-   * If the format is not supported, and @p output_style does not contain a
-   * format specification, an assertion is thrown.
+   * If neither the extension is supported, nor does the @p style parameter
+   * contain a format specification, an assertion is thrown.
    *
    * @param filename The output file name.
    * @param style The style with which output is produced.
