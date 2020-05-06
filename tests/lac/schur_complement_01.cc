@@ -29,7 +29,7 @@
 #include "../tests.h"
 
 #define PRINTME(name, var) \
-  deallog << "Solution vector: " << name << ": " << var;
+  deallog << "Solution vector: " << name << ": " << var << std::endl;
 
 
 
