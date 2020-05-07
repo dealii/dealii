@@ -2936,7 +2936,7 @@ public:
    * `i` and `j` taking on all valid indices for cell degrees of freedom, as
    * defined by the finite element passed to `fe_values`.
    */
-  boost::integer_range<unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   dof_indices() const;
 
   /**
@@ -2971,7 +2971,7 @@ public:
    * @note If the @p start_dof_index is equal to the number of DoFs in the cell,
    * then the returned index range is empty.
    */
-  boost::integer_range<unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   dof_indices_starting_at(const unsigned int start_dof_index) const;
 
   /**
@@ -3004,7 +3004,7 @@ public:
    * @note If the @p end_dof_index is equal to zero, then the returned index
    * range is empty.
    */
-  boost::integer_range<unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   dof_indices_ending_at(const unsigned int end_dof_index) const;
 
   //@}
@@ -5528,34 +5528,34 @@ FEValuesBase<dim, spacedim>::get_inverse_jacobians() const
 
 
 template <int dim, int spacedim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::dof_indices() const
 {
-  return boost::irange(0U, dofs_per_cell);
+  return {0U, dofs_per_cell};
 }
 
 
 
 template <int dim, int spacedim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::dof_indices_starting_at(
   const unsigned int start_dof_index) const
 {
   Assert(start_dof_index <= dofs_per_cell,
          ExcIndexRange(start_dof_index, 0, dofs_per_cell + 1));
-  return boost::irange(start_dof_index, dofs_per_cell);
+  return {start_dof_index, dofs_per_cell};
 }
 
 
 
 template <int dim, int spacedim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::dof_indices_ending_at(
   const unsigned int end_dof_index) const
 {
   Assert(end_dof_index < dofs_per_cell,
          ExcIndexRange(end_dof_index, 0, dofs_per_cell));
-  return boost::irange(0U, end_dof_index + 1);
+  return {0U, end_dof_index + 1};
 }
 
 
