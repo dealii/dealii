@@ -38,6 +38,7 @@
 
 #  include <cuda_runtime_api.h>
 
+#  include <cmath>
 #  include <functional>
 
 
@@ -277,7 +278,9 @@ namespace CUDAWrappers
     void
     ReinitHelper<dim, Number>::setup_color_arrays(const unsigned int n_colors)
     {
-      data->n_cells.resize(n_colors);
+      // We need at least three colors when we are using CUDA-aware MPI and
+      // overlapping the communication
+      data->n_cells.resize(std::max(n_colors, 3U), 0);
       data->grid_dim.resize(n_colors);
       data->block_dim.resize(n_colors);
       data->local_to_global.resize(n_colors);
@@ -785,11 +788,12 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
   {
     for (unsigned int i = 0; i < n_colors; ++i)
-      {
-        internal::evaluate_coeff<dim, Number, Functor>
-          <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
-        AssertCudaKernel();
-      }
+      if (n_cells[i] > 0)
+        {
+          internal::evaluate_coeff<dim, Number, Functor>
+            <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
+          AssertCudaKernel();
+        }
   }
 
 
@@ -840,6 +844,8 @@ namespace CUDAWrappers
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
     this->use_coloring           = additional_data.use_coloring;
+    this->overlap_communication_computation =
+      additional_data.overlap_communication_computation;
 
     // TODO: only free if we actually need arrays of different length
     free();
@@ -929,11 +935,61 @@ namespace CUDAWrappers
           }
         else
           {
-            // If we are not using coloring, all the cells belong to the same
-            // color.
-            graph.resize(1, std::vector<CellFilter>());
-            for (auto cell = begin; cell != end; ++cell)
-              graph[0].emplace_back(cell);
+            if (additional_data.overlap_communication_computation)
+              {
+                // We create one color (1) with the cells on the boundary of the
+                // local domain and two colors (0 and 2) with the interior
+                // cells.
+                graph.resize(3, std::vector<CellFilter>());
+
+                std::vector<bool> ghost_vertices(
+                  dof_handler.get_triangulation().n_vertices(), false);
+
+                for (const auto cell :
+                     dof_handler.get_triangulation().active_cell_iterators())
+                  if (cell->is_ghost())
+                    for (unsigned int i = 0;
+                         i < GeometryInfo<dim>::vertices_per_cell;
+                         i++)
+                      ghost_vertices[cell->vertex_index(i)] = true;
+
+                std::vector<dealii::FilteredIterator<dealii::TriaActiveIterator<
+                  dealii::DoFCellAccessor<dealii::DoFHandler<dim, dim>,
+                                          false>>>>
+                  inner_cells;
+
+                for (auto cell = begin; cell != end; ++cell)
+                  {
+                    bool ghost_vertex = false;
+
+                    for (unsigned int i = 0;
+                         i < GeometryInfo<dim>::vertices_per_cell;
+                         i++)
+                      if (ghost_vertices[cell->vertex_index(i)])
+                        {
+                          ghost_vertex = true;
+                          break;
+                        }
+
+                    if (ghost_vertex)
+                      graph[1].emplace_back(cell);
+                    else
+                      inner_cells.emplace_back(cell);
+                  }
+                for (unsigned i = 0; i < inner_cells.size(); i++)
+                  if (i < inner_cells.size() / 2)
+                    graph[0].emplace_back(inner_cells[i]);
+                  else
+                    graph[2].emplace_back(inner_cells[i]);
+              }
+            else
+              {
+                // If we are not using coloring, all the cells belong to the
+                // same color.
+                graph.resize(1, std::vector<CellFilter>());
+                for (auto cell = begin; cell != end; ++cell)
+                  graph[0].emplace_back(cell);
+              }
           }
       }
     n_colors = graph.size();
@@ -994,8 +1050,8 @@ namespace CUDAWrappers
             unsigned int i_constraint = 0;
             for (unsigned int i = 0; i < n_local_dofs; ++i)
               {
-                // is_constrained uses a global dof id but constrained_dofs_host
-                // works on the local id
+                // is_constrained uses a global dof id but
+                // constrained_dofs_host works on the local id
                 if (constraints.is_constrained(partitioner->local_to_global(i)))
                   {
                     constrained_dofs_host[i_constraint] = i;
@@ -1042,14 +1098,15 @@ namespace CUDAWrappers
   {
     // Execute the loop on the cells
     for (unsigned int i = 0; i < n_colors; ++i)
-      {
-        internal::apply_kernel_shmem<dim, Number, Functor>
-          <<<grid_dim[i], block_dim[i]>>>(func,
-                                          get_data(i),
-                                          src.get_values(),
-                                          dst.get_values());
-        AssertCudaKernel();
-      }
+      if (n_cells[i] > 0)
+        {
+          internal::apply_kernel_shmem<dim, Number, Functor>
+            <<<grid_dim[i], block_dim[i]>>>(func,
+                                            get_data(i),
+                                            src.get_values(),
+                                            dst.get_values());
+          AssertCudaKernel();
+        }
   }
 
 
@@ -1067,19 +1124,69 @@ namespace CUDAWrappers
     if (src.get_partitioner().get() == partitioner.get() &&
         dst.get_partitioner().get() == partitioner.get())
       {
-        src.update_ghost_values();
-
-        // Execute the loop on the cells
-        for (unsigned int i = 0; i < n_colors; ++i)
+        // This code is inspired to the code in TaskInfo::loop.
+        if (overlap_communication_computation)
           {
-            internal::apply_kernel_shmem<dim, Number, Functor>
-              <<<grid_dim[i], block_dim[i]>>>(func,
-                                              get_data(i),
-                                              src.get_values(),
-                                              dst.get_values());
-            AssertCudaKernel();
+            src.update_ghost_values_start(0);
+            // In parallel, it's possible that some processors do not own any
+            // cells.
+            if (n_cells[0] > 0)
+              {
+                internal::apply_kernel_shmem<dim, Number, Functor>
+                  <<<grid_dim[0], block_dim[0]>>>(func,
+                                                  get_data(0),
+                                                  src.get_values(),
+                                                  dst.get_values());
+                AssertCudaKernel();
+              }
+            src.update_ghost_values_finish();
+
+            // In serial this color does not exist because there are no ghost
+            // cells
+            if (n_cells[1] > 0)
+              {
+                internal::apply_kernel_shmem<dim, Number, Functor>
+                  <<<grid_dim[1], block_dim[1]>>>(func,
+                                                  get_data(1),
+                                                  src.get_values(),
+                                                  dst.get_values());
+                AssertCudaKernel();
+                // We need a synchronization point because we don't want
+                // CUDA-aware MPI to start the MPI communication until the
+                // kernel is done.
+                cudaDeviceSynchronize();
+              }
+
+            dst.compress_start(0, VectorOperation::add);
+            // When the mesh is coarse it is possible that some processors do
+            // not own any cells
+            if (n_cells[2] > 0)
+              {
+                internal::apply_kernel_shmem<dim, Number, Functor>
+                  <<<grid_dim[2], block_dim[2]>>>(func,
+                                                  get_data(2),
+                                                  src.get_values(),
+                                                  dst.get_values());
+                AssertCudaKernel();
+              }
+            dst.compress_finish(VectorOperation::add);
           }
-        dst.compress(VectorOperation::add);
+        else
+          {
+            src.update_ghost_values();
+
+            // Execute the loop on the cells
+            for (unsigned int i = 0; i < n_colors; ++i)
+              if (n_cells[i] > 0)
+                {
+                  internal::apply_kernel_shmem<dim, Number, Functor>
+                    <<<grid_dim[i], block_dim[i]>>>(func,
+                                                    get_data(i),
+                                                    src.get_values(),
+                                                    dst.get_values());
+                }
+            dst.compress(VectorOperation::add);
+          }
         src.zero_out_ghosts();
       }
     else
@@ -1093,14 +1200,15 @@ namespace CUDAWrappers
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
-          {
-            internal::apply_kernel_shmem<dim, Number, Functor>
-              <<<grid_dim[i], block_dim[i]>>>(func,
-                                              get_data(i),
-                                              ghosted_src.get_values(),
-                                              ghosted_dst.get_values());
-            AssertCudaKernel();
-          }
+          if (n_cells[i] > 0)
+            {
+              internal::apply_kernel_shmem<dim, Number, Functor>
+                <<<grid_dim[i], block_dim[i]>>>(func,
+                                                get_data(i),
+                                                ghosted_src.get_values(),
+                                                ghosted_dst.get_values());
+              AssertCudaKernel();
+            }
 
         // Add the ghosted values
         ghosted_dst.compress(VectorOperation::add);

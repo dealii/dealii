@@ -1,0 +1,4 @@
+New: Add a flag to overlap MPI communication and computation when using CUDA
+matrix-free and CUDA-aware MPI.
+<br>
+(Peter Munch and Bruno Turcksin, 2020/05/06)
