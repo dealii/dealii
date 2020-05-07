@@ -1171,20 +1171,25 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
   const Tensor<1, spacedim> intermediate =
     normal_direction * cosine + dxn * sine;
 
+  // avoid compiler warnings
+  constexpr int s0 = 0 % spacedim;
+  constexpr int s1 = 1 % spacedim;
+  constexpr int s2 = 2 % spacedim;
+
   // derivative w.r.t the radius
-  derivatives[0][0] = intermediate[0];
-  derivatives[1][0] = intermediate[1];
-  derivatives[2][0] = intermediate[2];
+  derivatives[s0][s0] = intermediate[s0];
+  derivatives[s1][s0] = intermediate[s1];
+  derivatives[s2][s0] = intermediate[s2];
 
   // derivatives w.r.t the angle
-  derivatives[0][1] = -normal_direction[0] * sine + dxn[0] * cosine;
-  derivatives[1][1] = -normal_direction[1] * sine + dxn[1] * cosine;
-  derivatives[2][1] = -normal_direction[2] * sine + dxn[2] * cosine;
+  derivatives[s0][s1] = -normal_direction[s0] * sine + dxn[s0] * cosine;
+  derivatives[s1][s1] = -normal_direction[s1] * sine + dxn[s1] * cosine;
+  derivatives[s2][s1] = -normal_direction[s2] * sine + dxn[s2] * cosine;
 
   // derivatives w.r.t the direction of the axis
-  derivatives[0][2] = direction[0];
-  derivatives[1][2] = direction[1];
-  derivatives[2][2] = direction[2];
+  derivatives[s0][s2] = direction[s0];
+  derivatives[s1][s2] = direction[s1];
+  derivatives[s2][s2] = direction[s2];
 
   return derivatives;
 }
