@@ -33,6 +33,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
 
   const enum SD::OptimizerType     opt_method = SD::OptimizerType::dictionary;
   const enum SD::OptimizationFlags opt_flags =
