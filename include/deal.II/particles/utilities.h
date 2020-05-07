@@ -165,12 +165,12 @@ namespace Particles
      * Interpolate a field to the position of the particles of a
      * particle_handler
      *
-     * Given a DoFHandler and a particle handler, interpolates a vector field
+     * Given a DoFHandler and a ParticleHandler, interpolates a vector field
      * at the position of the particles. The result is stored in an output
      * vector whose size corresponds to the number of locally owned particles *
      * number of active components
      *
-     * @param[in] dof_handler The DOF Handler which was used to generate the
+     * @param[in] field_dh The DOF Handler which was used to generate the
      * field vector that is to be interpolated.
      *
      * @param[in] particle_handler The particle handler whose particle serve as
