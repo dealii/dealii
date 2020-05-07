@@ -190,8 +190,7 @@ test_scalar_scalar_coupled_one_run(const number_t     s1,
 
   // Verify the result
   typedef FunctionsTestScalarScalarCoupled<dim, ScalarNumberType> func;
-  static const ScalarNumberType                                   tol =
-    1e8 * std::numeric_limits<ScalarNumberType>::epsilon();
+  static const ScalarNumberType                                   tol = 1.e-7;
   //  std::cout << "dpsi_ds1:            " << dpsi_ds1 << std::endl;
   //  std::cout << "func::dpsi_ds1(s1,s2): " << func::dpsi_ds1(s1,s2) <<
   //  std::endl; std::cout << "diff: " << std::abs(dpsi_ds1 -
