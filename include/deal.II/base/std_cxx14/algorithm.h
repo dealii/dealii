@@ -22,11 +22,13 @@
 #endif
 
 DEAL_II_NAMESPACE_OPEN
+
 namespace std_cxx14
 {
 #ifdef DEAL_II_WITH_CXX14
   using std::max;
   using std::min;
+
 #else
 
   template <class T>
@@ -59,6 +61,7 @@ namespace std_cxx14
 
 #endif
 } // namespace std_cxx14
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_cxx14_algorithm_h

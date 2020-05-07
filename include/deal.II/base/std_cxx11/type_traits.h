@@ -26,8 +26,6 @@ DEAL_II_WARNING(
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
-  // TODO: could fill up with more types from
-  // C++11 type traits
   using std::enable_if;
   using std::false_type;
   using std::is_fundamental;
