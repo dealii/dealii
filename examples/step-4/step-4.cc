@@ -373,9 +373,9 @@ void Step4<dim>::assemble_system()
       // constant right hand side with value 1, we use the object representing
       // the right hand side and evaluate it at the quadrature points:
       for (const unsigned int q_index : fe_values.quadrature_point_indices())
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            for (const unsigned int j : fe_values.dof_indices())
               cell_matrix(i, j) +=
                 (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
@@ -409,9 +409,9 @@ void Step4<dim>::assemble_system()
       // and right hand side is done exactly as before, but here we have again
       // merged some loops for efficiency:
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int j : fe_values.dof_indices())
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i, j));

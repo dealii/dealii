@@ -437,8 +437,8 @@ void Step3::assemble_system()
           // determinant and the quadrature point weight (that one
           // gets together by the call to FEValues::JxW() ). Finally,
           // this is repeated for all shape functions $i$ and $j$:
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
               cell_matrix(i, j) +=
                 (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
@@ -449,7 +449,7 @@ void Step3::assemble_system()
           // hand side function, which we choose to be the function
           // with constant value one (more interesting examples will
           // be considered in the following programs).
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
                             1 *                                 // f(x_q)
                             fe_values.JxW(q_index));            // dx
@@ -463,14 +463,14 @@ void Step3::assemble_system()
       // Then again loop over all shape functions i and j and transfer the
       // local elements to the global matrix. The global numbers can be
       // obtained using local_dof_indices[i]:
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+      for (const unsigned int i : fe_values.dof_indices())
+        for (const unsigned int j : fe_values.dof_indices())
           system_matrix.add(local_dof_indices[i],
                             local_dof_indices[j],
                             cell_matrix(i, j));
 
       // And again, we do the same thing for the right hand side vector.
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
     }
 
