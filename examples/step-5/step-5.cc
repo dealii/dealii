@@ -192,9 +192,9 @@ void Step5<dim>::assemble_system()
         {
           const double current_coefficient =
             coefficient<dim>(fe_values.quadrature_point(q_index));
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             {
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              for (const unsigned int j : fe_values.dof_indices())
                 cell_matrix(i, j) +=
                   (current_coefficient *              // a(x_q)
                    fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
@@ -209,9 +209,9 @@ void Step5<dim>::assemble_system()
 
 
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int j : fe_values.dof_indices())
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i, j));

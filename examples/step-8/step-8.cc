@@ -334,17 +334,18 @@ namespace Step8
         //
         // With this knowledge, we can assemble the local matrix
         // contributions:
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
 
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            for (const unsigned int j : fe_values.dof_indices())
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
 
-                for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                for (const unsigned int q_point :
+                     fe_values.quadrature_point_indices())
                   {
                     cell_matrix(i, j) +=
                       // The first term is $\lambda \partial_i u_i, \partial_j
@@ -390,12 +391,13 @@ namespace Step8
 
         // Assembling the right hand side is also just as discussed in the
         // introduction:
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
 
-            for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for (const unsigned int q_point :
+                 fe_values.quadrature_point_indices())
               cell_rhs(i) += fe_values.shape_value(i, q_point) *
                              rhs_values[q_point][component_i] *
                              fe_values.JxW(q_point);
