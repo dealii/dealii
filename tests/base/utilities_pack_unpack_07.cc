@@ -53,17 +53,18 @@ check(const double (&array)[N])
     Utilities::pack(array, array_uncompressed, false);
   }
 
-  // computing_timer.print_summary();
-
   // check if compression has been invoked by comparing sizes
   deallog << "unpacked array: " << sizeof(array) << std::endl;
 
   deallog << "packed array without compression: " << array_uncompressed.size()
           << std::endl;
 
+  // compression ratio might change depending on architecture and zlib
+  // library used, so set the lowest digit to 0 to make this test more
+  // robust:
 #ifdef DEAL_II_WITH_ZLIB
-  deallog << "packed array with compression: " << array_compressed.size()
-          << std::endl;
+  deallog << "packed array with compression: "
+          << (array_compressed.size() / 10) * 10 << std::endl;
 #endif
 }
 
