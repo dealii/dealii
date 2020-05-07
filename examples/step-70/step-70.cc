@@ -14,7 +14,7 @@
  * ---------------------------------------------------------------------
 
  *
- * Authors: Luca Heltai, Bruno Blais, 2019
+ * Authors: Luca Heltai, Bruno Blais, 2020
  */
 
 // @sect3{Include files}
@@ -103,7 +103,7 @@ namespace LA
 // ParticleHandler class. ParticleHandler is a class that allows you to manage
 // a collection of particles (objects of type Particles::Particle), representing
 // a collection of points with some attached properties (e.g. an id) floating on
-// a parallel::distributed::Triangulation. The methods and classes on the
+// a parallel::distributed::Triangulation. The methods and classes in the
 // namespace Particles allows one to easily implement Particle In Cell methods
 // and particle tracing on distributed triangulations.
 //
@@ -111,7 +111,8 @@ namespace LA
 // solid quadrature points w.r.t. to the surrounding fluid grid, including
 // integration weights, and possibly surface normals. The reason why we use this
 // additional data structure is related to the fact that the solid and the fluid
-// grids are non-overlapping, and distributed independently among processes.
+// grids might be non-overlapping, and are distributed independently among
+// processes.
 //
 // In order to couple the two problems, we rely on the ParticleHandler class,
 // storing in each particle the position of a solid quadrature point (which is
@@ -806,7 +807,7 @@ namespace Step70
   // since we want to keep track of what is happening to the particles
   // themselves.
   //
-  // In particle in cell methods (PIC), it is often customary to assign
+  // In particle-in-cell methods (PIC), it is often customary to assign
   // ownership of the particles to the process where the particles lie. In this
   // tutorial we illustrate a different approach, which is useful if one wants
   // to keep track of information related to the particles (for example, if a
@@ -903,7 +904,10 @@ namespace Step70
     //
     // Keeping this index set around allows us to leverage linear algebra
     // classes for all communications regarding positions and velocities of the
-    // particles.
+    // particles. This mimics what would happen in the case where another
+    // problem was solved in the solid domain (as in fluid-structure
+    // interaction. In this latter case, additional DOFs on the solid domain
+    // would be coupled to what is occuring in the fluid domain.
     relevant_tracer_particles = owned_tracer_particles;
 
     // Now make sure that upon refinement, particles are correctly transferred.
@@ -1280,8 +1284,14 @@ namespace Step70
 
     const auto k = 1.0 / GridTools::minimal_cell_diameter(fluid_tria);
 
-    // We loop over all the local particles instead of looping over
-    // through the cells to apply the Nitsche restriction
+    // We loop over all the local particles. Although this could be achieved
+    // directly by looping over all the cells, this would force us
+    // to loop over numerous cells which do not contain particles.
+    // Consequently, we loop over all the particles, but, we get the reference
+    // of the cell in which the particle lies and then loop over all particles
+    // within that cell. This enables us to skip the cells which do not contain
+    // particles, yet to assemble the local matrix and rhs of each cell to apply
+    // the Nitsche restriction
     auto particle = solid_particle_handler.begin();
     while (particle != solid_particle_handler.end())
       {

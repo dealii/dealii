@@ -24,7 +24,7 @@ $\Omega\setminus\Omega^{\text{imp}}$.
 
 For rotating impellers, the use of Arbitrary Lagrangian Eulerian formulations
 (in which the fluid domain is smoothly deformed to follow the deformations
-of the immersed solid) would not be possible, unless only small times (i.e.,
+of the immersed solid) is not possible, unless only small times (i.e.,
 small fluid domain deformations) are considered. If one wants to track the
 evolution of the flow across a few turns of the impellers, the resulting
 deformed grid would simply be too distorted to be useful.
