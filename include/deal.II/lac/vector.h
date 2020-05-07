@@ -1365,7 +1365,11 @@ swap(Vector<Number> &u, Vector<Number> &v)
 
 
 /**
- * Output operator writing a vector to a stream.
+ * Output operator writing a vector to a stream. This operator outputs the
+ * elements of the vector one by one, with a space between entries. Each entry
+ * is formatted according to the flags set on the output stream.
+ *
+ * @relatesalso Vector
  */
 template <typename number>
 inline std::ostream &
@@ -1389,6 +1393,7 @@ operator<<(std::ostream &out, const Vector<number> &v)
 /**
  * Declare dealii::Vector< Number > as serial vector.
  *
+ * @relatesalso Vector
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
