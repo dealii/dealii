@@ -59,7 +59,9 @@ check(const double (&array)[N])
   deallog << "packed array without compression: " << array_uncompressed.size()
           << std::endl;
 
-  // set the lowest digit to 0:
+  // compression ratio might change depending on architecture and zlib
+  // library used, so set the lowest digit to 0 to make this test more
+  // robust:
 #ifdef DEAL_II_WITH_ZLIB
   deallog << "packed array with compression: "
           << (array_compressed.size() / 10) * 10 << std::endl;
