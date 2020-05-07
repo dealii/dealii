@@ -1,0 +1,4 @@
+Fixed: FEFaceEvaluation::read_dof_values_plain() would sometimes access
+invalid dof indices and crash or produce wrong results for cells with
+constraints applied. This is now fixed.
+<br> (Martin Kronbichler, Niklas Fehn, 2020/05/07)

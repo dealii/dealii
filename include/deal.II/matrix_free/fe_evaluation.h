@@ -3983,53 +3983,30 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         operation.process_empty(values_dofs[comp][i]);
   for (unsigned int v = 0; v < n_vectorization_actual; ++v)
     {
-      unsigned int       index_indicators, next_index_indicators;
+      const unsigned int cell_index = is_face ? cells[v] : cell * n_lanes + v;
+      const unsigned int cell_dof_index =
+        cell_index * n_fe_components + first_selected_component;
       const unsigned int n_components_read =
         n_fe_components > 1 ? n_components : 1;
-      if (is_face)
-        {
-          index_indicators = dof_info
-                               ->row_starts[cells[v] * n_fe_components +
-                                            first_selected_component]
-                               .second;
-          next_index_indicators = dof_info
-                                    ->row_starts[cells[v] * n_fe_components +
-                                                 first_selected_component + 1]
-                                    .second;
-        }
-      else
-        {
-          index_indicators =
-            dof_info
-              ->row_starts[(cell * n_lanes + v) * n_fe_components +
-                           first_selected_component]
-              .second;
-          next_index_indicators =
-            dof_info
-              ->row_starts[(cell * n_lanes + v) * n_fe_components +
-                           first_selected_component + 1]
-              .second;
-        }
+      unsigned int index_indicators =
+        dof_info->row_starts[cell_dof_index].second;
+      unsigned int next_index_indicators =
+        dof_info->row_starts[cell_dof_index + 1].second;
 
+      // For read_dof_values_plain, redirect the dof_indices field to the
+      // unconstrained indices
       if (apply_constraints == false &&
-          dof_info
-              ->row_starts[(cell * n_lanes + v) * n_fe_components +
-                           first_selected_component]
-              .second !=
-            dof_info
-              ->row_starts[(cell * n_lanes + v) * n_fe_components +
-                           first_selected_component + n_components_read]
-              .second)
+          dof_info->row_starts[cell_dof_index].second !=
+            dof_info->row_starts[cell_dof_index + n_components_read].second)
         {
-          Assert(dof_info->row_starts_plain_indices[cell * n_lanes + v] !=
+          Assert(dof_info->row_starts_plain_indices[cell_index] !=
                    numbers::invalid_unsigned_int,
                  ExcNotInitialized());
           dof_indices[v] =
             dof_info->plain_dof_indices.data() +
             dof_info->component_dof_indices_offset[active_fe_index]
                                                   [first_selected_component] +
-            (is_face ? dof_info->row_starts_plain_indices[cells[v]] :
-                       dof_info->row_starts_plain_indices[cell * n_lanes + v]);
+            dof_info->row_starts_plain_indices[cell_index];
           next_index_indicators = index_indicators;
         }
 
@@ -4143,20 +4120,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 }
 
               if (apply_constraints == true && comp + 1 < n_components)
-                {
-                  if (is_face)
-                    next_index_indicators =
-                      dof_info
-                        ->row_starts[cells[v] * n_fe_components +
-                                     first_selected_component + comp + 2]
-                        .second;
-                  else
-                    next_index_indicators =
-                      dof_info
-                        ->row_starts[(cell * n_lanes + v) * n_fe_components +
-                                     first_selected_component + comp + 2]
-                        .second;
-                }
+                next_index_indicators =
+                  dof_info->row_starts[cell_dof_index + comp + 2].second;
             }
         }
     }
