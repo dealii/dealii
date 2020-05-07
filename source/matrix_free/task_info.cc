@@ -777,6 +777,27 @@ namespace internal
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
+      // This function is decomposed into several steps to determine a good
+      // ordering that satisfies the following constraints:
+      // a. Only cells belonging to the same category (or next higher if the
+      // cell_vectorization_categories_strict is false) can be grouped into
+      // the same SIMD batch
+      // b. hp adaptive computations must form contiguous ranges for the same
+      // degree (category) in cell_partition_data
+      // c. We want to group the cells with the same parent in the same SIMD
+      // lane if possible
+      // d. The cell order should be similar to the initial one
+      // e. Form sets without MPI communication and those with to overlap
+      // communication with computation
+      //
+      // These constraints are satisfied by first grouping by the categories
+      // and, within the groups, to distinguish between cells with a parent
+      // and those without. All of this is set up with batches of cells (with
+      // padding if the size does not match). Then we define a vector of
+      // arrays where we define sorting criteria for the cell batches to
+      // satisfy the items b and d together, split by different parts to
+      // satisfy item e.
+
       // Give the compiler a chance to detect that vectorization_length is a
       // power of two, which allows it to replace integer divisions by shifts
       unsigned int vectorization_length_bits = 0;
