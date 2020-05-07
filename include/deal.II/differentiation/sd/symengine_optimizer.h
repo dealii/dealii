@@ -1834,6 +1834,18 @@ namespace Differentiation
        *
        * These values were computed by substituting a @p substitution_values map
        * during substitute() call.
+       *
+       * @note In contrast to the other variants of this function, the order of
+       * the returned entries is an internal implementation detail, and cannot
+       * be guarenteed under all conditions. The entries in the returned vector
+       * are, in general, identical to the order in which the dependent
+       * expressions are originally registered. However, when registering
+       * tensors and symmetric tensors of expressions, these are "unrolled"
+       * and their components are individually registered. If it is necessary to
+       * control the order in which results appear in the returned vector, then
+       * the register_function() method that takes a Tensor or a SymmetricTensor
+       * as an argument should be avoided. Instead, the individual entries of
+       * these types of data should be registered one by one.
        */
       const std::vector<ReturnType> &
       evaluate() const;
