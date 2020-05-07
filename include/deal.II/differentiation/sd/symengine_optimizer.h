@@ -35,6 +35,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/logstream.h>
 #  include <deal.II/base/utilities.h>
 
@@ -62,6 +63,29 @@ namespace Differentiation
 {
   namespace SD
   {
+    /**
+     * @addtogroup Exceptions
+     * @{
+     */
+
+    /**
+     * An exception to indicate that the SymEngine library has not been built
+     * against the LLVM compiler.
+     */
+    DeclExceptionMsg(ExcSymEngineLLVMNotAvailable,
+                     "SymEngine has not been built with LLVM support.");
+
+    /**
+     * An exception to indicate that SymEngine's LLVM optimizer doesn't work
+     * with the desired return type.
+     */
+    DeclExceptionMsg(ExcSymEngineLLVMReturnTypeNotSupported,
+                     "The SymEngine LLVM optimizer does not (yet) support the "
+                     "selected return type.");
+
+    //@}
+
+
     // Forward declarations
     template <typename ReturnType>
     class BatchOptimizer;

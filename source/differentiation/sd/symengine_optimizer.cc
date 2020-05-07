@@ -78,18 +78,14 @@ namespace Differentiation
         ExcMessage(
           "Cannot call set_optimization_method() once the optimizer is finalized."));
 
-      method = optimization_method;
 #  ifndef HAVE_SYMENGINE_LLVM
-      if (this->optimization_method() == OptimizerType::llvm)
+      if (optimization_method == OptimizerType::llvm)
         {
-          // Fall-back if the LLVM JIT compiler is not available
-          deallog
-            << "Warning: The LLVM is not available, so the batch optimizer "
-            << "is using a lambda optimizer instead." << std::endl;
-          method = OptimizerType::lambda;
+          AssertThrow(false, ExcSymEngineLLVMNotAvailable());
         }
 #  endif
-      flags = optimization_flags;
+      method = optimization_method;
+      flags  = optimization_flags;
     }
 
 
@@ -774,12 +770,10 @@ namespace Differentiation
             }
           else
             {
-              AssertThrow(false,
-                          ExcMessage("The SymEngine LLVM optimizer does not "
-                                     "(yet) support the selected ReturnType."));
+              AssertThrow(false, ExcSymEngineLLVMReturnTypeNotSupported());
             }
 #  else
-          AssertThrow(false, ExcMessage("The LLVM compiler is not available."));
+          AssertThrow(false, ExcSymEngineLLVMNotAvailable());
 #  endif
         }
       else
