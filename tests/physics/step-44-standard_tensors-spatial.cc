@@ -1465,7 +1465,7 @@ namespace Step44
          scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
             if (k_group == u_dof)
