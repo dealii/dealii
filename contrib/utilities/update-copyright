@@ -17,7 +17,7 @@
 
 # Purpose: Update the copyright year of every file based on the last
 #          modification recorded in the git logs
-
+#
 
 if test ! -d source -o ! -d include -o ! -d examples ; then
   echo "*** This script must be run from the top-level directory of deal.II."
