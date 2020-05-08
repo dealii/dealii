@@ -62,11 +62,13 @@ namespace parallel
    * @endcode
    *
    * All parallel triangulations share certain traits, such as the fact that
-   * they communicate via @ref GlossMPICommunicator "MPI communicators" or
-   * that they have
+   * they communicate via
+   * @ref GlossMPICommunicator "MPI communicators"
+   * or that they have
    * @ref GlossLocallyOwnedCell "locally owned",
    * @ref GlossGhostCell "ghost", and possibly
-   * @ref GlossArtificialCell "artificial cells". This class provides
+   * @ref GlossArtificialCell "artificial cells".
+   * This class provides
    * a number of member functions that allows querying some information
    * about the triangulation that is independent of how exactly a
    * parallel triangulation is implemented (i.e., which of the various
@@ -307,9 +309,13 @@ namespace parallel
    * every detail of a triangulation may be known on each processor.
    * In particular, you have to expect that triangulations of classes
    * derived from this one only store some of the active cells (namely,
-   * the @ref GlossLocallyOwnedCell "locally owned cells"), along
-   * with @ref GlossGhostCell "ghost cells" and possibly
-   * @ref GlossArtificialCell "artificial cells". In contrast to the classes
+   * the
+   * @ref GlossLocallyOwnedCell "locally owned cells"),
+   * along with
+   * @ref GlossGhostCell "ghost cells"
+   * and possibly
+   * @ref GlossArtificialCell "artificial cells".
+   * In contrast to the classes
    * derived from parallel::TriangulationBase, it is certain that the
    * classes derived from the current class will not store the entire
    * triangulation as long as it has a large enough number of cells. (The

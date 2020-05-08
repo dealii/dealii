@@ -44,7 +44,8 @@ class Triangulation;
  *
  * This class stores the index of the coarse cell from which a cell is
  * descendant (or, more specifically, the
- * entry on @ref GlossCoarseCellId "coarse cell IDs"),
+ * entry on
+ * @ref GlossCoarseCellId "coarse cell IDs"),
  * together with information on how to reach the cell from that coarse cell
  * (i.e., which child index to take on each level of the triangulation when
  * moving from one cell to its children). The important point about this

@@ -751,8 +751,9 @@ namespace Utilities
     /**
      * Same as above but returning the sum, average, minimum, maximum,
      * process id of minimum and maximum as a collective operation on the
-     * given MPI @ref GlossMPICommunicator "communicator" @p mpi_communicator
-     * for each entry of the vector.
+     * given MPI
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator for each entry of the vector.
      *
      * @note This function performs a single reduction sweep.
      *
@@ -766,8 +767,9 @@ namespace Utilities
     /**
      * Same as above but returning the sum, average, minimum, maximum,
      * process id of minimum and maximum as a collective operation on the
-     * given MPI @ref GlossMPICommunicator "communicator" @p mpi_communicator
-     * for each entry of the ArrayView.
+     * given MPI
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator for each entry of the ArrayView.
      *
      * @note This function performs a single reduction sweep.
      *
