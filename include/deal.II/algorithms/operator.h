@@ -88,6 +88,7 @@ namespace Algorithms
      */
     virtual void
     notify(const Event &);
+
     /**
      * Clear all #notifications.
      */
@@ -134,11 +135,13 @@ namespace Algorithms
      */
     void
     initialize_stream(std::ostream &stream);
+
     /**
      * Set the current step.
      */
     void
     set_step(const unsigned int step);
+
     /**
      * Output all the vectors in AnyData.
      */
