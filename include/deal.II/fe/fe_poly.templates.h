@@ -569,15 +569,13 @@ std::vector<unsigned int>
 FE_Poly<dim, spacedim>::get_poly_space_numbering() const
 {
   auto *const space_tensor_prod =
-    dynamic_cast<TensorProductPolynomials<dim> *>(
-      this->poly_space.get());
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
 
   if (space_tensor_prod != nullptr)
     return space_tensor_prod->get_numbering();
 
   auto *const space_tensor_prod_const =
-    dynamic_cast<TensorProductPolynomials<dim> *>(
-      this->poly_space.get());
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
 
   if (space_tensor_prod_const != nullptr)
     return space_tensor_prod_const->get_numbering();
