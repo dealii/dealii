@@ -64,7 +64,7 @@ query_testsuite() {
   curl -s "${BASE_URL}/api/v1/index.php?project=deal.II" |
     jq -r ".buildgroups | .[] | .builds | .[] | .id , .site , .buildname, .update.files, .compilation.error, .compilation.warning, .test.fail, .test.pass" |
     paste -d ' ' - - - - - - - - |
-    sort -nr |
+    sort -n |
     if $links; then
       awk "{ print \$2,
         \"[\" \$3 \"](${BASE_URL}/buildSummary.php?buildid=\" \$1 \")\", \
