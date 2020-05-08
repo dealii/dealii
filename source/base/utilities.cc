@@ -28,13 +28,15 @@
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/copy.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
+#undef BOOST_BIND_GLOBAL_PLACEHOLDERS
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
