@@ -51,6 +51,12 @@ until [[ "$*" == "" ]]; do
   shift
 done
 
+if [ -z "$(command -v jq)" ]; then
+  echo "Error: need jq executable in path"
+  echo "Please install jq (sudo apt install jq, sudo yum install jq)"
+  exit 1
+fi
+
 query_testsuite() {
 
   echo "| Host | Configuration | Commit | Build errors | Build warnings | Failing tests | Passing tests |"
