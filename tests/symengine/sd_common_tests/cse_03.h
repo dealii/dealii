@@ -433,17 +433,12 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
 
       symbols_initialised = true;
 
-      // Print optimiser
-#ifdef DEBUG
-      const bool print_optimiser = true;
-#else
-      const bool print_optimiser = false;
-#endif
-      if (print_optimiser == true)
-        {
-          deallog << "Optimizer" << std::endl;
-          optimizer.print(deallog.get_file_stream());
-        }
+      // Unfortunately, we cannot print out the optimizer state. The result
+      // is not stable and depends on standard library, optimization
+      // parameters and compiler being used. MM '20
+      //
+      // deallog << "Optimizer" << std::endl;
+      // optimizer.print(deallog.get_file_stream());
     }
 
   SD::types::substitution_map sub_vals;
