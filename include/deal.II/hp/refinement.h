@@ -583,14 +583,17 @@ namespace hp
      * all siblings together how they will be coarsened. We distinguish between
      * three different cases:
      * <ol>
-     * <li> Not all siblings flagged for coarsening: p-coarsening<br>
+     * <li> Not all siblings flagged for coarsening: p-coarsening.
+     *   <br>
      *   We keep the @p future_fe_indices and clear the coarsen flags
      *   on all siblings.
      * <li> All siblings flagged for coarsening, but not all for
-     *   p-adaptation: h-coarsening<br>
+     *   p-adaptation: h-coarsening.
+     *   <br>
      *   We keep the coarsen flags and clear all @p future_fe_indices
      *   on all siblings.
-     * <li> All siblings flagged for coarsening and p-adaptation: p-coarsening<br>
+     * <li> All siblings flagged for coarsening and p-adaptation: p-coarsening.
+     *   <br>
      *   We keep the @p future_fe_indices and clear the coarsen flags
      *   on all siblings.
      * </ol>

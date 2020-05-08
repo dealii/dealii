@@ -3793,7 +3793,9 @@ private:
 
   /**
    * Translate the unique id of a coarse cell to its index. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
    *
    * @note For serial and shared triangulation both id and index are the same.
    *       For distributed triangulations setting both might differ, since the
@@ -3809,7 +3811,9 @@ private:
 
   /**
    * Translate the index of coarse cell to its unique id. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
    *
    * @note See the note of the method
    * coarse_cell_id_to_coarse_cell_index().

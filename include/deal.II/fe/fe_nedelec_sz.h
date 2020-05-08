@@ -83,7 +83,7 @@ public:
    * Constructor for the NedelecSZ element of given @p order. The maximal
    * polynomial degree of the shape functions is `order+1` (in each variable;
    * the total polynomial degree may be higher). If `order = 0`, the element is
-   * linear and has degrees of freedom only on the edges. If `order >=1` the
+   * linear and has degrees of freedom only on the edges. If `order >= 1` the
    * element has degrees of freedom on the edges, faces and volume. For example
    * the 3D version of FE_NedelecSZ has 12 degrees of freedom for `order = 0`
    * and 54 for `degree = 1`. It is important to have enough quadrature points

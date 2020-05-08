@@ -371,7 +371,8 @@ namespace TriangulationDescription
 
     /**
      * List that for each locally-relevant coarse cell provides the
-     * corresponding global @ref GlossCoarseCellId.
+     * corresponding global
+     * @ref GlossCoarseCellId.
      */
     std::vector<types::coarse_cell_id> coarse_cell_index_to_coarse_cell_id;
 
