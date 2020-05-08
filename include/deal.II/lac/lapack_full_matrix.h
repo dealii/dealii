@@ -793,7 +793,7 @@ public:
    * the diagonal while all the other elements are zero. U is a MxM orthogonal
    * matrix containing the left singular vectors corresponding to the singular
    * values of A. V is a NxN orthonal matrix containing the right singular
-   * vectors corresponding the the singular values of A.
+   * vectors corresponding the singular values of A.
    *
    * Note that the variable #svd_vt contains the tranpose of V and can be
    * accessed by get_svd_vt(), while U is accessed with get_svd_u().

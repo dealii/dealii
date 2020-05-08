@@ -1195,11 +1195,11 @@ namespace DoFTools
    * This function makes sure that identity constraints don't create cycles
    * in @p constraints.
    *
-   * @p periodicity_factor can be used to to implement Bloch periodic conditions
+   * @p periodicity_factor can be used to implement Bloch periodic conditions
    * (a.k.a. phase shift periodic conditions) of the form
    * $\psi(\mathbf{r})=e^{-i\mathbf{k}\cdot\mathbf{r}}u(\mathbf{r})$
    * where $u$ is periodic with the same periodicity as the crystal lattice and
-   * and $\mathbf{k}$ is the wavevector, see
+   * $\mathbf{k}$ is the wavevector, see
    * [https://en.wikipedia.org/wiki/Bloch_wave](https://en.wikipedia.org/wiki/Bloch_wave).
    * The solution at @p face_2 is equal to the solution at @p face_1 times
    * @p periodicity_factor. For example, if the solution at @p face_1 is

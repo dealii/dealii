@@ -755,7 +755,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
 
 
 /**
- * Load size() data items from memory into the the VectorizedArray @p out,
+ * Load size() data items from memory into the VectorizedArray @p out,
  * starting at the given addresses and with given offset, each entry from the
  * offset providing one element of the vectorized array.
  *

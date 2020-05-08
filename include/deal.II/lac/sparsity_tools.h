@@ -275,7 +275,7 @@ namespace SparsityTools
 
   /**
    * Communicate rows in a dynamic sparsity pattern over MPI, similar to the
-   * one above but using a vector `rows_per_cpu` containing the number of of
+   * one above but using a vector `rows_per_cpu` containing the number of
    * rows per CPU for determining ownership. This is typically the value
    * returned by DoFHandler::n_locally_owned_dofs_per_processor -- given that
    * the construction of the input to this function involves all-to-all

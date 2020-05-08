@@ -1198,7 +1198,7 @@ namespace Differentiation
      *
      * Example:
      * If <tt>map["a"] -> 1</tt> and
-     * <tt>map["b"] -> "a"+ 2</tt>, then then the function $f(a,b(a)) = a+b$
+     * <tt>map["b"] -> "a"+ 2</tt>, then the function $f(a,b(a)) = a+b$
      * will be evaluated and the result $f\vert_{a=1,b=a+2} = 3+a$ is determined
      * upon the completion of the first sweep. A second sweep is therefore
      * necessary to resolve the final symbol, and the returned value is

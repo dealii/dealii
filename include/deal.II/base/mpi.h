@@ -888,7 +888,7 @@ namespace Utilities
        *
        * The object @p request needs to exist when MPI_Finalize is called, which means the
        * request is typically statically allocated. Otherwise, you need to call
-       * unregister_request() before the request goes out of scope. Note that is
+       * unregister_request() before the request goes out of scope. Note that it
        * is acceptable for a request to be already waited on (and consequently
        * reset to MPI_REQUEST_NULL).
        *

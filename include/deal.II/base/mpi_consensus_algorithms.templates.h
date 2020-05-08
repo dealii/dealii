@@ -220,7 +220,7 @@ namespace Utilities
 #  endif
 
             std::vector<T1> buffer_recv;
-            // get size of of incoming message
+            // get size of incoming message
             int  number_amount;
             auto ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
             AssertThrowMPI(ierr);
