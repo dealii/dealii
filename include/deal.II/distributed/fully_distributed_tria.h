@@ -233,6 +233,7 @@ namespace parallel
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
 
+    private:
       virtual unsigned int
       coarse_cell_id_to_coarse_cell_index(
         const types::coarse_cell_id coarse_cell_id) const override;
@@ -241,7 +242,6 @@ namespace parallel
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
 
-    private:
       /**
        * store the Settings.
        */
