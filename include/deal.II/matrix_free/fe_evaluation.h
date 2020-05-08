@@ -4419,31 +4419,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size(); ++v)
     dof_indices[v] = numbers::invalid_unsigned_int;
 
-  // ECL: positive side
-  if (this->dof_access_index ==
-        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-      this->is_interior_face == false)
-    {
-      if (n_components == 1 || n_fe_components == 1)
-        for (unsigned int comp = 0; comp < n_components; ++comp)
-          operation.process_dofs_vectorized_transpose(
-            data->dofs_per_component_on_cell,
-            dof_indices,
-            *src[comp],
-            values_dofs[comp],
-            vector_selector);
-      else
-        operation.process_dofs_vectorized_transpose(
-          data->dofs_per_component_on_cell * n_components,
-          dof_indices,
-          *src[0],
-          &values_dofs[0][0],
-          vector_selector);
-    }
+  const bool is_ecl =
+    this->dof_access_index ==
+      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
+    this->is_interior_face == false;
+
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
-  else if (n_filled_lanes == VectorizedArrayType::size() &&
-           n_lanes == VectorizedArrayType::size())
+  if (n_filled_lanes == VectorizedArrayType::size() &&
+      n_lanes == VectorizedArrayType::size() && !is_ecl)
     {
       if (dof_info->index_storage_variants[ind][cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
