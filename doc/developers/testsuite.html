@@ -735,6 +735,9 @@ DEAL_II_PICKUP_TESTS()
         href="https://cdash.43-1.org/index.php?project=deal.II">CDash</a>
       instance just invoke ctest within a build directory (or designated
       build directory) with the <code>-S</code> option pointing to the
+      <code>run_testsuite.cmake</code> script (assuming here for the
+      moment that your build directory is a sub-directory of the
+      source directory):
 <pre>
 $ ctest [...] -V -S ../tests/run_testsuite.cmake
 </pre>
@@ -751,7 +754,13 @@ $ ctest [...] -V -S ../tests/run_testsuite.cmake
 <pre>
 $ ctest -DMAKEOPTS="-j N" -j N [...] -V -S ../tests/run_testsuite.cmake
 </pre>
-      for compiling the library and running the tests in parallel.
+      for compiling the library and running the tests in parallel,
+      where <code>N</code> is the number of jobs you want to
+      simultaneously execute on your machine; you would typically
+      choose <code>N</code> equal to the number of processor cores you
+      have in your machine, or maybe somewhere around one half to
+      three quarters if you don't want to overload it or are short on
+      memory.
     </p>
 
     <p>
