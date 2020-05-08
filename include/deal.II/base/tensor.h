@@ -2391,9 +2391,14 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
   Tensor<1, dim, typename ProductType<Number1, Number2>::type> result;
 
-  result[0] = src1[1] * src2[2] - src1[2] * src2[1];
-  result[1] = src1[2] * src2[0] - src1[0] * src2[2];
-  result[2] = src1[0] * src2[1] - src1[1] * src2[0];
+  // avoid compiler warnings
+  constexpr int s0 = 0 % dim;
+  constexpr int s1 = 1 % dim;
+  constexpr int s2 = 2 % dim;
+
+  result[s0] = src1[s1] * src2[s2] - src1[s2] * src2[s1];
+  result[s1] = src1[s2] * src2[s0] - src1[s0] * src2[s2];
+  result[s2] = src1[s0] * src2[s1] - src1[s1] * src2[s0];
 
   return result;
 }

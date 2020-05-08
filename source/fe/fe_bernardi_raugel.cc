@@ -177,7 +177,6 @@ FE_BernardiRaugel<dim>::initialize_support_points()
     }
 }
 
-template class FE_BernardiRaugel<1>;
 template class FE_BernardiRaugel<2>;
 template class FE_BernardiRaugel<3>;
 
