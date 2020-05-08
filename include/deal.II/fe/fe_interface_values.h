@@ -308,7 +308,7 @@ public:
    *
    * Note that one can define the jump in
    * different ways (the value "there" minus the value "here", or the other way
-   * way around; both are used in the finite element literature). The definition
+   * around; both are used in the finite element literature). The definition
    * here uses "value here minus value there", as seen from the first cell.
    *
    * If this is a boundary face (at_boundary() returns true), then

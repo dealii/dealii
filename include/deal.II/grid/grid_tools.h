@@ -2027,7 +2027,7 @@ namespace GridTools
    * @note If the flag @p group_siblings is set to false, children of a
    *       cell might be placed on different processors even though they are all
    *       active, which is an assumption made by p4est. By relaxing this, we
-   *       can can create partitions owning a single cell (also for refined
+   *       can create partitions owning a single cell (also for refined
    *       meshes).
    */
   template <int dim, int spacedim>

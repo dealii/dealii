@@ -53,7 +53,7 @@ class MultipleParameterLoop;
  * Input may be sorted into subsection trees in order to give the input a
  * logical structure, and input files may include other files.
  *
- * The ParameterHandler class is discussed in in step-29,
+ * The ParameterHandler class is discussed in step-29,
  * step-33, and step-34.
  *
  * <h3>Declaring entries</h3>

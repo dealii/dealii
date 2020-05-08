@@ -339,7 +339,7 @@ public:
 
   /**
    * Set the *desired* value of the next time step size. By calling this
-   * method, we are indicating the the next time advance_time() is called, we
+   * method, we are indicating the next time advance_time() is called, we
    * would like @p time_step_size to be used to advance the simulation time.
    * However, if the step is too large such that the next
    * simulation time exceeds the end time, the step size is truncated.

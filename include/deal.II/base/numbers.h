@@ -71,7 +71,7 @@ namespace internal
    * A helper class specifying the maximal vector length of VectorizedArray
    * for the data type `double` for the given processor architecture and
    * optimization level. For a detailed description of supported maximal vector
-   * lengths, see the the documentation of VectorizedArray.
+   * lengths, see the documentation of VectorizedArray.
    *
    * @author Peter Munch, 2019
    */
@@ -97,7 +97,7 @@ namespace internal
    * A helper class specifying the maximal vector length of VectorizedArray
    * for the data type `float` for the given processor architecture and
    * optimization level. For a detailed description of supported maximal vector
-   * lengths, see the the documentation of VectorizedArray.
+   * lengths, see the documentation of VectorizedArray.
    *
    * @author Peter Munch, 2019
    */
