@@ -796,12 +796,10 @@ namespace Step35
         vel_exact.set_time(t_0);
         vel_exact.set_component(d);
         VectorTools::interpolate(dof_handler_velocity,
-                                 Functions::ZeroFunction<dim>(),
+                                 vel_exact,
                                  u_n_minus_1[d]);
         vel_exact.advance_time(dt);
-        VectorTools::interpolate(dof_handler_velocity,
-                                 Functions::ZeroFunction<dim>(),
-                                 u_n[d]);
+        VectorTools::interpolate(dof_handler_velocity, vel_exact, u_n[d]);
       }
   }
 
