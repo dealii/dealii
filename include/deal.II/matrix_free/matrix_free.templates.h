@@ -460,11 +460,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       initialize_dof_handlers(dof_handler, additional_data);
       std::vector<unsigned int>  dummy;
       std::vector<unsigned char> dummy2;
-      task_info.collect_boundary_cells(cell_level_index.size(),
-                                       cell_level_index.size(),
-                                       VectorizedArrayType::size(),
-                                       dummy);
-      task_info.create_blocks_serial(dummy, 1, dummy, false, dummy, dummy2);
+      task_info.vectorization_length = VectorizedArrayType::size();
+      task_info.n_active_cells       = cell_level_index.size();
+      task_info.create_blocks_serial(
+        dummy, 1, false, dummy, false, dummy, dummy, dummy2);
+
       for (unsigned int i = 0; i < dof_info.size(); ++i)
         {
           Assert(dof_handler[i]->get_fe_collection().size() == 1,
@@ -970,11 +970,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         subdomain_boundary_cells.push_back(counter);
     }
 
-  const unsigned int n_lanes = VectorizedArrayType::size();
-  task_info.collect_boundary_cells(cell_level_index_end_local,
-                                   n_active_cells,
-                                   n_lanes,
-                                   subdomain_boundary_cells);
+  const unsigned int n_lanes     = VectorizedArrayType::size();
+  task_info.n_active_cells       = cell_level_index_end_local;
+  task_info.n_ghost_cells        = n_active_cells - cell_level_index_end_local;
+  task_info.vectorization_length = n_lanes;
 
   // Finalize the creation of the ghost indices
   {
@@ -1022,21 +1021,55 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   std::vector<unsigned char> irregular_cells;
   if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none)
     {
-      const bool strict_categories =
+      bool strict_categories =
         additional_data.cell_vectorization_categories_strict ||
         dof_handlers.active_dof_handler == DoFHandlers::hp;
       unsigned int dofs_per_cell = 0;
       for (const auto &info : dof_info)
         dofs_per_cell = std::max(dofs_per_cell, info.dofs_per_cell[0]);
+
+      // Detect cells with the same parent to make sure they get scheduled
+      // together in the loop, which increases data locality.
+      std::vector<unsigned int> parent_relation(task_info.n_active_cells +
+                                                  task_info.n_ghost_cells,
+                                                numbers::invalid_unsigned_int);
+      std::map<std::pair<int, int>, std::vector<unsigned int>> cell_parents;
+      for (unsigned int c = 0; c < cell_level_index_end_local; ++c)
+        if (cell_level_index[c].first > 0)
+          {
+            typename Triangulation<dim>::cell_iterator cell(
+              dof_handlers.active_dof_handler == DoFHandlers::usual ?
+                &dof_handlers.dof_handler[0]->get_triangulation() :
+                &dof_handlers.hp_dof_handler[0]->get_triangulation(),
+              cell_level_index[c].first,
+              cell_level_index[c].second);
+            Assert(cell->level() > 0, ExcInternalError());
+            cell_parents[std::make_pair(cell->parent()->level(),
+                                        cell->parent()->index())]
+              .push_back(c);
+          }
+      unsigned int position = 0;
+      for (const auto &it : cell_parents)
+        if (it.second.size() == GeometryInfo<dim>::max_children_per_cell)
+          {
+            for (auto i : it.second)
+              parent_relation[i] = position;
+            ++position;
+          }
       task_info.create_blocks_serial(subdomain_boundary_cells,
                                      dofs_per_cell,
+                                     dof_handlers.active_dof_handler ==
+                                       DoFHandlers::hp,
                                      dof_info[0].cell_active_fe_index,
                                      strict_categories,
+                                     parent_relation,
                                      renumbering,
                                      irregular_cells);
     }
   else
     {
+      task_info.make_boundary_cells_divisible(subdomain_boundary_cells);
+
       // For strategy with blocking before partitioning: reorganize the indices
       // in order to overlap communication in MPI with computations: Place all
       // cells with ghost indices into one chunk. Also reorder cells so that we

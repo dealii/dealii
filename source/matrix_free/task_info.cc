@@ -695,16 +695,9 @@ namespace internal
 
 
     void
-    TaskInfo::collect_boundary_cells(
-      const unsigned int         n_active_cells_in,
-      const unsigned int         n_active_and_ghost_cells,
-      const unsigned int         vectorization_length_in,
+    TaskInfo::make_boundary_cells_divisible(
       std::vector<unsigned int> &boundary_cells)
     {
-      vectorization_length = vectorization_length_in;
-      n_active_cells       = n_active_cells_in;
-      n_ghost_cells        = n_active_and_ghost_cells - n_active_cells;
-
       // try to make the number of boundary cells divisible by the number of
       // vectors in vectorization
       unsigned int fillup_needed =
@@ -775,88 +768,63 @@ namespace internal
 
     void
     TaskInfo::create_blocks_serial(
-      const std::vector<unsigned int> &boundary_cells,
+      const std::vector<unsigned int> &cells_with_comm,
       const unsigned int               dofs_per_cell,
+      const bool                       categories_are_hp,
       const std::vector<unsigned int> &cell_vectorization_categories,
       const bool                       cell_vectorization_categories_strict,
+      const std::vector<unsigned int> &parent_relation,
       std::vector<unsigned int> &      renumbering,
       std::vector<unsigned char> &     incompletely_filled_vectorization)
     {
-      const unsigned int n_macro_cells =
-        (n_active_cells + vectorization_length - 1) / vectorization_length;
-      const unsigned int n_ghost_slots =
-        (n_ghost_cells + vectorization_length - 1) / vectorization_length;
-      const unsigned int n_boundary_cells = boundary_cells.size();
+      // This function is decomposed into several steps to determine a good
+      // ordering that satisfies the following constraints:
+      // a. Only cells belonging to the same category (or next higher if the
+      // cell_vectorization_categories_strict is false) can be grouped into
+      // the same SIMD batch
+      // b. hp adaptive computations must form contiguous ranges for the same
+      // degree (category) in cell_partition_data
+      // c. We want to group the cells with the same parent in the same SIMD
+      // lane if possible
+      // d. The cell order should be similar to the initial one
+      // e. Form sets without MPI communication and those with to overlap
+      // communication with computation
+      //
+      // These constraints are satisfied by first grouping by the categories
+      // and, within the groups, to distinguish between cells with a parent
+      // and those without. All of this is set up with batches of cells (with
+      // padding if the size does not match). Then we define a vector of
+      // arrays where we define sorting criteria for the cell batches to
+      // satisfy the items b and d together, split by different parts to
+      // satisfy item e.
 
-      incompletely_filled_vectorization.resize(n_macro_cells + n_ghost_slots);
-      renumbering.resize(n_active_cells + n_ghost_cells,
-                         numbers::invalid_unsigned_int);
+      // Give the compiler a chance to detect that vectorization_length is a
+      // power of two, which allows it to replace integer divisions by shifts
+      unsigned int vectorization_length_bits = 0;
+      unsigned int my_length                 = vectorization_length;
+      while (my_length >>= 1)
+        ++vectorization_length_bits;
+      const unsigned int n_lanes = 1 << vectorization_length_bits;
 
-      // Define the outer number of partitions. In the MPI case, we have three
-      // partitions (part before comm, part with comm, part after comm)
-      if (n_procs == 1)
-        partition_row_index.resize(3);
-      else
-        partition_row_index.resize(5);
-
-      // Initially mark the cells according to the MPI ranking
-      std::vector<unsigned char> cell_marked(n_active_cells + n_ghost_cells, 0);
-      if (n_procs > 1)
-        {
-          for (unsigned int i = 0; i < n_boundary_cells; ++i)
-            cell_marked[boundary_cells[i]] = 2;
-
-          Assert(boundary_cells.size() % vectorization_length == 0 ||
-                   boundary_cells.size() == n_active_cells,
-                 ExcInternalError());
-
-          const unsigned int n_second_slot =
-            ((n_active_cells - n_boundary_cells) / 2 / vectorization_length) *
-            vectorization_length;
-          unsigned int count = 0;
-          unsigned int c     = 0;
-          for (; c < n_active_cells && count < n_second_slot; ++c)
-            if (cell_marked[c] == 0)
-              {
-                cell_marked[c] = 1;
-                ++count;
-              }
-          for (; c < n_active_cells; ++c)
-            if (cell_marked[c] == 0)
-              cell_marked[c] = 3;
-          for (; c < n_active_cells + n_ghost_cells; ++c)
-            if (cell_marked[c] == 0)
-              cell_marked[c] = 4;
-        }
-      else
-        std::fill(cell_marked.begin(), cell_marked.end(), 1);
-
-      for (const unsigned char marker : cell_marked)
-        {
-          (void)marker;
-          Assert(marker != 0, ExcInternalError());
-        }
-
+      // Step 1: find tight map of categories for not taking exceeding amounts
+      // of memory below. Sort the new categories by the numbers in the
+      // old one to ensure we respect the given rules
       unsigned int              n_categories = 1;
-      std::vector<unsigned int> tight_category_map;
+      std::vector<unsigned int> tight_category_map(n_active_cells, 0);
       if (cell_vectorization_categories.empty() == false)
         {
           AssertDimension(cell_vectorization_categories.size(),
                           n_active_cells + n_ghost_cells);
 
-          // create a tight map of categories for not taking exceeding amounts
-          // of memory below. Sort the new categories by the numbers in the
-          // old one.
-          tight_category_map.resize(n_active_cells + n_ghost_cells);
           std::set<unsigned int> used_categories;
-          for (unsigned int i = 0; i < n_active_cells + n_ghost_cells; ++i)
+          for (unsigned int i = 0; i < n_active_cells; ++i)
             used_categories.insert(cell_vectorization_categories[i]);
           std::vector<unsigned int> used_categories_vector(
             used_categories.size());
           n_categories = 0;
           for (const auto &it : used_categories)
             used_categories_vector[n_categories++] = it;
-          for (unsigned int i = 0; i < n_active_cells + n_ghost_cells; ++i)
+          for (unsigned int i = 0; i < n_active_cells; ++i)
             {
               const unsigned int index =
                 std::lower_bound(used_categories_vector.begin(),
@@ -866,93 +834,222 @@ namespace internal
               AssertIndexRange(index, used_categories_vector.size());
               tight_category_map[i] = index;
             }
+        }
 
-          // leave some more space for empty lanes
-          incompletely_filled_vectorization.resize(
-            incompletely_filled_vectorization.size() + 4 * n_categories);
+      // Step 2: Sort the cells by the category. If we want to fill up the
+      // ranges in vectorization, promote some of the cells to a higher
+      // category
+      std::vector<std::vector<unsigned int>> renumbering_category(n_categories);
+      for (unsigned int i = 0; i < n_active_cells; ++i)
+        renumbering_category[tight_category_map[i]].push_back(i);
+
+      if (cell_vectorization_categories_strict == false && n_categories > 1)
+        for (unsigned int j = n_categories - 1; j > 0; --j)
+          {
+            unsigned int lower_index = j - 1;
+            while (renumbering_category[j].size() % n_lanes)
+              {
+                while (renumbering_category[j].size() % n_lanes &&
+                       !renumbering_category[lower_index].empty())
+                  {
+                    renumbering_category[j].push_back(
+                      renumbering_category[lower_index].back());
+                    renumbering_category[lower_index].pop_back();
+                  }
+                if (lower_index == 0)
+                  break;
+                else
+                  --lower_index;
+              }
+          }
+
+      // Step 3: Use the parent relation to find a good grouping of cells. To
+      // do this, we first put cells of each category defined above into two
+      // bins, those which we know can be grouped together by the given parent
+      // relation and those which cannot
+      std::vector<unsigned int> temporary_numbering;
+      temporary_numbering.reserve(n_active_cells +
+                                  (n_lanes - 1) * n_categories);
+      const unsigned int n_cells_per_parent =
+        std::count(parent_relation.begin(), parent_relation.end(), 0);
+      std::vector<unsigned int> category_size;
+      for (unsigned int j = 0; j < n_categories; ++j)
+        {
+          std::vector<std::pair<unsigned int, unsigned int>> grouped_cells;
+          std::vector<unsigned int>                          other_cells;
+          for (const unsigned int cell : renumbering_category[j])
+            if (parent_relation.empty() ||
+                parent_relation[cell] == numbers::invalid_unsigned_int)
+              other_cells.push_back(cell);
+            else
+              grouped_cells.emplace_back(parent_relation[cell], cell);
+
+          // Compute the number of cells per group
+          std::sort(grouped_cells.begin(), grouped_cells.end());
+          std::vector<unsigned int> n_cells_per_group;
+          unsigned int              length = 0;
+          for (unsigned int i = 0; i < grouped_cells.size(); ++i, ++length)
+            if (i > 0 && grouped_cells[i].first != grouped_cells[i - 1].first)
+              {
+                n_cells_per_group.push_back(length);
+                length = 0;
+              }
+          if (length > 0)
+            n_cells_per_group.push_back(length);
+
+          // Move groups that do not have the complete size (due to
+          // categories) to the 'other_cells'. The cells with correct group
+          // size are immediately appended to the temporary cell numbering
+          auto group_it = grouped_cells.begin();
+          for (unsigned int length : n_cells_per_group)
+            if (length < n_cells_per_parent)
+              for (unsigned int j = 0; j < length; ++j)
+                other_cells.push_back((group_it++)->second);
+            else
+              {
+                // we should not have more cells in a group than in the first
+                // check we did above
+                AssertDimension(length, n_cells_per_parent);
+                for (unsigned int j = 0; j < length; ++j)
+                  temporary_numbering.push_back((group_it++)->second);
+              }
+
+          // Sort the remaining cells and append them as well
+          std::sort(other_cells.begin(), other_cells.end());
+          temporary_numbering.insert(temporary_numbering.end(),
+                                     other_cells.begin(),
+                                     other_cells.end());
+
+          while (temporary_numbering.size() % n_lanes != 0)
+            temporary_numbering.push_back(numbers::invalid_unsigned_int);
+
+          category_size.push_back(temporary_numbering.size());
+        }
+
+      // Step 4: Identify the batches with cells marked as "comm"
+      std::vector<bool> batch_with_comm(temporary_numbering.size() / n_lanes,
+                                        false);
+      std::vector<unsigned int> temporary_numbering_inverse(n_active_cells);
+      for (unsigned int i = 0; i < temporary_numbering.size(); ++i)
+        if (temporary_numbering[i] != numbers::invalid_unsigned_int)
+          temporary_numbering_inverse[temporary_numbering[i]] = i;
+      for (const unsigned int cell : cells_with_comm)
+        batch_with_comm[temporary_numbering_inverse[cell] / n_lanes] = true;
+
+      // Step 5: Sort the batches of cells by their last cell index to get
+      // good locality, assuming that the initial cell order is of good
+      // locality. In case we have hp calculations with categories, we need to
+      // sort also by the category.
+      std::vector<std::array<unsigned int, 3>> batch_order;
+      std::vector<std::array<unsigned int, 3>> batch_order_comm;
+      for (unsigned int i = 0; i < temporary_numbering.size(); i += n_lanes)
+        {
+          unsigned int max_index = 0;
+          for (unsigned int j = 0; j < n_lanes; ++j)
+            if (temporary_numbering[i + j] < numbers::invalid_unsigned_int)
+              max_index = std::max(temporary_numbering[i + j], max_index);
+          const unsigned int category_hp =
+            categories_are_hp ?
+              std::upper_bound(category_size.begin(), category_size.end(), i) -
+                category_size.begin() :
+              0;
+          const std::array<unsigned int, 3> next{category_hp, max_index, i};
+          if (batch_with_comm[i / n_lanes])
+            batch_order_comm.emplace_back(next);
+          else
+            batch_order.emplace_back(next);
+        }
+
+      std::sort(batch_order.begin(), batch_order.end());
+      std::sort(batch_order_comm.begin(), batch_order_comm.end());
+
+      // Step 6: Put the cells with communication in the middle of the cell
+      // range. For the MPI case, we need three groups to enable overlap for
+      // communication and computation (part before comm, part with comm, part
+      // after comm), whereas we need one for the other case. And in each
+      // case, we allow for a slot of "ghosted" cells.
+      std::vector<unsigned int> blocks;
+      if (n_procs == 1)
+        {
+          if (batch_order.empty())
+            std::swap(batch_order_comm, batch_order);
+          Assert(batch_order_comm.empty(), ExcInternalError());
+          partition_row_index.resize(3);
+          blocks = {0, static_cast<unsigned int>(batch_order.size())};
         }
       else
-        tight_category_map.resize(n_active_cells + n_ghost_cells, 0);
+        {
+          partition_row_index.resize(5);
+          const unsigned int comm_begin = batch_order.size() / 2;
+          batch_order.insert(batch_order.begin() + comm_begin,
+                             batch_order_comm.begin(),
+                             batch_order_comm.end());
+          const unsigned int comm_end = comm_begin + batch_order_comm.size();
+          const unsigned int end      = batch_order.size();
+          blocks                      = {0, comm_begin, comm_end, end};
+        }
+
+      // Step 7: Fill in the data by batches for the locally owned cells.
+      const unsigned int n_cell_batches = batch_order.size();
+      const unsigned int n_ghost_batches =
+        (n_ghost_cells + n_lanes - 1) / n_lanes;
+      incompletely_filled_vectorization.resize(n_cell_batches +
+                                               n_ghost_batches);
 
       cell_partition_data.clear();
       cell_partition_data.resize(1, 0);
-      unsigned int                           counter = 0;
-      unsigned int                           n_cells = 0;
-      std::vector<std::vector<unsigned int>> renumbering_category(n_categories);
-      for (unsigned int block = 1; block < (n_procs > 1u ? 5u : 3u); ++block)
+
+      renumbering.clear();
+      renumbering.resize(n_active_cells + n_ghost_cells,
+                         numbers::invalid_unsigned_int);
+
+      unsigned int counter = 0;
+      for (unsigned int block = 0; block < blocks.size() - 1; ++block)
         {
-          // step 1: sort by category
-          for (unsigned int i = 0; i < n_active_cells + n_ghost_cells; ++i)
-            if (cell_marked[i] == block)
-              renumbering_category[tight_category_map[i]].push_back(i);
+          const unsigned int grain_size =
+            std::max((2048U / dofs_per_cell) / 8 * 4, 2U);
+          for (unsigned int k = blocks[block]; k < blocks[block + 1];
+               k += grain_size)
+            cell_partition_data.push_back(
+              std::min(k + grain_size, blocks[block + 1]));
+          partition_row_index[block + 1] = cell_partition_data.size() - 1;
 
-          // step 2: if we want to fill up the ranges in vectorization, promote
-          // some of the cells to a higher category
-          if (cell_vectorization_categories_strict == false && n_categories > 1)
-            for (unsigned int j = n_categories - 1; j > 0; --j)
-              {
-                unsigned int lower_index = j - 1;
-                while (renumbering_category[j].size() % vectorization_length)
-                  {
-                    while (renumbering_category[j].size() %
-                             vectorization_length &&
-                           !renumbering_category[lower_index].empty())
-                      {
-                        renumbering_category[j].push_back(
-                          renumbering_category[lower_index].back());
-                        renumbering_category[lower_index].pop_back();
-                      }
-                    if (lower_index == 0)
-                      break;
-                    else
-                      --lower_index;
-                  }
-              }
-
-          // step 3: append cells according to categories
-          for (unsigned int j = 0; j < n_categories; ++j)
+          // Set the numbering according to the reordered temporary one
+          for (unsigned int k = blocks[block]; k < blocks[block + 1]; ++k)
             {
-              for (const unsigned int cell : renumbering_category[j])
-                renumbering[counter++] = cell;
-              unsigned int remainder =
-                renumbering_category[j].size() % vectorization_length;
-              if (remainder)
-                incompletely_filled_vectorization
-                  [renumbering_category[j].size() / vectorization_length +
-                   n_cells] = remainder;
-              const unsigned int n_my_macro_cells =
-                (renumbering_category[j].size() + vectorization_length - 1) /
-                vectorization_length;
-              renumbering_category[j].clear();
-
-              // step 4: create blocks for face integrals, make the number of
-              // cells divisible by 4 if possible
-              const unsigned int block_size =
-                std::max((2048U / dofs_per_cell) / 8 * 4, 2U);
-              if (block < 4)
-                for (unsigned int k = 0; k < n_my_macro_cells; k += block_size)
-                  cell_partition_data.push_back(
-                    n_cells + std::min(k + block_size, n_my_macro_cells));
-              else
-                cell_partition_data.back() += n_my_macro_cells;
-              n_cells += n_my_macro_cells;
+              const unsigned int pos = batch_order[k][2];
+              unsigned int       j   = 0;
+              for (; j < n_lanes && temporary_numbering[pos + j] !=
+                                      numbers::invalid_unsigned_int;
+                   ++j)
+                renumbering[counter++] = temporary_numbering[pos + j];
+              if (j < n_lanes)
+                incompletely_filled_vectorization[k] = j;
             }
-          partition_row_index[block] = cell_partition_data.size() - 1;
-          if (block == 3 || (block == 1 && n_procs == 1))
-            cell_partition_data.push_back(n_cells);
         }
-      if (cell_vectorization_categories_strict == true)
-        {
-          Assert(n_cells >= n_macro_cells + n_ghost_slots, ExcInternalError());
-        }
-      else
-        {
-          AssertDimension(n_cells, n_macro_cells + n_ghost_slots);
-        }
-      AssertDimension(cell_partition_data.back(), n_cells);
-      AssertDimension(counter, n_active_cells + n_ghost_cells);
+      AssertDimension(counter, n_active_cells);
 
-      incompletely_filled_vectorization.resize(cell_partition_data.back());
+      // Step 8: Treat the ghost cells
+      for (unsigned int cell = n_active_cells;
+           cell < n_active_cells + n_ghost_cells;
+           ++cell)
+        {
+          if (!cell_vectorization_categories.empty())
+            AssertDimension(cell_vectorization_categories[cell],
+                            cell_vectorization_categories[n_active_cells]);
+          renumbering[cell] = cell;
+        }
+      if (n_ghost_cells % n_lanes)
+        incompletely_filled_vectorization.back() = n_ghost_cells % n_lanes;
+      cell_partition_data.push_back(n_cell_batches + n_ghost_batches);
+      partition_row_index.back() = cell_partition_data.size() - 1;
+
+#ifdef DEBUG
+      std::vector<unsigned int> renumber_cpy(renumbering);
+      std::sort(renumber_cpy.begin(), renumber_cpy.end());
+      for (unsigned int i = 0; i < renumber_cpy.size(); ++i)
+        AssertDimension(i, renumber_cpy[i]);
+#endif
     }
 
 
