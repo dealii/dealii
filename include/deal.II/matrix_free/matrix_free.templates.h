@@ -749,6 +749,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   const unsigned int n_fe           = dof_handlers.n_dof_handlers;
   const unsigned int n_active_cells = cell_level_index.size();
 
+  std::vector<bool> is_fe_dg(n_fe, false);
+
   AssertDimension(n_active_cells, cell_level_index.size());
   AssertDimension(n_fe, locally_owned_set.size());
   AssertDimension(n_fe, constraint.size());
@@ -772,8 +774,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
             fes.push_back(&fe[f]);
 
           if (fe.size() > 1)
-            dof_info[no].cell_active_fe_index.resize(
-              n_active_cells, numbers::invalid_unsigned_int);
+            {
+              dof_info[no].cell_active_fe_index.resize(
+                n_active_cells, numbers::invalid_unsigned_int);
+              is_fe_dg[no] = fe[0].dofs_per_vertex == 0;
+            }
 
           Assert(additional_data.cell_vectorization_category.empty(),
                  ExcNotImplemented());
@@ -785,6 +790,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           if (cell_categorization_enabled == true)
             dof_info[no].cell_active_fe_index.resize(
               n_active_cells, numbers::invalid_unsigned_int);
+          is_fe_dg[no] = dofh->get_fe().dofs_per_vertex == 0;
         }
       lexicographic[no].resize(fes.size());
 
@@ -1282,6 +1288,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                                constraint_pool_row_index,
                                irregular_cells);
 
+  auto face_info_temp = face_info;
+
   // Finally resort the faces and collect several faces for vectorization
   if ((additional_data.mapping_update_flags_inner_faces |
        additional_data.mapping_update_flags_boundary_faces) != update_default)
@@ -1345,7 +1353,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
            task_info.refinement_edge_face_partition_data[0]));
 
       for (unsigned int no = 0; no < n_fe; ++no)
-        dof_info[no].compute_face_index_compression(face_info.faces);
+        if (is_fe_dg[no])
+          dof_info[no].compute_face_index_compression(face_info.faces);
 
       // build the inverse map back from the faces array to
       // cell_and_face_to_plain_faces
@@ -1401,8 +1410,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           }
 
       // compute tighter index sets for various sets of face integrals
-      for (internal::MatrixFreeFunctions::DoFInfo &di : dof_info)
+      for (unsigned int no = 0; no < n_fe; ++no)
         {
+          if (!is_fe_dg[no])
+            continue;
+
+          internal::MatrixFreeFunctions::DoFInfo &di = dof_info[no];
+
           const Utilities::MPI::Partitioner &part = *di.vector_partitioner;
 
           // partitioner 0: no face integrals, simply use the indices present
@@ -1785,7 +1799,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     }
 
   for (unsigned int no = 0; no < n_fe; ++no)
-    dof_info[no].compute_vector_zero_access_pattern(task_info, face_info.faces);
+    if (is_fe_dg[no])
+      dof_info[no].compute_vector_zero_access_pattern(task_info,
+                                                      face_info.faces);
+    else
+      dof_info[no].compute_vector_zero_access_pattern(task_info,
+                                                      face_info_temp.faces);
 
   indices_are_initialized = true;
 }
