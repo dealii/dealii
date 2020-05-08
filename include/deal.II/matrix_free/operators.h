@@ -900,7 +900,7 @@ namespace MatrixFreeOperators
      * constructed object.
      */
     virtual void
-    clear();
+    clear() override;
 
     /**
      * Read/Write access to coefficients to be used in Laplace operator.
