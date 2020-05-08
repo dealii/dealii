@@ -1531,8 +1531,9 @@ namespace GridGenerator
    * default boundary indicators, then you will have to set boundary indicators
    * again by hand in the output triangulation.
    *
-   * @note Unlike most GridGenerator functions, this function does not attach
-   * any manifolds to @p result, nor does it set any manifold ids.
+   * @note This function does not attach any manifolds to @p result, nor does
+   * it set any manifold ids. In particular, manifolds attached to the two
+   * input triangulations will be lost in the @p result triangulation.
    *
    * @note For a related operation on refined meshes when both meshes are
    * derived from the same coarse mesh, see
