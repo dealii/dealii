@@ -200,7 +200,7 @@ public:
    * output_table() also writes in this file in the format deduced from its
    * extension;
    * @param precision How many digits to use when writing the error;
-   * @param compute_error Control wether the filling of the table is enabled
+   * @param compute_error Control whether the filling of the table is enabled
    * or not. This flag may be used to disable at run time any error computation;
    *
    * The parameters you specify with this constructor can be written to a

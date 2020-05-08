@@ -865,7 +865,7 @@ namespace Differentiation
          * @param output_values The evaluated numerical outcome of the
          * substitution.
          * @param substitution_values The values with which to associate each
-         * individial independent symbol.
+         * individual independent symbol.
          */
         static void
         substitute(typename Optimizer::OptimizerType *optimizer,
@@ -1004,7 +1004,7 @@ namespace Differentiation
          * @param output_values The evaluated numerical outcome of the
          * substitution.
          * @param substitution_values The values with which to associate each
-         * individial independent symbol.
+         * individual independent symbol.
          */
         static void
         substitute(typename Optimizer::OptimizerType *optimizer,
@@ -1395,16 +1395,16 @@ namespace Differentiation
      * practices" that can be adopted in order to mitigate this cost as much
      * as possible:
      * 1. Reuse a single instance of the class as much as possible.
-     *    The most obvious wat that this can be achieved would be to place an
+     *    The most obvious way that this can be achieved would be to place an
      *    instance of this class in a centralized location where it can
-     *    potentially be used by mulitple calling functions and objects, if
+     *    potentially be used by multiple calling functions and objects, if
      *    contextually possible.
      * 2. Another form of reuse would entail generalizing the dependent
      *    functions/expressions to be evaluated by the optimizer as much as
-     *    possible. For example, material coeffients need not necessarily be
+     *    possible. For example, material coefficients need not necessarily be
      *    hard-coded, and one generalized statement of a constitutive law could
-     *    then be broadly used in other material subdomains goverened by the
-     *    same class of constiutive law, but with different constitutive
+     *    then be broadly used in other material subdomains governed by the
+     *    same class of constitutive law, but with different constitutive
      *    parameters. The same principle applies if using symbolic expressions
      *    to describe boundary conditions, systems of linear equations, etc.
      * 3. When possible, consider using serialization to save and load the state
@@ -1861,7 +1861,7 @@ namespace Differentiation
        *
        * @note In contrast to the other variants of this function, the order of
        * the returned entries is an internal implementation detail, and cannot
-       * be guarenteed under all conditions. The entries in the returned vector
+       * be guaranteed under all conditions. The entries in the returned vector
        * are, in general, identical to the order in which the dependent
        * expressions are originally registered. However, when registering
        * tensors and symmetric tensors of expressions, these are "unrolled"
@@ -1976,7 +1976,7 @@ namespace Differentiation
        * to store the result of a substitution sweep as some optimizers
        * work on all symbolic expressions in a single batch. In this way
        * they can employ methods such as common subexpression elimination
-       * to minimise the number of terms evaluated across all symbolic
+       * to minimize the number of terms evaluated across all symbolic
        * functions.
        *
        * This variable is marked as mutable. This facilitates the substitution

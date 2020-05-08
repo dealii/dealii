@@ -64,7 +64,7 @@ namespace internal
     virtual void
     vector_compress_finish() = 0;
 
-    /// Zeros part of the vector accroding to a given range as stored in
+    /// Zeros part of the vector according to a given range as stored in
     /// DoFInfo
     virtual void
     zero_dst_vector_range(const unsigned int range_index) = 0;

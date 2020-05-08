@@ -473,7 +473,7 @@ namespace TriangulationDescription
      * @return Description to be used to set up a Triangulation.
      *
      * @note If construct_multigrid_hierarchy is set in the settings, the
-     *   @p smooting parameter is extended with the
+     *   @p smoothing parameter is extended with the
      *   limit_level_difference_at_vertices flag.
      *
      * @author Peter Munch, 2019

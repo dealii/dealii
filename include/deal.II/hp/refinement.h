@@ -44,7 +44,7 @@ namespace hp
 namespace hp
 {
   /**
-   * We supply adaptive methods to align computational ressources with the
+   * We supply adaptive methods to align computational resources with the
    * complexity of the numerical solution. Error estimates are an appropriate
    * means of determining where adjustments need to be made.
    *
@@ -136,7 +136,7 @@ namespace hp
      *
      * Such functions take two numbers as arguments: The first one corresponds
      * to the provided criterion, while the other one conforms to the reference.
-     * The result of the comparision will be returned as a boolean.
+     * The result of the comparison will be returned as a boolean.
      */
     template <typename Number>
     using ComparisonFunction =
@@ -403,7 +403,7 @@ namespace hp
      * different, and their parent cell will be assigned to their least
      * dominating finite element that belongs to its most general child. Thus,
      * we will always interpolate on an enclosing finite element space.
-     * Additionaly assuming that the finite elements on the cells to be
+     * Additionally assuming that the finite elements on the cells to be
      * coarsened are sufficient to represent the solution correctly (e.g. at
      * least quadratic basis functions for a quadratic solution), we are
      * confident to say that the error will not change by sole interpolation on

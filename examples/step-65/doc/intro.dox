@@ -125,7 +125,7 @@ inverts in some regions
 because the new points placed along interior cells intersect with the boundary
 as they are not following the circular shape along the toroidal direction. The
 simple case of a torus can still be fixed because we know that the toroidal
-direction follows a cylindrical coordindate system, so attaching a
+direction follows a cylindrical coordinate system, so attaching a
 TorusManifold to the surface combined with CylindricalManifold with
 appropriate periodicity in toroidal direction applied to all interior entities
 would produce a high-quality mesh as follows, now shown with two top cells

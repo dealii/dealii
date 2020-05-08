@@ -2764,7 +2764,7 @@ public:
    * output/solution_0003.pvtu
    * @endcode
    * where the `.0.vtu` file contains the output of the first half of the
-   * proceses grouped together, and the `.1.vtu` the data from the remaining
+   * processes grouped together, and the `.1.vtu` the data from the remaining
    * half.
    *
    * A specified @p directory and a @p filename_without_extension

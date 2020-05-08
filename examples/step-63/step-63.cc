@@ -888,7 +888,7 @@ namespace Step63
   // relaxation parameter.
 
   // Since multiplicative methods tend to be more powerful than additive method,
-  // fewer smoothing steps are required to see convergence indepedent of mesh
+  // fewer smoothing steps are required to see convergence independent of mesh
   // size. The same holds for block smoothers over point smoothers. This is
   // reflected in the choice for the number of smoothing steps for each type of
   // smoother below.

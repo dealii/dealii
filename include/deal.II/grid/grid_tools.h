@@ -4005,7 +4005,7 @@ namespace GridTools
             }
         }
 
-    // Protect the following communcation:
+    // Protect the following communication:
     static Utilities::MPI::CollectiveMutex      mutex;
     Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex,
                                                      tria->get_communicator());

@@ -17,7 +17,7 @@
  * Authors: Bruno Turcksin, Daniel Arndt, Oak Ridge National Laboratory, 2019
  */
 
-// First include the necessary files from the deal.II libary known from the
+// First include the necessary files from the deal.II library known from the
 // previous tutorials.
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -486,7 +486,7 @@ namespace Step64
 
 
   // This solve() function finally contains the calls to the new classes
-  // previously dicussed. Here we don't use any preconditioner, i.e.
+  // previously discussed. Here we don't use any preconditioner, i.e.,
   // precondition by the identity matrix, to focus just on the peculiarities of
   // the CUDAWrappers::MatrixFree framework. Of course, in a real application
   // the choice of a suitable preconditioner is crucial but we have at least the
@@ -606,7 +606,7 @@ namespace Step64
 // the machine, there is nothing we can do about it: All MPI ranks on
 // that machine need to share it. But if there are more than one GPU,
 // then it is better to address different graphic cards for different
-// processes. The choice below is based on the MPI proccess id by
+// processes. The choice below is based on the MPI process id by
 // assigning GPUs round robin to GPU ranks. (To work correctly, this
 // scheme assumes that the MPI ranks on one machine are
 // consecutive. If that were not the case, then the rank-GPU

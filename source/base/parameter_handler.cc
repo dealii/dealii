@@ -1265,7 +1265,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
   // done recursively in our own code. take care of the two special formats
   // first
 
-  // explicity compress the tree if requested
+  // explicitly compress the tree if requested
   if ((style & Short) && (style & (XML | JSON)))
     {
       // modify the copy of the tree

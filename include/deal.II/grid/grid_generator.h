@@ -1914,7 +1914,7 @@ namespace GridGenerator
 
       /**
        * Vertical distance from airfoil chord to upper boundary of the mesh
-       * i.e. half of the total mesh hight.
+       * i.e. half of the total mesh height.
        */
       double height;
 
@@ -1981,7 +1981,7 @@ namespace GridGenerator
        * nonequidistand airfoil points.
        * Increasing the provided nonequidistant airfoil points leads to
        * a better approximation of the airfoil geometry. Parameter
-       * "airfoil_sampling_factor" therby defines the relation of
+       * "airfoil_sampling_factor" thereby defines the relation of
        * provided_nonequidistant_points to required_equidistant_points.
        */
       unsigned int airfoil_sampling_factor;

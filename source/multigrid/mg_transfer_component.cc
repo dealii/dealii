@@ -531,16 +531,16 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                   for (types::global_dof_index i = 0; i < n_dofs; ++i)
                     {
                       SparseMatrix<double>::iterator
-                        anfang = prolongation_matrices[level]
-                                   ->block(iblock, jblock)
-                                   .begin(i),
-                        ende = prolongation_matrices[level]
-                                 ->block(iblock, jblock)
-                                 .end(i);
-                      for (; anfang != ende; ++anfang)
+                        begin = prolongation_matrices[level]
+                                  ->block(iblock, jblock)
+                                  .begin(i),
+                        end = prolongation_matrices[level]
+                                ->block(iblock, jblock)
+                                .end(i);
+                      for (; begin != end; ++begin)
                         {
                           const types::global_dof_index column_number =
-                            anfang->column();
+                            begin->column();
 
                           // convert global indices into local ones
                           const BlockIndices block_indices_coarse(

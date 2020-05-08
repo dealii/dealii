@@ -121,7 +121,7 @@ public:
 
 protected:
   /**
-   * This is the main function overriden from the base class MappingQGeneric.
+   * This is the main function overridden from the base class MappingQGeneric.
    */
   virtual std::vector<Point<spacedim>>
   compute_mapping_support_points(

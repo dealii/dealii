@@ -346,7 +346,7 @@ namespace step62
     HDF5::DataSet frequency_dataset;
     HDF5::DataSet probe_positions_dataset;
 
-    // HDF5 dataset that stores the values of the energy measured by the proble.
+    // HDF5 dataset that stores the values of the energy measured by the probe.
     HDF5::DataSet displacement;
 
 

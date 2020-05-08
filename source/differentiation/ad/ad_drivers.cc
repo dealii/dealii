@@ -366,7 +366,7 @@ namespace Differentiation
       //               >>> File or directory not found! <<<
       // , every time a query is made about a non-existent tape.
       // So either way we have to guard that check with something more
-      // conervative so that we don't output useless messages for our users.
+      // conservative so that we don't output useless messages for our users.
       const std::vector<typename Types<ADNumberType>::tape_index>
                  registered_tape_indices = get_registered_tape_indices();
       const auto it = std::find(registered_tape_indices.begin(),

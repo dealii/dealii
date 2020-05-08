@@ -267,16 +267,16 @@ namespace GridGenerator
         // number of global refinements
         const unsigned int refinements;
 
-        // numer of subdivisions of coarse grid in blocks 1 and 4
+        // number of subdivisions of coarse grid in blocks 1 and 4
         const unsigned int n_subdivision_x_0;
 
-        // numer of subdivisions of coarse grid in blocks 2 and 5
+        // number of subdivisions of coarse grid in blocks 2 and 5
         const unsigned int n_subdivision_x_1;
 
-        // numer of subdivisions of coarse grid in blocks 3 and 6
+        // number of subdivisions of coarse grid in blocks 3 and 6
         const unsigned int n_subdivision_x_2;
 
-        // numer of subdivisions  of coarse grid in all blocks (normal to
+        // number of subdivisions  of coarse grid in all blocks (normal to
         // airfoil or in y-direction, respectively)
         const unsigned int n_subdivision_y;
 
@@ -284,7 +284,7 @@ namespace GridGenerator
         // (C-Mesh) that arises after interpolation in blocks 1 and 4
         const double height;
 
-        // lenght block 3 and 6
+        // length block 3 and 6
         const double length_b2;
 
         // factor to move points G and I horizontal to the right, i.e. make
@@ -536,7 +536,8 @@ namespace GridGenerator
          * Joukowski transformation of circle points created by function
          * joukowski_circle().
          *
-         * @param[in] circle_points Vector containing oints of joukowski circle.
+         * @param[in] circle_points Vector containing points of joukowski
+         * circle.
          * @return joukowski_points Vector containing joukowski airfoil points.
          */
         static std::vector<Point<2>>
@@ -562,7 +563,7 @@ namespace GridGenerator
          * by interpolation among factor*number_points NACA-airfoil points to
          * obtain a better approximation of the airfoil geometry
          *
-         * @param[in] serialnumber NACA serial numer for different airfoil
+         * @param[in] serialnumber NACA serial number for different airfoil
          * shapes (so far only 4-digit-series implemented).
          * @param[in] number_points Number of required airfoil points for each
          *  side to being conform with amount of cells along the airfoil after
@@ -682,7 +683,7 @@ namespace GridGenerator
                   5 * t *
                   (0.2969 * std::pow(x, 0.5) - 0.126 * x -
                    0.3516 * std::pow(x, 2) + 0.2843 * std::pow(x, 3) -
-                   0.1036 * std::pow(x, 4)); // half thicknes at a position x
+                   0.1036 * std::pow(x, 4)); // half thickness at a position x
 
                 const double theta = std::atan(dy_c);
 
@@ -933,7 +934,7 @@ namespace GridGenerator
          * x-axis (by definition of points A-L), blocks 1&4, 2&4 and 3&6 can be
          * interpolated with the same geometric computations Consider a
          * bias_factor and incline_factor during interpolation to obtain a more
-         * dense mesh next to airfoil geometry and recieve an inclined boundary
+         * dense mesh next to airfoil geometry and receive an inclined boundary
          * between block 2&3 and 5&6, respectively
          */
         void interpolate(Triangulation<2> &tria) const
@@ -980,7 +981,7 @@ namespace GridGenerator
                     // 1 so that A(0) is on y-axis so that faces AD and BC are
                     // horizontal. This simplifies the computation of the
                     // required indices for interpolation (all x-nodes are
-                    // positiv) Move trapeze to be in first quadrant by addig
+                    // positive) Move trapeze to be in first quadrant by adding
                     // trapeze_offset
                     Point<2, double> node_;
                     if (cell.material_id() == id_block_1)

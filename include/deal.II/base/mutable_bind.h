@@ -107,7 +107,7 @@ namespace Utilities
 
     /**
      * Construct a MutableBind object specifying only the function. By default,
-     * the arguments are left to their defult constructor values.
+     * the arguments are left to their default constructor values.
      */
     template <class FunctionType>
     MutableBind(FunctionType function);

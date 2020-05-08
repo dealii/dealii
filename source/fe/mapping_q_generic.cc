@@ -86,7 +86,7 @@ namespace internal
       {
         Assert(spacedim == 2, ExcInternalError());
 
-        // For accuracy reasons, we do all arithmetics in extended precision
+        // For accuracy reasons, we do all arithmetic in extended precision
         // (long double). This has a noticeable effect on the hit rate for
         // borderline cases and thus makes the algorithm more robust.
         const long double x = p(0);

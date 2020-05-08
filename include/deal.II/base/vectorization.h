@@ -1006,7 +1006,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -1560,7 +1560,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -2210,7 +2210,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -2723,7 +2723,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
