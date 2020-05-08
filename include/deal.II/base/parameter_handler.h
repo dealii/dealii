@@ -1105,7 +1105,7 @@ public:
    * The parameter @p has_to_be_set can be used in order to declare this
    * parameter as a parameter whose default value has to be overwritten by
    * one of the methods provided by this class. Whether a parameter has been set
-   * succesfully can be queried by the functions get_entries_wrongly_not_set()
+   * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
    *
    * @note An entry can be declared more than once without generating an
@@ -1177,7 +1177,7 @@ public:
    * The parameter @p has_to_be_set can be used in order to declare this
    * parameter as a parameter whose default value has to be overwritten by
    * one of the methods provided by this class. Whether a parameter has been set
-   * succesfully can be queried by the functions get_entries_wrongly_not_set()
+   * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
    */
   template <class ParameterType>

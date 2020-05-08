@@ -272,7 +272,7 @@ languages for other purposes.
 
 <h4> Adding the point value and the mean (see extension above) into the .h5 file</h4>
 
-After outputing the solution, the file can be opened again to include
+After outputting the solution, the file can be opened again to include
 more datasets.  This allows us to keep all the necessary information
 of our experiment in a single result file, which can then be read and
 processed by some postprocessing script.

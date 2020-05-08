@@ -331,7 +331,7 @@ namespace Utilities
       {
       public:
         /**
-         * Constructor. Blocks until it can aquire the lock.
+         * Constructor. Blocks until it can acquire the lock.
          */
         explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm &comm)
           : mutex(mutex)
@@ -370,7 +370,7 @@ namespace Utilities
       ~CollectiveMutex();
 
       /**
-       * Aquire the mutex and, if necessary, wait until we can do so.
+       * Acquire the mutex and, if necessary, wait until we can do so.
        *
        * This is a collective call that needs to be executed by all processors
        * in the communicator.

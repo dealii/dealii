@@ -4381,7 +4381,7 @@ namespace GridTools
         // We assume the last used cell contains the point: checking it
         if (cell_candidate_idx != -1)
           if (!box_cell[cell_candidate_idx].first.point_inside(points[p]))
-            // Point ouside candidate cell: we have no candidate
+            // Point outside candidate cell: we have no candidate
             cell_candidate_idx = -1;
 
         // If there's no candidate, run a tree search

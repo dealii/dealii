@@ -24,7 +24,7 @@ namespace GridGenerator
   namespace
   {
     /**
-     * Given a GridGenerator function pointer, a  string containig a text
+     * Given a GridGenerator function pointer, a  string containing a text
      * version of the function arguments and an empty Triangulation, calls the
      * corresponding function, after parsing the arguments from the given
      * string.

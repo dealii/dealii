@@ -2650,7 +2650,7 @@ project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor)
   LAPACKFullMatrix<Number> lapack_matrix(dim);
   LAPACKFullMatrix<Number> result(dim);
 
-  // todo: find or add dealii functionallity to copy in one step.
+  // todo: find or add dealii functionality to copy in one step.
   matrix.copy_from(tensor);
   lapack_matrix.copy_from(matrix);
 
@@ -2660,7 +2660,7 @@ project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor)
   // Use the SVD results to orthogonalize: $U V^T$
   lapack_matrix.get_svd_u().mmult(result, lapack_matrix.get_svd_vt());
 
-  // todo: find or add dealii functionallity to copy in one step.
+  // todo: find or add dealii functionality to copy in one step.
   matrix = result;
   matrix.copy_to(output_tensor);
   return output_tensor;

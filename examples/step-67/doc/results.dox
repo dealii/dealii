@@ -373,7 +373,7 @@ If we switch to the Harten-Lax-van Leer flux, the results are as follows:
 </table>
 
 The tables show that we get optimal $\mathcal O\left(h^{p+1}\right)$
-convergence rates for both numerical fluxes. The errors are slighly smaller
+convergence rates for both numerical fluxes. The errors are slightly smaller
 for the Lax--Friedrichs flux for $p=2$, but the picture is reversed for
 $p=3$; in any case, the differences on this testcase are relatively
 small.

@@ -105,7 +105,7 @@ that is also cyclic -- though this color map lacks all of the skill employed by
 the people who wrote the posts mentioned in the links above. It
 does, however, show the character of the solution as a wave equation
 if you look at the shaded part of the domain outside the circle of
-radius 0.7 in which the potential is zero -- you can see how everytime
+radius 0.7 in which the potential is zero -- you can see how every time
 one of the bumps (showing the amplitude $|\psi_h(\mathbf x,t)|^2$)
 bumps into the area where the potential is large: a wave travels
 outbound from there. Take a look at the video:

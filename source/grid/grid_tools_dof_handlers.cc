@@ -1443,7 +1443,7 @@ namespace GridTools
              "Vector containing patch cells should not be an empty vector!"));
     // In order to extract the set of cells with the coarsest common level from
     // the give vector of cells: First it finds the number associated with the
-    // minimum level of refinmenet, namely "min_level"
+    // minimum level of refinement, namely "min_level"
     int min_level = patch[0]->level();
 
     for (unsigned int i = 0; i < patch.size(); ++i)

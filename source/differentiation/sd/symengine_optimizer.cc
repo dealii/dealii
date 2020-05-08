@@ -549,7 +549,7 @@ namespace Differentiation
           // coefficient. Upon serialization, this might be dropped, meaning
           // that when we reload the expressions they now look somewhat
           // different to as before. If all data that the user uses is
-          // guarenteed to either have been serialized or never serialized, then
+          // guaranteed to either have been serialized or never serialized, then
           // there would be no problem. However, users might rebuild their
           // dependent expression and just reload the optimizer. This is
           // completely legitimate. But in this scenario we might be out of sync
@@ -591,7 +591,7 @@ namespace Differentiation
               const Expression new_map_expr =
                 serialize_and_deserialize_expression(e.first);
 
-              // Add a new map entry and re-search. This is guarenteed to be
+              // Add a new map entry and re-search. This is guaranteed to
               // return a valid entry. Note that we must do a string comparison,
               // because the data structures that form the expressions might
               // still be different.

@@ -623,7 +623,7 @@ keep the number of quadrature points a variable to be specified just as the
 polynomial degree, and note that one would make different choices depending
 also on the flow configuration. The default choice is $p+2$ points -- a bit
 more than the minimum possible of $p+1$ points. The FEEvaluation and
-FEFaceEvaluation classes allow to seemlessly change the number of points by a
+FEFaceEvaluation classes allow to seamlessly change the number of points by a
 template parameter, such that the program does not get more complicated
 because of that.
 

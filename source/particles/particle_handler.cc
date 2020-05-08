@@ -140,7 +140,7 @@ namespace Particles
     // Create the memory pool that will store all particle properties
     property_pool = std_cxx14::make_unique<PropertyPool>(n_properties);
 
-    // Create the grid cache to cache the informations about the triangulation
+    // Create the grid cache to cache the information about the triangulation
     // that is used to locate the particles into subdomains and cells
     triangulation_cache =
       std_cxx14::make_unique<GridTools::Cache<dim, spacedim>>(new_triangulation,

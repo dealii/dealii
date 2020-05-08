@@ -138,7 +138,7 @@ namespace Functions
    * expression, together with its derivatives (if required). These are then
    * used in all subsequent evaluations. Calling
    * set_additional_function_arguments() will evaluate the passed
-   * subsitution map on the fly during evaluation time, *after* all
+   * substitution map on the fly during evaluation time, *after* all
    * derivatives have been computed.
    *
    * @note The difference between this class and the FunctionParser class is

@@ -351,7 +351,7 @@ namespace hp
      * all elements associated with the provided set of indices @p fes.
      *
      * You may find information about the domination behavior of finite elements
-     * in their respecitve class documentation or in the implementation of their
+     * in their respective class documentation or in the implementation of their
      * inherited member function FiniteElement::compare_for_domination().
      * Consider that a finite element may or may not dominate itself (e.g.
      * FE_Nothing elements).
@@ -376,7 +376,7 @@ namespace hp
      * dominated by all elements associated with the provided set of indices @p fes.
      *
      * You may find information about the domination behavior of finite elements
-     * in their respecitve class documentation or in the implementation of their
+     * in their respective class documentation or in the implementation of their
      * inherited member function FiniteElement::compare_for_domination().
      * Consider that a finite element may or may not dominate itself (e.g.
      * FE_Nothing elements).
@@ -401,7 +401,7 @@ namespace hp
      * that dominates all other elements of this very set.
      *
      * You may find information about the domination behavior of finite elements
-     * in their respecitve class documentation or in the implementation of their
+     * in their respective class documentation or in the implementation of their
      * inherited member function FiniteElement::compare_for_domination().
      * Consider that a finite element may or may not dominate itself (e.g.
      * FE_Nothing elements).
@@ -437,7 +437,7 @@ namespace hp
      * that is dominated by all other elements of this very set.
      *
      * You may find information about the domination behavior of finite elements
-     * in their respecitve class documentation or in the implementation of their
+     * in their respective class documentation or in the implementation of their
      * inherited member function FiniteElement::compare_for_domination().
      * Consider that a finite element may or may not dominate itself (e.g.
      * FE_Nothing elements).
@@ -477,7 +477,7 @@ namespace hp
      * provided set @p fes are part of.
      *
      * You may find information about the domination behavior of finite elements
-     * in their respecitve class documentation or in the implementation of their
+     * in their respective class documentation or in the implementation of their
      * inherited member function FiniteElement::compare_for_domination().
      * Consider that a finite element may or may not dominate itself (e.g.
      * FE_Nothing elements).
@@ -503,7 +503,7 @@ namespace hp
      * element space which includes all finite elements of the provided set @p fes.
      *
      * You may find information about the domination behavior of finite elements
-     * in their respecitve class documentation or in the implementation of their
+     * in their respective class documentation or in the implementation of their
      * inherited member function FiniteElement::compare_for_domination().
      * Consider that a finite element may or may not dominate itself (e.g.
      * FE_Nothing elements).
