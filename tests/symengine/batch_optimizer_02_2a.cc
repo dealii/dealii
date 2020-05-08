@@ -29,6 +29,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
 
   // Show the difference between a SymEngine "value" and
   // an evaluated, floating point number
