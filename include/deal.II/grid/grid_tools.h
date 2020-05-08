@@ -425,9 +425,28 @@ namespace GridTools
    * hanging nodes in ghost cells if you call the current functions: The
    * vertices of all locally owned cells will be correct, but the vertices of
    * some ghost cells may not. This means that computations like
-   * KellyErrorEstimator may give wrong answers. A safe approach is to use
-   * this function prior to any refinement in parallel, if that is possible,
-   * but not after you refine the mesh.
+   * KellyErrorEstimator may give wrong answers.
+   *
+   * @note This function is in general not compatible with manifolds attached
+   * to the triangulation. For example, in order to refine the grid (using
+   * manifolds) after the grid transformation, you have to make sure that
+   * the original manifold is still valid for the transformed geometry. This
+   * does not hold in general, and it is necessary to clear the manifold and
+   * attach a new one for the transformed geometry in these cases.
+   * If you want to perform refinements according to the original
+   * manifold description attached to the triangulation, you should first do
+   * the refinements, subsequently deactivate all manifolds, and finally call
+   * the transform() function. The result is a triangulation with correctly
+   * transformed vertices, but otherwise straight-sided elements. The
+   * following procedure is recommended
+   * @code
+   * ...
+   * triangulation.refine_global(n_refinements);
+   * triangulation.reset_all_manifolds();
+   * Transformation<dim> transformation;
+   * GridTools::transform(transformation, triangulation);
+   * ...
+   * @endcode
    *
    * This function is used in the "Possibilities for extensions" section of
    * step-38. It is also used in step-49 and step-53.
