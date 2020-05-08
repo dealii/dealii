@@ -1947,7 +1947,7 @@ namespace Differentiation
 
       /**
        * A set of symbolic expressions to be optimized. It is required that
-       * the symbols on which these dependent functions be based are
+       * the symbols on which these dependent functions are based are
        * registered in the @p independent_variables_symbols map.
        */
       types::symbol_vector dependent_variables_functions;
