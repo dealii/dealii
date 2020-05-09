@@ -1100,6 +1100,157 @@ namespace internal
 
 
       /**
+       * This invokes the FEValues part of the initialization of MappingQ,
+       * storing the resulting quadrature points and an initial representation
+       * of Jacobians in two arrays.
+       */
+      template <int dim>
+      void
+      mapping_q_query_fe_values(
+        const unsigned int                                        begin_cell,
+        const unsigned int                                        end_cell,
+        const MappingQGeneric<dim> &                              mapping_q,
+        const dealii::Triangulation<dim> &                        tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
+        const double                                              jacobian_size,
+        std::vector<GeometryType> &preliminary_cell_type,
+        AlignedVector<double> &    plain_quadrature_points,
+        AlignedVector<std::array<Tensor<2, dim>, dim + 1>>
+          &jacobians_on_stencil)
+      {
+        if (begin_cell == end_cell)
+          return;
+
+        const unsigned int mapping_degree = mapping_q.get_degree();
+        FE_Nothing<dim>    dummy_fe;
+        QGaussLobatto<dim> quadrature(mapping_degree + 1);
+        const unsigned int n_mapping_points =
+          Utilities::pow(mapping_degree + 1, dim);
+
+        FEValues<dim> fe_values(mapping_q,
+                                dummy_fe,
+                                quadrature,
+                                update_quadrature_points | update_jacobians);
+
+        for (unsigned int cell = begin_cell; cell < end_cell; ++cell)
+          {
+            typename dealii::Triangulation<dim>::cell_iterator cell_it(
+              &tria, cell_array[cell].first, cell_array[cell].second);
+            fe_values.reinit(cell_it);
+            for (unsigned int d = 0; d < dim; ++d)
+              for (unsigned int q = 0; q < n_mapping_points; ++q)
+                plain_quadrature_points[(cell * dim + d) * n_mapping_points +
+                                        q] = fe_values.quadrature_point(q)[d];
+
+            // store the first, second, n-th and n^2-th one along a
+            // stencil-like pattern
+            std::array<Tensor<2, dim, double>, dim + 1> &my_jacobians =
+              jacobians_on_stencil[cell];
+            my_jacobians[0] = Tensor<2, dim, double>(fe_values.jacobian(0));
+            for (unsigned int d = 0, skip = 1; d < dim;
+                 ++d, skip *= (mapping_degree + 1))
+              my_jacobians[1 + d] =
+                Tensor<2, dim, double>(fe_values.jacobian(skip));
+
+            // check whether cell is Cartesian/affine/general
+            GeometryType type = cartesian;
+            for (unsigned int d = 0; d < dim; ++d)
+              for (unsigned int e = 0; e < dim; ++e)
+                if (d != e)
+                  if (std::abs(my_jacobians[0][d][e]) > 1e-12 * jacobian_size)
+                    type = affine;
+
+            for (unsigned int q = 1; q < n_mapping_points; ++q)
+              for (unsigned int d = 0; d < dim; ++d)
+                for (unsigned int e = 0; e < dim; ++e)
+                  if (std::abs(fe_values.jacobian(q)[d][e] -
+                               fe_values.jacobian(0)[d][e]) >
+                      1e-12 * jacobian_size)
+                    {
+                      type = general;
+                      goto endloop;
+                    }
+          endloop:
+            preliminary_cell_type[cell] = type;
+          }
+      }
+
+
+
+      template <int dim>
+      std::vector<unsigned int>
+      mapping_q_find_compression(
+        const double jacobian_size,
+        const AlignedVector<std::array<Tensor<2, dim>, dim + 1>>
+          &                          jacobians_on_stencil,
+        const unsigned int           n_mapping_points,
+        const AlignedVector<double> &plain_quadrature_points,
+        std::vector<GeometryType> &  preliminary_cell_type)
+      {
+        std::vector<unsigned int> cell_data_index(jacobians_on_stencil.size());
+
+        // we include a map to store some compressed information about the
+        // Jacobians which we collect by a stencil-like pattern around the
+        // first quadrature point on the cell - we use a relatively coarse
+        // tolerance to account for some inaccuracies in the manifold
+        // evaluation
+        const FPArrayComparator<double> comparator(1e4 * jacobian_size);
+        std::map<std::array<Tensor<2, dim>, dim + 1>,
+                 unsigned int,
+                 FPArrayComparator<double>>
+          compressed_jacobians(comparator);
+
+        unsigned int n_data_buckets = 0;
+        for (unsigned int cell = 0; cell < jacobians_on_stencil.size(); ++cell)
+          {
+            // check in the map for the index of this cell
+            auto inserted = compressed_jacobians.insert(
+              std::make_pair(jacobians_on_stencil[cell], cell));
+            bool add_this_cell = inserted.second;
+            if (inserted.second == false)
+              {
+                // check if the found duplicate really is a translation and
+                // the similarity identified by the map is not by accident
+                double        max_distance = 0;
+                const double *ptr_origin =
+                  plain_quadrature_points.data() +
+                  inserted.first->second * dim * n_mapping_points;
+                const double *ptr_mine = plain_quadrature_points.data() +
+                                         cell * dim * n_mapping_points;
+                for (unsigned int d = 0; d < dim; ++d)
+                  {
+                    const double translate_d =
+                      ptr_origin[d * n_mapping_points] -
+                      ptr_mine[d * n_mapping_points];
+                    for (unsigned int q = 1; q < n_mapping_points; ++q)
+                      max_distance =
+                        std::max(std::abs(ptr_origin[d * n_mapping_points + q] -
+                                          ptr_mine[d * n_mapping_points + q] -
+                                          translate_d),
+                                 max_distance);
+                  }
+
+                // this is not a duplicate, must add it again
+                if (max_distance > 1e-10 * jacobian_size)
+                  add_this_cell = true;
+              }
+            if (add_this_cell)
+              cell_data_index[cell] = n_data_buckets++;
+            else
+              {
+                cell_data_index[cell] = cell_data_index[inserted.first->second];
+                // make sure that the cell type is the same as in the original
+                // field, despite possible small differences due to roundoff
+                // and the tolerances we use
+                preliminary_cell_type[cell] =
+                  preliminary_cell_type[inserted.first->second];
+              }
+          }
+        return cell_data_index;
+      }
+
+
+      /**
        * This evaluates the mapping information on a range of cells calling
        * into the tensor product interpolators of the matrix-free framework,
        * using a polynomial expansion of the cell geometry in terms of
@@ -1110,7 +1261,7 @@ namespace internal
                 typename VectorizedArrayType,
                 typename VectorizedDouble>
       void
-      compute_range_mapping_q(
+      mapping_q_compute_range(
         const unsigned int                 begin_cell,
         const unsigned int                 end_cell,
         const std::vector<GeometryType> &  cell_type,
@@ -1926,7 +2077,7 @@ namespace internal
                 typename VectorizedArrayType,
                 typename VectorizedDouble>
       void
-      compute_range_mapping_q(
+      mapping_q_compute_range(
         const unsigned int begin_face,
         const unsigned int end_face,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
@@ -2366,114 +2517,44 @@ namespace internal
 
       const double jacobian_size = ExtractCellHelper::get_jacobian_size(tria);
 
-      std::vector<unsigned int> cell_data_index(cell_array.size());
+      std::vector<unsigned int> cell_data_index;
       std::vector<GeometryType> preliminary_cell_type(cell_array.size());
       {
-        FE_Nothing<dim>    dummy_fe;
-        QGaussLobatto<dim> quadrature(mapping_degree + 1);
+        AlignedVector<std::array<Tensor<2, dim>, dim + 1>> jacobians_on_stencil(
+          cell_array.size());
 
-        FEValues<dim> fe_values(*mapping_q,
-                                dummy_fe,
-                                quadrature,
-                                update_quadrature_points | update_jacobians);
+        // Create as many chunks of cells as we have threads and spawn the
+        // work
+        unsigned int work_per_chunk =
+          std::max(std::size_t(1),
+                   (cell_array.size() + MultithreadInfo::n_threads() - 1) /
+                     MultithreadInfo::n_threads());
 
-        // we include a map to store some compressed information about the
-        // Jacobians which we collect by a stencil-like pattern around the
-        // first quadrature point on the cell - we use a relatively coarse
-        // tolerance to account for some inaccuracies in the manifold
-        // evaluation
-        const FPArrayComparator<double> comparator(1e4 * jacobian_size);
-        std::map<std::array<Tensor<2, dim>, dim + 1>,
-                 unsigned int,
-                 FPArrayComparator<double>>
-          compressed_jacobians(comparator);
-
-        unsigned int n_data_buckets = 0;
-        for (unsigned int cell = 0; cell < cell_array.size(); ++cell)
-          {
-            typename dealii::Triangulation<dim>::cell_iterator cell_it(
-              &tria, cell_array[cell].first, cell_array[cell].second);
-            fe_values.reinit(cell_it);
-            for (unsigned int d = 0; d < dim; ++d)
-              for (unsigned int q = 0; q < n_mapping_points; ++q)
-                plain_quadrature_points[(cell * dim + d) * n_mapping_points +
-                                        q] = fe_values.quadrature_point(q)[d];
-
-            // store the first, second, n-th and n^2-th one along a
-            // stencil-like pattern
-            std::array<Tensor<2, dim, double>, dim + 1> jacobians_on_stencil;
-            jacobians_on_stencil[0] =
-              Tensor<2, dim, double>(fe_values.jacobian(0));
-            for (unsigned int d = 0, skip = 1; d < dim;
-                 ++d, skip *= (mapping_degree + 1))
-              jacobians_on_stencil[1 + d] =
-                Tensor<2, dim, double>(fe_values.jacobian(skip));
-
-            // check in the map for the index of this cell
-            auto inserted = compressed_jacobians.insert(
-              std::make_pair(jacobians_on_stencil, cell));
-            bool add_this_cell = inserted.second;
-            if (inserted.second == false)
-              {
-                // check if the found duplicate really is a translation and
-                // the similarity identified by the map is not by accident
-                double        max_distance = 0;
-                const double *ptr_origin =
-                  plain_quadrature_points.data() +
-                  inserted.first->second * dim * n_mapping_points;
-                const double *ptr_mine = plain_quadrature_points.data() +
-                                         cell * dim * n_mapping_points;
-                for (unsigned int d = 0; d < dim; ++d)
-                  {
-                    const double translate_d =
-                      ptr_origin[d * n_mapping_points] -
-                      ptr_mine[d * n_mapping_points];
-                    for (unsigned int q = 1; q < n_mapping_points; ++q)
-                      max_distance =
-                        std::max(std::abs(ptr_origin[d * n_mapping_points + q] -
-                                          ptr_mine[d * n_mapping_points + q] -
-                                          translate_d),
-                                 max_distance);
-                  }
-
-                // this is not a duplicate, must add it again
-                if (max_distance > 1e-10 * jacobian_size)
-                  add_this_cell = true;
-              }
-
-            if (add_this_cell == true)
-              {
-                // check whether cell is Cartesian/affine/general
-                GeometryType type = cartesian;
-                for (unsigned int d = 0; d < dim; ++d)
-                  for (unsigned int e = 0; e < dim; ++e)
-                    if (d != e)
-                      if (std::abs(inserted.first->first[0][d][e]) >
-                          1e-12 * jacobian_size)
-                        type = affine;
-
-                for (unsigned int q = 1; q < n_mapping_points; ++q)
-                  for (unsigned int d = 0; d < dim; ++d)
-                    for (unsigned int e = 0; e < dim; ++e)
-                      if (std::abs(fe_values.jacobian(q)[d][e] -
-                                   fe_values.jacobian(0)[d][e]) >
-                          1e-12 * jacobian_size)
-                        {
-                          type = general;
-                          goto endloop;
-                        }
-              endloop:
-                cell_data_index[cell]       = n_data_buckets;
-                preliminary_cell_type[cell] = type;
-                ++n_data_buckets;
-              }
-            else
-              {
-                cell_data_index[cell] = cell_data_index[inserted.first->second];
-                preliminary_cell_type[cell] =
-                  preliminary_cell_type[inserted.first->second];
-              }
-          }
+        // we manually use tasks here rather than parallel::apply_to_subranges
+        // because we want exactly as many loops as we have threads - the
+        // initialization of the loops with FEValues is expensive
+        std::size_t          offset = 0;
+        Threads::TaskGroup<> tasks;
+        for (unsigned int t = 0; t < MultithreadInfo::n_threads();
+             ++t, offset += work_per_chunk)
+          tasks += Threads::new_task(
+            &ExtractCellHelper::mapping_q_query_fe_values<dim>,
+            offset,
+            std::min(cell_array.size(), offset + work_per_chunk),
+            *mapping_q,
+            tria,
+            cell_array,
+            jacobian_size,
+            preliminary_cell_type,
+            plain_quadrature_points,
+            jacobians_on_stencil);
+        tasks.join_all();
+        cell_data_index =
+          ExtractCellHelper::mapping_q_find_compression(jacobian_size,
+                                                        jacobians_on_stencil,
+                                                        n_mapping_points,
+                                                        plain_quadrature_points,
+                                                        preliminary_cell_type);
       }
 
       // step 2: compute the appropriate evaluation matrices for cells and
@@ -2579,18 +2660,25 @@ namespace internal
 
           // step 4b: go through the cells and compute the information using
           // similar evaluators as for the matrix-free integrals
-          ExtractCellHelper::compute_range_mapping_q<dim,
-                                                     Number,
-                                                     VectorizedArrayType,
-                                                     VectorizedDouble>(
-            0,
+          parallel::apply_to_subranges(
+            0U,
             cell_type.size(),
-            cell_type,
-            process_cell,
-            update_flags_cells,
-            plain_quadrature_points,
-            shape_infos[my_q],
-            my_data);
+            [&](const unsigned int begin, const unsigned int end) {
+              ExtractCellHelper::mapping_q_compute_range<dim,
+                                                         Number,
+                                                         VectorizedArrayType,
+                                                         VectorizedDouble>(
+                begin,
+                end,
+                cell_type,
+                process_cell,
+                update_flags_cells,
+                plain_quadrature_points,
+                shape_infos[my_q],
+                my_data);
+            },
+            std::max(cell_type.size() / MultithreadInfo::n_threads() / 2,
+                     std::size_t(2U)));
         }
 
       if (faces.empty())
@@ -2700,19 +2788,26 @@ namespace internal
 
           // step 6b: go through the faces and compute the information using
           // similar evaluators as for the matrix-free face integrals
-          ExtractFaceHelper::compute_range_mapping_q<dim,
-                                                     Number,
-                                                     VectorizedArrayType,
-                                                     VectorizedDouble>(
-            0,
+          parallel::apply_to_subranges(
+            0U,
             face_type.size(),
-            faces,
-            face_type,
-            process_face,
-            update_flags_common,
-            plain_quadrature_points,
-            shape_infos[my_q],
-            my_data);
+            [&](const unsigned int begin, const unsigned int end) {
+              ExtractFaceHelper::mapping_q_compute_range<dim,
+                                                         Number,
+                                                         VectorizedArrayType,
+                                                         VectorizedDouble>(
+                begin,
+                end,
+                faces,
+                face_type,
+                process_face,
+                update_flags_common,
+                plain_quadrature_points,
+                shape_infos[my_q],
+                my_data);
+            },
+            std::max(face_type.size() / MultithreadInfo::n_threads() / 2,
+                     std::size_t(2U)));
         }
 
       // step 6c: figure out if normal vectors are the same on some of the
@@ -2722,26 +2817,33 @@ namespace internal
         if (face_data[my_q].descriptor[0].n_q_points >
             face_data[quad_with_most_points].descriptor[0].n_q_points)
           quad_with_most_points = my_q;
-      for (unsigned int face = 0; face < face_type.size(); ++face)
-        if (face_type[face] == general)
-          {
-            const unsigned int n_q_points =
-              face_data[quad_with_most_points].descriptor[0].n_q_points;
-            const Tensor<1, dim, VectorizedArrayType> *normals =
-              face_data[quad_with_most_points].normal_vectors.data() +
-              face_data[quad_with_most_points].data_index_offsets[face];
-            VectorizedArrayType distance = 0.;
-            for (unsigned int q = 1; q < n_q_points; ++q)
-              distance += (normals[q] - normals[0]).norm_square();
-            bool all_small = true;
-            for (unsigned int v = 0; v < n_lanes; ++v)
-              if (distance[v] > 50. * std::numeric_limits<Number>::epsilon() *
-                                  std::numeric_limits<Number>::epsilon() *
-                                  n_q_points)
-                all_small = false;
-            if (all_small)
-              face_type[face] = flat_faces;
-          }
+      parallel::apply_to_subranges(
+        0U,
+        face_type.size(),
+        [&](const unsigned int begin, const unsigned int end) {
+          for (unsigned int face = begin; face < end; ++face)
+            if (face_type[face] == general)
+              {
+                const unsigned int n_q_points =
+                  face_data[quad_with_most_points].descriptor[0].n_q_points;
+                const Tensor<1, dim, VectorizedArrayType> *normals =
+                  face_data[quad_with_most_points].normal_vectors.data() +
+                  face_data[quad_with_most_points].data_index_offsets[face];
+                VectorizedArrayType distance = 0.;
+                for (unsigned int q = 1; q < n_q_points; ++q)
+                  distance += (normals[q] - normals[0]).norm_square();
+                bool all_small = true;
+                for (unsigned int v = 0; v < n_lanes; ++v)
+                  if (distance[v] >
+                      50. * std::numeric_limits<Number>::epsilon() *
+                        std::numeric_limits<Number>::epsilon() * n_q_points)
+                    all_small = false;
+                if (all_small)
+                  face_type[face] = flat_faces;
+              }
+        },
+        std::max(face_type.size() / MultithreadInfo::n_threads() / 2,
+                 std::size_t(2U)));
 
       // step 7: compute the face data by cells. This still needs to be
       // transitioned to extracting the information from cell quadrature
