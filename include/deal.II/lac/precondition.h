@@ -1947,7 +1947,7 @@ namespace internal
         : updater(updater)
       {
         if (size < internal::VectorImplementation::minimum_parallel_grain_size)
-          apply_to_subrange(0, size);
+          VectorUpdatesRange::apply_to_subrange(0, size);
         else
           apply_parallel(
             0,
