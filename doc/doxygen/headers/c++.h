@@ -54,6 +54,52 @@
  * the idiomatic use of range-based for loops. Examples are
  * GeometryInfo::face_indices(), GeometryInfo::vertex_indices(),
  * FEValuesBase::quadrature_point_indices(), among many others.
+ *
+ * C++11 also introduces the concept of
+ * [constexpr](https://en.cppreference.com/w/cpp/language/constexpr)
+ * variables and function. The variables defined as `constexpr` are constant
+ * values that are computed during the compilation of the program and therefore
+ * have zero runtime cost associated to their initialization. Additionally,
+ * `constexpr` constants have properly defined lifetimes which prevent the
+ * so-called "static initialization order fiasco" completely. %Functions can be
+ * marked as `constexpr`, indicating that they can produce compile-time
+ * constant return values if their input arguments are constant expressions.
+ * Additionally, classes with at least one `constexpr` constructor can be
+ * initialized as `constexpr`.
+ *
+ * As an example, since the constructor Tensor::Tensor(const array_type &) is
+ * `constexpr`, we can initialize a tensor with an array during compile time
+ * as:
+ * @code
+ * constexpr double[2][2] entries = {{1., 0.}, {0., 1.}};
+ * constexpr Tensor<2, 2> A(entries);
+ * @endcode
+ * Here, the contents of A are not stored on the stack. Rather, they are
+ * initialized during compile time and inserted into the `.data` portion
+ * of the executable program. The program can use these values in runtime
+ * without spending time for initialization. Initializing tensors can be
+ * simplified in one line.
+ * @code
+ * constexpr Tensor<2, 2> A({{1., 0.}, {0., 1.}});
+ * @endcode
+ * Some functions such as determinant() are specified as `constexpr` but they
+ * require a compiler with C++14 capability. As such, this function is
+ * internally declared as:
+ * @code
+ * template <int dim, typename Number>
+ * DEAL_II_CONSTEXPR Number determinant(const Tensor<2, dim, Number> &t);
+ * @endcode
+ * The macro @ref DEAL_II_CONSTEXPR simplifies to `constexpr` if a C++14-capable
+ * compiler is available. Otherwise, for old compilers, it ignores
+ * DEAL_II_CONSTEXPR altogether.
+ * Therefore, with newer compilers, the user can write
+ * @code
+ * constexpr double det_A = determinant(A);
+ * @endcode
+ * assuming `A` is declared with the `constexpr` specifier. This example shows
+ * the performance gains of using `constexpr` because here we performed an
+ * operation with $O(\text{dim}^3)$ complexity during compile time, avoiding
+ * any runtime cost.
  */
 
 
