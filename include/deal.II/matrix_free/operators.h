@@ -918,7 +918,7 @@ namespace MatrixFreeOperators
      * using initialize_dof_vector().
      */
     virtual void
-    apply_add(VectorType &dst, const VectorType &src) const;
+    apply_add(VectorType &dst, const VectorType &src) const override;
 
     /**
      * Applies the Laplace operator on a cell.
