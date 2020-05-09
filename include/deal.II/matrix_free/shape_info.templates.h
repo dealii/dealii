@@ -68,6 +68,14 @@ namespace internal
       return a[0];
     }
 
+    template <typename Number, typename T>
+    Number
+    get_first_array_element(
+      const std::experimental::parallelism_v2::simd<Number, T> a)
+    {
+      return a[0];
+    }
+
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo()
       : element_type(tensor_general)
@@ -265,45 +273,62 @@ namespace internal
               q_point[0]         = quad.get_points()[q][0];
 
               shape_values[i * n_q_points_1d + q] =
-                fe->shape_value(my_i, q_point);
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_value(my_i, q_point));
               shape_gradients[i * n_q_points_1d + q] =
-                fe->shape_grad(my_i, q_point)[0];
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_grad(my_i, q_point)[0]);
               shape_hessians[i * n_q_points_1d + q] =
-                fe->shape_grad_grad(my_i, q_point)[0][0];
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_grad_grad(my_i, q_point)[0][0]);
 
               // evaluate basis functions on the two 1D subfaces (i.e., at the
               // positions divided by one half and shifted by one half,
               // respectively)
               q_point[0] *= 0.5;
               values_within_subface[0][i * n_q_points_1d + q] =
-                fe->shape_value(my_i, q_point);
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_value(my_i, q_point));
               gradients_within_subface[0][i * n_q_points_1d + q] =
-                fe->shape_grad(my_i, q_point)[0];
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_grad(my_i, q_point)[0]);
               hessians_within_subface[0][i * n_q_points_1d + q] =
-                fe->shape_grad_grad(my_i, q_point)[0][0];
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_grad_grad(my_i, q_point)[0][0]);
               q_point[0] += 0.5;
               values_within_subface[1][i * n_q_points_1d + q] =
-                fe->shape_value(my_i, q_point);
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_value(my_i, q_point));
               gradients_within_subface[1][i * n_q_points_1d + q] =
-                fe->shape_grad(my_i, q_point)[0];
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_grad(my_i, q_point)[0]);
               hessians_within_subface[1][i * n_q_points_1d + q] =
-                fe->shape_grad_grad(my_i, q_point)[0][0];
+                dealii::internal::NumberType<Number>::value(
+                  fe->shape_grad_grad(my_i, q_point)[0][0]);
             }
 
           // evaluate basis functions on the 1D faces, i.e., in zero and one
-          Point<dim> q_point       = unit_point;
-          q_point[0]               = 0;
-          shape_data_on_face[0][i] = fe->shape_value(my_i, q_point);
+          Point<dim> q_point = unit_point;
+          q_point[0]         = 0;
+          shape_data_on_face[0][i] =
+            dealii::internal::NumberType<Number>::value(
+              fe->shape_value(my_i, q_point));
           shape_data_on_face[0][i + n_dofs_1d] =
-            fe->shape_grad(my_i, q_point)[0];
+            dealii::internal::NumberType<Number>::value(
+              fe->shape_grad(my_i, q_point)[0]);
           shape_data_on_face[0][i + 2 * n_dofs_1d] =
-            fe->shape_grad_grad(my_i, q_point)[0][0];
-          q_point[0]               = 1;
-          shape_data_on_face[1][i] = fe->shape_value(my_i, q_point);
+            dealii::internal::NumberType<Number>::value(
+              fe->shape_grad_grad(my_i, q_point)[0][0]);
+          q_point[0] = 1;
+          shape_data_on_face[1][i] =
+            dealii::internal::NumberType<Number>::value(
+              fe->shape_value(my_i, q_point));
           shape_data_on_face[1][i + n_dofs_1d] =
-            fe->shape_grad(my_i, q_point)[0];
+            dealii::internal::NumberType<Number>::value(
+              fe->shape_grad(my_i, q_point)[0]);
           shape_data_on_face[1][i + 2 * n_dofs_1d] =
-            fe->shape_grad_grad(my_i, q_point)[0][0];
+            dealii::internal::NumberType<Number>::value(
+              fe->shape_grad_grad(my_i, q_point)[0][0]);
         }
 
       // get gradient and Hessian transformation matrix for the polynomial
@@ -320,9 +345,11 @@ namespace internal
             for (unsigned int q = 0; q < n_q_points_1d; ++q)
               {
                 shape_gradients_collocation[i * n_q_points_1d + q] =
-                  fe_coll.shape_grad(i, quad.get_points()[q])[0];
+                  dealii::internal::NumberType<Number>::value(
+                    fe_coll.shape_grad(i, quad.get_points()[q])[0]);
                 shape_hessians_collocation[i * n_q_points_1d + q] =
-                  fe_coll.shape_grad_grad(i, quad.get_points()[q])[0][0];
+                  dealii::internal::NumberType<Number>::value(
+                    fe_coll.shape_grad_grad(i, quad.get_points()[q])[0][0]);
               }
 
           // compute the inverse shape functions in three steps: we first
@@ -399,7 +426,8 @@ namespace internal
               for (unsigned int i = 0; i < n_dofs_1d; ++i)
                 for (unsigned int q = 0; q < n_q_points_1d; ++q)
                   inverse_shape_values[i * n_q_points_1d + q] =
-                    std::abs(result(i, q)) < 1e-15 ? 0 : result(i, q);
+                    dealii::internal::NumberType<Number>::value(
+                      std::abs(result(i, q)) < 1e-15 ? 0 : result(i, q));
             }
           else
             {
@@ -421,7 +449,8 @@ namespace internal
                   H.least_squares(out, in);
                   for (unsigned int i = 0; i < n_dofs_1d; ++i)
                     inverse_shape_values[i * n_q_points_1d + q] =
-                      std::abs(out(i)) < 1e-15 ? 0. : out(i);
+                      dealii::internal::NumberType<Number>::value(
+                        std::abs(out(i)) < 1e-15 ? 0. : out(i));
                 }
             }
         }
@@ -628,10 +657,10 @@ namespace internal
           for (unsigned int q = 0; q < stride; ++q)
             {
               array_eo[i * stride + q] =
-                0.5 *
+                dealii::internal::NumberType<Number>::value(0.5) *
                 (array[i * n_cols + q] + array[i * n_cols + n_cols - 1 - q]);
               array_eo[(n_rows - 1 - i) * stride + q] =
-                0.5 *
+                dealii::internal::NumberType<Number>::value(0.5) *
                 (array[i * n_cols + q] - array[i * n_cols + n_cols - 1 - q]);
             }
         if ((n_rows - 1) % 2 == 0)

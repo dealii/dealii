@@ -9,7 +9,18 @@ BOOL            := { true; false }
 REAL_SCALARS    := { double; float }
 
 // real scalar floating point types (vectorized)
-REAL_SCALARS_VECTORIZED    := { @DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED@; }
+REAL_SCALARS_VECTORIZED    := { @DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED@; 
+    std::experimental::native_simd<float>;
+    std::experimental::native_simd<double>;
+    std::experimental::fixed_size_simd< float, 1>; 
+    std::experimental::fixed_size_simd< float, 4>; 
+    std::experimental::fixed_size_simd< float, 8>; 
+    std::experimental::fixed_size_simd< float,16>; 
+    std::experimental::fixed_size_simd<double, 1>;
+    std::experimental::fixed_size_simd<double, 2>;
+    std::experimental::fixed_size_simd<double, 4>;
+    std::experimental::fixed_size_simd<double, 8>;
+}
 FLOAT_VECTORIZED           := { @DEAL_II_EXPAND_FLOAT_VECTORIZED@; }
 
 // complex scalar types

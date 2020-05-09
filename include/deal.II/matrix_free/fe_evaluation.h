@@ -3957,7 +3957,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               for (unsigned int comp = 0; comp < n_components; ++comp)
                 operation.process_dof(dof_indices[v][i],
                                       *src[comp],
-                                      values_dofs[comp][i][v]);
+                                      values_dofs[comp][i],
+                                      v);
         }
       else
         {
@@ -3967,7 +3968,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 operation.process_dof(
                   dof_indices[v][comp * dofs_per_component + i],
                   *src[0],
-                  values_dofs[comp][i][v]);
+                  values_dofs[comp][i],
+                  v);
         }
       return;
     }
@@ -4022,7 +4024,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   operation.process_dof(dof_indices[v][j],
                                         *src[comp],
-                                        values_dofs[comp][ind_local + j][v]);
+                                        values_dofs[comp][ind_local + j],
+                                        v);
 
               ind_local += indicator.first;
               dof_indices[v] += indicator.first;
@@ -4047,7 +4050,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
               for (unsigned int comp = 0; comp < n_components; ++comp)
                 operation.post_constraints(value[comp],
-                                           values_dofs[comp][ind_local][v]);
+                                           values_dofs[comp][ind_local],
+                                           v);
               ind_local++;
             }
 
@@ -4057,7 +4061,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int comp = 0; comp < n_components; ++comp)
               operation.process_dof(*dof_indices[v],
                                     *src[comp],
-                                    values_dofs[comp][ind_local][v]);
+                                    values_dofs[comp][ind_local],
+                                    v);
         }
       else
         {
@@ -4081,7 +4086,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   for (unsigned int j = 0; j < indicator.first; ++j)
                     operation.process_dof(dof_indices[v][j],
                                           *src[0],
-                                          values_dofs[comp][ind_local + j][v]);
+                                          values_dofs[comp][ind_local + j],
+                                          v);
                   ind_local += indicator.first;
                   dof_indices[v] += indicator.first;
 
@@ -4103,7 +4109,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                                                  value);
 
                   operation.post_constraints(value,
-                                             values_dofs[comp][ind_local][v]);
+                                             values_dofs[comp][ind_local],
+                                             v);
                   ind_local++;
                 }
 
@@ -4116,7 +4123,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   AssertIndexRange(*dof_indices[v], src[0]->size());
                   operation.process_dof(*dof_indices[v],
                                         *src[0],
-                                        values_dofs[comp][ind_local][v]);
+                                        values_dofs[comp][ind_local],
+                                        v);
                 }
 
               if (apply_constraints == true && comp + 1 < n_components)
@@ -4153,7 +4161,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           operation.process_dof_global(
             local_dof_indices[data->lexicographic_numbering[index]],
             *src[0],
-            values_dofs[comp][i][0]);
+            values_dofs[comp][i],
+            0);
         }
     }
 }
@@ -4346,7 +4355,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                          ++i)
                       operation.process_dof(dof_indices[v] + i,
                                             *src[comp],
-                                            values_dofs[comp][i][v]);
+                                            values_dofs[comp][i],
+                                            v);
               }
             else
               {
@@ -4359,7 +4369,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                         dof_indices[v] + i +
                           comp * data->dofs_per_component_on_cell,
                         *src[0],
-                        values_dofs[comp][i][v]);
+                        values_dofs[comp][i],
+                        v);
               }
           }
         else
@@ -4378,7 +4389,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                          ++i)
                       operation.process_dof(dof_indices[v] + i * offsets[v],
                                             *src[comp],
-                                            values_dofs[comp][i][v]);
+                                            values_dofs[comp][i],
+                                            v);
                 }
             else
               {
@@ -4392,7 +4404,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                           (i + comp * data->dofs_per_component_on_cell) *
                             offsets[v],
                         *src[0],
-                        values_dofs[comp][i][v]);
+                        values_dofs[comp][i],
+                        v);
               }
           }
       }

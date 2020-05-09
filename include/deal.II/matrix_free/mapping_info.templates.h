@@ -421,7 +421,8 @@ namespace internal
 
       DEAL_II_OPENMP_SIMD_PRAGMA
       for (unsigned int v = 0; v < VectorizedArrayType1::size(); ++v)
-        result[offset + v] = value[v];
+        result[offset + v] =
+          typename VectorizedArrayType2::value_type(value[v]);
     }
 
 
@@ -598,7 +599,7 @@ namespace internal
                 {
                   const Point<dim> &point = fe_val.quadrature_point(q);
                   for (unsigned int d = 0; d < dim; ++d)
-                    cell_data.quadrature_points[q][d][j] = point[d];
+                    cell_data.quadrature_points[q][d][j] = Number(point[d]);
                 }
 
             // if this is not the first quadrature formula and we already have
@@ -697,7 +698,7 @@ namespace internal
                     // set Jacobian into diagonal (off-diagonal part is already
                     // zeroed out)
                     for (unsigned int d = 0; d < dim; ++d)
-                      cell_data.const_jac[d][d][j] = jac_0[d][d];
+                      cell_data.const_jac[d][d][j] = Number(jac_0[d][d]);
                     continue;
                   }
 
@@ -708,7 +709,7 @@ namespace internal
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int e = 0; e < dim; ++e)
                         if (std::fabs(jac_0[d][e]) != 0.)
-                          cell_data.const_jac[d][e][j] = jac_0[d][e];
+                          cell_data.const_jac[d][e][j] = Number(jac_0[d][e]);
                     continue;
                   }
               }
@@ -726,9 +727,9 @@ namespace internal
                 const DerivativeForm<1, dim, dim> &jac = fe_val.jacobian(q);
                 for (unsigned int d = 0; d < dim; ++d)
                   for (unsigned int e = 0; e < dim; ++e)
-                    cell_data.general_jac[q][d][e][j] =
+                    cell_data.general_jac[q][d][e][j] = Number(
                       std::fabs(jac[d][e]) < zero_tolerance_double ? 0. :
-                                                                     jac[d][e];
+                                                                     jac[d][e]);
 
                 // need to do some calculus based on the gradient of the
                 // Jacobian, in order to find the gradient of the inverse
@@ -743,7 +744,7 @@ namespace internal
                       for (unsigned int e = 0; e < dim; ++e)
                         for (unsigned int f = 0; f < dim; ++f)
                           cell_data.general_jac_grad[q][d][e][f][j] =
-                            jacobian_grad[d][e][f];
+                            Number(jacobian_grad[d][e][f]);
                   }
               }
           } // end loop over entries of vectorization (size() cells)
@@ -934,12 +935,13 @@ namespace internal
                                 {
                                   jac[d][e][j] = cell_data.const_jac[d][e][j];
                                   for (unsigned int f = 0; f < dim; ++f)
-                                    jacobian_grad[d][e][f][j] = 0.;
+                                    jacobian_grad[d][e][f][j] = Number(0.);
                                 }
                           }
 
                       data.first[my_q].JxW_values.push_back(
-                        determinant(jac) * fe_val.get_quadrature().weight(q));
+                        determinant(jac) *
+                        Number(fe_val.get_quadrature().weight(q)));
                       Tensor<2, dim, VectorizedArrayType> inv_jac =
                         transpose(invert(jac));
                       data.first[my_q].jacobians[0].push_back(inv_jac);
@@ -981,7 +983,7 @@ namespace internal
                             mapping.transform_unit_to_real_cell(cell_it,
                                                                 Point<dim>());
                           for (unsigned int d = 0; d < dim; ++d)
-                            quad_point[d][v] = p[d];
+                            quad_point[d][v] = Number(p[d]);
                         }
                       data.first[my_q].quadrature_points.push_back(quad_point);
                     }
@@ -1170,9 +1172,9 @@ namespace internal
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int v = 0; v < n_lanes_d; ++v)
                         quadrature_points[0][d][vv + v] =
-                          plain_quadrature_points
-                            [(dim * (cell * n_lanes + vv + v) + d) *
-                             n_mapping_points];
+                          Number(plain_quadrature_points
+                                   [(dim * (cell * n_lanes + vv + v) + d) *
+                                    n_mapping_points]);
                   else
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int q = 0; q < n_q_points; ++q)
@@ -1600,7 +1602,8 @@ namespace internal
                               2048. * std::numeric_limits<double>::epsilon() *
                                 fe_face_values.JxW(0) * quadrature.weight(q))
                             JxW_is_similar = false;
-                          face_data.JxW_values[q][v] = fe_face_values.JxW(q);
+                          face_data.JxW_values[q][v] =
+                            Number(fe_face_values.JxW(q));
 
                           DerivativeForm<1, dim, dim> inv_jac =
                             fe_face_values.jacobian(q).covariant_form();
@@ -1633,12 +1636,13 @@ namespace internal
                                   reorder_face_derivative_indices<dim>(
                                     faces[face].interior_face_no, e);
                                 face_data.general_jac[q][d][e][v] =
-                                  inv_jac[d][ee];
+                                  Number(inv_jac[d][ee]);
                               }
 
                           for (unsigned int d = 0; d < dim; ++d)
                             {
-                              face_data.normal_vectors[q][d][v] = normal[d];
+                              face_data.normal_vectors[q][d][v] =
+                                Number(normal[d]);
                               if (std::abs(normal[d] -
                                            fe_face_values.normal_vector(0)[d]) >
                                   1024. *
@@ -1664,7 +1668,7 @@ namespace internal
                               update_quadrature_points)
                             for (unsigned int d = 0; d < dim; ++d)
                               face_data.quadrature_points[q][d][v] =
-                                fe_face_values.quadrature_point(q)[d];
+                                Number(fe_face_values.quadrature_point(q)[d]);
                         }
                     }
                   // Fill up with data of the zeroth component to avoid
@@ -1744,7 +1748,7 @@ namespace internal
                                   reorder_face_derivative_indices<dim>(
                                     faces[face].exterior_face_no, e);
                                 face_data.general_jac[n_q_points + q][d][e][v] =
-                                  inv_jac[d][ee];
+                                  Number(inv_jac[d][ee]);
                               }
                           for (unsigned int d = 0; d < dim; ++d)
                             for (unsigned int e = 0; e < dim; ++e)
@@ -1766,7 +1770,8 @@ namespace internal
                         for (unsigned int d = 0; d < dim; ++d)
                           for (unsigned int e = 0; e < dim; ++e)
                             face_data.general_jac[n_q_points + q][d][e][v] =
-                              face_data.general_jac[n_q_points + q][d][e][0];
+                              Number(
+                                face_data.general_jac[n_q_points + q][d][e][0]);
                     }
                   // If boundary face, simply set the data to zero (will not
                   // be used). Note that faces over periodic boundary
@@ -1775,7 +1780,8 @@ namespace internal
                     for (unsigned int q = 0; q < n_q_points; ++q)
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int e = 0; e < dim; ++e)
-                          face_data.general_jac[n_q_points + q][d][e][v] = 0.;
+                          face_data.general_jac[n_q_points + q][d][e][v] =
+                            Number(0.);
                 }
 
               // check if face is affine or at least if it is flat
@@ -2730,7 +2736,7 @@ namespace internal
             const Tensor<1, dim, VectorizedArrayType> *normals =
               face_data[quad_with_most_points].normal_vectors.data() +
               face_data[quad_with_most_points].data_index_offsets[face];
-            VectorizedArrayType distance = 0.;
+            VectorizedArrayType distance = Number();
             for (unsigned int q = 1; q < n_q_points; ++q)
               distance += (normals[q] - normals[0]).norm_square();
             bool all_small = true;
@@ -2903,9 +2909,9 @@ namespace internal
                     {
                       if (update_flags & update_JxW_values)
                         face_data_by_cells[my_q].JxW_values[offset][v] =
-                          fe_val.JxW(0) / face_data_by_cells[my_q]
-                                            .descriptor[fe_index]
-                                            .quadrature.weight(0);
+                          Number(fe_val.JxW(0) / face_data_by_cells[my_q]
+                                                   .descriptor[fe_index]
+                                                   .quadrature.weight(0));
                       if (update_flags & update_jacobians)
                         {
                           DerivativeForm<1, dim, dim> inv_jac =
@@ -2917,7 +2923,7 @@ namespace internal
                                   reorder_face_derivative_indices<dim>(face, e);
                                 face_data_by_cells[my_q]
                                   .jacobians[0][offset][d][e][v] =
-                                  inv_jac[d][ee];
+                                  Number(inv_jac[d][ee]);
                               }
                         }
                       if (is_local && (update_flags & update_jacobians))
@@ -2934,7 +2940,7 @@ namespace internal
                                                                          e);
                                   face_data_by_cells[my_q]
                                     .jacobians[1][offset + q][d][e][v] =
-                                    inv_jac[d][ee];
+                                    Number(inv_jac[d][ee]);
                                 }
                           }
                       if (update_flags & update_jacobian_grads)
@@ -2945,7 +2951,7 @@ namespace internal
                         for (unsigned int d = 0; d < dim; ++d)
                           face_data_by_cells[my_q]
                             .normal_vectors[offset][d][v] =
-                            fe_val.normal_vector(0)[d];
+                            Number(fe_val.normal_vector(0)[d]);
                     }
                   // copy data for general data type
                   else
@@ -2954,7 +2960,7 @@ namespace internal
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                              ++q)
                           face_data_by_cells[my_q].JxW_values[offset + q][v] =
-                            fe_val.JxW(q);
+                            Number(fe_val.JxW(q));
                       if (update_flags & update_jacobians)
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                              ++q)
@@ -2969,7 +2975,7 @@ namespace internal
                                                                          e);
                                   face_data_by_cells[my_q]
                                     .jacobians[0][offset + q][d][e][v] =
-                                    inv_jac[d][ee];
+                                    Number(inv_jac[d][ee]);
                                 }
                           }
                       if (update_flags & update_jacobian_grads)
@@ -2982,7 +2988,7 @@ namespace internal
                           for (unsigned int d = 0; d < dim; ++d)
                             face_data_by_cells[my_q]
                               .normal_vectors[offset + q][d][v] =
-                              fe_val.normal_vector(q)[d];
+                              Number(fe_val.normal_vector(q)[d]);
                     }
                   if (update_flags & update_quadrature_points)
                     for (unsigned int q = 0; q < fe_val.n_quadrature_points;
@@ -2991,7 +2997,7 @@ namespace internal
                         face_data_by_cells[my_q].quadrature_points
                           [face_data_by_cells[my_q].quadrature_point_offsets
                              [cell * GeometryInfo<dim>::faces_per_cell + face] +
-                           q][d][v] = fe_val.quadrature_point(q)[d];
+                           q][d][v] = Number(fe_val.quadrature_point(q)[d]);
                 }
               if (update_flags & update_normal_vectors &&
                   update_flags & update_jacobians)

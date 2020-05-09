@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include <experimental/simd>
+
 DEAL_II_NAMESPACE_OPEN
 
 #define SPLIT_INSTANTIATIONS_COUNT 3
