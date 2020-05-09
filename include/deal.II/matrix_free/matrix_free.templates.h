@@ -746,6 +746,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   const unsigned int n_fe           = dof_handlers.n_dof_handlers;
   const unsigned int n_active_cells = cell_level_index.size();
 
+  std::vector<bool> is_fe_dg(n_fe, false);
+
   AssertDimension(n_active_cells, cell_level_index.size());
   AssertDimension(n_fe, locally_owned_set.size());
   AssertDimension(n_fe, constraint.size());
@@ -769,8 +771,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
             fes.push_back(&fe[f]);
 
           if (fe.size() > 1)
-            dof_info[no].cell_active_fe_index.resize(
-              n_active_cells, numbers::invalid_unsigned_int);
+            {
+              dof_info[no].cell_active_fe_index.resize(
+                n_active_cells, numbers::invalid_unsigned_int);
+              is_fe_dg[no] = fe[0].dofs_per_vertex == 0;
+            }
 
           Assert(additional_data.cell_vectorization_category.empty(),
                  ExcNotImplemented());
@@ -782,6 +787,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           if (cell_categorization_enabled == true)
             dof_info[no].cell_active_fe_index.resize(
               n_active_cells, numbers::invalid_unsigned_int);
+          is_fe_dg[no] = dofh->get_fe().dofs_per_vertex == 0;
         }
       lexicographic[no].resize(fes.size());
 
@@ -1428,8 +1434,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           }
 
       // compute tighter index sets for various sets of face integrals
-      for (internal::MatrixFreeFunctions::DoFInfo &di : dof_info)
+      for (unsigned int no = 0; no < n_fe; ++no)
         {
+          internal::MatrixFreeFunctions::DoFInfo &di = dof_info[no];
+
           const Utilities::MPI::Partitioner &part = *di.vector_partitioner;
 
           // partitioner 0: no face integrals, simply use the indices present
@@ -1788,7 +1796,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                             loop_over_faces);
 
 
-          if (additional_data.hold_all_faces_to_owned_cells)
+          if (additional_data.hold_all_faces_to_owned_cells && is_fe_dg[no])
             {
               ghost_indices.clear();
               // partitioner 3: values on all faces
