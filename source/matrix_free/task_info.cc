@@ -338,7 +338,13 @@ namespace internal
     void
     TaskInfo::loop(MFWorkerInterface &funct) const
     {
-      if (scheme == none)
+      // If we use thread parallelism, we do not currently support to schedule
+      // pieces of updates within the loop, so this index will collect all
+      // calls in that case and work like a single complete loop over all
+      // cells
+      if (scheme != none)
+        funct.cell_loop_pre_range(numbers::invalid_unsigned_int);
+      else
         funct.cell_loop_pre_range(
           partition_row_index[partition_row_index.size() - 2]);
 
@@ -618,7 +624,10 @@ namespace internal
             }
         }
       funct.vector_compress_finish();
-      if (scheme == none)
+
+      if (scheme != none)
+        funct.cell_loop_post_range(numbers::invalid_unsigned_int);
+      else
         funct.cell_loop_post_range(
           partition_row_index[partition_row_index.size() - 2]);
     }
