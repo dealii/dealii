@@ -1,0 +1,8 @@
+New: The Step-50 tutorial has been updated. We discuss how to 
+use the multilevel preconditioner from step-16 in parallel and 
+give a comparison of parallel scaling between GMG and AMG for 
+a 3D Laplace example where adaptive refinement comes from a 
+residual-based, cell-wise a posteriori error estimator. 
+<br>
+(Thomas C. Clevenger, Timo Heister, 2020/04/20)
+
