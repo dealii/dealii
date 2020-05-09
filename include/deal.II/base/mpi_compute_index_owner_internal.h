@@ -243,7 +243,7 @@ namespace Utilities
             // 2) collect relevant processes and process local dict entries
             for (auto interval = owned_indices.begin_intervals();
                  interval != owned_indices.end_intervals();
-                 interval++)
+                 ++interval)
               {
                 // Due to the granularity of the dictionary, the interval
                 // might be split into several ranges of processor owner
@@ -737,7 +737,7 @@ namespace Utilities
 
             for (auto interval = is.begin_intervals();
                  interval != is.end_intervals();
-                 interval++)
+                 ++interval)
               send_buffer.emplace_back(*interval->begin(),
                                        interval->last() + 1);
           }
