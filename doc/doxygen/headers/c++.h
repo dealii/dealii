@@ -59,7 +59,7 @@
  * [constexpr](https://en.cppreference.com/w/cpp/language/constexpr)
  * variables and function. The variables defined as `constexpr` are constant
  * values that are computed during the compilation of the program and therefore
- * have zero runtime cost associated to their initialization. Additionally,
+ * have zero runtime cost associated with their initialization. Additionally,
  * `constexpr` constants have properly defined lifetimes which prevent the
  * so-called "static initialization order fiasco" completely. %Functions can be
  * marked as `constexpr`, indicating that they can produce compile-time
@@ -76,7 +76,7 @@
  * @endcode
  * Here, the contents of A are not stored on the stack. Rather, they are
  * initialized during compile time and inserted into the `.data` portion
- * of the executable program. The program can use these values in runtime
+ * of the executable program. The program can use these values at runtime
  * without spending time for initialization. Initializing tensors can be
  * simplified in one line.
  * @code
