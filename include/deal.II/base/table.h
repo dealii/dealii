@@ -2300,7 +2300,7 @@ template <int N, typename T>
 inline TableBase<N, T> &
 TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
 {
-  static_cast<Subscriptor &>(*this) = std::move(m);
+  static_cast<Subscriptor &>(*this) = std::move(static_cast<Subscriptor &>(m));
   values                            = std::move(m.values);
   table_size                        = m.table_size;
   m.table_size                      = TableIndices<N>();
