@@ -99,7 +99,7 @@ namespace LA
 // solid domain, of the quadrature weights, and possibly of the normal vector
 // to each point, if the solid domain is of co-dimension one.
 //
-// Deal.II offers these facilities on the Particles namespace, through the
+// Deal.II offers these facilities in the Particles namespace, through the
 // ParticleHandler class. ParticleHandler is a class that allows you to manage
 // a collection of particles (objects of type Particles::Particle), representing
 // a collection of points with some attached properties (e.g. an id) floating on
@@ -271,8 +271,8 @@ namespace Step70
 
     // We allow every grid to be refined independently. In this tutorial, no
     // physics is resolved on the solid grid, and its velocity is given as a
-    // datum. However it relatively straight forward to incorporate some
-    // elasticity model in this tutorial, and transform it in a fully fledged
+    // datum. However it is relatively straightforward to incorporate some
+    // elasticity model in this tutorial, and transform it into a fully fledged
     // FSI solver.
     unsigned int initial_fluid_refinement      = 3;
     unsigned int initial_solid_refinement      = 3;
@@ -320,7 +320,7 @@ namespace Step70
     // changed at run time by selecting any other supported function of the
     // GridGenerator namespace. If the GridGenerator function fails, this
     // program will interpret the name of the grid as a vtk grid filename, and
-    // the arguments as a map from manifold_id to the cad files describing the
+    // the arguments as a map from manifold_id to the CAD files describing the
     // geometry of the domain. Every CAD file will be analysed and a Manifold of
     // the OpenCASCADE namespace will be generated according to the content of
     // the CAD file itself.
@@ -401,7 +401,7 @@ namespace Step70
         }
       else if (spacedim == 2)
         {
-          double omega = angular_velocity.value(p, 0);
+          const double omega = angular_velocity.value(p, 0);
 
           velocity[0] = -omega * p[1];
           velocity[1] = omega * p[0];
@@ -475,11 +475,11 @@ namespace Step70
     // the grid for the solid.
     void make_grid();
 
-    // These two methods are new w.r.t. previous examples, and initiliaze the
+    // These two methods are new w.r.t. previous examples, and initialize the
     // Particles::ParticleHandler objects used in this class. We have two such
-    // objects: one is a passive tracer, used to plot the trajectories of fluid
-    // particles, while the the other is composed of the actual solid quadrature
-    // points, and represent material particles of the solid.
+    // objects: one represents passive tracers, used to plot the trajectories
+    // of fluid particles, while the the other represents material particles
+    // of the solid, which are placed at quadrature points of the solid grid.
     void setup_tracer_particles();
     void setup_solid_particles();
 
@@ -516,7 +516,7 @@ namespace Step70
     void output_particles(const Particles::ParticleHandler<spacedim> &particles,
                           std::string                                 fprefix,
                           const unsigned int                          iter,
-                          const double time) const;
+                          const double                                time) const;
 
     // As noted before, we make sure we cannot modify this object from within
     // this class, by making it a const reference.
@@ -531,11 +531,11 @@ namespace Step70
     //
     // We declare both finite element spaces as unique pointers, to allow their
     // generation after StokesImmersedProblemParameters has been initialized. In
-    // particular, they will be initialized in te initial_setup() method
+    // particular, they will be initialized in the initial_setup() method
     std::unique_ptr<FiniteElement<spacedim>>      fluid_fe;
     std::unique_ptr<FiniteElement<dim, spacedim>> solid_fe;
 
-    // This is one of the main novelty w.r.t. the tutorial step-60. Here we
+    // This is one of the main novelties w.r.t. the tutorial step-60. Here we
     // assume that both the solid and the fluid are fully distributed
     // triangulations. This allows the problem to scale to a very large number
     // of degrees of freedom, at the cost of communicating all the overlapping
@@ -570,7 +570,7 @@ namespace Step70
 
     std::unique_ptr<MappingFEField<dim, spacedim>> solid_mapping;
 
-    // Similarly to how things are done in step-32, we use a block system to
+    // Similarly to how things are done in step-22, we use a block system to
     // treat the Stokes part of the problem, and follow very closely what was
     // done there.
     std::vector<IndexSet> fluid_owned_dofs;
@@ -803,7 +803,7 @@ namespace Step70
   // particles generated as the locally owned support points of an FE_Q object
   // on an arbitrary grid (non-matching w.r.t. to the fluid grid) have no
   // reasons to lie in the same physical region of the locally owned subdomain
-  // of the fluid grid. In fact this will almost never be the case, specially
+  // of the fluid grid. In fact this will almost never be the case, especially
   // since we want to keep track of what is happening to the particles
   // themselves.
   //
@@ -819,7 +819,7 @@ namespace Step70
   // the beginning, and one-to-one communication happen whenever the original
   // owner needs information from the process that owns the cell where the
   // particle lives. We make sure that we set ownership of the particles using
-  // the initial particles distribution, and keep the same ownership throughout
+  // the initial particle distribution, and keep the same ownership throughout
   // the execution of the program.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_tracer_particles()
@@ -873,7 +873,7 @@ namespace Step70
                                  bounding_boxes_of_locally_owned_cells);
 
 
-    // Finally generate the particles from the support point of the
+    // Finally generate the particles from the support points of the
     // tracer particles triangulation. This function call uses the
     // global_bounding_boxes object we just constructed. At the end of this
     // call, every particle will have been distributed to the correct process

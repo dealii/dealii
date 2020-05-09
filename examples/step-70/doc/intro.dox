@@ -60,10 +60,10 @@ condition is applied on the moving *embedded domain* $\Gamma$ associated with
 the impeller. However, this tutorial could be readily extended
 to other equations (e.g. the Navier-Stokes equations, linear elasticity
 equation, etc.). It can can be seen as a natural extension of step-60 that
-enables the solution of large problems using distributed parallel computing
+enables the solution of large problems using a distributed parallel computing
 architecture via MPI.
 
-However, countrary to step-60, the Dirichlet boundary conditions on $\Gamma$
+However, contrary to step-60, the Dirichlet boundary conditions on $\Gamma$
 are imposed weakly instead of through the use of Lagrange multipliers, and we
 concentrate on dealing with the coupling of two fully distributed
 triangulations (a combination that was not possible in the implementation of
@@ -80,16 +80,17 @@ applied penalization only depends on the velocity, this is often referred
 to as $\mathcal{L}^2$ penalization whereas if the penalization depends
 on both the velocity and its gradient, it is an $\mathcal{H}^1$ penalization.
 The case of the $\mathcal{L}^2$ penalization is very similar to a Darcy-type
-of approach. Both $\mathcal{L}^2$ an $\mathcal{H}^1$ penalizations have been
+approach. Both $\mathcal{L}^2$ and $\mathcal{H}^1$ penalizations have been
 analyzed extensively (ex: see Angot 1999).
 
 - the embedded domain $\Gamma$ has an intrinsic dimension `dim` which is smaller
 than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
 zero; for example it is a curve embedded in a two dimensional domain, or a
 surface embedded in a three-dimensional domain. In this case, the boundary
-condition is imposed weekly on $\Gamma$ by applying Nitsche method (see Freund, 1995).
+condition is imposed weekly on $\Gamma$ by applying the Nitsche method (see
+Freund, 1995).
 
-Both approaches have very similar requirement and results in highly
+Both approaches have very similar requirements and result in highly
 similar formulations, therefore we treat them almost in the same way.
 
 In this tutorial program we are not interested in further details on $\Gamma$:
@@ -109,9 +110,11 @@ regular function $g$ on $\Gamma$, find the solution $(\textbf{u},p)$ to
 
 The main goal of this tutorial is to show how to impose the velocity field
 condition $\mathbf{u} = \mathbf{g}$ on a non-matching $\Gamma$ in a weak way,
-using a penalization method.
+using a penalization method. A more extensive discussion of the Stokes
+problem including body forces, different boundary conditions, and solution
+strategies can be found in step-22.
 
-Let's start by considering the Stokes problem alone, in the entire domain
+Let us start by considering the Stokes problem alone, in the entire domain
 $\Omega$. We look for a velocity field $\mathbf{u}$ and a pressure field $p$
 that satisfy the Stokes equations with homogeneous boundary conditions
 on $\partial\Omega$.
@@ -146,7 +149,7 @@ which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
 \\ q\end{pmatrix}$.
 
 
-Integrating by parts and exploiting the boundaryconditions on $\partial\Omega$,
+Integrating by parts and exploiting the boundary conditions on $\partial\Omega$,
 we obtain the following variational problem:
 @f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\textrm{div}\; \textbf{v}, p)_{\Omega}
@@ -159,7 +162,10 @@ This variational formulation does not take into account the embedded domain.
 Contrarily to step-60, we do not enforce strongly the constraints of
 $\textbf{u}$ on $\Gamma$, but enforce them weakly via a penalization term.
 
-The analysis of this weak imposition of the boundary condition depends on the spacedim-dimensional measure of $\Gamma$. We discuss both scenario.
+The analysis of this weak imposition of the boundary condition depends on the
+spacedim-dimensional measure of $\Gamma$ as ether positive (if `dim` is equal
+to `spacedim`) or zero (if `dim` is smaller than `spacedim`). We discuss both
+scenarios.
 
 <h4>Co-dimension one case</h4>
 
@@ -167,7 +173,7 @@ In this case, we assume that $\Gamma$ is the boundary of the actual impeller,
 that is, a closed curve embedded in a two-dimensional domain or a closed
 surface in a three-dimensional domain. The idea of this method starts by
 considering a weak imposition of the Dirichlet boundary condition on $\Gamma$,
-by Nitsche method. This is achieved by using the following modified formulation
+following the Nitsche method. This is achieved by using the following modified formulation
 on the fluid domain, where no strong conditions on the test functions on $\Gamma$ are imposed:
 
 @f{eqnarray*}
@@ -183,7 +189,7 @@ on the fluid domain, where no strong conditions on the test functions on $\Gamma
 @f}
 
 The integrals over $\Gamma$ are face integrals. It can be shown (see  Freund,
-1995) that there exist a positive constant
+1995) that there exists a positive constant
 $C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
 be consistent and stable. The first two additional integrals on $\Gamma$ (the
 second line in the equation above) appear naturally after integrating by parts,
@@ -191,7 +197,8 @@ when one does not assume that $\mathbf{v}$ is zero on $\Gamma$.
 
 The third line in the equation above contains two terms that are added to ensure
 consistency of the weak form, and a stabilization term, that is there to enforce
-the boundary condition with an error which is consistent with the approximation error. The consistency terms and the stabilization term are added to the
+the boundary condition with an error which is consistent with the approximation
+error. The consistency terms and the stabilization term are added to the
 right hand side with the actual boundary data $\mathbf{g}$.
 
 When $\mathbf{u}$ satisfies the condition $\mathbf{u}=\mathbf{g}$ on $\Gamma$,
@@ -219,7 +226,7 @@ a measure of size of the face being integrated and $C$ a constant such that
 $1 \leq C \leq 10$.
 
 Even if the non-symmetric case seems advantageous w.r.t.
-to possible choices of stabilization parameters, we opt for the symmetric
+possible choices of stabilization parameters, we opt for the symmetric
 discretization, since in this case it can be shown that the dual problem is
 also consistent, leading to a solution where not only the energy norm of the
 solution converges with the correct order, but also its $L^2$ norm.
@@ -245,8 +252,8 @@ This results in the following (intermediate) formulation:
 =  - &(\lbrack \nabla\textbf{v}\rbrack\cdot \textbf{n},\textbf{g})_{\Gamma} + (\lbrack q\rbrack, \textbf{g} \cdot n)_{\Gamma}
  + 2\beta (\textbf{v},\textbf{g})_{\Gamma},
 @f}
-where the jump terms, denoted with $\lbrack \cdot \rbrack$, are computed w.r.t.
-to a fixed orientation of the normal vector $\textbf{n}$.
+where the jump terms, denoted with $\lbrack \cdot \rbrack$, are computed with
+respect to a fixed orientation of the normal vector $\textbf{n}$.
 
 Here we notice that, unlike in discontinuous Galerkin methods, the test
 and trial functions are continuous across $\Gamma$. Moreover, if $\Gamma$ is
@@ -264,14 +271,16 @@ the following final form of the variational formulation:
 @f}
 
 In step-60, the imposition of the constraint
-required the addition of new variables in the form of the Lagrange multipliers.
+required the addition of new variables in the form of Lagrange multipliers.
 This is not the case for this tutorial program. The imposition of the
 boundary condition using Nitsche's method only modifies the system matrix
 and the right-hand side without adding additional unknowns.
 However, the velocity vector $\textbf{u}$ on the embedded domain will not match
 exactly the prescribed velocity $\textbf{g}$, but only up to a numerical error
-which is in the same order of the interpolation error of the finite element
-method. Furthermore, as in step-60, we still need to integrate over the non-matching embedded grid in order to construct the boundary term necessary to impose the boundary condition over $\Gamma$.
+which is in the same order as the interpolation error of the finite element
+method. Furthermore, as in step-60, we still need to integrate over the
+non-matching embedded grid in order to construct the boundary term necessary
+to impose the boundary condition over $\Gamma$.
 
 <h4>Co-dimension zero case</h4>
 
@@ -389,7 +398,9 @@ related to $\Gamma$ on its quadrature points that is:
 - The weights times the jacobian of the transformation, i.e JxW.
 - In the case of the Nitsche method, the normal vector of the face.
 
-The approach taken in this step it is as follow:
+TODO: Add paragraph about particles here.
+
+The approach taken in this step is as follows:
 - Create a parallel::distributed::Triangulation for the domain $\Gamma$
 - Create Particles::Particle at the position of the quadrature points on $\Gamma$
   by using the Particles::Generators::quadrature_points() generator. Since the quadrature_points generator
@@ -425,7 +436,7 @@ and we construct $S$ using LinearOperator classes.
 <h3>The testcase</h3>
 
 The problem we solve here is a demonstration of the time-reversibility of Stokes
-flow. This is often illustrated in science vulgarization experiments with a
+flow. This is often illustrated in science education experiments with a
 Taylor-Couette flow and dye droplets that revert back to their original shape
 after the fluid has been displaced in a periodic manner.
 
@@ -437,7 +448,7 @@ after the fluid has been displaced in a periodic manner.
 
 In the present problem, a very viscous fluid is agitated by the rotation of
 an impeller, which, in 2D, is modeled by a rectangular grid. The impeller
-rotates for a given number of revolutions and than, the flow is reversed such
+rotates for a given number of revolutions, after which the flow is reversed such
 that the same number of revolutions is carried out in the opposite direction. We
 recall that since the Stokes equations are self-adjoint, creeping flows are
 reversible. Consequently, if the impeller motion is reversed in the opposite
