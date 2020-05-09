@@ -4571,7 +4571,7 @@ namespace internal
           if (range_index == numbers::invalid_unsigned_int)
             {
               // Case with threaded loop -> currently no overlap implemented
-              parallel::apply_to_subranges(
+              dealii::parallel::apply_to_subranges(
                 0U,
                 dof_info.vector_partitioner->local_size(),
                 operation_before_loop,
@@ -4601,7 +4601,7 @@ namespace internal
           if (range_index == numbers::invalid_unsigned_int)
             {
               // Case with threaded loop -> currently no overlap implemented
-              parallel::apply_to_subranges(
+              dealii::parallel::apply_to_subranges(
                 0U,
                 dof_info.vector_partitioner->local_size(),
                 operation_after_loop,
