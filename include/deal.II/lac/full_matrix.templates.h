@@ -137,11 +137,8 @@ FullMatrix<number> &
 FullMatrix<number>::operator*=(const number factor)
 {
   AssertIsFinite(factor);
-
-  number *      p = &(*this)(0, 0);
-  const number *e = &(*this)(0, 0) + n() * m();
-  while (p != e)
-    *p++ *= factor;
+  for (number &v : this->values)
+    v *= factor;
 
   return *this;
 }
@@ -153,18 +150,9 @@ FullMatrix<number> &
 FullMatrix<number>::operator/=(const number factor)
 {
   AssertIsFinite(factor);
-
-  number *      p = &(*this)(0, 0);
-  const number *e = &(*this)(0, 0) + n() * m();
-
   const number factor_inv = number(1.) / factor;
 
-  AssertIsFinite(factor_inv);
-
-  while (p != e)
-    *p++ *= factor_inv;
-
-  return *this;
+  return *this *= factor_inv;
 }
 
 
@@ -187,7 +175,7 @@ FullMatrix<number>::vmult(Vector<number2> &      dst,
   // get access to the data in order to
   // avoid copying it when using the ()
   // operator
-  const number2 * src_ptr = &(*const_cast<Vector<number2> *>(&src))(0);
+  const number2 * src_ptr = src.begin();
   const size_type size_m = m(), size_n = n();
   for (size_type i = 0; i < size_m; ++i)
     {
