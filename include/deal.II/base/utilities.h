@@ -1264,7 +1264,7 @@ namespace Utilities
             boost::archive::binary_oarchive archive(out);
             archive << object;
 
-            const std::string &s = out.str();
+            const std::string s = out.str();
             dest_buffer.reserve(dest_buffer.size() + s.size());
             std::move(s.begin(), s.end(), std::back_inserter(dest_buffer));
           }
