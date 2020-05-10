@@ -516,7 +516,7 @@ namespace Step70
     void output_particles(const Particles::ParticleHandler<spacedim> &particles,
                           std::string                                 fprefix,
                           const unsigned int                          iter,
-                          const double                                time) const;
+                          const double time) const;
 
     // As noted before, we make sure we cannot modify this object from within
     // this class, by making it a const reference.
@@ -1109,6 +1109,9 @@ namespace Step70
       constraints.close();
     }
 
+    auto locally_owned_dofs_per_processor =
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 fluid_dh.locally_owned_dofs());
     {
       system_matrix.clear();
 
@@ -1129,7 +1132,7 @@ namespace Step70
 
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        fluid_dh.compute_locally_owned_dofs_per_processor(),
+        locally_owned_dofs_per_processor,
         mpi_communicator,
         locally_relevant_dofs);
 
@@ -1153,7 +1156,7 @@ namespace Step70
         fluid_dh, coupling, dsp, constraints, false);
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        fluid_dh.compute_locally_owned_dofs_per_processor(),
+        locally_owned_dofs_per_processor,
         mpi_communicator,
         locally_relevant_dofs);
       preconditioner_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);

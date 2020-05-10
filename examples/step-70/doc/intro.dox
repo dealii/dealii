@@ -37,7 +37,7 @@ motion) is coupled with a rotating, independent, grid.
 In order to maintain the same notations used in step-60, we use $\Omega$ to
 denote the domain in $R^{\text{spacedim}}$ representing the container of both
 the fluid and the impeller, and we use $\Gamma$ in $R^{\text{dim}}$ to denote
-either the full empeller (when its `spacedim` measure is non-negligible, i.e.,
+either the full impeller (when its `spacedim` measure is non-negligible, i.e.,
 when we can represent it as a grid of dimension `dim` equal to `spacedim`),
 a co-dimension one representation of a thin impeller, or just the boundary of
 the full impeller.
@@ -395,11 +395,11 @@ in this step.
 When looking at the formulation for both the penalization approach ($\mathcal{L}^2$ or $\mathcal{H}^1$)
 and the Nitsche method, we can come to the conclusion that we only require limited information
 related to $\Gamma$ on its quadrature points that is:
+- Their reference location w.r.t. to the embedding fluid cell
 - The weights times the jacobian of the transformation, i.e JxW.
-- In the case of the Nitsche method, the normal vector of the face.
 
 Since both of these properties are point-properties (or point-vectors) that are
-attached to the solid material they can be idealized as a set of disconnected
+attached to the solid material, they can be idealized as a set of disconnected
 infinitesimally small particles, which carry the required information with the
 movement of the solid. Deal.II already possesses the ability to distribute and
 store such a set of particles in large-scale parallel computations in form of
@@ -409,12 +409,10 @@ al., 2018), and we will make use of this functionality in this tutorial.
 Thus, the approach taken in this step is as follows:
 - Create a parallel::distributed::Triangulation for the domain $\Gamma$
 - Create Particles::Particle at the position of the quadrature points on $\Gamma$
-  by using the Particles::Generators::quadrature_points() generator. Since the quadrature_points generator
-  uses the Particles::ParticleHandler::insert_global_particles() function, the particles
-  will be automatically distributed across the processors, *following
-  the solid triangulation*
-- Attach the necessary information to the particles, i.e., the quadrature
-  weight.
+- Call the Particles::ParticleHandler::insert_global_particles() function, 
+  to distribute the particles across processors, *following the solid 
+  triangulation*
+- Attach the quadrature weight as property to each Particles::Particle object.
 
 This structure is relatively expensive to generate, but must only be generated
 once per simulation. Once the Particles::ParticleHandler is generated and the
