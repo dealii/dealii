@@ -209,6 +209,7 @@ namespace Euler_DG
 
         default:
           Assert(false, ExcNotImplemented());
+          return 0.;
       }
   }
 
