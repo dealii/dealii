@@ -10749,16 +10749,16 @@ Triangulation<dim, spacedim>::create_triangulation(
           {
             while (cell_info->id != cell->id().template to_binary<dim>())
               ++cell;
-            if (spacedim == 3)
+            if (dim == 3)
               for (unsigned int quad = 0;
-                   quad < GeometryInfo<spacedim>::quads_per_cell;
+                   quad < GeometryInfo<dim>::quads_per_cell;
                    ++quad)
                 cell->quad(quad)->set_manifold_id(
                   cell_info->manifold_quad_ids[quad]);
 
-            if (spacedim >= 2)
+            if (dim >= 2)
               for (unsigned int line = 0;
-                   line < GeometryInfo<spacedim>::lines_per_cell;
+                   line < GeometryInfo<dim>::lines_per_cell;
                    ++line)
                 cell->line(line)->set_manifold_id(
                   cell_info->manifold_line_ids[line]);
