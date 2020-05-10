@@ -1604,9 +1604,12 @@ namespace GridTools
         // invalid cell, then query for the closest global vertex
         if (current_cell.state() == IteratorState::valid)
           {
+            const auto cell_vertices = mapping.get_vertices(current_cell);
             const unsigned int closest_vertex =
-              find_closest_vertex_of_cell<dim, spacedim>(current_cell, p);
-            vertex_to_point      = p - current_cell->vertex(closest_vertex);
+              find_closest_vertex_of_cell<dim, spacedim>(current_cell,
+                                                         p,
+                                                         mapping);
+            vertex_to_point      = p - cell_vertices[closest_vertex];
             closest_vertex_index = current_cell->vertex_index(closest_vertex);
           }
         else
@@ -1736,15 +1739,16 @@ namespace GridTools
   unsigned int
   find_closest_vertex_of_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
-    const Point<spacedim> &                                            position)
+    const Point<spacedim> &                                            position,
+    const Mapping<dim, spacedim> &                                     mapping)
   {
-    double       minimum_distance = position.distance_square(cell->vertex(0));
+    const auto   vertices         = mapping.get_vertices(cell);
+    double       minimum_distance = position.distance_square(vertices[0]);
     unsigned int closest_vertex   = 0;
 
     for (unsigned int v = 1; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        const double vertex_distance =
-          position.distance_square(cell->vertex(v));
+        const double vertex_distance = position.distance_square(vertices[v]);
         if (vertex_distance < minimum_distance)
           {
             closest_vertex   = v;

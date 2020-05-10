@@ -1824,15 +1824,20 @@ namespace GridTools
 
   /**
    * Return the local vertex index of cell @p cell that is closest to
-   * the given location @p position.
+   * the given location @p position. The location of the vertices is extracted
+   * from the (optional) @p mapping argument, to guarantee that the correct
+   * answer is returned when the underlying mapping modifies the position of the
+   * vertices.
    *
-   * @author Rene Gassmoeller, Luca Heltai, 2017.
+   * @author Rene Gassmoeller, Luca Heltai, 2017, 2020.
    */
   template <int dim, int spacedim>
   unsigned int
   find_closest_vertex_of_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
-    const Point<spacedim> &position);
+    const Point<spacedim> &                                            position,
+    const Mapping<dim, spacedim> &                                     mapping =
+      StaticMappingQ1<dim, spacedim>::mapping);
 
   /**
    * Compute a globally unique index for each vertex and hanging node

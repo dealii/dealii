@@ -68,7 +68,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const typename Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::active_cell_iterator &,
-        const Point<deal_II_space_dimension> &);
+        const Point<deal_II_space_dimension> &,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
 
       template std::map<unsigned int, types::global_vertex_index>
       compute_local_to_global_vertex_index_map(
