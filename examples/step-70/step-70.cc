@@ -127,6 +127,7 @@ namespace LA
 #include <deal.II/particles/data_out.h>
 #include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
+#include <deal.II/particles/utilities.h>
 
 // When generating the grids, we allow reading it from a file, and if deal.II
 // has been built with OpenCASCADE support, we also allow reading cad files and
@@ -147,77 +148,6 @@ namespace LA
 namespace Step70
 {
   using namespace dealii;
-
-  // REMOVE THIS FUNCTION ONCE #9891 is merged.
-  template <int dim,
-            int spacedim,
-            typename InputVectorType,
-            typename OutputVectorType>
-  void interpolate_field_on_particles(
-    const DoFHandler<dim, spacedim> &                field_dh,
-    const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-    const InputVectorType &                          field_vector,
-    OutputVectorType &                               interpolated_field,
-    const ComponentMask &                            field_comps)
-  {
-    if (particle_handler.n_locally_owned_particles() == 0)
-      {
-        interpolated_field.compress(VectorOperation::add);
-        return; // nothing else to do here
-      }
-
-    const auto &tria     = field_dh.get_triangulation();
-    const auto &fe       = field_dh.get_fe();
-    auto        particle = particle_handler.begin();
-
-    // Take care of components
-    const ComponentMask comps =
-      (field_comps.size() == 0 ? ComponentMask(fe.n_components(), true) :
-                                 field_comps);
-    AssertDimension(comps.size(), fe.n_components());
-    const auto n_comps = comps.n_selected_components();
-
-    AssertDimension(field_vector.size(), field_dh.n_dofs());
-    AssertDimension(interpolated_field.size(),
-                    particle_handler.get_next_free_particle_index() * n_comps);
-    // Add check on locally owned indices
-
-    // Global to local indices
-    std::vector<unsigned int> space_gtl(fe.n_components(),
-                                        numbers::invalid_unsigned_int);
-    for (unsigned int i = 0, j = 0; i < space_gtl.size(); ++i)
-      if (comps[i])
-        space_gtl[i] = j++;
-
-    std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
-
-    while (particle != particle_handler.end())
-      {
-        const auto &cell = particle->get_surrounding_cell(tria);
-        const auto &dh_cell =
-          typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &field_dh);
-        dh_cell->get_dof_indices(dof_indices);
-        const auto pic = particle_handler.particles_in_cell(cell);
-        Assert(pic.begin() == particle, ExcInternalError());
-        for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
-          {
-            const auto &reference_location = particle->get_reference_location();
-
-            const auto id = particle->get_id();
-
-            for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-              {
-                const auto comp_j =
-                  space_gtl[fe.system_to_component_index(j).first];
-                if (comp_j != numbers::invalid_unsigned_int)
-                  interpolated_field[id * n_comps + comp_j] +=
-                    fe.shape_value(j, reference_location) *
-                    field_vector(dof_indices[j]);
-              }
-          }
-      }
-    interpolated_field.compress(VectorOperation::add);
-  }
 
   // Similiarly to what we have done in step-60, we set up a class that holds
   // all the parameters of our problem and derive it from the ParameterAcceptor
@@ -277,6 +207,16 @@ namespace Step70
     unsigned int initial_fluid_refinement      = 3;
     unsigned int initial_solid_refinement      = 3;
     unsigned int particle_insertion_refinement = 1;
+
+    // To provide a rough description of the fluid domain, we use the method
+    // extract_rtree_level() applied to the tree of bounding boxes of each
+    // locally owned cell of the fluid triangulation. The higher the level of
+    // the tree, the larger the number of extracted bounding boxes, and the more
+    // accurate is the description of the fluid domain.
+    // However, a large number of bounding boxes also implies a large
+    // communication cost, since the collection of bounding boxes is gathered by
+    // all processes
+    unsigned int fluid_rtree_extraction_level = 1;
 
     // The only two parameters used in the equations are the viscosity of the
     // fluid, and the penalty term used in the Nitsche formulation:
@@ -364,8 +304,8 @@ namespace Step70
     // realistic simulation, the solid velocity or its deformation would come
     // from the solution of an auxiliary problem on the solid domain. In this
     // example step we leave this part aside, and simply impose a fixed
-    // rotational velocity field on the immersed solid, governed by function
-    // that can be specified in the parameter file:
+    // rotational velocity field along the z-axis on the immersed solid,
+    // governed by a function that can be specified in the parameter file:
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>> rhs;
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
       angular_velocity;
@@ -391,21 +331,13 @@ namespace Step70
                          unsigned int           component = 0) const override
     {
       Tensor<1, spacedim> velocity;
-      if (spacedim == 3)
-        {
-          Tensor<1, spacedim> omega;
-          for (unsigned int i = 0; i < spacedim; ++i)
-            omega[i] = angular_velocity.value(p, i);
 
-          velocity = cross_product_3d(p, omega);
-        }
-      else if (spacedim == 2)
-        {
-          const double omega = angular_velocity.value(p, 0);
-
-          velocity[0] = -omega * p[1];
-          velocity[1] = omega * p[0];
-        }
+      // We assume that the angular velocity is directed along the z-axis, i.e.,
+      // we model the actual angular velocity as if it was a two-dimensional
+      // rotation, irrespective of the actual value of `spacedim`.
+      const double omega = angular_velocity.value(p);
+      velocity[0]        = -omega * p[1];
+      velocity[1]        = omega * p[0];
 
       return velocity[component];
     }
@@ -414,17 +346,17 @@ namespace Step70
     const Functions::ParsedFunction<spacedim> &angular_velocity;
   };
 
-  // Similarly, we assume that the incremental solid displacement can be
-  // computed simply by a one step time integration process (here using a
-  // trivial forward Euler method), so that at each time step, the solid simply
-  // displaces by `v*dt`.
+  // Similarly, we assume that the solid position can be computed explicitly at
+  // each time step, exploiting the knoweledge of the agnular velocity. We
+  // perform a one step time integration process (here using a trivial forward
+  // Euler method), so that at each time step, the solid simply displaces by
+  // `v*dt`.
   template <int spacedim>
-  class SolidDisplacement : public Function<spacedim>
+  class SolidPosition : public Function<spacedim>
   {
   public:
-    SolidDisplacement(
-      const Functions::ParsedFunction<spacedim> &angular_velocity,
-      const double                               time_step)
+    SolidPosition(const Functions::ParsedFunction<spacedim> &angular_velocity,
+                  const double                               time_step)
       : Function<spacedim>(spacedim)
       , angular_velocity(angular_velocity)
       , time_step(time_step)
@@ -436,7 +368,7 @@ namespace Step70
     virtual double value(const Point<spacedim> &p,
                          unsigned int           component = 0) const override
     {
-      Tensor<1, spacedim> displacement;
+      Tensor<1, spacedim> displacement = p;
 
       double dtheta = angular_velocity.value(p, 0) * time_step;
 
@@ -474,6 +406,10 @@ namespace Step70
     // it not only takes care of generating the grid for the fluid, but also
     // the grid for the solid.
     void make_grid();
+
+    // We use the largest time step that guarantees that each particle moves of
+    // at most one
+    double compute_time_step() const;
 
     // These two methods are new w.r.t. previous examples, and initialize the
     // Particles::ParticleHandler objects used in this class. We have two such
@@ -631,6 +567,41 @@ namespace Step70
     Particles::ParticleHandler<spacedim> tracer_particle_handler;
     Particles::ParticleHandler<spacedim> solid_particle_handler;
 
+    // One of the key point of this tutorial program is the coupling between
+    // two independent parallel::distributed::Triangulation objects, one of
+    // which may be moving and deforming (with possibly large deformations) with
+    // respect to the other. When both the fluid and the solid triangulations
+    // are of type parallel::distributed::Triangulation, every process has
+    // access only to the fraction of locally owned cells of each of the two
+    // triangulations. In general, the locally owned domains are not
+    // overlapping.
+    //
+    // In order to allow for the efficient exchange of information between
+    // non-overlapping parallell::distributed::Triangulation objects, some
+    // algorithms of the library require the user to provide a rough description
+    // of the area occupied by the locally owned part of the triangulation, in
+    // the form of a collection of axis-aligned bounding boxes for each process,
+    // that provide a full covering of the locally owned part of the domain.
+    //
+    // We construct this information by gathering a vector (of length
+    // Utilities::MPI::n_mpi_processes()) of vectors of BoundingBox objects.
+    // We fill this vector using the extract_rtree_level() function, and allow
+    // the user to select what level of the tree to extract.
+    //
+    // As an example, this is what would be extracted by the
+    // extract_rtree_level() function applied to a two dimensional hyper ball,
+    // distributed over three processes. Each image shows in green the bounding
+    // boxes associated to the locally owned cells of the triangulation on each
+    // process, and in violet the bounding boxes extracted from the rtree:
+    //
+    // @image html rtree-process-0.png
+    // @image html rtree-process-1.png
+    // @image html rtree-process-2.png
+    //
+    // We store these boxes in a global member variable, which is updated at
+    // every refinement step:
+    std::vector<std::vector<BoundingBox<spacedim>>> global_fluid_bounding_boxes;
+
     ConditionalOStream  pcout;
     mutable TimerOutput computing_timer;
   };
@@ -764,6 +735,8 @@ namespace Step70
     catch (...)
       {
         // and if we fail, we proceed with the above function call
+        pcout << "Generating from name and argument failed." << std::endl
+              << "Trying to read from file name." << std::endl;
         read_grid_and_cad_files(par.name_of_fluid_grid,
                                 par.arguments_for_fluid_grid,
                                 fluid_tria);
@@ -857,20 +830,26 @@ namespace Step70
     // particles to, we need to have a (rough) idea of how the fluid grid is
     // distributed among processors.
     //
-    // The following method computes a small collection of axis aligned
-    // bounding boxes that represent well the locally owned part of the fluid
-    // domain.
-    auto bounding_boxes_of_locally_owned_cells =
-      GridTools::compute_mesh_predicate_bounding_box(
-        fluid_tria, IteratorFilters::LocallyOwnedCell());
+    // We construct this information by first building an index tree of boxes
+    // bounding the locally owned cells, and then extracting one of the first
+    // levels of the tree:
+    std::vector<BoundingBox<spacedim>> all_boxes(
+      fluid_tria.n_locally_owned_active_cells());
+    unsigned int i = 0;
+    for (const auto cell : fluid_tria.active_cell_iterators())
+      if (cell->is_locally_owned())
+        all_boxes[i++] = cell->bounding_box();
 
-    // These bounding boxes are then exchanged with all other processes, so
-    // that now every active process has a rough idea (based on bounding boxes
-    // that overlap with the locally owned part of the domain) of who they
-    // should send particles to.
-    auto global_bounding_boxes =
-      Utilities::MPI::all_gather(MPI_COMM_WORLD,
-                                 bounding_boxes_of_locally_owned_cells);
+    // We construct the tree
+    const auto tree = pack_rtree(all_boxes);
+
+    // extract the desired level
+    const auto local_boxes =
+      extract_rtree_level(tree, par.fluid_rtree_extraction_level);
+
+    // and gather the information from all participating processes
+    global_fluid_bounding_boxes =
+      Utilities::MPI::all_gather(MPI_COMM_WORLD, local_boxes);
 
 
     // Finally generate the particles from the support points of the
@@ -879,7 +858,7 @@ namespace Step70
     // call, every particle will have been distributed to the correct process
     // (i.e., the process that owns the cell where the particle lives).
     Particles::Generators::dof_support_points(particles_dof_handler,
-                                              global_bounding_boxes,
+                                              global_fluid_bounding_boxes,
                                               tracer_particle_handler);
 
     // As soon as we have initialized the particles in each process, we set
@@ -996,21 +975,14 @@ namespace Step70
             }
         }
 
-    // We proceed in the same way we did with the tracer particles
-    auto my_bounding_box = GridTools::compute_mesh_predicate_bounding_box(
-      fluid_tria, IteratorFilters::LocallyOwnedCell());
-
-    auto global_bounding_boxes =
-      Utilities::MPI::all_gather(mpi_communicator, my_bounding_box);
-
+    // We proceed in the same way we did with the tracer particles, reusing the
+    // computed bounding boxes.
     // Since we have already stored the position of the quadrature point,
     // we can use these positions to insert the particles directly using
     // the solid_particle_handler instead of having to go through a
     // Particles::Generators
-    auto cpu_to_index =
-      solid_particle_handler.insert_global_particles(quadrature_points_vec,
-                                                     global_bounding_boxes,
-                                                     properties);
+    auto cpu_to_index = solid_particle_handler.insert_global_particles(
+      quadrature_points_vec, global_fluid_bounding_boxes, properties);
 
 
     // Now make sure that upon refinement, particles are correctly transferred
@@ -1037,10 +1009,10 @@ namespace Step70
   void StokesImmersedProblem<dim, spacedim>::initial_setup()
   {
     // We store the time necessary to carry-out the initial_setup under the
-    // label "initial setup" Numerous other calls to this timer are made in
+    // label "Initial setup" Numerous other calls to this timer are made in
     // various functions. They allow to monitor the absolute and relative load
     // of each individual function to identify the bottlenecks.
-    TimerOutput::Scope t(computing_timer, "initial setup");
+    TimerOutput::Scope t(computing_timer, "Initial setup");
 
     fluid_fe =
       std::make_unique<FESystem<spacedim>>(FE_Q<spacedim>(par.velocity_degree),
@@ -1066,7 +1038,7 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_dofs()
   {
-    TimerOutput::Scope t(computing_timer, "setup dofs");
+    TimerOutput::Scope t(computing_timer, "Setup dofs");
 
     fluid_dh.distribute_dofs(*fluid_fe);
 
@@ -1179,8 +1151,7 @@ namespace Step70
     preconditioner_matrix = 0;
     system_rhs            = 0;
 
-    TimerOutput::Scope t(computing_timer, "Stokes_assembly");
-
+    TimerOutput::Scope t(computing_timer, "Assemble Stokes terms");
 
     FEValues<spacedim> fe_values(*fluid_fe,
                                  *fluid_quadrature_formula,
@@ -1271,7 +1242,7 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::assemble_nitsche_restriction()
   {
-    TimerOutput::Scope t(computing_timer, "Nitsche_assembly");
+    TimerOutput::Scope t(computing_timer, "Assemble Nitsche terms");
 
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(spacedim);
@@ -1368,7 +1339,7 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::solve()
   {
-    TimerOutput::Scope t(computing_timer, "solve");
+    TimerOutput::Scope t(computing_timer, "Solve");
 
     LA::MPI::PreconditionAMG prec_A;
     {
@@ -1437,7 +1408,7 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::refine_and_transfer()
   {
-    TimerOutput::Scope               t(computing_timer, "refine");
+    TimerOutput::Scope               t(computing_timer, "Refine");
     const FEValuesExtractors::Vector velocity(0);
 
     Vector<float> error_per_cell(fluid_tria.n_active_cells());
@@ -1627,9 +1598,9 @@ namespace Step70
             TimerOutput::Scope t(computing_timer,
                                  "Set solid particle position");
 
-            SolidDisplacement<spacedim> solid_displacement(par.angular_velocity,
-                                                           time_step);
-            solid_particle_handler.set_particle_positions(solid_displacement,
+            SolidPosition<spacedim> solid_position(par.angular_velocity,
+                                                   time_step);
+            solid_particle_handler.set_particle_positions(solid_position,
                                                           false);
           }
         {
@@ -1637,11 +1608,12 @@ namespace Step70
           // particles and, with a naive explicit Euler scheme, we advect the
           // massless tracer particles.
           TimerOutput::Scope t(computing_timer, "Set tracer particle motion");
-          interpolate_field_on_particles(fluid_dh,
-                                         tracer_particle_handler,
-                                         locally_relevant_solution,
-                                         tracer_particle_velocities,
-                                         velocity_mask);
+          Particles::Utilities::interpolate_field_on_particles(
+            fluid_dh,
+            tracer_particle_handler,
+            locally_relevant_solution,
+            tracer_particle_velocities,
+            velocity_mask);
 
           tracer_particle_velocities *= time_step;
 
@@ -1697,7 +1669,7 @@ namespace Step70
                                   spacedim>::StokesImmersedProblemParameters()
     : ParameterAcceptor("Stokes Immersed Problem/")
     , rhs("Right hand side", spacedim + 1)
-    , angular_velocity("Angular velocity", spacedim == 3 ? spacedim : 1)
+    , angular_velocity("Angular velocity")
   {
     // We split the parameters in various categories, by putting them in
     // different sections of the ParameterHandler class. We begin by
@@ -1722,6 +1694,11 @@ namespace Step70
     add_parameter("Initial solid refinement",
                   initial_solid_refinement,
                   "Initial mesh refinement used for the solid domain Gamma");
+
+    add_parameter("Fluid bounding boxes extraction level",
+                  fluid_rtree_extraction_level,
+                  "Extraction level of the rtree used to construct global "
+                  "bounding boxes");
 
     add_parameter(
       "Particle insertion refinement",
