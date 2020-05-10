@@ -162,10 +162,7 @@ namespace Particles
       const ComponentMask &space_comps = ComponentMask());
 
     /**
-     * Interpolate a field to the position of the particles of a
-     * particle_handler
-     *
-     * Given a DoFHandler and a ParticleHandler, interpolates a vector field
+     * Given a DoFHandler and a ParticleHandler, interpolate a vector field
      * at the position of the particles. The result is stored in an output
      * vector whose size corresponds to the number of locally owned particles *
      * number of active components
@@ -181,7 +178,7 @@ namespace Particles
      *
      * @param[in,out] interpolated_field The interpolated value of the field at
      * the position of the particles. The size of the vector must be
-     * n_locally_owned_particles * n_components
+     * n_locally_owned_particles times the n_components
      *
      * @param[in] field_comps An optional component mask that decides which
      * subset of the vector fields are interpolated

@@ -209,7 +209,6 @@ namespace Particles
       matrix.compress(VectorOperation::add);
     }
 
-
 #include "utilities.inst"
 
   } // namespace Utilities

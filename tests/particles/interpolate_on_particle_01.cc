@@ -25,16 +25,10 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
