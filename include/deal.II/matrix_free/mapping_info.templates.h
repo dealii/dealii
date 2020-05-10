@@ -565,15 +565,17 @@ namespace internal
       /**
        * Helper function called internally during the initialize function.
        */
-      template <int dim, typename Number, typename VectorizedArrayType>
+      template <int dim, typename VectorizedArrayType>
       void
       evaluate_on_cell(const dealii::Triangulation<dim> &           tria,
                        const std::pair<unsigned int, unsigned int> *cells,
                        const unsigned int                           my_q,
                        GeometryType &                               cell_t_prev,
-                       GeometryType (&cell_t)[VectorizedArrayType::size()],
+                       GeometryType *                               cell_t,
                        dealii::FEValues<dim, dim> &                 fe_val,
-                       LocalData<dim, Number, VectorizedArrayType> &cell_data)
+                       LocalData<dim,
+                                 typename VectorizedArrayType::value_type,
+                                 VectorizedArrayType> &             cell_data)
       {
         const unsigned int n_q_points   = fe_val.n_quadrature_points;
         const UpdateFlags  update_flags = fe_val.get_update_flags();
@@ -845,14 +847,13 @@ namespace internal
                        active_fe_index[cell] != active_fe_index[cell - 1])
                 cell_t_prev = general;
 
-              evaluate_on_cell<dim, Number, VectorizedArrayType>(
-                tria,
-                &cells[cell * VectorizedArrayType::size()],
-                my_q,
-                cell_t_prev,
-                cell_t,
-                fe_val,
-                cell_data);
+              evaluate_on_cell(tria,
+                               &cells[cell * VectorizedArrayType::size()],
+                               my_q,
+                               cell_t_prev,
+                               cell_t,
+                               fe_val,
+                               cell_data);
 
               // now reorder the data into vectorized types. if we are here
               // for the first time, we need to find out whether the Jacobian
