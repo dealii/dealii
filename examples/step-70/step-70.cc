@@ -1410,7 +1410,7 @@ namespace Step70
     SolverControl solver_control(system_matrix.m(),
                                  1e-10 * system_rhs.l2_norm());
 
-    SolverMinRes<LA::MPI::BlockVector> solver(solver_control);
+    SolverFGMRES<LA::MPI::BlockVector> solver(solver_control);
 
     constraints.set_zero(solution);
 
