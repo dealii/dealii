@@ -739,6 +739,38 @@ namespace GridGenerator
              const bool attach_spherical_manifold_on_boundary_cells = false);
 
   /**
+   * This is an alternative to hyper_ball with 12 cells in 2d and 32 cells in
+   * 3d, which provides a better balance between the size of the cells around
+   * the outer curved boundaries and the cell in the interior. The mesh is
+   * based on the cells used by GridGenerator::quarter_hyper_ball() with
+   * appropriate copies and rotations to fill the whole ball.
+   *
+   * The following pictures show the resulting mesh in 2D (left) and 3D:
+   * <table align="center" class="doxtable">
+   *   <tr>
+   *     <td>
+   *       <img src="hyper_ball_balanced_2d.png" alt="" width="40%">
+   *     </td>
+   *     <td>
+   *       <img src="hyper_ball_balanced_3d.png" alt="" width="40%">
+   *     </td>
+   *   </tr>
+   * </table>
+   *
+   * By default, the manifold_id is set to 0 on the boundary faces, 1 on the
+   * boundary cells, and types::flat_manifold_id on the central cell and on
+   * internal faces.
+   *
+   * @pre The triangulation passed as argument needs to be empty when calling
+   * this function.
+   */
+  template <int dim>
+  void
+  hyper_ball_balanced(Triangulation<dim> &tria,
+                      const Point<dim> &  center = Point<dim>(),
+                      const double        radius = 1.);
+
+  /**
    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
    * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
    * dimensions. (To create a mesh of a ball, use GridGenerator::hyper_ball().)
