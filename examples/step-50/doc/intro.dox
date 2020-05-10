@@ -4,7 +4,7 @@
 This program was contributed by Thomas C Clevenger and Timo Heister.
 <br>
 This material is based upon work partly supported by the National
-Science Foundation Award DMS-1901529, OAC-2015848, EAR-1925575, by the Computational
+Science Foundation Award DMS-2028346, OAC-2015848, EAR-1925575, by the Computational
 Infrastructure in Geodynamics initiative (CIG), through the NSF under Award
 EAR-0949446 and EAR-1550901 and The University of California -- Davis.
 </i>
@@ -36,7 +36,7 @@ for 2D and a Fichera corner for 3D) with $\epsilon = 1$ if $\min(x,y,z)>-\frac{1
 $\epsilon = 100$ otherwise. The boundary conditions are $u=0$ on the whole boundary and
 the right-hand side is $f=1$. We use continuous Q2 elements to discretize $V_h$ and use a
 residual-based, cell-wise a posteriori error estimator
-$e(K) = e_{\text{cell}}(K) + e_{\text{face}}(K)$ from _CITE EST PAPER_ with
+$e(K) = e_{\text{cell}}(K) + e_{\text{face}}(K)$ from @cite karakashian2003posteriori with
 @f{align*}
  e_{\text{cell}}(K) = h^2 \| f + \epsilon \triangle u \|_K^2, \qquad
  e_{\text{face}}(K) = \sum_F h_F \| [ \epsilon \nabla u \cdot n ] \|_F^2.
@@ -116,7 +116,7 @@ The value MGTools::workload_imbalance()$= 1/\mathbb{E}$ then represents the fact
 in timings we expect for GMG methods (vmults, assembly, etc.) due to the imbalance of the
 mesh partition.
 
-_CITE MG PAPER_ contains a full discussion of the partition efficiency model
+@cite clevenger_par_gmg contains a full discussion of the partition efficiency model
 and the effect the imbalance has on the GMG V-cycle timing. In summary, the value
 of $\mathbb{E}$ is highly dependent on the degree of local mesh refinement used and has
 an optimal value $\mathbb{E} \approx 1$ for globally refined meshes. Typically for adaptively
