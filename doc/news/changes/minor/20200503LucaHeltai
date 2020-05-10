@@ -1,0 +1,4 @@
+New: ExtractLevelVisitor and extract_rtree_level() allow one to return the vector of BoundingBox objects 
+that make up a specific level of a boost::rtree object.
+<br>
+(Luca Heltai, 2020/05/03)
