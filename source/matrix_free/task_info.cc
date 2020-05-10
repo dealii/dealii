@@ -962,7 +962,7 @@ namespace internal
               std::upper_bound(category_size.begin(), category_size.end(), i) -
                 category_size.begin() :
               0;
-          const std::array<unsigned int, 3> next{category_hp, max_index, i};
+          const std::array<unsigned int, 3> next{{category_hp, max_index, i}};
           if (batch_with_comm[i / n_lanes])
             batch_order_comm.emplace_back(next);
           else
