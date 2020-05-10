@@ -178,13 +178,13 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
       const std::vector<BoundingBox<deal_II_space_dimension>> &, MPI_Comm);
 
     template Vector<double> GridTools::compute_aspect_ratio_of_cells(
-      const Triangulation<deal_II_space_dimension> &,
       const Mapping<deal_II_space_dimension> &,
+      const Triangulation<deal_II_space_dimension> &,
       const Quadrature<deal_II_space_dimension> &);
 
     template double GridTools::compute_maximum_aspect_ratio(
-      const Triangulation<deal_II_space_dimension> &,
       const Mapping<deal_II_space_dimension> &,
+      const Triangulation<deal_II_space_dimension> &,
       const Quadrature<deal_II_space_dimension> &);
   }
 

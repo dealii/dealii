@@ -189,8 +189,8 @@ namespace GridTools
 
   template <int dim>
   Vector<double>
-  compute_aspect_ratio_of_cells(const Triangulation<dim> &triangulation,
-                                const Mapping<dim> &      mapping,
+  compute_aspect_ratio_of_cells(const Mapping<dim> &      mapping,
+                                const Triangulation<dim> &triangulation,
                                 const Quadrature<dim> &   quadrature)
   {
     FE_Nothing<dim> fe;
@@ -255,12 +255,12 @@ namespace GridTools
 
   template <int dim>
   double
-  compute_maximum_aspect_ratio(const Triangulation<dim> &triangulation,
-                               const Mapping<dim> &      mapping,
+  compute_maximum_aspect_ratio(const Mapping<dim> &      mapping,
+                               const Triangulation<dim> &triangulation,
                                const Quadrature<dim> &   quadrature)
   {
     Vector<double> aspect_ratio_vector =
-      compute_aspect_ratio_of_cells(triangulation, mapping, quadrature);
+      compute_aspect_ratio_of_cells(mapping, triangulation, quadrature);
 
     return VectorTools::compute_global_error(triangulation,
                                              aspect_ratio_vector,
