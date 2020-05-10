@@ -76,7 +76,7 @@ compute_aspect_ratio_hyper_rectangle(
   QGauss<dim> const          gauss(n_q_points);
 
   Vector<double> ratios =
-    GridTools::compute_aspect_ratio_of_cells(tria, mapping, gauss);
+    GridTools::compute_aspect_ratio_of_cells(mapping, tria, gauss);
 
   deallog << std::endl
           << "Parameters:"
@@ -87,7 +87,7 @@ compute_aspect_ratio_hyper_rectangle(
   deallog << "Aspect ratio vector = " << std::endl;
   ratios.print(deallog.get_file_stream());
 
-  return GridTools::compute_maximum_aspect_ratio(tria, mapping, gauss);
+  return GridTools::compute_maximum_aspect_ratio(mapping, tria, gauss);
 }
 
 int

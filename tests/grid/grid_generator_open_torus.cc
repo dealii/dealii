@@ -52,9 +52,9 @@ test()
   QGauss<3> const          gauss(4);
 
   double const ar_full_torus =
-    GridTools::compute_maximum_aspect_ratio(tria, mapping, gauss);
+    GridTools::compute_maximum_aspect_ratio(mapping, tria, gauss);
   double const ar_open_torus =
-    GridTools::compute_maximum_aspect_ratio(tria_open, mapping, gauss);
+    GridTools::compute_maximum_aspect_ratio(mapping, tria_open, gauss);
 
   deallog << "N_active_cells_full = " << tria.n_global_active_cells()
           << std::endl;
