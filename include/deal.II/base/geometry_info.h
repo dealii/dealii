@@ -21,8 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-
-#include <boost/range/irange.hpp>
+#include <deal.II/base/std_cxx20/iota_view.h>
 
 #include <array>
 #include <cstdint>
@@ -1949,7 +1948,7 @@ struct GeometryInfo
    *
    * @see CPP11
    */
-  static boost::integer_range<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   face_indices();
 
   /**
@@ -1982,7 +1981,7 @@ struct GeometryInfo
    *
    * @see CPP11
    */
-  static boost::integer_range<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   vertex_indices();
 
   /**
@@ -2837,19 +2836,19 @@ GeometryInfo<0>::vertex_indices()
 
 
 template <int dim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::face_indices()
 {
-  return boost::irange(0U, faces_per_cell);
+  return {0U, faces_per_cell};
 }
 
 
 
 template <int dim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::vertex_indices()
 {
-  return boost::irange(0U, vertices_per_cell);
+  return {0U, vertices_per_cell};
 }
 
 

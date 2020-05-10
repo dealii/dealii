@@ -78,9 +78,9 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
-// The last two boost header files are for creating custom iterator ranges
+// The last two header files are for creating custom iterator ranges
 // over integer intervals.
-#include <boost/range/irange.hpp>
+#include <deal.II/base/std_cxx20/iota_view.h>
 #include <boost/range/iterator_range.hpp>
 
 // For std::isnan, std::isinf, std::ifstream, std::async, and std::future
@@ -1225,7 +1225,8 @@ namespace Step69
     // defined by the <code>indices.begin()</code> and
     // <code>indices.end()</code> iterators into subranges (we want to be
     // able to read any entry in those subranges with constant complexity).
-    // In order to provide such iterators we resort to boost::irange.
+    // In order to provide such iterators we resort to
+    // std_cxx20::ranges::iota_view.
     //
     // The bulk of the following piece of code is spent defining
     // the "worker" <code>on_subranges</code>: i.e. the  operation applied at
@@ -1249,26 +1250,21 @@ namespace Step69
     // to carry out (computation and storage of normals, and normalization
     // of the $\mathbf{c}_{ij}$ of entries) threads cannot conflict
     // attempting to write the same entry (we do not need a scheduler).
-    //
-    // We have one more difficulty to overcome: In order to implement the
-    // <code>on_subranges</code> lambda we need to name the iterator type
-    // of the object returned by <code>boost::irange%<unsigned
-    // int%>()</code>. This is unfortunately a very convoluted name exposing
-    // implementation details about <code>boost::irange</code>. For this
-    // reason we resort to the <a
-    // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
-    // specifier, a C++11 feature that returns the type of an entity, or
-    // expression.
     {
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - compute |c_ij|, and n_ij");
 
-      const auto indices = boost::irange<unsigned int>(0, n_locally_relevant);
+      const std_cxx20::ranges::iota_view<unsigned int, unsigned int> indices(
+        0, n_locally_relevant);
 
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
-          for (const auto row_index : boost::make_iterator_range(i1, i2))
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
+          for (const auto row_index :
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               // First column-loop: we compute and store the entries of the
               // matrix norm_matrix and write normalized entries into the
@@ -1870,9 +1866,10 @@ namespace Step69
     const auto &n_locally_owned    = offline_data->n_locally_owned;
     const auto &n_locally_relevant = offline_data->n_locally_relevant;
 
-    const auto indices_owned = boost::irange<unsigned int>(0, n_locally_owned);
-    const auto indices_relevant =
-      boost::irange<unsigned int>(0, n_locally_relevant);
+    const std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+      indices_owned(0, n_locally_owned);
+    const std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+      indices_relevant(0, n_locally_relevant);
 
     const auto &sparsity = offline_data->sparsity_pattern;
 
@@ -1926,9 +1923,13 @@ namespace Step69
                                "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = //
-        [&](typename decltype(indices_relevant)::iterator       i1,
-            const typename decltype(indices_relevant)::iterator i2) {
-          for (const auto i : boost::make_iterator_range(i1, i2))
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
+          for (const auto i :
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               const auto U_i = gather(U, i);
 
@@ -2021,11 +2022,15 @@ namespace Step69
       // locally.
 
       const auto on_subranges = //
-        [&](typename decltype(indices_relevant)::iterator       i1,
-            const typename decltype(indices_relevant)::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
-          for (const auto i : boost::make_iterator_range(i1, i2))
+          for (const auto i :
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               double d_sum = 0.;
 
@@ -2106,8 +2111,10 @@ namespace Step69
                                "time_stepping - 3 perform update");
 
       const auto on_subranges =
-        [&](typename decltype(indices_owned)::iterator       i1,
-            const typename decltype(indices_owned)::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
@@ -2344,7 +2351,9 @@ namespace Step69
     const auto &boundary_normal_map = offline_data->boundary_normal_map;
     const auto &n_locally_owned     = offline_data->n_locally_owned;
 
-    const auto indices = boost::irange<unsigned int>(0, n_locally_owned);
+    const auto indices =
+      std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0,
+                                                               n_locally_owned);
 
     // We define the r_i_max and r_i_min in the current MPI process as
     // atomic doubles in order to avoid race conditions between threads:
@@ -2355,8 +2364,10 @@ namespace Step69
     // global maxima and minima of the gradients.
     {
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           double r_i_max_on_subrange = 0.;
           double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
@@ -2440,8 +2451,10 @@ namespace Step69
 
     {
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
+        [&](
+          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
+          const std_cxx20::ranges::iota_view<unsigned int,
+                                             unsigned int>::iterator i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
