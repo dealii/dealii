@@ -2660,7 +2660,7 @@ namespace internal
 
           // step 4b: go through the cells and compute the information using
           // similar evaluators as for the matrix-free integrals
-          parallel::apply_to_subranges(
+          dealii::parallel::apply_to_subranges(
             0U,
             cell_type.size(),
             [&](const unsigned int begin, const unsigned int end) {
@@ -2788,7 +2788,7 @@ namespace internal
 
           // step 6b: go through the faces and compute the information using
           // similar evaluators as for the matrix-free face integrals
-          parallel::apply_to_subranges(
+          dealii::parallel::apply_to_subranges(
             0U,
             face_type.size(),
             [&](const unsigned int begin, const unsigned int end) {
@@ -2817,7 +2817,7 @@ namespace internal
         if (face_data[my_q].descriptor[0].n_q_points >
             face_data[quad_with_most_points].descriptor[0].n_q_points)
           quad_with_most_points = my_q;
-      parallel::apply_to_subranges(
+      dealii::parallel::apply_to_subranges(
         0U,
         face_type.size(),
         [&](const unsigned int begin, const unsigned int end) {
