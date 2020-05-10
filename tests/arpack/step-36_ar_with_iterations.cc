@@ -223,12 +223,15 @@ namespace Step36
     ArpackSolver::AdditionalData additional_data(
       num_arnoldi_vectors, ArpackSolver::largest_magnitude, true);
     ArpackSolver eigensolver(solver_control, additional_data);
-    eigensolver.solve(stiffness_matrix,
-                      mass_matrix,
-                      inverse,
-                      eigenvalues,
-                      eigenfunctions,
-                      eigenvalues.size());
+    check_solver_within_range(eigensolver.solve(stiffness_matrix,
+                                                mass_matrix,
+                                                inverse,
+                                                eigenvalues,
+                                                eigenfunctions,
+                                                eigenvalues.size()),
+                              solver_control.last_step(),
+                              2,
+                              10);
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
