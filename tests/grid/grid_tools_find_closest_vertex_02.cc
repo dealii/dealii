@@ -60,7 +60,7 @@ test(const Point<spacedim> &p, double displacement)
       const auto &v = mapping.get_vertices(cell);
 
       deallog << "Closest vertex of cell " << cell << " to " << p
-              << " is cell->vertex(" << i << ") :" << v[i] << std::endl;
+              << " is cell->vertex(" << i << ") : " << v[i] << std::endl;
     }
 };
 
