@@ -5,4 +5,4 @@ should receive the positions and the properties, and sends this information to t
 This is useful when constructing particles from non-matching triangulations, where the
 distribution of the particle positions is arbitrary, and possibly not related to the locally owned cells.
 <br>
-(Luca Heltai, 2019/11/25)
+(Luca Heltai, Bruno Blais, 2019/11/25)
