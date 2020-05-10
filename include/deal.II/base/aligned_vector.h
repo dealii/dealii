@@ -477,7 +477,7 @@ namespace internal
              ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
-        apply_to_subrange(0, size);
+        AlignedVectorMove::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }
@@ -566,7 +566,7 @@ namespace internal
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
-        apply_to_subrange(0, size);
+        AlignedVectorSet::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }
@@ -649,7 +649,7 @@ namespace internal
       Assert(destination != nullptr, ExcInternalError());
 
       if (size < minimum_parallel_grain_size)
-        apply_to_subrange(0, size);
+        AlignedVectorDefaultInitialize::apply_to_subrange(0, size);
       else
         apply_parallel(0, size, minimum_parallel_grain_size);
     }

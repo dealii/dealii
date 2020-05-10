@@ -150,7 +150,7 @@ SparseLUDecomposition<number>::prebuild_lower_bound()
 
   prebuilt_lower_bound.resize(N);
 
-  for (size_type row = 0; row < N; row++)
+  for (size_type row = 0; row < N; ++row)
     {
       prebuilt_lower_bound[row] =
         Utilities::lower_bound(&column_numbers[rowstart_indices[row] + 1],

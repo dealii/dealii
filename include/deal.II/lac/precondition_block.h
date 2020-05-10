@@ -939,12 +939,11 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
     const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
     const size_type                                          row)
   : matrix(matrix)
+  , bs(matrix->block_size())
+  , a_block(row / bs)
   , b_iterator(&matrix->inverse(0), 0, 0)
   , b_end(&matrix->inverse(0), 0, 0)
 {
-  bs      = matrix->block_size();
-  a_block = row / bs;
-
   // This is the end accessor, which
   // does not have a valid block.
   if (a_block == matrix->size())
