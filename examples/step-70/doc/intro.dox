@@ -398,17 +398,23 @@ related to $\Gamma$ on its quadrature points that is:
 - The weights times the jacobian of the transformation, i.e JxW.
 - In the case of the Nitsche method, the normal vector of the face.
 
-TODO: Add paragraph about particles here.
+Since both of these properties are point-properties (or point-vectors) that are
+attached to the solid material they can be idealized as a set of disconnected
+infinitesimally small particles, which carry the required information with the
+movement of the solid. Deal.II already possesses the ability to distribute and
+store such a set of particles in large-scale parallel computations in form of
+the ParticleHandler class (for details on the implementation see Gassmöller et
+al., 2018), and we will make use of this functionality in this tutorial.
 
-The approach taken in this step is as follows:
+Thus, the approach taken in this step is as follows:
 - Create a parallel::distributed::Triangulation for the domain $\Gamma$
 - Create Particles::Particle at the position of the quadrature points on $\Gamma$
   by using the Particles::Generators::quadrature_points() generator. Since the quadrature_points generator
-  uses Particles::ParticleHandler::insert_global_particles() function, the particles
+  uses the Particles::ParticleHandler::insert_global_particles() function, the particles
   will be automatically distributed across the processors, *following
-  the solid Triangulation*
+  the solid triangulation*
 - Attach the necessary information to the particles, i.e., the quadrature
-  weight
+  weight.
 
 This structure is relatively expensive to generate, but must only be generated
 once per simulation. Once the Particles::ParticleHandler is generated and the
@@ -417,8 +423,7 @@ can be carried out by exploiting the fact that particles are grouped cellwise
 inside ParticleHandler, allowing us to:
 - Looping over all cells of $\Omega$ that contain at least one particle
 - Looping over all particles in the given cell
-- Compute the integrals and fill the global matrix
-
+- Compute the integrals and fill the global matrix.
 
 Since the Particles::ParticleHandler can manage the exchange of particles from
 one processor to the other, the embedded
@@ -427,8 +432,8 @@ The only constraint associated with this displacement is that particles should
 be displaced by a distance that is no larger than the size of a cell.
 
 Once the entire problem (the Stokes problem and the immersed boundary
-imposition) are assembled,
-the final saddle point problem by an iterative solver, applied to the
+imposition) is assembled,
+the final saddle point problem is solved by an iterative solver, applied to the
 Schur complement $S$ (whose construction is described, for example, in step-22),
 and we construct $S$ using LinearOperator classes.
 
@@ -478,3 +483,8 @@ demonstrating the time-reversibility of the flow.
 - Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
   Finite Element Methods.” Computer Methods in Applied Mechanics and Engineering
   229–232.
+
+- Gassmöller, R., H. Lokavarapu, E. Heien, E. G. Puckett, and W. Bangerth.
+  2018.  "Flexible and Scalable Particle‐in‐Cell Methods With Adaptive Mesh
+  Refinement for Geodynamic Computations." Geochemistry, Geophysics, Geosystems
+  19(9).  3596-3604.
