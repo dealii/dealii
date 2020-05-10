@@ -642,7 +642,7 @@ namespace python
           mapping_wrapper.get_mapping());
 
       auto aspect_ratios =
-        GridTools::compute_aspect_ratio_of_cells(*tria, *mapping, *quad);
+        GridTools::compute_aspect_ratio_of_cells(*mapping, *tria, *quad);
 
       boost::python::list ratios;
       for (size_t i = 0; i < aspect_ratios.size(); ++i)
