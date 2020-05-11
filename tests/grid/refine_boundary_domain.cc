@@ -24,7 +24,6 @@
 #include "../tests.h"
 
 using namespace dealii;
-using namespace std;
 
 int
 main()
@@ -49,40 +48,69 @@ main()
   tria_domain.refine_global(2);
   tria_boundary.refine_global(2);
 
-  // get sets with vertices for boundary cells and domain faces (use float to
-  // avoid different ordering in sets caused by round-off)
-  set<tuple<const float, const float, const float>> boundary_vertices,
-    domain_vertices;
-  for (const auto &boundary_cell : tria_boundary.active_cell_iterators())
-    {
-      for (unsigned int v = 0;
-           v < GeometryInfo<spacedim - 1>::vertices_per_cell;
-           ++v)
-        {
-          const Point<spacedim> p = boundary_cell->vertex(v);
-          boundary_vertices.insert(make_tuple(p(0), p(1), p(2)));
-        }
-    }
-  for (const auto &domain_cell : tria_domain.active_cell_iterators())
-    {
-      for (unsigned int f = 0; f < GeometryInfo<spacedim>::faces_per_cell; ++f)
-        {
-          if (domain_cell->face(f)->at_boundary())
-            {
-              for (unsigned int v = 0;
-                   v < GeometryInfo<spacedim>::vertices_per_face;
-                   ++v)
-                {
-                  const Point<spacedim> p = domain_cell->face(f)->vertex(v);
-                  domain_vertices.insert(make_tuple(p(0), p(1), p(2)));
-                }
-            }
-        }
-    }
+  // create a set of boundary and domain vertices (that have to coincide).
+  // In order to compare the two sets we order them in lexicographic order
+  // and identify coordinates as being identical up to a certain tolerance,
+  // i.e., is_less_tol only returns true if one (or more) coordinates of
+  // two points have a difference of at least tol.
+  //
+  // Warning: Ensure that is_less_tol is a "weak strict ordering", i.e.
+  // ensure that is_less_tol(p, p) == false for any p.
 
-  // compare sets
-  if (boundary_vertices != domain_vertices)
-    deallog << "ERROR : Meshes do not coincide!" << endl;
+  const double tol = 1.0e-8;
+
+  auto is_less_tol = [tol](const Point<spacedim> &p_1,
+                           const Point<spacedim> &p_2) {
+    if (p_1[0] < p_2[0] - tol)
+      return true;
+
+    if (p_1[0] <= p_2[0] + tol && p_1[1] < p_2[1] - tol)
+      return true;
+
+    if (p_1[0] <= p_2[0] + tol && p_1[1] <= p_2[1] + tol &&
+        p_1[2] < p_2[2] - tol)
+      return true;
+
+    return false;
+  };
+
+  std::set<Point<spacedim>, decltype(is_less_tol)> boundary_vertices(
+    is_less_tol);
+
+  for (const auto &boundary_cell : tria_boundary.active_cell_iterators())
+    for (unsigned int v = 0; v < GeometryInfo<spacedim - 1>::vertices_per_cell;
+         ++v)
+      boundary_vertices.insert(boundary_cell->vertex(v));
+
+  std::set<Point<spacedim>, decltype(is_less_tol)> domain_vertices(is_less_tol);
+
+  for (const auto &domain_cell : tria_domain.active_cell_iterators())
+    for (unsigned int f = 0; f < GeometryInfo<spacedim>::faces_per_cell; ++f)
+      if (domain_cell->face(f)->at_boundary())
+        for (unsigned int v = 0; v < GeometryInfo<spacedim>::vertices_per_face;
+             ++v)
+          {
+            domain_vertices.insert(domain_cell->face(f)->vertex(v));
+          }
+
+  // Create the symmetric set difference:
+
+  std::vector<Point<spacedim>> symmetric_difference;
+  std::set_symmetric_difference(boundary_vertices.begin(),
+                                boundary_vertices.end(),
+                                domain_vertices.begin(),
+                                domain_vertices.end(),
+                                std::back_inserter(symmetric_difference),
+                                is_less_tol);
+
+  if (!symmetric_difference.empty())
+    {
+      deallog << "Found nonmatching vertices" << std::endl;
+      for (auto it : symmetric_difference)
+        deallog << it << std::endl;
+    }
   else
-    deallog << "OK : Meshes coincide!" << endl;
+    {
+      deallog << "OK : Meshes coincide!" << std::endl;
+    }
 }
