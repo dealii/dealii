@@ -213,7 +213,7 @@ make sense:
   same spirit as we used for the assembly of the linear system.
 
 
-  <h4> Derivation for the simply supported plates </h3>
+  <h4> Derivation for the simply supported plates </h4>
 
   Similar to the "clamped" boundary condition addressed in the implementation,
   we will derive the $C^0$ IP finite element scheme for simply supported plates:
