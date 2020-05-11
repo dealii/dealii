@@ -749,10 +749,16 @@ namespace GridGenerator
    * <table align="center" class="doxtable">
    *   <tr>
    *     <td>
-   *       <img src="hyper_ball_balanced_2d.png" alt="" width="40%">
+   *       \htmlonly <style>div.image
+   *         img[src="hyper_ball_balanced_2d.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html hyper_ball_balanced_2d.png
    *     </td>
    *     <td>
-   *       <img src="hyper_ball_balanced_3d.png" alt="" width="40%">
+   *       \htmlonly <style>div.image
+   *         img[src="hyper_ball_balanced_3d.png"]{width:40%}</style>
+   *       \endhtmlonly
+   *       @image html hyper_ball_balanced_3d.png
    *     </td>
    *   </tr>
    * </table>
@@ -817,10 +823,16 @@ namespace GridGenerator
    * <table align="center" class="doxtable">
    *   <tr>
    *     <td>
-   *       <img src="quarter_hyper_ball_2d.png" alt="" width="50%">
+   *       \htmlonly <style>div.image
+   *         img[src="quarter_hyper_ball_2d.png"]{width:50%}</style>
+   *       \endhtmlonly
+   *       @image html quarter_hyper_ball_2d.png
    *     </td>
    *     <td>
-   *       <img src="quarter_hyper_ball_3d.png" alt="" width="45%">
+   *       \htmlonly <style>div.image
+   *         img[src="quarter_hyper_ball_3d.png"]{width:46%}</style>
+   *       \endhtmlonly
+   *       @image html quarter_hyper_ball_3d.png
    *     </td>
    *   </tr>
    * </table>
