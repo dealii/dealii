@@ -192,7 +192,7 @@ namespace Step70
     // Instead of defining a time step increment, in this tutorial we prefer to
     // let the user choose a final simulation time, and the number of steps in
     // which we want to reach the final time
-    unsigned int number_of_time_steps = 1;
+    unsigned int number_of_time_steps = 501;
     double       final_time           = 1.0;
 
     // Instead of producing an output at every time step, we allow the user to
@@ -204,9 +204,9 @@ namespace Step70
     // datum. However it is relatively straightforward to incorporate some
     // elasticity model in this tutorial, and transform it into a fully fledged
     // FSI solver.
-    unsigned int initial_fluid_refinement      = 3;
+    unsigned int initial_fluid_refinement      = 5;
     unsigned int initial_solid_refinement      = 3;
-    unsigned int particle_insertion_refinement = 1;
+    unsigned int particle_insertion_refinement = 3;
 
     // To provide a rough description of the fluid domain, we use the method
     // extract_rtree_level() applied to the tree of bounding boxes of each
@@ -221,7 +221,7 @@ namespace Step70
     // The only two parameters used in the equations are the viscosity of the
     // fluid, and the penalty term used in the Nitsche formulation:
     double viscosity    = 1.0;
-    double penalty_term = 10;
+    double penalty_term = 100;
 
     // By default, we create a hyper_cube without colorisation, and we use
     // homogenous Dirichlet boundary conditions. In this set we store the
@@ -292,7 +292,7 @@ namespace Step70
     //
     // Refinement may be done every few time steps, instead of continuously, and
     // we control this value by the `refinement_frequency` parameter:
-    int          max_level_refinement = 5;
+    int          max_level_refinement = 7;
     std::string  refinement_strategy  = "fixed_fraction";
     double       coarsening_fraction  = 0.3;
     double       refinement_fraction  = 0.3;
@@ -370,7 +370,7 @@ namespace Step70
     {
       Tensor<1, spacedim> displacement = p;
 
-      double dtheta = angular_velocity.value(p, 0) * time_step;
+      double dtheta = angular_velocity.value(p) * time_step;
 
       displacement[0] = std::cos(dtheta) * p[0] - std::sin(dtheta) * p[1];
       displacement[1] = std::sin(dtheta) * p[0] + std::cos(dtheta) * p[1];
@@ -1554,9 +1554,13 @@ namespace Step70
   void StokesImmersedProblem<dim, spacedim>::run()
   {
 #ifdef USE_PETSC_LA
-    pcout << "Running using PETSc." << std::endl;
+    pcout << "Running StokesImmersedProblem<"
+          << Utilities::dim_string(dim, spacedim) << "> using PETSc."
+          << std::endl;
 #else
-    pcout << "Running using Trilinos." << std::endl;
+    pcout << "Running StokesImmersedProblem<"
+          << Utilities::dim_string(dim, spacedim) << "> using Trilinos."
+          << std::endl;
 #endif
 
     ComponentMask velocity_mask(spacedim + 1, true);
@@ -1711,19 +1715,19 @@ namespace Step70
       "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
 
     // Next section is dedicated to the parameters used to create the
-    // various grids. We will need three different triangulations: `Grid
-    // one` is used to define the fluid domain, `Grid two` defines the
+    // various grids. We will need three different triangulations: `Fluid grid`
+    // is used to define the fluid domain, `Solid grid` defines the
     // solid domain, and `Particle grid` is used to distribute some tracer
     // particles, that are advected with the velocity and only used as
     // passive tracers.
     enter_my_subsection(this->prm);
     this->prm.enter_subsection("Grid generation");
-    this->prm.add_parameter("Grid one generator", name_of_fluid_grid);
-    this->prm.add_parameter("Grid one generator arguments",
+    this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
+    this->prm.add_parameter("Fluid grid generator arguments",
                             arguments_for_fluid_grid);
 
-    this->prm.add_parameter("Grid two generator", name_of_solid_grid);
-    this->prm.add_parameter("Grid two generator arguments",
+    this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
+    this->prm.add_parameter("Solid grid generator arguments",
                             arguments_for_solid_grid);
 
     this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
@@ -1751,21 +1755,29 @@ namespace Step70
     this->prm.leave_subsection();
     leave_my_subsection(this->prm);
 
-    // correct the default dimension for the functions
+    // correct the default dimension for the rhs function
     rhs.declare_parameters_call_back.connect([&]() {
       Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
                                                               spacedim + 1);
     });
-    angular_velocity.declare_parameters_call_back.connect([&]() {
-      Functions::ParsedFunction<spacedim>::declare_parameters(
-        this->prm, spacedim == 3 ? spacedim : 1);
-    });
+    // and define a meaningful default angular velocity instaed of zero
+    angular_velocity.declare_parameters_call_back.connect(
+      [&]() { this->prm.set("Function expression", "t < .500001 ? 5 : -5"); });
   }
 
 } // namespace Step70
 
 
-// The remainder of the code, the main function, is standard.
+// The remainder of the code, the main function, is standard, with the exception
+// of the handling of input parameter files.
+// We allow the user to specify an optional parameter file as an argument to the
+// program. If nothing is specified, we use the default file "parameters.prm",
+// which is created if non existent.
+// The file name is scanned for the the string "23" first, and "3" afterwards.
+// If the filename contains the string "23", a the problem classes are
+// instantiated with template arguments 2 and 3 respectively. If only the string
+// "3" is found, then both template arguments are set to 3, otherwise both are
+// set to 2.
 int main(int argc, char *argv[])
 {
   using namespace Step70;
@@ -1775,12 +1787,46 @@ int main(int argc, char *argv[])
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      StokesImmersedProblemParameters<2, 3> par;
-      ParameterAcceptor::initialize("parameters_23.prm",
-                                    "used_parameters_23.prm");
+      // Interpret the
+      std::string prm_file;
+      if (argc > 1)
+        {
+          prm_file = argv[1];
+        }
+      else
+        {
+          prm_file = "parameters.prm";
+        }
 
-      StokesImmersedProblem<2, 3> problem(par);
-      problem.run();
+      std::string used_prm_file = prm_file;
+      used_prm_file.insert(used_prm_file.find_last_of("."), "_used");
+
+      // deduce the dimension of the problem from the name of the
+      // parameter file specified at the command line
+      if (prm_file.find("23") != std::string::npos)
+        {
+          StokesImmersedProblemParameters<2, 3> par;
+          ParameterAcceptor::initialize(prm_file, used_prm_file);
+
+          StokesImmersedProblem<2, 3> problem(par);
+          problem.run();
+        }
+      else if (prm_file.find("3") != std::string::npos)
+        {
+          StokesImmersedProblemParameters<3> par;
+          ParameterAcceptor::initialize(prm_file, used_prm_file);
+
+          StokesImmersedProblem<3> problem(par);
+          problem.run();
+        }
+      else
+        {
+          StokesImmersedProblemParameters<2> par;
+          ParameterAcceptor::initialize(prm_file, used_prm_file);
+
+          StokesImmersedProblem<2> problem(par);
+          problem.run();
+        }
     }
   catch (std::exception &exc)
     {
