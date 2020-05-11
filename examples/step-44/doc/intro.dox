@@ -116,7 +116,7 @@ The fourth-order <code>SymmetricTensor</code> returned by identity_tensor() is $
 
 Let the time domain be denoted $\mathbb{T} = [0,T_{\textrm{end}}]$, where $t \in \mathbb{T}$ and $T_{\textrm{end}}$ is the total problem duration.
 Consider a continuum body that occupies the reference configuration $\Omega_0$ at time $t=0$.
-Particles in the reference configuration are identified by the position vector $\mathbf{X}$.
+%Particles in the reference configuration are identified by the position vector $\mathbf{X}$.
 The configuration of the body at a later time $t>0$ is termed the current configuration, denoted $\Omega$, with particles identified by the vector $\mathbf{x}$.
 The nonlinear map between the reference and current configurations, denoted $\boldsymbol{\varphi}$, acts as follows:
 @f[
@@ -276,7 +276,7 @@ The fictitious Kirchhoff stress tensor $\overline{\boldsymbol{\tau}}$ is defined
 pressure in solid mechanics as
 $p = - 1/3 \textrm{tr} \boldsymbol{\sigma} = - 1/3 J^{-1} \textrm{tr} \boldsymbol{\tau}$.
 Here $p$ is the hydrostatic pressure.
-We make use of the pressure response throughout this tut (although we refer to it as the pressure).
+We make use of the pressure response throughout this tutorial (although we refer to it as the pressure).
 
 <h4> Neo-Hookean materials </h4>
 
