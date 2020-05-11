@@ -27,8 +27,6 @@
 
 #include <deal.II/numerics/rtree.h>
 
-#include <boost/geometry/index/indexable.hpp>
-
 #include <algorithm>
 
 #include "../tests.h"
@@ -71,10 +69,13 @@ main(int argc, char **argv)
 
   const auto tree  = pack_rtree(all_boxes);
   const auto boxes = extract_rtree_level(tree, 0);
+
   deallog << "LEVEL 0:  N boxes: " << boxes.size() << std::endl;
+  for (const auto &b : boxes)
+    deallog << print(b) << std::endl;
 
   // Uncomment the following lines to generate the images of the documentation
-
+  //
   // std::ofstream ofile(
   //   "output_" +
   //   std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
@@ -84,11 +85,7 @@ main(int argc, char **argv)
   //   "all_" + std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
   //   +
   //   ".gpl");
-
-
-  for (const auto &b : boxes)
-    deallog << print(b) << std::endl;
-
+  //
   // for (const auto &b : all_boxes)
   //   all << print(b);
 }
