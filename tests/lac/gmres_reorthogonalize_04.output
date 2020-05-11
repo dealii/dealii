@@ -1,5 +1,3 @@
 
-DEAL:double:GMRES::Starting value 14.1
-DEAL:double:GMRES::Convergence step 105 value 1.56e-13
-DEAL:float:GMRES::Starting value 14.1
-DEAL:float:GMRES::Convergence step 59 value 0.000110
+DEAL:double::Solver stopped within 102 - 108 iterations
+DEAL:float::Solver stopped within 56 - 62 iterations

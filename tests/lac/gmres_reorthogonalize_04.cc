@@ -54,7 +54,7 @@ namespace dealii
 
 template <typename number>
 void
-test()
+test(const unsigned int n_expected_steps)
 {
   const unsigned int n = 200;
   Vector<number>     rhs(n), sol(n);
@@ -81,19 +81,24 @@ test()
                               << accumulated_iterations << std::endl;
   };
   solver.connect_re_orthogonalization_slot(print_re_orthogonalization);
-  solver.solve(matrix, sol, rhs, PreconditionIdentity());
+
+  check_solver_within_range(
+    solver.solve(matrix, sol, rhs, PreconditionIdentity()),
+    control.last_step(),
+    n_expected_steps - 3,
+    n_expected_steps + 3);
 }
 
 int
 main()
 {
   initlog();
-  deallog << std::setprecision(3);
+  deallog << std::setprecision(10);
 
   deallog.push("double");
-  test<double>();
+  test<double>(105);
   deallog.pop();
   deallog.push("float");
-  test<float>();
+  test<float>(59);
   deallog.pop();
 }
