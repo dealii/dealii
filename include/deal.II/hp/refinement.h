@@ -376,7 +376,7 @@ namespace hp
      * measured in the energy norm; this assumption enters the rate of
      * convergence that is used in the prediction. The $l_2$-norm of the output
      * argument @p predicted_errors corresponds to the predicted global error
-     * after adaptation will be applied.
+     * after adaptation.
      *
      * For p-adaptation, the local error is expected to converge exponentially
      * with the polynomial degree of the assigned finite element. Each increase

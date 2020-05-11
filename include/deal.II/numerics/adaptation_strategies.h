@@ -145,7 +145,7 @@ namespace AdaptationStrategies
      * @f]
      *
      * This strategy preserves the $l_1$-norm of the corresponding global data
-     * Vector before and after adaptation.
+     * vector before and after adaptation.
      */
     template <int dim, int spacedim, typename value_type>
     value_type
@@ -163,7 +163,7 @@ namespace AdaptationStrategies
      * @f]
      *
      * This strategy preserves the $l_2$-norm of the corresponding global data
-     * Vector before and after adaptation.
+     * vector before and after adaptation.
      */
     template <int dim, int spacedim, typename value_type>
     value_type
