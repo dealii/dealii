@@ -86,7 +86,7 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
     false,
     parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(3);
+  tria.refine_global(2);
 
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim>(FE_Q<dim>(4), dim));
@@ -186,5 +186,6 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+  deallog << std::setprecision(10) << std::endl;
   test<3>();
 }
