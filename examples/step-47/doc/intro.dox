@@ -230,7 +230,10 @@ As mentioned, this method relies on the use of $C^0$ Lagrange finite
 elements where the $C^1$ continuity requirement is relaxed and has
 been replaced with interior penalty techniques. To derive this method,
 we consider a $C^0$ shape function $v_h$ which vanishes on
-$\partial\Omega$. Since the higher order derivatives of $v_h$ have two
+$\partial\Omega$. We introduce notation $ \mathbb{F} $ as the set of
+all faces of $\mathbb{T}$, $ \mathbb{F}^b $ as the set of boundary faces,
+and $ \mathbb{F}^i $ as the set of interior faces for use further down below.
+Since the higher order derivatives of $v_h$ have two
 values on each interface $e\in \mathbb{F}$ (shared by the two cells
 $K_{+},K_{-} \in \mathbb{T}$), we cope with this discontinuity by
 defining the following single-valued functions on $e$:
