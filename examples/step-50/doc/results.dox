@@ -209,7 +209,16 @@ only an eighth of the number of unknowns.
 
 <h3> Possible extensions </h3>
 
-We currently don't have suggestions for possible extensions.
+<h4> Testing convergence and higher order elements </h4>
 
+The finite element degree is currently hard-coded as 2, see the template
+arguments of the main class. It is easy to change. To test, it would be
+interesting to switch to a test problem with a reference solution. This way,
+you can compare error rates.
 
+<h4> Coarse solver </h4>
 
+A more interesting example would involve a complicated coarse mesh (see
+step-49 for inspiration). This then requires a more sophisticated coarse
+solver for the geometric multigrid methods. A common approach here is a switch
+to AMG by assembling the coarse matrix (even for the matrix-free version).
