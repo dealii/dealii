@@ -1659,17 +1659,15 @@ namespace internal
           // Step 1: distribute dofs on all cells, but definitely
           // exclude artificial cells
           types::global_dof_index next_free_dof = 0;
-          typename DoFHandlerType::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
 
-          for (; cell != endc; ++cell)
+          std::vector<types::global_dof_index> dof_indices;
+
+          for (auto cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
               if ((subdomain_id == numbers::invalid_subdomain_id) ||
                   (cell->subdomain_id() == subdomain_id))
                 {
-                  std::vector<types::global_dof_index> dof_indices(
-                    cell->get_fe().dofs_per_cell);
+                  dof_indices.resize(cell->get_fe().dofs_per_cell);
 
                   internal::DoFAccessorImplementation::get_dof_indices(
                     *cell, dof_indices, cell->active_fe_index());
@@ -1732,259 +1730,6 @@ namespace internal
         /* -------------- distribute_mg_dofs functionality ------------- */
 
 
-        /**
-         * Distribute multilevel dofs on the given cell, with new dofs starting
-         * with index @p next_free_dof. Return the next unused index number.
-         *
-         * Note that unlike for the usual dofs, here all cells and not
-         * only active ones are allowed.
-         */
-        template <int dim, int spacedim>
-        static types::global_dof_index
-        distribute_mg_dofs_on_cell(
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell,
-          types::global_dof_index next_free_dof,
-          const std::integral_constant<int, 1> &)
-        {
-          // distribute dofs of vertices
-          if (cell->get_fe().dofs_per_vertex > 0)
-            for (const unsigned int v : GeometryInfo<1>::vertex_indices())
-              {
-                typename DoFHandler<dim, spacedim>::level_cell_iterator
-                  neighbor = cell->neighbor(v);
-
-                if (neighbor.state() == IteratorState::valid)
-                  {
-                    // has neighbor already been processed?
-                    if (neighbor->user_flag_set() &&
-                        (neighbor->level() == cell->level()))
-                      // copy dofs if the neighbor is on the same level (only
-                      // then are mg dofs the same)
-                      {
-                        if (v == 0)
-                          for (unsigned int d = 0;
-                               d < cell->get_fe().dofs_per_vertex;
-                               ++d)
-                            cell->set_mg_vertex_dof_index(
-                              cell->level(),
-                              0,
-                              d,
-                              neighbor->mg_vertex_dof_index(cell->level(),
-                                                            1,
-                                                            d));
-                        else
-                          for (unsigned int d = 0;
-                               d < cell->get_fe().dofs_per_vertex;
-                               ++d)
-                            cell->set_mg_vertex_dof_index(
-                              cell->level(),
-                              1,
-                              d,
-                              neighbor->mg_vertex_dof_index(cell->level(),
-                                                            0,
-                                                            d));
-
-                        // next neighbor
-                        continue;
-                      }
-                  }
-
-                // otherwise: create dofs newly
-                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex;
-                     ++d)
-                  cell->set_mg_vertex_dof_index(cell->level(),
-                                                v,
-                                                d,
-                                                next_free_dof++);
-              }
-
-          // dofs of line
-          if (cell->get_fe().dofs_per_line > 0)
-            for (unsigned int d = 0; d < cell->get_fe().dofs_per_line; ++d)
-              cell->set_mg_dof_index(cell->level(), d, next_free_dof++);
-
-          // note that this cell has been processed
-          cell->set_user_flag();
-
-          return next_free_dof;
-        }
-
-
-
-        template <int dim, int spacedim>
-        static types::global_dof_index
-        distribute_mg_dofs_on_cell(
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell,
-          types::global_dof_index next_free_dof,
-          const std::integral_constant<int, 2> &)
-        {
-          if (cell->get_fe().dofs_per_vertex > 0)
-            // number dofs on vertices
-            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
-              // check whether dofs for this
-              // vertex have been distributed
-              // (only check the first dof)
-              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex;
-                     ++d)
-                  cell->set_mg_vertex_dof_index(cell->level(),
-                                                vertex,
-                                                d,
-                                                next_free_dof++);
-
-          // for the four sides
-          if (cell->get_fe().dofs_per_line > 0)
-            for (const unsigned int side : GeometryInfo<2>::face_indices())
-              {
-                typename DoFHandler<dim, spacedim>::line_iterator line =
-                  cell->line(side);
-
-                // distribute dofs if necessary: check whether line dof is
-                // already numbered (check only first dof)
-                if (line->mg_dof_index(cell->level(), 0) ==
-                    numbers::invalid_dof_index)
-                  // if not: distribute dofs
-                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_line;
-                       ++d)
-                    line->set_mg_dof_index(cell->level(), d, next_free_dof++);
-              }
-
-
-          // dofs of quad
-          if (cell->get_fe().dofs_per_quad > 0)
-            for (unsigned int d = 0; d < cell->get_fe().dofs_per_quad; ++d)
-              cell->set_mg_dof_index(cell->level(), d, next_free_dof++);
-
-
-          // note that this cell has been processed
-          cell->set_user_flag();
-
-          return next_free_dof;
-        }
-
-
-
-        template <int dim, int spacedim>
-        static types::global_dof_index
-        distribute_mg_dofs_on_cell(
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell,
-          types::global_dof_index next_free_dof,
-          const std::integral_constant<int, 3> &)
-        {
-          if (cell->get_fe().dofs_per_vertex > 0)
-            // number dofs on vertices
-            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
-              // check whether dofs for this vertex have been distributed
-              // (only check the first dof)
-              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex;
-                     ++d)
-                  cell->set_mg_vertex_dof_index(cell->level(),
-                                                vertex,
-                                                d,
-                                                next_free_dof++);
-
-          // for the lines
-          if (cell->get_fe().dofs_per_line > 0)
-            for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
-              {
-                typename DoFHandler<dim, spacedim>::line_iterator line =
-                  cell->line(l);
-
-                // distribute dofs if necessary:
-                // check whether line dof is already
-                // numbered (check only first dof)
-                if (line->mg_dof_index(cell->level(), 0) ==
-                    numbers::invalid_dof_index)
-                  // if not: distribute dofs
-                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_line;
-                       ++d)
-                    line->set_mg_dof_index(cell->level(), d, next_free_dof++);
-              }
-
-          // for the quads
-          if (cell->get_fe().dofs_per_quad > 0)
-            for (unsigned int q = 0; q < GeometryInfo<3>::quads_per_cell; ++q)
-              {
-                typename DoFHandler<dim, spacedim>::quad_iterator quad =
-                  cell->quad(q);
-
-                // distribute dofs if necessary:
-                // check whether line dof is already
-                // numbered (check only first dof)
-                if (quad->mg_dof_index(cell->level(), 0) ==
-                    numbers::invalid_dof_index)
-                  // if not: distribute dofs
-                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_quad;
-                       ++d)
-                    quad->set_mg_dof_index(cell->level(), d, next_free_dof++);
-              }
-
-
-          // dofs of cell
-          if (cell->get_fe().dofs_per_hex > 0)
-            for (unsigned int d = 0; d < cell->get_fe().dofs_per_hex; ++d)
-              cell->set_mg_dof_index(cell->level(), d, next_free_dof++);
-
-
-          // note that this cell has been processed
-          cell->set_user_flag();
-
-          return next_free_dof;
-        }
-
-
-
-        // same for the hp::DoFHandler
-        template <int spacedim>
-        static types::global_dof_index
-        distribute_mg_dofs_on_cell(
-          const hp::DoFHandler<1, spacedim> &dof_handler,
-          const typename hp::DoFHandler<1, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
-        {
-          (void)dof_handler;
-          (void)cell;
-          (void)next_free_dof;
-          return 0;
-        }
-
-
-
-        template <int spacedim>
-        static types::global_dof_index
-        distribute_mg_dofs_on_cell(
-          const hp::DoFHandler<2, spacedim> &dof_handler,
-          const typename hp::DoFHandler<2, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
-        {
-          (void)dof_handler;
-          (void)cell;
-          (void)next_free_dof;
-          return 0;
-        }
-
-
-
-        template <int spacedim>
-        static types::global_dof_index
-        distribute_mg_dofs_on_cell(
-          const hp::DoFHandler<3, spacedim> &dof_handler,
-          const typename hp::DoFHandler<3, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
-        {
-          (void)dof_handler;
-          (void)cell;
-          (void)next_free_dof;
-          return 0;
-        }
-
-
 
         template <class DoFHandlerType>
         static types::global_dof_index
@@ -1992,6 +1737,9 @@ namespace internal
                                  DoFHandlerType &          dof_handler,
                                  const unsigned int        level)
         {
+          Assert(DoFHandlerType::is_hp_dof_handler == false,
+                 ExcInternalError());
+
           const unsigned int dim      = DoFHandlerType::dimension;
           const unsigned int spacedim = DoFHandlerType::space_dimension;
 
@@ -2001,30 +1749,24 @@ namespace internal
           if (level >= tria.n_levels())
             return 0; // this is allowed for multigrid
 
-          // Clear user flags because we will need them. But first we save
-          // them and make sure that we restore them later such that at
-          // the end of this function the Triangulation will be in the
-          // same state as it was at the beginning of this function.
-          std::vector<bool> user_flags;
-          tria.save_user_flags(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .clear_user_flags();
-
           types::global_dof_index next_free_dof = 0;
-          typename DoFHandler<dim, spacedim>::level_cell_iterator
-            cell = dof_handler.begin(level),
-            endc = dof_handler.end(level);
 
-          for (; cell != endc; ++cell)
+          std::vector<types::global_dof_index> dof_indices;
+
+          for (auto cell : dof_handler.cell_iterators_on_level(level))
             if ((level_subdomain_id == numbers::invalid_subdomain_id) ||
                 (cell->level_subdomain_id() == level_subdomain_id))
-              next_free_dof =
-                Implementation::distribute_mg_dofs_on_cell<dim, spacedim>(
-                  cell, next_free_dof, std::integral_constant<int, dim>());
+              {
+                dof_indices.resize(cell->get_fe().dofs_per_cell);
 
-          // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .load_user_flags(user_flags);
+                cell->get_mg_dof_indices(dof_indices);
+
+                for (auto &dof_index : dof_indices)
+                  if (dof_index == numbers::invalid_dof_index)
+                    dof_index = next_free_dof++;
+
+                cell->set_mg_dof_indices(dof_indices);
+              }
 
           return next_free_dof;
         }
