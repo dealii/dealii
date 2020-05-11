@@ -409,8 +409,8 @@ al., 2018), and we will make use of this functionality in this tutorial.
 Thus, the approach taken in this step is as follows:
 - Create a parallel::distributed::Triangulation for the domain $\Gamma$
 - Create Particles::Particle at the position of the quadrature points on $\Gamma$
-- Call the Particles::ParticleHandler::insert_global_particles() function, 
-  to distribute the particles across processors, *following the solid 
+- Call the Particles::ParticleHandler::insert_global_particles() function,
+  to distribute the particles across processors, *following the solid
   triangulation*
 - Attach the quadrature weight as property to each Particles::Particle object.
 
