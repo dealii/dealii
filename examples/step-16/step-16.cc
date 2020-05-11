@@ -349,7 +349,6 @@ namespace Step16
       {
         const double coefficient =
           (fe_values.get_quadrature_points()[q][0] < 0.0) ? 1.0 : 0.1;
-        //(cell->center().square() < 0.5 * 0.5) ? 10.0:1.0;
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
