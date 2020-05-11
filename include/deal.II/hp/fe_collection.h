@@ -921,8 +921,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->degree > max)
-        max = finite_elements[i]->degree;
+      max = std::max(max, finite_elements[i]->degree);
 
     return max;
   }

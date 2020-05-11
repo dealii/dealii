@@ -84,7 +84,7 @@ namespace SmoothnessEstimator
    * reasons, we will perform the calculation of these matrices and coefficients
    * only on the reference cell $\hat K$. We only have to calculate the
    * transformation matrices once this way. However, results are only applicable
-   * if mapping from the reference cell to the actual cell is linear. We use
+   * if the mapping from the reference cell to the actual cell is affine. We use
    * the class FESeries::Legendre to determine all coefficients $a_k$.
    *
    * A function is analytic, i.e., representable by a power series, if and only
@@ -141,7 +141,7 @@ namespace SmoothnessEstimator
      * coefficients of some functions may have a repeating pattern of zero
      * coefficients (i.e. for functions that are locally symmetric or
      * antisymmetric about the midpoint of the element in any coordinate
-     * direction). Thus this parameters allows to ingore small (in absolute
+     * direction). Thus this parameters allows to ignore small (in absolute
      * value) coefficients within the linear regression fit. In case there are
      * less than two nonzero coefficients, the returned value for this cell will
      * be $\sigma=\infty$.
@@ -196,7 +196,7 @@ namespace SmoothnessEstimator
      * Note that Legendre coefficients of some functions may have a repeating
      * pattern of zero coefficients (i.e. for functions that are locally
      * symmetric or antisymmetric about the midpoint of the element in any
-     * coordinate direction). Thus this parameters allows to ingore small (in
+     * coordinate direction). Thus this parameters allows to ignore small (in
      * absolute value) coefficients within the linear regression fit. In case
      * there are less than two nonzero coefficients for a coordinate direction,
      * this direction will be skipped. If all coefficients are zero, the
@@ -266,7 +266,7 @@ namespace SmoothnessEstimator
    * FESeries::Fourier to determine all coefficients $a_{\bf k}$.
    *
    * If the finite element approximation on cell $K$ is part of the Hilbert
-   * space $H^s(K)$, then the following integral must exit for both finite
+   * space $H^s(K)$, then the following integral must exist for both the finite
    * element and spectral representation of our solution
    * @f{eqnarray*}
    *   \| \nabla^s u_h({\bf x}) \|_{L^2(K)}^2 &=&
@@ -294,7 +294,7 @@ namespace SmoothnessEstimator
    *     {-\left(s + \frac d2 + \epsilon \right)} \right)
    * @f]
    *
-   * The next step is that we have to estimate how fast these coefficients
+   * The next step is to estimate how fast these coefficients
    * decay with $\|{\bf k}\|_2$. Thus, we perform a least-squares fit
    * @f[
    *    \min_{\alpha,\sigma}
@@ -378,7 +378,7 @@ namespace SmoothnessEstimator
      * A series expansion object @p fe_fourier has to be supplied, which needs
      * to be constructed with the same FECollection object as the @p dof_handler.
      *
-     * The parameter @p smallest_abs_coefficient allows to ingore small (in
+     * The parameter @p smallest_abs_coefficient allows to ignore small (in
      * absolute value) coefficients within the linear regression fit. In case
      * there are less than two nonzero coefficients for a coordinate direction,
      * this direction will be skipped. If all coefficients are zero, the
@@ -417,7 +417,7 @@ namespace SmoothnessEstimator
      * provided to this function. Note that its size is $p+1$, where $p$ is the
      * polynomial degree of the FE basis on a given element. The default
      * implementation will use all Fourier coefficients in each coordinate
-     * direction, i.e. set all elements of the vector to `true`.
+     * direction, i.e., set all the elements of the vector to `true`.
      *
      * For a provided solution vector @p solution defined on a DoFHandler
      * @p dof_handler, this function returns a vector @p smoothness_indicators
@@ -427,9 +427,9 @@ namespace SmoothnessEstimator
      * A series expansion object @p fe_fourier has to be supplied, which needs
      * to be constructed with the same FECollection object as the @p dof_handler.
      *
-     * The parameter @p smallest_abs_coefficient allows to ingore small (in
+     * The parameter @p smallest_abs_coefficient allows to ignore small (in
      * absolute value) coefficients within the linear regression fit. In case
-     * there are less than two nonzero coefficients for a coordinate direction,
+     * there are fewer than two nonzero coefficients for a coordinate direction,
      * this direction will be skipped. If all coefficients are zero, the
      * returned value for this cell will be $\sigma=\infty$.
      *
