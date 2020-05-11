@@ -32,6 +32,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// work around the problem that doxygen for some reason lists all template
+// specializations in this file
+#ifndef DOXYGEN
 
 namespace GridGenerator
 {
@@ -1606,14 +1609,14 @@ namespace GridGenerator
     Assert(dim > 1, ExcNotImplemented());
     Assert(dim < 4, ExcNotImplemented());
 
-#ifdef DEBUG
+#  ifdef DEBUG
     Tensor<2, dim> vector_matrix;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int c = 1; c <= dim; ++c)
         vector_matrix[c - 1][d] = vertices[c](d) - vertices[0](d);
     Assert(determinant(vector_matrix) > 0.,
            ExcMessage("Vertices of simplex must form a right handed system"));
-#endif
+#  endif
 
     // Set up the vertices by first copying into points.
     std::vector<Point<dim>> points = vertices;
@@ -2144,11 +2147,11 @@ namespace GridGenerator
   template <int dim>
   void
   subdivided_parallelepiped(Triangulation<dim> &tria,
-#ifndef _MSC_VER
+#  ifndef _MSC_VER
                             const unsigned int (&n_subdivisions)[dim],
-#else
+#  else
                             const unsigned int *n_subdivisions,
-#endif
+#  endif
                             const Point<dim> (&corners)[dim],
                             const bool colorize)
   {
@@ -6061,12 +6064,12 @@ namespace GridGenerator
                           Triangulation<dim, spacedim> &      result)
   {
     AssertDimension(dim, extents.size());
-#ifdef DEBUG
+#  ifdef DEBUG
     for (const auto &extent : extents)
       Assert(0 < extent,
              ExcMessage("The Triangulation must be copied at least one time in "
                         "each coordinate dimension."));
-#endif
+#  endif
     const BoundingBox<spacedim> bbox(input.get_vertices());
     const auto &                min = bbox.get_boundary_points().first;
     const auto &                max = bbox.get_boundary_points().second;
@@ -6345,7 +6348,7 @@ namespace GridGenerator
       // mode)
       if (0 < manifold_priorities.size())
         {
-#ifdef DEBUG
+#  ifdef DEBUG
           // check that the provided manifold_priorities is valid
           std::vector<types::manifold_id> sorted_manifold_priorities =
             manifold_priorities;
@@ -6378,7 +6381,7 @@ namespace GridGenerator
               const std::string m = message.str();
               Assert(false, ExcMessage(m));
             }
-#endif
+#  endif
           return manifold_priorities;
         }
       // otherwise use the default ranking: ascending order, but TFI manifolds
@@ -7017,12 +7020,12 @@ namespace GridGenerator
 
 
   template <template <int, int> class MeshType, int dim, int spacedim>
-#ifndef _MSC_VER
+#  ifndef _MSC_VER
   std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
            typename MeshType<dim, spacedim>::face_iterator>
-#else
+#  else
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
-#endif
+#  endif
   extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
                         MeshType<dim - 1, spacedim> &       surface_mesh,
                         const std::set<types::boundary_id> &boundary_ids)
@@ -7305,6 +7308,8 @@ namespace GridGenerator
 } // namespace GridGenerator
 
 // explicit instantiations
-#include "grid_generator.inst"
+#  include "grid_generator.inst"
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
