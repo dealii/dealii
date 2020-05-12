@@ -8,6 +8,7 @@ subsection Stokes Immersed Problem
   set Number of time steps               = 501
   set Velocity degree                    = 2
   set Viscosity                          = 1
+  set Output directory                   = results
   subsection Angular velocity
     set Function constants  = 
     set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
