@@ -1,7 +1,0 @@
-New: There is a new triad of functions FEValuesBase::dof_indices(),
-FEValuesBase::dof_indices_starting_at() and 
-FEValuesBase::dof_indices_ending_at()
-that makes writing range-based for loops over all local cell degrees of 
-freedom much simpler.
-<br>
-(Jean-Paul Pelteret, 2020/04/29)

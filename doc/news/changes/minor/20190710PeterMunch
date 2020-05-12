@@ -1,4 +1,0 @@
-New: It is possible to access the value type Number of VectorizedArray<Number,width>
-directly via VectorizedArray<Number, width>::value_type.
-<br>
-(Peter Munch, 2019/07/10)

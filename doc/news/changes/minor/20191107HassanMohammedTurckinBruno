@@ -1,4 +1,0 @@
-Fixed: In Step-54, the std namespace was missing for some calls to cout and
-endl.
-<br>
-(Mohammed Hassan, Bruno Turcksin, 2019/11/07)

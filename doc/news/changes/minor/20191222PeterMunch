@@ -1,4 +1,0 @@
-New: The method memory_consumption has been implemented in and added
-to a variety of classes, e.g. FE_DGQ.  
-<br>
-(Peter Munch, 2019/12/22)

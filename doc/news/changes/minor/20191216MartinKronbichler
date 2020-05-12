@@ -1,6 +1,0 @@
-Improved: GridGenerator::channel_with_cylinder() now places some of the points
-at the transition between the cylinder mesh and the outer structured mesh
-slightly farther away from the cylinder center, thereby improving mesh
-quality.
-<br>
-(Martin Kronbichler, 2019/12/16)

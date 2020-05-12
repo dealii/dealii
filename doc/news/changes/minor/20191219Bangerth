@@ -1,6 +1,0 @@
-New: There are new versions of DoFTools::extract_dofs() that return
-their results as an IndexSet, rather than doing so through an output
-argument of type `std::vector<bool>`. The versions that did the latter
-have been deprecated.
-<br>
-(Wolfgang Bangerth, 2019/12/19)

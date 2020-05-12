@@ -1,4 +1,0 @@
-New: Add Boost serialization function to dealii::TriangulationDescription::CellData and
-dealii::TriangulationDescription::Description.
-<br>
-(Peter Munch, 2019/09/13)

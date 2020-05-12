@@ -1,5 +1,0 @@
-Changed: SolverControl returns number of iterations of ArpackSolver after solving
-for Eigenvalues. It also checks if the requested eigenvalues are supported by the
-solver, depending on symmetry.
-<br>
-(Roland Richter, 2019/10/17)

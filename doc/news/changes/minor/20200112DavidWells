@@ -1,5 +1,0 @@
-Improved: GridTools::delete_duplicated_vertices() now runs, for cubelike
-geometries, in $O(n^{3/2})$ time in 2D and $O(n^(5/3))$ time in 3D instead
-of $O(n^2)$ time.
-<br>
-(David Wells, 2020/01/12)

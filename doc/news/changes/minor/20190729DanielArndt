@@ -1,4 +1,0 @@
-New: The content of a VectorizedArray object can be printed
-using the output operator.
-<br>
-(Daniel Arndt, 2019/07/29)

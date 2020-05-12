@@ -1,4 +1,0 @@
-New: FESeries::process_coefficients() now allows to ignore coefficients
-below an absolute threshold, which has to be provided as a parameter.
-<br>
-(Marc Fehling, 2020/01/21)

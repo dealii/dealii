@@ -1,4 +1,0 @@
-Fixed: The GridOut::write_svg() function was not instantiated for the
-case `dim=3, spacedim=3` by accident. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2020/01/14)

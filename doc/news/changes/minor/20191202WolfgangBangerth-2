@@ -1,5 +1,0 @@
-Changed: step-61 no longer generates two output files for the interior
-pressures and the Darcy velocities, respectively. Instead, it puts all
-of this information into a single graphical output file.
-<br>
-(Wolfgang Bangerth, 2019/12/02)

@@ -1,3 +1,0 @@
-New: Enable periodicity for 1D triangulations (only for dealii::DoFHandler).
-<br>
-(Peter Munch, 2019/07/27)

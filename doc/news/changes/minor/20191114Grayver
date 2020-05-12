@@ -1,4 +1,0 @@
-Added: extend python bindings to allow for working with cell's
-neighbors, iterate over faces and modify boundary ids. 
-<br>
-(Alexander Grayver, 2019/11/14)

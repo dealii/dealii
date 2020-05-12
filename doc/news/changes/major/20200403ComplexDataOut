@@ -1,7 +1,0 @@
-New: The DataOut class has learned to deal with complex-valued
-solution vectors in all regards. This includes writing the real and
-imaginary parts of not only scalar complex-valued fields, but also
-complex-valued vector and tensor fields. DataOut can now also pass
-such fields to classes derived from DataPostprocessor.
-<br>
-(Wolfgang Bangerth, 2020/04/03)

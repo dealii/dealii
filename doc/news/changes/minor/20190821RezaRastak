@@ -1,5 +1,0 @@
-New: method try_get_data() added to CellDataStorage in both const and
-non-const forms. It returns a std_cxx17::optional which determines whether a
-cell has a data associated with it.
-<br>
-(Reza Rastak, 2019/08/21)

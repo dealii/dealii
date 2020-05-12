@@ -1,5 +1,0 @@
-Add an optional std::function parameter to make_flux_sparsity_pattern which can
-be used to specify over which faces there should be a flux coupling in the
-created sparsity pattern.
-<br>
-(Simon Sticko, 2020/01/28)

@@ -1,4 +1,0 @@
-New: Provide cell iterators to interior and exterior cells of
-a macro face through the function MatrixFree::get_face_iterator().
-<br>
-(Martin Kronbichler, Peter Munch, Michal Wichrowski, 2019/10/16)

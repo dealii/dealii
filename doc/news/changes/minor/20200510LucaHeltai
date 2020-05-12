@@ -1,4 +1,0 @@
-Fixed: GridTools::find_closest_vertex_of_cell() now takes an optional mapping argument, to take into
-account of all those cases where a mapping may modify the location of the cell vertices.
-<br>
-(Luca Heltai, 2020/05/10)

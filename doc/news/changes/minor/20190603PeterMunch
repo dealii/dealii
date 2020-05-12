@@ -1,4 +1,0 @@
-New: The function Utilities::MPI::compute_index_owner() provides the owner of
-the ghost degrees of freedom relative to a set of locally owned ones. 
-<br>
-(Peter Munch, 2019/06/03)

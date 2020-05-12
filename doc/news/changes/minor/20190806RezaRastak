@@ -1,4 +1,0 @@
-Improved: CellDataStorage::get_data() now checks whether we are retrieving
-using a data type that matches the type we used to initialize the cell data.
-<br>
-(Reza Rastak, 2019/08/06)

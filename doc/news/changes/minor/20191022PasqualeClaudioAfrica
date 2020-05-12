@@ -1,3 +1,0 @@
-Improved: VectorTools::interpolate() now works for a parallel::distributed::Triangulation
-<br>
-(Pasquale Claudio Africa, Doug Shi-Dong, 2019/10/24)

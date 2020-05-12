@@ -1,4 +1,0 @@
-Removed: The deprecated headers `deal.II/grid/tria_boundary.h` and
-`deal.II/grid/tria_boundary_lib.h` have been removed.
-<br>
-(Martin Kronbichler, 2019/06/13)

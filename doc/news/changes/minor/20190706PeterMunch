@@ -1,5 +1,0 @@
-New: An additional optional template parameter VectorizedArrayType has been 
-added to the MatrixFree framework. It lets the user switch between no 
-vectorization (only auto vectorization) and vectorization over elements.
-<br>
-(Peter Munch, 2019/07/06)

@@ -1,4 +1,0 @@
-Removed: The deprecated method MatrixFree::get_size_info() has been removed.
-Please use the method MatrixFree::get_task_info() to access the same information.
-<br>
-(Peter Munch, 2019/12/01)

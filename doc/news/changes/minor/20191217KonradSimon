@@ -1,4 +1,0 @@
-New: The TensorFunctionParser class allows to read 
-in a function similarly to the FunctionParser class using the MuParser.
-<br>
-(Konrad Simon, 2019/12/17)

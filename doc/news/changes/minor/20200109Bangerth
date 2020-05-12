@@ -1,6 +1,0 @@
-New: There are new versions of DoFTools::count_dofs_per_component()
-and DoFTools::count_dofs_per_block() that return their results as a
-`std::vector` object, rather than doing so through an output
-argument. The versions that did the latter have been deprecated.
-<br>
-(Wolfgang Bangerth, 2020/01/09)

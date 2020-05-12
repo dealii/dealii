@@ -1,7 +1,0 @@
-Changed: The storage type of MGLevelGlobalTransfer::copy_indices,
-MGLevelGlobalTransfer::copy_indices_global_mine,
-MGLevelGlobalTransfer::copy_indices_level_mine has been changed to a
-std::vector of Table<2,unsigned int>, in order to simplify some copy
-operations.
-<br>
-(Martin Kronbichler, 2019/09/20)

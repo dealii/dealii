@@ -1,5 +1,0 @@
-Extension: An optional additional parameter assert_mandatory_entries_are_found
-is introduced to the function ParameterHandler::parse_input() to avoid errors, 
-e.g., due to typos in the input file.
-<br>
-(Niklas Fehn, 2020/03/26)

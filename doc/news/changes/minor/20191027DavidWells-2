@@ -1,5 +1,0 @@
-New: Added convenience functions CellAccessor::face_iterator_to_index()
-and TriaAccessor::child_iterator_to_index() for computing face and child numbers
-from iterators.
-<br>
-(David Wells, 2019/10/27)

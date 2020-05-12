@@ -1,5 +1,0 @@
-New: A variant of CellwiseInverseMassMatrix::apply() defining the inverse of
-the diagonal by FEEvaluationBase::JxW() from the provided FEEvaluationBase
-variable has been implemented.
-<br>
-(Martin Kronbichler, 2020/01/05)

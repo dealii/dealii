@@ -1,4 +1,0 @@
-Improved: ParameterHandler class can now optionally print parameters in the same
-order as they are declared, rather than sorted in alphabetical order.
-<br>
-(Pasquale Claudio Africa, 2020/01/28)

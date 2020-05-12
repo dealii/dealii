@@ -1,5 +1,0 @@
-Fixed: MappingQGeneric::transform_real_to_unit_cell() would previously ignore
-the moved vertex locations of derived classes such as MappingQEulerian for
-linear mappings in 1D and 2D. This is now fixed.
-<br>
-(Martin Kronbichler, 2019/11/14)

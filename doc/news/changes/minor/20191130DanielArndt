@@ -1,6 +1,0 @@
-Fixed: ParticleHandler::insert_particles() taking a std::vector of Point objects
-starts numbering the particles with 0 instead of 1 to be consistent with the
-other ParticleHandler::insert_particles() function and the 
-ParticleHandler::insert_particle() function.
-<br>
-(Daniel Arndt, 2019/11/30)

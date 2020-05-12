@@ -1,4 +1,0 @@
-Changed: Adjusted ranges for GridRefinement::refine_and_coarsen_fixed_fraction():
-Now criteria of every cell will be considered.
-<br>
-(Marc Fehling, 12/05/2019)

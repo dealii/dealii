@@ -1,4 +1,0 @@
-Changed: The test suite now requires numdiff (i.e., it cannot be run with
-simply diff).
-<br>
-(David Wells, 2019/08/10)

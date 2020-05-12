@@ -1,4 +1,0 @@
-Fixed: OpenCASCADE::interpolation_curve() returned a TopoDS_Shape that was not properly closed. This is 
-now fixed.
-<br>
-(Luca Heltai, 2019/08/21)

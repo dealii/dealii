@@ -1,6 +1,0 @@
-Removed: The deprecated functions DoFHandler::distribute_mg_dofs() and
-MGTransferPrebuilt::initialize_constraints() and deprecated constructors for
-MGSmootherBlock, MGTransferPrebuilt, MGTransferBlockBase and
-MGTransferBlockSelect have been removed.
-<br>
-(Daniel Arndt, 2020/03/27)

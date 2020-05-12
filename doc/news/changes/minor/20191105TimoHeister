@@ -1,5 +1,0 @@
-Fixed: Computations with block vectors with more than 4 billion degrees of
-freedom reported incorrect values for locally_owned_elements(). This is now
-fixed by implementing IndexSet::add_indices() for large offsets.
-<br>
-(Timo Heister, 2019/11/05)

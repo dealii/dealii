@@ -1,6 +1,0 @@
-New: The mechanism implemented by DataOut via the `first_cell()` and
-`next_cell()` virtual functions has been deprecated. In its place, the
-DataOut::set_cell_selection() function allows doing the same but
-without the need for deriving classes.
-<br>
-(Wolfgang Bangerth, 2020/01/11)

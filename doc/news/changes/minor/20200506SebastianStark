@@ -1,3 +1,0 @@
-Changed: Allow hp::DoFHandler to distribute dofs based on a triangulation class derived from parallel::DistributedTriangulationBase other than parallel::distributed::Triangulation.
-<br>
-(Sebastian Stark, 2020/05/06)

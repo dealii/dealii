@@ -1,5 +1,0 @@
-New: There are new functions GeometryInfo::face_indices() and
-GeometryInfo::vertex_indices() that make writing range-based for loops
-over all faces or vertices of a cell much simpler.
-<br>
-(Wolfgang Bangerth, 2020/03/04)

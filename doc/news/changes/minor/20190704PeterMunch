@@ -1,6 +1,0 @@
-New: A second template parameter has been added to VectorizedArray. This template
-parameter optionally controls the number of vectorization lanes to be used, i.e.,
-which instruction set architecture extension to be used, at the time the application
-is built.
-<br>
-(Peter Munch, 2019/07/04)

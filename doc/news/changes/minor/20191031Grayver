@@ -1,4 +1,0 @@
-Changed: parallel::TriangulationBase::copy_triangulation does not
-copy the MPI communicator from the given source triangulation.
-<br>
-(Alexander Grayver, 2019/10/31)

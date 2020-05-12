@@ -1,9 +1,0 @@
-Improved: The setup of MappingQGeneric::InternalData within the constructor of
-FEValues would previously unconditionally allocate memory for all shape
-functions and all quadrature points, also for the case where we use the tensor
-product and the full interpolation is unnecessary. This has been fixed,
-improving the situation for very high orders and numbers of quadrature points
-(e.g., avoiding 400 MB of memory for mapping degrees of 15 with $16^3$
-quadrature points in 3D).
-<br>
-(Martin Kronbichler, 2019/11/26)

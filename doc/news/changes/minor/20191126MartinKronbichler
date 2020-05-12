@@ -1,5 +1,0 @@
-Fixed: MatrixFree::reinit() would sometimes perform invalid index accesses on
-continuous elements with hanging nodes when data structures for face integrals
-are requested. This is now fixed.
-<br>
-(Martin Kronbichler, Peter Munch, Laura Prieto Saavedra, 2019/11/26)

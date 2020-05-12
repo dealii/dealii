@@ -1,9 +1,0 @@
-Removed: The include files in `include/deal.II/base/std_cxx1x`,
-deprecated since 2014, have been removed. They had introduced a
-namespace `std_cxx1x` at a time when deal.II did not yet require
-C++11-compatible compilers, and this namespace was later also made
-available via the name `std_cxx11` once C++11 was actually
-published. In any case, none of this is necessary any more since we
-now have C++11 compilers.
-<br>
-(Wolfgang Bangerth, 2019/12/02)

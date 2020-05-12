@@ -1,4 +1,0 @@
-Improved: ParameterHandler::parse_input_from_json() can handle values of type `"a" : 1', in addition to
-`"a" : {"value" : 1}'.
-<br>
-(Peter Munch, 2020/01/27)

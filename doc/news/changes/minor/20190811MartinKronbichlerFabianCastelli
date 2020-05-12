@@ -1,5 +1,0 @@
-Fixed: MatrixFree::loop() and MatrixFree::cell_loop() forgot to exchange
-ghosted vector entries located on the first active cell of an MPI rank for
-continuous elements when face integrals are activated. This is now fixed.
-<br>
-(Martin Kronbichler, Fabian Castelli, 2019/08/11)

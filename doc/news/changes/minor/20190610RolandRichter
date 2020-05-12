@@ -1,4 +1,0 @@
-New: The function schur_product was added for the Tensor class,
-allowing the entrywise multiplication of tensor objects of general rank.
-<br>
-(Roland Richter, 2019/06/10)

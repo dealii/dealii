@@ -1,3 +1,0 @@
-New: Particles::Particle::set_id() allows to set a particle ID number.
-<br>
-(Luca Heltai, 2019/12/02)

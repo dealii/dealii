@@ -1,5 +1,0 @@
-Improved: parallel::distributed::ContinuousQuadratureDataTransfer allows the
-number of data values per quadrature points vary across the mesh. It also allows
-a cell to not have any associated quadrature data during refinement.
-<br>
-(Reza Rastak, Marc Fehling, Peter Munch, 2019/08/09)

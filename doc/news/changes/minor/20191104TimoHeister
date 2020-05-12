@@ -1,4 +1,0 @@
-New: The Utilities::MPI::CollectiveMutex helper class allows
-protection of critical sections in code using MPI.
-<br>
-(Timo Heister, 2019/11/04)

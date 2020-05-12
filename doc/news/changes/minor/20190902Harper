@@ -1,4 +1,0 @@
-Bugfix: In PolynomialsBDM, the degree() function is corrected to return a 
-polynomial degree of k+1, instead of its previous value of k.
-<br>
-(Graham Harper, 2019/09/02)

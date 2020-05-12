@@ -1,3 +1,0 @@
-New: template argument for type of vectorized array (vector width) in matrix-free operators.
-<br>
-(Daniel Jodlbauer, 2019/11/06)

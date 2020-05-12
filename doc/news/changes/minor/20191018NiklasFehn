@@ -1,4 +1,0 @@
-Refactor: improve implementation of Utilities::needed_digits() by using
-functionality from the standard library.
-<br>
-(Niklas Fehn, 2019/10/18)

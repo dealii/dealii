@@ -1,4 +1,0 @@
-New: The SparseDirectUMFPACK class is now able to solve complex-valued
-problems as well.
-<br>
-(Wolfgang Bangerth, 2019/12/30)
