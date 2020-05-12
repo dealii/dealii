@@ -1,0 +1,318 @@
+deal.II Authors
+===============
+
+deal.II is a global project. It is run by a group of principal developers.
+Former developers with significant contributions in the past who are no
+longer active, are listed under developers emeriti. A subset of the active
+developers are administrators and responsible for the upkeep of the
+technical infrastructure such as the website, discussion forums, and other
+pieces. Finally, a large number of contributors have provided substantial
+patches over the years. These groups are listed below. If necessary, you
+can contact the project administrators.
+
+Principal developers:
+---------------------
+
+Daniel Arndt, Oak Ridge National Laboratory, USA
+Wolfgang Bangerth, Colorado State University, CO, USA
+Denis Davydov
+Timo Heister, Clemson University, SC, USA
+Luca Heltai, SISSA, Trieste, Italy
+Guido Kanschat, Heidelberg University, Germany
+Martin Kronbichler, Technical University of Munich, Germany
+Matthias Maier, Texas A&M University, College Station, TX, USA
+Peter Munch, Technical University of Munich, and Helmholtz-Zentrum Geesthacht, Germany
+Jean-Paul Pelteret
+Bruno Turcksin, Oak Ridge National Laboratory, USA
+David Wells, University of North Carolina, Chapel Hill, NC, USA
+
+Developers emeriti:
+-------------------
+
+Ralf Hartmann, DLR, Germany
+Toby D. Young, Polish Academy of Sciences, Poland
+
+Administrators:
+---------------
+
+Wolfgang Bangerth, Colorado State University, CO, USA
+Timo Heister, Clemson University, SC, USA
+Guido Kanschat, Universität Heidelberg, Germany
+Matthias Maier, Texas A&M University, College Station, TX, USA
+
+Contributors:
+-------------
+
+Pasquale Africa
+Ashna Aggarwal
+Mihai Alexe
+Moritz Allmaras
+Fahad Alrashed
+Giovanni Alzetta
+Michael Anderson
+Julian Andrej
+Mathias Anselmann
+Daniel Appel
+Juan Carlos Araujo Cabarcas
+Daniel Arndt
+Rajat Arora
+Andrew Baker
+Wolfgang Bangerth
+Mauro Bardelloni
+Alistair Bentley
+Kirana Bergstrom
+Manaswinee Bezbaruah
+Bruno Blais
+Alexander Blank
+Vishal Boddu
+Andrea Bonito
+Marco Borelli
+Benjamin Brands
+Claire Bruna-Rosso
+Markus Bürg
+John Burnell
+Krysztof Bzowski
+Yong-Yong Cai
+Lucas Campos
+Brian Carnes
+Daniel Castanon Quiroz
+Fabian Castelli
+Nicola Cavallini
+Jordan Cazamias
+Praveen Chandrashekar
+Jie Cheng
+Ivan Christov
+Pi-Yueh Chuang
+Chih-Che Chueh
+Emma Cinatl
+Conrad Clevenger
+Thomas C. Clevenger
+Ester Comellas
+Katherine Cosburn
+Sam Cox
+Juliane Dannberg
+Sambit Das
+Denis Davydov
+Elias Dejene
+Nicola Demo
+Ginkgo developers
+Giovanni Di Ilio
+Stefano Dominici
+Nivesh Dommaraju
+Brett Dong
+Minh Do-Quang
+Kevin Drzycimski
+Kevin Dugan
+Luel Emishaw
+Marco Engelhard
+Patrick Esser
+Anton Evgrafov
+Marc Fehling
+Niklas Fehn
+Isuru Fernando
+Rebecca Fildes
+Andreas Fink
+Menno Fraters
+Jörg Frohne
+Anian Fuchs
+Andres Galindo
+Daniel Garcia-Sanchez
+Rene Gassmoeller
+Joscha Gedicke
+Thomas Geenen
+Martin Genet
+Melanie Gerault
+Arezou Ghesmati
+Nicola Giuliani
+Brandon Gleeson
+Anne Glerum
+Christoph Goering
+Christian Goll
+Sebastian Gonzalez-Pintor
+Krishnakumar Gopalakrishnan
+Alexander Grayver
+Ryan Grove
+Felix Gruber
+Maien Hamed
+Joshua Hanophy
+Logan Harbour
+Michael Harmon
+Graham Harper
+Mohammed Hassan
+Nicole Hayes
+Bang He
+Eric Heien
+Christoph Heiniger
+Johannes Heinz
+Timo Heister
+Luca Heltai
+Michael F. Herbst
+Jiuhua Hu
+Dakshina Ilangovan
+Lise-Marie Imbert-Gerard
+Samuel Imfeld
+Bärbel Janssen
+Manu Jayadharan
+Armin Ghajar Jazi
+Xing Jin
+Daniel Jodlbauer
+Stefan Kaessmair
+Marie Kajan
+Guido Kanschat
+Justin Kauffman
+Oliver Kayser-Herold
+Vishal Kenchan
+Andreas Kergassner
+Eldar Khattatov
+Seungil Kim
+Benjamin Shelton Kirk
+Angela Klewinghaus
+Ingo Kligge
+Alexander Knieps
+Uwe Köcher
+Alex Kokomov
+Joachim Kopp
+Katharina Kormann
+Lukas Korous
+Aslan Kosakian
+Adam Kosik
+Giorgos Kourakos
+Oleh Krehel
+Kurt Kremitzki
+Martin Kronbichler
+Paul Kuberry
+Paras Kumar
+Dustin Kumor
+Ross Kynch
+Konstantin Ladutenko
+Charu Lata
+Damien Lebrun-Grandie
+Adam Lee
+Tobias Leicht
+Wenyu Lei
+Tulio Ligneul
+Yan Li
+Karl Ljungkvist
+Vijay Mahadevan
+Matthias Maier
+Katrin Mang
+Cataldo Manigrasso
+Mae Markowski
+Andre Massing
+Jonathan Matthews
+Andrew McBride
+Stefan Meggendorfer
+Mathias Mentler
+Craig Michoski
+Franco Milicchio
+Scott Miller
+Andrea Mola
+Adriana Morales
+Adriana Morales Miranda
+Helmut Müller
+Peter Munch
+Jose Javier Munoz Criollo
+Bob Myhill
+Stefan Nauber
+Pratik Nayak
+David Neckels
+Dragan Nikolic
+Emily Novak
+Omotayo Omosebi
+Santiago Ospina
+Alexey Ozeritskiy
+Vaibhav Palkar
+Spencer Patty
+M. Sebastian Pauletti
+Jean-Paul Pelteret
+Rebecca Pereira
+Jonathan Perry-Houts
+Dirk Peschka
+Jan Philipp
+Jonathan Pitt
+Giuseppe Pitton
+Geneva Porter
+Fernando Posada
+Adam Powell IV
+Laura Prieto
+Laura Prieto Saavedra
+Florian Prill
+Simon Puchert
+E. Gerry Puckett
+Andreas Putz
+Lei Qiao
+Ce Qin
+Manuel Quezada de Luna
+Michael Rapson
+Reza Rastak
+Roland Richter
+Thomas Richter
+Gennadiy Rishin
+Jonathan Robey
+Angel Rodriguez
+Irabiel Romero
+Ian Rose
+Shiva Rudraraju
+Matthew Russell
+Mayank Sabharwal
+Abner Salgado-Gonzalez
+Ali Samii
+Tonatiuh Sanchez-Vizuet
+Alberto Sartori
+Anna Schneebeli
+Svenja Schoeder
+Jan Schrage
+Ralf B. Schulz
+Daniel Shapero
+Natasha S. Sharma
+Jason Sheldon
+Doug Shi-Dong
+Ben Shields
+Konrad Simon
+Florian Sonner
+Stephanie Sparks
+Michael Stadler
+Sebastian Stark
+Jan Stebel
+Martin Steigemann
+Simon Sticko
+Franz-Theo Suttmeier
+Oliver Sutton
+Habib Talavatifard
+Zhen Tao
+Marco Tezzele
+Thiele Jan Philipp
+Ben Thompson
+Jihuan Tian
+Ignacio Tomas
+Christophe Trophime
+Sara Tro
+Bruno Turcksin
+Ferdinand Vanmaele
+Antoni Vidal
+Heikki Virtanen
+Jiaxin Wang
+Kainan Wang
+Yaqi Wang
+Yuxiang Wang
+Zhuoran Wang
+Xiaoyu Wei
+David Wells
+Sven Wetterauer
+Daniel Weygand
+Joshua White
+Michał Wichrowski
+Julius Witte
+Winnifried Wollner
+Christian Wülker
+Ming Yang
+Jaeryun Yim
+Toby D. Young
+Feimi Yu
+Mario Zepeda Aguilar
+Wenjuan Zhang
+Liang Zhao
+Victor Zheng
+Weixiong Zheng
+Yuhan Zhou
+Valentin Zingan
