@@ -523,7 +523,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Removed: The deprecated PreconditionChebyshev member variables nonzero_strarting
+  Removed: The deprecated PreconditionChebyshev member variables nonzero_starting
   and matrix_diagonal_inverse were removed.
   <br>
   (Daniel Arndt, 2019/07/11)
