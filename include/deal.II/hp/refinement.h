@@ -503,7 +503,7 @@ namespace hp
      * decide whether h- or p-adaptation is supposed to happen. An h-step will
      * be applied with $\eta_{K,\text{pred}} = 0$, whereas
      * $\eta_{K,\text{pred}} = \infty$ ensures a p-step. The latter may be
-     * realised with `std::numeric_limits::infinity()`.
+     * realized with `std::numeric_limits::infinity()`.
      *
      * The following code snippet demonstrates how to impose hp-adaptivity based
      * on refinement history in an application:
