@@ -1126,7 +1126,7 @@ namespace internal
                              child_index < parent->n_children();
                              ++child_index)
                           {
-                            const auto sibling = parent->child(child_index);
+                            const auto &sibling = parent->child(child_index);
                             Assert(sibling->is_active() &&
                                      sibling->coarsen_flag_set(),
                                    typename dealii::Triangulation<
@@ -1229,6 +1229,7 @@ namespace internal
         template <int dim, int spacedim>
         static unsigned int
         determine_fe_from_children(
+          const typename Triangulation<dim, spacedim>::cell_iterator &,
           const std::vector<unsigned int> &        children_fe_indices,
           dealii::hp::FECollection<dim, spacedim> &fe_collection)
         {
@@ -2072,10 +2073,17 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          [this](const std::vector<unsigned int> &children_fe_indices) {
+          /*refinement_strategy=*/
+          &dealii::AdaptationStrategies::Refinement::
+            preserve<dim, spacedim, unsigned int>,
+          /*coarsening_strategy=*/
+          [this](
+            const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+            const std::vector<unsigned int> &children_fe_indices)
+            -> unsigned int {
             return dealii::internal::hp::DoFHandlerImplementation::
               Implementation::determine_fe_from_children<dim, spacedim>(
-                children_fe_indices, fe_collection);
+                parent, children_fe_indices, fe_collection);
           });
 
         active_fe_index_transfer->cell_data_transfer
@@ -2193,10 +2201,17 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          [this](const std::vector<unsigned int> &children_fe_indices) {
+          /*refinement_strategy=*/
+          &dealii::AdaptationStrategies::Refinement::
+            preserve<dim, spacedim, unsigned int>,
+          /*coarsening_strategy=*/
+          [this](
+            const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+            const std::vector<unsigned int> &children_fe_indices)
+            -> unsigned int {
             return dealii::internal::hp::DoFHandlerImplementation::
               Implementation::determine_fe_from_children<dim, spacedim>(
-                children_fe_indices, fe_collection);
+                parent, children_fe_indices, fe_collection);
           });
 
         // If we work on a p::d::Triangulation, we have to transfer all
@@ -2279,10 +2294,17 @@ namespace hp
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
           /*transfer_variable_size_data=*/false,
-          [this](const std::vector<unsigned int> &children_fe_indices) {
+          /*refinement_strategy=*/
+          &dealii::AdaptationStrategies::Refinement::
+            preserve<dim, spacedim, unsigned int>,
+          /*coarsening_strategy=*/
+          [this](
+            const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+            const std::vector<unsigned int> &children_fe_indices)
+            -> unsigned int {
             return dealii::internal::hp::DoFHandlerImplementation::
               Implementation::determine_fe_from_children<dim, spacedim>(
-                children_fe_indices, fe_collection);
+                parent, children_fe_indices, fe_collection);
           });
 
         // Unpack active_fe_indices.
