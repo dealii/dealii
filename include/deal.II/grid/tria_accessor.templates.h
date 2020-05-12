@@ -632,45 +632,15 @@ namespace internal
       line_index(const TriaAccessor<3, dim, spacedim> &accessor,
                  const unsigned int                    i)
       {
-        // get the line index by asking the
-        // quads. first assume standard orientation
-        //
-        // set up a table that for each
-        // line describes a) from which
-        // quad to take it, b) which line
-        // therein it is if the face is
-        // oriented correctly
-        static const unsigned int
-          lookup_table[GeometryInfo<3>::lines_per_cell][2] = {
-            {4, 0}, // take first four lines from bottom face
-            {4, 1},
-            {4, 2},
-            {4, 3},
+        const auto pair = GeometryInfo<3>::standard_line_to_quad_line_index(i);
+        const auto quad_index = pair[0];
+        const auto line_index = GeometryInfo<3>::standard_to_real_face_line(
+          pair[1],
+          accessor.face_orientation(quad_index),
+          accessor.face_flip(quad_index),
+          accessor.face_rotation(quad_index));
 
-            {5, 0}, // second four lines from top face
-            {5, 1},
-            {5, 2},
-            {5, 3},
-
-            {0, 0}, // the rest randomly
-            {1, 0},
-            {0, 1},
-            {1, 1}};
-
-        // respect non-standard faces by calling the
-        // reordering function from GeometryInfo
-
-        const unsigned int quad_index     = lookup_table[i][0];
-        const unsigned int std_line_index = lookup_table[i][1];
-
-        const unsigned int line_index =
-          GeometryInfo<dim>::standard_to_real_face_line(
-            std_line_index,
-            accessor.face_orientation(quad_index),
-            accessor.face_flip(quad_index),
-            accessor.face_rotation(quad_index));
-
-        return (accessor.quad(quad_index)->line_index(line_index));
+        return accessor.quad(quad_index)->line_index(line_index);
       }
 
 
@@ -696,7 +666,6 @@ namespace internal
       quad_index(const TriaAccessor<3, dim, spacedim> &accessor,
                  const unsigned int                    i)
       {
-        AssertIndexRange(i, GeometryInfo<3>::quads_per_cell);
         return accessor.tria->levels[accessor.present_level]
           ->cells.cells[accessor.present_index]
           .face(i);
@@ -1100,20 +1069,13 @@ namespace internal
       vertex_index(const TriaAccessor<2, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        // table used to switch the vertices, if the
-        // line orientation is wrong,
-        //
-        // first index: line orientation 0: false or
-        // 1: true=standard
-        //
-        // second index: vertex index to be switched
-        // (or not)
+        const auto pair =
+          GeometryInfo<2>::standard_corner_to_line_vertex_index(corner);
+        const auto line_index   = pair[0];
+        const auto vertex_index = GeometryInfo<2>::standard_to_real_line_vertex(
+          pair[1], accessor.line_orientation(line_index));
 
-        static const unsigned int switch_table[2][2] = {{1, 0}, {0, 1}};
-
-        return accessor.line(corner % 2)
-          ->vertex_index(
-            switch_table[accessor.line_orientation(corner % 2)][corner / 2]);
+        return accessor.line(line_index)->vertex_index(vertex_index);
       }
 
 
@@ -1123,22 +1085,16 @@ namespace internal
       vertex_index(const TriaAccessor<3, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        // get the corner indices by asking either
-        // the bottom or the top face for its
-        // vertices. handle non-standard faces by
-        // calling the vertex reordering function
-        // from GeometryInfo
+        const auto pair =
+          GeometryInfo<3>::standard_corner_to_quad_vertex_index(corner);
+        const auto face_index   = pair[0];
+        const auto vertex_index = GeometryInfo<3>::standard_to_real_face_vertex(
+          pair[1],
+          accessor.face_orientation(face_index),
+          accessor.face_flip(face_index),
+          accessor.face_rotation(face_index));
 
-        // bottom face (4) for first four vertices,
-        // top face (5) for the rest
-        const unsigned int face_index = 4 + corner / 4;
-
-        return accessor.quad(face_index)
-          ->vertex_index(GeometryInfo<dim>::standard_to_real_face_vertex(
-            corner % 4,
-            accessor.face_orientation(face_index),
-            accessor.face_flip(face_index),
-            accessor.face_rotation(face_index)));
+        return accessor.quad(face_index)->vertex_index(vertex_index);
       }
     };
   } // namespace TriaAccessorImplementation
