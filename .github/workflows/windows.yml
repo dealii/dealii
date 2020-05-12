@@ -23,7 +23,7 @@ jobs:
         mkdir build
         mkdir c:/project
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project ..
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -T host=x64 ..
     - name: archive logs
       uses: actions/upload-artifact@v1
       with:
