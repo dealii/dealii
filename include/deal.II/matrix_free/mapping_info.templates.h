@@ -2565,11 +2565,13 @@ namespace internal
       // evaluate the geometry in double precision; thus, for floats we need
       // to do things in two sweeps and convert the final result.
       constexpr unsigned int n_lanes = VectorizedArrayType::size();
+
       using VectorizedDouble =
         VectorizedArray<double,
-                        ((std::is_same<Number, float>::value && n_lanes > 1) ?
-                           n_lanes / 2 :
-                           n_lanes)>;
+                        ((std::is_same<Number, float>::value &&
+                          VectorizedArrayType::size() > 1) ?
+                           VectorizedArrayType::size() / 2 :
+                           VectorizedArrayType::size())>;
 
       // Create a ShapeInfo object to provide the necessary interpolators to
       // the various quadrature points. Note that it is initialized with the
