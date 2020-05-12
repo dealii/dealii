@@ -278,7 +278,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Chaned: VectorizedArray::n_array_elements has been deprecated.
+  Changed: VectorizedArray::n_array_elements has been deprecated.
   Please use the method VectorizedArray::size() to access the same information.
   <br>
   (Peter Munch, 2020/03/20)
