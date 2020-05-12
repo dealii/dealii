@@ -54,8 +54,11 @@ pipeline
         stage("check")
         {
           when {
-            allOf {
-              not {branch 'master'}
+            not {
+	      anyOf {
+	        branch 'master'
+	        branch pattern: "dealii-*", comparator: "GLOB"
+	      }
             }
           }
 

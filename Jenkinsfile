@@ -36,9 +36,14 @@ pipeline
       {
         stage("permission")
         {
-          // skip permission check on master:
+          // skip permission check on master and release branches
           when {
-              not {branch 'master'}
+              not {
+	        anyOf {
+	          branch 'master'
+		  branch pattern: "dealii-*", comparator: "GLOB"
+		}
+	      }
           }
           steps
           {
