@@ -1,0 +1,4 @@
+New: The new class FEFieldConvolutionFunction allows one to construct the convolution of a finite element
+field function with a CutOffFunctionBase object.
+<br>
+(Luca Heltai, 2019/05/11)

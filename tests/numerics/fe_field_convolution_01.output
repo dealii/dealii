@@ -1,0 +1,16 @@
+
+DEAL::dim: 1, spacedim: 2
+DEAL::FE      : FE_Q<1,2>(1)
+DEAL::Space FE: FE_Q<2>(1)
+cells dofs   u_L2_norm      u_H1_norm    immersed_dofs 
+8     8    2.027e+00 -    3.851e+00 -    8.000e+00     
+16    16   1.260e+00 1.37 2.515e+00 1.23 1.600e+01     
+32    32   4.260e-01 3.13 1.011e+00 2.63 3.200e+01     
+64    64   1.153e-01 3.77 4.053e-01 2.64 6.400e+01     
+DEAL::dim: 2, spacedim: 2
+DEAL::FE      : FE_Q<2>(1)
+DEAL::Space FE: FE_Q<2>(1)
+cells dofs   u_L2_norm      u_H1_norm    immersed_dofs 
+20    25   1.349e+00 -    3.328e+00 -    2.500e+01     
+80    89   6.378e-01 1.18 1.744e+00 1.02 8.900e+01     
+320   337  1.907e-01 1.81 6.681e-01 1.44 3.370e+02     

@@ -44,6 +44,7 @@ SET(_separate_src
   error_estimator.cc
   error_estimator_inst2.cc
   fe_field_function.cc
+  fe_field_convolution_function.cc
   matrix_creator.cc
   matrix_creator_inst2.cc
   matrix_creator_inst3.cc
@@ -87,6 +88,7 @@ SET(_inst
   error_estimator_1d.inst.in
   error_estimator.inst.in
   fe_field_function.inst.in
+  fe_field_convolution_function.inst.in
   matrix_creator.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in
