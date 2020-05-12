@@ -1111,7 +1111,7 @@ inconvenience this causes.
   New: Introduce a new communication-pattern class Utilities::MPI::NoncontiguousPartitioner.
   It is similar to Utilities::MPI::Partitioner, however, does not make any
   restrictions regarding to the ordering of the underlying index sets. This class enables
-  efficient repartitioning of vectors, which might be benefitial in interfacing with
+  efficient repartitioning of vectors, which might be beneficial in interfacing with
   external libraries that expect a certain fixed order (like checkerboard partitioning).
   <br>
   (Peter Munch, 2020/03/04)
