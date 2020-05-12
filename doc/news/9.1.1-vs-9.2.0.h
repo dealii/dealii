@@ -1247,7 +1247,7 @@ inconvenience this causes.
 
  <li>
   New: ParameterHandler::parse_input_from_json() and  ParameterHandler::parse_input_from_xml() can skip
-  undifined sections and entries.
+  undefined sections and entries.
   <br>
   (Peter Munch, 2020/01/27)
  </li>
