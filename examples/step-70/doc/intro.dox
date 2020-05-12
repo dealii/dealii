@@ -13,12 +13,11 @@
 <h3>Massively parallel non-matching grid simulations of fluid structure interaction problems</h3>
 
 In this tutorial we consider a mixing problem in the laminar flow regime.
-They occur in a wide range of applications ranging from chemical engineering to power
+Such problems occur in a wide range of applications ranging from chemical engineering to power
 generation (e.g. turbomachinery). Mixing problems are particularly hard to solve numerically,
 because they often involve a container (with fixed boundaries, and possibly
 complex geometries such as baffles), represented by the domain $\Omega$,
 and one (or more) immersed and rotating impellers (represented by the domain $\Omega^{\text{imp}}$).
-
 The domain in which we would like to solve the flow equations is the (time
 depedendent) difference between the two domains, namely:
 $\Omega\setminus\Omega^{\text{imp}}$.
