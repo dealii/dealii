@@ -32,101 +32,13 @@
 
 #include "../../tests.h"
 
+#include "utilities.h"
+
 using namespace dealii;
 namespace SD = Differentiation::SD;
 
 namespace Diff_Test
 {
-  namespace internal
-  {
-    namespace
-    {
-      template <typename Stream, typename NumberType>
-      void
-      print(Stream &stream, const std::string &name, const NumberType &val)
-      {
-        stream << name << ": " << val << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                          stream,
-            const std::string &               name,
-            const Tensor<0, dim, NumberType> &val)
-      {
-        stream << name << ": " << val << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                          stream,
-            const std::string &               name,
-            const Tensor<1, dim, NumberType> &t)
-      {
-        for (unsigned int i = 0; i < dim; ++i)
-          stream << name << "[" << i << "]: " << t[i] << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                          stream,
-            const std::string &               name,
-            const Tensor<2, dim, NumberType> &t)
-      {
-        for (unsigned int i = 0; i < dim; ++i)
-          for (unsigned int j = 0; j < dim; ++j)
-            stream << name << "[" << i << "][" << j << "]: " << t[i][j]
-                   << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                                   stream,
-            const std::string &                        name,
-            const SymmetricTensor<2, dim, NumberType> &t)
-      {
-        for (unsigned int i = 0; i < dim; ++i)
-          for (unsigned int j = i; j < dim; ++j)
-            stream << name << "[" << i << "][" << j << "]: " << t[i][j]
-                   << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                          stream,
-            const std::string &               name,
-            const Tensor<3, dim, NumberType> &t)
-      {
-        for (unsigned int i = 0; i < dim; ++i)
-          for (unsigned int j = 0; j < dim; ++j)
-            for (unsigned int k = 0; k < dim; ++k)
-              stream << name << "[" << i << "][" << j << "][" << k
-                     << "]: " << t[i][j][k] << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                          stream,
-            const std::string &               name,
-            const Tensor<4, dim, NumberType> &t)
-      {
-        for (unsigned int i = 0; i < dim; ++i)
-          for (unsigned int j = 0; j < dim; ++j)
-            for (unsigned int k = 0; k < dim; ++k)
-              for (unsigned int l = 0; l < dim; ++l)
-                stream << name << "[" << i << "][" << j << "][" << k << "]["
-                       << l << "]: " << t[i][j][k][l] << std::endl;
-      }
-      template <typename Stream, int dim, typename NumberType>
-      void
-      print(Stream &                                   stream,
-            const std::string &                        name,
-            const SymmetricTensor<4, dim, NumberType> &t)
-      {
-        for (unsigned int i = 0; i < dim; ++i)
-          for (unsigned int j = i; j < dim; ++j)
-            for (unsigned int k = 0; k < dim; ++k)
-              for (unsigned int l = k; l < dim; ++l)
-                stream << name << "[" << i << "][" << j << "][" << k << "]["
-                       << l << "]: " << t[i][j][k][l] << std::endl;
-      }
-    } // namespace
-  }   // namespace internal
-
   template <int dim,
             typename NumberType,
             enum SD::OptimizerType     opt_method,
@@ -166,9 +78,9 @@ namespace Diff_Test
     const bool print_symbols = true;
     if (print_symbols == true)
       {
-        internal::print(deallog, "psi", symbolic_psi);
-        internal::print(deallog, "S", symbolic_S);
-        internal::print(deallog, "HH", symbolic_HH);
+        print(deallog, "psi", symbolic_psi);
+        print(deallog, "S", symbolic_S);
+        print(deallog, "HH", symbolic_HH);
       }
 
     // Numerical substitution
@@ -194,9 +106,9 @@ namespace Diff_Test
     const bool print_values = true;
     if (print_values == true)
       {
-        internal::print(deallog, "psi", optimizer.evaluate(symbolic_psi));
-        internal::print(deallog, "S", optimizer.evaluate(symbolic_S));
-        internal::print(deallog, "HH", optimizer.evaluate(symbolic_HH));
+        print(deallog, "psi", optimizer.evaluate(symbolic_psi));
+        print(deallog, "S", optimizer.evaluate(symbolic_S));
+        print(deallog, "HH", optimizer.evaluate(symbolic_HH));
       }
   }
 
@@ -263,11 +175,11 @@ namespace Diff_Test
     const bool print_symbols = true;
     if (print_symbols == true)
       {
-        internal::print(deallog, "psi (Q)", symbolic_psi_CQi);
-        internal::print(deallog, "psi", symbolic_psi);
-        internal::print(deallog, "S (Q)", symbolic_S_CQi);
-        internal::print(deallog, "S", symbolic_S);
-        internal::print(deallog, "HH", symbolic_HH);
+        print(deallog, "psi (Q)", symbolic_psi_CQi);
+        print(deallog, "psi", symbolic_psi);
+        print(deallog, "S (Q)", symbolic_S_CQi);
+        print(deallog, "S", symbolic_S);
+        print(deallog, "HH", symbolic_HH);
       }
 
     // Numerical substitution
@@ -297,9 +209,9 @@ namespace Diff_Test
     const bool print_values = true;
     if (print_values == true)
       {
-        internal::print(deallog, "psi", optimizer.evaluate(symbolic_psi));
-        internal::print(deallog, "S", optimizer.evaluate(symbolic_S));
-        internal::print(deallog, "HH", optimizer.evaluate(symbolic_HH));
+        print(deallog, "psi", optimizer.evaluate(symbolic_psi));
+        print(deallog, "S", optimizer.evaluate(symbolic_S));
+        print(deallog, "HH", optimizer.evaluate(symbolic_HH));
       }
   }
 
@@ -345,8 +257,8 @@ namespace Diff_Test
         "Qd", sub_vals_func_symb_dependencies);
     const SymmetricTensor<4, dim, SD::Expression> dQd_SD_dC =
       SD::differentiate(Qd_SD, C_SD);
-    //    internal::print(deallog,"Qd_SD",Qd_SD);
-    //    internal::print(deallog,"dQd_SD_dC",dQd_SD_dC);
+    //    print(deallog,"Qd_SD",Qd_SD);
+    //    print(deallog,"dQd_SD_dC",dQd_SD_dC);
 
     // Now we substitute out the independent internal variable
     // for one that has a sensitivity on the primary independent variable
@@ -360,7 +272,7 @@ namespace Diff_Test
     const SymmetricTensor<4, dim, SD::Expression> symbolic_HH_total_impl =
       2.0 * SD::differentiate(symbolic_S_subs_Q,
                               C_SD); // HH = 2*dS_dC = 4*d2psi_dC_dC
-    //    internal::print(deallog,"symbolic_HH_total_impl",symbolic_HH_total_impl);
+    //    print(deallog,"symbolic_HH_total_impl",symbolic_HH_total_impl);
 
     // An example of an implicit relationship would be
     // dQ/dt = 2.0*C*log( det(C)*log(Q(C) )
@@ -376,7 +288,7 @@ namespace Diff_Test
       SD::make_substitution_map(std::make_pair(Qd_SD, Qi_SD),
                                 std::make_pair(SD::differentiate(Qd_SD, C_SD),
                                                dQ_dC_i_SD));
-    //    internal::print(deallog,"dQ_dC_i",dQ_dC_i);
+    //    print(deallog,"dQ_dC_i",dQ_dC_i);
 
     // Substitute derivative terms
     SD::resolve_explicit_dependencies(sub_vals_explicit);
@@ -398,9 +310,9 @@ namespace Diff_Test
     const bool print_symbols = true;
     if (print_symbols == true)
       {
-        internal::print(deallog, "psi", symbolic_psi);
-        internal::print(deallog, "S", symbolic_S);
-        internal::print(deallog, "HH", symbolic_HH);
+        print(deallog, "psi", symbolic_psi);
+        print(deallog, "S", symbolic_S);
+        print(deallog, "HH", symbolic_HH);
       }
 
     // Numerical substitution
@@ -435,9 +347,9 @@ namespace Diff_Test
     const bool print_values = true;
     if (print_values == true)
       {
-        internal::print(deallog, "psi", optimizer.evaluate(symbolic_psi));
-        internal::print(deallog, "S", optimizer.evaluate(symbolic_S));
-        internal::print(deallog, "HH", optimizer.evaluate(symbolic_HH));
+        print(deallog, "psi", optimizer.evaluate(symbolic_psi));
+        print(deallog, "S", optimizer.evaluate(symbolic_S));
+        print(deallog, "HH", optimizer.evaluate(symbolic_HH));
       }
   }
 

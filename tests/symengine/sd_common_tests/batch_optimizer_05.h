@@ -27,36 +27,10 @@
 #include "../../tests.h"
 
 #include "serialization.h"
+#include "utilities.h"
 
 using namespace dealii;
 namespace SD = Differentiation::SD;
-
-
-template <int dim, typename NumberType>
-Tensor<2, dim, NumberType>
-make_tensor(const NumberType &val)
-{
-  Tensor<2, dim, NumberType> out;
-  for (unsigned int i = 0; i < dim; ++i)
-    out[i][i] = 1.0;
-
-  for (unsigned int i = 0; i < out.n_independent_components; ++i)
-    out[out.unrolled_to_component_indices(i)] += i + val;
-  return out;
-}
-
-template <int dim, typename NumberType>
-SymmetricTensor<2, dim, NumberType>
-make_symm_tensor(const NumberType &val)
-{
-  SymmetricTensor<2, dim, NumberType> out;
-  for (unsigned int i = 0; i < dim; ++i)
-    out[i][i] = 1.0;
-
-  for (unsigned int i = 0; i < out.n_independent_components; ++i)
-    out[out.unrolled_to_component_indices(i)] += i + val;
-  return out;
-}
 
 template <int dim,
           typename NumberType,

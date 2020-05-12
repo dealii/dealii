@@ -35,6 +35,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include "utilities.h"
+
 using namespace dealii;
 namespace SD = Differentiation::SD;
 
@@ -265,65 +267,6 @@ struct CoupledFunction
 
 template <int dim, typename NumberType>
 const double CoupledFunction<dim, NumberType>::sf(2.2);
-
-template <typename Stream, typename NumberType>
-void
-print(Stream &stream, const std::string &name, const NumberType &val)
-{
-  stream << name << ": " << val << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<0, dim, NumberType> &val)
-{
-  stream << name << ": " << val << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<1, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    stream << name << "[" << i << "]: " << t[i] << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<2, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      stream << name << "[" << i << "][" << j << "]: " << t[i][j] << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<3, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int k = 0; k < dim; ++k)
-        stream << name << "[" << i << "][" << j << "][" << k
-               << "]: " << t[i][j][k] << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<4, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int k = 0; k < dim; ++k)
-        for (unsigned int l = 0; l < dim; ++l)
-          stream << name << "[" << i << "][" << j << "][" << k << "][" << l
-                 << "]: " << t[i][j][k][l] << std::endl;
-}
 
 template <int dim,
           typename number_t,
