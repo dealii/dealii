@@ -456,18 +456,12 @@ namespace internal
        *
        * In effect, this field has <code>6*n_cells</code> elements, being the
        * number of cells times the six faces each has.
-       */
-      std::vector<bool> face_orientations;
-
-      /**
+       *
        * flip = rotation by 180 degrees
-       */
-      std::vector<bool> face_flips;
-
-      /**
+       *
        * rotation by 90 degrees
        */
-      std::vector<bool> face_rotations;
+      std::vector<char> face_orientations;
 
       /**
        * Assert that enough space is allocated to accommodate
@@ -533,7 +527,7 @@ namespace internal
        * In effect, this field has <code>4*n_quads</code> elements, being the
        * number of quads times the four lines each has.
        */
-      std::vector<bool> line_orientations;
+      std::vector<char> line_orientations;
 
       /**
        * Assert that enough space is allocated to accommodate
@@ -748,7 +742,7 @@ namespace internal
     {
       this->TriaObjects<TriaObject<3>>::serialize(ar, version);
 
-      ar &face_orientations &face_flips &face_rotations;
+      ar &face_orientations;
     }
 
 
@@ -773,7 +767,8 @@ namespace internal
                          GeometryInfo<3>::faces_per_cell);
       AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
 
-      return face_orientations[cell * GeometryInfo<3>::faces_per_cell + face];
+      return face_orientations[cell * GeometryInfo<3>::faces_per_cell + face] &
+             1;
     }
 
     //----------------------------------------------------------------------//
@@ -782,7 +777,8 @@ namespace internal
     TriaObjectsQuad3D::face_orientation(const unsigned int cell,
                                         const unsigned int face) const
     {
-      return line_orientations[cell * GeometryInfo<2>::faces_per_cell + face];
+      return line_orientations[cell * GeometryInfo<2>::faces_per_cell + face] &
+             1;
     }
 
 
