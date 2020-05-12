@@ -1962,7 +1962,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: compare_and_apply_mask() allows to use a ternary operater idiom with
+  New: compare_and_apply_mask() allows to use a ternary operator idiom with
   VectorizedArray that is based on generating a mask via component-wise
   comparison. Such a computational idiom is useful as an alternative to
   branching whenever the control flow itself would depend on (computed) data
