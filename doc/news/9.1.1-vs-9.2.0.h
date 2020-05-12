@@ -953,7 +953,7 @@ inconvenience this causes.
   slightly changed. It concerns the points along the straight faces and in the
   interior. The new positions have been determined to balance the sizes and
   aspect ratios (expressed by the minimal and maximal singular values of the
-  Jacobian from reference to real coordinates), producting a slightly better
+  Jacobian from reference to real coordinates), producing a slightly better
   mesh quality.
   <br> (Martin Kronbichler, 2020/04/02)
  </li>
