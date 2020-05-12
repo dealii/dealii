@@ -599,12 +599,6 @@ namespace hp
             // step 2: algebraic decay with h-adaptation
             if (cell->refine_flag_set())
               {
-                Assert(
-                  cell->refine_flag_set() ==
-                    RefinementCase<dim>::isotropic_refinement,
-                  ExcMessage(
-                    "Error prediction is only valid for isotropic refinement!"));
-
                 predicted_errors[cell->active_cell_index()] *=
                   (gamma_h * std::pow(.5, future_fe_degree));
 

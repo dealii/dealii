@@ -388,11 +388,6 @@ namespace hp
      * cell diameter and $p_K$ the polynomial degree of the currently assigned
      * finite element on cell $K$.
      *
-     * If both h- and p-adaptation are applied simultaneously, we need to
-     * determine the order at which which type of adaptation happensis
-     * performed. We perform p-adaptation first and perform h-adaptation with
-     * the degree of the future finite element $p_{K,\text{future}}$.
-     *
      * During h-coarsening, the finite elements on siblings may be
      * different, and their parent cell will be assigned to their least
      * dominating finite element that belongs to its most general child. Thus,
@@ -403,26 +398,13 @@ namespace hp
      * confident to say that the error will not change by sole interpolation on
      * the larger finite element space.
      *
-     * Further, the function assumes that the local error on a cell that will be
-     * refined, will lead to errors on the $2^{dim}$ children that are all
-     * equal, whereas local errors on siblings will be summed up on the parent
-     * cell in case of coarsening. This assumption is often not satisfied in
-     * practice: For example, if a cell is at a corner singularity, then the one
-     * child cell that ends up closest to the singularity will inherit the
-     * majority of the remaining error -- but this function can not know where
-     * the singularity will be, and consequently assumes equal distribution.
-     *
-     * When transferring the predicted error to the coarsened mesh, make sure to
-     * configure your CellDataTransfer object with CoarseningStrategies::sum()
-     * as a coarsening strategy.
-     *
      * For p-adaptation, the local error is expected to converge exponentially
      * with the polynomial degree of the assigned finite element. Each increase
      * or decrease of the degree will thus change its value by a user-defined
      * control parameter @p gamma_p. The assumption of exponential convergence
-     * is only valid if both h- and p-adaptive methods are combined. An
-     * exception is thrown if a cell is flagged for both h- and p-adaptation at
-     * once.
+     * is only valid if both h- and p-adaptive methods are combined in a sense
+     * that they are both utilitzed throughout a mesh, but do not have to be
+     * applied both on a cell simultaneously.
      *
      * The prediction algorithm is formulated as follows with control parameters
      * @p gamma_p, @p gamma_h and @p gamma_n that may be used to influence
@@ -464,9 +446,9 @@ namespace hp
      * This ensures that the $l_2$-norm of the predict errors is preserved on
      * both meshes.
      *
-     * In the context, we assume that the local error on a cell that will be
-     * h-refined, will be divided equally on all $n_{K_c}$ children, whereas
-     * local errors on siblings will be summed up on the parent cell in case of
+     * In this context, we assume that the local error on a cell to be h-refined
+     * will be divided equally on all of its $n_{K_c}$ children, whereas local
+     * errors on siblings will be summed up on the parent cell in case of
      * h-coarsening. This assumption is often not satisfied in practice: For
      * example, if a cell is at a corner singularity, then the one child cell
      * that ends up closest to the singularity will inherit the majority of the
@@ -509,14 +491,19 @@ namespace hp
      * $\eta_{K} < \eta_{K,\text{pred}}$, where the subscript $\text{pred}$
      * denotes the predicted error. This corresponds to our assumption of
      * smoothness being correct, else h-adaptation is applied. We achieve this
-     * with the function hp::Refinement::p_adaptivity_from_criteria() and a
+     * with the function hp::Refinement::p_adaptivity_from_reference() and a
      * function object `std::less<Number>()` for both comparator parameters.
      *
-     * For the very first adaptation step, the user needs to decide whether h-
-     * or p-adaptation is supposed to happen. An h-step will be applied with
-     * $\eta_{K,\text{pred}} = 0$, whereas $\eta_{K,\text{pred}} = \infty$
-     * ensures a p-step. The latter may be realised with
-     * `std::numeric_limits::infinity()`.
+     * Also with an alternative strategy, we can determine the fractions of
+     * cells to be h- and p-adapted among all cells to be adapted. For this, use
+     * hp::Refinement::p_adaptivity_fixed_number() with criteria
+     * $(\eta_{K,\text{pred}} - \eta_{K})$.
+     *
+     * For the very first adaptation step in either case, the user needs to
+     * decide whether h- or p-adaptation is supposed to happen. An h-step will
+     * be applied with $\eta_{K,\text{pred}} = 0$, whereas
+     * $\eta_{K,\text{pred}} = \infty$ ensures a p-step. The latter may be
+     * realized with `std::numeric_limits::infinity()`.
      *
      * The following code snippet demonstrates how to impose hp-adaptivity based
      * on refinement history in an application:
@@ -566,8 +553,6 @@ namespace hp
      * parameters for this function come from as well, i.e.
      * $\gamma_\text{p}^2 = 0.4$, $\gamma_\text{h}^2 = 4$,
      * $\gamma_\text{n}^2 = 1$.
-     *
-     * @note This feature is currently only implemented for isotropic refinement.
      *
      * @note We want to predict the error by how adaptation will actually happen.
      *   Thus, this function needs to be called after
