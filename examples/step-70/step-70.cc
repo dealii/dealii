@@ -60,10 +60,10 @@ namespace LA
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -205,7 +205,7 @@ namespace Step70
     // elasticity model in this tutorial, and transform it into a fully fledged
     // FSI solver.
     unsigned int initial_fluid_refinement      = 5;
-    unsigned int initial_solid_refinement      = 3;
+    unsigned int initial_solid_refinement      = 5;
     unsigned int particle_insertion_refinement = 3;
 
     // To provide a rough description of the fluid domain, we use the method
@@ -281,7 +281,9 @@ namespace Step70
     // Similarly, we allow for different local refinement strategies. In
     // particular, we limit the maximum number of refinement levels, in order
     // to control the minimum size of the fluid grid, and guarantee that it is
-    // compatible with the solid grid. Additionnaly, we perform local refinement
+    // compatible with the solid grid. The minimum number of refinement levels
+    // is also controlled to ensured sufficient accuracy in the
+    // bulk of the flow. Additionnaly, we perform local refinement
     // based on standard error estimators on the fluid velocity field.
     //
     // We permit the user to choose between the
@@ -292,11 +294,12 @@ namespace Step70
     //
     // Refinement may be done every few time steps, instead of continuously, and
     // we control this value by the `refinement_frequency` parameter:
-    int          max_level_refinement = 7;
+    int          max_level_refinement = 8;
+    int          min_level_refinement = 5;
     std::string  refinement_strategy  = "fixed_fraction";
     double       coarsening_fraction  = 0.3;
     double       refinement_fraction  = 0.3;
-    unsigned int max_cells            = 1000;
+    unsigned int max_cells            = 20000;
     int          refinement_frequency = 5;
 
     // These two functions are used to control the source term of Stokes flow
@@ -1439,8 +1442,14 @@ namespace Step70
       }
 
     for (const auto &cell : fluid_tria.active_cell_iterators())
-      if (cell->refine_flag_set() && cell->level() == par.max_level_refinement)
-        cell->clear_refine_flag();
+      {
+        if (cell->refine_flag_set() &&
+            cell->level() == par.max_level_refinement)
+          cell->clear_refine_flag();
+        if (cell->coarsen_flag_set() &&
+            cell->level() == par.min_level_refinement)
+          cell->clear_coarsen_flag();
+      }
 
     parallel::distributed::SolutionTransfer<spacedim, LA::MPI::BlockVector>
       transfer(fluid_dh);
@@ -1743,6 +1752,7 @@ namespace Step70
     this->prm.enter_subsection("Refinement and remeshing");
     this->prm.add_parameter("Refinement step frequency", refinement_frequency);
     this->prm.add_parameter("Refinement maximal level", max_level_refinement);
+    this->prm.add_parameter("Refinement minimal level", min_level_refinement);
     this->prm.add_parameter("Refinement strategy",
                             refinement_strategy,
                             "",
@@ -1761,8 +1771,10 @@ namespace Step70
                                                               spacedim + 1);
     });
     // and define a meaningful default angular velocity instaed of zero
-    angular_velocity.declare_parameters_call_back.connect(
-      [&]() { this->prm.set("Function expression", "t < .500001 ? 5 : -5"); });
+    angular_velocity.declare_parameters_call_back.connect([&]() {
+      this->prm.set("Function expression",
+                    "t < .500001 ? 6.283185 : -6.283185");
+    });
   }
 
 } // namespace Step70

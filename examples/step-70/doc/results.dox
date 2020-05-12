@@ -51,10 +51,10 @@ subsection Stokes Immersed Problem
   set Homogeneous Dirichlet boundary ids    = 0
 
   # Initial mesh refinement used for the fluid domain Omega
-  set Initial fluid refinement              = 3
+  set Initial fluid refinement              = 5
 
   # Initial mesh refinement used for the solid domain Gamma
-  set Initial solid refinement              = 3
+  set Initial solid refinement              = 5
   set Nitsche penalty term                  = 10
   set Number of time steps                  = 11
   set Output frequency                      = 1
@@ -90,7 +90,7 @@ subsection Stokes Immersed Problem
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
-    set Function expression = t < .500001 ? 5 : -5 # default: 0
+    set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
 
     # The names of the variables as they will be used in the function,
     # separated by commas. By default, the names of variables at which the
@@ -116,10 +116,11 @@ subsection Stokes Immersed Problem
   end
 
   subsection Refinement and remeshing
-    set Maximum number of cells        = 1000
+    set Maximum number of cells        = 20000
     set Refinement coarsening fraction = 0.3
     set Refinement fraction            = 0.3
-    set Refinement maximal level       = 5
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 5
     set Refinement step frequency      = 5
     set Refinement strategy            = fixed_fraction
   end
@@ -177,7 +178,7 @@ subsection Stokes Immersed Problem
   set Fluid bounding boxes extraction level = 1
   set Homogeneous Dirichlet boundary ids    = 0
   set Initial fluid refinement              = 5
-  set Initial solid refinement              = 3
+  set Initial solid refinement              = 5
   set Nitsche penalty term                  = 100
   set Number of time steps                  = 501
   set Output frequency                      = 1
@@ -186,7 +187,7 @@ subsection Stokes Immersed Problem
   set Viscosity                             = 1
   subsection Angular velocity
     set Function constants  =
-    set Function expression = t < .500001 ? 5 : -5
+    set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
     set Variable names      = x,y,t
   end
   subsection Grid generation
@@ -198,10 +199,11 @@ subsection Stokes Immersed Problem
     set Solid grid generator arguments    = -.5, -.1: .5, .1: false
   end
   subsection Refinement and remeshing
-    set Maximum number of cells        = 1000
+    set Maximum number of cells        = 20000
     set Refinement coarsening fraction = 0.3
     set Refinement fraction            = 0.3
-    set Refinement maximal level       = 7
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 5
     set Refinement step frequency      = 5
     set Refinement strategy            = fixed_fraction
   end
@@ -238,69 +240,117 @@ parameters to their default value.
 The default problem generates a co-dimension zero impeller, consisting of a
 rotating rectangular grid, where the rotation is for half a second in one
 direction, and half a second in the opposite direction, with constant angular
-velocity equal to five.
+velocity equal to $\approx 2\Pi rad/s$. Consequently, the impeller does half a rotation
+and returns to it's original position. The following animation displays
+the velocity magnitude, the motion of the solid impeller and of the
+tracer particles.
 
 
 <p align="center">
    <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.2d.gif"
+      <img src="https://www.dealii.org/images/steps/developer/step-70.2d_tracing.gif"
            alt = ""
            width="500">
     </div>
 </p>
 
-The output of the program will look like the following:
+On one core, the output of the program will look like the following:
 
 @code
-bash$ mpirun -np 8 ./step-70 test.prm
+bash$ mpirun -np 1 ./step-70 test.prm
 Running StokesImmersedProblem<2> using Trilinos.
 Cycle 0:
 Time : 0, time step: 0.002
    Number of degrees of freedom: 9539 (8450+1089 -- 0+0)
-Tracer particles: 753
-Solid particles: 576
-   Solved in 142 iterations.
-   Number of degrees of freedom: 3790 (3354+436 -- 576+753)
+Tracer particles: 337
+Solid particles: 9216
+   Solved in 158 iterations.
+   Number of degrees of freedom: 9845 (8722+1123 -- 9216+337)
 Cycle 1:
 Time : 0.002, time step: 0.002
-   Solved in 133 iterations.
+   Solved in 142 iterations.
 Cycle 2:
 Time : 0.004, time step: 0.002
-   Solved in 148 iterations.
+   Solved in 121 iterations.
 Cycle 3:
-
+Time : 0.006, time step: 0.002
+   Solved in 121 iterations.
 ...
-
 Cycle 499:
 Time : 0.998, time step: 0.002
-   Solved in 167 iterations.
+   Solved in 199 iterations.
 Cycle 500:
 Time : 1, time step: 0.002
-   Solved in 156 iterations.
-
+   Solved in 196 iterations.
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      46.9s |            |
+| Total wallclock time elapsed since start    |       302s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Nitsche terms          |       501 |      0.73s |       1.6% |
-| Assemble Stokes terms           |       501 |      1.34s |       2.8% |
-| Initial setup                   |         1 |  0.000827s |         0% |
-| Output fluid                    |       502 |      2.92s |       6.2% |
-| Output solid particles          |       502 |      1.58s |       3.4% |
-| Output tracer particles         |       502 |      2.04s |       4.4% |
-| Refine                          |       100 |       1.2s |       2.6% |
-| Set solid particle position     |       500 |     0.213s |      0.45% |
-| Set tracer particle motion      |       501 |      1.13s |       2.4% |
-| Setup dofs                      |       101 |      0.82s |       1.7% |
-| Solve                           |       501 |      35.4s |        76% |
+| Assemble Nitsche terms          |       501 |      43.3s |        14% |
+| Assemble Stokes terms           |       501 |      21.5s |       7.1% |
+| Initial setup                   |         1 |  0.000792s |         0% |
+| Output fluid                    |       502 |      31.8s |        11% |
+| Output solid particles          |       502 |      32.2s |        11% |
+| Output tracer particles         |       502 |      0.61s |       0.2% |
+| Refine                          |       100 |      4.68s |       1.5% |
+| Set solid particle position     |       500 |      3.34s |       1.1% |
+| Set tracer particle motion      |       501 |     0.729s |      0.24% |
+| Setup dofs                      |       101 |       2.2s |      0.73% |
+| Solve                           |       501 |       164s |        54% |
 +---------------------------------+-----------+------------+------------+
 @endcode
 
-You may notice that assembling the coupling system is roughly as expensive as
-assemblying the Stokes part, and roughly as expensive as tracking the motion
-of the particles.
+You may notice that assembling the coupling system is more expensive than
+assembling the Stokes part. This depends highly on the number of gauss points
+(solid particles) that are used to apply the Nitsche restriction.
+In the present case, a relatively low number of tracer particles are used.
+Consequently, tracking their motion is relatively cheap.
+
+The following images present the initial and the final configuration of the
+simulation domain:
+
+
+<p align="center">
+   <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-70.initial_configuration.png"
+           alt = ""
+           width="500">
+    </div>
+</p>
+
+
+<p align="center">
+   <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-70.final_configuration.png"
+           alt = ""
+           width="500">
+    </div>
+</p>
+
+We see that, generally, the tracer particles have somewhat returned to their
+original position, although they have been distorted by the flow field.
+The following image compares the initial and the final position of the particles
+after 1s of flow.
+
+<p align="center">
+   <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-70.tracer_comparison.png"
+           alt = ""
+           width="500">
+    </div>
+</p>
+
+In this case, we see that the tracer particles that were outside of the swept volume of the
+impeller have returned very close to their initial position, whereas those in the swept
+volume were slightly more deformed. This deformation is non-physical. It is caused by
+the numerical error induced by the explicit Euler scheme used to advect the particles,
+by the loss of accuracy due to the fictious domain and, finally, by the discretization
+error on the Stokes equations. The first two errors are the leading cause of this deformation
+and they could be alleviated by the use of a finer mesh and a lower time step.
+
+<h3> Three dimensional test case </h3>
 
 To play around a little bit, we complicate the fictitious domain (taken from
 https://grabcad.com/library/lungstors-blower-1), and run a co-dimension one
