@@ -206,8 +206,6 @@ namespace Particles
       const auto &tria     = field_dh.get_triangulation();
       const auto &fe       = field_dh.get_fe();
       auto        particle = particle_handler.begin();
-      const auto  max_particles_per_cell =
-        particle_handler.n_global_max_particles_per_cell();
 
       // Take care of components
       const ComponentMask comps =
@@ -236,8 +234,7 @@ namespace Particles
           const auto &dh_cell =
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, &field_dh);
           dh_cell->get_dof_indices(dof_indices);
-          const auto pic         = particle_handler.particles_in_cell(cell);
-          const auto n_particles = particle_handler.n_particles_in_cell(cell);
+          const auto pic = particle_handler.particles_in_cell(cell);
 
           Assert(pic.begin() == particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
