@@ -693,7 +693,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The SymbolicFunction<dim> class allows one to leaverage the SymEngine library to generate
+  New: The SymbolicFunction<dim> class allows one to leverage the SymEngine library to generate
   dealii::Function objects where the gradients, Laplacians, and Hessians are computed symbolically
   providing also the possibility to extract the time derivative of the SymbolicFunction<dim> object
   as another SymbolicFunction<dim> object.
