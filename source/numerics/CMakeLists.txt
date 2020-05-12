@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -48,6 +48,7 @@ SET(_separate_src
   matrix_creator_inst2.cc
   matrix_creator_inst3.cc
   point_value_history.cc
+  smoothness_estimator.cc
   solution_transfer.cc
   solution_transfer_inst2.cc
   solution_transfer_inst3.cc
@@ -90,6 +91,7 @@ SET(_inst
   matrix_creator.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in
+  smoothness_estimator.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
   vector_tools_boundary.inst.in

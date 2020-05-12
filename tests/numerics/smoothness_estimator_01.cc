@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,11 +14,14 @@
 // ---------------------------------------------------------------------
 
 
-// Test Legendre expansion in 2D and 3D for a function given using Legendre
-// coefficients.
+
+// essentially similar to fe/fe_series_05.cc but test smoothness estimation.
+
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_series.h>
 
@@ -30,6 +33,7 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/numerics/smoothness_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <gsl/gsl_sf_legendre.h>
@@ -37,6 +41,9 @@
 #include <iostream>
 
 #include "../tests.h"
+
+
+using namespace dealii;
 
 
 template <int dim>
@@ -61,6 +68,8 @@ private:
   const Table<dim, double> coefficients;
 };
 
+
+
 // copy-paste from fe_series.cc
 template <int dim>
 double
@@ -77,6 +86,8 @@ Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
     }
   return res;
 }
+
+
 
 template <>
 double
@@ -107,24 +118,36 @@ LegendreFunction<3>::value(const dealii::Point<3> &point,
   return f;
 }
 
+
+
 void
-print(const Table<2, double> &coeff)
+compare(const Table<2, double> &coeff1, const Table<2, double> &coeff2)
 {
-  for (unsigned int i = 0; i < coeff.size(0); i++)
-    for (unsigned int j = 0; j < coeff.size(1); j++)
-      deallog << coeff(i, j) << " ";
-  deallog << std::endl;
+  double linf = 0.;
+  for (unsigned int i = 0; i < coeff1.size(0); i++)
+    for (unsigned int j = 0; j < coeff1.size(1); j++)
+      linf = std::max(linf, std::abs(coeff1(i, j) - coeff2(i, j)));
+
+  deallog << "Linf norm in exact and calculate Legendre coefficients:"
+          << std::endl
+          << linf << std::endl;
 }
 
 void
-print(const Table<3, double> &coeff)
+compare(const Table<3, double> &coeff1, const Table<3, double> &coeff2)
 {
-  for (unsigned int i = 0; i < coeff.size(0); i++)
-    for (unsigned int j = 0; j < coeff.size(1); j++)
-      for (unsigned int k = 0; k < coeff.size(2); k++)
-        deallog << coeff(i, j, k) << " ";
-  deallog << std::endl;
+  double linf = 0.;
+  for (unsigned int i = 0; i < coeff1.size(0); i++)
+    for (unsigned int j = 0; j < coeff1.size(1); j++)
+      for (unsigned int k = 0; k < coeff1.size(2); k++)
+        linf = std::max(linf, std::abs(coeff1(i, j, k) - coeff2(i, j, k)));
+
+  deallog << "Linf norm in exact and calculate Legendre coefficients:"
+          << std::endl
+          << linf << std::endl;
 }
+
+
 
 void resize(Table<2, double> &coeff, const unsigned int N)
 {
@@ -150,37 +173,38 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
   deallog << dim << "d, p=" << poly_degree << ", max_p=" << max_poly
           << std::endl;
   deallog << "-----------------------------------" << std::endl;
-  Triangulation<dim>    triangulation;
-  hp::DoFHandler<dim>   dof_handler(triangulation);
-  hp::FECollection<dim> fe_collection;
-  hp::QCollection<dim>  quadrature_formula;
 
   // add some extra FEs in fe_collection
+  hp::FECollection<dim> fe_collection;
   for (unsigned int p = 1; p <= max_poly; p++)
-    {
-      fe_collection.push_back(FE_Q<dim>(p));
-      quadrature_formula.push_back(QGauss<dim>(p + 1 + 5));
-    }
+    fe_collection.push_back(FE_Q<dim>(p));
 
-  GridGenerator::hyper_cube(triangulation, 0.0, 1.0); // reference cell
+  FESeries::Legendre<dim> legendre =
+    SmoothnessEstimator::Legendre::default_fe_series(fe_collection);
+
   const unsigned int fe_index = poly_degree - 1;
+  const unsigned int n_modes =
+    legendre.get_n_coefficients_per_direction(fe_index);
+
+  // custom predicate:
+  // p-ref for linear elements and use j=1,...,pe otherwise.
+  ComponentMask coefficients_predicate(n_modes, true);
+  coefficients_predicate.set(0, false);
+
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_cube(triangulation, 0.0, 1.0); // reference cell
+
+  hp::DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.set_fe(fe_collection);
   dof_handler.begin_active()->set_active_fe_index(fe_index);
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> values(dof_handler.n_dofs());
-
   VectorTools::interpolate(dof_handler, func, values);
-
-  const unsigned int              N = poly_degree + 1;
-  const std::vector<unsigned int> n_coefficients_per_direction(
-    fe_collection.size(), N);
-  FESeries::Legendre<dim> legendre(n_coefficients_per_direction,
-                                   fe_collection,
-                                   quadrature_formula);
 
   const Table<dim, double> &coeff_in = func.get_coefficients();
   Table<dim, double>        coeff_out;
-  resize(coeff_out, N);
+  resize(coeff_out, n_modes);
 
   Vector<double> local_dof_values;
 
@@ -196,13 +220,25 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
     legendre.calculate(local_dof_values, cell_active_fe_index, coeff_out);
   }
 
-  deallog << "calculated:" << std::endl;
-  print(coeff_out);
-  deallog << "exact:" << std::endl;
-  print(coeff_in);
+  compare(coeff_in, coeff_out);
+
+  // finally test smoothness estimator:
+  Vector<float> smoothness(1);
+  SmoothnessEstimator::Legendre::coefficient_decay_per_direction(
+    legendre,
+    dof_handler,
+    values,
+    smoothness,
+    coefficients_predicate,
+    /*smallest_abs_coefficient=*/1e-10,
+    /*only_flagged_cells=*/false);
+
+  deallog << "smoothness:" << std::endl << smoothness[0] << std::endl;
 
   dof_handler.clear();
 }
+
+
 
 int
 main()
@@ -211,6 +247,7 @@ main()
   dealii::deallog.attach(logfile, /*do not print job id*/ false);
   dealii::deallog.depth_console(0);
 
+  // for linear elements we expect p-refinement by convention
   {
     const unsigned int dim      = 2;
     const unsigned int coeff_1d = 2;
@@ -223,22 +260,38 @@ main()
 
     LegendreFunction<dim> function(coeff_in);
     test(function, p);
+    deallog << "expected smoothness:" << std::endl
+            << std::numeric_limits<float>::infinity() << std::endl;
   }
 
+  // for quadratic we can already assign exponential decay:   a_i = C exp ( -k
+  // i) set one with different k's
   {
+    const double k1 = 1.;
+    const double k2 = 2.;
+
     const unsigned int dim      = 2;
     const unsigned int coeff_1d = 3;
     const unsigned int p        = 2;
     Table<dim, double> coeff_in(coeff_1d, coeff_1d);
     unsigned int       ind = 0;
     for (unsigned int i = 0; i < coeff_1d; i++)
-      for (unsigned int j = 0; j < coeff_1d; j++)
-        coeff_in(i, j) = 1.0 + ind++;
+      coeff_in(i, 0) = exp(-k1 * i);
+
+    for (unsigned int i = 0; i < coeff_1d; i++)
+      coeff_in(0, i) = exp(-k2 * i);
+
+    // make sure predicate skips 0-th:
+    coeff_in(0, 0) = 12345;
 
     LegendreFunction<dim> function(coeff_in);
     test(function, p);
+
+    deallog << "expected smoothness:" << std::endl
+            << std::min(k1, k2) << std::endl;
   }
 
+  // linear elements in 3D (expect zero output)
   {
     const unsigned int dim      = 3;
     const unsigned int coeff_1d = 2;
@@ -252,21 +305,81 @@ main()
 
     LegendreFunction<dim> function(coeff_in);
     test(function, p);
+    deallog << "expected smoothness:" << std::endl
+            << std::numeric_limits<float>::infinity() << std::endl;
   }
 
+  // cubic in 3D
   {
+    const double       k1       = 2.;
+    const double       k2       = 3.;
+    const double       k3       = 4.;
     const unsigned int dim      = 3;
-    const unsigned int coeff_1d = 3;
-    const unsigned int p        = 2;
+    const unsigned int coeff_1d = 4;
+    const unsigned int p        = 3;
     Table<dim, double> coeff_in(coeff_1d, coeff_1d, coeff_1d);
-    unsigned int       ind = 0;
     for (unsigned int i = 0; i < coeff_1d; i++)
-      for (unsigned int j = 0; j < coeff_1d; j++)
-        for (unsigned int k = 0; k < coeff_1d; k++)
-          coeff_in(i, j, k) = 1.0 + ind++;
+      coeff_in(i, 0, 0) = exp(-k1 * i);
+
+    for (unsigned int j = 0; j < coeff_1d; j++)
+      coeff_in(0, j, 0) = exp(-k2 * j);
+
+    for (unsigned int k = 0; k < coeff_1d; k++)
+      coeff_in(0, 0, k) = exp(-k3 * k);
+
+    // make sure predicate skips 0-th:
+    coeff_in(0, 0, 0) = 12345;
 
     LegendreFunction<dim> function(coeff_in);
     test(function, p);
+
+    deallog << "expected smoothness:" << std::endl
+            << std::min(k1, std::min(k2, k3)) << std::endl;
+  }
+
+
+  // 4-th order in 3D but with some coefficients being zero
+  {
+    const double       k1       = 2.;
+    const double       k2       = k1 + 1.;
+    const unsigned int dim      = 3;
+    const unsigned int coeff_1d = 5;
+    const unsigned int p        = 4;
+    Table<dim, double> coeff_in(coeff_1d, coeff_1d, coeff_1d);
+    // all non-zero:
+    for (unsigned int i = 0; i < coeff_1d; i++)
+      coeff_in(i, 0, 0) = exp(-k2 * i);
+
+    // some non-zero (2nd and 4th), the slowest decay will be from this
+    // direction
+    for (unsigned int j = 2; j < coeff_1d; j = j + 2)
+      coeff_in(0, j, 0) = exp(-k1 * j);
+
+    // all but one zero:
+    for (unsigned int k = 3; k < coeff_1d; k = k + 10)
+      coeff_in(0, 0, k) = exp(-k2 * k);
+
+    // make sure predicate skips 0-th:
+    coeff_in(0, 0, 0) = 12345;
+
+    LegendreFunction<dim> function(coeff_in);
+    test(function, p);
+
+    deallog << "expected smoothness:" << std::endl << k1 << std::endl;
+  }
+
+  // cubic in 3D (zero)
+  {
+    const unsigned int dim      = 3;
+    const unsigned int coeff_1d = 4;
+    const unsigned int p        = 3;
+    Table<dim, double> coeff_in(coeff_1d, coeff_1d, coeff_1d);
+
+    LegendreFunction<dim> function(coeff_in);
+    test(function, p);
+
+    deallog << "expected smoothness:" << std::endl
+            << std::numeric_limits<float>::infinity() << std::endl;
   }
 
   dealii::deallog << "Ok" << std::endl;

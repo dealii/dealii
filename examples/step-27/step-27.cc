@@ -111,7 +111,7 @@ namespace Step27
     hp::QCollection<dim - 1> face_quadrature_collection;
 
     hp::QCollection<dim>                    fourier_q_collection;
-    std::shared_ptr<FESeries::Fourier<dim>> fourier;
+    std::unique_ptr<FESeries::Fourier<dim>> fourier;
     std::vector<double>                     ln_k;
     Table<dim, std::complex<double>>        fourier_coefficients;
 
@@ -230,9 +230,10 @@ namespace Step27
       fourier_q_collection.push_back(quadrature);
 
     // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std::make_shared<FESeries::Fourier<dim>>(N,
-                                                       fe_collection,
-                                                       fourier_q_collection);
+    const std::vector<unsigned int> n_coefficients_per_direction(
+      fe_collection.size(), N);
+    fourier = std_cxx14::make_unique<FESeries::Fourier<dim>>(
+      n_coefficients_per_direction, fe_collection, fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.

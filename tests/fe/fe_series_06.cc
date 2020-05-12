@@ -43,7 +43,13 @@ test_2d()
   for (unsigned int i = 0; i < fe_collection.size(); i++)
     fourier_q_collection.push_back(quadrature);
 
-  FESeries::Fourier<dim> fourier(N, fe_collection, fourier_q_collection);
+  const std::vector<unsigned int> n_coefficients_per_direction(
+    fe_collection.size(), N);
+
+  FESeries::Fourier<dim> fourier(n_coefficients_per_direction,
+                                 fe_collection,
+                                 fourier_q_collection);
+
   Table<dim, std::complex<double>> fourier_coefficients;
   fourier_coefficients.reinit(N, N);
 
