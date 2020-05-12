@@ -825,7 +825,7 @@ inconvenience this causes.
 
  <li>
   Changed: The order by which MatrixFree::cell_loop() and MatrixFree::loop()
-  pass through cells has been changed to preferrably group cells with the same
+  pass through cells has been changed to preferably group cells with the same
   parent into the same batch of cells with vectorization, which increases data
   locality and slightly improves performance.
   <br>
