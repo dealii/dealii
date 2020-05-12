@@ -554,8 +554,6 @@ namespace hp
      * $\gamma_\text{p}^2 = 0.4$, $\gamma_\text{h}^2 = 4$,
      * $\gamma_\text{n}^2 = 1$.
      *
-     * @note This feature is currently only implemented for isotropic refinement.
-     *
      * @note We want to predict the error by how adaptation will actually happen.
      *   Thus, this function needs to be called after
      *   Triangulation::prepare_coarsening_and_refinement().
