@@ -1,14 +1,15 @@
 <h1>Results</h1>
 
-The directory in which this program is run contains a number of sample parameter
-files that you can use to reproduce the results presented in this section. If
-you do not specify a parameter file as an argument on command line, the program
-will try to read the file "parameters.prm" by default, and will execute the two
-dimensional version of the code. As explained before, if your file name contains
-the string "23", then the program will run a three dimensional problem, with
-immersed solid of co-dimension one. If it contains the string "3", it will run
-a three dimensional problem, with immersed solid of co-dimension zero, otherwise
-it will run a two dimensional problem with immersed solid of co-dimension zero.
+The directory in which this program is run contains a number of sample
+parameter files that you can use to reproduce the results presented in this
+section. If you do not specify a parameter file as an argument on the command
+line, the program will try to read the file "parameters.prm" by default, and
+will execute the two dimensional version of the code. As explained before, if
+your file name contains the string "23", then the program will run a three
+dimensional problem, with immersed solid of co-dimension one. If it contains
+the string "3", it will run a three dimensional problem, with immersed solid of
+co-dimension zero, otherwise it will run a two dimensional problem with
+immersed solid of co-dimension zero.
 
 Regardless of the specific parameter file name, if the specified file does not
 exist, when you execute the program you will get an exception that no such file
@@ -32,11 +33,11 @@ Aborting!
 @endcode
 
 However, as the error message already states, the code that triggers the
-exception will also generate the specified file ("parameters.prm" in this
-case) that simply contains the default values for all parameters this program
-cares about (for the correct dimension and co-dimension, according to the
-wether a string "23" or "3" is contained in the file name).
-By inspection of the default parameter file, we see the following:
+exception will also generate the specified file ("parameters.prm" in this case)
+that simply contains the default values for all parameters this program cares
+about (for the correct dimension and co-dimension, according to the wether a
+string "23" or "3" is contained in the file name). By inspection of the default
+parameter file, we see the following:
 
 @code
 # Listing of Parameters
@@ -55,12 +56,13 @@ subsection Stokes Immersed Problem
 
   # Initial mesh refinement used for the solid domain Gamma
   set Initial solid refinement              = 5
-  set Nitsche penalty term                  = 10
-  set Number of time steps                  = 11
+  set Nitsche penalty term                  = 100
+  set Number of time steps                  = 501
+  set Output directory                      = .
   set Output frequency                      = 1
 
   # Refinement of the volumetric mesh used to insert the particles
-  set Particle insertion refinement         = 1
+  set Particle insertion refinement         = 3
   set Velocity degree                       = 2
   set Viscosity                             = 1
 
@@ -70,12 +72,12 @@ subsection Stokes Immersed Problem
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    #
+    # 
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  =
+    set Function constants  = 
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -86,7 +88,7 @@ subsection Stokes Immersed Problem
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    #
+    # 
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -130,12 +132,12 @@ subsection Stokes Immersed Problem
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    #
+    # 
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  =
+    set Function constants  = 
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -146,7 +148,7 @@ subsection Stokes Immersed Problem
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    #
+    # 
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -169,9 +171,12 @@ subsection Stokes Immersed Problem
 end
 @endcode
 
-If you now run the program, you will get a file called `parameters_used.prm`,
-containing a shorter version of the above parameters (without comments and
-documentation), documenting all parameters that were used to run your program:
+If you now run the program, you will get a file called `parameters_22.prm` in
+the directory specified by the parameter `Output directory` (which defaults to
+the current directory) containing a shorter version of the above parameters
+(without comments and documentation), documenting all parameters that were used
+to run your program:
+
 @code
 subsection Stokes Immersed Problem
   set Final time                            = 1
@@ -181,13 +186,14 @@ subsection Stokes Immersed Problem
   set Initial solid refinement              = 5
   set Nitsche penalty term                  = 100
   set Number of time steps                  = 501
+  set Output directory                      = .
   set Output frequency                      = 1
   set Particle insertion refinement         = 3
   set Velocity degree                       = 2
   set Viscosity                             = 1
   subsection Angular velocity
-    set Function constants  =
-    set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
+    set Function constants  = 
+    set Function expression = t < .500001 ? 6.283185 : -6.283185
     set Variable names      = x,y,t
   end
   subsection Grid generation
@@ -208,7 +214,7 @@ subsection Stokes Immersed Problem
     set Refinement strategy            = fixed_fraction
   end
   subsection Right hand side
-    set Function constants  =
+    set Function constants  = 
     set Function expression = 0; 0; 0
     set Variable names      = x,y,t
   end
@@ -216,9 +222,11 @@ end
 @endcode
 
 The rationale behind creating first `parameters.prm` file (the first time the
-program is run) and then a `parameters_used.prm` (every other times you run the
-program), is because you may want to leave most parameters to their default
-values, and only modify a handful of them.
+program is run) and then a `output/parameters_22.prm` (every other times you
+run the program), is because you may want to leave most parameters to their
+default values, and only modify a handful of them, while still beeing able to
+reproduce the results and inspect what parameters where used for a scpeficic
+simulation.
 
 For example, you could use the following (perfectly valid) parameter file with
 this tutorial program:
@@ -231,18 +239,19 @@ subsection Stokes Immersed Problem
 end
 @endcode
 
-and you would run the program with Q3/Q2 Taylor-Hood finite elements,
-for 101 steps, using a Nistche penalty of `10`, and leaving all the other
-parameters to their default value.
+and you would run the program with Q3/Q2 Taylor-Hood finite elements, for 101
+steps, using a Nistche penalty of `10`, and leaving all the other parameters to
+their default value. You could then inspect all the other parameters in the
+produced file `parameters_22.prm`.
 
 <h3> Two dimensional test case </h3>
 
 The default problem generates a co-dimension zero impeller, consisting of a
 rotating rectangular grid, where the rotation is for half a second in one
 direction, and half a second in the opposite direction, with constant angular
-velocity equal to $\approx 2\Pi rad/s$. Consequently, the impeller does half a rotation
-and returns to it's original position. The following animation displays
-the velocity magnitude, the motion of the solid impeller and of the
+velocity equal to $\approx 2\Pi rad/s$. Consequently, the impeller does half a
+rotation and returns to it's original position. The following animation
+displays the velocity magnitude, the motion of the solid impeller and of the
 tracer particles.
 
 
@@ -330,8 +339,8 @@ simulation domain:
 </p>
 
 We see that, generally, the tracer particles have somewhat returned to their
-original position, although they have been distorted by the flow field.
-The following image compares the initial and the final position of the particles
+original position, although they have been distorted by the flow field. The
+following image compares the initial and the final position of the particles
 after 1s of flow.
 
 <p align="center">
@@ -342,13 +351,14 @@ after 1s of flow.
     </div>
 </p>
 
-In this case, we see that the tracer particles that were outside of the swept volume of the
-impeller have returned very close to their initial position, whereas those in the swept
-volume were slightly more deformed. This deformation is non-physical. It is caused by
-the numerical error induced by the explicit Euler scheme used to advect the particles,
-by the loss of accuracy due to the fictious domain and, finally, by the discretization
-error on the Stokes equations. The first two errors are the leading cause of this deformation
-and they could be alleviated by the use of a finer mesh and a lower time step.
+In this case, we see that the tracer particles that were outside of the swept
+volume of the impeller have returned very close to their initial position,
+whereas those in the swept volume were slightly more deformed. This deformation
+is non-physical. It is caused by the numerical error induced by the explicit
+Euler scheme used to advect the particles, by the loss of accuracy due to the
+fictious domain and, finally, by the discretization error on the Stokes
+equations. The first two errors are the leading cause of this deformation and
+they could be alleviated by the use of a finer mesh and a lower time step.
 
 <h3> Three dimensional test case </h3>
 
@@ -442,16 +452,16 @@ points.
 
 The structure of the code already allows one to implement a two-way coupling,
 by exploiting the possibility to read values of the fluid velocity on the
-quadrature points of the solid grid. For this to be more efficient in terms
-of MPI communication patterns, one should maintain ownership of the quadrature
-points on the solid processor that owns them. In the current code, it is
-sufficient to define the IndexSet of the vectors used to exchange information
-of the quadrature points by using the solid partition instead of the initial
-fluid partition.
+quadrature points of the solid grid. For this to be more efficient in terms of
+MPI communication patterns, one should maintain ownership of the quadrature
+points on the solid processor that owns the cells where they have been created.
+In the current code, it is sufficient to define the IndexSet of the vectors
+used to exchange information of the quadrature points by using the solid
+partition instead of the initial fluid partition.
 
-This allows the combination of the technique used in this tutorial program
-with those presented in the tutorial step-60 to solve a fluid structure
-interaction problem with distributed Lagrange multipliers, on
+This allows the combination of the technique used in this tutorial program with
+those presented in the tutorial step-60 to solve a fluid structure interaction
+problem with distributed Lagrange multipliers, on
 parallel::distributed::Triangulation objects.
 
 The timings above show that the current preconditioning strategy does not work

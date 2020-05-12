@@ -14,7 +14,7 @@
  * ---------------------------------------------------------------------
 
  *
- * Authors: Luca Heltai, Bruno Blais, 2020
+ * Authors: Luca Heltai, Bruno Blais, Rene Gassmoeller, 2020
  */
 
 // @sect3{Include files}
@@ -184,6 +184,9 @@ namespace Step70
       angular_velocity.set_time(time);
     }
 
+    // this is where we write all the output files
+    std::string output_directory = ".";
+
     // We will use a Taylor-Hood function space of arbitrary order. This
     // parameter is used to initialize the FiniteElement space with the corret
     // FESystem object
@@ -350,10 +353,10 @@ namespace Step70
   };
 
   // Similarly, we assume that the solid position can be computed explicitly at
-  // each time step, exploiting the knoweledge of the agnular velocity. We
-  // perform a one step time integration process (here using a trivial forward
-  // Euler method), so that at each time step, the solid simply displaces by
-  // `v*dt`.
+  // each time step, exploiting the knoweledge of the angular velocity. We
+  // compute the exact position of the solid particle assuming that the solid is
+  // rotated by an amount equal to the time step multiplied by the angular
+  // velocity computed at the point `p`:
   template <int spacedim>
   class SolidPosition : public Function<spacedim>
   {
@@ -365,20 +368,20 @@ namespace Step70
       , time_step(time_step)
     {
       static_assert(spacedim > 1,
-                    "Cannot instantiate SolidDisplacement for spacedim == 1");
+                    "Cannot instantiate SolidPosition for spacedim == 1");
     }
 
     virtual double value(const Point<spacedim> &p,
                          unsigned int           component = 0) const override
     {
-      Tensor<1, spacedim> displacement = p;
+      Point<spacedim> new_position = p;
 
       double dtheta = angular_velocity.value(p) * time_step;
 
-      displacement[0] = std::cos(dtheta) * p[0] - std::sin(dtheta) * p[1];
-      displacement[1] = std::sin(dtheta) * p[0] + std::cos(dtheta) * p[1];
+      new_position[0] = std::cos(dtheta) * p[0] - std::sin(dtheta) * p[1];
+      new_position[1] = std::sin(dtheta) * p[0] + std::cos(dtheta) * p[1];
 
-      return displacement[component];
+      return new_position[component];
     }
 
     void set_time_step(const double new_time_step)
@@ -722,6 +725,7 @@ namespace Step70
       }
 #else
     (void)ids_and_cad_file_names;
+    AssertThrow(false, ExcNotImplemented("Generation of the grid failed."));
 #endif
   }
 
@@ -900,7 +904,7 @@ namespace Step70
     // The Particles::ParticleHandler class has a way to transfer information
     // from a cell to its children or to its parent upon refinement, without the
     // need to reconstruct the entire data structure. This is done by
-    // "registering" two callback functions to the triangulation. These
+    // registering two callback functions to the triangulation. These
     // functions will receive a signal when refinement is about to happen, and
     // when it has just happened, and will take care of transferring all
     // information to the newly refined grid with minimal computational cost.
@@ -979,7 +983,21 @@ namespace Step70
         }
 
     // We proceed in the same way we did with the tracer particles, reusing the
-    // computed bounding boxes.
+    // computed bounding boxes. However, we first check that the
+    // global_fluid_bounding_boxes object has been actually filled. This should
+    // certainly be the case here, since this method is called after the one
+    // that initializes the tracer particles. However, we want to make sure that
+    // if in the future someone decides (for whatever reason) to initialize
+    // first the solid particle handler, or to copy just this part of the
+    // tutorial, a meaningful exception is thrown when things don't work as
+    // expected
+    AssertThrow(!global_fluid_bounding_boxes.empty(),
+                ExcInternalError(
+                  "I was expecting the "
+                  "global_fluid_bounding_boxes to be filled at this stage. "
+                  "Make sure you fill this vector before trying to use it "
+                  "here. Bailing out."));
+
     // Since we have already stored the position of the quadrature point,
     // we can use these positions to insert the particles directly using
     // the solid_particle_handler instead of having to go through a
@@ -1004,10 +1022,10 @@ namespace Step70
 
   // We set up the finite element space and the quadrature formula to be
   // used throughout the step. For the fluid, we use Taylor-Hood elements (e.g.
-  // Q2-Q1). Since we do not solve any equation on the solid domain, an empty
-  // finite element space is generated. A natural extension of this program
-  // would be to solve a fluid structure interaction problem, which would
-  // require that the solid_fe use a non-empty FiniteElement.
+  // Q(P)-Q(P-1)). Since we do not solve any equation on the solid domain, an
+  // empty finite element space is generated. A natural extension of this
+  // program would be to solve a fluid structure interaction problem, which
+  // would require that the solid_fe use a non-empty FiniteElement.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::initial_setup()
   {
@@ -1032,6 +1050,13 @@ namespace Step70
       std::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
     solid_quadrature_formula =
       std::make_unique<QGauss<dim>>(par.velocity_degree + 1);
+
+    // Save the current parameter file in the output directory, for
+    // reproducibility
+    par.prm.print_parameters(par.output_directory + "/" + "parameters_" +
+                               std::to_string(dim) + std::to_string(spacedim) +
+                               ".prm",
+                             ParameterHandler::Short);
   }
 
 
@@ -1268,7 +1293,7 @@ namespace Step70
     // of the cell in which the particle lies and then loop over all particles
     // within that cell. This enables us to skip the cells which do not contain
     // particles, yet to assemble the local matrix and rhs of each cell to apply
-    // the Nitsche restriction
+    // the Nitsche restriction.
     auto particle = solid_particle_handler.begin();
     while (particle != solid_particle_handler.end())
       {
@@ -1335,8 +1360,8 @@ namespace Step70
   }
 
 
-  // This function solves the linear system with MINRES with a block diagonal
-  // preconditioner and AMG for the two diagonal blocks as used in step-55. The
+  // This function solves the linear system with FGMRES with a block diagonal
+  // preconditioner and AMG for the two diagonal blocks. The
   // preconditioner applies a v cycle to the 0,0 block and a CG with the mass
   // matrix for the 1,1 block (the Schur complement).
   template <int dim, int spacedim>
@@ -1491,25 +1516,6 @@ namespace Step70
                              DataOut<spacedim>::type_dof_data,
                              data_component_interpretation);
 
-    LA::MPI::BlockVector interpolated;
-    interpolated.reinit(fluid_owned_dofs, MPI_COMM_WORLD);
-    VectorTools::interpolate(fluid_dh,
-                             ConstantFunction<spacedim>(1.0, spacedim + 1),
-                             interpolated);
-
-    LA::MPI::BlockVector interpolated_relevant(fluid_owned_dofs,
-                                               fluid_relevant_dofs,
-                                               MPI_COMM_WORLD);
-    interpolated_relevant = interpolated;
-    {
-      std::vector<std::string> solution_names(spacedim, "ref_u");
-      solution_names.emplace_back("ref_p");
-      data_out.add_data_vector(interpolated_relevant,
-                               solution_names,
-                               DataOut<spacedim>::type_dof_data,
-                               data_component_interpretation);
-    }
-
 
     Vector<float> subdomain(fluid_tria.n_active_cells());
     for (unsigned int i = 0; i < subdomain.size(); ++i)
@@ -1520,11 +1526,12 @@ namespace Step70
 
     const std::string filename =
       "solution-" + Utilities::int_to_string(cycle) + ".vtu";
-    data_out.write_vtu_in_parallel(filename, mpi_communicator);
+    data_out.write_vtu_in_parallel(par.output_directory + "/" + filename,
+                                   mpi_communicator);
 
     static std::vector<std::pair<double, std::string>> times_and_names;
     times_and_names.push_back(std::make_pair(time, filename));
-    std::ofstream ofile("solution.pvd");
+    std::ofstream ofile(par.output_directory + "/" + "solution.pvd");
     DataOutBase::write_pvd_record(ofile, times_and_names);
   }
 
@@ -1543,7 +1550,8 @@ namespace Step70
     particles_out.build_patches(particles);
     const std::string filename =
       (fprefix + "-" + Utilities::int_to_string(iter) + ".vtu");
-    particles_out.write_vtu_in_parallel(filename, mpi_communicator);
+    particles_out.write_vtu_in_parallel(par.output_directory + "/" + filename,
+                                        mpi_communicator);
 
 
     static std::map<std::string, std::vector<std::pair<double, std::string>>>
@@ -1552,13 +1560,13 @@ namespace Step70
       times_and_names[fprefix].push_back(std::make_pair(time, filename));
     else
       times_and_names[fprefix] = {std::make_pair(time, filename)};
-    std::ofstream ofile(fprefix + ".pvd");
+    std::ofstream ofile(par.output_directory + "/" + fprefix + ".pvd");
     DataOutBase::write_pvd_record(ofile, times_and_names[fprefix]);
   }
 
 
   // This function orchestrates the entire simulation. It is very similar
-  // to the other transient steps.
+  // to the other time dependent tutorial programs.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::run()
   {
@@ -1575,8 +1583,10 @@ namespace Step70
     ComponentMask velocity_mask(spacedim + 1, true);
     velocity_mask.set(spacedim, false);
 
-    const double time_step = par.final_time / (par.number_of_time_steps - 1);
-    double       time      = 0;
+    const double time_step    = par.final_time / (par.number_of_time_steps - 1);
+    double       time         = 0;
+    unsigned int output_cycle = 0;
+
     for (unsigned int cycle = 0; cycle < par.number_of_time_steps;
          ++cycle, time += time_step)
       {
@@ -1594,14 +1604,20 @@ namespace Step70
             setup_solid_particles();
             tracer_particle_velocities.reinit(owned_tracer_particles,
                                               mpi_communicator);
-            output_results(0, time);
+            output_results(output_cycle, time);
             {
               TimerOutput::Scope t(computing_timer, "Output tracer particles");
-              output_particles(tracer_particle_handler, "tracer", 0, time);
+              output_particles(tracer_particle_handler,
+                               "tracer",
+                               output_cycle,
+                               time);
             }
             {
               TimerOutput::Scope t(computing_timer, "Output solid particles");
-              output_particles(solid_particle_handler, "solid", 0, time);
+              output_particles(solid_particle_handler,
+                               "solid",
+                               output_cycle,
+                               time);
             }
           }
         // On the other cycle, we displace the solid body to take into account
@@ -1652,7 +1668,6 @@ namespace Step70
         // particles, the tracer particles and the fluid domain.
         if (cycle % par.output_frequency == 0)
           {
-            static unsigned int output_cycle = 0;
             output_results(output_cycle, time);
             {
               TimerOutput::Scope t(computing_timer, "Output tracer particles");
@@ -1694,6 +1709,8 @@ namespace Step70
     add_parameter("Number of time steps", number_of_time_steps);
     add_parameter("Output frequency", output_frequency);
 
+    add_parameter("Output directory", output_directory);
+
     add_parameter("Final time", final_time);
 
     add_parameter("Viscosity", viscosity);
@@ -1724,8 +1741,8 @@ namespace Step70
       "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
 
     // Next section is dedicated to the parameters used to create the
-    // various grids. We will need three different triangulations: `Fluid grid`
-    // is used to define the fluid domain, `Solid grid` defines the
+    // various grids. We will need three different triangulations: `Fluid
+    // grid` is used to define the fluid domain, `Solid grid` defines the
     // solid domain, and `Particle grid` is used to distribute some tracer
     // particles, that are advected with the velocity and only used as
     // passive tracers.
@@ -1780,16 +1797,15 @@ namespace Step70
 } // namespace Step70
 
 
-// The remainder of the code, the main function, is standard, with the exception
-// of the handling of input parameter files.
-// We allow the user to specify an optional parameter file as an argument to the
-// program. If nothing is specified, we use the default file "parameters.prm",
-// which is created if non existent.
-// The file name is scanned for the the string "23" first, and "3" afterwards.
-// If the filename contains the string "23", a the problem classes are
-// instantiated with template arguments 2 and 3 respectively. If only the string
-// "3" is found, then both template arguments are set to 3, otherwise both are
-// set to 2.
+// The remainder of the code, the main function, is standard, with the
+// exception of the handling of input parameter files. We allow the user to
+// specify an optional parameter file as an argument to the program. If
+// nothing is specified, we use the default file "parameters.prm", which is
+// created if non existent. The file name is scanned for the the string "23"
+// first, and "3" afterwards. If the filename contains the string "23", a the
+// problem classes are instantiated with template arguments 2 and 3
+// respectively. If only the string "3" is found, then both template arguments
+// are set to 3, otherwise both are set to 2.
 int main(int argc, char *argv[])
 {
   using namespace Step70;
@@ -1802,23 +1818,16 @@ int main(int argc, char *argv[])
       // Interpret the
       std::string prm_file;
       if (argc > 1)
-        {
-          prm_file = argv[1];
-        }
+        prm_file = argv[1];
       else
-        {
-          prm_file = "parameters.prm";
-        }
-
-      std::string used_prm_file = prm_file;
-      used_prm_file.insert(used_prm_file.find_last_of("."), "_used");
+        prm_file = "parameters.prm";
 
       // deduce the dimension of the problem from the name of the
       // parameter file specified at the command line
       if (prm_file.find("23") != std::string::npos)
         {
           StokesImmersedProblemParameters<2, 3> par;
-          ParameterAcceptor::initialize(prm_file, used_prm_file);
+          ParameterAcceptor::initialize(prm_file);
 
           StokesImmersedProblem<2, 3> problem(par);
           problem.run();
@@ -1826,7 +1835,7 @@ int main(int argc, char *argv[])
       else if (prm_file.find("3") != std::string::npos)
         {
           StokesImmersedProblemParameters<3> par;
-          ParameterAcceptor::initialize(prm_file, used_prm_file);
+          ParameterAcceptor::initialize(prm_file);
 
           StokesImmersedProblem<3> problem(par);
           problem.run();
@@ -1834,7 +1843,7 @@ int main(int argc, char *argv[])
       else
         {
           StokesImmersedProblemParameters<2> par;
-          ParameterAcceptor::initialize(prm_file, used_prm_file);
+          ParameterAcceptor::initialize(prm_file);
 
           StokesImmersedProblem<2> problem(par);
           problem.run();
