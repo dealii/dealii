@@ -1094,14 +1094,32 @@ namespace GridGenerator
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3d, only certain numbers are allowed, 6 (or the default 0) for a
-   * surface based on a hexahedron (i.e. 6 panels on the inner sphere extruded
-   * in radial direction to form 6 cells), 12 for the rhombic dodecahedron,
-   * and 96. This choice dates from an older version of deal.II before the
-   * Manifold classes were implemented: today all three choices are roughly
-   * equivalent (after performing global refinement, of course).
+   * In 3d, only certain numbers are allowed:
+   * <ul>
+   * <li> 6 (or the default 0) for a surface based on a hexahedron (i.e. 6
+   *      panels on the inner sphere extruded in radial direction to form 6
+   *      cells),
+   * <li> 12 for the rhombic dodecahedron,
+   * <li> 24 for the hexahedron-based surface refined once in the azimuthal
+   *      directions but not in the radial direction,
+   * <li> 48 for the rhombic dodecahedron refined once in the azimuthal
+   *      directions but not in the radial direction,
+   * <li> 96 for the rhombic dodecahedron refined once. This choice dates from
+   *      an older version of deal.II before the Manifold classes were
+   *      implemented: today this choce is equivalent to the rhombic
+   *      dodecahedron after performing one global refinement.
+   * <li> Numbers of the kind $192\times 2^m$ with $m\geq 0$ integer. This
+   *      choice is similar to the 24 and 48 cell cases, but provides
+   *      additional refinements in azimuthal direction combined with a single
+   *      layer in radial direction. The base mesh is either the 6 or 12 cell
+   *      version, depending on whether $m$ in the power is odd or even,
+   *      respectively.
+   * </ul>
+   * The versions with 24, 48, and $2^m 192$ cells are useful if the shell is
+   * thin and the radial lengths should be made more similar to the
+   * circumferential lengths.
    *
-   * The grids with 12 and 96 cells are plotted below:
+   * The 3d grids with 12 and 96 cells are plotted below:
    *
    * @image html hypershell3d-12.png
    * @image html hypershell3d-96.png

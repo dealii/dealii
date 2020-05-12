@@ -5437,7 +5437,22 @@ namespace GridGenerator
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
 
-    const unsigned int n = (n_cells == 0) ? 6 : n_cells;
+    unsigned int n_refinement_steps = 0;
+    unsigned int n_cells_coarsened  = n_cells;
+    if (n_cells != 96 && n_cells > 12)
+      while (n_cells_coarsened > 12 && n_cells_coarsened % 4 == 0)
+        {
+          ++n_refinement_steps;
+          n_cells_coarsened /= 4;
+        }
+    Assert(n_cells == 0 || n_cells == 6 || n_cells == 12 || n_cells == 96 ||
+             (n_refinement_steps > 0 &&
+              (n_cells_coarsened == 6 || n_cells_coarsened == 12)),
+           ExcMessage("Invalid number of coarse mesh cells"));
+
+    const unsigned int n = n_refinement_steps > 0 ?
+                             4 * n_cells_coarsened :
+                             ((n_cells == 0) ? 6 : n_cells);
 
     const double             irad = inner_radius / std::sqrt(3.0);
     const double             orad = outer_radius / std::sqrt(3.0);
@@ -5454,112 +5469,168 @@ namespace GridGenerator
                                                         {-1, +1, +1}, //
                                                         {+1, +1, +1}}};
 
-    // Start with the shell bounded by
-    // two nested cubes
-    if (n == 6)
+    switch (n)
       {
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * irad);
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * orad);
-
-        const unsigned int n_cells                   = 6;
-        const int          cell_vertices[n_cells][8] = {
-          {8, 9, 10, 11, 0, 1, 2, 3},    // bottom
-          {9, 11, 1, 3, 13, 15, 5, 7},   // right
-          {12, 13, 4, 5, 14, 15, 6, 7},  // top
-          {8, 0, 10, 2, 12, 4, 14, 6},   // left
-          {8, 9, 0, 1, 12, 13, 4, 5},    // front
-          {10, 2, 11, 3, 14, 6, 15, 7}}; // back
-
-        cells.resize(n_cells, CellData<3>());
-
-        for (unsigned int i = 0; i < n_cells; ++i)
+        case 6:
           {
-            for (const unsigned int j : GeometryInfo<3>::vertex_indices())
-              cells[i].vertices[j] = cell_vertices[i][j];
-            cells[i].material_id = 0;
-          }
+            // Start with the shell bounded by two nested cubes
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * irad);
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * orad);
 
-        tria.create_triangulation(vertices, cells, SubCellData());
-      }
-    // A more regular subdivision can
-    // be obtained by two nested
-    // rhombic dodecahedra
+            const unsigned int n_cells                   = 6;
+            const int          cell_vertices[n_cells][8] = {
+              {8, 9, 10, 11, 0, 1, 2, 3},    // bottom
+              {9, 11, 1, 3, 13, 15, 5, 7},   // right
+              {12, 13, 4, 5, 14, 15, 6, 7},  // top
+              {8, 0, 10, 2, 12, 4, 14, 6},   // left
+              {8, 9, 0, 1, 12, 13, 4, 5},    // front
+              {10, 2, 11, 3, 14, 6, 15, 7}}; // back
 
-    else if (n == 12)
-      {
-        // Octahedron inscribed in the cube [-1,1]^3
-        static const std::array<Point<3>, 6> octahedron = {{{-1, 0, 0}, //
-                                                            {1, 0, 0},  //
-                                                            {0, -1, 0}, //
-                                                            {0, 1, 0},  //
-                                                            {0, 0, -1}, //
-                                                            {0, 0, 1}}};
+            cells.resize(n_cells, CellData<3>());
 
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * irad);
-        for (unsigned int i = 0; i < 6; ++i)
-          vertices.push_back(p + octahedron[i] * inner_radius);
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * orad);
-        for (unsigned int i = 0; i < 6; ++i)
-          vertices.push_back(p + octahedron[i] * outer_radius);
-
-        const unsigned int n_cells            = 12;
-        const unsigned int rhombi[n_cells][4] = {{10, 4, 0, 8},
-                                                 {4, 13, 8, 6},
-                                                 {10, 5, 4, 13},
-                                                 {1, 9, 10, 5},
-                                                 {9, 7, 5, 13},
-                                                 {7, 11, 13, 6},
-                                                 {9, 3, 7, 11},
-                                                 {1, 12, 9, 3},
-                                                 {12, 2, 3, 11},
-                                                 {2, 8, 11, 6},
-                                                 {12, 0, 2, 8},
-                                                 {1, 10, 12, 0}};
-
-        cells.resize(n_cells, CellData<3>());
-
-        for (unsigned int i = 0; i < n_cells; ++i)
-          {
-            for (unsigned int j = 0; j < 4; ++j)
+            for (unsigned int i = 0; i < n_cells; ++i)
               {
-                cells[i].vertices[j]     = rhombi[i][j];
-                cells[i].vertices[j + 4] = rhombi[i][j] + 14;
+                for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+                  cells[i].vertices[j] = cell_vertices[i][j];
+                cells[i].material_id = 0;
               }
-            cells[i].material_id = 0;
+
+            tria.create_triangulation(vertices, cells, SubCellData());
+            break;
           }
-
-        tria.create_triangulation(vertices, cells, SubCellData());
-      }
-    else if (n == 96)
-      {
-        // create a triangulation based on the 12-cell version. This function
-        // was needed before SphericalManifold was written: it manually
-        // adjusted the interior vertices to lie along concentric
-        // spheres. Nowadays we can just refine globally:
-        Triangulation<3> tmp;
-        hyper_shell(tmp, p, inner_radius, outer_radius, 12);
-        tmp.refine_global(1);
-
-        // now copy the resulting level 1 cells into the new triangulation,
-        cells.resize(tmp.n_active_cells(), CellData<3>());
-        for (const auto &cell : tmp.active_cell_iterators())
+        case 12:
           {
-            const unsigned int cell_index = cell->active_cell_index();
-            for (const unsigned int v : GeometryInfo<3>::vertex_indices())
-              cells[cell_index].vertices[v] = cell->vertex_index(v);
-            cells[cell_index].material_id = 0;
-          }
+            // A more regular subdivision can be obtained by two nested rhombic
+            // dodecahedra
+            //
+            // Octahedron inscribed in the cube [-1,1]^3
+            static const std::array<Point<3>, 6> octahedron = {{{-1, 0, 0}, //
+                                                                {1, 0, 0},  //
+                                                                {0, -1, 0}, //
+                                                                {0, 1, 0},  //
+                                                                {0, 0, -1}, //
+                                                                {0, 0, 1}}};
 
-        tria.create_triangulation(tmp.get_vertices(), cells, SubCellData());
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * irad);
+            for (unsigned int i = 0; i < 6; ++i)
+              vertices.push_back(p + octahedron[i] * inner_radius);
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * orad);
+            for (unsigned int i = 0; i < 6; ++i)
+              vertices.push_back(p + octahedron[i] * outer_radius);
+
+            const unsigned int n_cells            = 12;
+            const unsigned int rhombi[n_cells][4] = {{10, 4, 0, 8},
+                                                     {4, 13, 8, 6},
+                                                     {10, 5, 4, 13},
+                                                     {1, 9, 10, 5},
+                                                     {9, 7, 5, 13},
+                                                     {7, 11, 13, 6},
+                                                     {9, 3, 7, 11},
+                                                     {1, 12, 9, 3},
+                                                     {12, 2, 3, 11},
+                                                     {2, 8, 11, 6},
+                                                     {12, 0, 2, 8},
+                                                     {1, 10, 12, 0}};
+
+            cells.resize(n_cells, CellData<3>());
+
+            for (unsigned int i = 0; i < n_cells; ++i)
+              {
+                for (unsigned int j = 0; j < 4; ++j)
+                  {
+                    cells[i].vertices[j]     = rhombi[i][j];
+                    cells[i].vertices[j + 4] = rhombi[i][j] + 14;
+                  }
+                cells[i].material_id = 0;
+              }
+
+            tria.create_triangulation(vertices, cells, SubCellData());
+            break;
+          }
+        case 24:
+        case 48:
+          {
+            // These two meshes are created by first creating a mesh of the
+            // 6-cell/12-cell version, refining globally, and removing the
+            // outer half of the cells. For 192 and more cells, we do this
+            // iteratively several times, always refining and removing the
+            // outer half. Thus, the outer radius for the start is larger and
+            // set as 2^n_refinement_steps such that it exactly gives the
+            // desired radius in the end. It would have been slightly less
+            // code to treat refinement steps recursively for 192 cells or
+            // beyond, but unfortunately we could end up with the 96 cell case
+            // which is not what we want. Thus, we need to implement a loop
+            // manually here.
+            Triangulation<3>   tmp;
+            const unsigned int outer_radius_factor = 1 << n_refinement_steps;
+            hyper_shell(tmp,
+                        p,
+                        inner_radius,
+                        outer_radius_factor * outer_radius -
+                          (outer_radius_factor - 1) * inner_radius,
+                        n / 4);
+            for (unsigned int r = 0; r < n_refinement_steps; ++r)
+              {
+                tmp.refine_global(1);
+                std::set<Triangulation<3>::active_cell_iterator>
+                  cells_to_remove;
+
+                // We remove all cells which do not have exactly four vertices
+                // at the inner radius (plus some tolerance).
+                for (const auto &cell : tmp.active_cell_iterators())
+                  {
+                    unsigned int n_vertices_inside = 0;
+                    for (const auto v : GeometryInfo<3>::vertex_indices())
+                      if ((cell->vertex(v) - p).norm_square() <
+                          inner_radius * inner_radius * (1 + 1e-12))
+                        ++n_vertices_inside;
+                    if (n_vertices_inside < 4)
+                      cells_to_remove.insert(cell);
+                  }
+
+                AssertDimension(cells_to_remove.size(),
+                                tmp.n_active_cells() / 2);
+                if (r == n_refinement_steps - 1)
+                  create_triangulation_with_removed_cells(tmp,
+                                                          cells_to_remove,
+                                                          tria);
+                else
+                  {
+                    Triangulation<3> copy;
+                    create_triangulation_with_removed_cells(tmp,
+                                                            cells_to_remove,
+                                                            copy);
+                    tmp = std::move(copy);
+                    tmp.set_all_manifold_ids(0);
+                    tmp.set_manifold(0, SphericalManifold<3>(p));
+                  }
+              }
+            break;
+          }
+        case 96:
+          {
+            // create a triangulation based on the 12-cell version. This
+            // function was needed before SphericalManifold was written: it
+            // manually adjusted the interior vertices to lie along concentric
+            // spheres. Nowadays we can just refine globally:
+            Triangulation<3> tmp;
+            hyper_shell(tmp, p, inner_radius, outer_radius, 12);
+            tmp.refine_global(1);
+            flatten_triangulation(tmp, tria);
+            break;
+          }
+        default:
+          {
+            Assert(false, ExcMessage("Invalid number of coarse mesh cells."));
+          }
       }
-    else
-      {
-        Assert(false, ExcMessage("Invalid number of coarse mesh cells."));
-      }
+
+    if (n_cells > 0)
+      AssertDimension(tria.n_global_active_cells(), n_cells);
 
     if (colorize)
       colorize_hyper_shell(tria, p, inner_radius, outer_radius);

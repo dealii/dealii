@@ -1,0 +1,9 @@
+Improved: GridGenerator::hyper_shell() in 3d now supports more `n_cells`
+options. While previously only 6, 12, or 96 cells were possible, the function
+now supports any number of the kind $6 \times 2^m$ with $m$ a non-negative
+integer. The new cases $m=2,3$ and $m\geq 5$ correspond to refinement in the
+azimuthal direction of the 6 or 12 cell case with a single mesh layer in
+radial direction, and are intended for shells that are thin and should be
+given more resolution in azimuthal direction.
+<br>
+(Martin Kronbichler, 2020/04/07)
