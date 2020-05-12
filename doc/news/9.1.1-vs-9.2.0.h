@@ -2420,7 +2420,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: All member funtions and free functions related to Tensor
+  Improved: All member functions and free functions related to Tensor
   that can be used in CUDA code so far have been annotated accordingly.
   <br>
   (Daniel Arndt, 2019/07/03)
