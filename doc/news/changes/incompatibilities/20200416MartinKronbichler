@@ -1,5 +1,0 @@
-Changed: The header file `deal.II/fe/fe_q.h` is not included implicitly via
-`deal.II/fe/mapping_q_generic.h` any more. Add the header
-`deal.II/fe/fe_q.h` if necessary.
-<br>
-(Martin Kronbichler, 2020/04/16)

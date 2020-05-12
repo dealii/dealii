@@ -1,4 +1,0 @@
-Fixed: CUDAWrappers::MatrixFree::cell_loop() would deadlock on adaptively
-refined meshes when using Volta GPU.
-<br>
-(Bruno Turcksin, 2019/07/02)

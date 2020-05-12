@@ -1,4 +1,0 @@
-Changed: The variable level_mg_handler has been renamed
-to mg_level in MatrixFree and its associated AdditionalData.
-<br>
-(Peter Munch, 2019/10/17)

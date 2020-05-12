@@ -1,5 +1,0 @@
-New: There is a new function GridGenerator::hyper_ball_balanced() which uses a
-more refined mesh of 12 cells in 2D and 32 in 3D to create a disk in 2D and
-ball in 3D, producing better mesh quality than the default
-GridGenerator::hyper_ball().
-<br> (Martin Kronbichler, 2020/04/02)

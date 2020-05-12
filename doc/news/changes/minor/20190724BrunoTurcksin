@@ -1,5 +1,0 @@
-New: The function LinearAlgebra::distributed::Vector::import() allows to
-copy the data from a LinearAlgebra::distributed::Vector of a given MemorySpace
-to another LinearAlgebra::distributed::Vector of a different MemorySpace.
-<br>
-(Bruno Turcksin, 2019/07/24)

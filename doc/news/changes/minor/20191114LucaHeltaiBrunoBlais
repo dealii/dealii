@@ -1,4 +1,0 @@
-New: DoFTools::locally_owned_dofs_per_component() returns a vector of IndexSet, containing the locally owned
-dofs that refers to the ComponentMask passed as an argument.
-<br>
-(Bruno Blais, Luca Heltai, 2019/11/26)

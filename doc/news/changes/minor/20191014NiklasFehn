@@ -1,6 +1,0 @@
-New: The function DataOutInterface::write_vtu_with_pvtu_record() combines
-write_vtu() and write_pvtu_record() into a single function and generates 
-the file extensions with counter, processor ID, and .vtu/.pvtu ending 
-automatically.
-<br>
-(Niklas Fehn, 2019/10/14)

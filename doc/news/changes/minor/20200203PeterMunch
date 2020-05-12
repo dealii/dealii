@@ -1,4 +1,0 @@
-New: The function Utilities::MPI::min_max_avg() can now compute the sum, average, minimum, maximum, and the 
-process id of the minimum and maximum for each entry of a ArrayView.
-<br>
-(Peter Munch, 2020/02/03)

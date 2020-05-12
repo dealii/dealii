@@ -1,3 +1,0 @@
-Fixed: Add missing fields to MatrixFree::copy_from.
-<br>
-(Daniel Jodlbauer, 2020/03/16)

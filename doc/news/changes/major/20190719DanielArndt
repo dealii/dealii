@@ -1,4 +1,0 @@
-Improved: deal.II now bundles a subset of Boost 1.70 instead of a subset
-of Boost 1.62.
-<br>
-(Daniel Arndt, 2019/07/19)

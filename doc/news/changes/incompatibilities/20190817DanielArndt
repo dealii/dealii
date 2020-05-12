@@ -1,4 +1,0 @@
-Replaced: boost::optional was replaced by std_cxx17::optional that wraps the
-former and std::optional depending on compiler support for C++17.
-<br>
-(Daniel Arndt, 2019/08/17)

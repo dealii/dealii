@@ -1,3 +1,0 @@
-Improved: ParticleHandler to have a GridTools::Cache to ensure better efficiency
-<br>
-(Bruno Blais, 2020/03/12)

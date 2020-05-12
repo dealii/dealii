@@ -1,4 +1,0 @@
-New: The definition of CellID has been modified so that it depends on the 
-unique coarse-cell id and no longer on the coarse-cell index.
-<br>
-(Peter Munch, 2019/08/13)

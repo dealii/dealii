@@ -1,5 +1,0 @@
-New: GeometryInfo<dim> now holds an array
-GeometryInfo<dim>::unit_tangential_vectors with the tangential vectors on the
-reference cell.
-<br>
-(Martin Kronbichler, 2020/02/28)

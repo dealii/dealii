@@ -1,4 +1,0 @@
-New: An IndexSet::split_by_block() function is added which partitions the set
-indices, for example based on a block structure, into blocks.
-<br>
-(Katrin Mang, 2020/02/14)

@@ -1,8 +1,0 @@
-Removed: The deprecated functions Utilities::fixed_int_power(),
-LinearAlgebra::distributed::BlockVector::equ(),
-LinearAlgebra::distributed::BlockVector::sadd()
-and FEEvaluationBase::get_cell_data_number() and the deprecated variable
-DoFHandler::invalid_dof_index and hp::DoFHandler::invalid_dof_index have been
-removed.
-<br>
-(Daniel Arndt, 2020/04/08)

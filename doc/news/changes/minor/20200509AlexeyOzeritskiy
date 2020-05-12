@@ -1,3 +1,0 @@
-Fixed: Fix a bug in tutorial step-35, which caused incorrect initial condition initialization. This bug could lead to incorrect results if the user decided to edit the equation data.
-<br>
-(Alexey Ozeritskiy, 2020/05/09)

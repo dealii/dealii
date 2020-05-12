@@ -1,7 +1,0 @@
-Fixed: Fixed two functions in GridTools::Cache class, namely
-GridTools::Cache::get_used_vertices_rtree() and
-GridTools::Cache::get_cell_bounding_boxes_rtree() where the update flags were
-not cleared. Fixed that by adding a line to both functions at the end of the if
-clause checking the flag.
-<br>
-(Manu Jayadharan, 2019/08/08)

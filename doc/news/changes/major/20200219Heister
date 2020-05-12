@@ -1,6 +1,0 @@
-Fixed: Large computations with more than 4 Billion cells or DoFs
-would run into issues in various situations. Bugs in BlockVector,
-Triangulation, Multigrid, GridRefinement, and other places are
-now fixed.
-<br>
-(Thomas Clevenger, Timo Heister, Martin Kronbichler, Peter Munch, 2020/02/19)

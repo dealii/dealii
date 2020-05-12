@@ -1,6 +1,0 @@
-Improved: The gzip compression previously applied by
-GridTools::exchange_cell_data_to_ghosts() has been disabled because network
-throughput is typically higher than the rate by which gzip is able to
-compress. This speeds up DoFHandler::distribute_dofs(), among others.
-<br>
-(Martin Kronbichler, 2019/09/16)

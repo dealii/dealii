@@ -1,5 +1,0 @@
-Fixed: PreconditionChebyshev can be used with LinearAlgebra::distributed::Vector
-with MemorySpace::CUDA. In particular, PreconditionChebyshev can set constrained
-indices to zero in the initial guess.
-<br>
-(Daniel Arndt, 2019/09/03)

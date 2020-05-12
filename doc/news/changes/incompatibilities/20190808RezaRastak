@@ -1,5 +1,0 @@
-Improved: CellDataStorage stores a reference to a single unique triangulation
-to ensure that cells from other triangulations cannot store any data on the
-current object.
-<br>
-(Reza Rastak, 2019/08/08)

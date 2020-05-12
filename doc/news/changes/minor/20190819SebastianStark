@@ -1,3 +1,0 @@
-Fixed: Make sure that begin() and end() of PETScWrappers::MatrixBase can only be called on a processor owning all rows of the matrix. Also fix a bug which caused begin() to fail when the first row(s) of the matrix is(are) empty.
-<br>
-(Sebastian Stark, 2019/08/19)

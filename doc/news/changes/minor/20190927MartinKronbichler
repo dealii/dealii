@@ -1,6 +1,0 @@
-Improved: CUDAWrappers::MatrixFree::cell_loop() can now detect whether the
-given vectors have the same parallel MPI partitioner as the matrix-free
-class, which circumvents vector copies and speeds up execution. This
-approach has also been applied to step-64.
-<br>
-(Martin Kronbichler, Peter Munch, 2019/09/27)

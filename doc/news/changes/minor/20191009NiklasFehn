@@ -1,4 +1,0 @@
-New: The function GridTools::compute_maximum_aspect_ratio() computes the
-maximum aspect ratio of a mesh with arbitrarily deformed elements.
-<br>
-(Niklas Fehn, 2019/10/08)

@@ -1,4 +1,0 @@
-Removed: The deprecated functions numbers::is_nan() and
-SLEPcWrappers::SolverBase::set_initial_vector() have been removed.
-<br>
-(Daniel Arndt, 2020/04/24)

@@ -1,5 +1,0 @@
-New: new function Utilities::truncate_to_n_digits() that can be used to
-cutoff floating point numbers after a specified number of digits of
-accuracy (decimal places) in scientific floating point notation.
-<br>
-(Niklas Fehn, 2019/10/18)

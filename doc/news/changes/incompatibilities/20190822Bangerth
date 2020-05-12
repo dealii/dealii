@@ -1,7 +1,0 @@
-Changed: A number of classes implementing tensor-valued polynomials
-had a member function called `compute_n_pols()`. This name has now
-been changed to `n_polynomials()`, better reflecting our usual naming
-scheme as well as what the function does -- which in many cases is not
-actually computing but just returning something.
-<br>
-(Wolfgang Bangerth, 2019/08/2)

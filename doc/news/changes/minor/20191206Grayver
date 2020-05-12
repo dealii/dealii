@@ -1,5 +1,0 @@
-Added: Python wrappers for the CellAccessor::center, GridTools::transform,
-GridTools::distort_random, GridGenerator::extrude_triangulation, 
-GridTools::find_active_cell_around_point
-<br>
-(Alexander Grayver, 2019/12/06)

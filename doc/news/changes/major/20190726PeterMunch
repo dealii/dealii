@@ -1,5 +1,0 @@
-New: Introduce a new distributed triangulation class parallel::fullydistributed::Triangulation. 
-It partitions the coarse-grid as well as works for hanging nodes, geometric multigrid, and 
-arbitrary dimensions.
-<br>
-(Peter Munch, 2019/07/26)

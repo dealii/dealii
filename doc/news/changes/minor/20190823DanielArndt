@@ -1,4 +1,0 @@
-New: There is a new constructor for DiagonalMatrix that immediately initializes
-the underlying vector.
-<br>
-(Daniel Arndt, 2019/08/23)

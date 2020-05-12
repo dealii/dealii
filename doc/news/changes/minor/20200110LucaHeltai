@@ -1,4 +1,0 @@
-New: ParticleHandler::get_particle_positions() and ParticleHandler::set_particle_positions() allow
-to set and get particle positions from various types of sources.
-<br>
-(Bruno Blais, Luca Heltai, 2020/01/10)

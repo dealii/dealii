@@ -1,6 +1,0 @@
-New: Add Utilities::create_evenly_distributed_partitioning(my_partition_id, n_partitions, total_size)
-to create a one-to-one evenly distributed ascending partitioning from total size.
-Add Utilities::MPI::create_evenly_distributed_partitioning(comm, total_size) to use processor ID and 
-number of MPI processes to determine partitioning.
-<br>
-(Doug Shi-Dong, 2020/04/29)

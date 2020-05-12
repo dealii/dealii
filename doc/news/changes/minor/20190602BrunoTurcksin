@@ -1,5 +1,0 @@
-New: Add functions SparseMatrix::print_as_numpy_arrays() and
-LinearAlgebra::Vector::print_as_numpy_array() to output the 
-object in a format readable with numpy.loadtxt.
-<br>
-(Bruno Turcksin, 2019/06/02)

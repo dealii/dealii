@@ -1,4 +1,0 @@
-New: ParticleHandler::locally_relevant_ids() generates an IndexSet of the locally owned 
-particles. This can be used to construct linear algebra vectors to be used with particles.
-<br>
-(Luca Heltai, Bruno Blais, 2019/11/18)

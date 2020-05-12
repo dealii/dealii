@@ -1,6 +1,0 @@
-New: There is now a new type types::global_cell_index that is used to
-denote the global index of a cell in a parallel triangulation, and
-consequently also places where we compute or return the *total* number
-of cells.
-<br>
-(Wolfgang Bangerth, 2020/03/01)

@@ -1,3 +1,0 @@
-Fixed: DataOut::write_vtu_in_parallel() used to generate invalid .vtu files if
-some processors had 0 patches to write. This is now fixed.
-<br> (Timo Heister, 2020/01/12)

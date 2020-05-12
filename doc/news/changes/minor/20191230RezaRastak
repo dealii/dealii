@@ -1,4 +1,0 @@
-Improved: mu_parser functions now use random number generation facilities
-provided by the standard library.
-<br>
-(Reza Rastak, 2019/20/30)

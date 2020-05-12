@@ -1,4 +1,0 @@
-New: Provide a list of all possible VectorizedArray<Number, width> instances for a given
-hardware and optimization level. The list can be used during template instantiation.
-<br>
-(Peter Munch, 2019/07/13)

@@ -1,9 +1,0 @@
-Bugfix: For parallel::distributed::Triangulation objects, p4est determines
-which cells will be refined and coarsened. Thus, refinement flags are not
-a good measure to predict refinement behavior for transferring active finite
-element indices. We now provide a matching coarsening strategy to the
-parallel::distributed::CellDataTransfer object responsible for their transfer.
-This fixes assertions being triggered in
-parallel::distributed::SolutionTransfer::interpolate().
-<br>
-(Marc Fehling, 2019/08/27)
