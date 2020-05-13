@@ -183,7 +183,7 @@ public:
   // need a function that creates a Table of coefficient values for a
   // set of cells provided by the MatrixFree operator argument here.
   template <typename number>
-  std::shared_ptr<Table<2, VectorizedArray<number>>> create_coefficient_table(
+  std::shared_ptr<Table<2, VectorizedArray<number>>> make_coefficient_table(
     const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const;
 };
 
@@ -242,7 +242,7 @@ number Coefficient<dim>::average_value(
 template <int dim>
 template <typename number>
 std::shared_ptr<Table<2, VectorizedArray<number>>>
-Coefficient<dim>::create_coefficient_table(
+Coefficient<dim>::make_coefficient_table(
   const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const
 {
   std::shared_ptr<Table<2, VectorizedArray<number>>> coefficient_table =
@@ -516,7 +516,7 @@ void LaplaceProblem<dim, degree>::setup_system()
 
           const Coefficient<dim> coefficient;
           mf_system_matrix.set_coefficient(
-            coefficient.create_coefficient_table(*mf_storage));
+            coefficient.make_coefficient_table(*mf_storage));
 
           break;
         }
@@ -620,7 +620,7 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
 
               const Coefficient<dim> coefficient;
               mf_mg_matrix[level].set_coefficient(
-                coefficient.create_coefficient_table(*mf_storage_level));
+                coefficient.make_coefficient_table(*mf_storage_level));
 
               mf_mg_matrix[level].compute_diagonal();
             }
