@@ -313,11 +313,11 @@ bool Settings::try_parse(const std::string &prm_filename)
                     "1",
                     Patterns::Integer(1),
                     "Number of smoother steps.");
-  prm.declare_entry(
-    "solver",
-    "MF",
-    Patterns::Selection("MF|MB|AMG"),
-    "Switch between matrix-free GMG,  matrix-based GMG, and AMG.");
+  prm.declare_entry("solver",
+                    "MF",
+                    Patterns::Selection("MF|MB|AMG"),
+                    "Switch between matrix-free GMG, "
+                    "matrix-based GMG, and AMG.");
   prm.declare_entry("output",
                     "false",
                     Patterns::Bool(),
