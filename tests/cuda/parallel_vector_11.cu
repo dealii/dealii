@@ -131,7 +131,8 @@ test()
 
   if (myid == 0)
     deallog << "Check sadd (factor, factor, vector, factor, vector): ";
-  y.sadd(2., 3., v, 2., w);
+  y.sadd(2., 3., v);
+  y.add(2., w);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     {
@@ -144,7 +145,8 @@ test()
   if (myid == 0)
     deallog
       << "Check sadd (factor, factor, vector, factor, vector, factor, vector): ";
-  y.sadd(-1., 1., v, 2., w);
+  y.sadd(-1., 1., v);
+  y.add(2., w);
   y.add(2., x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
@@ -202,7 +204,8 @@ test()
 
   if (myid == 0)
     deallog << "Check equ (factor, vector, factor, vector): ";
-  y.equ(10., v, -2., w);
+  y.equ(10., v);
+  y.add(-2., w);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) - 2000,
@@ -212,7 +215,8 @@ test()
 
   if (myid == 0)
     deallog << "Check equ (factor, vector, factor, vector, factor, vector): ";
-  y.equ(10., v, -2., w);
+  y.equ(10., v);
+  y.add(-2., w);
   y.add(3., x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
