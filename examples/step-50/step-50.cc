@@ -1388,9 +1388,9 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
   data_out.add_data_vector(level, "level");
 
   if (estimate_vector.size() > 0)
-    data_out.add_data_vector(estimate_vector, "estimator");
+    data_out.add_data_vector(estimate_vector, "error_estimator");
 
-  data_out.build_patches(0);
+  data_out.build_patches();
 
   const std::string master = data_out.write_vtu_with_pvtu_record(
     "", "solution", cycle, mpi_communicator, 2 /*n_digits*/, 1 /*n_groups*/);
@@ -1414,6 +1414,7 @@ void LaplaceProblem<dim, degree>::run()
 
       pcout << "   Number of active cells:       "
             << triangulation.n_global_active_cells();
+
       // We only output level cell data for the GMG methods (same with DoF
       // data below). Note that the partition efficiency is irrelevant for AMG
       // since the level hierarchy is not distributed or used during the
