@@ -52,8 +52,8 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-// Comment the following \#define if you have PETSc and Trilinos installed and
-// you prefer using PETSc in this example:
+// Comment the following `\#define` in or out if you have PETSc and
+// Trilinos installed and you prefer using PETSc in this example:
 #define FORCE_USE_OF_TRILINOS
 
 namespace LA
@@ -116,6 +116,8 @@ namespace ChangeVectorTypes
 #endif
   }
 
+
+
   template <typename number>
   void copy(dealii::LinearAlgebra::distributed::Vector<number> &out,
             const LA::MPI::Vector &                             in)
@@ -134,7 +136,8 @@ namespace ChangeVectorTypes
 } // namespace ChangeVectorTypes
 
 
-// We set the right-hand side to 1.0. The @p value function returning a
+// Let's move on to the description of the problem we want to solve.
+// We set the right-hand side function to 1.0. The @p value function returning a
 // VectorizedArray is used by the matrix-free code path.
 template <int dim>
 class RightHandSide : public Function<dim>
@@ -146,6 +149,7 @@ public:
     return 1.0;
   }
 
+
   template <typename number>
   VectorizedArray<number>
   value(const Point<dim, VectorizedArray<number>> & /*p*/,
@@ -155,7 +159,8 @@ public:
   }
 };
 
-// This class represents the diffusion coefficient. We use a variable
+
+// This next class represents the diffusion coefficient. We use a variable
 // coefficient which is 100.0 at any point where at least one coordinate is
 // less than -0.5, and 1.0 at all other points. As above, a separate value()
 // returning a VectorizedArray is used for the matrix-free code. An @p
@@ -174,12 +179,14 @@ public:
   template <typename number>
   number average_value(const std::vector<Point<dim, number>> &points) const;
 
-  // This function creates a Table of coefficient values per cell of the
-  // MatrixFree operator provided.
+  // When using a coefficient in the MatrixFree framework, we also
+  // need a function that creates a Table of coefficient values for a
+  // set of cells provided by the MatrixFree operator argument here.
   template <typename number>
   std::shared_ptr<Table<2, VectorizedArray<number>>> create_coefficient_table(
     const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const;
 };
+
 
 
 template <int dim>
@@ -192,6 +199,7 @@ double Coefficient<dim>::value(const Point<dim> &p, const unsigned int) const
     }
   return 1.0;
 }
+
 
 
 template <int dim>
@@ -261,7 +269,9 @@ Coefficient<dim>::create_coefficient_table(
   return coefficient_table;
 }
 
-// @sect3{Problem settings}
+
+
+// @sect3{Run time parameters}
 
 // We will use ParameterHandler to pass in parameters at runtime.  The
 // structure @p Settings parses and stores these parameters to be queried
@@ -315,7 +325,7 @@ bool Settings::try_parse(const std::string &prm_filename)
 
   if (prm_filename.size() == 0)
     {
-      // No .prm file provided? Print the default values and exit.
+      /* No .prm file provided? Print the default values and exit. */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         prm.print_parameters(std::cout, ParameterHandler::Text);
       return false;
@@ -350,12 +360,14 @@ bool Settings::try_parse(const std::string &prm_filename)
   return true;
 }
 
-// @sect3{LaplaceProlem class}
 
-// This is the main class of the program. It should look very similar to
+
+// @sect3{LaplaceProblem class}
+
+// This is the main class of the program. It looks very similar to
 // step-16, step-37, and step-40. For the MatrixFree setup, we use the
-// MatrixFreeOperators::LaplaceOperator class which defines local_apply(),
-// compute_diagonal(), and set_coefficient() functions internally. Note that
+// MatrixFreeOperators::LaplaceOperator class which defines `local_apply()`,
+// `compute_diagonal()`, and `set_coefficient()` functions internally. Note that
 // the polynomial degree is a template parameter of this class. This is
 // necesary for the matrix-free code.
 template <int dim, int degree>
@@ -433,7 +445,7 @@ private:
 
 // The only interesting part about the constructor is that we construct the
 // multigrid hierarchy unless we use AMG. For that, we need to parse the
-// parameters before this constructor completes.
+// run time parameters before this constructor completes.
 template <int dim, int degree>
 LaplaceProblem<dim, degree>::LaplaceProblem(const Settings &settings)
   : settings(settings)
@@ -454,12 +466,14 @@ LaplaceProblem<dim, degree>::LaplaceProblem(const Settings &settings)
   triangulation.refine_global(1);
 }
 
+
+
 // @sect4{LaplaceProblem::setup_system()}
 
-// Unlike step-16 and step-37, we split the setup into two parts,
+// Unlike step-16 and step-37, we split the set up into two parts,
 // setup_system() and setup_multigrid(). Here is the typical setup_system()
 // function for the active mesh found in most tutorials. For matrix-free, the
-// active mesh setup similar to step-37, and for matrix-based (GMG and AMG
+// active mesh set up is similar to step-37; for matrix-based (GMG and AMG
 // solvers), the setup is similar to step-40.
 template <int dim, int degree>
 void LaplaceProblem<dim, degree>::setup_system()
@@ -533,6 +547,12 @@ void LaplaceProblem<dim, degree>::setup_system()
 // matrix-based GMG. The matrix-free setup is similar to that of step-37, and
 // the matrix-based is similar to step-16, except we must use appropriate
 // distributed sparsity patterns.
+//
+// The function is not called for the AMG approach, but to err on the
+// safe side, the main `switch` statement of this function
+// nevertheless makes sure that the function only operates on known
+// multigrid settings by throwing an assertion if the function were
+// called for anything other than the two geometric multigrid methods.
 template <int dim, int degree>
 void LaplaceProblem<dim, degree>::setup_multigrid()
 {
@@ -670,10 +690,11 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
 
 // @sect4{LaplaceProblem::assemble_system()}
 
-// The assembly is split into three parts: assemble_system(),
-// assemble_multigrid(), and assemble_rhs(). The assemble_system() function
-// here assembles and stores the system matrix and the right-hand side for the
-// matrix-based methods. It is similar to the assembly in step-40.
+// The assembly is split into three parts: `assemble_system()`,
+// `assemble_multigrid()`, and `assemble_rhs()`. The
+// `assemble_system()` function here assembles and stores the (global)
+// system matrix and the right-hand side for the matrix-based
+// methods. It is similar to the assembly in step-40.
 //
 // Note that the matrix-free method does not execute this function as it does
 // not need to assemble a matrix, and it will instead assemble the right-hand
@@ -719,13 +740,15 @@ void LaplaceProblem<dim, degree>::assemble_system()
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i, j) +=
-                  (coefficient_value * fe_values.shape_grad(i, q_point) *
-                   fe_values.shape_grad(j, q_point)) *
-                  fe_values.JxW(q_point);
+                  (coefficient_value *                // epsilon(x)
+                   fe_values.shape_grad(i, q_point) * // * grad phi_i(x)
+                   fe_values.shape_grad(j, q_point) * // * grad phi_j(x)
+                   fe_values.JxW(q_point));           // * dx
 
               cell_rhs(i) +=
-                (fe_values.shape_value(i, q_point) * rhs_values[q_point]) *
-                fe_values.JxW(q_point);
+                (fe_values.shape_value(i, q_point) * // grad phi_i(x)
+                 rhs_values[q_point] *               // * f(x)
+                 fe_values.JxW(q_point));            // * dx
             }
 
         cell->get_dof_indices(local_dof_indices);
@@ -743,7 +766,7 @@ void LaplaceProblem<dim, degree>::assemble_system()
 
 // @sect4{LaplaceProblem::assemble_multigrid()}
 
-// This function assembles and stores the multilevel matrices for the
+// The following function assembles and stores the multilevel matrices for the
 // matrix-based GMG method. This function is similar to the one found in
 // step-16, only here it works for distributed meshes. This difference amounts
 // to adding a condition that we only assemble on locally owned level cells and
@@ -823,12 +846,21 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 }
 
 
+
 // @sect4{LaplaceProblem::assemble_rhs()}
 
-// This function assembles the right-hand side vector for the matrix-free
-// method. The function is similar to the one found in the ``Use
-// FEEvaluation::read_dof_values_plain() to avoid resolving constraints''
-// subsection in the ``Possibilities for extensions'' section of step-37.
+// The final function in this triptych assembles the right-hand side
+// vector for the matrix-free method -- because in the matrix-free
+// framework, we don't have to assemble the matrix and can get away
+// with only assembling the right hand side. We could do this by extracting the
+// code from the `assemble_system()` function above that deals with the right
+// hand side, but we decide instead to go all in on the matrix-free approach and
+// do the assembly using that way as well.
+//
+// The result is a function that is similar
+// to the one found in the "Use FEEvaluation::read_dof_values_plain()
+// to avoid resolving constraints" subsection in the "Possibilities
+// for extensions" section of step-37.
 //
 // The reason for this function is that the MatrixFree operators do not take
 // into account non-homogeneous Dirichlet constraints, instead treating all
@@ -837,24 +869,26 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 // zero vector except in the Dirichlet values. Then when solving, we have that
 // the solution is $u = u_0 + A^{-1}r_0$. This can be seen as a Newton
 // iteration on a linear system with initial guess $u_0$. The CG solve in the
-// solve() function below computes $A^{-1}r_0$ and the call to
+// `solve()` function below computes $A^{-1}r_0$ and the call to
 // `constraints.distribute()` (which directly follows) adds the $u_0$.
 //
 // Obviously, since we are considering a problem with zero Dirichlet boundary,
-// we could have taken a similar approach to step-37 assemble_rhs(), but this
+// we could have taken a similar approach to step-37 `assemble_rhs()`, but this
 // additional work allows us to change the problem declaration if we so
 // choose.
 //
 // This function has two parts in the integration loop: applying the negative
 // of matrix $A$ to $u_0$ by submitting the negative of the gradient, and adding
 // the right-hand side contribution by submitting the value $f$. We must be sure
-// to use read_dof_values_plain() for evaluating $u_0$ as read_dof_vaues() would
-// set all Dirichlet values to zero.
+// to use `read_dof_values_plain()` for evaluating $u_0$ as `read_dof_vaues()`
+// would set all Dirichlet values to zero.
 //
-// Finally, the system_rhs vector is of type LA::MPI::Vector, but the MatrixFree
-// class only work for dealii::LinearAlgebra::distributed::Vector.
-// Therefore we must compute the right-hand side using MatrixFree funtionality
-// and then use the ChangeVectorType class to copy it to the correct type.
+// Finally, the system_rhs vector is of type LA::MPI::Vector, but the
+// MatrixFree class only work for
+// dealii::LinearAlgebra::distributed::Vector.  Therefore we must
+// compute the right-hand side using MatrixFree funtionality and then
+// use the functions in the `ChangeVectorType` namespace to copy it to
+// the correct type.
 template <int dim, int degree>
 void LaplaceProblem<dim, degree>::assemble_rhs()
 {
@@ -899,14 +933,13 @@ void LaplaceProblem<dim, degree>::assemble_rhs()
 
   right_hand_side_copy.compress(VectorOperation::add);
 
-  // Copy the computed right-hand side to an LA::MPI::Vector
   ChangeVectorTypes::copy(right_hand_side, right_hand_side_copy);
 }
 
 
 // @sect4{LaplaceProblem::solve()}
 
-// Here we setup the multigrid preconditioner, test the timing of a single
+// Here we set up the multigrid preconditioner, test the timing of a single
 // V-cycle, and solve the linear system. Unsurprisingly, this is one of the
 // places where the three methods differ the most.
 template <int dim, int degree>
@@ -1119,7 +1152,9 @@ void LaplaceProblem<dim, degree>::solve()
 // We use the FEInterfaceValues class to assemble an error estimator to decide
 // which cells to refine. See the exact definition of the cell and face
 // integrals in the introduction. To use the method, we define Scratch and
-// Copy objects for the MeshWorker::mesh_loop().
+// Copy objects for the MeshWorker::mesh_loop() with much of the following code
+// being in essence as was set up in step-12 already (or at least similar in
+// spirit).
 template <int dim>
 struct ScratchData
 {
@@ -1191,7 +1226,7 @@ void LaplaceProblem<dim, degree>::estimate()
 
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
-  // assembler for cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$
+  // Assembler for cell residual $h \| f + \epsilon \triangle u \|_K$
   auto cell_worker = [&](const Iterator &  cell,
                          ScratchData<dim> &scratch_data,
                          CopyData &        copy_data) {
@@ -1218,7 +1253,7 @@ void LaplaceProblem<dim, degree>::estimate()
     copy_data.value = std::sqrt(value);
   };
 
-  // assembler for face term $\sum_F h_F \| [ \epsilon \nabla u \cdot n ]
+  // Assembler for face term $\sum_F h_F \| \jump{\epsilon \nabla u \cdot n}
   // \|_F^2$
   auto face_worker = [&](const Iterator &    cell,
                          const unsigned int &f,
@@ -1308,7 +1343,7 @@ void LaplaceProblem<dim, degree>::estimate()
 
 // @sect4{LaplaceProblem::refine_grid()}
 
-// We used the cell-wise estimator stored in the vector @p estimate_vector and
+// We use the cell-wise estimator stored in the vector @p error_estimator and
 // refine a fixed number of cells (chosen here to roughly double the number of
 // DoFs in each step).
 template <int dim, int degree>
@@ -1393,7 +1428,7 @@ void LaplaceProblem<dim, degree>::run()
 
       setup_system();
 
-      // Only setup the multievel hierarchy for GMG.
+      // Only set up the multilevel hierarchy for GMG.
       if (settings.solver == Settings::gmg_mf ||
           settings.solver == Settings::gmg_mb)
         setup_multigrid();
@@ -1438,9 +1473,10 @@ void LaplaceProblem<dim, degree>::run()
 
 // @sect3{The main() function}
 
-// This is a similar main function to step-40, with the exception that we
-// require the user to pass a .prm file as a sole command line argument (see
-// step-29 for a complete discussion of parameter files).
+// This is a similar main function to step-40, with the exception that
+// we require the user to pass a .prm file as a sole command line
+// argument (see step-29 and the documentation of the ParameterHandler
+// class for a complete discussion of parameter files).
 int main(int argc, char *argv[])
 {
   using namespace dealii;
