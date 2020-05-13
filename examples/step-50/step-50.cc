@@ -1488,15 +1488,28 @@ int main(int argc, char *argv[])
 
   try
     {
-      if (settings.dimension == 2)
+      constexpr unsigned int fe_degree = 2;
+
+      switch (settings.dimension)
         {
-          LaplaceProblem<2, 2> test(settings);
-          test.run();
-        }
-      else if (settings.dimension == 3)
-        {
-          LaplaceProblem<3, 2> test(settings);
-          test.run();
+          case 2:
+            {
+              LaplaceProblem<2, fe_degree> test(settings);
+              test.run();
+
+              break;
+            }
+
+          case 3:
+            {
+              LaplaceProblem<3, fe_degree> test(settings);
+              test.run();
+
+              break;
+            }
+
+          default:
+            Assert(false, ExcMessage("This program only works in 2d and 3d."));
         }
     }
   catch (std::exception &exc)
