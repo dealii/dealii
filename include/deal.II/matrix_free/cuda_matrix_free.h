@@ -108,12 +108,10 @@ namespace CUDAWrappers
                                                  update_JxW_values |
                                                  update_quadrature_points,
         const bool use_coloring                      = false,
-        const bool n_colors                          = 1,
         const bool overlap_communication_computation = false)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
-        , n_colors(n_colors)
         , overlap_communication_computation(overlap_communication_computation)
       {
 #  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
@@ -150,11 +148,6 @@ namespace CUDAWrappers
        * newer architectures.
        */
       bool use_coloring;
-
-      /**
-       * Number of colors created by the graph coloring algorithm.
-       */
-      unsigned int n_colors;
 
       /**
        *  Overlap MPI communications with computation. This requires CUDA-aware
