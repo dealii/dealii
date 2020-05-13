@@ -244,7 +244,7 @@ std::shared_ptr<Table<2, VectorizedArray<number>>>
 Coefficient<dim>::create_coefficient_table(
   const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const
 {
-  auto coefficient_table =
+  std::shared_ptr<Table<2, VectorizedArray<number>>> coefficient_table =
     std::make_shared<Table<2, VectorizedArray<number>>>();
 
   FEEvaluation<dim, -1, 0, 1, number> fe_eval(mf_storage);
@@ -821,8 +821,7 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i, j) +=
                 (coefficient_value * fe_values.shape_grad(i, q_point) *
-                 fe_values.shape_grad(j, q_point)) *
-                fe_values.JxW(q_point);
+                 fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
         cell->get_mg_dof_indices(local_dof_indices);
 
