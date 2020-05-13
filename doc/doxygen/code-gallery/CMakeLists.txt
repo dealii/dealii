@@ -136,20 +136,19 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     # Copy files of interest (non-metadata) to the build directory
     # so we can link to them, and schedule them for installation
     FILE(COPY ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
-         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
-         PATTERN REGEX "doc/tooltip|doc/dependencies|doc/builds-on" EXCLUDE)
+      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+      PATTERN REGEX "doc/tooltip|doc/dependencies|doc/builds-on" EXCLUDE
+      )
     INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_step}
-            DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen/code-gallery
-            COMPONENT documentation
-           )
+      DESTINATION ${DEAL_II_EXAMPLES_RELDIR}/code-gallery
+      COMPONENT examples
+      )
 
     # Create a target for this program and add it to the top-level
     # target of this directory
     ADD_CUSTOM_TARGET(code-gallery_${_step}
-      DEPENDS
-        ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-      COMMENT
-        "Building doxygen input file for code gallery program <${_step}>"
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      COMMENT "Building doxygen input file for code gallery program <${_step}>"
       )
     ADD_DEPENDENCIES(code-gallery code-gallery_${_step})
 
