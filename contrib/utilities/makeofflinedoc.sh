@@ -31,8 +31,8 @@ echo "Downloading images (this will take a long time; press ctrl-c to cancel) ..
 
 {
   trap "echo \"(skipping)\"" SIGINT
-  wget -q -nH -A svg,png,gif,webm -m -l 3 -np "https://www.dealii.org/images/steps"
-  wget -q -nH -A svg,png,gif,webm -m -l 3 -np "https://www.dealii.org/images/shape-functions"
+  wget -q -nH -A svg,jpg,png,gif,webm -m -l 3 -np "https://www.dealii.org/images/steps"
+  wget -q -nH -A svg,jpg,png,gif,webm -m -l 3 -np "https://www.dealii.org/images/shape-functions"
   rm -f robots.txt* images/robots.txt*
 }
 
