@@ -52,8 +52,9 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
-// Comment the following `\#define` in or out if you have PETSc and
-// Trilinos installed and you prefer using PETSc in this example:
+// Comment the following preprocessor definition in or out if you have
+// PETSc and Trilinos installed and you prefer using PETSc in this
+// example:
 #define FORCE_USE_OF_TRILINOS
 
 namespace LA
