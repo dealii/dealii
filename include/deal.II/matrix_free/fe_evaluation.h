@@ -165,7 +165,14 @@ public:
    * temporary solution should always have homogeneous constraints and this
    * method is the correct one.
    *
-   * If this class was constructed without a MatrixFree object and the
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function reads
+   * @p n_components blocks from the block vector starting at the index
+   * @p first_index. For non-block vectors, @p first_index is ignored.
+   *
+   * @note If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
    * DoFHandler<dim>::cell_iterator, only one single cell is used by this
    * class and this function extracts the values of the underlying components
@@ -173,13 +180,6 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::size() same copies are worked on).
-   *
-   * If the given vector template class is a block vector (determined through
-   * the template function 'IsBlockVector<VectorType>::value', which checks
-   * for vectors derived from dealii::BlockVectorBase) or an
-   * std::vector<VectorType> or std::vector<VectorType *>, this function reads
-   * @p n_components blocks from the block vector starting at the index
-   * @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
   void
@@ -197,7 +197,14 @@ public:
    * as MatrixFree can only handle homogeneous constraints. Note that if
    * vectorization is enabled, the DoF values for several cells are set.
    *
-   * If this class was constructed without a MatrixFree object and the
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function reads
+   * @p n_components blocks from the block vector starting at the index
+   * @p first_index. For non-block vectors, @p first_index is ignored.
+   *
+   * @note If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
    * DoFHandler<dim>::cell_iterator, only one single cell is used by this
    * class and this function extracts the values of the underlying components
@@ -205,13 +212,6 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::size() same copies are worked on).
-   *
-   * If the given vector template class is a block vector (determined through
-   * the template function 'IsBlockVector<VectorType>::value', which checks
-   * for vectors derived from dealii::BlockVectorBase) or an
-   * std::vector<VectorType> or std::vector<VectorType *>, this function reads
-   * @p n_components blocks from the block vector starting at the index
-   * @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
   void
@@ -223,23 +223,7 @@ public:
    * sums them into the vector @p dst. The function also applies constraints
    * during the write operation. The functionality is hence similar to the
    * function AffineConstraints::distribute_local_to_global. If vectorization
-   * is enabled, the DoF values for several cells are used. The mask can be
-   * used to suppress the write access for some of the cells contained in the
-   * current cell vectorization batch, e.g. in case of local time stepping,
-   * where some cells are excluded from a call. A value of `true` in the
-   * bitset means that the respective lane index will be processed, whereas a
-   * value of `false` skips this index. The default setting is a bitset that
-   * contains all ones, which will write the accumulated integrals to all
-   * cells in the batch.
-   *
-   * If this class was constructed without a MatrixFree object and the
-   * information is acquired on the fly through a
-   * DoFHandler<dim>::cell_iterator, only one single cell is used by this
-   * class and this function extracts the values of the underlying components
-   * on the given cell. This call is slower than the ones done through a
-   * MatrixFree object and lead to a structure that does not effectively use
-   * vectorization in the evaluate routines based on these values (instead,
-   * VectorizedArray::size() same copies are worked on).
+   * is enabled, the DoF values for several cells are used.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -247,6 +231,23 @@ public:
    * std::vector<VectorType> or std::vector<VectorType *>, this function
    * writes to @p n_components blocks of the block vector starting at the
    * index @p first_index. For non-block vectors, @p first_index is ignored.
+   *
+   * The @p mask can be used to suppress the write access for some of the
+   * cells contained in the current cell vectorization batch, e.g. in case of
+   * local time stepping, where some cells are excluded from a call. A value
+   * of `true` in the bitset means that the respective lane index will be
+   * processed, whereas a value of `false` skips this index. The default
+   * setting is a bitset that contains all ones, which will write the
+   * accumulated integrals to all cells in the batch.
+   *
+   * @note If this class was constructed without a MatrixFree object and the
+   * information is acquired on the fly through a
+   * DoFHandler<dim>::cell_iterator, only one single cell is used by this
+   * class and this function extracts the values of the underlying components
+   * on the given cell. This call is slower than the ones done through a
+   * MatrixFree object and lead to a structure that does not effectively use
+   * vectorization in the evaluate routines based on these values (instead,
+   * VectorizedArray::size() same copies are worked on).
    */
   template <typename VectorType>
   void
@@ -264,7 +265,20 @@ public:
    * by the current cell are overwritten. Thus, if a degree of freedom is
    * associated to more than one cell (as usual in continuous finite
    * elements), the values will be overwritten and only the value written last
-   * is retained. The mask can be used to suppress the write access for some
+   * is retained. Please note that in a parallel context this function might
+   * also touch degrees of freedom owned by other MPI processes, so that a
+   * subsequent update or accumulation of ghost values as done by
+   * MatrixFree::loop() might invalidate the degrees of freedom set by this
+   * function.
+   *
+   * If the given vector template class is a block vector (determined through
+   * the template function 'IsBlockVector<VectorType>::value', which checks
+   * for vectors derived from dealii::BlockVectorBase) or an
+   * std::vector<VectorType> or std::vector<VectorType *>, this function
+   * writes to @p n_components blocks of the block vector starting at the
+   * index @p first_index. For non-block vectors, @p first_index is ignored.
+   *
+   * The @p mask can be used to suppress the write access for some
    * of the cells contained in the current cell vectorization batch, e.g. in
    * case of local time stepping, where some  cells are excluded from a call.
    * A value of `true` in the bitset means that the respective lane index will
@@ -272,7 +286,7 @@ public:
    * setting is a bitset that contains all ones, which will write the
    * accumulated integrals to all cells in the batch.
    *
-   * If this class was constructed without a MatrixFree object and the
+   * @note If this class was constructed without a MatrixFree object and the
    * information is acquired on the fly through a
    * DoFHandler<dim>::cell_iterator, only one single cell is used by this
    * class and this function extracts the values of the underlying components
@@ -281,12 +295,6 @@ public:
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::size() same copies are worked on).
    *
-   * If the given vector template class is a block vector (determined through
-   * the template function 'IsBlockVector<VectorType>::value', which checks
-   * for vectors derived from dealii::BlockVectorBase) or an
-   * std::vector<VectorType> or std::vector<VectorType *>, this function
-   * writes to @p n_components blocks of the block vector starting at the
-   * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
   void
