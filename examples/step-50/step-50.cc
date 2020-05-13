@@ -1220,7 +1220,7 @@ void LaplaceProblem<dim, degree>::estimate()
                        mpi_communicator);
   temp_solution = solution;
 
-  Coefficient<dim> coefficient;
+  const Coefficient<dim> coefficient;
 
   error_estimator.reinit(triangulation.n_active_cells());
 
@@ -1243,14 +1243,14 @@ void LaplaceProblem<dim, degree>::estimate()
 
     copy_data.cell_index = cell->active_cell_index();
 
-    double value = 0.;
+    double residual_norm_square = 0.;
     for (unsigned k = 0; k < fe_values.n_quadrature_points; ++k)
       {
-        const double res =
-          cell->diameter() * (rhs_value + nu * trace(hessians[k]));
-        value += res * res * fe_values.JxW(k);
+        const double residual = (rhs_value + nu * trace(hessians[k]));
+        residual_norm_square += residual * residual * fe_values.JxW(k);
       }
-    copy_data.value = std::sqrt(value);
+
+    copy_data.value = cell->diameter() * std::sqrt(residual_norm_square);
   };
 
   // Assembler for face term $\sum_F h_F \| \jump{\epsilon \nabla u \cdot n}
@@ -1273,9 +1273,8 @@ void LaplaceProblem<dim, degree>::estimate()
     copy_data_face.cell_indices[0] = cell->active_cell_index();
     copy_data_face.cell_indices[1] = ncell->active_cell_index();
 
-    const double nu1 = coefficient.value(cell->center());
-    const double nu2 = coefficient.value(ncell->center());
-    const double h   = cell->face(f)->measure();
+    const double coeff1 = coefficient.value(cell->center());
+    const double coeff2 = coefficient.value(ncell->center());
 
     std::vector<Tensor<1, dim>> grad_u[2];
 
@@ -1286,20 +1285,21 @@ void LaplaceProblem<dim, degree>::estimate()
           temp_solution, grad_u[i]);
       }
 
-    double value = 0.;
+    double jump_norm_square = 0.;
 
     for (unsigned int qpoint = 0;
          qpoint < fe_interface_values.n_quadrature_points;
          ++qpoint)
       {
         const double jump =
-          nu1 * grad_u[0][qpoint] * fe_interface_values.normal(qpoint) -
-          nu2 * grad_u[1][qpoint] * fe_interface_values.normal(qpoint);
+          coeff1 * grad_u[0][qpoint] * fe_interface_values.normal(qpoint) -
+          coeff2 * grad_u[1][qpoint] * fe_interface_values.normal(qpoint);
 
-        value += h * jump * jump * fe_interface_values.JxW(qpoint);
+        jump_norm_square += jump * jump * fe_interface_values.JxW(qpoint);
       }
 
-    copy_data_face.values[0] = 0.5 * std::sqrt(value);
+    const double h           = cell->face(f)->measure();
+    copy_data_face.values[0] = 0.5 * h * std::sqrt(jump_norm_square);
     copy_data_face.values[1] = copy_data_face.values[0];
   };
 
@@ -1336,14 +1336,14 @@ void LaplaceProblem<dim, degree>::estimate()
                         MeshWorker::assemble_own_cells |
                           MeshWorker::assemble_ghost_faces_both |
                           MeshWorker::assemble_own_interior_faces_once,
-                        nullptr /*boundary_worker*/,
+                        /*boundary_worker=*/nullptr,
                         face_worker);
 }
 
 
 // @sect4{LaplaceProblem::refine_grid()}
 
-// We use the cell-wise estimator stored in the vector @p error_estimator and
+// We use the cell-wise estimator stored in the vector @p estimate_vector and
 // refine a fixed number of cells (chosen here to roughly double the number of
 // DoFs in each step).
 template <int dim, int degree>
@@ -1377,6 +1377,7 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(temp_solution, "solution");
+
   Vector<float> subdomain(triangulation.n_active_cells());
   for (unsigned int i = 0; i < subdomain.size(); ++i)
     subdomain(i) = triangulation.locally_owned_subdomain();
