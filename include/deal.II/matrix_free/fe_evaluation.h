@@ -3549,8 +3549,8 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
-inline Tensor<2, dim, VectorizedArrayType>
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
+                             FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   inverse_jacobian(const unsigned int q_index) const
 {
   AssertIndexRange(q_index, n_quadrature_points);
@@ -3561,12 +3561,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     return jacobian[q_index];
 }
 
+
+
 template <int dim,
           int n_components_,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
-std::array<unsigned int, VectorizedArrayType::size()>
+inline std::array<unsigned int, VectorizedArrayType::size()>
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_cell_ids() const
 {
