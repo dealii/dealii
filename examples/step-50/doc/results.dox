@@ -70,15 +70,24 @@ allowing for vectorization over 8 doubles (vectorization used only in the matrix
 computations). The code is compiled using gcc 7.1.0 with intel-mpi 17.0.3. Trilinos
 12.10.1 is used for the matrix-based GMG/AMG computations.
 
-The following table gives weak scale timings for this program on up to 256M DoFs
-and 7168 processors. Here, $\mathbb{E}$ is the partition efficiency from the
+We can then gather a variety of information by calling the program
+with the input files that are provided in the directory in which
+step-50 is located. Using these, and adjusting the number of mesh
+refinement steps, we can produce information about how well the
+program scales.
+
+The following table gives weak scaling timings for this program on up to 256M DoFs
+and 7,168 processors. (Recall that weak scaling keeps the number of
+degrees of freedom per processor constant while increasing the number of
+processors; i.e., it considers larger and larger problems.)
+Here, $\mathbb{E}$ is the partition efficiency from the
  introduction (also equal to 1.0/workload imbalance), "Setup" is a combination
 of setup, setup multigrid, assemble, and assemble multigrid from the timing blocks,
 and "Prec" is the preconditioner setup. Ideally all times would stay constant
 over each problem size for the individual solvers, but since the partition
 efficiency decreases from 0.371 to 0.161 from largest to smallest problem size,
 we expect to see an approximately $0.371/0.161=2.3$ times increase in timings
-for GMG.
+for GMG. This is, in fact, pretty close to what we really get:
 
 <table align="center" class="doxtable">
 <tr>
@@ -116,17 +125,17 @@ for GMG.
   <td align="right">13</th>
   <td align="right">4M</th>
   <td align="right">0.37</th>
-  <td></th>
+  <td></td>
   <td align="right">0.742</th>
   <td align="right">0.393</th>
   <td align="right">0.200</th>
   <td align="right">1.335</th>
-  <td></th>
+  <td></td>
   <td align="right">1.714</th>
   <td align="right">2.934</th>
   <td align="right">0.716</th>
   <td align="right">5.364</th>
-  <td></th>
+  <td></td>
   <td align="right">1.544</th>
   <td align="right">0.456</th>
   <td align="right">1.150</th>
@@ -137,59 +146,59 @@ for GMG.
   <td align="right">15</th>
   <td align="right">16M</th>
   <td align="right">0.29</th>
-  <td></th>
+  <td></td>
   <td align="right">0.884</th>
   <td align="right">0.535</th>
   <td align="right">0.253</th>
   <td align="right">1.672</th>
-  <td></th>
+  <td></td>
   <td align="right">1.927</th>
   <td align="right">3.776</th>
   <td align="right">1.190</th>
   <td align="right">6.893</th>
-  <td></th>
+  <td></td>
   <td align="right">1.544</th>
   <td align="right">0.456</th>
   <td align="right">1.150</th>
   <td align="right">3.150</th>
 </tr>
 <tr>
-  <td align="right">1792</th>
+  <td align="right">1,792</th>
   <td align="right">17</th>
   <td align="right">65M</th>
   <td align="right">0.22</th>
-  <td></th>
+  <td></td>
   <td align="right">1.122</th>
   <td align="right">0.686</th>
   <td align="right">0.309</th>
   <td align="right">2.117</th>
-  <td></th>
+  <td></td>
   <td align="right">2.171</th>
   <td align="right">4.862</th>
   <td align="right">1.660</th>
   <td align="right">8.693</th>
-  <td></th>
+  <td></td>
   <td align="right">1.654</th>
   <td align="right">0.546</th>
   <td align="right">1.460</th>
   <td align="right">3.660</th>
 </tr>
 <tr>
-  <td align="right">7168</th>
+  <td align="right">7,168</th>
   <td align="right">19</th>
   <td align="right">256M</th>
   <td align="right">0.16</th>
-  <td></th>
+  <td></td>
   <td align="right">1.214</th>
   <td align="right">0.893</th>
   <td align="right">0.521</th>
   <td align="right">2.628</th>
-  <td></th>
+  <td></td>
   <td align="right">2.386</th>
   <td align="right">7.260</th>
   <td align="right">2.560</th>
   <td align="right">12.206</th>
-  <td></th>
+  <td></td>
   <td align="right">1.844</th>
   <td align="right">1.010</th>
   <td align="right">1.890</th>
@@ -197,14 +206,34 @@ for GMG.
 </tr>
 </table>
 
-The following figure gives the strong scaling for each method for cycle 16
-(32M DoFs) and 19 (256M DoFs) on between 56 to 28672 processors. While the
-matrix-based GMG solver and AMG scale similarly and have a similar time to
-solution, the matrix-free GMG solver scales much better and solves the finer
-problem in roughly the same time as the AMG solver for the coarser mesh with
-only an eighth of the number of unknowns.
+On the other hand, the algebraic multigrid in the last set of columns
+is relatively unaffected by the increasing imbalance of the mesh
+hierarchy (because it doesn't use the mesh hierarchy) and the growth
+in time is rather driven by other factors that are well documented in
+the literature (most notably that the algorithmic complexity of
+some parts of algebraic multigrid methods appears to be ${\cal O}(N
+\log N)$ instead of ${\cal O}(N)$ for geometric multigrid).
 
-<img width="400px" src="https://www.dealii.org/images/steps/developer/step-50-strong-scaling.png" alt="">
+The upshort of the table above is that the matrix-free geometric multigrid
+method appears to be the fastest approach to solving this equation if
+not by a huge margin. Matrix-based methods, on the other hand, are
+consistently the worst.
+
+The following figure provides strong scaling results for each method, i.e.,
+we solve the same problem on more and more processors. Specifically,
+we consider the problems after 16 mesh refinement cycles
+(32M DoFs) and 19 cycles (256M DoFs), on between 56 to 28,672 processors:
+
+<img width="600px" src="https://www.dealii.org/images/steps/developer/step-50-strong-scaling.png" alt="">
+
+While the matrix-based GMG solver and AMG scale similarly and have a
+similar time to solution (at least as long as there is a substantial
+number of unknowns per processor -- say, several 10,000), the
+matrix-free GMG solver scales much better and solves the finer problem
+in roughly the same time as the AMG solver for the coarser mesh with
+only an eighth of the number of processors. Conversely, it can solve the
+same problem on the same number of processors in about one eighth the
+time.
 
 
 <h3> Possible extensions </h3>
@@ -218,7 +247,24 @@ you can compare error rates.
 
 <h4> Coarse solver </h4>
 
-A more interesting example would involve a complicated coarse mesh (see
-step-49 for inspiration). This then requires a more sophisticated coarse
-solver for the geometric multigrid methods. A common approach here is a switch
-to AMG by assembling the coarse matrix (even for the matrix-free version).
+A more interesting example would involve a more complicated coarse mesh (see
+step-49 for inspiration). The issue in that case is that the coarsest
+level of the mesh hierarchy is actually quite large, and one would
+have to think about ways to solve the coarse level problem
+efficiently. (This is not an issue for algebraic multigrid methods
+because they would just continue to build coarser and coarser levels
+of the matrix, regardless of their geometric origin.)
+
+In the program here, we simply solve the coarse level problem with a
+Conjugate Gradient method without any preconditioner. That is acceptable
+if the coarse problem is really small -- for example, if the coarse
+mesh had a single cell, then the coarse mesh problems has a $9\times 9$
+matrix in 2d, and a $27\times 27$ matrix in 3d; for the coarse mesh we
+use on the $L$-shaped domain of the current program, these sizes are
+$21\times 21$ in 2d and $117\times 117$ in 3d. But if the coarse mesh
+consists of hundreds or thousands of cells, this approach will no
+longer work and might start to dominate the overall run-time of each V-cyle.
+A common approach is then to solve the coarse mesh problem using an
+algebraic multigrid preconditioner; this would then, however, require
+assembling the coarse matrix (even for the matrix-free version) as
+input to the AMG implementation.
