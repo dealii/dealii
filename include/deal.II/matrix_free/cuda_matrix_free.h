@@ -643,7 +643,7 @@ namespace CUDAWrappers
   /**
    * Compute the quadrature point index in the local cell of a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim>
   __device__ inline unsigned int
@@ -663,7 +663,7 @@ namespace CUDAWrappers
    * Return the quadrature point index local of a given thread. The index is
    * only unique for a given MPI process.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline unsigned int
@@ -682,7 +682,7 @@ namespace CUDAWrappers
   /**
    * Return the quadrature point associated with a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
