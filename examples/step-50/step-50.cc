@@ -562,9 +562,9 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
 
   mg_constrained_dofs.clear();
   mg_constrained_dofs.initialize(dof_handler);
-  std::set<types::boundary_id> bset;
-  bset.insert(0);
-  mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, bset);
+
+  const std::set<types::boundary_id> boundary_ids = {types::boundary_id(0)};
+  mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, boundary_ids);
 
   const unsigned int n_levels = triangulation.n_global_levels();
   if (settings.solver == Settings::gmg_mf)
