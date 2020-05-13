@@ -105,14 +105,13 @@ namespace CUDAWrappers
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values,
+                                                 update_JxW_values |
+                                                 update_quadrature_points,
         const bool use_coloring                      = false,
-        const bool n_colors                          = 1,
         const bool overlap_communication_computation = false)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
-        , n_colors(n_colors)
         , overlap_communication_computation(overlap_communication_computation)
       {
 #  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
@@ -149,11 +148,6 @@ namespace CUDAWrappers
        * newer architectures.
        */
       bool use_coloring;
-
-      /**
-       * Number of colors created by the graph coloring algorithm.
-       */
-      unsigned int n_colors;
 
       /**
        *  Overlap MPI communications with computation. This requires CUDA-aware
@@ -649,7 +643,7 @@ namespace CUDAWrappers
   /**
    * Compute the quadrature point index in the local cell of a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim>
   __device__ inline unsigned int
@@ -669,7 +663,7 @@ namespace CUDAWrappers
    * Return the quadrature point index local of a given thread. The index is
    * only unique for a given MPI process.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline unsigned int
@@ -688,7 +682,7 @@ namespace CUDAWrappers
   /**
    * Return the quadrature point associated with a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
