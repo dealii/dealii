@@ -431,7 +431,7 @@ private:
   MatrixFreeActiveMatrix mf_system_matrix;
   VectorType             solution;
   VectorType             right_hand_side;
-  Vector<double>         estimate_vector;
+  Vector<double>         error_estimator;
 
   MGLevelObject<MatrixType> mg_matrix;
   MGLevelObject<MatrixType> mg_interface_in;
@@ -1222,7 +1222,7 @@ void LaplaceProblem<dim, degree>::estimate()
 
   Coefficient<dim> coefficient;
 
-  estimate_vector.reinit(triangulation.n_active_cells());
+  error_estimator.reinit(triangulation.n_active_cells());
 
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
@@ -1305,11 +1305,11 @@ void LaplaceProblem<dim, degree>::estimate()
 
   auto copier = [&](const CopyData &copy_data) {
     if (copy_data.cell_index != numbers::invalid_unsigned_int)
-      estimate_vector[copy_data.cell_index] += copy_data.value;
+      error_estimator[copy_data.cell_index] += copy_data.value;
 
     for (auto &cdf : copy_data.face_data)
       for (unsigned int j = 0; j < 2; ++j)
-        estimate_vector[cdf.cell_indices[j]] += cdf.values[j];
+        error_estimator[cdf.cell_indices[j]] += cdf.values[j];
   };
 
   const unsigned int n_gauss_points = degree + 1;
@@ -1353,7 +1353,7 @@ void LaplaceProblem<dim, degree>::refine_grid()
 
   const double refinement_fraction = 1. / (std::pow(2.0, dim) - 1.);
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, estimate_vector, refinement_fraction, 0.0);
+    triangulation, error_estimator, refinement_fraction, 0.0);
 
   triangulation.execute_coarsening_and_refinement();
 }
@@ -1387,8 +1387,8 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
     level(cell->active_cell_index()) = cell->level();
   data_out.add_data_vector(level, "level");
 
-  if (estimate_vector.size() > 0)
-    data_out.add_data_vector(estimate_vector, "error_estimator");
+  if (error_estimator.size() > 0)
+    data_out.add_data_vector(error_estimator, "error_estimator");
 
   data_out.build_patches();
 
