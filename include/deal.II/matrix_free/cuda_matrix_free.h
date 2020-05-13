@@ -105,7 +105,8 @@ namespace CUDAWrappers
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values,
+                                                 update_JxW_values |
+                                                 update_quadrature_points,
         const bool use_coloring                      = false,
         const bool n_colors                          = 1,
         const bool overlap_communication_computation = false)
