@@ -223,6 +223,7 @@ Coefficient<dim>::value(const Point<dim, VectorizedArray<number>> &p,
 }
 
 
+
 template <int dim>
 template <typename number>
 number Coefficient<dim>::average_value(
@@ -295,6 +296,7 @@ struct Settings
   unsigned int n_steps;
   bool         output;
 };
+
 
 
 bool Settings::try_parse(const std::string &prm_filename)
@@ -494,50 +496,62 @@ void LaplaceProblem<dim, degree>::setup_system()
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
-  if (settings.solver == Settings::gmg_mf)
+  switch (settings.solver)
     {
-      typename MatrixFree<dim, double>::AdditionalData additional_data;
-      additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
-      additional_data.mapping_update_flags =
-        (update_gradients | update_JxW_values | update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> mf_storage(
-        new MatrixFree<dim, double>());
-      mf_storage->reinit(dof_handler,
-                         constraints,
-                         QGauss<1>(degree + 1),
-                         additional_data);
+      case Settings::gmg_mf:
+        {
+          typename MatrixFree<dim, double>::AdditionalData additional_data;
+          additional_data.tasks_parallel_scheme =
+            MatrixFree<dim, double>::AdditionalData::none;
+          additional_data.mapping_update_flags =
+            (update_gradients | update_JxW_values | update_quadrature_points);
+          std::shared_ptr<MatrixFree<dim, double>> mf_storage =
+            std::make_shared<MatrixFree<dim, double>>();
+          mf_storage->reinit(dof_handler,
+                             constraints,
+                             QGauss<1>(degree + 1),
+                             additional_data);
 
-      mf_system_matrix.initialize(mf_storage);
+          mf_system_matrix.initialize(mf_storage);
 
-      const Coefficient<dim> coefficient;
-      mf_system_matrix.set_coefficient(
-        coefficient.create_coefficient_table(*mf_storage));
-    }
-  else /*gmg_mb or amg*/
-    {
+          const Coefficient<dim> coefficient;
+          mf_system_matrix.set_coefficient(
+            coefficient.create_coefficient_table(*mf_storage));
+
+          break;
+        }
+
+      case Settings::gmg_mb:
+      case Settings::amg:
+        {
 #ifdef USE_PETSC_LA
-      DynamicSparsityPattern dsp(locally_relevant_set);
-      DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+          DynamicSparsityPattern dsp(locally_relevant_set);
+          DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
-      SparsityTools::distribute_sparsity_pattern(dsp,
-                                                 locally_owned_set,
-                                                 mpi_communicator,
-                                                 locally_relevant_set);
+          SparsityTools::distribute_sparsity_pattern(dsp,
+                                                     locally_owned_set,
+                                                     mpi_communicator,
+                                                     locally_relevant_set);
 
-      system_matrix.reinit(locally_owned_set,
-                           locally_owned_set,
-                           dsp,
-                           mpi_communicator);
+          system_matrix.reinit(locally_owned_set,
+                               locally_owned_set,
+                               dsp,
+                               mpi_communicator);
 #else
-      TrilinosWrappers::SparsityPattern dsp(locally_owned_set,
-                                            locally_owned_set,
-                                            locally_relevant_set,
-                                            MPI_COMM_WORLD);
-      DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
-      dsp.compress();
-      system_matrix.reinit(dsp);
+          TrilinosWrappers::SparsityPattern dsp(locally_owned_set,
+                                                locally_owned_set,
+                                                locally_relevant_set,
+                                                MPI_COMM_WORLD);
+          DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
+          dsp.compress();
+          system_matrix.reinit(dsp);
 #endif
+
+          break;
+        }
+
+      default:
+        Assert(false, ExcNotImplemented());
     }
 }
 
@@ -567,123 +581,136 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, boundary_ids);
 
   const unsigned int n_levels = triangulation.n_global_levels();
-  if (settings.solver == Settings::gmg_mf)
+
+  switch (settings.solver)
     {
-      mf_mg_matrix.resize(0, n_levels - 1);
-
-      for (unsigned int level = 0; level < n_levels; ++level)
+      case Settings::gmg_mf:
         {
-          IndexSet relevant_dofs;
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                        level,
-                                                        relevant_dofs);
-          AffineConstraints<double> level_constraints;
-          level_constraints.reinit(relevant_dofs);
-          level_constraints.add_lines(
-            mg_constrained_dofs.get_boundary_indices(level));
-          level_constraints.close();
+          mf_mg_matrix.resize(0, n_levels - 1);
 
-          typename MatrixFree<dim, float>::AdditionalData additional_data;
-          additional_data.tasks_parallel_scheme =
-            MatrixFree<dim, float>::AdditionalData::none;
-          additional_data.mapping_update_flags =
-            (update_gradients | update_JxW_values | update_quadrature_points);
-          additional_data.mg_level = level;
-          std::shared_ptr<MatrixFree<dim, float>> mf_storage_level(
-            new MatrixFree<dim, float>());
-          mf_storage_level->reinit(dof_handler,
-                                   level_constraints,
-                                   QGauss<1>(degree + 1),
-                                   additional_data);
+          for (unsigned int level = 0; level < n_levels; ++level)
+            {
+              IndexSet relevant_dofs;
+              DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                            level,
+                                                            relevant_dofs);
+              AffineConstraints<double> level_constraints;
+              level_constraints.reinit(relevant_dofs);
+              level_constraints.add_lines(
+                mg_constrained_dofs.get_boundary_indices(level));
+              level_constraints.close();
 
-          mf_mg_matrix[level].initialize(mf_storage_level,
-                                         mg_constrained_dofs,
-                                         level);
+              typename MatrixFree<dim, float>::AdditionalData additional_data;
+              additional_data.tasks_parallel_scheme =
+                MatrixFree<dim, float>::AdditionalData::none;
+              additional_data.mapping_update_flags =
+                (update_gradients | update_JxW_values |
+                 update_quadrature_points);
+              additional_data.mg_level = level;
+              std::shared_ptr<MatrixFree<dim, float>> mf_storage_level(
+                new MatrixFree<dim, float>());
+              mf_storage_level->reinit(dof_handler,
+                                       level_constraints,
+                                       QGauss<1>(degree + 1),
+                                       additional_data);
 
-          const Coefficient<dim> coefficient;
-          mf_mg_matrix[level].set_coefficient(
-            coefficient.create_coefficient_table(*mf_storage_level));
+              mf_mg_matrix[level].initialize(mf_storage_level,
+                                             mg_constrained_dofs,
+                                             level);
 
-          mf_mg_matrix[level].compute_diagonal();
+              const Coefficient<dim> coefficient;
+              mf_mg_matrix[level].set_coefficient(
+                coefficient.create_coefficient_table(*mf_storage_level));
+
+              mf_mg_matrix[level].compute_diagonal();
+            }
+
+          break;
         }
-    }
-  else /*gmg_mb*/
-    {
-      mg_matrix.resize(0, n_levels - 1);
-      mg_matrix.clear_elements();
-      mg_interface_in.resize(0, n_levels - 1);
-      mg_interface_in.clear_elements();
 
-      for (unsigned int level = 0; level < n_levels; ++level)
+      case Settings::gmg_mb:
         {
-          IndexSet dofset;
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                        level,
-                                                        dofset);
+          mg_matrix.resize(0, n_levels - 1);
+          mg_matrix.clear_elements();
+          mg_interface_in.resize(0, n_levels - 1);
+          mg_interface_in.clear_elements();
 
-          {
+          for (unsigned int level = 0; level < n_levels; ++level)
+            {
+              IndexSet dof_set;
+              DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                            level,
+                                                            dof_set);
+
+              {
 #ifdef USE_PETSC_LA
-            DynamicSparsityPattern dsp(dofset);
-            MGTools::make_sparsity_pattern(dof_handler, dsp, level);
-            dsp.compress();
-            SparsityTools::distribute_sparsity_pattern(
-              dsp,
-              dof_handler.locally_owned_mg_dofs(level),
-              mpi_communicator,
-              dofset);
+                DynamicSparsityPattern dsp(dof_set);
+                MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+                dsp.compress();
+                SparsityTools::distribute_sparsity_pattern(
+                  dsp,
+                  dof_handler.locally_owned_mg_dofs(level),
+                  mpi_communicator,
+                  dof_set);
 
-            mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                                    dof_handler.locally_owned_mg_dofs(level),
-                                    dsp,
-                                    mpi_communicator);
+                mg_matrix[level].reinit(
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dsp,
+                  mpi_communicator);
 #else
-            TrilinosWrappers::SparsityPattern dsp(
-              dof_handler.locally_owned_mg_dofs(level),
-              dof_handler.locally_owned_mg_dofs(level),
-              dofset,
-              mpi_communicator);
-            MGTools::make_sparsity_pattern(dof_handler, dsp, level);
+                TrilinosWrappers::SparsityPattern dsp(
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dof_set,
+                  mpi_communicator);
+                MGTools::make_sparsity_pattern(dof_handler, dsp, level);
 
-            dsp.compress();
-            mg_matrix[level].reinit(dsp);
+                dsp.compress();
+                mg_matrix[level].reinit(dsp);
 #endif
-          }
+              }
 
-          {
+              {
 #ifdef USE_PETSC_LA
-            DynamicSparsityPattern dsp(dofset);
-            MGTools::make_interface_sparsity_pattern(dof_handler,
-                                                     mg_constrained_dofs,
-                                                     dsp,
-                                                     level);
-            dsp.compress();
-            SparsityTools::distribute_sparsity_pattern(
-              dsp,
-              dof_handler.locally_owned_mg_dofs(level),
-              mpi_communicator,
-              dofset);
+                DynamicSparsityPattern dsp(dof_set);
+                MGTools::make_interface_sparsity_pattern(dof_handler,
+                                                         mg_constrained_dofs,
+                                                         dsp,
+                                                         level);
+                dsp.compress();
+                SparsityTools::distribute_sparsity_pattern(
+                  dsp,
+                  dof_handler.locally_owned_mg_dofs(level),
+                  mpi_communicator,
+                  dof_set);
 
-            mg_interface_in[level].reinit(
-              dof_handler.locally_owned_mg_dofs(level),
-              dof_handler.locally_owned_mg_dofs(level),
-              dsp,
-              mpi_communicator);
+                mg_interface_in[level].reinit(
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dsp,
+                  mpi_communicator);
 #else
-            TrilinosWrappers::SparsityPattern dsp(
-              dof_handler.locally_owned_mg_dofs(level),
-              dof_handler.locally_owned_mg_dofs(level),
-              dofset,
-              mpi_communicator);
+                TrilinosWrappers::SparsityPattern dsp(
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dof_handler.locally_owned_mg_dofs(level),
+                  dof_set,
+                  mpi_communicator);
 
-            MGTools::make_interface_sparsity_pattern(dof_handler,
-                                                     mg_constrained_dofs,
-                                                     dsp,
-                                                     level);
-            dsp.compress();
-            mg_interface_in[level].reinit(dsp);
+                MGTools::make_interface_sparsity_pattern(dof_handler,
+                                                         mg_constrained_dofs,
+                                                         dsp,
+                                                         level);
+                dsp.compress();
+                mg_interface_in[level].reinit(dsp);
 #endif
-          }
+              }
+            }
+          break;
         }
+
+      default:
+        Assert(false, ExcNotImplemented());
     }
 }
 
@@ -796,9 +823,11 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
     triangulation.n_global_levels());
   for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
     {
-      IndexSet dofset;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, dofset);
-      boundary_constraints[level].reinit(dofset);
+      IndexSet dof_set;
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                    level,
+                                                    dof_set);
+      boundary_constraints[level].reinit(dof_set);
       boundary_constraints[level].add_lines(
         mg_constrained_dofs.get_refinement_edge_indices(level));
       boundary_constraints[level].add_lines(
@@ -936,6 +965,7 @@ void LaplaceProblem<dim, degree>::assemble_rhs()
 }
 
 
+
 // @sect4{LaplaceProblem::solve()}
 
 // Here we set up the multigrid preconditioner, test the timing of a single
@@ -953,192 +983,212 @@ void LaplaceProblem<dim, degree>::solve()
 
   // The solver for the matrix-free GMG method is similar to step-37, apart
   // from adding some interface matrices in complete analogy to step-16.
-  if (settings.solver == Settings::gmg_mf)
+  switch (settings.solver)
     {
-      computing_timer.enter_subsection("Solve: Preconditioner setup");
+      case Settings::gmg_mf:
+        {
+          computing_timer.enter_subsection("Solve: Preconditioner setup");
 
-      MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
-      mg_transfer.build(dof_handler);
+          MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
+          mg_transfer.build(dof_handler);
 
-      SolverControl coarse_solver_control(1000, 1e-12, false, false);
-      SolverCG<MatrixFreeLevelVector> coarse_solver(coarse_solver_control);
-      PreconditionIdentity            identity;
-      MGCoarseGridIterativeSolver<MatrixFreeLevelVector,
-                                  SolverCG<MatrixFreeLevelVector>,
-                                  MatrixFreeLevelMatrix,
-                                  PreconditionIdentity>
-        coarse_grid_solver(coarse_solver, mf_mg_matrix[0], identity);
+          SolverControl coarse_solver_control(1000, 1e-12, false, false);
+          SolverCG<MatrixFreeLevelVector> coarse_solver(coarse_solver_control);
+          PreconditionIdentity            identity;
+          MGCoarseGridIterativeSolver<MatrixFreeLevelVector,
+                                      SolverCG<MatrixFreeLevelVector>,
+                                      MatrixFreeLevelMatrix,
+                                      PreconditionIdentity>
+            coarse_grid_solver(coarse_solver, mf_mg_matrix[0], identity);
 
-      using Smoother = dealii::PreconditionJacobi<MatrixFreeLevelMatrix>;
-      MGSmootherPrecondition<MatrixFreeLevelMatrix,
-                             Smoother,
-                             MatrixFreeLevelVector>
-        smoother;
-      smoother.initialize(mf_mg_matrix,
-                          typename Smoother::AdditionalData(
-                            settings.smoother_dampen));
-      smoother.set_steps(settings.smoother_steps);
+          using Smoother = dealii::PreconditionJacobi<MatrixFreeLevelMatrix>;
+          MGSmootherPrecondition<MatrixFreeLevelMatrix,
+                                 Smoother,
+                                 MatrixFreeLevelVector>
+            smoother;
+          smoother.initialize(mf_mg_matrix,
+                              typename Smoother::AdditionalData(
+                                settings.smoother_dampen));
+          smoother.set_steps(settings.smoother_steps);
 
-      mg::Matrix<MatrixFreeLevelVector> mg_m(mf_mg_matrix);
+          mg::Matrix<MatrixFreeLevelVector> mg_m(mf_mg_matrix);
 
-      MGLevelObject<
-        MatrixFreeOperators::MGInterfaceOperator<MatrixFreeLevelMatrix>>
-        mg_interface_matrices;
-      mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
-      for (unsigned int level = 0; level < triangulation.n_global_levels();
-           ++level)
-        mg_interface_matrices[level].initialize(mf_mg_matrix[level]);
-      mg::Matrix<MatrixFreeLevelVector> mg_interface(mg_interface_matrices);
+          MGLevelObject<
+            MatrixFreeOperators::MGInterfaceOperator<MatrixFreeLevelMatrix>>
+            mg_interface_matrices;
+          mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
+          for (unsigned int level = 0; level < triangulation.n_global_levels();
+               ++level)
+            mg_interface_matrices[level].initialize(mf_mg_matrix[level]);
+          mg::Matrix<MatrixFreeLevelVector> mg_interface(mg_interface_matrices);
 
-      Multigrid<MatrixFreeLevelVector> mg(
-        mg_m, coarse_grid_solver, mg_transfer, smoother, smoother);
-      mg.set_edge_matrices(mg_interface, mg_interface);
+          Multigrid<MatrixFreeLevelVector> mg(
+            mg_m, coarse_grid_solver, mg_transfer, smoother, smoother);
+          mg.set_edge_matrices(mg_interface, mg_interface);
 
-      PreconditionMG<dim,
-                     MatrixFreeLevelVector,
-                     MGTransferMatrixFree<dim, float>>
-        preconditioner(dof_handler, mg, mg_transfer);
+          PreconditionMG<dim,
+                         MatrixFreeLevelVector,
+                         MGTransferMatrixFree<dim, float>>
+            preconditioner(dof_handler, mg, mg_transfer);
 
-      // Copy the solution vector and right-hand side from LA::MPI::Vector to
-      // dealii::LinearAlgebra::distributed::Vector so that we can solve.
-      MatrixFreeActiveVector solution_copy;
-      MatrixFreeActiveVector right_hand_side_copy;
-      mf_system_matrix.initialize_dof_vector(solution_copy);
-      mf_system_matrix.initialize_dof_vector(right_hand_side_copy);
+          // Copy the solution vector and right-hand side from LA::MPI::Vector
+          // to dealii::LinearAlgebra::distributed::Vector so that we can solve.
+          MatrixFreeActiveVector solution_copy;
+          MatrixFreeActiveVector right_hand_side_copy;
+          mf_system_matrix.initialize_dof_vector(solution_copy);
+          mf_system_matrix.initialize_dof_vector(right_hand_side_copy);
 
-      ChangeVectorTypes::copy(solution_copy, solution);
-      ChangeVectorTypes::copy(right_hand_side_copy, right_hand_side);
-      computing_timer.leave_subsection("Solve: Preconditioner setup");
+          ChangeVectorTypes::copy(solution_copy, solution);
+          ChangeVectorTypes::copy(right_hand_side_copy, right_hand_side);
+          computing_timer.leave_subsection("Solve: Preconditioner setup");
 
-      // Timing for 1 V-cycle.
-      {
-        TimerOutput::Scope timing(computing_timer,
-                                  "Solve: 1 multigrid V-cycle");
-        preconditioner.vmult(solution_copy, right_hand_side_copy);
-      }
-      solution_copy = 0.;
+          // Timing for 1 V-cycle.
+          {
+            TimerOutput::Scope timing(computing_timer,
+                                      "Solve: 1 multigrid V-cycle");
+            preconditioner.vmult(solution_copy, right_hand_side_copy);
+          }
+          solution_copy = 0.;
 
-      // Solve the linear system, update the ghost values of the solution,
-      // copy back to LA::MPI::Vector and distribute constraints.
-      {
-        SolverCG<MatrixFreeActiveVector> solver(solver_control);
+          // Solve the linear system, update the ghost values of the solution,
+          // copy back to LA::MPI::Vector and distribute constraints.
+          {
+            SolverCG<MatrixFreeActiveVector> solver(solver_control);
 
-        TimerOutput::Scope timing(computing_timer, "Solve: CG");
-        solver.solve(mf_system_matrix,
-                     solution_copy,
-                     right_hand_side_copy,
-                     preconditioner);
-      }
+            TimerOutput::Scope timing(computing_timer, "Solve: CG");
+            solver.solve(mf_system_matrix,
+                         solution_copy,
+                         right_hand_side_copy,
+                         preconditioner);
+          }
 
-      solution_copy.update_ghost_values();
-      ChangeVectorTypes::copy(solution, solution_copy);
-      constraints.distribute(solution);
-    }
-  // Solver for the matrix-based GMG method, similar to step-16, only using a
-  // Jacobi smoother instead of a SOR smoother (which is not implemented in
-  // parallel).
-  else if (settings.solver == Settings::gmg_mb)
-    {
-      computing_timer.enter_subsection("Solve: Preconditioner setup");
+          solution_copy.update_ghost_values();
+          ChangeVectorTypes::copy(solution, solution_copy);
+          constraints.distribute(solution);
 
-      MGTransferPrebuilt<VectorType> mg_transfer(mg_constrained_dofs);
-      mg_transfer.build(dof_handler);
+          break;
+        }
 
-      SolverControl        coarse_solver_control(1000, 1e-12, false, false);
-      SolverCG<VectorType> coarse_solver(coarse_solver_control);
-      PreconditionIdentity identity;
-      MGCoarseGridIterativeSolver<VectorType,
-                                  SolverCG<VectorType>,
-                                  MatrixType,
-                                  PreconditionIdentity>
-        coarse_grid_solver(coarse_solver, mg_matrix[0], identity);
+        // Solver for the matrix-based GMG method, similar to step-16, only
+        // using a Jacobi smoother instead of a SOR smoother (which is not
+        // implemented in parallel).
+      case Settings::gmg_mb:
+        {
+          computing_timer.enter_subsection("Solve: Preconditioner setup");
 
-      using Smoother = LA::MPI::PreconditionJacobi;
-      MGSmootherPrecondition<MatrixType, Smoother, VectorType> smoother;
+          MGTransferPrebuilt<VectorType> mg_transfer(mg_constrained_dofs);
+          mg_transfer.build(dof_handler);
+
+          SolverControl        coarse_solver_control(1000, 1e-12, false, false);
+          SolverCG<VectorType> coarse_solver(coarse_solver_control);
+          PreconditionIdentity identity;
+          MGCoarseGridIterativeSolver<VectorType,
+                                      SolverCG<VectorType>,
+                                      MatrixType,
+                                      PreconditionIdentity>
+            coarse_grid_solver(coarse_solver, mg_matrix[0], identity);
+
+          using Smoother = LA::MPI::PreconditionJacobi;
+          MGSmootherPrecondition<MatrixType, Smoother, VectorType> smoother;
 
 #ifdef USE_PETSC_LA
-      smoother.initialize(mg_matrix);
-      Assert(
-        settings.smoother_dampen == 1.0,
-        ExcNotImplemented(
-          "PETSc's PreconditionJacobi has no support for a damping parameter."));
+          smoother.initialize(mg_matrix);
+          Assert(
+            settings.smoother_dampen == 1.0,
+            ExcNotImplemented(
+              "PETSc's PreconditionJacobi has no support for a damping parameter."));
 #else
-      smoother.initialize(mg_matrix, settings.smoother_dampen);
+          smoother.initialize(mg_matrix, settings.smoother_dampen);
 #endif
 
-      smoother.set_steps(settings.smoother_steps);
+          smoother.set_steps(settings.smoother_steps);
 
-      mg::Matrix<VectorType> mg_m(mg_matrix);
-      mg::Matrix<VectorType> mg_in(mg_interface_in);
-      mg::Matrix<VectorType> mg_out(mg_interface_in);
+          mg::Matrix<VectorType> mg_m(mg_matrix);
+          mg::Matrix<VectorType> mg_in(mg_interface_in);
+          mg::Matrix<VectorType> mg_out(mg_interface_in);
 
-      Multigrid<VectorType> mg(
-        mg_m, coarse_grid_solver, mg_transfer, smoother, smoother);
-      mg.set_edge_matrices(mg_out, mg_in);
+          Multigrid<VectorType> mg(
+            mg_m, coarse_grid_solver, mg_transfer, smoother, smoother);
+          mg.set_edge_matrices(mg_out, mg_in);
 
 
-      PreconditionMG<dim, VectorType, MGTransferPrebuilt<VectorType>>
-        preconditioner(dof_handler, mg, mg_transfer);
+          PreconditionMG<dim, VectorType, MGTransferPrebuilt<VectorType>>
+            preconditioner(dof_handler, mg, mg_transfer);
 
-      computing_timer.leave_subsection("Solve: Preconditioner setup");
+          computing_timer.leave_subsection("Solve: Preconditioner setup");
 
-      // Timing for 1 V-cycle.
-      {
-        TimerOutput::Scope timing(computing_timer,
-                                  "Solve: 1 multigrid V-cycle");
-        preconditioner.vmult(solution, right_hand_side);
-      }
-      solution = 0.;
+          // Timing for 1 V-cycle.
+          {
+            TimerOutput::Scope timing(computing_timer,
+                                      "Solve: 1 multigrid V-cycle");
+            preconditioner.vmult(solution, right_hand_side);
+          }
+          solution = 0.;
 
-      // Solve the linear system and distribute constraints.
-      {
-        SolverCG<VectorType> solver(solver_control);
+          // Solve the linear system and distribute constraints.
+          {
+            SolverCG<VectorType> solver(solver_control);
 
-        TimerOutput::Scope timing(computing_timer, "Solve: CG");
-        solver.solve(system_matrix, solution, right_hand_side, preconditioner);
-      }
+            TimerOutput::Scope timing(computing_timer, "Solve: CG");
+            solver.solve(system_matrix,
+                         solution,
+                         right_hand_side,
+                         preconditioner);
+          }
 
-      constraints.distribute(solution);
-    }
-  // Solver for the AMG method, similar to step-40.
-  else /*amg*/
-    {
-      computing_timer.enter_subsection("Solve: Preconditioner setup");
+          constraints.distribute(solution);
 
-      PreconditionAMG                 preconditioner;
-      PreconditionAMG::AdditionalData Amg_data;
+          break;
+        }
+
+      // Solver for the AMG method, similar to step-40.
+      case Settings::amg:
+        {
+          computing_timer.enter_subsection("Solve: Preconditioner setup");
+
+          PreconditionAMG                 preconditioner;
+          PreconditionAMG::AdditionalData Amg_data;
 
 #ifdef USE_PETSC_LA
-      Amg_data.symmetric_operator = true;
+          Amg_data.symmetric_operator = true;
 #else
-      Amg_data.elliptic              = true;
-      Amg_data.smoother_type         = "Jacobi";
-      Amg_data.higher_order_elements = true;
-      Amg_data.smoother_sweeps       = settings.smoother_steps;
-      Amg_data.aggregation_threshold = 0.02;
+          Amg_data.elliptic              = true;
+          Amg_data.smoother_type         = "Jacobi";
+          Amg_data.higher_order_elements = true;
+          Amg_data.smoother_sweeps       = settings.smoother_steps;
+          Amg_data.aggregation_threshold = 0.02;
 #endif
 
-      Amg_data.output_details = false;
+          Amg_data.output_details = false;
 
-      preconditioner.initialize(system_matrix, Amg_data);
-      computing_timer.leave_subsection("Solve: Preconditioner setup");
+          preconditioner.initialize(system_matrix, Amg_data);
+          computing_timer.leave_subsection("Solve: Preconditioner setup");
 
-      // Timing for 1 V-cycle.
-      {
-        TimerOutput::Scope timing(computing_timer,
-                                  "Solve: 1 multigrid V-cycle");
-        preconditioner.vmult(solution, right_hand_side);
-      }
-      solution = 0.;
+          // Timing for 1 V-cycle.
+          {
+            TimerOutput::Scope timing(computing_timer,
+                                      "Solve: 1 multigrid V-cycle");
+            preconditioner.vmult(solution, right_hand_side);
+          }
+          solution = 0.;
 
-      // Solve the linear system and distribute constraints.
-      {
-        SolverCG<VectorType> solver(solver_control);
+          // Solve the linear system and distribute constraints.
+          {
+            SolverCG<VectorType> solver(solver_control);
 
-        TimerOutput::Scope timing(computing_timer, "Solve: CG");
-        solver.solve(system_matrix, solution, right_hand_side, preconditioner);
-      }
-      constraints.distribute(solution);
+            TimerOutput::Scope timing(computing_timer, "Solve: CG");
+            solver.solve(system_matrix,
+                         solution,
+                         right_hand_side,
+                         preconditioner);
+          }
+          constraints.distribute(solution);
+
+          break;
+        }
+
+      default:
+        Assert(false, ExcInternalError());
     }
 
   pcout << "   Number of CG iterations:      " << solver_control.last_step()
