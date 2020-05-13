@@ -425,8 +425,8 @@ private:
 
   DoFHandler<dim> dof_handler;
 
-  IndexSet                  locally_owned_set;
-  IndexSet                  locally_relevant_set;
+  IndexSet                  locally_owned_dofs;
+  IndexSet                  locally_relevant_dofs;
   AffineConstraints<double> constraints;
 
   MatrixType             system_matrix;
@@ -484,12 +484,12 @@ void LaplaceProblem<dim, degree>::setup_system()
 
   dof_handler.distribute_dofs(fe);
 
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
-  locally_owned_set = dof_handler.locally_owned_dofs();
+  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  locally_owned_dofs = dof_handler.locally_owned_dofs();
 
-  solution.reinit(locally_owned_set, mpi_communicator);
-  right_hand_side.reinit(locally_owned_set, mpi_communicator);
-  constraints.reinit(locally_relevant_set);
+  solution.reinit(locally_owned_dofs, mpi_communicator);
+  right_hand_side.reinit(locally_owned_dofs, mpi_communicator);
+  constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   VectorTools::interpolate_boundary_values(
@@ -525,22 +525,22 @@ void LaplaceProblem<dim, degree>::setup_system()
       case Settings::amg:
         {
 #ifdef USE_PETSC_LA
-          DynamicSparsityPattern dsp(locally_relevant_set);
+          DynamicSparsityPattern dsp(locally_relevant_dofs);
           DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
           SparsityTools::distribute_sparsity_pattern(dsp,
-                                                     locally_owned_set,
+                                                     locally_owned_dofs,
                                                      mpi_communicator,
-                                                     locally_relevant_set);
+                                                     locally_relevant_dofs);
 
-          system_matrix.reinit(locally_owned_set,
-                               locally_owned_set,
+          system_matrix.reinit(locally_owned_dofs,
+                               locally_owned_dofs,
                                dsp,
                                mpi_communicator);
 #else
-          TrilinosWrappers::SparsityPattern dsp(locally_owned_set,
-                                                locally_owned_set,
-                                                locally_relevant_set,
+          TrilinosWrappers::SparsityPattern dsp(locally_owned_dofs,
+                                                locally_owned_dofs,
+                                                locally_relevant_dofs,
                                                 MPI_COMM_WORLD);
           DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
           dsp.compress();
@@ -1264,8 +1264,8 @@ void LaplaceProblem<dim, degree>::estimate()
   TimerOutput::Scope timing(computing_timer, "Estimate");
 
   VectorType temp_solution;
-  temp_solution.reinit(locally_owned_set,
-                       locally_relevant_set,
+  temp_solution.reinit(locally_owned_dofs,
+                       locally_relevant_dofs,
                        mpi_communicator);
   temp_solution = solution;
 
@@ -1418,8 +1418,8 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
   TimerOutput::Scope timing(computing_timer, "Output results");
 
   VectorType temp_solution;
-  temp_solution.reinit(locally_owned_set,
-                       locally_relevant_set,
+  temp_solution.reinit(locally_owned_dofs,
+                       locally_relevant_dofs,
                        mpi_communicator);
   temp_solution = solution;
 
