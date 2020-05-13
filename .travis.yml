@@ -30,7 +30,3 @@ script:
     - cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
     - make -j documentation
     - cat doxygen.log && ! [ -s doxygen.log ]
-
-branches:
-  only:
-    - master
