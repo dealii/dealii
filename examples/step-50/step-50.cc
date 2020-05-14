@@ -246,7 +246,7 @@ std::shared_ptr<Table<2, VectorizedArray<number>>>
 Coefficient<dim>::make_coefficient_table(
   const MatrixFree<dim, number, VectorizedArray<number>> &mf_storage) const
 {
-  std::shared_ptr<Table<2, VectorizedArray<number>>> coefficient_table =
+  auto coefficient_table =
     std::make_shared<Table<2, VectorizedArray<number>>>();
 
   FEEvaluation<dim, -1, 0, 1, number> fe_eval(mf_storage);
@@ -439,7 +439,7 @@ private:
   MatrixFreeActiveMatrix mf_system_matrix;
   VectorType             solution;
   VectorType             right_hand_side;
-  Vector<double>         error_estimator;
+  Vector<double>         estimated_error_per_cell;
 
   MGLevelObject<MatrixType> mg_matrix;
   MGLevelObject<MatrixType> mg_interface_in;
@@ -773,15 +773,15 @@ void LaplaceProblem<dim, degree>::assemble_system()
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i, j) +=
-                  (coefficient_value *                // epsilon(x)
-                   fe_values.shape_grad(i, q_point) * // * grad phi_i(x)
-                   fe_values.shape_grad(j, q_point) * // * grad phi_j(x)
-                   fe_values.JxW(q_point));           // * dx
+                  coefficient_value *                // epsilon(x)
+                  fe_values.shape_grad(i, q_point) * // * grad phi_i(x)
+                  fe_values.shape_grad(j, q_point) * // * grad phi_j(x)
+                  fe_values.JxW(q_point);            // * dx
 
               cell_rhs(i) +=
-                (fe_values.shape_value(i, q_point) * // grad phi_i(x)
-                 rhs_values[q_point] *               // * f(x)
-                 fe_values.JxW(q_point));            // * dx
+                fe_values.shape_value(i, q_point) * // grad phi_i(x)
+                rhs_values[q_point] *               // * f(x)
+                fe_values.JxW(q_point);             // * dx
             }
 
         cell->get_dof_indices(local_dof_indices);
@@ -855,8 +855,8 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i, j) +=
-                (coefficient_value * fe_values.shape_grad(i, q_point) *
-                 fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+                coefficient_value * fe_values.shape_grad(i, q_point) *
+                fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point);
 
         cell->get_mg_dof_indices(local_dof_indices);
 
@@ -1277,7 +1277,7 @@ void LaplaceProblem<dim, degree>::estimate()
 
   const Coefficient<dim> coefficient;
 
-  error_estimator.reinit(triangulation.n_active_cells());
+  estimated_error_per_cell.reinit(triangulation.n_active_cells());
 
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
@@ -1360,11 +1360,11 @@ void LaplaceProblem<dim, degree>::estimate()
 
   auto copier = [&](const CopyData &copy_data) {
     if (copy_data.cell_index != numbers::invalid_unsigned_int)
-      error_estimator[copy_data.cell_index] += copy_data.value;
+      estimated_error_per_cell[copy_data.cell_index] += copy_data.value;
 
     for (auto &cdf : copy_data.face_data)
       for (unsigned int j = 0; j < 2; ++j)
-        error_estimator[cdf.cell_indices[j]] += cdf.values[j];
+        estimated_error_per_cell[cdf.cell_indices[j]] += cdf.values[j];
   };
 
   const unsigned int n_gauss_points = degree + 1;
@@ -1408,7 +1408,7 @@ void LaplaceProblem<dim, degree>::refine_grid()
 
   const double refinement_fraction = 1. / (std::pow(2.0, dim) - 1.);
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-    triangulation, error_estimator, refinement_fraction, 0.0);
+    triangulation, estimated_error_per_cell, refinement_fraction, 0.0);
 
   triangulation.execute_coarsening_and_refinement();
 }
@@ -1443,8 +1443,9 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
     level(cell->active_cell_index()) = cell->level();
   data_out.add_data_vector(level, "level");
 
-  if (error_estimator.size() > 0)
-    data_out.add_data_vector(error_estimator, "error_estimator");
+  if (estimated_error_per_cell.size() > 0)
+    data_out.add_data_vector(estimated_error_per_cell,
+                             "estimated_error_per_cell");
 
   data_out.build_patches();
 
