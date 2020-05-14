@@ -72,12 +72,12 @@ subsection Stokes Immersed Problem
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = 
+    set Function constants  =
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -88,7 +88,7 @@ subsection Stokes Immersed Problem
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -132,12 +132,12 @@ subsection Stokes Immersed Problem
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = 
+    set Function constants  =
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -148,7 +148,7 @@ subsection Stokes Immersed Problem
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -192,7 +192,7 @@ subsection Stokes Immersed Problem
   set Velocity degree                       = 2
   set Viscosity                             = 1
   subsection Angular velocity
-    set Function constants  = 
+    set Function constants  =
     set Function expression = t < .500001 ? 6.283185 : -6.283185
     set Variable names      = x,y,t
   end
@@ -214,7 +214,7 @@ subsection Stokes Immersed Problem
     set Refinement strategy            = fixed_fraction
   end
   subsection Right hand side
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 0; 0; 0
     set Variable names      = x,y,t
   end
