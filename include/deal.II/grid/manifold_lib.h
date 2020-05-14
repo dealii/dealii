@@ -601,6 +601,10 @@ public:
    *
    * The tolerance argument is used in debug mode to actually check that the
    * two functions are one the inverse of the other.
+   *
+   * Note: the object constructed in this way stores pointers to the
+   * push_forward and  pull_back functions. Therefore, one must guarantee that
+   * the function objects are destroyed only after the constructed manifold.
    */
   FunctionManifold(
     const Function<chartdim> & push_forward_function,
@@ -620,8 +624,8 @@ public:
    *                                std_cxx14::make_unique<MyPullBack>(...));
    */
   FunctionManifold(
-    std::unique_ptr<Function<chartdim>> push_forward_function,
-    std::unique_ptr<Function<spacedim>> pull_back_function,
+    std::unique_ptr<Function<chartdim>> push_forward,
+    std::unique_ptr<Function<spacedim>> pull_back,
     const Tensor<1, chartdim> &         periodicity = Tensor<1, chartdim>(),
     const double                        tolerance   = 1e-10);
 

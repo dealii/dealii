@@ -1378,14 +1378,14 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
 
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
-  std::unique_ptr<Function<chartdim>> push_forward_function,
-  std::unique_ptr<Function<spacedim>> pull_back_function,
+  std::unique_ptr<Function<chartdim>> push_forward,
+  std::unique_ptr<Function<spacedim>> pull_back,
   const Tensor<1, chartdim> &         periodicity,
   const double                        tolerance)
   : ChartManifold<dim, spacedim, chartdim>(periodicity)
   , const_map()
-  , push_forward_function(push_forward_function.release())
-  , pull_back_function(pull_back_function.release())
+  , push_forward_function(push_forward.release())
+  , pull_back_function(pull_back.release())
   , tolerance(tolerance)
   , owns_pointers(true)
   , finite_difference_step(0)
@@ -1473,8 +1473,6 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
     }
   else
     {
-      Assert(owns_pointers == false, ExcNotImplemented());
-
       return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
         *push_forward_function,
         *pull_back_function,
