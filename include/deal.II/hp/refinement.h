@@ -368,7 +368,7 @@ namespace hp
 
     /**
      * Predict how the current @p error_indicators will adapt after refinement
-     * and coarsening has happened on the provided @p dof_handler, and write its
+     * and coarsening were to happen on the provided @p dof_handler, and write its
      * results to @p predicted_errors. Each entry of @p error_indicators and
      * @p predicted_errors corresponds to an active cell on the underlying
      * Triangulation, thus each container has to be of size
@@ -517,7 +517,7 @@ namespace hp
      * // set h-adaptivity flags
      * Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
      * KellyErrorEstimator::estimate(...);
-     * GridRefinemet::refine_and_coarsen_fixed_fraction(...);
+     * GridRefinemet::refine_and_coarsen_fixed_{number|fraction}(...);
      *
      * // set p-adaptivity flags
      * hp::Refinement::p_adaptivity_from_reference(
