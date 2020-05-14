@@ -49,17 +49,13 @@ print(const BoundingBox<2> &box)
   return str.str();
 }
 
-
-int
-main(int argc, char **argv)
+void
+test(const unsigned int n_refinements)
 {
-  auto          mpi_init = Utilities::MPI::MPI_InitFinalize(argc, argv);
-  MPILogInitAll log;
-
   parallel::distributed::Triangulation<2> tria(MPI_COMM_WORLD);
 
   GridGenerator::hyper_ball(tria);
-  tria.refine_global(3);
+  tria.refine_global(n_refinements);
 
   std::vector<BoundingBox<2>> all_boxes(tria.n_locally_owned_active_cells());
   unsigned int                i = 0;
@@ -70,6 +66,7 @@ main(int argc, char **argv)
   const auto tree  = pack_rtree(all_boxes);
   const auto boxes = extract_rtree_level(tree, 0);
 
+  deallog << "Refinements: " << n_refinements << std::endl;
   deallog << "LEVEL 0:  N boxes: " << boxes.size() << std::endl;
   for (const auto &b : boxes)
     deallog << print(b) << std::endl;
@@ -88,4 +85,15 @@ main(int argc, char **argv)
   //
   // for (const auto &b : all_boxes)
   //   all << print(b);
+}
+
+
+int
+main(int argc, char **argv)
+{
+  auto          mpi_init = Utilities::MPI::MPI_InitFinalize(argc, argv);
+  MPILogInitAll log;
+
+  for (unsigned int i = 0; i <= 3; ++i)
+    test(i);
 }

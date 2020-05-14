@@ -423,18 +423,28 @@ extract_rtree_level(const Rtree &tree, const unsigned int level)
 
   std::vector<BoundingBox<dim>> boxes;
 
-  const unsigned int target_level =
-    std::min<unsigned int>(level, rtv.depth() - 1);
-  // There should always be at least one level.
-  Assert(target_level >= 0, ExcInternalError());
+  if (rtv.depth() == 0)
+    {
+      // The below algorithm does not work for `rtv.depth()==0`, which might
+      // happen if the number entries in the tree is too small.
+      // In this case, simply return a single bounding box.
+      boxes.resize(1);
+      boost::geometry::convert(tree.bounds(), boxes[0]);
+    }
+  else
+    {
+      const unsigned int target_level =
+        std::min<unsigned int>(level, rtv.depth() - 1);
 
-  ExtractLevelVisitor<typename RtreeView::value_type,
-                      typename RtreeView::options_type,
-                      typename RtreeView::translator_type,
-                      typename RtreeView::box_type,
-                      typename RtreeView::allocators_type>
-    extract_level_visitor(rtv.translator(), target_level, boxes);
-  rtv.apply_visitor(extract_level_visitor);
+      ExtractLevelVisitor<typename RtreeView::value_type,
+                          typename RtreeView::options_type,
+                          typename RtreeView::translator_type,
+                          typename RtreeView::box_type,
+                          typename RtreeView::allocators_type>
+        extract_level_visitor(rtv.translator(), target_level, boxes);
+      rtv.apply_visitor(extract_level_visitor);
+    }
+
   return boxes;
 }
 
