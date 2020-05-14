@@ -171,7 +171,7 @@ namespace Step27
     , triangulation(mpi_communicator)
     , dof_handler(triangulation)
     , max_degree(dim <= 2 ? 7 : 5)
-    , pcout(std::cout,
+    , pcout(deallog.get_file_stream(),
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
   {
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
@@ -329,10 +329,13 @@ namespace Step27
     LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
-    SolverControl solver_control(system_rhs.size(),
-                                 1e-8 * system_rhs.l2_norm());
-    //                           ^~~~
-    // Loss of precision with a factor of 1e-12 with Trilinos
+    SolverControl solver_control(
+      system_rhs.size(),
+      1e-8 * system_rhs.l2_norm(),
+      // ^~~~
+      // Loss of precision with a factor of 1e-12 with Trilinos
+      false,
+      false);
     LA::SolverCG cg(solver_control, mpi_communicator);
 
     LA::MPI::PreconditionAMG                 preconditioner;
@@ -340,13 +343,10 @@ namespace Step27
     data.symmetric_operator = true;
     preconditioner.initialize(system_matrix, data);
 
-    check_solver_within_range(cg.solve(system_matrix,
-                                       completely_distributed_solution,
-                                       system_rhs,
-                                       preconditioner),
-                              solver_control.last_step(),
-                              5,
-                              40);
+    cg.solve(system_matrix,
+             completely_distributed_solution,
+             system_rhs,
+             preconditioner);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
@@ -476,6 +476,9 @@ main(int argc, char *argv[])
       using namespace Step27;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      // This is the right choice (e.g., vs. mpi_initlog()) since the test
+      // uses ConditionalOStream
+      initlog();
 
       LaplaceProblem<2> laplace_problem;
       laplace_problem.run();
