@@ -908,14 +908,12 @@ namespace Step70
     // functions will receive a signal when refinement is about to happen, and
     // when it has just happened, and will take care of transferring all
     // information to the newly refined grid with minimal computational cost.
-    fluid_tria.signals.pre_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<spacedim>::register_store_callback_function,
-      &tracer_particle_handler));
+    fluid_tria.signals.pre_distributed_refinement.connect(
+      [&]() { tracer_particle_handler.register_store_callback_function(); });
 
-    fluid_tria.signals.post_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<spacedim>::register_load_callback_function,
-      &tracer_particle_handler,
-      false));
+    fluid_tria.signals.post_distributed_refinement.connect([&]() {
+      tracer_particle_handler.register_load_callback_function(false);
+    });
 
     // Finally, we display to the terminal the number of total tracer particles
     // that were generated
@@ -1007,14 +1005,11 @@ namespace Step70
 
 
     // Now make sure that upon refinement, particles are correctly transferred
-    fluid_tria.signals.pre_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<spacedim>::register_store_callback_function,
-      &solid_particle_handler));
+    fluid_tria.signals.pre_distributed_refinement.connect(
+      [&]() { solid_particle_handler.register_store_callback_function(); });
 
-    fluid_tria.signals.post_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<spacedim>::register_load_callback_function,
-      &solid_particle_handler,
-      false));
+    fluid_tria.signals.post_distributed_refinement.connect(
+      [&]() { solid_particle_handler.register_load_callback_function(false); });
 
     pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
           << std::endl;
