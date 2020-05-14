@@ -71,7 +71,7 @@ class TestManifoldWrapperFunction(unittest.TestCase):
 
     def setUp(self):
         self.manifold_1 = Manifold(dim = 2, spacedim = 2)
-        self.manifold_1.create_function("x^2;y^2", "sqrt(x);sqrt(y)")
+        self.manifold_1.create_function_string("x^2;y^2", "sqrt(x);sqrt(y)")
 
         self.manifold_2 = Manifold(dim = 2, spacedim = 2)
         self.manifold_2.create_function(lambda p: [p[0]**2., p[1]**2.],\
@@ -85,7 +85,7 @@ class TestManifoldWrapperFunction(unittest.TestCase):
         p_center = Point([0., 0., 0.])
         self.triangulation.generate_hyper_cube()
         self.triangulation.reset_manifold(number = 0)
-        self.triangulation.set_manifold(number = 0, manifold = self.manifold_2)
+        self.triangulation.set_manifold(number = 0, manifold = self.manifold_1)
         for cell in self.triangulation.active_cells():
             cell.set_all_manifold_ids(0)
 
