@@ -677,7 +677,7 @@ namespace Step70
     using map_type  = std::map<types::manifold_id, std::string>;
     using Converter = Patterns::Tools::Convert<map_type>;
 
-    for (const auto pair : Converter::to_value(ids_and_cad_file_names))
+    for (const auto &pair : Converter::to_value(ids_and_cad_file_names))
       {
         const auto &manifold_id   = pair.first;
         const auto &cad_file_name = pair.second;
