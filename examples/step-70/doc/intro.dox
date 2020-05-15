@@ -19,7 +19,7 @@ because they often involve a container (with fixed boundaries, and possibly
 complex geometries such as baffles), represented by the domain $\Omega$,
 and one (or more) immersed and rotating impellers (represented by the domain $\Omega^{\text{imp}}$).
 The domain in which we would like to solve the flow equations is the (time
-depedendent) difference between the two domains, namely:
+dependent) difference between the two domains, namely:
 $\Omega\setminus\Omega^{\text{imp}}$.
 
 For rotating impellers, the use of Arbitrary Lagrangian Eulerian formulations
@@ -59,7 +59,7 @@ flow (i.e. a flow where $\text{Re}\rightarrow 0$) and a no-slip boundary
 condition is applied on the moving *embedded domain* $\Gamma$ associated with
 the impeller. However, this tutorial could be readily extended
 to other equations (e.g. the Navier-Stokes equations, linear elasticity
-equation, etc.). It can can be seen as a natural extension of step-60 that
+equation, etc.). It can be seen as a natural extension of step-60 that
 enables the solution of large problems using a distributed parallel computing
 architecture via MPI.
 
@@ -202,7 +202,7 @@ error. The consistency terms and the stabilization term are added to the
 right hand side with the actual boundary data $\mathbf{g}$.
 
 When $\mathbf{u}$ satisfies the condition $\mathbf{u}=\mathbf{g}$ on $\Gamma$,
-all the consistency and stabilty integrals on $\Gamma$ cancel out, and one is
+all the consistency and stability integrals on $\Gamma$ cancel out, and one is
 left with the usual weak form of Stokes flow, that is, the above formulation is
 consistent.
 
@@ -231,7 +231,7 @@ discretization, since in this case it can be shown that the dual problem is
 also consistent, leading to a solution where not only the energy norm of the
 solution converges with the correct order, but also its $L^2$ norm.
 
-The above formulation works under the assumption that the domain is discretised
+The above formulation works under the assumption that the domain is discretized
 exactly. However, if the deformation of the impeller is a rigid body
 motion, it is possible to artificially extend the solution of the Stokes
 problem inside the propeller itself, since a rigid body motion is also a
@@ -284,7 +284,7 @@ to impose the boundary condition over $\Gamma$.
 
 <h4>Co-dimension zero case</h4>
 
-In this case, $\Gamma$ has the same dimension, but is imbedded into $\Omega$.
+In this case, $\Gamma$ has the same dimension, but is embedded into $\Omega$.
 In the case of $\mathcal{L}^2$ penalization, the additional penalization
 term, can be interpreted as a Darcy term within $\Gamma$, resulting in:
 
@@ -322,7 +322,7 @@ implementation, thanks to the dimension independent capabilities of deal.II.
 
 In this tutorial, both the embedded grid $\Gamma$ and the embedding
 grid are described using a parallel::distributed::Triangulation. These two
-triangulations can be built from deal.II GridGenerators namespace or by reading
+triangulations can be built from the GridGenerator namespace or by reading
 a mesh file produced with another application (e.g. GMSH). This is slightly
 more general than what was previously done in step-60.
 

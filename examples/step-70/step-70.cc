@@ -149,11 +149,11 @@ namespace Step70
 {
   using namespace dealii;
 
-  // Similiarly to what we have done in step-60, we set up a class that holds
+  // Similarly to what we have done in step-60, we set up a class that holds
   // all the parameters of our problem and derive it from the ParameterAcceptor
   // class to simplify the management and creation of parameter files.
   //
-  // The ParameterAcceptor paradigm requires all parameters to be writeable by
+  // The ParameterAcceptor paradigm requires all parameters to be writable by
   // the ParameterAcceptor methods. In order to avoid bugs that would be very
   // difficult to trace down (such as writing things like `time = 0` instead of
   // `time == 0`), we declare all the parameters in an external class, which is
@@ -188,7 +188,7 @@ namespace Step70
     std::string output_directory = ".";
 
     // We will use a Taylor-Hood function space of arbitrary order. This
-    // parameter is used to initialize the FiniteElement space with the corret
+    // parameter is used to initialize the FiniteElement space with the correct
     // FESystem object
     unsigned int velocity_degree = 2;
 
@@ -226,8 +226,8 @@ namespace Step70
     double viscosity    = 1.0;
     double penalty_term = 100;
 
-    // By default, we create a hyper_cube without colorisation, and we use
-    // homogenous Dirichlet boundary conditions. In this set we store the
+    // By default, we create a hyper_cube without colorization, and we use
+    // homogeneous Dirichlet boundary conditions. In this set we store the
     // boundary ids to use when setting the boundary conditions:
     std::list<types::boundary_id> homogeneous_dirichlet_ids{0};
 
@@ -239,7 +239,7 @@ namespace Step70
     // The mechanism with which the arguments are parsed from and to a string is
     // explained in detail in the Patterns::Tools::Convert class, which is
     // used to translate from strings to most of the basic STL types (vectors,
-    // maps, tuples) and basic dealii types (Point, Tensor, BoundingBox, etc.).
+    // maps, tuples) and basic deal.II types (Point, Tensor, BoundingBox, etc.).
     //
     // In general objects that can be represented by rank 1 uniform elements
     // (i.e., std::vector<double>, Point<dim>, std::set<int>, etc.) are comma
@@ -264,7 +264,7 @@ namespace Step70
     // GridGenerator namespace. If the GridGenerator function fails, this
     // program will interpret the name of the grid as a vtk grid filename, and
     // the arguments as a map from manifold_id to the CAD files describing the
-    // geometry of the domain. Every CAD file will be analysed and a Manifold of
+    // geometry of the domain. Every CAD file will be analyzed and a Manifold of
     // the OpenCASCADE namespace will be generated according to the content of
     // the CAD file itself.
     //
@@ -286,7 +286,7 @@ namespace Step70
     // to control the minimum size of the fluid grid, and guarantee that it is
     // compatible with the solid grid. The minimum number of refinement levels
     // is also controlled to ensured sufficient accuracy in the
-    // bulk of the flow. Additionnaly, we perform local refinement
+    // bulk of the flow. Additionally, we perform local refinement
     // based on standard error estimators on the fluid velocity field.
     //
     // We permit the user to choose between the
@@ -353,7 +353,7 @@ namespace Step70
   };
 
   // Similarly, we assume that the solid position can be computed explicitly at
-  // each time step, exploiting the knoweledge of the angular velocity. We
+  // each time step, exploiting the knowledge of the angular velocity. We
   // compute the exact position of the solid particle assuming that the solid is
   // rotated by an amount equal to the time step multiplied by the angular
   // velocity computed at the point `p`:
@@ -434,7 +434,7 @@ namespace Step70
 
     // The assembly routine is very similar to other Stokes assembly routines,
     void assemble_stokes_system();
-    // with the exception of the Nistche restriction part, which exploits one of
+    // with the exception of the Nitsche restriction part, which exploits one of
     // the particle handlers to integrate on a non-matching part of the fluid
     // domain, corresponding to the position of the solid.
     void assemble_nitsche_restriction();
@@ -444,7 +444,7 @@ namespace Step70
 
     // The refine_and_transfer() method is called only every
     // `refinement_frequency` steps, and makes sure that all the fields
-    // that were computed on the time step before refinement are transfered
+    // that were computed on the time step before refinement are transferred
     // correctly to the new grid. This includes vector fields, as well as
     // particle information.
     void refine_and_transfer();
@@ -583,7 +583,7 @@ namespace Step70
     // overlapping.
     //
     // In order to allow for the efficient exchange of information between
-    // non-overlapping parallell::distributed::Triangulation objects, some
+    // non-overlapping parallel::distributed::Triangulation objects, some
     // algorithms of the library require the user to provide a rough description
     // of the area occupied by the locally owned part of the triangulation, in
     // the form of a collection of axis-aligned bounding boxes for each process,
@@ -615,7 +615,7 @@ namespace Step70
 
   // In the constructor, we create the mpi_communicator as well as
   // the triangulations and dof_handler for both the fluid and the solid.
-  // Using the mpi_communicator, both the ConditionalOSStream and TimerOutput
+  // Using the mpi_communicator, both the ConditionalOStream and TimerOutput
   // are constructed.
   template <int dim, int spacedim>
   StokesImmersedProblem<dim, spacedim>::StokesImmersedProblem(
@@ -663,14 +663,14 @@ namespace Step70
     // ready to attach to it the correct manifold descriptions. We perform the
     // next lines of codes only if deal.II has been built with OpenCASCADE
     // support. For each entry in the map, we try to open the corresponding CAD
-    // file, we analyse it, and according to its content, opt for either a
+    // file, we analyze it, and according to its content, opt for either a
     // ArchLengthProjectionLineManifold (if the CAD file contains a single
     // TopoDS_Edge or a single TopoDS_Wire) or a NURBSPatchManifold, if the file
     // contains a single face. Notice that if the CAD files do not contain
     // single wires, edges, or faces, an assertion will be throw in the
     // generation of the Manifold.
     //
-    // We use the Patterns::Tools::Convert class to do the convertion from the
+    // We use the Patterns::Tools::Convert class to do the conversion from the
     // string to a map between manifold ids and file names for us:
 
 #ifdef DEAL_II_WITH_OPENCASCADE
@@ -893,7 +893,7 @@ namespace Step70
     // particles. This mimics what would happen in the case where another
     // problem was solved in the solid domain (as in fluid-structure
     // interaction. In this latter case, additional DOFs on the solid domain
-    // would be coupled to what is occuring in the fluid domain.
+    // would be coupled to what is occurring in the fluid domain.
     relevant_tracer_particles = owned_tracer_particles;
 
     // Now make sure that upon refinement, particles are correctly transferred.
@@ -1295,7 +1295,7 @@ namespace Step70
         local_matrix = 0;
         local_rhs    = 0;
 
-        // We get the refence to the cell within which the particle lies from
+        // We get the reference to the cell within which the particle lies from
         // the particle itself. Consequently, we can assemble the additional
         // terms in the system matrix the rhs as we would normally.
         const auto &cell = particle->get_surrounding_cell(fluid_tria);
@@ -1782,7 +1782,7 @@ namespace Step70
       Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
                                                               spacedim + 1);
     });
-    // and define a meaningful default angular velocity instaed of zero
+    // and define a meaningful default angular velocity instead of zero
     angular_velocity.declare_parameters_call_back.connect([&]() {
       this->prm.set("Function expression",
                     "t < .500001 ? 6.283185 : -6.283185");

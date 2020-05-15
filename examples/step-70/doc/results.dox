@@ -35,7 +35,7 @@ Aborting!
 However, as the error message already states, the code that triggers the
 exception will also generate the specified file ("parameters.prm" in this case)
 that simply contains the default values for all parameters this program cares
-about (for the correct dimension and co-dimension, according to the wether a
+about (for the correct dimension and co-dimension, according to the whether a
 string "23" or "3" is contained in the file name). By inspection of the default
 parameter file, we see the following:
 
@@ -240,7 +240,7 @@ end
 @endcode
 
 and you would run the program with Q3/Q2 Taylor-Hood finite elements, for 101
-steps, using a Nistche penalty of `10`, and leaving all the other parameters to
+steps, using a Nitsche penalty of `10`, and leaving all the other parameters to
 their default value. You could then inspect all the other parameters in the
 produced file `parameters_22.prm`.
 
@@ -312,7 +312,7 @@ Time : 1, time step: 0.002
 @endcode
 
 You may notice that assembling the coupling system is more expensive than
-assembling the Stokes part. This depends highly on the number of gauss points
+assembling the Stokes part. This depends highly on the number of Gauss points
 (solid particles) that are used to apply the Nitsche restriction.
 In the present case, a relatively low number of tracer particles are used.
 Consequently, tracking their motion is relatively cheap.
@@ -356,7 +356,7 @@ volume of the impeller have returned very close to their initial position,
 whereas those in the swept volume were slightly more deformed. This deformation
 is non-physical. It is caused by the numerical error induced by the explicit
 Euler scheme used to advect the particles, by the loss of accuracy due to the
-fictious domain and, finally, by the discretization error on the Stokes
+fictitious domain and, finally, by the discretization error on the Stokes
 equations. The first two errors are the leading cause of this deformation and
 they could be alleviated by the use of a finer mesh and a lower time step.
 
@@ -465,7 +465,7 @@ problem with distributed Lagrange multipliers, on
 parallel::distributed::Triangulation objects.
 
 The timings above show that the current preconditioning strategy does not work
-well for Nitsche penalisation, and we should come up with a better
+well for Nitsche penalization, and we should come up with a better
 preconditioner if we want to aim at larger problems. Moreover, a checkpoint
 restart strategy should be implemented to allow for longer simulations to be
 interrupted and restored, as it is done for example in the tutorial step-69.
