@@ -1611,16 +1611,16 @@ namespace parallel
       const bool         callback_variable_transfer = (handle % 2 == 0);
       const unsigned int callback_index             = handle / 2;
 
+      // Cells will always receive fixed size data (i.e., CellStatus
+      // information), but not necessarily variable size data (e.g., with a
+      // ParticleHandler a cell might not contain any particle at all).
+      // Thus it is sufficient to check if fixed size data has been received.
       Assert(sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
       if (quad_cell_relations.size() > 0)
         {
           Assert(dest_data_fixed.size() > 0,
                  ExcMessage("No data has been received!"));
-
-          if (callback_variable_transfer)
-            Assert(dest_data_variable.size() > 0,
-                   ExcMessage("No data has been received!"));
         }
 
       std::vector<char>::const_iterator dest_data_it;
