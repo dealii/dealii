@@ -1724,9 +1724,13 @@ namespace GridTools
         // the user did not provide a hint_cell, and at the beginning of the
         // while loop we performed an actual global search on the mesh
         // vertices. Not finding the point then means the point is outside the
-        // domain.
-        AssertThrow(current_cell.state() == IteratorState::valid,
-                    ExcPointNotFound<spacedim>(p));
+        // domain, or that we've had problems with the algorithm above. Try as a
+        // last resort the other (simpler) algorithm.
+        if (current_cell.state() != IteratorState::valid)
+          return find_active_cell_around_point(mapping,
+                                               mesh,
+                                               p,
+                                               marked_vertices);
 
         current_cell = typename MeshType<dim, spacedim>::active_cell_iterator();
       }
