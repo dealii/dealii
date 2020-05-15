@@ -316,17 +316,19 @@ formulation of the problem is more difficult, since $\Gamma$ will have a
 boundary by itself that has co-dimension two with respect to the domain
 $\Omega$.
 
+
 <h3>References</h3>
 
-- Glowinski, R., T.-W. Pan, T.I. Hesla, and D.D. Joseph. 1999. “A Distributed
+<ul>
+<li> Glowinski, R., T.-W. Pan, T.I. Hesla, and D.D. Joseph. 1999. “A Distributed
   Lagrange Multiplier/fictitious Domain Method for Particulate Flows.”
   International Journal of Multiphase Flow 25 (5). Pergamon: 755–94.
 
-- Boffi, D., L. Gastaldi, L. Heltai, and C.S. Peskin. 2008. “On the
+<li> Boffi, D., L. Gastaldi, L. Heltai, and C.S. Peskin. 2008. “On the
   Hyper-Elastic Formulation of the Immersed Boundary Method.” Computer Methods
   in Applied Mechanics and Engineering 197 (25–28).
 
-- Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
+<li> Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
   Finite Element Methods.” Computer Methods in Applied Mechanics and Engineering
   229–232.
-
+</ul>
