@@ -1,8 +1,5 @@
 
 DEAL::dim = 1
-DEAL::test_cross_section
-DEAL::orthogonal to 0
-DEAL::
 DEAL::
 DEAL::test_center
 DEAL::center 0.500000
