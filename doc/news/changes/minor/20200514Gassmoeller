@@ -1,0 +1,5 @@
+Fixed: The parallel::distributed::Triangulation::DataTransfer class triggered
+an assert if one MPI rank did not receive any data during a distribution of
+cell data, even if this was intended. This is fixed now.
+<br>
+(Rene Gassmoeller, Luca Heltai, 2020/05/14)

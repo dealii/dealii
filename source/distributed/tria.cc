@@ -1615,12 +1615,14 @@ namespace parallel
              ExcMessage("No data has been packed!"));
       if (quad_cell_relations.size() > 0)
         {
+          // Even if only variable data is transferred there has to
+          // be fixed data, which contains the variable data size per cell.
           Assert(dest_data_fixed.size() > 0,
                  ExcMessage("No data has been received!"));
 
-          if (callback_variable_transfer)
-            Assert(dest_data_variable.size() > 0,
-                   ExcMessage("No data has been received!"));
+          // We do not check for the existence of the variable data, since
+          // it may happen that a process is not expected to get any variable
+          // data
         }
 
       std::vector<char>::const_iterator dest_data_it;
