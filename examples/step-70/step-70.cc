@@ -1398,8 +1398,11 @@ namespace Step70
 
     const auto invS = inverse_operator(S, cg, amgS);
 
-    const auto P =
-      block_diagonal_operator<2, LA::MPI::BlockVector>({amgA, amgS});
+    const auto P = block_diagonal_operator<2, LA::MPI::BlockVector>(
+      std::array<
+        dealii::LinearOperator<
+          typename dealii::TrilinosWrappers::MPI::BlockVector::BlockType>,
+        2>{{amgA, amgS}});
 
     SolverControl solver_control(system_matrix.m(),
                                  1e-10 * system_rhs.l2_norm());
