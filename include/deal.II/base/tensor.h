@@ -796,8 +796,22 @@ namespace internal
       Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
   };
 
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<Tensor<rank, dim, std::complex<T>>, std::complex<U>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+
   template <typename T, int rank, int dim, typename U>
   struct ProductTypeImpl<std::complex<T>, Tensor<rank, dim, U>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>, Tensor<rank, dim, std::complex<U>>>
   {
     using type =
       Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;

@@ -81,8 +81,29 @@ namespace internal
                       std::complex<typename ProductType<T, U>::type>>;
   };
 
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<SymmetricTensor<rank, dim, std::complex<T>>,
+                         std::complex<U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
   template <typename T, int rank, int dim, typename U>
   struct ProductTypeImpl<std::complex<T>, SymmetricTensor<rank, dim, U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>,
+                         SymmetricTensor<rank, dim, std::complex<U>>>
   {
     using type =
       SymmetricTensor<rank,
