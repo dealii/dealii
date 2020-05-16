@@ -32,10 +32,8 @@ files="
          contrib/utilities/{update-copyright,indent} \
          doc/doxygen/*/*.{h,h.in} \
          doc/doxygen/scripts/{create_anchors,filter,intro2toc,program*,*.pl} \
-         doc/screen.css \
-         examples/*/*.cc \
-         include/deal.II/*/*h \
-         source/*/*.{cc,in})
+         doc/screen.css)
+  $(find include/ source/ examples/ | egrep '\.(h|in|cc|cu)$')
   $(find cmake/ | egrep '\.(cmake|in|cc)$')
   $(find . -name CMakeLists.txt)
   $(find tests/ | egrep '\.(h|cc)$')
