@@ -72,6 +72,14 @@ test_cross_section()
 
 
 
+// It doesn't make sense to test the cross section in 1D so skip it:
+template <>
+void
+test_cross_section<1>()
+{}
+
+
+
 // Compute and print the center of the box.
 template <int dim>
 void
