@@ -72,8 +72,23 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 
 namespace internal
 {
+  // Workaround: The following 4 overloads are necessary to be able to
+  // compile the library with Apple Clang 8 and older. We should remove
+  // these overloads again when we bump the minimal required version to
+  // something later than clang-3.6 / Apple Clang 6.3.
+  // - Jean-Paul Pelteret, Matthias Maier, Daniel Arndt 2020
   template <int rank, int dim, typename T, typename U>
   struct ProductTypeImpl<SymmetricTensor<rank, dim, T>, std::complex<U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<SymmetricTensor<rank, dim, std::complex<T>>,
+                         std::complex<U>>
   {
     using type =
       SymmetricTensor<rank,
@@ -89,6 +104,17 @@ namespace internal
                       dim,
                       std::complex<typename ProductType<T, U>::type>>;
   };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>,
+                         SymmetricTensor<rank, dim, std::complex<U>>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+  // end workaround
 
   /**
    * A namespace for functions and classes that are internal to how the
