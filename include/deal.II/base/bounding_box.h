@@ -253,6 +253,9 @@ public:
   /**
    * Returns the cross section of the box orthogonal to @p direction.
    * This is a box in one dimension lower.
+   *
+   * @note Calling this method in 1D will result in an exception since
+   * <code>BoundingBox&lt;0&gt;</code> is not implemented.
    */
   BoundingBox<spacedim - 1, Number>
   cross_section(const unsigned int direction) const;
@@ -266,6 +269,32 @@ public:
 
 private:
   std::pair<Point<spacedim, Number>, Point<spacedim, Number>> boundary_points;
+};
+
+/**
+ * Specialization of BoundingBox for spacedim 0. This class exists to enable
+ * dimension-independent programming but unconditionally throws an exception
+ * in its constructor.
+ */
+template <typename Number>
+class BoundingBox<0, Number>
+{
+public:
+  /**
+   * Default constructor. Throws an exception.
+   */
+  BoundingBox();
+
+  /**
+   * Equivalent two-point constructor. Throws an exception.
+   */
+  BoundingBox(const std::pair<Point<0, Number>, Point<0, Number>> &);
+
+  /**
+   * Equivalent container constructor. Throws an exception.
+   */
+  template <class Container>
+  BoundingBox(const Container &);
 };
 
 
@@ -381,6 +410,34 @@ BoundingBox<spacedim, Number>::serialize(Archive &ar,
 {
   ar &boundary_points;
 }
+
+
+
+template <typename Number>
+inline BoundingBox<0, Number>::BoundingBox()
+{
+  AssertThrow(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <typename Number>
+inline BoundingBox<0, Number>::BoundingBox(
+  const std::pair<Point<0, Number>, Point<0, Number>> &)
+{
+  AssertThrow(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <typename Number>
+template <class Container>
+inline BoundingBox<0, Number>::BoundingBox(const Container &)
+{
+  AssertThrow(false, ExcImpossibleInDim(0));
+}
+
+
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE
