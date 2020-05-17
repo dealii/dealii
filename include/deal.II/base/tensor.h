@@ -789,8 +789,20 @@ private:
 #ifndef DOXYGEN
 namespace internal
 {
+  // Workaround: The following 4 overloads are necessary to be able to
+  // compile the library with Apple Clang 8 and older. We should remove
+  // these overloads again when we bump the minimal required version to
+  // something later than clang-3.6 / Apple Clang 6.3.
+  // - Jean-Paul Pelteret, Matthias Maier, Daniel Arndt 2020
   template <int rank, int dim, typename T, typename U>
   struct ProductTypeImpl<Tensor<rank, dim, T>, std::complex<U>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<Tensor<rank, dim, std::complex<T>>, std::complex<U>>
   {
     using type =
       Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
@@ -802,6 +814,14 @@ namespace internal
     using type =
       Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
   };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>, Tensor<rank, dim, std::complex<U>>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+  // end workaround
 
   /**
    * The structs below are needed to initialize nested Tensor objects.
