@@ -3,8 +3,9 @@
 The directory in which this program is run contains a number of sample
 parameter files that you can use to reproduce the results presented in this
 section. If you do not specify a parameter file as an argument on the command
-line, the program will try to read the file "parameters.prm" by default, and
-will execute the two dimensional version of the code. As explained before, if
+line, the program will try to read the file "`parameters.prm`" by default, and
+will execute the two dimensional version of the code. As explained in
+the discussion of the source code, if
 your file name contains the string "23", then the program will run a three
 dimensional problem, with immersed solid of co-dimension one. If it contains
 the string "3", it will run a three dimensional problem, with immersed solid of
@@ -33,9 +34,9 @@ Aborting!
 @endcode
 
 However, as the error message already states, the code that triggers the
-exception will also generate the specified file ("parameters.prm" in this case)
+exception will also generate the specified file ("`parameters.prm`" in this case)
 that simply contains the default values for all parameters this program cares
-about (for the correct dimension and co-dimension, according to the wether a
+about (for the correct dimension and co-dimension, according to the whether a
 string "23" or "3" is contained in the file name). By inspection of the default
 parameter file, we see the following:
 
@@ -222,12 +223,17 @@ end
 @endcode
 
 The rationale behind creating first `parameters.prm` file (the first time the
-program is run) and then a `output/parameters_22.prm` (every other times you
-run the program), is because you may want to leave most parameters to their
+program is run) and then a `output/parameters_22.prm` (every time you
+run the program with an existing input file), is because you may want
+to leave most parameters to their
 default values, and only modify a handful of them, while still beeing able to
-reproduce the results and inspect what parameters where used for a scpeficic
-simulation.
+reproduce the results and inspect what parameters were used for a specific
+simulation. It is generally good scientific practice to store the
+parameter file you used for a simulation along with the simulation
+output so that you can repeat the exact same run at a later time if necessary.
 
+Another reason is because the input file may only contain those
+parameters that differ from their defaults.
 For example, you could use the following (perfectly valid) parameter file with
 this tutorial program:
 @code
@@ -238,19 +244,21 @@ subsection Stokes Immersed Problem
   set Velocity degree                    = 3
 end
 @endcode
-
 and you would run the program with Q3/Q2 Taylor-Hood finite elements, for 101
-steps, using a Nistche penalty of `10`, and leaving all the other parameters to
-their default value. You could then inspect all the other parameters in the
+steps, using a Nitsche penalty of `10`, and leaving all the other parameters to
+their default value. The output directory then contains a record of
+not just these parameters, but indeed all parameters used in the
+simulation. You can inspect all the other parameters in the
 produced file `parameters_22.prm`.
+
 
 <h3> Two dimensional test case </h3>
 
 The default problem generates a co-dimension zero impeller, consisting of a
-rotating rectangular grid, where the rotation is for half a second in one
-direction, and half a second in the opposite direction, with constant angular
-velocity equal to $\approx 2\Pi rad/s$. Consequently, the impeller does half a
-rotation and returns to it's original position. The following animation
+rotating rectangular grid, where the rotation is for half a time unit in one
+direction, and half a time unit in the opposite direction, with constant angular
+velocity equal to $\approx 2\pi \frac{\text{rad}}{\text{time unit}}$. Consequently, the impeller does half a
+rotation and returns to its original position. The following animation
 displays the velocity magnitude, the motion of the solid impeller and of the
 tracer particles.
 
@@ -284,7 +292,9 @@ Time : 0.004, time step: 0.002
 Cycle 3:
 Time : 0.006, time step: 0.002
    Solved in 121 iterations.
+
 ...
+
 Cycle 499:
 Time : 0.998, time step: 0.002
    Solved in 199 iterations.
@@ -312,7 +322,7 @@ Time : 1, time step: 0.002
 @endcode
 
 You may notice that assembling the coupling system is more expensive than
-assembling the Stokes part. This depends highly on the number of gauss points
+assembling the Stokes part. This depends highly on the number of Gauss points
 (solid particles) that are used to apply the Nitsche restriction.
 In the present case, a relatively low number of tracer particles are used.
 Consequently, tracking their motion is relatively cheap.
@@ -341,7 +351,7 @@ simulation domain:
 We see that, generally, the tracer particles have somewhat returned to their
 original position, although they have been distorted by the flow field. The
 following image compares the initial and the final position of the particles
-after 1s of flow.
+after one time unit of flow.
 
 <p align="center">
    <div class="img" align="center">
@@ -356,7 +366,7 @@ volume of the impeller have returned very close to their initial position,
 whereas those in the swept volume were slightly more deformed. This deformation
 is non-physical. It is caused by the numerical error induced by the explicit
 Euler scheme used to advect the particles, by the loss of accuracy due to the
-fictious domain and, finally, by the discretization error on the Stokes
+fictitious domain and, finally, by the discretization error on the Stokes
 equations. The first two errors are the leading cause of this deformation and
 they could be alleviated by the use of a finer mesh and a lower time step.
 
@@ -365,7 +375,7 @@ they could be alleviated by the use of a finer mesh and a lower time step.
 To play around a little bit, we complicate the fictitious domain (taken from
 https://grabcad.com/library/lungstors-blower-1), and run a co-dimension one
 simulation in three space dimensions, using the following
-"parameters_23.prm" file:
+"`parameters_23.prm`" file:
 
 @code
 subsection Stokes Immersed Problem
@@ -431,8 +441,9 @@ In this case, the timing outputs are a bit different:
 +---------------------------------+-----------+------------+------------+
 @endcode
 
-showing how the solver is taking most of the solution time in three dimensions,
-and that the particle motion and Nitsche assembly remain under control.
+Now, the solver is taking most of the solution time in three dimensions,
+and the particle motion and Nitsche assembly remain relatively
+unimportant as far as run time is concerned.
 
 <p align="center">
    <div class="img" align="center">
@@ -465,7 +476,7 @@ problem with distributed Lagrange multipliers, on
 parallel::distributed::Triangulation objects.
 
 The timings above show that the current preconditioning strategy does not work
-well for Nitsche penalisation, and we should come up with a better
+well for Nitsche penalization, and we should come up with a better
 preconditioner if we want to aim at larger problems. Moreover, a checkpoint
 restart strategy should be implemented to allow for longer simulations to be
-interrupted and restored, as it is done for example in the tutorial step-69.
+interrupted and restored, as it is done for example in the step-69 tutorial.
