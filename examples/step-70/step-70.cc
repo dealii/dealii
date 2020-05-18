@@ -1098,13 +1098,6 @@ namespace Step70
       std_cxx14::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
     solid_quadrature_formula =
       std_cxx14::make_unique<QGauss<dim>>(par.velocity_degree + 1);
-
-    // Save the current parameter file in the output directory, for
-    // reproducibility
-    par.prm.print_parameters(par.output_directory + "/" + "parameters_" +
-                               std::to_string(dim) + std::to_string(spacedim) +
-                               ".prm",
-                             ParameterHandler::Short);
   }
 
 
@@ -1616,8 +1609,13 @@ namespace Step70
   }
 
 
-  // This function orchestrates the entire simulation. It is very similar
-  // to the other time dependent tutorial programs.
+  // @sect4{The "run" function}
+
+  // This function now orchestrates the entire simulation. It is very similar
+  // to the other time dependent tutorial programs -- take step-26 as an example. At the beginning, we
+  // output some status information and also
+  // save all current parameters to a file in the output directory, for
+  // reproducibility.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::run()
   {
@@ -1630,6 +1628,10 @@ namespace Step70
           << Utilities::dim_string(dim, spacedim) << "> using Trilinos."
           << std::endl;
 #endif
+    par.prm.print_parameters(par.output_directory + "/" + "parameters_" +
+                               std::to_string(dim) + std::to_string(spacedim) +
+                               ".prm",
+                             ParameterHandler::Short);
 
     ComponentMask velocity_mask(spacedim + 1, true);
     velocity_mask.set(spacedim, false);
