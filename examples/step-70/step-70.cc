@@ -1009,16 +1009,17 @@ namespace Step70
     // non-matching grid).
     std::vector<Point<spacedim>> quadrature_points_vec(
       quadrature.size() * solid_tria.n_locally_owned_active_cells());
+    std::vector<Point<spacedim>> quadrature_points_vec;
+    quadrature_points_vec.reserve(quadrature.size() *
+                                  solid_tria.n_locally_owned_active_cells());
 
-    std::vector<std::vector<double>> properties(
-      quadrature.size() * solid_tria.n_locally_owned_active_cells(),
-      std::vector<double>(n_properties));
+    std::vector<std::vector<double>> properties;
+    properties.reserve(quadrature.size() *
+                       solid_tria.n_locally_owned_active_cells());
 
     FEValues<dim, spacedim> fe_v(*solid_fe,
                                  quadrature,
                                  update_JxW_values | update_quadrature_points);
-
-    unsigned int point_index = 0;
     for (const auto &cell : solid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
@@ -1028,9 +1029,8 @@ namespace Step70
 
           for (unsigned int q = 0; q < points.size(); ++q)
             {
-              quadrature_points_vec[point_index] = points[q];
-              properties[point_index][0]         = JxW[q];
-              ++point_index;
+              quadrature_points_vec.emplace_back(points[q]);
+              properties.emplace_back (std::vector<double>(n_properties, JxW[q]));
             }
         }
 
