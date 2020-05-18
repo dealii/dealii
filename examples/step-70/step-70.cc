@@ -910,7 +910,7 @@ namespace Step70
 
     // and gather the information from all participating processes
     global_fluid_bounding_boxes =
-      Utilities::MPI::all_gather(MPI_COMM_WORLD, local_boxes);
+      Utilities::MPI::all_gather(mpi_communicator, local_boxes);
 
 
     // Finally generate the particles from the support points of the
