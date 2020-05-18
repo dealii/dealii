@@ -1325,7 +1325,8 @@ namespace Step70
                                     fluid_fe->dofs_per_cell);
     dealii::Vector<double> local_rhs(fluid_fe->dofs_per_cell);
 
-    const auto k = 1.0 / GridTools::minimal_cell_diameter(fluid_tria);
+    const auto penalty_parameter =
+      1.0 / GridTools::minimal_cell_diameter(fluid_tria);
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us
@@ -1380,11 +1381,11 @@ namespace Step70
                           fluid_fe->system_to_component_index(j).first;
                         if (comp_i == comp_j)
                           local_matrix(i, j) +=
-                            k * par.penalty_term *
+                            penalty_parameter * par.penalty_term *
                             fluid_fe->shape_value(i, ref_q) *
                             fluid_fe->shape_value(j, ref_q) * JxW;
                       }
-                    local_rhs(i) += k * par.penalty_term *
+                    local_rhs(i) += penalty_parameter * par.penalty_term *
                                     solid_velocity.value(real_q, comp_i) *
                                     fluid_fe->shape_value(i, ref_q) * JxW;
                   }
