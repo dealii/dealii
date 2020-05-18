@@ -896,14 +896,12 @@ namespace Step70
     // We construct this information by first building an index tree of boxes
     // bounding the locally owned cells, and then extracting one of the first
     // levels of the tree:
-    std::vector<BoundingBox<spacedim>> all_boxes(
-      fluid_tria.n_locally_owned_active_cells());
-    unsigned int i = 0;
+    std::vector<BoundingBox<spacedim>> all_boxes;
+    all_boxes.reserve(fluid_tria.n_locally_owned_active_cells());
     for (const auto cell : fluid_tria.active_cell_iterators())
       if (cell->is_locally_owned())
-        all_boxes[i++] = cell->bounding_box();
+        all_boxes.emplace_back(cell->bounding_box());
 
-    // We construct the tree
     const auto tree = pack_rtree(all_boxes);
 
     // extract the desired level
