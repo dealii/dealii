@@ -445,13 +445,16 @@ Now, the solver is taking most of the solution time in three dimensions,
 and the particle motion and Nitsche assembly remain relatively
 unimportant as far as run time is concerned.
 
+
+@htmlonly
 <p align="center">
-   <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.2d-3d.gif"
-           alt = ""
-           width="500">
-    </div>
-</p>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/Srwq7zyR9mg"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
