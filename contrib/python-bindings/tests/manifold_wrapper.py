@@ -14,6 +14,7 @@
 # ---------------------------------------------------------------------
 
 import math
+import os
 import unittest
 from PyDealII.Debug import *
 
@@ -78,7 +79,8 @@ class TestManifoldWrapperFunction(unittest.TestCase):
                                         lambda p: [math.sqrt(p[0]), math.sqrt(p[1])] )
 
         self.tria_reference = Triangulation('2D')
-        self.tria_reference.read('manifold_wrapper.vtk', 'vtk')
+        test_directory = os.environ.get('DEAL_II_PYTHON_TESTPATH')
+        self.tria_reference.read(test_directory+'/manifold_wrapper.vtk', 'vtk')
 
     def test_manifold_str(self):
         self.triangulation = Triangulation('2D')
