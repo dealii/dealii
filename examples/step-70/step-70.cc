@@ -688,21 +688,27 @@ namespace Step70
 
     // For every tracer particle, we need to compute the velocity field in its
     // current position, and update its position using a discrete time stepping
-    // scheme. We do this using distributed linear algebra objects, where the
-    // owner of a particle is set to be equal to the process that generated that
-    // particle at time $t=0$. This information is stored for every process in
-    // the `owned_tracer_particles` IndexSet, that indicates which particles the
-    // current process owns.
+    // scheme. We do this using distributed linear algebra objects that store
+    // the coordinates of each particle's location or velocity. That is, these
+    // vectors have `tracer_particle_handler.n_global_particles() * spacedim`
+    // entries that we will store in a way so that parts of the vector are
+    // partitioned across all processes. (Implicitly, we here make the
+    // assumption that the `spacedim` coordinates of each particle are stored in
+    // consecutive entries of the vector.) Thus, we need to determine who the
+    // owner of each vector entry is. We set this owner to be equal to the
+    // process that generated that particle at time $t=0$. This information is
+    // stored for every process in the
+    // `locally_owned_tracer_particle_coordinates` IndexSet.
     //
     // Once the particles have been distributed around to match the process that
     // owns the region where the particle lives, we will need read access from
-    // that process on the corresponding velocity field. We achieve this by
+    // that process to the corresponding velocity field. We achieve this by
     // filling a read only velocity vector field that contains the relevant
     // information in ghost entries. This is achieved using the
-    // `relevant_tracer_particles` IndexSet, that keeps track of how things
-    // change during the simulation, i.e., it keeps track of where particles
-    // that the current process owns have ended up being, and who owns the
-    // particles that ended up in my subdomain.
+    // `locally_relevant_tracer_particle_coordinates` IndexSet, that keeps track
+    // of how things change during the simulation, i.e., it keeps track of where
+    // particles that the current process owns have ended up being, and who owns
+    // the particles that ended up in my subdomain.
     //
     // While this is not the most efficient strategy, we keep it this way to
     // illustrate how things would work in a real fluid-structure
@@ -715,8 +721,8 @@ namespace Step70
     // The vectors defined based on these subdivisions are then used to store
     // the particles velocities (read-only, with ghost entries) and their
     // displacement (read/write, no ghost entries).
-    IndexSet owned_tracer_particles;
-    IndexSet relevant_tracer_particles;
+    IndexSet locally_owned_tracer_particle_coordinates;
+    IndexSet locally_relevant_tracer_particle_coordinates;
 
     LA::MPI::Vector tracer_particle_velocities;
     LA::MPI::Vector relevant_tracer_particle_displacements;
@@ -1068,7 +1074,7 @@ namespace Step70
     // store the coordinates of each location or velocity in `spacedim`
     // successive vector elements (this is what the IndexSet::tensor_priduct()
     // function does).
-    owned_tracer_particles =
+    locally_owned_tracer_particle_coordinates =
       tracer_particle_handler.locally_relevant_ids().tensor_product(
         complete_index_set(spacedim));
 
@@ -1087,7 +1093,8 @@ namespace Step70
     // problem was solved in the solid domain (as in fluid-structure
     // interaction. In this latter case, additional DOFs on the solid domain
     // would be coupled to what is occurring in the fluid domain.
-    relevant_tracer_particles = owned_tracer_particles;
+    locally_relevant_tracer_particle_coordinates =
+      locally_owned_tracer_particle_coordinates;
 
     // Finally, we make sure that upon refinement, particles are correctly
     // transferred. When performing local refinement or coarsening, particles
@@ -1819,8 +1826,8 @@ namespace Step70
             setup_dofs();
             setup_tracer_particles();
             setup_solid_particles();
-            tracer_particle_velocities.reinit(owned_tracer_particles,
-                                              mpi_communicator);
+            tracer_particle_velocities.reinit(
+              locally_owned_tracer_particle_coordinates, mpi_communicator);
             output_results(output_cycle, time);
             {
               TimerOutput::Scope t(computing_timer, "Output tracer particles");
@@ -1866,13 +1873,13 @@ namespace Step70
 
           tracer_particle_velocities *= time_step;
 
-          relevant_tracer_particles =
+          locally_relevant_tracer_particle_coordinates =
             tracer_particle_handler.locally_relevant_ids().tensor_product(
               complete_index_set(spacedim));
 
           relevant_tracer_particle_displacements.reinit(
-            owned_tracer_particles,
-            relevant_tracer_particles,
+            locally_owned_tracer_particle_coordinates,
+            locally_relevant_tracer_particle_coordinates,
             mpi_communicator);
 
           relevant_tracer_particle_displacements = tracer_particle_velocities;
