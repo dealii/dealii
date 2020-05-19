@@ -52,6 +52,8 @@ namespace Particles
    * and particles that belong to neighbor processes and live in the ghost cells
    * around the locally owned domain "ghost particles".
    *
+   * This class is used in step-70.
+   *
    * @ingroup Particle
    */
   template <int dim, int spacedim = dim>
@@ -240,7 +242,8 @@ namespace Particles
      * at these positions, which are then distributed and added to the local
      * particle collection of a procesor. Note that this function uses
      * GridTools::distributed_compute_point_locations(). Consequently, it can
-     * require intense communications between the processors.
+     * require intense communications between the processors. This function
+     * is used in step-70.
      *
      * This function figures out what mpi process owns the points that do not
      * fall within the locally owned part of the triangulation, it sends
