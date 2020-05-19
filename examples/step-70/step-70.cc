@@ -670,12 +670,11 @@ namespace Step70
     AffineConstraints<double> constraints;
 
     LA::MPI::BlockSparseMatrix system_matrix;
-    LA::MPI::BlockSparseMatrix coupling_matrix;
-
     LA::MPI::BlockSparseMatrix preconditioner_matrix;
-    LA::MPI::BlockVector       solution;
-    LA::MPI::BlockVector       locally_relevant_solution;
-    LA::MPI::BlockVector       system_rhs;
+
+    LA::MPI::BlockVector solution;
+    LA::MPI::BlockVector locally_relevant_solution;
+    LA::MPI::BlockVector system_rhs;
 
     // Let us move to the particles side of this program. There are two
     // Particles::ParticleHandler objects used to couple the solid with the
