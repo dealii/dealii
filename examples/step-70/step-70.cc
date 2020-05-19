@@ -328,6 +328,111 @@ namespace Step70
   };
 
 
+
+  // There remains the task of declaring what run-time parameters we can accept
+  // in input files. We split the parameters in various categories, by putting
+  // them in different sections of the ParameterHandler class. We begin by
+  // declaring all the global parameters used by StokesImmersedProblem
+  // in the global scope:
+  template <int dim, int spacedim>
+  StokesImmersedProblemParameters<dim,
+                                  spacedim>::StokesImmersedProblemParameters()
+    : ParameterAcceptor("Stokes Immersed Problem/")
+    , rhs("Right hand side", spacedim + 1)
+    , angular_velocity("Angular velocity")
+  {
+    add_parameter(
+      "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
+
+    add_parameter("Number of time steps", number_of_time_steps);
+    add_parameter("Output frequency", output_frequency);
+
+    add_parameter("Output directory", output_directory);
+
+    add_parameter("Final time", final_time);
+
+    add_parameter("Viscosity", viscosity);
+
+    add_parameter("Nitsche penalty term", penalty_term);
+
+    add_parameter("Initial fluid refinement",
+                  initial_fluid_refinement,
+                  "Initial mesh refinement used for the fluid domain Omega");
+
+    add_parameter("Initial solid refinement",
+                  initial_solid_refinement,
+                  "Initial mesh refinement used for the solid domain Gamma");
+
+    add_parameter("Fluid bounding boxes extraction level",
+                  fluid_rtree_extraction_level,
+                  "Extraction level of the rtree used to construct global "
+                  "bounding boxes");
+
+    add_parameter(
+      "Particle insertion refinement",
+      particle_insertion_refinement,
+      "Refinement of the volumetric mesh used to insert the particles");
+
+    add_parameter(
+      "Homogeneous Dirichlet boundary ids",
+      homogeneous_dirichlet_ids,
+      "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
+
+    // Next section is dedicated to the parameters used to create the
+    // various grids. We will need three different triangulations: `Fluid
+    // grid` is used to define the fluid domain, `Solid grid` defines the
+    // solid domain, and `Particle grid` is used to distribute some tracer
+    // particles, that are advected with the velocity and only used as
+    // passive tracers.
+    enter_my_subsection(this->prm);
+    this->prm.enter_subsection("Grid generation");
+    this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
+    this->prm.add_parameter("Fluid grid generator arguments",
+                            arguments_for_fluid_grid);
+
+    this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
+    this->prm.add_parameter("Solid grid generator arguments",
+                            arguments_for_solid_grid);
+
+    this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
+    this->prm.add_parameter("Particle grid generator arguments",
+                            arguments_for_particle_grid);
+    this->prm.leave_subsection();
+
+    leave_my_subsection(this->prm);
+
+
+
+    enter_my_subsection(this->prm);
+    this->prm.enter_subsection("Refinement and remeshing");
+    this->prm.add_parameter("Refinement step frequency", refinement_frequency);
+    this->prm.add_parameter("Refinement maximal level", max_level_refinement);
+    this->prm.add_parameter("Refinement minimal level", min_level_refinement);
+    this->prm.add_parameter("Refinement strategy",
+                            refinement_strategy,
+                            "",
+                            Patterns::Selection("fixed_fraction|fixed_number"));
+    this->prm.add_parameter("Refinement coarsening fraction",
+                            coarsening_fraction);
+    this->prm.add_parameter("Refinement fraction", refinement_fraction);
+    this->prm.add_parameter("Maximum number of cells", max_cells);
+
+    this->prm.leave_subsection();
+    leave_my_subsection(this->prm);
+
+    // correct the default dimension for the rhs function
+    rhs.declare_parameters_call_back.connect([&]() {
+      Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
+                                                              spacedim + 1);
+    });
+    // and define a meaningful default angular velocity instead of zero
+    angular_velocity.declare_parameters_call_back.connect([&]() {
+      this->prm.set("Function expression",
+                    "t < .500001 ? 6.283185 : -6.283185");
+    });
+  }
+
+
   // Once the angular velocity is provided as a Function object, we reconstruct
   // the pointwise solid velocity through the following class which derives
   // from the Function class. It provides the value of the velocity of
@@ -1803,109 +1908,6 @@ namespace Step70
             cycle != par.number_of_time_steps - 1)
           refine_and_transfer();
       }
-  }
-
-
-  template <int dim, int spacedim>
-  StokesImmersedProblemParameters<dim,
-                                  spacedim>::StokesImmersedProblemParameters()
-    : ParameterAcceptor("Stokes Immersed Problem/")
-    , rhs("Right hand side", spacedim + 1)
-    , angular_velocity("Angular velocity")
-  {
-    // We split the parameters in various categories, by putting them in
-    // different sections of the ParameterHandler class. We begin by
-    // declaring all the global parameters used by StokesImmersedProblem
-    // in the global scope:
-    add_parameter(
-      "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
-
-    add_parameter("Number of time steps", number_of_time_steps);
-    add_parameter("Output frequency", output_frequency);
-
-    add_parameter("Output directory", output_directory);
-
-    add_parameter("Final time", final_time);
-
-    add_parameter("Viscosity", viscosity);
-
-    add_parameter("Nitsche penalty term", penalty_term);
-
-    add_parameter("Initial fluid refinement",
-                  initial_fluid_refinement,
-                  "Initial mesh refinement used for the fluid domain Omega");
-
-    add_parameter("Initial solid refinement",
-                  initial_solid_refinement,
-                  "Initial mesh refinement used for the solid domain Gamma");
-
-    add_parameter("Fluid bounding boxes extraction level",
-                  fluid_rtree_extraction_level,
-                  "Extraction level of the rtree used to construct global "
-                  "bounding boxes");
-
-    add_parameter(
-      "Particle insertion refinement",
-      particle_insertion_refinement,
-      "Refinement of the volumetric mesh used to insert the particles");
-
-    add_parameter(
-      "Homogeneous Dirichlet boundary ids",
-      homogeneous_dirichlet_ids,
-      "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
-
-    // Next section is dedicated to the parameters used to create the
-    // various grids. We will need three different triangulations: `Fluid
-    // grid` is used to define the fluid domain, `Solid grid` defines the
-    // solid domain, and `Particle grid` is used to distribute some tracer
-    // particles, that are advected with the velocity and only used as
-    // passive tracers.
-    enter_my_subsection(this->prm);
-    this->prm.enter_subsection("Grid generation");
-    this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
-    this->prm.add_parameter("Fluid grid generator arguments",
-                            arguments_for_fluid_grid);
-
-    this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
-    this->prm.add_parameter("Solid grid generator arguments",
-                            arguments_for_solid_grid);
-
-    this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
-    this->prm.add_parameter("Particle grid generator arguments",
-                            arguments_for_particle_grid);
-    this->prm.leave_subsection();
-
-    leave_my_subsection(this->prm);
-
-
-
-    enter_my_subsection(this->prm);
-    this->prm.enter_subsection("Refinement and remeshing");
-    this->prm.add_parameter("Refinement step frequency", refinement_frequency);
-    this->prm.add_parameter("Refinement maximal level", max_level_refinement);
-    this->prm.add_parameter("Refinement minimal level", min_level_refinement);
-    this->prm.add_parameter("Refinement strategy",
-                            refinement_strategy,
-                            "",
-                            Patterns::Selection("fixed_fraction|fixed_number"));
-    this->prm.add_parameter("Refinement coarsening fraction",
-                            coarsening_fraction);
-    this->prm.add_parameter("Refinement fraction", refinement_fraction);
-    this->prm.add_parameter("Maximum number of cells", max_cells);
-
-    this->prm.leave_subsection();
-    leave_my_subsection(this->prm);
-
-    // correct the default dimension for the rhs function
-    rhs.declare_parameters_call_back.connect([&]() {
-      Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
-                                                              spacedim + 1);
-    });
-    // and define a meaningful default angular velocity instead of zero
-    angular_velocity.declare_parameters_call_back.connect([&]() {
-      this->prm.set("Function expression",
-                    "t < .500001 ? 6.283185 : -6.283185");
-    });
   }
 
 } // namespace Step70
