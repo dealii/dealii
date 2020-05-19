@@ -4,7 +4,7 @@
 # dimensions, and a solid grid representing a surface embedded in three
 # dimensions. 
 #
-# With this parameter file, we generate a hyper rectangular grid sligthly
+# With this parameter file, we generate a hyper rectangular grid slightly
 # larger w.r.t. to a impeller grid that was generated from the CAD files
 # downloaded from https://grabcad.com/library/lungstors-blower-1
 subsection Stokes Immersed Problem
