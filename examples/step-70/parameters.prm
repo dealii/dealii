@@ -1,3 +1,5 @@
+# This is a parameter file that can be used to reproduce the two dimensional
+# results of the tutorial program step-70.
 subsection Stokes Immersed Problem
   set Final time                         = 1
   set Homogeneous Dirichlet boundary ids = 0
