@@ -1588,6 +1588,252 @@ namespace internal
           *local_values_begin = read_write_vector[sorted_indices_pos[i]];
       }
 #endif
+
+
+
+      /**
+       * Loop over all degrees of freedom of the object described by the
+       * provided @p accessor and @p fe_index and perform the static functions
+       * provided by DoFOperation (set/get) on these.
+       */
+      template <typename DoFHandlerType,
+                bool level_dof_access,
+                int  structdim,
+                typename DoFIndicesType,
+                typename DoFOperation>
+      static void
+      process_dof_indices(
+        const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+          &                accessor,
+        DoFIndicesType &   dof_indices,
+        const unsigned int fe_index,
+        const DoFOperation &)
+      {
+        const unsigned int                                             //
+          dofs_per_vertex = accessor.get_fe(fe_index).dofs_per_vertex, //
+          dofs_per_line   = accessor.get_fe(fe_index).dofs_per_line,   //
+          dofs_per_quad   = accessor.get_fe(fe_index).dofs_per_quad,   //
+          dofs_per_hex    = accessor.get_fe(fe_index).dofs_per_hex;    //
+
+        const unsigned int inner_dofs =
+          structdim == 1 ? dofs_per_line :
+                           (structdim == 2 ? dofs_per_quad : dofs_per_hex);
+
+        unsigned int index = 0;
+
+        // 1) VERTEX dofs
+        for (const unsigned int vertex :
+             GeometryInfo<structdim>::vertex_indices())
+          for (unsigned int d = 0; d < dofs_per_vertex; ++d, ++index)
+            DoFOperation::process_vertex_dof(
+              accessor, vertex, d, dof_indices[index], fe_index);
+
+        // 2) copy dof numbers from the LINE. for lines with the wrong
+        // orientation (which might occur in 3d), we have already made sure that
+        // we're ok by picking the correct vertices (this happens automatically
+        // in the vertex() function). however, if the line is in wrong
+        // orientation, we look at it in flipped orientation and we will have to
+        // adjust the shape function indices that we see to correspond to the
+        // correct (face/cell-local) ordering.
+        if (structdim == 2 || structdim == 3)
+          for (unsigned int line = 0;
+               line < GeometryInfo<structdim>::lines_per_cell;
+               ++line)
+            for (unsigned int d = 0; d < dofs_per_line; ++d, ++index)
+              DoFOperation::process_dof(
+                *accessor.line(line),
+                accessor.get_fe(fe_index)
+                  .adjust_line_dof_index_for_line_orientation(
+                    d, accessor.line_orientation(line)),
+                dof_indices[index],
+                fe_index);
+
+        // 3) copy dof numbers from the FACE. for faces with the wrong
+        // orientation, we have already made sure that we're ok by picking the
+        // correct lines and vertices (this happens automatically in the line()
+        // and vertex() functions). however, if the face is in wrong
+        // orientation, we look at it in flipped orientation and we will have to
+        // adjust the shape function indices that we see to correspond to the
+        // correct (cell-local) ordering. The same applies, if the face_rotation
+        // or face_orientation is non-standard
+        if (structdim == 3)
+          for (unsigned int quad = 0;
+               quad < GeometryInfo<structdim>::quads_per_cell;
+               ++quad)
+            for (unsigned int d = 0; d < dofs_per_quad; ++d, ++index)
+              DoFOperation::process_dof(
+                *accessor.quad(quad),
+                accessor.get_fe(fe_index)
+                  .adjust_quad_dof_index_for_face_orientation(
+                    d,
+                    accessor.face_orientation(quad),
+                    accessor.face_flip(quad),
+                    accessor.face_rotation(quad)),
+                dof_indices[index],
+                fe_index);
+
+        // 4) INNER dofs
+        for (unsigned int d = 0; d < inner_dofs; ++d, ++index)
+          DoFOperation::process_dof(accessor, d, dof_indices[index], fe_index);
+
+        AssertDimension(dof_indices.size(), index);
+      }
+
+
+
+      /**
+       * An internal struct encapsulating the task of getting (vertex)
+       * DoF indices.
+       */
+      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      struct DoFIndexGetter
+      {
+        /**
+         * Return vertex DoF index.
+         */
+        static DEAL_II_ALWAYS_INLINE void
+        process_vertex_dof(
+          const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+            &                      accessor,
+          const unsigned int       vertex,
+          const unsigned int       d,
+          types::global_dof_index &index_value,
+          const unsigned int       fe_index)
+        {
+          index_value = accessor.vertex_dof_index(vertex, d, fe_index);
+        }
+
+        /**
+         * Return DoF index for lines, quads, and inner degrees of freedom.
+         */
+        template <int structdim_>
+        static DEAL_II_ALWAYS_INLINE void
+        process_dof(const dealii::DoFAccessor<structdim_,
+                                              DoFHandlerType,
+                                              level_dof_access> &accessor,
+                    const unsigned int                           d,
+                    types::global_dof_index &                    index_value,
+                    const unsigned int                           fe_index)
+        {
+          index_value = accessor.dof_index(d, fe_index);
+        }
+
+        /**
+         * Fallback for DoFInvalidAccessor.
+         */
+        template <int structdim_>
+        static DEAL_II_ALWAYS_INLINE void
+        process_dof(
+          const dealii::DoFInvalidAccessor<structdim_,
+                                           DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> &,
+          const unsigned int,
+          types::global_dof_index &,
+          const unsigned int)
+        {
+          Assert(false, ExcInternalError());
+        }
+      };
+
+
+
+      /**
+       * An internal struct encapsulating the task of setting (vertex)
+       * DoF indices.
+       */
+      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      struct DoFIndexSetter
+      {
+        /**
+         * Set vertex DoF index.
+         */
+        static DEAL_II_ALWAYS_INLINE void
+        process_vertex_dof(
+          const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+            &                            accessor,
+          const unsigned int             vertex,
+          const unsigned int             d,
+          const types::global_dof_index &index_value,
+          const unsigned int             fe_index)
+        {
+          accessor.set_vertex_dof_index(vertex, d, index_value, fe_index);
+        }
+
+        /**
+         * Set DoF index for lines, quads, and inner degrees of freedom.
+         */
+        template <int structdim_>
+        static DEAL_II_ALWAYS_INLINE void
+        process_dof(const dealii::DoFAccessor<structdim_,
+                                              DoFHandlerType,
+                                              level_dof_access> &accessor,
+                    const unsigned int                           d,
+                    const types::global_dof_index &              index_value,
+                    const unsigned int                           fe_index)
+        {
+          accessor.set_dof_index(d, index_value, fe_index);
+        }
+
+        /**
+         * Fallback for DoFInvalidAccessor.
+         */
+        template <int structdim_>
+        static DEAL_II_ALWAYS_INLINE void
+        process_dof(
+          const dealii::DoFInvalidAccessor<structdim_,
+                                           DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> &,
+          const unsigned int,
+          const types::global_dof_index &,
+          const unsigned int)
+        {
+          Assert(false, ExcInternalError());
+        }
+      };
+
+
+
+      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      static void
+      get_dof_indices(
+        const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+          &                                   accessor,
+        std::vector<types::global_dof_index> &dof_indices,
+        const unsigned int                    fe_index)
+      {
+        process_dof_indices(
+          accessor,
+          dof_indices,
+          fe_index,
+          DoFIndexGetter<DoFHandlerType, level_dof_access, structdim>());
+      }
+
+
+
+      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      static void
+      set_dof_indices(
+        const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+          &                                         accessor,
+        const std::vector<types::global_dof_index> &dof_indices,
+        const unsigned int                          fe_index)
+      {
+        // Note: this function is as general as `get_dof_indices()`. This
+        // assert is placed here since it is currently only used by the
+        // function DoFCellAccessor::set_dof_indices(), which is called by
+        // internal::DoFHandlerImplementation::Policy::Implementation::distribute_dofs().
+        // In the case of new use cases, this assert can be removed.
+        Assert(
+          DoFHandlerType::dimension == structdim,
+          ExcMessage(
+            "This function is intended to be used for DoFCellAccessor, i.e., dimension == structdim."));
+
+        process_dof_indices(
+          accessor,
+          dof_indices,
+          fe_index,
+          DoFIndexSetter<DoFHandlerType, level_dof_access, structdim>());
+      }
     };
   } // namespace DoFAccessorImplementation
 } // namespace internal
@@ -1804,136 +2050,6 @@ namespace internal
   {
     template <typename DoFHandlerType, bool level_dof_access>
     void
-    get_dof_indices(
-      const dealii::DoFAccessor<1, DoFHandlerType, level_dof_access> &accessor,
-      std::vector<types::global_dof_index> &dof_indices,
-      const unsigned int                    fe_index)
-    {
-      const unsigned int dofs_per_vertex =
-                           accessor.get_fe(fe_index).dofs_per_vertex,
-                         dofs_per_line =
-                           accessor.get_fe(fe_index).dofs_per_line;
-      std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
-      for (unsigned int vertex : GeometryInfo<1>::vertex_indices())
-        for (unsigned int d = 0; d < dofs_per_vertex; ++d)
-          *next++ = accessor.vertex_dof_index(vertex, d, fe_index);
-      for (unsigned int d = 0; d < dofs_per_line; ++d)
-        *next++ = accessor.dof_index(d, fe_index);
-    }
-
-
-
-    template <typename DoFHandlerType, bool level_dof_access>
-    void
-    get_dof_indices(
-      const dealii::DoFAccessor<2, DoFHandlerType, level_dof_access> &accessor,
-      std::vector<types::global_dof_index> &dof_indices,
-      const unsigned int                    fe_index)
-    {
-      const unsigned int dofs_per_vertex =
-                           accessor.get_fe(fe_index).dofs_per_vertex,
-                         dofs_per_line =
-                           accessor.get_fe(fe_index).dofs_per_line,
-                         dofs_per_quad =
-                           accessor.get_fe(fe_index).dofs_per_quad;
-      std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
-      for (unsigned int vertex : GeometryInfo<2>::vertex_indices())
-        for (unsigned int d = 0; d < dofs_per_vertex; ++d)
-          *next++ = accessor.vertex_dof_index(vertex, d, fe_index);
-      // now copy dof numbers from the line. for
-      // lines with the wrong orientation (which
-      // might occur in 3d), we have already made
-      // sure that we're ok by picking the correct
-      // vertices (this happens automatically in
-      // the vertex() function). however, if the
-      // line is in wrong orientation, we look at
-      // it in flipped orientation and we will have
-      // to adjust the shape function indices that
-      // we see to correspond to the correct
-      // (face-local) ordering.
-      for (unsigned int line = 0; line < GeometryInfo<2>::lines_per_cell;
-           ++line)
-        for (unsigned int d = 0; d < dofs_per_line; ++d)
-          *next++ = accessor.line(line)->dof_index(
-            accessor.get_fe(fe_index)
-              .adjust_line_dof_index_for_line_orientation(
-                d, accessor.line_orientation(line)),
-            fe_index);
-      for (unsigned int d = 0; d < dofs_per_quad; ++d)
-        *next++ = accessor.dof_index(d, fe_index);
-    }
-
-
-
-    template <typename DoFHandlerType, bool level_dof_access>
-    void
-    get_dof_indices(
-      const dealii::DoFAccessor<3, DoFHandlerType, level_dof_access> &accessor,
-      std::vector<types::global_dof_index> &dof_indices,
-      const unsigned int                    fe_index)
-    {
-      const unsigned int dofs_per_vertex =
-                           accessor.get_fe(fe_index).dofs_per_vertex,
-                         dofs_per_line =
-                           accessor.get_fe(fe_index).dofs_per_line,
-                         dofs_per_quad =
-                           accessor.get_fe(fe_index).dofs_per_quad,
-                         dofs_per_hex = accessor.get_fe(fe_index).dofs_per_hex;
-      std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
-      for (unsigned int vertex : GeometryInfo<3>::vertex_indices())
-        for (unsigned int d = 0; d < dofs_per_vertex; ++d)
-          *next++ = accessor.vertex_dof_index(vertex, d, fe_index);
-      // now copy dof numbers from the line. for
-      // lines with the wrong orientation, we have
-      // already made sure that we're ok by picking
-      // the correct vertices (this happens
-      // automatically in the vertex()
-      // function). however, if the line is in
-      // wrong orientation, we look at it in
-      // flipped orientation and we will have to
-      // adjust the shape function indices that we
-      // see to correspond to the correct
-      // (cell-local) ordering.
-      for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell;
-           ++line)
-        for (unsigned int d = 0; d < dofs_per_line; ++d)
-          *next++ = accessor.line(line)->dof_index(
-            accessor.get_fe(fe_index)
-              .adjust_line_dof_index_for_line_orientation(
-                d, accessor.line_orientation(line)),
-            fe_index);
-      // now copy dof numbers from the face. for
-      // faces with the wrong orientation, we
-      // have already made sure that we're ok by
-      // picking the correct lines and vertices
-      // (this happens automatically in the
-      // line() and vertex() functions). however,
-      // if the face is in wrong orientation, we
-      // look at it in flipped orientation and we
-      // will have to adjust the shape function
-      // indices that we see to correspond to the
-      // correct (cell-local) ordering. The same
-      // applies, if the face_rotation or
-      // face_orientation is non-standard
-      for (unsigned int quad = 0; quad < GeometryInfo<3>::faces_per_cell;
-           ++quad)
-        for (unsigned int d = 0; d < dofs_per_quad; ++d)
-          *next++ = accessor.quad(quad)->dof_index(
-            accessor.get_fe(fe_index)
-              .adjust_quad_dof_index_for_face_orientation(
-                d,
-                accessor.face_orientation(quad),
-                accessor.face_flip(quad),
-                accessor.face_rotation(quad)),
-            fe_index);
-      for (unsigned int d = 0; d < dofs_per_hex; ++d)
-        *next++ = accessor.dof_index(d, fe_index);
-    }
-
-
-
-    template <typename DoFHandlerType, bool level_dof_access>
-    void
     get_mg_dof_indices(
       const dealii::DoFAccessor<1, DoFHandlerType, level_dof_access> &accessor,
       const int                                                       level,
@@ -2108,9 +2224,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_indices(
          ExcInternalError());
 
   // now do the actual work
-  dealii::internal::DoFAccessorImplementation::get_dof_indices(*this,
-                                                               dof_indices,
-                                                               fe_index);
+  dealii::internal::DoFAccessorImplementation::Implementation::get_dof_indices(
+    *this, dof_indices, fe_index);
 }
 
 
@@ -2711,88 +2826,6 @@ namespace internal
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i, ++next_dof_index)
           *next_dof_index = dof_indices[i];
-      }
-
-
-
-      /**
-       * Implement setting dof indices on a cell.
-       */
-      template <typename DoFHandlerType, bool level_dof_access>
-      static void
-      set_dof_indices(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor,
-        const std::vector<types::global_dof_index> &local_dof_indices)
-      {
-        const unsigned int dim = DoFHandlerType::dimension;
-
-        Assert(accessor.has_children() == false, ExcInternalError());
-
-        const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
-                           dofs_per_line   = accessor.get_fe().dofs_per_line,
-                           dofs_per_quad   = accessor.get_fe().dofs_per_quad,
-                           dofs_per_hex    = accessor.get_fe().dofs_per_hex;
-
-        Assert(local_dof_indices.size() == accessor.get_fe().dofs_per_cell,
-               ExcInternalError());
-
-        unsigned int index = 0;
-
-        for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
-          for (unsigned int d = 0; d < dofs_per_vertex; ++d, ++index)
-            accessor.set_vertex_dof_index(vertex,
-                                          d,
-                                          local_dof_indices[index],
-                                          accessor.active_fe_index());
-        // now copy dof numbers into the line. for lines in 3d with the
-        // wrong orientation, we have already made sure that we're ok
-        // by picking the correct vertices (this happens automatically
-        // in the vertex() function). however, if the line is in wrong
-        // orientation, we look at it in flipped orientation and we
-        // will have to adjust the shape function indices that we see
-        // to correspond to the correct (cell-local) ordering.
-        //
-        // of course, if dim<3, then there is nothing to adjust
-        for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
-             ++line)
-          for (unsigned int d = 0; d < dofs_per_line; ++d, ++index)
-            accessor.line(line)->set_dof_index(
-              dim < 3 ?
-                d :
-                accessor.get_fe().adjust_line_dof_index_for_line_orientation(
-                  d, accessor.line_orientation(line)),
-              local_dof_indices[index],
-              accessor.active_fe_index());
-        // now copy dof numbers into the face. for faces in 3d with the
-        // wrong orientation, we have already made sure that we're ok
-        // by picking the correct lines and vertices (this happens
-        // automatically in the line() and vertex()
-        // functions). however, if the face is in wrong orientation,
-        // we look at it in flipped orientation and we will have to
-        // adjust the shape function indices that we see to correspond
-        // to the correct (cell-local) ordering. The same applies, if
-        // the face_rotation or face_orientation is non-standard
-        //
-        // again, if dim<3, then there is nothing to adjust
-        for (unsigned int quad = 0; quad < GeometryInfo<dim>::quads_per_cell;
-             ++quad)
-          for (unsigned int d = 0; d < dofs_per_quad; ++d, ++index)
-            accessor.quad(quad)->set_dof_index(
-              dim < 3 ?
-                d :
-                accessor.get_fe().adjust_quad_dof_index_for_face_orientation(
-                  d,
-                  accessor.face_orientation(quad),
-                  accessor.face_flip(quad),
-                  accessor.face_rotation(quad)),
-              local_dof_indices[index],
-              accessor.active_fe_index());
-        for (unsigned int d = 0; d < dofs_per_hex; ++d, ++index)
-          accessor.set_dof_index(d,
-                                 local_dof_indices[index],
-                                 accessor.active_fe_index());
-
-        Assert(index == accessor.get_fe().dofs_per_cell, ExcInternalError());
       }
 
 

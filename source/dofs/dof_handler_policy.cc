@@ -1671,8 +1671,11 @@ namespace internal
                   std::vector<types::global_dof_index> dof_indices(
                     cell->get_fe().dofs_per_cell);
 
-                  internal::DoFAccessorImplementation::get_dof_indices(
-                    *cell, dof_indices, cell->active_fe_index());
+                  // circumvent cache
+                  internal::DoFAccessorImplementation::Implementation::
+                    get_dof_indices(*cell,
+                                    dof_indices,
+                                    cell->active_fe_index());
 
                   for (auto &dof_index : dof_indices)
                     if (dof_index == numbers::invalid_dof_index)
