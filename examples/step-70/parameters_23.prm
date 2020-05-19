@@ -7,7 +7,7 @@ subsection Stokes Immersed Problem
   set Nitsche penalty term                  = 10
   set Number of time steps                  = 501
   set Output frequency                      = 1
-  set Output directory                      = results_23
+  set Output directory                      = .
   set Particle insertion refinement         = 4
   set Velocity degree                       = 2
   set Viscosity                             = 1
@@ -19,8 +19,8 @@ subsection Stokes Immersed Problem
   subsection Grid generation
     set Fluid grid generator                = hyper_rectangle
     set Fluid grid generator arguments      = -50,-50, -10: 50, 50, 40: false
-    set Solid grid generator                = ../impeller.vtk
-    set Solid grid generator arguments      = 1:../impeller.step
+    set Solid grid generator                = impeller.vtk
+    set Solid grid generator arguments      = 1:impeller.step
     set Particle grid generator           = hyper_ball
     set Particle grid generator arguments = 30, 30, 20: 10: false
   end
