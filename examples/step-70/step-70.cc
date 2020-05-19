@@ -19,7 +19,9 @@
 
 // @sect3{Include files}
 // Most of these have been introduced elsewhere, we'll comment only on the new
-// ones.
+// ones. The switches close to the top that allow selecting between PETSc
+// and Trilinos linear algebra capabilities are similar to the ones in
+// step-40 and step-50.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -92,46 +94,50 @@ namespace LA
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
 
-// These are the only new include files w.r.t. step-60. In this tutorial,
-// the non-matching coupling between the solid and the fluid is computed using
-// an intermediate data structure that keeps track of how the quadrature points
-// of the solid evolve w.r.t. the fluid mesh. This data structure needs to keep
-// track of the position of the quadrature points on each cell describing the
-// solid domain, of the quadrature weights, and possibly of the normal vector
-// to each point, if the solid domain is of co-dimension one.
+// These are the only new include files with regard to step-60. In this
+// tutorial, the non-matching coupling between the solid and the fluid is
+// computed using an intermediate data structure that keeps track of how the
+// locations of quadrature points of the solid evolve within the fluid mesh.
+// This data structure needs to keep track of the position of the quadrature
+// points on each cell describing the solid domain, of the quadrature weights,
+// and possibly of the normal vector to each point, if the solid domain is of
+// co-dimension one.
 //
 // Deal.II offers these facilities in the Particles namespace, through the
 // ParticleHandler class. ParticleHandler is a class that allows you to manage
 // a collection of particles (objects of type Particles::Particle), representing
-// a collection of points with some attached properties (e.g. an id) floating on
-// a parallel::distributed::Triangulation. The methods and classes in the
-// namespace Particles allows one to easily implement Particle In Cell methods
+// a collection of points with some attached properties (e.g., an id) floating
+// on a parallel::distributed::Triangulation. The methods and classes in the
+// namespace Particles allows one to easily implement Particle-In-Cell methods
 // and particle tracing on distributed triangulations.
 //
 // We "abuse" this data structure to store information about the location of
-// solid quadrature points w.r.t. to the surrounding fluid grid, including
+// solid quadrature points embedded in the surrounding fluid grid, including
 // integration weights, and possibly surface normals. The reason why we use this
 // additional data structure is related to the fact that the solid and the fluid
-// grids might be non-overlapping, and are distributed independently among
+// grids might be non-overlapping, and if we were using two separate
+// triangulation objects, would be distributed independently among parallel
 // processes.
 //
 // In order to couple the two problems, we rely on the ParticleHandler class,
 // storing in each particle the position of a solid quadrature point (which is
 // in general not aligned to any of the fluid quadrature points), its weight,
 // and any other information that may be required to couple the two problems.
+// These locations are then propagated along with the (prescribed) velocity
+// of the solid impeller.
 //
-// Ownership of the solid quadrature points is inherited by the MPI partitioning
-// on the solid mesh itself. The Particles so generated are later distributed to
-// the fluid mesh using the methods of the ParticleHandler class. This allows
-// transparent exchange of information between MPI processes about the
-// overlapping pattern between fluid cells and solid quadrature points.
+// Ownership of the solid quadrature points is initially inherited from the MPI
+// partitioning on the solid mesh itself. The Particles so generated are later
+// distributed to the fluid mesh using the methods of the ParticleHandler class.
+// This allows transparent exchange of information between MPI processes about
+// the overlapping pattern between fluid cells and solid quadrature points.
 #include <deal.II/particles/data_out.h>
 #include <deal.II/particles/generators.h>
 #include <deal.II/particles/particle_handler.h>
 #include <deal.II/particles/utilities.h>
 
 // When generating the grids, we allow reading it from a file, and if deal.II
-// has been built with OpenCASCADE support, we also allow reading cad files and
+// has been built with OpenCASCADE support, we also allow reading CAD files and
 // use them as manifold descriptors for the grid (see step-54 for a detailed
 // description of the various Manifold descriptors that are available in the
 // OpenCASCADE namespace)
@@ -150,57 +156,58 @@ namespace Step70
 {
   using namespace dealii;
 
+  // @sect3{Run-time parameter handling}
+
   // Similarly to what we have done in step-60, we set up a class that holds
   // all the parameters of our problem and derive it from the ParameterAcceptor
   // class to simplify the management and creation of parameter files.
   //
   // The ParameterAcceptor paradigm requires all parameters to be writable by
   // the ParameterAcceptor methods. In order to avoid bugs that would be very
-  // difficult to trace down (such as writing things like `time = 0` instead of
+  // difficult to track down (such as writing things like `time = 0` instead of
   // `time == 0`), we declare all the parameters in an external class, which is
-  // initialized before the actual StokesImmersedProblem class, and pass it to
-  // the main class as a const reference.
+  // initialized before the actual `StokesImmersedProblem` class, and pass it to
+  // the main class as a `const` reference.
+  //
+  // The constructor of the class is responsible for the connection between the
+  // members of this class and the corresponding entries in the
+  // ParameterHandler. Thanks to the use of the
+  // ParameterHandler::add_parameter() method, this connection is trivial, but
+  // requires all members of this class to be writeable.
   template <int dim, int spacedim = dim>
   class StokesImmersedProblemParameters : public ParameterAcceptor
   {
   public:
-    // The constructor is responsible for the connection between the members of
-    // this class and the corresponding entries in the ParameterHandler. Thanks
-    // to the use of the ParameterHandler::add_parameter() method, this
-    // connection is trivial, but requires all members of this class to be
-    // writeable
     StokesImmersedProblemParameters();
 
-    // however, since this class will be passed as a const reference to the
+    // however, since this class will be passed as a `const` reference to the
     // StokesImmersedProblem class, we have to make sure we can still set the
     // time correctly in the objects derived by the Function class defined
-    // here. In order to do so, we declare both the
-    // StokesImmersedProblemParameters::rhs and
-    // StokesImmersedProblemParameters::angular_velocity members to be mutable,
-    // and define this little helper method that sets their time to the correct
-    // value.
+    // herein. In order to do so, we declare both the
+    // `StokesImmersedProblemParameters::rhs` and
+    // `StokesImmersedProblemParameters::angular_velocity` members to be
+    // `mutable`, and define the following little helper method that sets their
+    // time to the correct value.
     void set_time(const double &time) const
     {
       rhs.set_time(time);
       angular_velocity.set_time(time);
     }
 
-    // this is where we write all the output files
+    // The remainder of the class consists largely of member variables that
+    // describe the details of the simulation and its discretization. The
+    // following parameters are about where output should land, the spatial and
+    // temporal discretization (the default is the $Q_2\times Q_1$ Taylor-Hood
+    // discretization which uses a polynomial degree of 2 for the velocity), and
+    // how many time steps should elapse before we generate graphical output
+    // again:
     std::string output_directory = ".";
 
-    // We will use a Taylor-Hood function space of arbitrary order. This
-    // parameter is used to initialize the FiniteElement space with the correct
-    // FESystem object
     unsigned int velocity_degree = 2;
 
-    // Instead of defining a time step increment, in this tutorial we prefer to
-    // let the user choose a final simulation time, and the number of steps in
-    // which we want to reach the final time
     unsigned int number_of_time_steps = 501;
     double       final_time           = 1.0;
 
-    // Instead of producing an output at every time step, we allow the user to
-    // select the frequency at which output is produced:
     unsigned int output_frequency = 1;
 
     // We allow every grid to be refined independently. In this tutorial, no
@@ -219,11 +226,12 @@ namespace Step70
     // accurate is the description of the fluid domain.
     // However, a large number of bounding boxes also implies a large
     // communication cost, since the collection of bounding boxes is gathered by
-    // all processes
+    // all processes.
     unsigned int fluid_rtree_extraction_level = 1;
 
-    // The only two parameters used in the equations are the viscosity of the
-    // fluid, and the penalty term used in the Nitsche formulation:
+    // The only two numerical parameters used in the equations are the viscosity
+    // of the fluid, and the penalty term $\beta$ used in the Nitsche
+    // formulation:
     double viscosity    = 1.0;
     double penalty_term = 100;
 
@@ -306,33 +314,145 @@ namespace Step70
     unsigned int max_cells            = 20000;
     int          refinement_frequency = 5;
 
-    // These two functions are used to control the source term of Stokes flow
-    // and the angular velocity at which we move the solid body. In a more
-    // realistic simulation, the solid velocity or its deformation would come
-    // from the solution of an auxiliary problem on the solid domain. In this
-    // example step we leave this part aside, and simply impose a fixed
-    // rotational velocity field along the z-axis on the immersed solid,
-    // governed by a function that can be specified in the parameter file:
+    // Finally, the following two function objects are used to control the
+    // source term of Stokes flow and the angular velocity at which we move the
+    // solid body. In a more realistic simulation, the solid velocity or its
+    // deformation would come from the solution of an auxiliary problem on the
+    // solid domain. In this example step we leave this part aside, and simply
+    // impose a fixed rotational velocity field along the z-axis on the immersed
+    // solid, governed by a function that can be specified in the parameter
+    // file:
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>> rhs;
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
       angular_velocity;
   };
 
 
+
+  // There remains the task of declaring what run-time parameters we can accept
+  // in input files. We split the parameters in various categories, by putting
+  // them in different sections of the ParameterHandler class. We begin by
+  // declaring all the global parameters used by StokesImmersedProblem
+  // in the global scope:
+  template <int dim, int spacedim>
+  StokesImmersedProblemParameters<dim,
+                                  spacedim>::StokesImmersedProblemParameters()
+    : ParameterAcceptor("Stokes Immersed Problem/")
+    , rhs("Right hand side", spacedim + 1)
+    , angular_velocity("Angular velocity")
+  {
+    add_parameter(
+      "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
+
+    add_parameter("Number of time steps", number_of_time_steps);
+    add_parameter("Output frequency", output_frequency);
+
+    add_parameter("Output directory", output_directory);
+
+    add_parameter("Final time", final_time);
+
+    add_parameter("Viscosity", viscosity);
+
+    add_parameter("Nitsche penalty term", penalty_term);
+
+    add_parameter("Initial fluid refinement",
+                  initial_fluid_refinement,
+                  "Initial mesh refinement used for the fluid domain Omega");
+
+    add_parameter("Initial solid refinement",
+                  initial_solid_refinement,
+                  "Initial mesh refinement used for the solid domain Gamma");
+
+    add_parameter("Fluid bounding boxes extraction level",
+                  fluid_rtree_extraction_level,
+                  "Extraction level of the rtree used to construct global "
+                  "bounding boxes");
+
+    add_parameter(
+      "Particle insertion refinement",
+      particle_insertion_refinement,
+      "Refinement of the volumetric mesh used to insert the particles");
+
+    add_parameter(
+      "Homogeneous Dirichlet boundary ids",
+      homogeneous_dirichlet_ids,
+      "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
+
+    // Next section is dedicated to the parameters used to create the
+    // various grids. We will need three different triangulations: `Fluid
+    // grid` is used to define the fluid domain, `Solid grid` defines the
+    // solid domain, and `Particle grid` is used to distribute some tracer
+    // particles, that are advected with the velocity and only used as
+    // passive tracers.
+    enter_my_subsection(this->prm);
+    this->prm.enter_subsection("Grid generation");
+    {
+      this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
+      this->prm.add_parameter("Fluid grid generator arguments",
+                              arguments_for_fluid_grid);
+
+      this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
+      this->prm.add_parameter("Solid grid generator arguments",
+                              arguments_for_solid_grid);
+
+      this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
+      this->prm.add_parameter("Particle grid generator arguments",
+                              arguments_for_particle_grid);
+    }
+    this->prm.leave_subsection();
+    leave_my_subsection(this->prm);
+
+
+
+    enter_my_subsection(this->prm);
+    this->prm.enter_subsection("Refinement and remeshing");
+    {
+      this->prm.add_parameter("Refinement step frequency",
+                              refinement_frequency);
+      this->prm.add_parameter("Refinement maximal level", max_level_refinement);
+      this->prm.add_parameter("Refinement minimal level", min_level_refinement);
+      this->prm.add_parameter("Refinement strategy",
+                              refinement_strategy,
+                              "",
+                              Patterns::Selection(
+                                "fixed_fraction|fixed_number"));
+      this->prm.add_parameter("Refinement coarsening fraction",
+                              coarsening_fraction);
+      this->prm.add_parameter("Refinement fraction", refinement_fraction);
+      this->prm.add_parameter("Maximum number of cells", max_cells);
+    }
+    this->prm.leave_subsection();
+    leave_my_subsection(this->prm);
+
+    // The final task is to correct the default dimension for the right hand
+    // side function and define a meaningful default angular velocity instead of
+    // zero.
+    rhs.declare_parameters_call_back.connect([&]() {
+      Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
+                                                              spacedim + 1);
+    });
+    angular_velocity.declare_parameters_call_back.connect([&]() {
+      this->prm.set("Function expression",
+                    "t < .500001 ? 6.283185 : -6.283185");
+    });
+  }
+
+
   // Once the angular velocity is provided as a Function object, we reconstruct
   // the pointwise solid velocity through the following class which derives
-  // from the Function class. It derives the value of the velocity of
-  // the solid body using the position of the points.
+  // from the Function class. It provides the value of the velocity of
+  // the solid body at a given position by assuming that the body rotates
+  // around the origin (or the $z$ axis in 3d) with a given angular velocity.
   template <int spacedim>
   class SolidVelocity : public Function<spacedim>
   {
   public:
+    static_assert(spacedim > 1,
+                  "Cannot instantiate SolidVelocity for spacedim == 1");
+
     SolidVelocity(const Functions::ParsedFunction<spacedim> &angular_velocity)
       : angular_velocity(angular_velocity)
-    {
-      static_assert(spacedim > 1,
-                    "Cannot instantiate SolidVelocity for spacedim == 1");
-    }
+    {}
 
     virtual double value(const Point<spacedim> &p,
                          unsigned int           component = 0) const override
@@ -353,6 +473,7 @@ namespace Step70
     const Functions::ParsedFunction<spacedim> &angular_velocity;
   };
 
+
   // Similarly, we assume that the solid position can be computed explicitly at
   // each time step, exploiting the knowledge of the angular velocity. We
   // compute the exact position of the solid particle assuming that the solid is
@@ -362,15 +483,15 @@ namespace Step70
   class SolidPosition : public Function<spacedim>
   {
   public:
+    static_assert(spacedim > 1,
+                  "Cannot instantiate SolidPosition for spacedim == 1");
+
     SolidPosition(const Functions::ParsedFunction<spacedim> &angular_velocity,
                   const double                               time_step)
       : Function<spacedim>(spacedim)
       , angular_velocity(angular_velocity)
       , time_step(time_step)
-    {
-      static_assert(spacedim > 1,
-                    "Cannot instantiate SolidPosition for spacedim == 1");
-    }
+    {}
 
     virtual double value(const Point<spacedim> &p,
                          unsigned int           component = 0) const override
@@ -395,7 +516,13 @@ namespace Step70
     double                                     time_step;
   };
 
-  // We are now ready to introduce the main class of our tutorial program.
+
+  // @sect3{The StokesImmersedProblem class declaration}
+
+  // We are now ready to introduce the main class of our tutorial program. As
+  // usual, other than the constructor, we leave a single public entry point:
+  // the `run()` method. Everything else is left `private`, and accessed through
+  // the run method itself.
   template <int dim, int spacedim = dim>
   class StokesImmersedProblem
   {
@@ -403,100 +530,99 @@ namespace Step70
     StokesImmersedProblem(
       const StokesImmersedProblemParameters<dim, spacedim> &par);
 
-    // As usual, we leave a single public entry point to the user: the run
-    // method. Everything else is left private, and accessed through the run
-    // method itself.
     void run();
 
+    // The next section contains the `private` members of the class.
+    // The first method is similar to what is present in previous example.
+    // However it not only takes care of generating the grid for the fluid, but
+    // also the grid for the solid. The second computes the largest time step
+    // that guarantees that each particle moves of at most one cell. This is
+    // important to ensure that the Particles::ParticleHandler can find which
+    // cell a particle ends up in, as it can only look from one cell to its
+    // immediate neighbors (because, in a parallel setting, every MPI process
+    // only knows about the cells it owns as well as their immediate neighbors).
   private:
-    // This method is similar to what is present in previous example. However
-    // it not only takes care of generating the grid for the fluid, but also
-    // the grid for the solid.
     void make_grid();
 
-    // We use the largest time step that guarantees that each particle moves of
-    // at most one
     double compute_time_step() const;
 
-    // These two methods are new w.r.t. previous examples, and initialize the
+    // The next two functions initialize the
     // Particles::ParticleHandler objects used in this class. We have two such
-    // objects: one represents passive tracers, used to plot the trajectories
+    // objects: One represents passive tracers, used to plot the trajectories
     // of fluid particles, while the the other represents material particles
     // of the solid, which are placed at quadrature points of the solid grid.
     void setup_tracer_particles();
     void setup_solid_particles();
 
-    // The setup is split in two parts: create all objects that are needed once
-    // per simulation,
+    // The remainder of the set up is split in two parts: The first of the
+    // following two functions creates all objects that are needed once per
+    // simulation, whereas the other sets up all objects that need to be
+    // reinitialized at every refinement step.
     void initial_setup();
-    // followed by all objects that need to be reinitialized at every refinement
-    // step.
     void setup_dofs();
 
     // The assembly routine is very similar to other Stokes assembly routines,
-    void assemble_stokes_system();
     // with the exception of the Nitsche restriction part, which exploits one of
     // the particle handlers to integrate on a non-matching part of the fluid
-    // domain, corresponding to the position of the solid.
+    // domain, corresponding to the position of the solid. We split these two
+    // parts into two separate functions.
+    void assemble_stokes_system();
     void assemble_nitsche_restriction();
 
-    // Nothing new in the solve routine, which is almost identical to step-60
+    // The remaining functions solve the linear system (which looks almost
+    // identical to the one in step-60) and then postprocess the solution: The
+    // refine_and_transfer() method is called only every `refinement_frequency`
+    // steps to adapt the mesh and also make sure that all the fields that were
+    // computed on the time step before refinement are transferred correctly to
+    // the new grid. This includes vector fields, as well as particle
+    // information. Similarly, we call the two output methods only every
+    // `output_frequency` steps.
     void solve();
 
-    // The refine_and_transfer() method is called only every
-    // `refinement_frequency` steps, and makes sure that all the fields
-    // that were computed on the time step before refinement are transferred
-    // correctly to the new grid. This includes vector fields, as well as
-    // particle information.
     void refine_and_transfer();
 
-    // Similarly, we call the output_results() method only every
-    // `output_frequency` steps. This method takes care of outputting both the
-    // fields variables,
     void output_results(const unsigned int cycle, const double time) const;
-
-    // and the tracers:
     void output_particles(const Particles::ParticleHandler<spacedim> &particles,
                           std::string                                 fprefix,
                           const unsigned int                          iter,
                           const double time) const;
 
+    // Let us then move on to the member functions of the class. The first
+    // deals with run-time parameters that are read from a parameter file.
     // As noted before, we make sure we cannot modify this object from within
-    // this class, by making it a const reference.
+    // this class, by making it a `const` reference.
     const StokesImmersedProblemParameters<dim, spacedim> &par;
 
+    // Then there is also the MPI communicator object that we will use to
+    // let processes send information across the network if the program runs
+    // in parallel, along with the `pcout` object and timer information
+    // that has also been employed by step-40, for example:
     MPI_Comm mpi_communicator;
 
-    // For the current implementation, only `fluid_fe` is really necessary.
-    // For completeness, and to allow easy extensions, we keep also the
-    // `solid_fe` around, which is however initialized to a FE_Nothing finite
-    // element space, i.e., one that has no degrees of freedom.
-    //
-    // We declare both finite element spaces as unique pointers, to allow their
-    // generation after StokesImmersedProblemParameters has been initialized. In
-    // particular, they will be initialized in the initial_setup() method
-    std::unique_ptr<FiniteElement<spacedim>>      fluid_fe;
-    std::unique_ptr<FiniteElement<dim, spacedim>> solid_fe;
+    ConditionalOStream pcout;
 
-    // This is one of the main novelties w.r.t. the tutorial step-60. Here we
+    mutable TimerOutput computing_timer;
+
+    // Next is one of the main novelties with regard to step-60. Here we
     // assume that both the solid and the fluid are fully distributed
     // triangulations. This allows the problem to scale to a very large number
     // of degrees of freedom, at the cost of communicating all the overlapping
     // regions between non matching triangulations. This is especially tricky,
     // since we make no assumptions on the relative position or distribution of
-    // the various subdomains. In particular, we assume that every process owns
-    // only a part of the solid_tria, and only a part of the fluid_tria, not
-    // necessarily in the same physical region, and not necessarily overlapping.
+    // the various subdomains of the two triangulations. In particular, we
+    // assume that every process owns only a part of the `solid_tria`, and only
+    // a part of the `fluid_tria`, not necessarily in the same physical region,
+    // and not necessarily overlapping.
     //
     // We could in principle try to create the initial subdivisions in such a
-    // way that they overlap between the solid and the fluid regions. However,
-    // this overlap would be destroyed during the simulation, and we would have
-    // to redistribute the dofs again and again. The approach we follow in this
-    // tutorial is more flexible, and not much more expensive. We make two
-    // all-to-all communications at the beginning of the simulation to exchange
-    // information about an (approximate) information of the geometrical
-    // occupancy of each processor (done through a collection of bounding
-    // boxes).
+    // way that each process's subdomains overlap between the solid and the
+    // fluid regions. However, this overlap would be destroyed during the
+    // simulation, and we would have to redistribute the DoFs again and again.
+    // The approach we follow in this tutorial is more flexible, and not much
+    // more expensive. We make two all-to-all communications at the beginning of
+    // the simulation to exchange information about an (approximate) information
+    // of the geometrical occupancy of each processor (done through a collection
+    // of bounding boxes).
     //
     // This information is used by the Particles::ParticleHandler class
     // to exchange (using a some-to-some communication pattern) all particles,
@@ -507,6 +633,23 @@ namespace Step70
     // implemented in the ParticleHandler class.
     parallel::distributed::Triangulation<spacedim>      fluid_tria;
     parallel::distributed::Triangulation<dim, spacedim> solid_tria;
+
+    // Next come descriptions of the finite elements in use, along with
+    // appropriate quadrature formulas and the corresponding DoFHandler objects.
+    // For the current implementation, only `fluid_fe` is really necessary. For
+    // completeness, and to allow easy extension, we also keep the `solid_fe`
+    // around, which is however initialized to a FE_Nothing finite element
+    // space, i.e., one that has no degrees of freedom.
+    //
+    // We declare both finite element spaces as `std::unique_ptr` objects rather
+    // than regular member variables, to allow their generation after
+    // `StokesImmersedProblemParameters` has been initialized. In particular,
+    // they will be initialized in the `initial_setup()` method.
+    std::unique_ptr<FiniteElement<spacedim>>      fluid_fe;
+    std::unique_ptr<FiniteElement<dim, spacedim>> solid_fe;
+
+    std::unique_ptr<Quadrature<spacedim>> fluid_quadrature_formula;
+    std::unique_ptr<Quadrature<dim>>      solid_quadrature_formula;
 
     DoFHandler<spacedim>      fluid_dh;
     DoFHandler<dim, spacedim> solid_dh;
@@ -522,6 +665,8 @@ namespace Step70
     std::vector<IndexSet> fluid_relevant_dofs;
     std::vector<IndexSet> solid_relevant_dofs;
 
+    // Using this partitioning of degrees of freedom, we can then define all of
+    // the objects necessary to describe the linear systems in question:
     AffineConstraints<double> constraints;
 
     LA::MPI::BlockSparseMatrix system_matrix;
@@ -532,56 +677,58 @@ namespace Step70
     LA::MPI::BlockVector       locally_relevant_solution;
     LA::MPI::BlockVector       system_rhs;
 
+    // Let us move to the particles side of this program. There are two
+    // Particles::ParticleHandler objects used to couple the solid with the
+    // fluid, and to describe the passive tracers. These, in many ways, play a
+    // role similar to the DoFHandler class used in the discretization, i.e.,
+    // they provide for an enumeration of particles and allow querying
+    // information about each particle.
+    Particles::ParticleHandler<spacedim> tracer_particle_handler;
+    Particles::ParticleHandler<spacedim> solid_particle_handler;
+
     // For every tracer particle, we need to compute the velocity field in its
     // current position, and update its position using a discrete time stepping
     // scheme. We do this using distributed linear algebra objects, where the
     // owner of a particle is set to be equal to the process that generated that
-    // particle at time t=0. This information is stored for every process in the
-    // `owned_tracer_particles` IndexSet, that indicates which particles the
+    // particle at time $t=0$. This information is stored for every process in
+    // the `owned_tracer_particles` IndexSet, that indicates which particles the
     // current process owns.
     //
     // Once the particles have been distributed around to match the process that
     // owns the region where the particle lives, we will need read access from
     // that process on the corresponding velocity field. We achieve this by
-    // filling a read only velocity vector field, that contains the relevant
+    // filling a read only velocity vector field that contains the relevant
     // information in ghost entries. This is achieved using the
     // `relevant_tracer_particles` IndexSet, that keeps track of how things
     // change during the simulation, i.e., it keeps track of where particles
-    // that I own have ended up being, and who owns the particles that ended up
-    // in my subdomain.
+    // that the current process owns have ended up being, and who owns the
+    // particles that ended up in my subdomain.
     //
     // While this is not the most efficient strategy, we keep it this way to
-    // illustrate how things would work in a real FSI problem. If a particle
-    // is linked to a specific solid degree of freedom, we are not free to
-    // choose who owns it, and we have to communicate this information around.
-    // We illustrate this here, and show that the communication pattern is
-    // point-to-point, and negligible in terms of total cost of the algorithm.
+    // illustrate how things would work in a real fluid-structure
+    // interaction (FSI) problem. If a particle is linked to a specific solid
+    // degree of freedom, we are not free to choose who owns it, and we have to
+    // communicate this information around. We illustrate this here, and show
+    // that the communication pattern is point-to-point, and negligible in terms
+    // of total cost of the algorithm.
+    //
+    // The vectors defined based on these subdivisions are then used to store
+    // the particles velocities (read-only, with ghost entries) and their
+    // displacement (read/write, no ghost entries).
     IndexSet owned_tracer_particles;
     IndexSet relevant_tracer_particles;
 
-    // These vectors are used to store the particles velocities (read-only, with
-    // ghost entries) and their displacement (read/write, no ghost entries).
     LA::MPI::Vector tracer_particle_velocities;
     LA::MPI::Vector relevant_tracer_particle_displacements;
 
-    // We fix once the quadrature formula that is used to integrate on the fluid
-    // and on the solid domains.
-    std::unique_ptr<Quadrature<spacedim>> fluid_quadrature_formula;
-    std::unique_ptr<Quadrature<dim>>      solid_quadrature_formula;
-
-    // Finally, these are the two Particles::ParticleHandler classes used to
-    // couple the solid with the fluid, and to describe the passive tracers.
-    Particles::ParticleHandler<spacedim> tracer_particle_handler;
-    Particles::ParticleHandler<spacedim> solid_particle_handler;
-
-    // One of the key point of this tutorial program is the coupling between
+    // One of the key points of this tutorial program is the coupling between
     // two independent parallel::distributed::Triangulation objects, one of
     // which may be moving and deforming (with possibly large deformations) with
     // respect to the other. When both the fluid and the solid triangulations
     // are of type parallel::distributed::Triangulation, every process has
-    // access only to the fraction of locally owned cells of each of the two
-    // triangulations. In general, the locally owned domains are not
-    // overlapping.
+    // access only to its fraction of locally owned cells of each of the two
+    // triangulations. As mentioned above, in general, the locally owned domains
+    // are not overlapping.
     //
     // In order to allow for the efficient exchange of information between
     // non-overlapping parallel::distributed::Triangulation objects, some
@@ -589,11 +736,27 @@ namespace Step70
     // of the area occupied by the locally owned part of the triangulation, in
     // the form of a collection of axis-aligned bounding boxes for each process,
     // that provide a full covering of the locally owned part of the domain.
+    // This kind of information can then be used in situations where one needs
+    // to send information to the owner of the cell surrounding a known
+    // location, without knowing who that owner may in fact be. But, if one
+    // knows a collection of bounding boxes for the geometric area or volume
+    // each process owns, then we can determine a subset of all processes that
+    // might possibly own the cell in which that location lies: namely, all of
+    // those processes whose bounding boxes contain that point. Instead of
+    // sending the information associated to that location to all processes, one
+    // can then get away with only sending it to a small subset of the processes
+    // with point-to-point communication primitives. (You will notice that this
+    // also allows for the typical time-vs-memory trade-off: The more data we
+    // are willing to store about each process's owned area -- in the form of
+    // more refined bounding box information -- the less communication we have
+    // to perform.)
     //
     // We construct this information by gathering a vector (of length
     // Utilities::MPI::n_mpi_processes()) of vectors of BoundingBox objects.
     // We fill this vector using the extract_rtree_level() function, and allow
-    // the user to select what level of the tree to extract.
+    // the user to select what level of the tree to extract. The "level"
+    // corresponds to how coarse/fine the overlap of the area with bounding
+    // boxes should be.
     //
     // As an example, this is what would be extracted by the
     // extract_rtree_level() function applied to a two dimensional hyper ball,
@@ -608,21 +771,29 @@ namespace Step70
     // We store these boxes in a global member variable, which is updated at
     // every refinement step:
     std::vector<std::vector<BoundingBox<spacedim>>> global_fluid_bounding_boxes;
-
-    ConditionalOStream  pcout;
-    mutable TimerOutput computing_timer;
   };
 
+
+
+  // @sect3{The StokesImmersedProblem class implementation}
+
+  // @sect4{Object construction and mesh initialization functions}
 
   // In the constructor, we create the mpi_communicator as well as
   // the triangulations and dof_handler for both the fluid and the solid.
   // Using the mpi_communicator, both the ConditionalOStream and TimerOutput
-  // are constructed.
+  // object are constructed.
   template <int dim, int spacedim>
   StokesImmersedProblem<dim, spacedim>::StokesImmersedProblem(
     const StokesImmersedProblemParameters<dim, spacedim> &par)
     : par(par)
     , mpi_communicator(MPI_COMM_WORLD)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(mpi_communicator,
+                      pcout,
+                      TimerOutput::summary,
+                      TimerOutput::wall_times)
     , fluid_tria(mpi_communicator,
                  typename Triangulation<spacedim>::MeshSmoothing(
                    Triangulation<spacedim>::smoothing_on_refinement |
@@ -633,47 +804,38 @@ namespace Step70
                    Triangulation<dim, spacedim>::smoothing_on_coarsening))
     , fluid_dh(fluid_tria)
     , solid_dh(solid_tria)
-    , pcout(std::cout,
-            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
-    , computing_timer(mpi_communicator,
-                      pcout,
-                      TimerOutput::summary,
-                      TimerOutput::wall_times)
   {}
 
 
   // In order to generate the grid, we first try to use the functions in the
   // deal.II GridGenerator namespace, by leveraging the
-  // GridGenerator::generate_from_name_and_argument(), if this function fails,
+  // GridGenerator::generate_from_name_and_argument(). If this function fails,
   // then we use the following method, where the name is interpreted as a
   // filename, and the arguments are interpreted as a map from manifold ids to
   // CAD files, and are converted to Manifold descriptors using the OpenCASCADE
-  // namespace facilities:
+  // namespace facilities. At the top, we read the file into a triangulation:
   template <int dim, int spacedim>
   void read_grid_and_cad_files(const std::string &grid_file_name,
                                const std::string &ids_and_cad_file_names,
                                Triangulation<dim, spacedim> &tria)
   {
-    // Try to read the grid using GridIn facilities. Let the GridIn class
-    // automatically detect the file format:
     GridIn<dim, spacedim> grid_in;
     grid_in.attach_triangulation(tria);
     grid_in.read(grid_file_name);
 
     // If we got to this point, then the Triangulation has been read, and we are
     // ready to attach to it the correct manifold descriptions. We perform the
-    // next lines of codes only if deal.II has been built with OpenCASCADE
+    // next lines of code only if deal.II has been built with OpenCASCADE
     // support. For each entry in the map, we try to open the corresponding CAD
     // file, we analyze it, and according to its content, opt for either a
-    // ArchLengthProjectionLineManifold (if the CAD file contains a single
-    // TopoDS_Edge or a single TopoDS_Wire) or a NURBSPatchManifold, if the file
-    // contains a single face. Notice that if the CAD files do not contain
-    // single wires, edges, or faces, an assertion will be throw in the
-    // generation of the Manifold.
+    // OpenCASCADE::ArcLengthProjectionLineManifold (if the CAD file contains a
+    // single `TopoDS_Edge` or a single `TopoDS_Wire`) or a
+    // OpenCASCADE::NURBSPatchManifold, if the file contains a single face.
+    // Notice that if the CAD files do not contain single wires, edges, or
+    // faces, an assertion will be throw in the generation of the Manifold.
     //
     // We use the Patterns::Tools::Convert class to do the conversion from the
     // string to a map between manifold ids and file names for us:
-
 #ifdef DEAL_II_WITH_OPENCASCADE
     using map_type  = std::map<types::manifold_id, std::string>;
     using Converter = Patterns::Tools::Convert<map_type>;
@@ -697,10 +859,11 @@ namespace Step70
                                         "do not recognize as a CAD file "
                                         "extension. Bailing out."));
 
-        // Now we check how many faces are contained in the Shape. OpenCASCADE
+        // Now we check how many faces are contained in the `Shape`. OpenCASCADE
         // is intrinsically 3D, so if this number is zero, we interpret this as
-        // a line manifold, otherwise as a NormalToMeshProjectionManifold in
-        // spacedim = 3, or NURBSPatchManifold in spacedim = 2.
+        // a line manifold, otherwise as a
+        // OpenCASCADE::NormalToMeshProjectionManifold in `spacedim` = 3, or
+        // OpenCASCADE::NURBSPatchManifold in `spacedim` = 2.
         const auto n_elements = OpenCASCADE::count_elements(shape);
         if ((std::get<0>(n_elements) == 0))
           tria.set_manifold(
@@ -708,9 +871,10 @@ namespace Step70
             OpenCASCADE::ArclengthProjectionLineManifold<dim, spacedim>(shape));
         else if (spacedim == 3)
           {
-            // We use this trick, because NormalToMeshProjectionManifold
-            // is only implemented for spacedim = 3. The check above makes
-            // sure that things actually work correctly.
+            // We use this trick, because
+            // OpenCASCADE::NormalToMeshProjectionManifold is only implemented
+            // for spacedim = 3. The check above makes sure that things actually
+            // work correctly.
             const auto t = reinterpret_cast<Triangulation<dim, 3> *>(&tria);
             t->set_manifold(manifold_id,
                             OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(
@@ -719,7 +883,7 @@ namespace Step70
         else
           // We also allow surface descriptions in two dimensional spaces based
           // on single NURBS patches. For this to work, the CAD file must
-          // contain a single TopoDS_Face.
+          // contain a single `TopoDS_Face`.
           tria.set_manifold(manifold_id,
                             OpenCASCADE::NURBSPatchManifold<dim, spacedim>(
                               TopoDS::Face(shape)));
@@ -730,19 +894,24 @@ namespace Step70
 #endif
   }
 
-  // Now let's put things together, and make all the necessary grids
+
+
+  // Now let's put things together, and make all the necessary grids. As
+  // mentioned above, we first try to generate the grid internally, and if we
+  // fail (i.e., if we end up in the `catch` clause), then we proceed with the
+  // above function.
+  //
+  // We repeat this pattern for both the fluid and the solid mesh.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::make_grid()
   {
     try
       {
-        // we first try to generate the grid internally
         GridGenerator::generate_from_name_and_arguments(
           fluid_tria, par.name_of_fluid_grid, par.arguments_for_fluid_grid);
       }
     catch (...)
       {
-        // and if we fail, we proceed with the above function call
         pcout << "Generating from name and argument failed." << std::endl
               << "Trying to read from file name." << std::endl;
         read_grid_and_cad_files(par.name_of_fluid_grid,
@@ -751,7 +920,6 @@ namespace Step70
       }
     fluid_tria.refine_global(par.initial_fluid_refinement);
 
-    // The same is done for the solid grid:
     try
       {
         GridGenerator::generate_from_name_and_arguments(
@@ -767,10 +935,17 @@ namespace Step70
     solid_tria.refine_global(par.initial_solid_refinement);
   }
 
+  // @sect4{Particle initialization functions}
+
   // Once the solid and fluid grids have been created, we start filling the
   // Particles::ParticleHandler objects. The first one we take care of is the
-  // one we use to keep track of passive tracers in the fluid. No other role is
-  // given to these particles, so their initialization is standard.
+  // one we use to keep track of passive tracers in the fluid. These are
+  // simply transported along, and in some sense their locations are
+  // unimportant: We just want to use them to see where flow is being
+  // transported. We could use any way we choose to determine where they are
+  // initially located. A convenient one is to create the initial locations as
+  // the vertices of a mesh in a shape of our choice -- a choice determined by
+  // one of the run-time parameters in the parameter file.
   //
   // In this implementation, we create tracers using the support points of a
   // FE_Q finite element space defined on a temporary grid, which is then
@@ -782,7 +957,7 @@ namespace Step70
   // of particles that live physically in the part of the domain owned by the
   // active process. However, in this case this function would not suffice. The
   // particles generated as the locally owned support points of an FE_Q object
-  // on an arbitrary grid (non-matching w.r.t. to the fluid grid) have no
+  // on an arbitrary grid (non-matching with regard to the fluid grid) have no
   // reasons to lie in the same physical region of the locally owned subdomain
   // of the fluid grid. In fact this will almost never be the case, especially
   // since we want to keep track of what is happening to the particles
@@ -795,18 +970,19 @@ namespace Step70
   // particle is associated to a given degree of freedom, which is owned by a
   // specific process and not necessarily the same process that owns the fluid
   // cell where the particle happens to be at any given time).
-  //
   // In the approach used here, ownership of the particles is assigned once at
-  // the beginning, and one-to-one communication happen whenever the original
+  // the beginning, and one-to-one communication happens whenever the original
   // owner needs information from the process that owns the cell where the
   // particle lives. We make sure that we set ownership of the particles using
   // the initial particle distribution, and keep the same ownership throughout
   // the execution of the program.
+  //
+  // With this overview out of the way, let us see what the function does. At
+  // the top, we create a temporary triangulation and DoFHandler object from
+  // which we will take the node locations for initial particle locations:
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_tracer_particles()
   {
-    // Generate a triangulation that will be used to decide the position
-    // of the particles to insert.
     parallel::distributed::Triangulation<spacedim> particle_insert_tria(
       mpi_communicator);
     GridGenerator::generate_from_name_and_arguments(
@@ -815,79 +991,95 @@ namespace Step70
       par.arguments_for_particle_grid);
     particle_insert_tria.refine_global(par.particle_insertion_refinement);
 
-    // Generate the support point on the triangulation that will be used as
-    // particle insertion point
-    DoFHandler<spacedim> particles_dof_handler(particle_insert_tria);
     FE_Q<spacedim>       particles_fe(1);
+    DoFHandler<spacedim> particles_dof_handler(particle_insert_tria);
     particles_dof_handler.distribute_dofs(particles_fe);
 
-    // Create the particle handler associated with the fluid triangulation
-    tracer_particle_handler.initialize(fluid_tria,
-                                       StaticMappingQ1<spacedim>::mapping);
-
-    // This is where things start to get complicated. In fully distributed
-    // triangulations, the active process only knows about the locally owned
-    // cells, and has no idea of how other processes have distributed their own
-    // cells. On the other hand, by design we assign to the active process also
-    // the particles that were generated as support points of the locally owned
-    // parts of a non matching and arbitrary grid.
-    //
-    // The location of these particles is arbitrary, and may fall within a
-    // region that we don't have access to (i.e., a region of the fluid domain
-    // where cells are artificial). In order to understand who to send those
-    // particles to, we need to have a (rough) idea of how the fluid grid is
-    // distributed among processors.
+    // This is where things start to get complicated. Since we may run
+    // this program in a parallel environment, every parallel process will now
+    // have created these temporary triangulations and DoFHandlers. But, in
+    // fully distributed triangulations, the active process only knows about the
+    // locally owned cells, and has no idea of how other processes have
+    // distributed their own cells. This is true for both the temporary
+    // triangulation created above as well as the fluid triangulation into which
+    // we want to embed the particles below. On the other hand, these locally
+    // known portions of the two triangulations will, in general, not overlap.
+    // That is, the locations of the particles we will create from the node
+    // locations of the temporary mesh are arbitrary, and may fall within a
+    // region of the fluid triangulation that the current process doesn't have
+    // access to (i.e., a region of the fluid domain where cells are
+    // artificial). In order to understand who to send those particles to, we
+    // need to have a (rough) idea of how the fluid grid is distributed among
+    // processors.
     //
     // We construct this information by first building an index tree of boxes
     // bounding the locally owned cells, and then extracting one of the first
     // levels of the tree:
-    std::vector<BoundingBox<spacedim>> all_boxes(
-      fluid_tria.n_locally_owned_active_cells());
-    unsigned int i = 0;
+    std::vector<BoundingBox<spacedim>> all_boxes;
+    all_boxes.reserve(fluid_tria.n_locally_owned_active_cells());
     for (const auto cell : fluid_tria.active_cell_iterators())
       if (cell->is_locally_owned())
-        all_boxes[i++] = cell->bounding_box();
+        all_boxes.emplace_back(cell->bounding_box());
 
-    // We construct the tree
     const auto tree = pack_rtree(all_boxes);
-
-    // extract the desired level
     const auto local_boxes =
       extract_rtree_level(tree, par.fluid_rtree_extraction_level);
 
-    // and gather the information from all participating processes
+    // Each process now has a collection of bounding boxes that completely
+    // enclose all locally owned processes (but that may overlap the bounding
+    // boxes of other processes). We then exchange this information between all
+    // participating processes so that every process knows the bounding boxes of
+    // all other processes.
+    //
+    // Equipped with this knowledge, we can then initialize the
+    // `tracer_particle_handler` to the fluid mesh and generate the particles
+    // from the support points of the (temporary) tracer particles
+    // triangulation. This function call uses the `global_bounding_boxes` object
+    // we just constructed to figure out where to send the particles whose
+    // locations were derived from the locally owned part of the
+    // `particles_dof_handler`. At the end of this call, every particle will
+    // have been distributed to the correct process (i.e., the process that owns
+    // the fluid cell where the particle lives). We also output their number to
+    // the screen at this point.
     global_fluid_bounding_boxes =
-      Utilities::MPI::all_gather(MPI_COMM_WORLD, local_boxes);
+      Utilities::MPI::all_gather(mpi_communicator, local_boxes);
 
+    tracer_particle_handler.initialize(fluid_tria,
+                                       StaticMappingQ1<spacedim>::mapping);
 
-    // Finally generate the particles from the support points of the
-    // tracer particles triangulation. This function call uses the
-    // global_bounding_boxes object we just constructed. At the end of this
-    // call, every particle will have been distributed to the correct process
-    // (i.e., the process that owns the cell where the particle lives).
     Particles::Generators::dof_support_points(particles_dof_handler,
                                               global_fluid_bounding_boxes,
                                               tracer_particle_handler);
 
-    // As soon as we have initialized the particles in each process, we set
-    // their ownership to the current distribution. Since we will need this
-    // information to initialize a vector containing velocity information for
-    // each particle, we query the tracer_particle_handler for its locally
-    // relevant ids, and construct the indices that would be needed to store in
-    // a (parallel distributed) vector the position and velocity of all
-    // particles.
+    pcout << "Tracer particles: "
+          << tracer_particle_handler.n_global_particles() << std::endl;
+
+    // Each particle so created has a unique ID. At some point in the
+    // algorithm below, we will need vectors containing position and velocity
+    // information for each particle. This vector will have size `n_particles *
+    // spacedim`, and we will have to store the elements of this vector in a way
+    // so that each parallel process "owns" those elements that correspond to
+    // coordinates of the particles it owns. In other words, we have to
+    // partition the index space between zero and `n_particles * spacedim` among
+    // all processes. We can do this by querying the `tracer_particle_handler`
+    // for the IDs of its locally relevant particles, and construct the indices
+    // that would be needed to store in a (parallel distributed) vector of the
+    // position and velocity of all particles where we implicitly assume that we
+    // store the coordinates of each location or velocity in `spacedim`
+    // successive vector elements (this is what the IndexSet::tensor_priduct()
+    // function does).
     owned_tracer_particles =
       tracer_particle_handler.locally_relevant_ids().tensor_product(
         complete_index_set(spacedim));
 
     // At the beginning of the simulation, all particles are in their original
-    // position. When particles move, they may jump to a part of the domain
+    // position. When particles move, they may traverse to a part of the domain
     // which is owned by another process. If this happens, the current process
     // keeps formally "ownership" of the particles, but may need read access
     // from the process where the particle has landed. We keep this information
     // in another index set, which stores the indices of all particles that are
-    // currently on my subdomain, independently if they have always been here or
-    // not.
+    // currently on the current process's subdomain, independently if they have
+    // always been here or not.
     //
     // Keeping this index set around allows us to leverage linear algebra
     // classes for all communications regarding positions and velocities of the
@@ -897,10 +1089,10 @@ namespace Step70
     // would be coupled to what is occurring in the fluid domain.
     relevant_tracer_particles = owned_tracer_particles;
 
-    // Now make sure that upon refinement, particles are correctly transferred.
-    // When performing local refinement or coarsening, particles will land in
-    // another cell. We could in principle redistribute all particles after
-    // refining, however this would be overly expensive.
+    // Finally, we make sure that upon refinement, particles are correctly
+    // transferred. When performing local refinement or coarsening, particles
+    // will land in another cell. We could in principle redistribute all
+    // particles after refining, however this would be overly expensive.
     //
     // The Particles::ParticleHandler class has a way to transfer information
     // from a cell to its children or to its parent upon refinement, without the
@@ -915,57 +1107,50 @@ namespace Step70
     fluid_tria.signals.post_distributed_refinement.connect([&]() {
       tracer_particle_handler.register_load_callback_function(false);
     });
-
-    // Finally, we display to the terminal the number of total tracer particles
-    // that were generated
-    pcout << "Tracer particles: "
-          << tracer_particle_handler.n_global_particles() << std::endl;
   }
 
 
-  // Similarly to what we have done for passive tracers, we now setup the solid
-  // particles. The main difference here is that we also want to attach a weight
-  // value to each of the quadrature points, so that we can compute integrals
-  // even without direct access to the original solid grid.
+  // Similarly to what we have done for passive tracers, we next set up the
+  // particles that track the quadrature points of the solid mesh. The main
+  // difference here is that we also want to attach a weight value (the "JxW"
+  // value of the quadrature point) to each of particle, so that we can compute
+  // integrals even without direct access to the original solid grid.
   //
   // This is achieved by leveraging the "properties" concept of the
-  // Particles::ParticleHandler class. It is possible to store (in a memory
-  // efficient way) an arbitrary number of doubles alongside with a
-  // Particles::Particle, inside a Particles::ParticleHandler object. We use
-  // this possibility to store the JxW values of the quadrature points of the
-  // solid grid.
+  // Particles::Particle class. It is possible to store (in a memory
+  // efficient way) an arbitrary number of `double` numbers for each of the
+  // Particles::Particle objects inside a Particles::ParticleHandler object. We
+  // use this possibility to store the JxW values of the quadrature points of
+  // the solid grid.
+  //
+  // In our case, we only need to store one property per particle: the JxW value
+  // of the integration on the solid grid. This is passed at construction time
+  // to the solid_particle_handler object as the last argument
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
   {
     QGauss<dim> quadrature(fluid_fe->degree + 1);
 
-    // We only need to store one property per particle: the JxW value of the
-    // integration on the solid grid. This is passed at construction time to the
-    // solid_particle_handler object as the last argument
     const unsigned int n_properties = 1;
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<spacedim>::mapping,
                                       n_properties);
 
     // The number of particles that we generate locally is equal to the total
-    // number of cells times the number of quadrature points used in each cell.
-    // We store all these points in a vector, and their corresponding properties
-    // in a vector of vectors, which we fill with the actual position of the
-    // quadrature points, and their JxW values (the only information that is
-    // needed to perform integration on the solid cells, even with a
-    // non-matching grid).
-    std::vector<Point<spacedim>> quadrature_points_vec(
-      quadrature.size() * solid_tria.n_locally_owned_active_cells());
+    // number of locally owned cells times the number of quadrature points used
+    // in each cell. We store all these points in a vector, and their
+    // corresponding properties in a vector of vectors:
+    std::vector<Point<spacedim>> quadrature_points_vec;
+    quadrature_points_vec.reserve(quadrature.size() *
+                                  solid_tria.n_locally_owned_active_cells());
 
-    std::vector<std::vector<double>> properties(
-      quadrature.size() * solid_tria.n_locally_owned_active_cells(),
-      std::vector<double>(n_properties));
+    std::vector<std::vector<double>> properties;
+    properties.reserve(quadrature.size() *
+                       solid_tria.n_locally_owned_active_cells());
 
     FEValues<dim, spacedim> fe_v(*solid_fe,
                                  quadrature,
                                  update_JxW_values | update_quadrature_points);
-
-    unsigned int point_index = 0;
     for (const auto &cell : solid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
@@ -975,37 +1160,40 @@ namespace Step70
 
           for (unsigned int q = 0; q < points.size(); ++q)
             {
-              quadrature_points_vec[point_index] = points[q];
-              properties[point_index][0]         = JxW[q];
-              ++point_index;
+              quadrature_points_vec.emplace_back(points[q]);
+              properties.emplace_back(
+                std::vector<double>(n_properties, JxW[q]));
             }
         }
 
     // We proceed in the same way we did with the tracer particles, reusing the
     // computed bounding boxes. However, we first check that the
-    // global_fluid_bounding_boxes object has been actually filled. This should
-    // certainly be the case here, since this method is called after the one
-    // that initializes the tracer particles. However, we want to make sure that
-    // if in the future someone decides (for whatever reason) to initialize
+    // `global_fluid_bounding_boxes` object has been actually filled. This
+    // should certainly be the case here, since this method is called after the
+    // one that initializes the tracer particles. However, we want to make sure
+    // that if in the future someone decides (for whatever reason) to initialize
     // first the solid particle handler, or to copy just this part of the
     // tutorial, a meaningful exception is thrown when things don't work as
     // expected
-    AssertThrow(!global_fluid_bounding_boxes.empty(),
-                ExcInternalError(
-                  "I was expecting the "
-                  "global_fluid_bounding_boxes to be filled at this stage. "
-                  "Make sure you fill this vector before trying to use it "
-                  "here. Bailing out."));
-
-    // Since we have already stored the position of the quadrature point,
+    //
+    // Since we have already stored the position of the quadrature points,
     // we can use these positions to insert the particles directly using
-    // the solid_particle_handler instead of having to go through a
-    // Particles::Generators
-    auto cpu_to_index = solid_particle_handler.insert_global_particles(
-      quadrature_points_vec, global_fluid_bounding_boxes, properties);
+    // the `solid_particle_handler` instead of having to go through a
+    // Particles::Generators function:
+    Assert(!global_fluid_bounding_boxes.empty(),
+           ExcInternalError(
+             "I was expecting the "
+             "global_fluid_bounding_boxes to be filled at this stage. "
+             "Make sure you fill this vector before trying to use it "
+             "here. Bailing out."));
+
+    solid_particle_handler.insert_global_particles(quadrature_points_vec,
+                                                   global_fluid_bounding_boxes,
+                                                   properties);
 
 
-    // Now make sure that upon refinement, particles are correctly transferred
+    // As in the previous function, we end by making sure that upon refinement,
+    // particles are correctly transferred:
     fluid_tria.signals.pre_distributed_refinement.connect(
       [&]() { solid_particle_handler.register_store_callback_function(); });
 
@@ -1016,19 +1204,26 @@ namespace Step70
           << std::endl;
   }
 
+
+
+  // @sect4{DoF initialization functions}
+
   // We set up the finite element space and the quadrature formula to be
   // used throughout the step. For the fluid, we use Taylor-Hood elements (e.g.
-  // Q(P)-Q(P-1)). Since we do not solve any equation on the solid domain, an
-  // empty finite element space is generated. A natural extension of this
-  // program would be to solve a fluid structure interaction problem, which
-  // would require that the solid_fe use a non-empty FiniteElement.
+  // $Q_k \times Q_{k-1}$). Since we do not solve any equation on the solid
+  // domain, an empty finite element space is generated. A natural extension of
+  // this program would be to solve a fluid structure interaction problem, which
+  // would require that the `solid_fe` use more useful FiniteElement class.
+  //
+  // Like for many other functions, we store the time necessary to carry out the
+  // operations we perform here. The current function puts its timing
+  // information into a section with label "Initial setup". Numerous other calls
+  // to this timer are made in various functions. They allow to monitor the
+  // absolute and relative cost of each individual function to identify
+  // bottlenecks.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::initial_setup()
   {
-    // We store the time necessary to carry-out the initial_setup under the
-    // label "Initial setup" Numerous other calls to this timer are made in
-    // various functions. They allow to monitor the absolute and relative load
-    // of each individual function to identify the bottlenecks.
     TimerOutput::Scope t(computing_timer, "Initial setup");
 
     fluid_fe = std_cxx14::make_unique<FESystem<spacedim>>(
@@ -1045,18 +1240,11 @@ namespace Step70
       std_cxx14::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
     solid_quadrature_formula =
       std_cxx14::make_unique<QGauss<dim>>(par.velocity_degree + 1);
-
-    // Save the current parameter file in the output directory, for
-    // reproducibility
-    par.prm.print_parameters(par.output_directory + "/" + "parameters_" +
-                               std::to_string(dim) + std::to_string(spacedim) +
-                               ".prm",
-                             ParameterHandler::Short);
   }
 
 
-  // We construct the distributed block matrices and vectors which are used to
-  // solve the linear equations that arise from the problem. This function is
+  // We next construct the distributed block matrices and vectors which are used
+  // to solve the linear equations that arise from the problem. This function is
   // adapted from step-55 and we refer to this step for a thorough explanation.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_dofs()
@@ -1165,8 +1353,12 @@ namespace Step70
   }
 
 
+  // @sect4{Assembly functions}
+
   // We assemble the system matrix, the preconditioner matrix, and the right
-  // hand side. The code is adapted from step-55 and is pretty standard.
+  // hand side. The code is adapted from step-55, which is essentially what
+  // step-27 also has, and is pretty standard if you know what the Stokes
+  // equations look like.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::assemble_stokes_system()
   {
@@ -1259,9 +1451,11 @@ namespace Step70
   }
 
 
-  // This method is the heart of the tutorial, but it is relatively
-  // straightforward. Here we exploit the solid_particle_handler to compute the
-  // Nitsche restriction or the penalization in the embedded domain.
+  // The following method is then the one that deals with the penalty terms that
+  // result from imposing the velocity on the impeller. It is, in a sense, the
+  // heart of the tutorial, but it is relatively straightforward. Here we
+  // exploit the `solid_particle_handler` to compute the Nitsche restriction or
+  // the penalization in the embedded domain.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::assemble_nitsche_restriction()
   {
@@ -1279,7 +1473,8 @@ namespace Step70
                                     fluid_fe->dofs_per_cell);
     dealii::Vector<double> local_rhs(fluid_fe->dofs_per_cell);
 
-    const auto k = 1.0 / GridTools::minimal_cell_diameter(fluid_tria);
+    const auto penalty_parameter =
+      1.0 / GridTools::minimal_cell_diameter(fluid_tria);
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us
@@ -1288,40 +1483,44 @@ namespace Step70
     // of the cell in which the particle lies and then loop over all particles
     // within that cell. This enables us to skip the cells which do not contain
     // particles, yet to assemble the local matrix and rhs of each cell to apply
-    // the Nitsche restriction.
+    // the Nitsche restriction. Once we are done with all particles on one cell,
+    // we advance the `particle` iterator to the particle past the end of the
+    // ones on the current cell (this is the last line of the `while` loop's
+    // body).
     auto particle = solid_particle_handler.begin();
     while (particle != solid_particle_handler.end())
       {
         local_matrix = 0;
         local_rhs    = 0;
 
-        // We get the reference to the cell within which the particle lies from
-        // the particle itself. Consequently, we can assemble the additional
-        // terms in the system matrix the rhs as we would normally.
+        // We get an iterator to the cell within which the particle lies from
+        // the particle itself. We can then assemble the additional
+        // terms in the system matrix and the right hand side as we would
+        // normally.
         const auto &cell = particle->get_surrounding_cell(fluid_tria);
         const auto &dh_cell =
           typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
         dh_cell->get_dof_indices(fluid_dof_indices);
 
+        // So then let us get the collection of cells that are located on this
+        // cell and iterate over them. From each particle we gather the location
+        // and the reference location of the particle as well as the additional
+        // information that is attached to the particle. In the present case,
+        // this information is the "JxW" of the quadrature points which were
+        // used to generate the particles.
+        //
+        // Using this information, we can add the contribution of the quadrature
+        // point to the local_matrix and local_rhs. We can evaluate the value of
+        // the shape function at the position of each particle easily by using
+        // its reference location.
         const auto pic = solid_particle_handler.particles_in_cell(cell);
-
         Assert(pic.begin() == particle, ExcInternalError());
-
         for (const auto &p : pic)
           {
-            // From the particle we gather the location and the reference
-            // location of the particle as well as the additional information
-            // that is attached to the particle. In the present case, this
-            // information is the JxW of the quadrature points which were used
-            // to generate the particles.
             const auto &ref_q  = p.get_reference_location();
             const auto &real_q = p.get_location();
             const auto &JxW    = p.get_properties()[0];
 
-            // We add the contribution of the quadrature point to the
-            // local_matrix and local_rhs. We can evaluate the value of the
-            // shape function at the position of each particle easily by using
-            // its reference location.
             for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
               {
                 const auto comp_i =
@@ -1334,11 +1533,11 @@ namespace Step70
                           fluid_fe->system_to_component_index(j).first;
                         if (comp_i == comp_j)
                           local_matrix(i, j) +=
-                            k * par.penalty_term *
+                            penalty_parameter * par.penalty_term *
                             fluid_fe->shape_value(i, ref_q) *
                             fluid_fe->shape_value(j, ref_q) * JxW;
                       }
-                    local_rhs(i) += k * par.penalty_term *
+                    local_rhs(i) += penalty_parameter * par.penalty_term *
                                     solid_velocity.value(real_q, comp_i) *
                                     fluid_fe->shape_value(i, ref_q) * JxW;
                   }
@@ -1355,10 +1554,14 @@ namespace Step70
   }
 
 
+  // @sect4{Solving the linear system}
+
   // This function solves the linear system with FGMRES with a block diagonal
-  // preconditioner and AMG for the two diagonal blocks. The
-  // preconditioner applies a v cycle to the 0,0 block and a CG with the mass
-  // matrix for the 1,1 block (the Schur complement).
+  // preconditioner and an algebraic multigrid (AMG) method for the diagonal
+  // blocks. The preconditioner applies a V cycle to the $(0,0)$ (i.e., the
+  // velocity-velocity) block and a CG with the mass matrix for the $(1,1)$
+  // block (which is our approximation to the Schur complement: the pressure
+  // mass matrix assembled above).
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::solve()
   {
@@ -1430,7 +1633,10 @@ namespace Step70
   }
 
 
-  // We deal with mesh refinement in a standard way.
+
+  // @sect4{Mesh refinement}
+
+  // We deal with mesh refinement in a completely standard way:
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::refine_and_transfer()
   {
@@ -1479,19 +1685,22 @@ namespace Step70
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(locally_relevant_solution);
     fluid_tria.execute_coarsening_and_refinement();
+
     setup_dofs();
+
     transfer.interpolate(solution);
     constraints.distribute(solution);
     locally_relevant_solution = solution;
   }
 
 
+  // @sect4{Creating output for visualization}
 
   // We output the results (velocity and pressure) on the fluid domain
-  // using the standard parallel capacities of deal.II. A single compressed vtu
-  // file is written that agglomerates the information of all processors. An
-  // additional .pvd record is written to associate the physical time to the vtu
-  // files.
+  // using the standard parallel capabilities of deal.II. A single compressed
+  // vtu file is written that agglomerates the information of all processors. An
+  // additional `.pvd` record is written to associate the physical time to the
+  // vtu files.
   template <int dim, int spacedim>
   void
   StokesImmersedProblem<dim, spacedim>::output_results(const unsigned int cycle,
@@ -1533,10 +1742,13 @@ namespace Step70
     DataOutBase::write_pvd_record(ofile, times_and_names);
   }
 
-  // We write the particles (either from the solid or the tracers)
+
+  // Similarly, we write the particles (either from the solid or the tracers)
   // as a single compressed vtu file through the Particles::DataOut object.
   // This simple object does not write the additional information
-  // attached to the particles, but only writes their id.
+  // attached as "properties" to the particles, but only writes their id -- but
+  // then, we don't care about the "JxW" values of these particle locations
+  // anyway, so no information that we may have wanted to visualize is lost.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::output_particles(
     const Particles::ParticleHandler<spacedim> &particles,
@@ -1563,8 +1775,13 @@ namespace Step70
   }
 
 
-  // This function orchestrates the entire simulation. It is very similar
-  // to the other time dependent tutorial programs.
+  // @sect4{The "run" function}
+
+  // This function now orchestrates the entire simulation. It is very similar
+  // to the other time dependent tutorial programs -- take step-21 or step-26 as
+  // an example. At the beginning, we output some status information and also
+  // save all current parameters to a file in the output directory, for
+  // reproducibility.
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::run()
   {
@@ -1577,10 +1794,13 @@ namespace Step70
           << Utilities::dim_string(dim, spacedim) << "> using Trilinos."
           << std::endl;
 #endif
+    par.prm.print_parameters(par.output_directory + "/" + "parameters_" +
+                               std::to_string(dim) + std::to_string(spacedim) +
+                               ".prm",
+                             ParameterHandler::Short);
 
-    ComponentMask velocity_mask(spacedim + 1, true);
-    velocity_mask.set(spacedim, false);
-
+    // We then start the time loop. We initialize all the elements of the
+    // simulation in the first cycle
     const double time_step    = par.final_time / (par.number_of_time_steps - 1);
     double       time         = 0;
     unsigned int output_cycle = 0;
@@ -1592,7 +1812,6 @@ namespace Step70
         pcout << "Cycle " << cycle << ':' << std::endl
               << "Time : " << time << ", time step: " << time_step << std::endl;
 
-        // We initialize all the elements of the simulation in the first cycle
         if (cycle == 0)
           {
             make_grid();
@@ -1618,8 +1837,9 @@ namespace Step70
                                time);
             }
           }
-        // On the other cycle, we displace the solid body to take into account
-        // the fact that is has moved.
+        // After the first time step, we displace the solid body at the
+        // beginning of each time step to take into account the fact that is has
+        // moved.
         else
           {
             TimerOutput::Scope t(computing_timer,
@@ -1630,17 +1850,19 @@ namespace Step70
             solid_particle_handler.set_particle_positions(solid_position,
                                                           false);
           }
+
+        // In order to update the state of the system, we first
+        // interpolate the fluid velocity at the position of the tracer
+        // particles and, with a naive explicit Euler scheme, advect the
+        // massless tracer particles.
         {
-          // We interpolate the fluid velocity at the position of the tracer
-          // particles and, with a naive explicit Euler scheme, we advect the
-          // massless tracer particles.
           TimerOutput::Scope t(computing_timer, "Set tracer particle motion");
           Particles::Utilities::interpolate_field_on_particles(
             fluid_dh,
             tracer_particle_handler,
             locally_relevant_solution,
             tracer_particle_velocities,
-            velocity_mask);
+            fluid_fe->component_mask(FEValuesExtractors::Vector(0)));
 
           tracer_particle_velocities *= time_step;
 
@@ -1658,12 +1880,16 @@ namespace Step70
           tracer_particle_handler.set_particle_positions(
             relevant_tracer_particle_displacements);
         }
+
+        // Using these new locations, we can then assemble the Stokes system and
+        // solve it.
         assemble_stokes_system();
         assemble_nitsche_restriction();
         solve();
 
-        // At every output frequency, we write the information of the solid
-        // particles, the tracer particles and the fluid domain.
+        // With the appropriate frequencies, we then write the information of
+        // the solid particles, the tracer particles, and the fluid domain into
+        // files for visualization, and end the time step by adapting the mesh.
         if (cycle % par.output_frequency == 0)
           {
             output_results(output_cycle, time);
@@ -1689,121 +1915,23 @@ namespace Step70
       }
   }
 
-
-  template <int dim, int spacedim>
-  StokesImmersedProblemParameters<dim,
-                                  spacedim>::StokesImmersedProblemParameters()
-    : ParameterAcceptor("Stokes Immersed Problem/")
-    , rhs("Right hand side", spacedim + 1)
-    , angular_velocity("Angular velocity")
-  {
-    // We split the parameters in various categories, by putting them in
-    // different sections of the ParameterHandler class. We begin by
-    // declaring all the global parameters used by StokesImmersedProblem
-    // in the global scope:
-    add_parameter(
-      "Velocity degree", velocity_degree, "", this->prm, Patterns::Integer(1));
-
-    add_parameter("Number of time steps", number_of_time_steps);
-    add_parameter("Output frequency", output_frequency);
-
-    add_parameter("Output directory", output_directory);
-
-    add_parameter("Final time", final_time);
-
-    add_parameter("Viscosity", viscosity);
-
-    add_parameter("Nitsche penalty term", penalty_term);
-
-    add_parameter("Initial fluid refinement",
-                  initial_fluid_refinement,
-                  "Initial mesh refinement used for the fluid domain Omega");
-
-    add_parameter("Initial solid refinement",
-                  initial_solid_refinement,
-                  "Initial mesh refinement used for the solid domain Gamma");
-
-    add_parameter("Fluid bounding boxes extraction level",
-                  fluid_rtree_extraction_level,
-                  "Extraction level of the rtree used to construct global "
-                  "bounding boxes");
-
-    add_parameter(
-      "Particle insertion refinement",
-      particle_insertion_refinement,
-      "Refinement of the volumetric mesh used to insert the particles");
-
-    add_parameter(
-      "Homogeneous Dirichlet boundary ids",
-      homogeneous_dirichlet_ids,
-      "Boundary Ids over which homogeneous Dirichlet boundary conditions are applied");
-
-    // Next section is dedicated to the parameters used to create the
-    // various grids. We will need three different triangulations: `Fluid
-    // grid` is used to define the fluid domain, `Solid grid` defines the
-    // solid domain, and `Particle grid` is used to distribute some tracer
-    // particles, that are advected with the velocity and only used as
-    // passive tracers.
-    enter_my_subsection(this->prm);
-    this->prm.enter_subsection("Grid generation");
-    this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
-    this->prm.add_parameter("Fluid grid generator arguments",
-                            arguments_for_fluid_grid);
-
-    this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
-    this->prm.add_parameter("Solid grid generator arguments",
-                            arguments_for_solid_grid);
-
-    this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
-    this->prm.add_parameter("Particle grid generator arguments",
-                            arguments_for_particle_grid);
-    this->prm.leave_subsection();
-
-    leave_my_subsection(this->prm);
-
-
-
-    enter_my_subsection(this->prm);
-    this->prm.enter_subsection("Refinement and remeshing");
-    this->prm.add_parameter("Refinement step frequency", refinement_frequency);
-    this->prm.add_parameter("Refinement maximal level", max_level_refinement);
-    this->prm.add_parameter("Refinement minimal level", min_level_refinement);
-    this->prm.add_parameter("Refinement strategy",
-                            refinement_strategy,
-                            "",
-                            Patterns::Selection("fixed_fraction|fixed_number"));
-    this->prm.add_parameter("Refinement coarsening fraction",
-                            coarsening_fraction);
-    this->prm.add_parameter("Refinement fraction", refinement_fraction);
-    this->prm.add_parameter("Maximum number of cells", max_cells);
-
-    this->prm.leave_subsection();
-    leave_my_subsection(this->prm);
-
-    // correct the default dimension for the rhs function
-    rhs.declare_parameters_call_back.connect([&]() {
-      Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
-                                                              spacedim + 1);
-    });
-    // and define a meaningful default angular velocity instead of zero
-    angular_velocity.declare_parameters_call_back.connect([&]() {
-      this->prm.set("Function expression",
-                    "t < .500001 ? 6.283185 : -6.283185");
-    });
-  }
-
 } // namespace Step70
 
 
-// The remainder of the code, the main function, is standard, with the
+// @sect3{The main() function}
+
+// The remainder of the code, the `main()` function, is standard, with the
 // exception of the handling of input parameter files. We allow the user to
 // specify an optional parameter file as an argument to the program. If
 // nothing is specified, we use the default file "parameters.prm", which is
 // created if non existent. The file name is scanned for the the string "23"
-// first, and "3" afterwards. If the filename contains the string "23", a the
+// first, and "3" afterwards. If the filename contains the string "23", the
 // problem classes are instantiated with template arguments 2 and 3
 // respectively. If only the string "3" is found, then both template arguments
 // are set to 3, otherwise both are set to 2.
+//
+// If the program is called without any command line arguments (i.e.,
+// `argc==1`), then we just use "parameters.prm" by default.
 int main(int argc, char *argv[])
 {
   using namespace Step70;
@@ -1813,15 +1941,12 @@ int main(int argc, char *argv[])
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      // Interpret the
       std::string prm_file;
       if (argc > 1)
         prm_file = argv[1];
       else
         prm_file = "parameters.prm";
 
-      // deduce the dimension of the problem from the name of the
-      // parameter file specified at the command line
       if (prm_file.find("23") != std::string::npos)
         {
           StokesImmersedProblemParameters<2, 3> par;

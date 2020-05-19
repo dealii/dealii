@@ -523,7 +523,7 @@ namespace Particles
      * This function can be used to construct distributed vectors and matrices
      * to manipulate particles using linear algebra operations.
      *
-     * Notice that it is the user's responsability to guarantee that particle
+     * Notice that it is the user's responsibility to guarantee that particle
      * indices are unique, and no check is performed to verify that this is the
      * case, nor that the union of all IndexSet objects on each mpi process is
      * complete.
@@ -579,7 +579,8 @@ namespace Particles
     /**
      * Callback function that should be called before every refinement
      * and when writing checkpoints. This function is used to
-     * register store_particles() with the triangulation.
+     * register store_particles() with the triangulation. This function
+     * is used in step-70.
      */
     void
     register_store_callback_function();
@@ -587,7 +588,8 @@ namespace Particles
     /**
      * Callback function that should be called after every refinement
      * and after resuming from a checkpoint.  This function is used to
-     * register load_particles() with the triangulation.
+     * register load_particles() with the triangulation. This function
+     * is used in step-70.
      */
     void
     register_load_callback_function(const bool serialization);

@@ -149,9 +149,11 @@ RTree<typename LeafTypeIterator::value_type, IndexType>
 pack_rtree(const LeafTypeIterator &begin, const LeafTypeIterator &end);
 
 /**
- * Construct the correct RTree object by passing an STL container type.
+ * Construct an RTree object by passing an STL container type.
+ * This function is used in step-70.
  *
- * Notice that the order of the parameters is the opposite with respect to the
+ * Notice that the order of the template parameters is the opposite with respect
+ * to the
  * RTree class, since we can automatically infer the @p LeafType from the
  * arguments, and we only need to specify the @p IndexType if the default is not
  * adequate.
@@ -259,7 +261,7 @@ struct ExtractLevelVisitor
  * Given a RTree object @p rtree, and a target level @p level, return a vector
  * of BoundingBox objects containing all the bounding boxes that make the given
  * @p level of the @p rtree. This function is a convenient wrapper around the
- * ExtractLevelVisitor class.
+ * ExtractLevelVisitor class. It is used in step-70.
  *
  * Since an RTree object is a balanced tree, you can expect each entry of the
  * resulting vector to contain roughly the same number of children, and
