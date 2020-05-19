@@ -386,46 +386,51 @@ namespace Step70
     // passive tracers.
     enter_my_subsection(this->prm);
     this->prm.enter_subsection("Grid generation");
-    this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
-    this->prm.add_parameter("Fluid grid generator arguments",
-                            arguments_for_fluid_grid);
+    {
+      this->prm.add_parameter("Fluid grid generator", name_of_fluid_grid);
+      this->prm.add_parameter("Fluid grid generator arguments",
+                              arguments_for_fluid_grid);
 
-    this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
-    this->prm.add_parameter("Solid grid generator arguments",
-                            arguments_for_solid_grid);
+      this->prm.add_parameter("Solid grid generator", name_of_solid_grid);
+      this->prm.add_parameter("Solid grid generator arguments",
+                              arguments_for_solid_grid);
 
-    this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
-    this->prm.add_parameter("Particle grid generator arguments",
-                            arguments_for_particle_grid);
+      this->prm.add_parameter("Particle grid generator", name_of_particle_grid);
+      this->prm.add_parameter("Particle grid generator arguments",
+                              arguments_for_particle_grid);
+    }
     this->prm.leave_subsection();
-
     leave_my_subsection(this->prm);
 
 
 
     enter_my_subsection(this->prm);
     this->prm.enter_subsection("Refinement and remeshing");
-    this->prm.add_parameter("Refinement step frequency", refinement_frequency);
-    this->prm.add_parameter("Refinement maximal level", max_level_refinement);
-    this->prm.add_parameter("Refinement minimal level", min_level_refinement);
-    this->prm.add_parameter("Refinement strategy",
-                            refinement_strategy,
-                            "",
-                            Patterns::Selection("fixed_fraction|fixed_number"));
-    this->prm.add_parameter("Refinement coarsening fraction",
-                            coarsening_fraction);
-    this->prm.add_parameter("Refinement fraction", refinement_fraction);
-    this->prm.add_parameter("Maximum number of cells", max_cells);
-
+    {
+      this->prm.add_parameter("Refinement step frequency",
+                              refinement_frequency);
+      this->prm.add_parameter("Refinement maximal level", max_level_refinement);
+      this->prm.add_parameter("Refinement minimal level", min_level_refinement);
+      this->prm.add_parameter("Refinement strategy",
+                              refinement_strategy,
+                              "",
+                              Patterns::Selection(
+                                "fixed_fraction|fixed_number"));
+      this->prm.add_parameter("Refinement coarsening fraction",
+                              coarsening_fraction);
+      this->prm.add_parameter("Refinement fraction", refinement_fraction);
+      this->prm.add_parameter("Maximum number of cells", max_cells);
+    }
     this->prm.leave_subsection();
     leave_my_subsection(this->prm);
 
-    // correct the default dimension for the rhs function
+    // The final task is to correct the default dimension for the right hand
+    // side function and define a meaningful default angular velocity instead of
+    // zero.
     rhs.declare_parameters_call_back.connect([&]() {
       Functions::ParsedFunction<spacedim>::declare_parameters(this->prm,
                                                               spacedim + 1);
     });
-    // and define a meaningful default angular velocity instead of zero
     angular_velocity.declare_parameters_call_back.connect([&]() {
       this->prm.set("Function expression",
                     "t < .500001 ? 6.283185 : -6.283185");
