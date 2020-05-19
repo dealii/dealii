@@ -781,6 +781,7 @@ namespace python
       GridIn<dim, spacedim> mesh_reader;
       mesh_reader.attach_triangulation(*tria);
       std::ifstream ifs(filename);
+      AssertThrow(ifs, ExcIO());
       mesh_reader.read(ifs, input_format);
       ifs.close();
     }

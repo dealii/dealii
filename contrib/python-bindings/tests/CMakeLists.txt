@@ -22,9 +22,12 @@ ENABLE_TESTING()
 FILE(GLOB _tests "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
 FOREACH(_test_path ${_tests})
  GET_FILENAME_COMPONENT(_test ${_test_path} NAME_WE)
+ GET_FILENAME_COMPONENT(_test_directory ${_test_path} DIRECTORY)
  ADD_TEST(NAME python-bindings/${_test} COMMAND ${PYTHON_EXECUTABLE} ${_test_path})
  SET_TESTS_PROPERTIES(python-bindings/${_test} PROPERTIES ENVIRONMENT
    PYTHONPATH=${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}/../:$ENV{PYTHONPATH}
+   ENVIRONMENT
+   DEAL_II_PYTHON_TESTPATH=${_test_directory}
    )
 ENDFOREACH()
 
