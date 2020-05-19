@@ -19,6 +19,7 @@
 
 #include <boost/geometry/algorithms/equals.hpp>
 #include <boost/geometry/algorithms/make.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
 
 #include "../tests.h"
 
