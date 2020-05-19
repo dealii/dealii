@@ -1603,8 +1603,7 @@ namespace Step70
 
     const auto P = block_diagonal_operator<2, LA::MPI::BlockVector>(
       std::array<
-        dealii::LinearOperator<
-          typename dealii::TrilinosWrappers::MPI::BlockVector::BlockType>,
+        dealii::LinearOperator<typename LA::MPI::BlockVector::BlockType>,
         2>{{amgA, amgS}});
 
     SolverControl solver_control(system_matrix.m(),
