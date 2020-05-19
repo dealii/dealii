@@ -327,28 +327,27 @@ assembling the Stokes part. This depends highly on the number of Gauss points
 In the present case, a relatively low number of tracer particles are used.
 Consequently, tracking their motion is relatively cheap.
 
-The following images present the initial and the final configuration of the
-simulation domain:
+The following movie shows the evolution of the solution over time:
 
-
+@htmlonly
 <p align="center">
-   <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.initial_configuration.png"
-           alt = ""
-           width="500">
-    </div>
-</p>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/y4Gypj2jpXw"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
 
+The movie shows the rotating obstacle in gray (actually a
+superposition of the solid particles plotted with large enough dots
+that they overlap), <a
+href="https://en.wikipedia.org/wiki/Streamlines,_streaklines,_and_pathlines">streamlines
+of the fluid flow</a> in light colors (including the corner vertices
+that form at specific times during the simulation), and the tracer particles in
+bluish tones.
 
-<p align="center">
-   <div class="img" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-70.final_configuration.png"
-           alt = ""
-           width="500">
-    </div>
-</p>
-
-We see that, generally, the tracer particles have somewhat returned to their
+The simulation shows that at the end time,
+the tracer particles have somewhat returned to their
 original position, although they have been distorted by the flow field. The
 following image compares the initial and the final position of the particles
 after one time unit of flow.
@@ -369,6 +368,7 @@ Euler scheme used to advect the particles, by the loss of accuracy due to the
 fictitious domain and, finally, by the discretization error on the Stokes
 equations. The first two errors are the leading cause of this deformation and
 they could be alleviated by the use of a finer mesh and a lower time step.
+
 
 <h3> Three dimensional test case </h3>
 
