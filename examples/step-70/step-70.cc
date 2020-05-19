@@ -1634,9 +1634,6 @@ namespace Step70
                                ".prm",
                              ParameterHandler::Short);
 
-    ComponentMask velocity_mask(spacedim + 1, true);
-    velocity_mask.set(spacedim, false);
-
     const double time_step    = par.final_time / (par.number_of_time_steps - 1);
     double       time         = 0;
     unsigned int output_cycle = 0;
@@ -1696,7 +1693,7 @@ namespace Step70
             tracer_particle_handler,
             locally_relevant_solution,
             tracer_particle_velocities,
-            velocity_mask);
+            fluid_fe->component_mask(FEValuesExtractors::Vector(0)));
 
           tracer_particle_velocities *= time_step;
 
