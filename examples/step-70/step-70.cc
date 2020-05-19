@@ -1551,6 +1551,9 @@ namespace Step70
                                                system_rhs);
         particle = pic.end();
       }
+
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
   }
 
 
