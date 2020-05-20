@@ -22,7 +22,6 @@
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
-#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/utilities.h>
 
 #include <boost/signals2/signal.hpp>
@@ -433,6 +432,41 @@ private:
 // -------------------  inline and template functions ----------------
 #ifndef DOXYGEN
 
+namespace internal
+{
+  namespace QRImplementation
+  {
+    // We want to avoid including our own LAPACK wrapper header in any external
+    // headers to avoid possible conflicts with other packages that may define
+    // their own such header. At the same time we want to be able to call some
+    // LAPACK functions from the template functions below. To resolve both
+    // problems define some extra wrappers here that can be in the header:
+    template <typename Number>
+    void
+    call_trmv(const char            uplo,
+              const char            trans,
+              const char            diag,
+              const types::blas_int n,
+              const Number *        a,
+              const types::blas_int lda,
+              Number *              x,
+              const types::blas_int incx);
+
+    template <typename Number>
+    void
+    call_trtrs(const char            uplo,
+               const char            trans,
+               const char            diag,
+               const types::blas_int n,
+               const types::blas_int nrhs,
+               const Number *        a,
+               const types::blas_int lda,
+               Number *              b,
+               const types::blas_int ldb,
+               types::blas_int *     info);
+  } // namespace QRImplementation
+} // namespace internal
+
 
 
 template <typename VectorType>
@@ -482,16 +516,16 @@ BaseQR<VectorType>::solve(Vector<Number> &      x,
   const int N     = this->current_size;
   const int n_rhs = 1;
   int       info  = 0;
-  trtrs("U",
-        transpose ? "T" : "N",
-        "N",
-        &N,
-        &n_rhs,
-        &this->R(0, 0),
-        &lda,
-        &x(0),
-        &ldb,
-        &info);
+  internal::QRImplementation::call_trtrs('U',
+                                         transpose ? 'T' : 'N',
+                                         'N',
+                                         N,
+                                         n_rhs,
+                                         &this->R(0, 0),
+                                         lda,
+                                         &x(0),
+                                         ldb,
+                                         &info);
 }
 
 
@@ -579,8 +613,8 @@ ImplicitQR<VectorType>::append_column(const VectorType &column)
       const int N     = this->current_size;
       const int n_rhs = 1;
       int       info  = 0;
-      trtrs(
-        "U", "T", "N", &N, &n_rhs, &this->R(0, 0), &lda, &u(0), &ldb, &info);
+      internal::QRImplementation::call_trtrs(
+        'U', 'T', 'N', N, n_rhs, &this->R(0, 0), lda, &u(0), ldb, &info);
 
       // finally get the diagonal element:
       // rho2 = |column|^2 - |u|^2
@@ -852,7 +886,8 @@ QR<VectorType>::multiply_with_A(VectorType &y, const Vector<Number> &x) const
   const int      N    = this->current_size;
   const int      lda  = N;
   const int      incx = 1;
-  trmv("U", "N", "N", &N, &this->R(0, 0), &lda, &x1[0], &incx);
+  internal::QRImplementation::call_trmv(
+    'U', 'N', 'N', N, &this->R(0, 0), lda, &x1[0], incx);
 
   multiply_with_Q(y, x1);
 }
@@ -868,7 +903,8 @@ QR<VectorType>::multiply_with_AT(Vector<Number> &y, const VectorType &x) const
   const int N    = this->current_size;
   const int lda  = N;
   const int incx = 1;
-  trmv("U", "T", "N", &N, &this->R(0, 0), &lda, &y[0], &incx);
+  internal::QRImplementation::call_trmv(
+    'U', 'T', 'N', N, &this->R(0, 0), lda, &y[0], incx);
 }
 
 #endif // no DOXYGEN
