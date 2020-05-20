@@ -27,6 +27,54 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+template <int structdim>
+CellData<structdim>::CellData()
+  : material_id(0)
+  , manifold_id(numbers::flat_manifold_id)
+{
+  std::fill(std::begin(vertices),
+            std::end(vertices),
+            numbers::invalid_unsigned_int);
+}
+
+
+
+template <int structdim>
+bool
+CellData<structdim>::operator==(const CellData<structdim> &other) const
+{
+  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+    if (vertices[i] != other.vertices[i])
+      return false;
+
+  if (material_id != other.material_id)
+    return false;
+
+  if (boundary_id != other.boundary_id)
+    return false;
+
+  if (manifold_id != other.manifold_id)
+    return false;
+
+  return true;
+}
+
+
+
+bool
+SubCellData::check_consistency(const unsigned int dim) const
+{
+  switch (dim)
+    {
+      case 1:
+        return ((boundary_lines.size() == 0) && (boundary_quads.size() == 0));
+      case 2:
+        return (boundary_quads.size() == 0);
+    }
+  return true;
+}
+
 namespace TriangulationDescription
 {
   namespace Utilities
