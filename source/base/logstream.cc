@@ -385,6 +385,7 @@ LogStream::get_prefixes() const
   bool                     exists         = false;
   std::stack<std::string> &local_prefixes = prefixes.get(exists);
 
+#  if 0 // FIXME
   // If this is a new locally stored stack, copy the "blessed" prefixes
   // from the initial thread that created logstream.
   if (!exists)
@@ -402,6 +403,7 @@ LogStream::get_prefixes() const
           local_prefixes = *first_elem;
         }
     }
+#  endif
 
   return local_prefixes;
 
