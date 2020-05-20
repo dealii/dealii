@@ -288,7 +288,7 @@ the stabilization ones, can be neglected from the formulation, resulting in
 the following final form of the variational formulation:
 
 @f{multline*}{
-(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\textrm{div}\;  \textbf{v}, p)_{\Omega}
   - (q, \textrm{div}\; \textbf{u})_{\Omega}  + 2\beta (\textbf{v},\textbf{u})_{\Gamma} \\
 =  2\beta (\textbf{v},\textbf{g})_{\Gamma}.
 @f}
