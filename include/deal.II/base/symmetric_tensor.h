@@ -2442,7 +2442,7 @@ namespace internal
             if (i < dim)
               return {i, i};
 
-            for (unsigned int d = 0, c = 0; d < dim; ++d)
+            for (unsigned int d = 0, c = dim; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if (c == i)
                   return {d, e};
