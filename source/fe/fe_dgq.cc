@@ -303,14 +303,11 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
       // cell and evaluate the
       // shape functions there
       const Point<dim> p = this->unit_support_points[j];
-      auto *const      polynomial_space_p =
-        dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
-      Assert(polynomial_space_p != nullptr, ExcInternalError());
       for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-        cell_interpolation(j, i) = polynomial_space_p->compute_value(i, p);
+        cell_interpolation(j, i) = this->poly_space->compute_value(i, p);
 
       for (unsigned int i = 0; i < source_fe.dofs_per_cell; ++i)
-        source_interpolation(j, i) = polynomial_space_p->compute_value(i, p);
+        source_interpolation(j, i) = source_fe.poly_space->compute_value(i, p);
     }
 
   // then compute the

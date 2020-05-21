@@ -233,13 +233,10 @@ FE_DGPMonomial<dim>::get_interpolation_matrix(
           source_fe_matrix(k, j) = source_fe.shape_value(j, unit_points[k]);
 
       FullMatrix<double> this_matrix(this->dofs_per_cell, this->dofs_per_cell);
-      auto *const        polynomial_space_p =
-        dynamic_cast<PolynomialsP<dim> *>(this->poly_space.get());
-      Assert(polynomial_space_p != nullptr, ExcInternalError());
       for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
         for (unsigned int k = 0; k < unit_points.size(); ++k)
           this_matrix(k, j) =
-            polynomial_space_p->compute_value(j, unit_points[k]);
+            this->poly_space->compute_value(j, unit_points[k]);
 
       this_matrix.gauss_jordan();
 
