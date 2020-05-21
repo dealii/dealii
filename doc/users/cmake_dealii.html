@@ -49,6 +49,7 @@
 	    <li><a href="#configurecomp">Component selection</a></li>
 	    <li><a href="#configurebuild">Build configuration</a></li>
 	    <li><a href="#compiler">Selecting a compiler</a></li>
+	    <li><a href="#compileccache">Compiling using Ccache</a></li>
 	    <li><a href="#configureinstall">Installation</a></li>
 	  </ol>
 	</li>
@@ -798,16 +799,16 @@ cmake -DLAPACK_FOUND=true \
           (default), <acronym>deal.II</acronym> will perform platform
           introspection for the given CPU.
 
-	<li>
+        <li>
           <code>BUILD_SHARED_LIBS</code>: If set (default),
           <acronym>deal.II</acronym> will be linked as a shared library
 
         <li>
-        <code>DEAL_II_PREFER_STATIC_LIBS</code> (defaults to off): If set
-        to true, static archives will be preferred over dynamic libraries when
-        searching for features and corresponding link interface.
+          <code>DEAL_II_PREFER_STATIC_LIBS</code> (defaults to off): If set
+          to true, static archives will be preferred over dynamic libraries when
+          searching for features and corresponding link interface.
 
-	<li>
+        <li>
           <code>DEAL_II_STATIC_EXECUTABLE</code> (defaults to off):
           If set to true, <acronym>deal.II</acronym> will be configured in
           a way to provide a link interface that is suitable for static
@@ -815,11 +816,11 @@ cmake -DLAPACK_FOUND=true \
           <code>BUILD_SHARED_LIBS=OFF</code> and
           <code>DEAL_II_PREFER_STATIC_LIBS=ON</code>.
 
-	<li>
-	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
-	  (default), the <acronym>deal.II</acronym> library will be
-	  installed with rpaths  set for all libraries outside of the
-	  system search paths
+        <li>
+          <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
+          (default), the <acronym>deal.II</acronym> library will be
+          installed with rpaths  set for all libraries outside of the
+          system search paths
       </ul>
     </p>
 
@@ -891,6 +892,49 @@ cmake -DDEAL_II_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
           coverage information by adding the flag
           <code>-D DEAL_II_SETUP_COVERAGE=ON</code>.
       </ol>
+    </p>
+
+
+    <a name="compileccache"></a>
+    <h3> Compiling using Ccache </h3>
+    <p>
+      <a href="https://ccache.dev/">Ccache</a> is a compiler caching tool. It
+      accelerates recompilation by caching previously executed compilations
+      and subsequently detecting when the same compilation is being performed
+      again.
+    </p>
+
+    <p>
+      It is possible for the library to be built using the Ccache tool.
+      This may be useful for those who frequently rebuild the library, as it
+      caches the output of the compilation (the C++ components, at least).
+      The next time that the library is built, if the compilation objects remain
+      the same then rebuilding them can be avoided as the results will be taken
+      from directly the cache. Anecdotally, Ccache is not well suited to
+      everybody's workflow, so it may take some experimentation to determine if
+      it's effective and helpful, or offers no particular gain to you.
+    </p>
+
+    <p>
+      Building with Ccache can be enabled directly via the command line.
+      When using a version of CMake that is greater or equal to 3.4, then using
+      Ccache is easy. Passing the configure-time argument
+<pre class="cmake">
+  -DCXX_COMPILER_LAUNCHER="ccache"
+</pre>
+      to Cmake ensures that Ccache is invoked whenever C++ code is compiled.
+    </p>
+
+    <p>
+      For older versions of CMake, Ccache may be invoked by prefixing the
+      compiler commands passed to CMake by environment or configure-time
+      variables. For example, if building using GCC then
+<pre class="cmake">
+  -DCMAKE_C_COMPILER="ccache gcc" -DCMAKE_CXX_COMPILER="ccache g++"
+</pre>
+      would indicate that ccache should invoke the GCC compilers to build deal.II.
+      Ccache itself is invoked when calling <code>make</code> or
+      <code>ninja</code>.
     </p>
 
 
