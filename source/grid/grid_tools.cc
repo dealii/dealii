@@ -1638,8 +1638,8 @@ namespace GridTools
               }
             else
               {
-                closest_vertex_index =
-                  GridTools::find_closest_vertex(mesh, p, marked_vertices);
+                closest_vertex_index = GridTools::find_closest_vertex(
+                  mapping, mesh, p, marked_vertices);
               }
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
