@@ -193,7 +193,7 @@ public:
    * class. A derived class may override this if its value is different from
    * @p my_degree.
    */
-  unsigned int
+  virtual unsigned int
   degree() const;
 
   /**
