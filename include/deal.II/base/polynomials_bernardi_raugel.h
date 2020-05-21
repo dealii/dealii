@@ -131,7 +131,7 @@ public:
   n_polynomials(const unsigned int k);
 
   /**
-   * @copydoc TensorPolynomialsBase<dim>::clone()
+   * @copydoc TensorPolynomialsBase::clone()
    */
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;

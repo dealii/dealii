@@ -233,7 +233,7 @@ public:
   name() const override;
 
   /**
-   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   * @copydoc ScalarPolynomialsBase::clone()
    */
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
