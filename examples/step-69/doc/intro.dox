@@ -317,9 +317,9 @@ $t_n$:
 @f{align*}
 &\textbf{for } i \in \mathcal{V} \\
 &\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow
-\texttt{gather_cij_vectors} (\textbf{c}, \mathcal{I}(i)) \\
+\mathtt{gather\_cij\_vectors} (\textbf{c}, \mathcal{I}(i)) \\
 &\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow
-\texttt{gather_state_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
+\mathtt{gather\_state\_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
 &\ \ \ \ \ \textbf{U}_i^{n+1} \leftarrow \mathbf{U}_i^{n} \\
 &\ \ \ \ \textbf{for } j \in \mathcal{I}(i)\backslash\{i\} \\
 &\ \ \ \ \ \ \ \  \texttt{compute } d_{ij} \\
@@ -327,7 +327,7 @@ $t_n$:
 &\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} \leftarrow \textbf{U}_i^{n+1} - \frac{\tau_n}{m_i}
  \mathbb{f}(\mathbf{U}_j^{n})\cdot \mathbf{c}_{ij} + d_{ij} \mathbf{U}_j^{n} \\
 &\ \ \ \ \textbf{end} \\
-&\ \ \ \ \texttt{scatter_updated_state} (\textbf{U}_i^{n+1}) \\
+&\ \ \ \ \mathtt{scatter\_updated\_state} (\textbf{U}_i^{n+1}) \\
 &\textbf{end}
 @f}
 
@@ -336,8 +336,8 @@ We note here that:
 - Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
 containing all the vectors $\mathbf{c}_{ij}$ and all the states
 $\mathbf{U}_j^n$ respectively.
-- $\texttt{gather_cij_vectors}$, $\texttt{gather_state_vectors}$, and
-$\texttt{scatter_updated_state}$ are hypothetical implementations that
+- $\mathtt{gather\_cij\_vectors}$, $\mathtt{gather\_state\_vectors}$, and
+$\mathtt{scatter\_updated\_state}$ are hypothetical implementations that
 either collect (from) or write (into) global matrices and vectors.
 - If we assume a Cartesian mesh in two space
 dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
