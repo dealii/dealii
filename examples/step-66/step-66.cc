@@ -92,7 +92,7 @@ namespace Step66
   // extensively documented.
 
 
-  // @setc4{JacobianOperator}
+  // @sect4{JacobianOperator}
 
   // Since we want to use the Jacobian as system matrix and pass it to the
   // linear solver as well as to the multilevel preconditioner classes we derive
@@ -589,7 +589,7 @@ namespace Step66
 
 
 
-  // @setc4{GelfandProblem::setup_system}
+  // @sect4{GelfandProblem::setup_system}
 
   // The setup_system function is quasi identical to the one in step-37. The
   // only differences are obviously the time measurement with only one
