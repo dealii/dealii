@@ -565,6 +565,15 @@ FE_Poly<dim, spacedim>::correct_third_derivatives(
 
 
 template <int dim, int spacedim>
+inline const ScalarPolynomialsBase<dim> &
+FE_Poly<dim, spacedim>::get_poly_space() const
+{
+  return *poly_space;
+}
+
+
+
+template <int dim, int spacedim>
 std::vector<unsigned int>
 FE_Poly<dim, spacedim>::get_poly_space_numbering() const
 {
