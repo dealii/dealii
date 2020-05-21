@@ -1023,15 +1023,6 @@ namespace Step66
       pcout << std::endl;
       
     }
-    
-    // At the end of the run function we close the textual output writing the
-    // end time and date.
-    {
-      pcout << std::string(80, '=') << std::endl;
-      pcout << "END DATE: " << Utilities::System::get_date()
-      << ", TIME: " << Utilities::System::get_time() << std::endl;
-      pcout << std::string(80, '=') << std::endl;
-    }
   }
 }
 
