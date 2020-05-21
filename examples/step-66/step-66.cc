@@ -335,7 +335,7 @@ namespace Step66
   // object handling the loop over all cells, and a local_apply function
   // implementing the calculation of the cell contribution.
   
-  // ??? As functor with operator() function.
+  // TODO: As functor with operator() function?
   
   template <int dim, int fe_degree>
   class ResidualOperator
@@ -543,8 +543,6 @@ namespace Step66
   // the instructions for the TransfiniteInterpolationManifold class and assign
   // also a SphericalManifold for the boundaty. In the end we use a six times
   // globally refined triangulation.
-  
-  // ??? Issue #6663
   template <int dim>
   void
   GelfandProblem<dim>::make_grid()
@@ -683,7 +681,7 @@ namespace Step66
   // states that Newton's method converges with quadratic order, but only if we
   // have an appropriate initial value. For wrong initial values the Newton
   // method diverges even with quadratic order. A common way is then to use a
-  // damped version $\alpha<1$ unitl the Newton step is good enough and the full
+  // damped version $\alpha<1$ until the Newton step is good enough and the full
   // Newton step can be performed. This was also discussed in step-15.
   template <int dim>
   double
