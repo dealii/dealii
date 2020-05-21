@@ -14,7 +14,6 @@
  * ---------------------------------------------------------------------
  *
  * Authors: Fabian Castelli, Karlsruhe Institute of Technology (KIT)
- *          Timo Heister, University of Utah
  */
 
 
