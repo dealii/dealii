@@ -449,10 +449,11 @@ public:
    * away and only non-zero data is added. The default value is <tt>true</tt>,
    * i.e., zero values won't be added into the matrix.
    *
-   * If anyway a new element will be inserted and it does not exist, allocates
-   * the entry.
+   * If this function sets the value of an element that does not yet exist,
+   * then it allocates an entry for it. (Unless `elide_zero_values` is `true`
+   * as mentioned above.)
    *
-   * @note You may need to insert some zero elements to keep a symmetric
+   * @note You may need to insert zero elements if you want to keep a symmetric
    * sparsity pattern for the matrix.
    */
   void
@@ -462,9 +463,14 @@ public:
       const bool      elide_zero_values = true);
 
   /**
-   * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
-   * does not exist. Filters out zeroes automatically. If <tt>value</tt> is
-   * not a finite number an exception is thrown.
+   * Add @p value to the element <tt>(i,j)</tt>.
+   *
+   * If this function adds to the value of an element that does not yet exist,
+   * then it allocates an entry for it.
+   *
+   * The function filters out zeroes automatically, i.e., it does not create
+   * new entries when adding zero to a matrix element for which no entry
+   * currently exists.
    */
   void
   add(const size_type i, const size_type j, const number value);
