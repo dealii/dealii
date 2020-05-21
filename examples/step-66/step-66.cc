@@ -83,7 +83,7 @@ namespace Step66
 
 
 
-  // sect3{Matrix-free operators}
+  // @sect3{Matrix-free operators}
 
   // In the beginning we define the two matrix-free operator for the Jacobian
   // and the residual. As guideline we follow the tutorials step-37 and step-48,
