@@ -20,7 +20,7 @@
       capabilities of newer ones. In order to use CUDA with deal.II, you will
       need your GPU to have compute capability 3.5 or higher. Independently
       from the GPU itself, you also need a version of CUDA recent enough.
-      deal.II supports CUDA 8.0 and higher. Finally to be able to configure
+      deal.II supports CUDA 9.0 and higher. Finally to be able to configure
       deal.II, you will need CMake 3.9 or higher.
     </p>
 
@@ -31,14 +31,12 @@
         -DDEAL_II_WITH_CUDA=ON
       </pre>
       Depending on you system, this may be enough to get CUDA to work. If you
-      are using CUDA 8 with gcc 5.4, you will need to turn off support for
-      C++14:
+      are using CUDA 9 or 10, you might need to turn off support for
+      C++17:
       <pre>
 
-        -DDEAL_II_WITH_CXX14=OFF
+        -DDEAL_II_WITH_CXX17=OFF
       </pre>
-      If you are using CUDA 9 or CUDA 10, you will need to turn off support for
-      C++17 similarly.
       By default, we try to detect the compute capability of your device
       but you can easily set your own CUDA flags:
       <pre>
