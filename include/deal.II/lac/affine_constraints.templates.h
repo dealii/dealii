@@ -2869,8 +2869,8 @@ namespace internals
     {
     public:
       /**
-       * Constructor. Grabs a scratch data object on the current thread and
-       * mark it as used
+       * Constructor. Grabs the scratch data object on the current thread and
+       * marks it as used.
        */
       ScratchDataAccessor()
         : my_scratch_data(&AffineConstraintsData::scratch_data.get())
