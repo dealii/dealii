@@ -113,11 +113,7 @@ public:
    * Consider using compute() instead.
    */
   virtual double
-  compute_value(const unsigned int /*i*/, const Point<dim> & /*p*/) const
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
+  compute_value(const unsigned int /*i*/, const Point<dim> & /*p*/) const = 0;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
@@ -129,12 +125,43 @@ public:
    */
   template <int order>
   Tensor<order, dim>
-  compute_derivative(const unsigned int /*i*/, const Point<dim> & /*p*/) const
-  {
-    Assert(false, ExcNotImplemented());
-    Tensor<order, dim> empty;
-    return empty;
-  }
+  compute_derivative(const unsigned int i, const Point<dim> &p) const;
+
+  /**
+   * Compute the first derivative of the <tt>i</tt>th polynomial
+   * at unit point <tt>p</tt>.
+   *
+   * Consider using evaluate() instead.
+   */
+  virtual Tensor<1, dim>
+  compute_1st_derivative(const unsigned int i, const Point<dim> &p) const = 0;
+
+  /**
+   * Compute the second derivative of the <tt>i</tt>th polynomial
+   * at unit point <tt>p</tt>.
+   *
+   * Consider using evaluate() instead.
+   */
+  virtual Tensor<2, dim>
+  compute_2nd_derivative(const unsigned int i, const Point<dim> &p) const = 0;
+
+  /**
+   * Compute the third derivative of the <tt>i</tt>th polynomial
+   * at unit point <tt>p</tt>.
+   *
+   * Consider using evaluate() instead.
+   */
+  virtual Tensor<3, dim>
+  compute_3rd_derivative(const unsigned int i, const Point<dim> &p) const = 0;
+
+  /**
+   * Compute the fourth derivative of the <tt>i</tt>th polynomial
+   * at unit point <tt>p</tt>.
+   *
+   * Consider using evaluate() instead.
+   */
+  virtual Tensor<4, dim>
+  compute_4th_derivative(const unsigned int i, const Point<dim> &p) const = 0;
 
   /**
    * Compute the gradient of the <tt>i</tt>th polynomial at unit point
@@ -143,12 +170,7 @@ public:
    * Consider using compute() instead.
    */
   virtual Tensor<1, dim>
-  compute_grad(const unsigned int /*i*/, const Point<dim> & /*p*/) const
-  {
-    Assert(false, ExcNotImplemented());
-    Tensor<1, dim> empty;
-    return empty;
-  }
+  compute_grad(const unsigned int /*i*/, const Point<dim> & /*p*/) const = 0;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
@@ -157,12 +179,8 @@ public:
    * Consider using compute() instead.
    */
   virtual Tensor<2, dim>
-  compute_grad_grad(const unsigned int /*i*/, const Point<dim> & /*p*/) const
-  {
-    Assert(false, ExcNotImplemented());
-    Tensor<2, dim> empty;
-    return empty;
-  }
+  compute_grad_grad(const unsigned int /*i*/,
+                    const Point<dim> & /*p*/) const = 0;
 
   /**
    * Return the number of polynomials.
@@ -234,6 +252,37 @@ ScalarPolynomialsBase<dim>::degree() const
 }
 
 
+
+template <int dim>
+template <int order>
+inline Tensor<order, dim>
+ScalarPolynomialsBase<dim>::compute_derivative(const unsigned int i,
+                                               const Point<dim> & p) const
+{
+  if (order == 1)
+    {
+      auto derivative = compute_1st_derivative(i, p);
+      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+    }
+  if (order == 2)
+    {
+      auto derivative = compute_2nd_derivative(i, p);
+      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+    }
+  if (order == 3)
+    {
+      auto derivative = compute_3rd_derivative(i, p);
+      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+    }
+  if (order == 4)
+    {
+      auto derivative = compute_4th_derivative(i, p);
+      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+    }
+  Assert(false, ExcNotImplemented());
+  Tensor<order, dim> empty;
+  return empty;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

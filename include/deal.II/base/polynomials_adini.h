@@ -81,6 +81,34 @@ public:
   compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
+   * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   */
+  virtual Tensor<1, dim>
+  compute_1st_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   */
+  virtual Tensor<2, dim>
+  compute_2nd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   */
+  virtual Tensor<3, dim>
+  compute_3rd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   */
+  virtual Tensor<4, dim>
+  compute_4th_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
    * Compute the gradient of the <tt>i</tt>th polynomial at
    * <tt>unit_point</tt>.
    *
@@ -147,6 +175,50 @@ private:
    */
   Table<2, double> dxy;
 };
+
+
+
+template <int dim>
+inline Tensor<1, dim>
+PolynomialsAdini<dim>::compute_1st_derivative(const unsigned int /*i*/,
+                                              const Point<dim> & /*p*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return {};
+}
+
+
+
+template <int dim>
+inline Tensor<2, dim>
+PolynomialsAdini<dim>::compute_2nd_derivative(const unsigned int /*i*/,
+                                              const Point<dim> & /*p*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return {};
+}
+
+
+
+template <int dim>
+inline Tensor<3, dim>
+PolynomialsAdini<dim>::compute_3rd_derivative(const unsigned int /*i*/,
+                                              const Point<dim> & /*p*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return {};
+}
+
+
+
+template <int dim>
+inline Tensor<4, dim>
+PolynomialsAdini<dim>::compute_4th_derivative(const unsigned int /*i*/,
+                                              const Point<dim> & /*p*/) const
+{
+  Assert(false, ExcNotImplemented());
+  return {};
+}
 
 
 
