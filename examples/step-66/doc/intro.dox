@@ -16,7 +16,7 @@ On the unit circle $\Omega = \bigl\{ x \in \mathbb{R}^2 : \|x\| \leq 1 \bigr\}$
 we consider the following nonlinear elliptic boundary value problem subject to a
 homogeneous Dirichlet boundary condition: Find a function
 $u\colon\Omega\to\mathbb{R}$ such that holds:
-@f{alignat*}{2}{
+@f{align*}
  - \Delta u &= \exp(u) & \qquad & \text{in } \Omega,\\
           u &= 0       & \qquad & \text{on } \partial\Omega.
 @f}
@@ -59,7 +59,7 @@ representing the discrete nonlinear problem.
 To solve this nonlinear problem we use Newton's method. So given an
 initial guess $u_h^0\in V_h$ we determine a sequence of Newton steps
 $\bigl( u_h^n \bigr)_n$ by successively apply the following scheme:
-@f{alignat*}{2}{
+@f{align*}{
  &\text{Solve for } s_h^n\in V_h: \qquad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
  &\text{Update: } & u_h^{n+1} &= u_h^n + s_h^n.
 @f}
