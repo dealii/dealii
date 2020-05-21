@@ -835,11 +835,11 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   bool                equidistant = true;
   std::vector<double> points(this->degree + 1);
 
-  auto *const polynomial_space_p =
+  auto *const polynomial_space =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
-  Assert(polynomial_space_p != nullptr, ExcInternalError());
+  Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
-    polynomial_space_p->get_numbering_inverse();
+    polynomial_space->get_numbering_inverse();
   for (unsigned int j = 0; j <= this->degree; j++)
     points[j] = this->unit_support_points[lexicographic[j]][0];
 
@@ -952,11 +952,11 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 {
   // Construct a dummy quadrature formula containing the FE's nodes:
   std::vector<Point<1>> qpoints(this->degree + 1);
-  auto *const           polynomial_space_p =
+  auto *const           polynomial_space =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
-  Assert(polynomial_space_p != nullptr, ExcInternalError());
+  Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
-    polynomial_space_p->get_numbering_inverse();
+    polynomial_space->get_numbering_inverse();
   for (unsigned int i = 0; i <= this->degree; ++i)
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
   Quadrature<1> pquadrature(qpoints);
