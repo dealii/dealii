@@ -18,6 +18,7 @@
 #
 # This file sets up
 #
+#   DEAL_II_HAVE_CXX14
 #   DEAL_II_HAVE_CXX17
 #
 #   DEAL_II_HAVE_FP_EXCEPTIONS
@@ -34,239 +35,240 @@
 #                                                                      #
 ########################################################################
 
-#
-# Some old compiler versions default to C++98/03 rather than C++14. Inject
-# -std=c++14 into the compiler flags in this case.
-#
-IF((CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-     AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.1")
-    OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
-     AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0")
-    OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
-     AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.0"))
-  MESSAGE(STATUS "Old compiler detected, setting -std=c++14")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-std=c++14")
-ENDIF()
 
 #
-# Use compile flags specified in ${DEAL_II_CXX_FLAGS} for the following
-# tests:
+# We need compiler flags specified in ${DEAL_II_CXX_FLAGS} for all the
+# tests. Create a small macro to easily set CMAKE_REQUIRED_FLAGS
 #
+MACRO(_set_up_cmake_required)
+  RESET_CMAKE_REQUIRED()
+  SET(CMAKE_REQUIRED_FLAGS "")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  SET(_werror_flag "/WX /EHsc")
-ELSE()
-  SET(_werror_flag "-Werror")
-ENDIF()
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    SET(_werror_flag "/WX")
+  ELSE()
+    SET(_werror_flag "-Werror")
+  ENDIF()
 
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${_werror_flag}")
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ENDIF()
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${_werror_flag}")
+  ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
 
-#
-# Rerun all checks if compile flags change:
-#
-UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
-  "${CMAKE_REQUIRED_FLAGS}"
-  DEAL_II_HAVE_CXX17_FEATURES
-  DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
-  DEAL_II_HAVE_CXX14_FEATURES
-  DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
-  DEAL_II_HAVE_CXX11_FEATURES
-  DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
-  DEAL_II_HAVE_FP_EXCEPTIONS
-  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
-  DEAL_II_CXX14_CONSTEXPR_BUG_OK
-  )
+  # Let's put the user supplied `DEAL_II_CXX_FLAGS_SAVED` last so that we
+  # never override a user supplied -std=c++XY flag in our tests.
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
+ENDMACRO()
 
 
 #
-# Test that the c++17 attributes are supported.
+# Wrap the following checks into a macro to make it easier to rerun them.
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <iostream>
+MACRO(_test_cxx17_support)
 
-  #if __cplusplus < 201703L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
-  #  error \"insufficient support for C++17\"
-  #endif
+  UNSET_IF_CHANGED(CHECK_CXX17_FEATURES_FLAGS_SAVED
+    "${CMAKE_REQUIRED_FLAGS}"
+    DEAL_II_HAVE_CXX17_FEATURES
+    DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
+    )
 
-  [[nodiscard]] int test_nodiscard()
-  {
-    return 1;
-  }
+  # Test that the c++17 attributes are supported.
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <iostream>
 
-  int main()
-  {
-    const unsigned int n=1;
-    switch (n)
+    #if __cplusplus < 201703L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+    #  error \"insufficient support for C++17\"
+    #endif
+
+    [[nodiscard]] int test_nodiscard()
     {
-      case 1:
-        std::cout << n;
-        [[fallthrough]];
-      case 2:
-        std::cout << n;
+      return 1;
     }
 
-    [[maybe_unused]] int i = test_nodiscard();
-
-    constexpr bool flag = false;
-    if constexpr(flag)
-      return 1;
-    return 0;
-  }
-  "
-  DEAL_II_HAVE_CXX17_FEATURES)
-
-
-#
-# Some compilers treat lambdas as constexpr functions when compiling with
-# C++17 support even if they don't fulfill all the constexpr function
-# requirements. Consequently, these compilers don't allow try-blocks or
-# non-literal return types in lambdas. This is a bug.
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <string>
-
-  int main()
-  {
-    auto c = []()
+    int main()
     {
-      return std::string{};
-    }();
-    (void) c;
+      const unsigned int n=1;
+      switch (n)
+      {
+        case 1:
+          std::cout << n;
+          [[fallthrough]];
+        case 2:
+          std::cout << n;
+      }
 
-    return []()
-    {
-      try
-      {}
-      catch(...)
-      {}
+      [[maybe_unused]] int i = test_nodiscard();
+
+      constexpr bool flag = false;
+      if constexpr(flag)
+        return 1;
       return 0;
-    }();
-  }
-  "
-  DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
+    }
+    "
+    DEAL_II_HAVE_CXX17_FEATURES)
+
+  # Some compilers treat lambdas as constexpr functions when compiling with
+  # C++17 support even if they don't fulfill all the constexpr function
+  # requirements. Consequently, these compilers don't allow try-blocks or
+  # non-literal return types in lambdas. This is a bug.
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <string>
+    int main()
+    {
+      auto c = []()
+      {
+        return std::string{};
+      }();
+      (void) c;
+
+      return []()
+      {
+        try
+        {}
+        catch(...)
+        {}
+        return 0;
+      }();
+    }
+    "
+    DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
+
+  IF(DEAL_II_HAVE_CXX17_FEATURES AND
+     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
+    MESSAGE(STATUS "C++17 support is enabled.")
+    SET(DEAL_II_HAVE_CXX17 TRUE)
+  ELSE()
+    MESSAGE(STATUS "C++17 support is disabled.")
+    SET(DEAL_II_HAVE_CXX17 FALSE)
+  ENDIF()
+ENDMACRO()
 
 
 #
-# Check some generic C++14 features
+# Wrap the following checks into a macro to make it easier to rerun them.
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <memory>
-  #include <algorithm>
+MACRO(_test_cxx14_support)
+  UNSET_IF_CHANGED(CHECK_CXX14_FEATURES_FLAGS_SAVED
+    "${CMAKE_REQUIRED_FLAGS}"
+    DEAL_II_HAVE_CXX14_FEATURES
+    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
+    DEAL_II_HAVE_CXX11_FEATURES
+    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
+    )
 
-  // Check the version language macro, but skip MSVC because
-  // MSVC reports 199711 even in MSVC 2017.
-  #if __cplusplus < 201402L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
-  #  error \"insufficient support for C++14\"
-  #endif
+  # Check some generic C++14 features
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <memory>
+    #include <algorithm>
 
-  int main()
-  {
-    auto ptr = std::make_unique<int>(42);
-    constexpr int max = std::max(0, 1);
-    (void) ptr;
-    (void) max;
-    return 0;
-  }
-  "
-  DEAL_II_HAVE_CXX14_FEATURES)
+    // Check the version language macro, but skip MSVC because
+    // MSVC reports 199711 even in MSVC 2017.
+    #if __cplusplus < 201402L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+    #  error \"insufficient support for C++14\"
+    #endif
 
+    int main()
+    {
+      auto ptr = std::make_unique<int>(42);
+      constexpr int max = std::max(0, 1);
+      (void) ptr;
+      (void) max;
+      return 0;
+    }
+    "
+    DEAL_II_HAVE_CXX14_FEATURES)
 
-#
-# Clang-3.5* or older, bail out with a spurious error message in case
-# of an undeduced auto return type.
-#
-# https://llvm.org/bugs/show_bug.cgi?id=16876
-#
-SET(_flags "${DEAL_II_CXX_FLAGS_DEBUG}")
-STRIP_FLAG(_flags "-Wa,--compress-debug-sections")
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flags}")
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  struct foo
-  {
-    auto func();
-  };
-  int main()
-  {
-    foo bar;
-    (void) bar;
-  }
-  "
-  DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
+  # Clang-3.5* or older, bail out with a spurious error message in case
+  # of an undeduced auto return type.
+  #
+  # https://llvm.org/bugs/show_bug.cgi?id=16876
+  SET(_flags "${DEAL_II_CXX_FLAGS_DEBUG}")
+  STRIP_FLAG(_flags "-Wa,--compress-debug-sections")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flags}")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    struct foo
+    {
+      auto func();
+    };
+    int main()
+    {
+      foo bar;
+      (void) bar;
+    }
+    "
+    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
 
+  # Check some generic C++11 features
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    // common C++11 include files
+    #include <array>
+    #include <condition_variable>
+    #include <type_traits>
 
-#
-# Check some generic C++11 features
-#
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  // common C++11 include files
-  #include <array>
-  #include <condition_variable>
-  #include <type_traits>
+    // thread_local storage specification
+    static thread_local std::array<int,3> p;
 
-  // thread_local storage specification
-  static thread_local std::array<int,3> p;
+    // Check the version language macro, but skip MSVC because
+    // MSVC reports 199711 even in MSVC 2017.
+    #if __cplusplus < 201103L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+    #  error \"insufficient support for C++11\"
+    #endif
 
-  // Check the version language macro, but skip MSVC because
-  // MSVC reports 199711 even in MSVC 2017.
-  #if __cplusplus < 201103L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
-  #  error \"insufficient support for C++11\"
-  #endif
+    int main()
+    {
+      std::condition_variable c;
+      p[0];
+      c.notify_all();
 
-  int main()
-  {
-    std::condition_variable c;
-    p[0];
-    c.notify_all();
+     // type traits functionality
+     constexpr auto m0 = std::is_trivial<double>::value;
+     (void) m0;
+     constexpr auto m1 = std::is_standard_layout<double>::value;
+     (void) m1;
+     constexpr auto m2 = std::is_pod<double>::value;
+     (void) m2;
+    }
+    "
+    DEAL_II_HAVE_CXX11_FEATURES)
 
-   // type traits functionality
-   constexpr auto m0 = std::is_trivial<double>::value;
-   (void) m0;
-   constexpr auto m1 = std::is_standard_layout<double>::value;
-   (void) m1;
-   constexpr auto m2 = std::is_pod<double>::value;
-   (void) m2;
-  }
-  "
-  DEAL_II_HAVE_CXX11_FEATURES)
+  # clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <functional>
+    struct A { void foo() const {} };
+    int main() { A a; std::bind(&A::foo,a)(); return 0; }
+    "
+    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
 
+  IF(DEAL_II_HAVE_CXX14_FEATURES AND
+     DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK AND
+     DEAL_II_HAVE_CXX11_FEATURES AND
+     DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
+    MESSAGE(STATUS "C++14 support is enabled.")
+    SET(DEAL_II_HAVE_CXX14 TRUE)
+  ELSE()
+    MESSAGE(STATUS "C++14 support is disabled.")
+    SET(DEAL_II_HAVE_CXX14 FALSE)
+  ENDIF()
+ENDMACRO()
 
-#
-# clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <functional>
-  struct A { void foo() const {} };
-  int main() { A a; std::bind(&A::foo,a)(); return 0; }
-  "
-  DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
+_set_up_cmake_required()
+_test_cxx14_support()
+_test_cxx17_support()
 
-IF(DEAL_II_HAVE_CXX17_FEATURES AND
-   DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
-  MESSAGE(STATUS "C++17 support is enabled.")
-  SET(DEAL_II_HAVE_CXX17 TRUE)
-ELSE()
-  MESSAGE(STATUS "C++17 support is disabled.")
-  SET(DEAL_II_HAVE_CXX17 FALSE)
+IF(NOT DEAL_II_HAVE_CXX14)
+  MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-std=c++14")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/std:c++14")
+  _set_up_cmake_required()
+  _test_cxx14_support()
+  _test_cxx17_support()
 ENDIF()
 
-IF(DEAL_II_HAVE_CXX14_FEATURES AND
-   DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK AND
-   DEAL_II_HAVE_CXX11_FEATURES AND
-   DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
-  # we require C++14 so this is fine
-ELSE()
+IF(NOT DEAL_II_HAVE_CXX14)
   MESSAGE(FATAL_ERROR
     "\nThe current version of deal.II requires a compiler with enabled "
     "C++14 support. Make sure to use a modern enough compiler (GCC version "
@@ -282,6 +284,16 @@ ENDIF()
 #                   Check for various C++ features:                    #
 #                                                                      #
 ########################################################################
+
+
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
+  "${CMAKE_REQUIRED_FLAGS}"
+  DEAL_II_HAVE_FP_EXCEPTIONS
+  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_CXX14_CONSTEXPR_BUG_OK
+  )
 
 
 #
