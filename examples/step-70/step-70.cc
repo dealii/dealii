@@ -1764,7 +1764,7 @@ namespace Step70
     const unsigned int                          iter,
     const double                                time) const
   {
-    Particles::DataOut<spacedim, spacedim> particles_out;
+    Particles::DataOut<spacedim> particles_out;
     particles_out.build_patches(particles);
     const std::string filename =
       (fprefix + "-" + Utilities::int_to_string(iter) + ".vtu");
