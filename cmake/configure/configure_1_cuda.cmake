@@ -59,8 +59,8 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     #
     # disable CUDA support older than 9.0:
     #
-    IF(CUDA_VERSION_MAJOR VERSION_LESS 9)
-      MESSAGE(ERROR "\n"
+    IF(CUDA_VERSION_MAJOR VERSION_LESS 9.0)
+      MESSAGE(FATAL_ERROR "\n"
         "deal.II requires CUDA version 9 or newer."
       )
     ENDIF()
@@ -79,7 +79,7 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
             "CUDA ${_version} is not compatible with the C++ standard\n"
             "enabled by ${_feature}.\n"
             "Please disable ${_feature}, e.g. by reconfiguring with\n"
-            "  cmake -D${_feature}=OFF ."
+            "  cmake -D${_feature}=OFF .\n"
             )
         ENDIF()
       ENDIF()
