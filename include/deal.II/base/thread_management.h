@@ -30,15 +30,13 @@
 #  include <list>
 #  include <memory>
 #  include <mutex>
+#  include <thread>
 #  include <tuple>
 #  include <utility>
 #  include <vector>
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_THREADS
 #    include <thread>
-#    ifdef DEAL_II_USE_MT_POSIX
-#      include <pthread.h>
-#    endif
 #    define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #    include <tbb/task.h>
 #    undef TBB_SUPPRESS_DEPRECATED_MESSAGES
@@ -198,10 +196,9 @@ namespace Threads
     }
 
     /**
-     * Wait for the condition to be signalled. Signal variables need to be
+     * Wait for the condition to be signaled. Signal variables need to be
      * guarded by a mutex which needs to be given to this function as an
-     * argument, see the man page of <code>pthread_cond_wait</code> for a
-     * description of the mechanisms.
+     * argument.
      *
      * The mutex is assumed held at the entry to this function but is released
      * upon exit.
@@ -220,71 +217,6 @@ namespace Threads
     std::condition_variable condition_variable;
   };
 
-#  ifdef DEAL_II_USE_MT_POSIX
-  /**
-   * Implementation of a thread barrier class, based on the POSIX thread
-   * functions. POSIX barriers are a relatively new feature and are not
-   * supported on all systems.
-   *
-   * If the configuration detected the absence of these functions, then
-   * barriers will not be available, and creating objects of this class will
-   * result in an exception been thrown unless the count given for the parties
-   * waiting for the barrier is equal to one (as in this case waiting for the
-   * barrier is a no-operation, and we can dispense with the POSIX functions
-   * at all). The rest of the threading functionality will be available in its
-   * full extent, though, even if POSIX barriers are not available.
-   *
-   * @deprecated This class is deprecated. It is easily possible to implement
-   *   its functionality with the facilities provided by C++11.
-   *
-   * @author Wolfgang Bangerth, 2002
-   */
-  class DEAL_II_DEPRECATED PosixThreadBarrier
-  {
-  public:
-    /**
-     * Constructor. Initialize the underlying POSIX barrier data structure.
-     */
-    PosixThreadBarrier(const unsigned int count,
-                       const char *       name = nullptr,
-                       void *             arg  = nullptr);
-
-    /**
-     * Destructor. Release all resources.
-     */
-    ~PosixThreadBarrier();
-
-    /**
-     * Wait for all threads to reach this point. The return value is zero for
-     * all participating threads except for one, for which the return value is
-     * some non-zero value. The operating system picks the special thread by
-     * some not further known method.
-     */
-    int
-    wait();
-
-  private:
-    /**
-     * Data object storing the POSIX data which we need to call the POSIX
-     * functions.
-     */
-#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-    pthread_barrier_t barrier;
-#    else
-    unsigned int count;
-#    endif
-  };
-
-
-  /**
-   * If using POSIX functions, then alias the POSIX wrapper classes to the
-   * names we use throughout the library.
-   *
-   * @deprecated Like the PosixThreadBarrier class, this `using` declaration
-   *   is deprecated.
-   */
-  using Barrier DEAL_II_DEPRECATED = PosixThreadBarrier;
-#  endif
 } // namespace Threads
 
 
@@ -309,7 +241,8 @@ namespace Threads
    * Note that this means that only threads created and terminated through the
    * interfaces of this namespace are taken care of. If threads are created by
    * directly calling the respective functions of the operating system (e.g.
-   * <code>pthread_create</code> for the POSIX thread interface), or if they
+   * <code>pthread_create</code> for the POSIX thread interface, or
+   * `std::thread` for C++11 facilities), or if they
    * are killed (e.g. either through <code>pthread_exit</code> from the
    * spawned thread, or <code>pthread_kill</code> from another thread), then
    * these events are not registered and counted for the result of this
@@ -679,7 +612,7 @@ namespace Threads
        * anyway since they can not both join the same thread. That said, more
        * recent C++ standards do not appear to have the requirement any more
        * that the only thread that can call join() is the one that created the
-       * thread. Neither does pthread_join appear to have this requirement any
+       * thread. Neither does `pthread_join` appear to have this requirement any
        * more.  Consequently, we can in fact join from different threads and
        * we test this in base/thread_validity_07.
        */
