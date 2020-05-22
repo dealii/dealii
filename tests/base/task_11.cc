@@ -27,10 +27,10 @@ unsigned int   n_max_running;
 void
 a_task()
 {
-  mutex.acquire();
+  mutex.lock();
   n_running++;
   n_max_running = std::max(n_max_running, n_running);
-  mutex.release();
+  mutex.unlock();
 
   // Sleep some time to make sure all other concurrently running tasks enter
   // here.
@@ -60,8 +60,6 @@ test()
   mutex.release();
 
   tg.join_all();
-  deallog << "max concurrent running: " << n_max_running
-          << " should be: " << MultithreadInfo::n_threads() << std::endl;
 }
 
 
