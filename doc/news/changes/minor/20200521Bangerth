@@ -1,0 +1,5 @@
+Changed: In many other classes that are templated on `dim` and
+`spacedim`, the second template argument `spacedim` had a default
+value equal to `dim`. Particles::DataOut did not, but now does.
+<br>
+(Wolfgang Bangerth, 2020/05/21)
