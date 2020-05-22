@@ -475,7 +475,7 @@ namespace Utilities
   constexpr T
   pow(const T base, const int iexp)
   {
-#if defined(DEBUG) && defined(DEAL_II_CXX14_CONSTEXPR_BUG_OK)
+#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))

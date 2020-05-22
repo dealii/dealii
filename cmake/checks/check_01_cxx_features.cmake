@@ -251,13 +251,11 @@ ENDMACRO()
 #
 
 _set_up_cmake_required()
-
 _test_cxx14_support()
 
 IF(NOT DEAL_II_HAVE_CXX14)
   MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-std=c++14")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/std:c++14")
   _set_up_cmake_required()
   _test_cxx14_support()
 ENDIF()
@@ -511,7 +509,12 @@ ENDIF()
 # We only run this check if we have CXX14 support, otherwise the use of constexpr
 # is limited (non-const constexpr functions for example).
 #
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+
+# MSVC has considerable problems with "constexpr", disable unconditionally
+# for now
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  SET(DEAL_II_CXX14_CONSTEXPR_BUG true)
+ELSE()
   CHECK_CXX_COMPILER_BUG(
     "
     #define Assert(x,y) if (!(x)) throw y;
