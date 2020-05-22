@@ -23,6 +23,7 @@
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #   DEAL_II_FALLTHROUGH
+#   DEAL_II_DEPRECATED
 #   DEAL_II_CONSTEXPR
 #
 
@@ -347,6 +348,73 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
+# Even though [[deprecated]] is a C++14 feature we have to check
+# wether we can actually use the [[deprecated]] attribute in all
+# cases we care about; some of the following are C++17 features.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          [[deprecated]] int old_fn ();
+          int old_fn () { return 0; }
+
+          struct [[deprecated]] bob
+          {
+            [[deprecated]] bob(int i);
+            [[deprecated]] void test();
+          };
+
+          enum color
+          {
+            red [[deprecated]]
+          };
+
+          template <int dim>
+          struct foo {};
+          using bar [[deprecated]] = foo<2>;
+
+          int main () {}
+  "
+  DEAL_II_COMPILER_HAS_CXX17_ATTRIBUTE_DEPRECATED
+  )
+
+#
+# Also test the corresponding GCC extension
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          __attribute__((deprecated)) int old_fn ();
+          int old_fn () { return 0; }
+
+          struct __attribute__((deprecated)) bob
+          {
+            __attribute__((deprecated)) bob(int i);
+            __attribute__((deprecated)) void test();
+          };
+
+          enum color
+          {
+            red __attribute__((deprecated))
+          };
+
+          template <int dim>
+          struct foo {};
+          using bar __attribute__((deprecated)) = foo<2>;
+
+          int main () {}
+  "
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+  )
+
+IF(DEAL_II_COMPILER_HAS_CXX17_ATTRIBUTE_DEPRECATED)
+  SET(DEAL_II_DEPRECATED "[[deprecated]]")
+ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
+  SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
+ELSE()
+  SET(DEAL_II_DEPRECATED " ")
+ENDIF()
+
+
+#
 # Try to enable a fallthrough attribute. This is a language feature in C++17,
 # but a compiler extension in earlier language versions.
 #
@@ -371,7 +439,6 @@ CHECK_CXX_SOURCE_COMPILES(
    "
    DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
    )
-
 
 #
 # see if the current compiler configuration supports the GCC extension
