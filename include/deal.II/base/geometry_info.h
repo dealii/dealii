@@ -2475,7 +2475,7 @@ struct GeometryInfo
   template <int spacedim>
   static void
   alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
     (const Point<spacedim> (&vertices)[vertices_per_cell],
      Tensor<spacedim - dim, spacedim> (&forms)[vertices_per_cell]);
 #else
@@ -4744,7 +4744,7 @@ template <int dim>
 template <int spacedim>
 inline void
 GeometryInfo<dim>::alternating_form_at_vertices
-#  ifndef DEAL_II_CONSTEXPR_BUG
+#  ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<spacedim> (&vertices)[vertices_per_cell],
    Tensor<spacedim - dim, spacedim> (&forms)[vertices_per_cell])
 #  else
