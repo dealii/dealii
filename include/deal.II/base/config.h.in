@@ -40,8 +40,6 @@
 #cmakedefine DEAL_II_WITH_ASSIMP
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
-#cmakedefine DEAL_II_WITH_CXX14
-#cmakedefine DEAL_II_WITH_CXX17
 #cmakedefine DEAL_II_WITH_GINKGO
 #cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_GMSH
@@ -66,8 +64,9 @@
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
-// defined for backwards compatibility with pre-C++11
+// defined for backwards compatibility with older deal.II versions
 #define DEAL_II_WITH_CXX11
+#define DEAL_II_WITH_CXX14
 
 /***********************************************************************
  * Compiler bugs:
@@ -137,6 +136,8 @@
  *
  * For documentation see cmake/checks/check_01_cxx_features.cmake
  */
+
+#cmakedefine DEAL_II_HAVE_CXX17
 
 #cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
 #cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR

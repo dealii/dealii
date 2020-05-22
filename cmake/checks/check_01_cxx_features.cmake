@@ -25,6 +25,7 @@
 #   DEAL_II_HAVE_CXX14_CONSTEXPR
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#   DEAL_II_DEPRECATED
 #
 #   DEAL_II_CONSTEXPR
 #   DEAL_II_FALLTHROUGH
@@ -259,8 +260,14 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
+
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${_werror_flag}")
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+ENDIF()
+
 UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
-  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
+  "${CMAKE_REQUIRED_FLAGS}"
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
   DEAL_II_HAVE_CXX14_CONSTEXPR
@@ -270,17 +277,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
 
 #
 # Try to enable a fallthrough attribute. This is a language feature in C++17,
-# but a compiler extension in earlier language versions: check both
-# possibilities here.
-#
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ENDIF()
-
-#
-# first try the attribute [[fallthrough]]
+# but a compiler extension in earlier language versions.
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -330,7 +327,6 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   )
 
-RESET_CMAKE_REQUIRED()
 IF(DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH)
   SET(DEAL_II_FALLTHROUGH "[[fallthrough]]")
 ELSEIF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
@@ -347,6 +343,8 @@ CHECK_CXX_SOURCE_COMPILES(
   int main(){ std::is_trivially_copyable<int> bob; }
   "
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+
+RESET_CMAKE_REQUIRED()
 
 #
 # Check that we can use feenableexcept through the C++11 header file cfenv:
@@ -456,10 +454,94 @@ ENDIF()
 # functions. This requirement is probabely very conservative in most cases, but
 # it will prevent breaking builds with certain compilers.
 #
+SET(DEAL_II_CONSTEXPR "constexpr")
 IF (DEAL_II_HAVE_CXX14_CONSTEXPR)
-  SET(DEAL_II_CONSTEXPR "constexpr")
 ELSE()
   SET(DEAL_II_CONSTEXPR " ")
 ENDIF()
+
+RESET_CMAKE_REQUIRED()
+
+
+#
+# GCC and some other compilers have an attribute of the form
+# __attribute__((deprecated)) that can be used to make the
+# compiler warn whenever a deprecated function is used. C++14
+# provides a standardized attribute of the form [[deprecated]
+# with the exact same functionality.
+# See if one of these attribute is available.
+#
+# If it is, set the variable DEAL_II_DEPRECATED to its value. If
+# it isn't, set it to an empty string (actually, to a single
+# space, since the empty string causes CMAKE to #undef the
+# variable in config.h), i.e., to something the compiler will
+# ignore
+#
+# - Wolfgang Bangerth, 2012
+#
+
+# first see if the compiler accepts the attribute
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          [[deprecated]] int old_fn ();
+          int old_fn () { return 0; }
+
+          struct [[deprecated]] bob
+          {
+            [[deprecated]] bob(int i);
+            [[deprecated]] void test();
+          };
+
+          enum color
+          {
+            red [[deprecated]]
+          };
+
+          template <int dim>
+          struct foo {};
+          using bar [[deprecated]] = foo<2>;
+
+          int main () {}
+  "
+  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
+  )
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          __attribute__((deprecated)) int old_fn ();
+          int old_fn () { return 0; }
+
+          struct __attribute__((deprecated)) bob
+          {
+            __attribute__((deprecated)) bob(int i);
+            __attribute__((deprecated)) void test();
+          };
+
+          enum color
+          {
+            red __attribute__((deprecated))
+          };
+
+          template <int dim>
+          struct foo {};
+          using bar __attribute__((deprecated)) = foo<2>;
+
+          int main () {}
+  "
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+  )
+
+RESET_CMAKE_REQUIRED()
+
+
+DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
+IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
+  SET(DEAL_II_DEPRECATED "[[deprecated]]")
+ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
+  SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
+ELSE()
+  SET(DEAL_II_DEPRECATED " ")
+ENDIF()
+
 
 RESET_CMAKE_REQUIRED()
