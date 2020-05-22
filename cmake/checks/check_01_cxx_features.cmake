@@ -255,9 +255,13 @@ MACRO(_test_cxx14_support)
   ENDIF()
 ENDMACRO()
 
+#
+# Try to find out what we support:
+#
+
 _set_up_cmake_required()
+
 _test_cxx14_support()
-_test_cxx17_support()
 
 IF(NOT DEAL_II_HAVE_CXX14)
   MESSAGE(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
@@ -265,7 +269,6 @@ IF(NOT DEAL_II_HAVE_CXX14)
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/std:c++14")
   _set_up_cmake_required()
   _test_cxx14_support()
-  _test_cxx17_support()
 ENDIF()
 
 IF(NOT DEAL_II_HAVE_CXX14)
@@ -277,6 +280,8 @@ IF(NOT DEAL_II_HAVE_CXX14)
     "at least c++14.\n\n"
     )
 ENDIF()
+
+_test_cxx17_support()
 
 
 ########################################################################
