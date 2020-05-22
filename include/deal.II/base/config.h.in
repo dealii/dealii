@@ -64,10 +64,6 @@
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
-// defined for backwards compatibility with older deal.II versions
-#define DEAL_II_WITH_CXX11
-#define DEAL_II_WITH_CXX14
-
 /***********************************************************************
  * Compiler bugs:
  *
@@ -145,6 +141,13 @@
 #cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
+
+// defined for backwards compatibility with older deal.II versions
+#define DEAL_II_WITH_CXX11
+#define DEAL_II_WITH_CXX14
+#ifdef DEAL_II_HAVE_CXX17
+#  define DEAL_II_WITH_CXX17
+#endif
 
 
 /***********************************************************************
