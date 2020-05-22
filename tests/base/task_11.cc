@@ -36,9 +36,9 @@ a_task()
   // here.
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  mutex.acquire();
+  mutex.lock();
   n_running--;
-  mutex.release();
+  mutex.unlock();
 }
 
 
@@ -51,13 +51,13 @@ test()
   n_max_running = 0;
 
   // force all tasks to wait until we are done starting
-  mutex.acquire();
+  mutex.lock();
 
   for (unsigned int t = 0; t < 10; ++t)
     tg += Threads::new_task(a_task);
 
   // now let the tasks run
-  mutex.release();
+  mutex.unlock();
 
   tg.join_all();
 }
