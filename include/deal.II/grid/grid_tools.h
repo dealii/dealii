@@ -908,8 +908,7 @@ namespace GridTools
    * @return A tuple containing the quadrature information
    *
    * The elements of the output tuple are:
-   * - cells : a vector of cells of the all cells containing at
-   *  least a point.
+   * - cells : a vector of all cells containing at least one point.
    * - qpoints : a vector of vector of points; containing in @p qpoints[i]
    *   the reference positions of all points that fall within the cell @p cells[i] .
    * - maps : a vector of vector of integers, containing the mapping between
