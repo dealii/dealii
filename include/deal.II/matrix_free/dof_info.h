@@ -174,7 +174,7 @@ namespace internal
       read_dof_indices(
         const std::vector<types::global_dof_index> &local_indices,
         const std::vector<unsigned int> &           lexicographic_inv,
-        const AffineConstraints<number> &           constraints,
+        const dealii::AffineConstraints<number> &   constraints,
         const unsigned int                          cell_number,
         ConstraintValues<double> &                  constraint_values,
         bool &                                      cell_at_boundary);

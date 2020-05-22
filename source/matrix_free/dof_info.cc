@@ -35,7 +35,7 @@ namespace internal
     DoFInfo::read_dof_indices<double>(
       const std::vector<types::global_dof_index> &,
       const std::vector<unsigned int> &,
-      const AffineConstraints<double> &,
+      const dealii::AffineConstraints<double> &,
       const unsigned int,
       ConstraintValues<double> &,
       bool &);
@@ -44,7 +44,7 @@ namespace internal
     DoFInfo::read_dof_indices<float>(
       const std::vector<types::global_dof_index> &,
       const std::vector<unsigned int> &,
-      const AffineConstraints<float> &,
+      const dealii::AffineConstraints<float> &,
       const unsigned int,
       ConstraintValues<double> &,
       bool &);
