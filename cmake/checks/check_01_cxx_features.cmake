@@ -34,6 +34,20 @@
 ########################################################################
 
 #
+# Some old compiler versions default to C++98/03 rather than C++14. Inject
+# -std=c++14 into the compiler flags in this case.
+#
+IF((CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+     AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.1")
+    OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+     AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0")
+    OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+     AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.0"))
+  MESSAGE(STATUS "Old compiler detected, setting -std=c++14")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-std=c++14")
+ENDIF()
+
+#
 # Use compile flags specified in ${DEAL_II_CXX_FLAGS} for the following
 # tests:
 #
