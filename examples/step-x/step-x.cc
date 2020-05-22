@@ -330,7 +330,10 @@ namespace Stepx
   {
     std::vector<types::global_dof_index> dof_indices(fluid_fe.dofs_per_cell);
 
+    Vector<double> dof_data_per_cell(fluid_fe.dofs_per_cell);
+
     Tensor<1, dim> particle_velocity;
+
 
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
@@ -340,9 +343,16 @@ namespace Stepx
         const auto &dh_cell =
           typename DoFHandler<dim>::cell_iterator(*cell, &fluid_dh);
         dh_cell->get_dof_indices(dof_indices);
-        const auto pic = particle_handler.particles_in_cell(cell);
 
-        for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
+        // Gather the DOF information in a local vector to prevent dynamically
+        // re-accessing everything when there are multiple particles in a cell
+        for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
+          {
+            dof_data_per_cell[j] = field_relevant(dof_indices[j]);
+          }
+
+        const auto pic = particle_handler.particles_in_cell(cell);
+        for (; particle != pic.end(); ++particle)
           {
             const auto &reference_location = particle->get_reference_location();
             particle_velocity              = 0.;
@@ -352,7 +362,7 @@ namespace Stepx
 
                 particle_velocity[comp_j.first] +=
                   fluid_fe.shape_value(j, reference_location) *
-                  field_relevant(dof_indices[j]);
+                  dof_data_per_cell[j];
               }
 
             Point<dim> particle_location = particle->get_location();
