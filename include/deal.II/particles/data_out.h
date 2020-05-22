@@ -40,7 +40,7 @@ namespace Particles
    *
    * @author Bruno Blais, Luca Heltai 2019
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim = dim>
   class DataOut : public dealii::DataOutInterface<0, spacedim>
   {
   public:
