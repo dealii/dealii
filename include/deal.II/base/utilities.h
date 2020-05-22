@@ -475,7 +475,7 @@ namespace Utilities
   constexpr T
   pow(const T base, const int iexp)
   {
-#if defined(DEBUG) && defined(DEAL_II_HAVE_CXX14_CONSTEXPR)
+#if defined(DEBUG) && defined(DEAL_II_CXX14_CONSTEXPR_BUG_OK)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))
@@ -1225,7 +1225,7 @@ namespace Utilities
 #if __GNUG__ && __GNUC__ < 5
     if (__has_trivial_copy(T) && sizeof(T) < 256)
 #else
-#  ifdef DEAL_II_WITH_CXX17
+#  ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #  else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
@@ -1307,7 +1307,7 @@ namespace Utilities
 #if __GNUG__ && __GNUC__ < 5
     if (__has_trivial_copy(T) && sizeof(T) < 256)
 #else
-#  ifdef DEAL_II_WITH_CXX17
+#  ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #  else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)

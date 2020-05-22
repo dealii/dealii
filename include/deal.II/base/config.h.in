@@ -86,11 +86,9 @@
 #cmakedefine DEAL_II_HAVE_GLIBC_STACKTRACE
 #cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
-#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 #cmakedefine DEAL_II_ALWAYS_INLINE @DEAL_II_ALWAYS_INLINE@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
-#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 /*
  * A variable to tell if the compiler used in the current compilation process
@@ -139,10 +137,13 @@
 
 #cmakedefine DEAL_II_HAVE_CXX17
 
-#cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG_OK
+
+#define DEAL_II_DEPRECATED [[deprecated]]
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
+#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 
 /***********************************************************************

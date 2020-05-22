@@ -219,7 +219,7 @@ SparseMatrix<number>::operator=(const double d)
       grain_size);
   else if (matrix_size > 0)
     {
-#ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
       if constexpr (std::is_trivial<number>::value)
 #else
       if (std::is_trivial<number>::value)
