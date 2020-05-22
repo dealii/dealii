@@ -2788,6 +2788,83 @@ namespace internal
         }
     }
 
+
+    /**
+     * Scratch data that is used during calls to distribute_local_to_global and
+     * add_entries_local_to_global. In order to avoid frequent memory
+     * allocation, we keep the data alive from one call to the next in a static
+     * variable. Since we want to allow for different number types in matrices,
+     * this is a template.
+     *
+     * Since each thread gets its private version of scratch data out of a
+     * ThreadLocalStorage, no conflicting access can occur. For this to be
+     * valid, we need to make sure that no call within
+     * distribute_local_to_global is made that by itself can spawn tasks.
+     * Otherwise, we might end up in a situation where several threads fight for
+     * the data.
+     *
+     * Access to the scratch data is only through an accessor class which
+     * handles the access as well as marks the data as used.
+     */
+    template <typename number>
+    struct ScratchData
+    {
+      /**
+       * Constructor, does nothing.
+       */
+      ScratchData()
+        : in_use(false)
+      {}
+
+      /**
+       * Copy constructor, does nothing
+       */
+      ScratchData(const ScratchData &)
+        : in_use(false)
+      {}
+
+      /**
+       * Stores whether the data is currently in use.
+       */
+      bool in_use;
+
+      /**
+       * Temporary array for column indices
+       */
+      std::vector<size_type> columns;
+
+      /**
+       * Temporary array for column values
+       */
+      std::vector<number> values;
+
+      /**
+       * Temporary array for block start indices
+       */
+      std::vector<size_type> block_starts;
+
+      /**
+       * Temporary array for vector indices
+       */
+      std::vector<size_type> vector_indices;
+
+      /**
+       * Temporary array for vector values
+       */
+      std::vector<number> vector_values;
+
+      /**
+       * Data array for reorder row/column indices.
+       */
+      GlobalRowsFromLocal<number> global_rows;
+
+      /**
+       * Data array for reorder row/column indices.
+       */
+      GlobalRowsFromLocal<number> global_columns;
+    };
+
+
     /**
      * Scratch data that is used during calls to distribute_local_to_global and
      * add_entries_local_to_global. In order to avoid frequent memory
@@ -2809,65 +2886,6 @@ namespace internal
     class AffineConstraintsData
     {
     public:
-      struct ScratchData
-      {
-        /**
-         * Constructor, does nothing.
-         */
-        ScratchData()
-          : in_use(false)
-        {}
-
-        /**
-         * Copy constructor, does nothing
-         */
-        ScratchData(const ScratchData &)
-          : in_use(false)
-        {}
-
-        /**
-         * Stores whether the data is currently in use.
-         */
-        bool in_use;
-
-        /**
-         * Temporary array for column indices
-         */
-        std::vector<size_type> columns;
-
-        /**
-         * Temporary array for column values
-         */
-        std::vector<number> values;
-
-        /**
-         * Temporary array for block start indices
-         */
-        std::vector<size_type> block_starts;
-
-        /**
-         * Temporary array for vector indices
-         */
-        std::vector<size_type> vector_indices;
-
-        /**
-         * Temporary array for vector values
-         */
-        std::vector<number> vector_values;
-
-        /**
-         * Data array for reorder row/column indices.
-         */
-        GlobalRowsFromLocal<number> global_rows;
-
-        /**
-         * Data array for reorder row/column indices.
-         */
-        GlobalRowsFromLocal<number> global_columns;
-      };
-
-
-
       /**
        * Accessor class to guard access to scratch_data
        */
@@ -2900,7 +2918,7 @@ namespace internal
         /**
          * Dereferencing operator.
          */
-        ScratchData &operator*()
+        ScratchData<number> &operator*()
         {
           return *my_scratch_data;
         }
@@ -2908,20 +2926,20 @@ namespace internal
         /**
          * Dereferencing operator.
          */
-        ScratchData *operator->()
+        ScratchData<number> *operator->()
         {
           return my_scratch_data;
         }
 
       private:
-        ScratchData *my_scratch_data;
+        ScratchData<number> *my_scratch_data;
       };
 
     private:
       /**
        * The actual data object that contains a scratch data for each thread.
        */
-      static Threads::ThreadLocalStorage<ScratchData> scratch_data;
+      static Threads::ThreadLocalStorage<ScratchData<number>> scratch_data;
     };
 
 
