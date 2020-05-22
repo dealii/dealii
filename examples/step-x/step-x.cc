@@ -99,10 +99,10 @@ namespace Stepx
     // elapse before we generate graphical output again):
     std::string output_directory = "./";
 
-    unsigned int velocity_degree  = 1;
-    double       time_step        = 0.002;
-    double       final_time       = 4.0;
-    unsigned int output_frequency = 10;
+    unsigned int velocity_degree       = 1;
+    double       time_step             = 0.002;
+    double       final_time            = 4.0;
+    unsigned int output_frequency      = 10;
     unsigned int repartition_frequency = 5;
 
     // We allow every grid to be refined independently. In this tutorial, no
@@ -126,7 +126,7 @@ namespace Stepx
                   output_frequency,
                   "Iteration frequency at which output results are written");
 
-                      add_parameter("Repartition frequency",
+    add_parameter("Repartition frequency",
                   repartition_frequency,
                   "Iteration frequency at which the mesh is load balanced");
 
@@ -154,15 +154,13 @@ namespace Stepx
     SingleVortex()
       : Function<dim>(dim)
     {}
-    virtual void
-    vector_value(const Point<dim> &point,
-                 Vector<double> &  values) const override;
+    virtual void vector_value(const Point<dim> &point,
+                              Vector<double> &  values) const override;
   };
 
   template <int dim>
-  void
-  SingleVortex<dim>::vector_value(const Point<dim> &point,
-                                  Vector<double> &  values) const
+  void SingleVortex<dim>::vector_value(const Point<dim> &point,
+                                       Vector<double> &  values) const
   {
     const double T = 4;
     const double t = this->get_time();
@@ -186,30 +184,23 @@ namespace Stepx
   public:
     ParticleTracking(const ParticleTrackingParameters &par,
                      const bool                        interpolated_velocity);
-    void
-    run_analytical_velocity();
+    void run_analytical_velocity();
 
-    unsigned int
-    cell_weight(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-                const typename parallel::distributed::Triangulation<dim>::CellStatus status);
+    unsigned int cell_weight(
+      const typename parallel::distributed::Triangulation<dim>::cell_iterator
+        &cell,
+      const typename parallel::distributed::Triangulation<dim>::CellStatus
+        status);
 
   private:
-    void
-    particles_generation();
-    void
-    setup_background_dofs();
-    void
-    interpolate_function_to_field();
-    void
-    euler_interpolated(double dt);
-    void
-    euler_analytical(double dt);
-    void
-    field_euler(double t, double dt, double T);
-    void
-    output_particles(unsigned int it);
-    void
-    output_background(unsigned int it);
+    void particles_generation();
+    void setup_background_dofs();
+    void interpolate_function_to_field();
+    void euler_interpolated(double dt);
+    void euler_analytical(double dt);
+    void field_euler(double t, double dt, double T);
+    void output_particles(unsigned int it);
+    void output_background(unsigned int it);
 
     const ParticleTrackingParameters &par;
 
@@ -246,44 +237,48 @@ namespace Stepx
 
   {}
 
-      template <int dim>
-    unsigned int
-    ParticleTracking<dim>::cell_weight(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-                            const typename parallel::distributed::Triangulation<dim>::CellStatus status)
-    {
-      if (cell->is_active() && !cell->is_locally_owned())
-        return 0;
-
-      // This determines how important particle distribution is compared to cell distribution
-      // (1 cell == 1000). We set this number much higher to indicate the particle load is the
-      // only one that is important to distribute.
-        const unsigned int particle_weight = 10000;
-
-      if (status == parallel::distributed::Triangulation<dim>::CELL_PERSIST
-          || status == parallel::distributed::Triangulation<dim>::CELL_REFINE)
-        {
-          const unsigned int n_particles_in_cell = particle_handler.n_particles_in_cell(cell);
-          return n_particles_in_cell * particle_weight;
-        }
-      else if (status == parallel::distributed::Triangulation<dim>::CELL_COARSEN)
-        {
-          unsigned int n_particles_in_cell = 0;
-
-          for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
-            n_particles_in_cell += particle_handler.n_particles_in_cell(cell->child(child_index));
-
-          return n_particles_in_cell * particle_weight;
-        }
-
-      Assert (false, ExcInternalError());
+  template <int dim>
+  unsigned int ParticleTracking<dim>::cell_weight(
+    const typename parallel::distributed::Triangulation<dim>::cell_iterator
+      &                                                                  cell,
+    const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+  {
+    if (cell->is_active() && !cell->is_locally_owned())
       return 0;
-    }
+
+    // This determines how important particle distribution is compared to cell
+    // distribution (1 cell == 1000). We set this number much higher to indicate
+    // the particle load is the only one that is important to distribute.
+    const unsigned int particle_weight = 10000;
+
+    if (status == parallel::distributed::Triangulation<dim>::CELL_PERSIST ||
+        status == parallel::distributed::Triangulation<dim>::CELL_REFINE)
+      {
+        const unsigned int n_particles_in_cell =
+          particle_handler.n_particles_in_cell(cell);
+        return n_particles_in_cell * particle_weight;
+      }
+    else if (status == parallel::distributed::Triangulation<dim>::CELL_COARSEN)
+      {
+        unsigned int n_particles_in_cell = 0;
+
+        for (unsigned int child_index = 0;
+             child_index < GeometryInfo<dim>::max_children_per_cell;
+             ++child_index)
+          n_particles_in_cell +=
+            particle_handler.n_particles_in_cell(cell->child(child_index));
+
+        return n_particles_in_cell * particle_weight;
+      }
+
+    Assert(false, ExcInternalError());
+    return 0;
+  }
 
   // Generation of particles using the grid where particles are generated at the
   // locations of the degrees of freedom.
   template <int dim>
-  void
-  ParticleTracking<dim>::particles_generation()
+  void ParticleTracking<dim>::particles_generation()
   {
     // Create a square triangulation
     GridGenerator::hyper_cube(background_triangulation, 0, 1);
@@ -291,27 +286,30 @@ namespace Stepx
 
     // In order to consider the particles when repartitioning the triangulation
     // the algorithm needs to know three things:
-    // 1. How much weight to assign to each cell (how many particles are in there)
+    // 1. How much weight to assign to each cell (how many particles are in
+    // there)
     // 2. How to pack the particles before shipping data around
     // 3. How to unpack the particles after repartitioning
-    // Attach the correct functions to the signals inside parallel::distributed::Triangulation,
-    // which will be called every time the repartition() function is called.
-                    background_triangulation.signals.cell_weight.connect(
-          [&] (const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-               const typename parallel::distributed::Triangulation<dim>::CellStatus status)
-          -> unsigned int
-        {
-          return this->cell_weight(cell, status);
-        });
+    // Attach the correct functions to the signals inside
+    // parallel::distributed::Triangulation, which will be called every time the
+    // repartition() function is called.
+    background_triangulation.signals.cell_weight.connect(
+      [&](
+        const typename parallel::distributed::Triangulation<dim>::cell_iterator
+          &cell,
+        const typename parallel::distributed::Triangulation<dim>::CellStatus
+          status) -> unsigned int { return this->cell_weight(cell, status); });
 
-            background_triangulation.signals.pre_distributed_repartition.connect(std::bind(
-      &Particles::ParticleHandler<dim>::register_store_callback_function,
-      &particle_handler));
+    background_triangulation.signals.pre_distributed_repartition.connect(
+      std::bind(
+        &Particles::ParticleHandler<dim>::register_store_callback_function,
+        &particle_handler));
 
-          background_triangulation.signals.post_distributed_repartition.connect(std::bind(
-      &Particles::ParticleHandler<dim>::register_load_callback_function,
-      &particle_handler,
-      false));
+    background_triangulation.signals.post_distributed_repartition.connect(
+      std::bind(
+        &Particles::ParticleHandler<dim>::register_load_callback_function,
+        &particle_handler,
+        false));
 
     // Establish where the particles are living
     particle_handler.initialize(background_triangulation, mapping);
@@ -361,8 +359,7 @@ namespace Stepx
   // And allocated a vector where you can store the entire solution
   // of the velocity field
   template <int dim>
-  void
-  ParticleTracking<dim>::setup_background_dofs()
+  void ParticleTracking<dim>::setup_background_dofs()
   {
     fluid_dh.distribute_dofs(fluid_fe);
     IndexSet locally_owned_dofs = fluid_dh.locally_owned_dofs();
@@ -379,8 +376,7 @@ namespace Stepx
   }
 
   template <int dim>
-  void
-  ParticleTracking<dim>::interpolate_function_to_field()
+  void ParticleTracking<dim>::interpolate_function_to_field()
   {
     const MappingQ<dim> mapping(fluid_fe.degree);
 
@@ -389,8 +385,7 @@ namespace Stepx
   }
 
   template <int dim>
-  void
-  ParticleTracking<dim>::euler_interpolated(double dt)
+  void ParticleTracking<dim>::euler_interpolated(double dt)
   {
     std::vector<types::global_dof_index> dof_indices(fluid_fe.dofs_per_cell);
 
@@ -438,8 +433,7 @@ namespace Stepx
   }
 
   template <int dim>
-  void
-  ParticleTracking<dim>::euler_analytical(double dt)
+  void ParticleTracking<dim>::euler_analytical(double dt)
   {
     Vector<double> particle_velocity(dim);
 
@@ -470,8 +464,7 @@ namespace Stepx
   //  }
 
   template <int dim>
-  void
-  ParticleTracking<dim>::output_particles(unsigned int it)
+  void ParticleTracking<dim>::output_particles(unsigned int it)
   {
     Particles::DataOut<dim, dim> particle_output;
     particle_output.build_patches(particle_handler);
@@ -479,15 +472,15 @@ namespace Stepx
     std::string file_name(interpolated_velocity ? "interpolated-particles" :
                                                   "analytical-particles");
 
-                                                  pcout << "Writing particle output file: " << file_name << "-" << it << std::endl;
+    pcout << "Writing particle output file: " << file_name << "-" << it
+          << std::endl;
 
     particle_output.write_vtu_with_pvtu_record(
       output_folder, file_name, it, mpi_communicator, 6);
   }
 
   template <int dim>
-  void
-  ParticleTracking<dim>::output_background(unsigned int it)
+  void ParticleTracking<dim>::output_background(unsigned int it)
   {
     std::vector<std::string> solution_names(dim, "velocity");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -514,22 +507,23 @@ namespace Stepx
     std::string output_folder(par.output_directory);
     std::string file_name("background");
 
-    pcout << "Writing background field file: " << file_name << "-" << it << std::endl;
+    pcout << "Writing background field file: " << file_name << "-" << it
+          << std::endl;
 
     data_out.write_vtu_with_pvtu_record(
       output_folder, file_name, it, mpi_communicator, 6);
   }
 
   template <int dim>
-  void
-  ParticleTracking<dim>::run_analytical_velocity()
+  void ParticleTracking<dim>::run_analytical_velocity()
   {
     DiscreteTime discrete_time(0, par.final_time, par.time_step);
 
     particles_generation();
 
-    pcout << "Repartitioning triangulation after particle generation" << std::endl;
-          background_triangulation.repartition();
+    pcout << "Repartitioning triangulation after particle generation"
+          << std::endl;
+    background_triangulation.repartition();
 
     setup_background_dofs();
     interpolate_function_to_field();
@@ -545,8 +539,9 @@ namespace Stepx
 
         if ((discrete_time.get_step_number() % par.repartition_frequency) == 0)
           {
-                        pcout << "Repartitioning triangulation after particle advection" << std::endl;
-        background_triangulation.repartition();
+            pcout << "Repartitioning triangulation after particle advection"
+                  << std::endl;
+            background_triangulation.repartition();
             setup_background_dofs();
           }
 
@@ -572,8 +567,7 @@ namespace Stepx
 // @sect3{The main() function}
 
 // The remainder of the code, the `main()` function, is standard.
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   using namespace Stepx;
   using namespace dealii;
