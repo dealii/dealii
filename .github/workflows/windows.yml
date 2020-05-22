@@ -44,3 +44,17 @@ jobs:
       with:
         name: dealii-windows.zip
         path: c:/project/dealii-windows.zip
+    - name: archive error 1
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: windows-serial-CMakeOutput.log
+        path: build/CMakeFiles/CMakeOutput.log
+    - name: archive error 2
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: windows-serial-CMakeError.log
+        path: build/CMakeFiles/CMakeError.log
