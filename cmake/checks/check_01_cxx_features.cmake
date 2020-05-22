@@ -41,20 +41,11 @@
 # tests. Create a small macro to easily set CMAKE_REQUIRED_FLAGS
 #
 MACRO(_set_up_cmake_required)
-  RESET_CMAKE_REQUIRED()
-  SET(CMAKE_REQUIRED_FLAGS "")
-
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    SET(_werror_flag "/WX")
-  ELSE()
-    SET(_werror_flag "-Werror")
-  ENDIF()
-
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${_werror_flag}")
-  ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-
   # Let's put the user supplied `DEAL_II_CXX_FLAGS_SAVED` last so that we
   # never override a user supplied -std=c++XY flag in our tests.
+  RESET_CMAKE_REQUIRED()
+  SET(CMAKE_REQUIRED_FLAGS "")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
 ENDMACRO()
 
@@ -290,6 +281,18 @@ _test_cxx17_support()
 #                                                                      #
 ########################################################################
 
+
+#
+# In the following we have to avoid
+#
+SET(_werror_flag "")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ENABLE_IF_SUPPORTED(_werror_flag "/WX /EHsc")
+ELSE()
+  ENABLE_IF_SUPPORTED(_werror_flag "-Werror")
+  ENABLE_IF_SUPPORTED(_werror_flag "-Wno-unused-command-line-argument")
+ENDIF()
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 
 UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}"
