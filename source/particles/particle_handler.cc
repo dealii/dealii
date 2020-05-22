@@ -1624,22 +1624,12 @@ namespace Particles
             for (const auto &particle : loaded_particles_on_cell)
               {
                 // Use std::multimap::emplace_hint to speed up insertion of
-                // particles. This is a C++11 function, but not all compilers
-                // that report a -std=c++11 (like gcc 4.6) implement it, so
-                // require C++14 instead.
-#ifdef DEAL_II_WITH_CXX14
+                // particles.
                 position_hint =
                   particles.emplace_hint(position_hint,
                                          std::make_pair(cell->level(),
                                                         cell->index()),
                                          std::move(particle));
-#else
-                position_hint =
-                  particles.insert(position_hint,
-                                   std::make_pair(std::make_pair(cell->level(),
-                                                                 cell->index()),
-                                                  std::move(particle)));
-#endif
                 // Move the hint position forward by one, i.e., for the next
                 // particle. The 'hint' position will thus be right after the
                 // one just inserted.
@@ -1660,22 +1650,12 @@ namespace Particles
                                                        particle.get_location());
                 particle.set_reference_location(p_unit);
                 // Use std::multimap::emplace_hint to speed up insertion of
-                // particles. This is a C++11 function, but not all compilers
-                // that report a -std=c++11 (like gcc 4.6) implement it, so
-                // require C++14 instead.
-#ifdef DEAL_II_WITH_CXX14
+                // particles.
                 position_hint =
                   particles.emplace_hint(position_hint,
                                          std::make_pair(cell->level(),
                                                         cell->index()),
                                          std::move(particle));
-#else
-                position_hint =
-                  particles.insert(position_hint,
-                                   std::make_pair(std::make_pair(cell->level(),
-                                                                 cell->index()),
-                                                  std::move(particle)));
-#endif
                 // Move the hint position forward by one, i.e., for the next
                 // particle. The 'hint' position will thus be right after the
                 // one just inserted.
@@ -1718,23 +1698,12 @@ namespace Particles
                           {
                             particle.set_reference_location(p_unit);
                             // Use std::multimap::emplace_hint to speed up
-                            // insertion of particles. This is a C++11
-                            // function, but not all compilers that report a
-                            // -std=c++11 (like gcc 4.6) implement it, so
-                            // require C++14 instead.
-#ifdef DEAL_II_WITH_CXX14
+                            // insertion of particles.
                             position_hints[child_index] =
                               particles.emplace_hint(
                                 position_hints[child_index],
                                 std::make_pair(child->level(), child->index()),
                                 std::move(particle));
-#else
-                            position_hints[child_index] = particles.insert(
-                              position_hints[child_index],
-                              std::make_pair(std::make_pair(child->level(),
-                                                            child->index()),
-                                             std::move(particle)));
-#endif
                             // Move the hint position forward by one, i.e.,
                             // for the next particle. The 'hint' position will
                             // thus be right after the one just inserted.
