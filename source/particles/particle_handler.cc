@@ -297,6 +297,30 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  unsigned int
+  ParticleHandler<dim, spacedim>::n_particles_in_cell(
+    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+    const
+  {
+    const internal::LevelInd found_cell =
+      std::make_pair(cell->level(), cell->index());
+
+    if (cell->is_locally_owned())
+      return particles.count(found_cell);
+    else if (cell->is_ghost())
+      return ghost_particles.count(found_cell);
+    else
+      AssertThrow(false,
+                  ExcMessage("You can't ask for the particles on an artificial "
+                             "cell since we don't know what exists on these "
+                             "kinds of cells."));
+
+    return numbers::invalid_unsigned_int;
+  }
+
+
+
+  template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator_range
   ParticleHandler<dim, spacedim>::particles_in_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
@@ -323,11 +347,20 @@ namespace Particles
           particle_iterator(ghost_particles, particles_in_cell.first),
           particle_iterator(ghost_particles, particles_in_cell.second));
       }
+    else if (cell->is_locally_owned())
+      {
+        const auto particles_in_cell = particles.equal_range(level_index);
+        return boost::make_iterator_range(
+          particle_iterator(particles, particles_in_cell.first),
+          particle_iterator(particles, particles_in_cell.second));
+      }
+    else
+      AssertThrow(false,
+                  ExcMessage("You can't ask for the particles on an artificial "
+                             "cell since we don't know what exists on these "
+                             "kinds of cells."));
 
-    const auto particles_in_cell = particles.equal_range(level_index);
-    return boost::make_iterator_range(
-      particle_iterator(particles, particles_in_cell.first),
-      particle_iterator(particles, particles_in_cell.second));
+    return {};
   }
 
 
@@ -682,27 +715,6 @@ namespace Particles
   ParticleHandler<dim, spacedim>::n_properties_per_particle() const
   {
     return property_pool->n_properties_per_slot();
-  }
-
-
-
-  template <int dim, int spacedim>
-  unsigned int
-  ParticleHandler<dim, spacedim>::n_particles_in_cell(
-    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-    const
-  {
-    const internal::LevelInd found_cell =
-      std::make_pair(cell->level(), cell->index());
-
-    if (cell->is_locally_owned())
-      return particles.count(found_cell);
-    else if (cell->is_ghost())
-      return ghost_particles.count(found_cell);
-    else if (cell->is_artificial())
-      AssertThrow(false, ExcInternalError());
-
-    return 0;
   }
 
 

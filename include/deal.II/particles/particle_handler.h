@@ -176,19 +176,32 @@ namespace Particles
     end_ghost();
 
     /**
-     * Return a pair of particle iterators that mark the begin and end of
-     * the particles in a particular cell. The last iterator is the first
-     * particle that is no longer in the cell.
+     * Return the number of particles that live on the given cell.
      */
-    particle_iterator_range
-    particles_in_cell(
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
-
+    types::particle_index
+    n_particles_in_cell(
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+      const;
 
     /**
      * Return a pair of particle iterators that mark the begin and end of
      * the particles in a particular cell. The last iterator is the first
      * particle that is no longer in the cell.
+     *
+     * The number of elements in the returned range equals what the
+     * n_particles_in_cell() function returns.
+     */
+    particle_iterator_range
+    particles_in_cell(
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
+
+    /**
+     * Return a pair of particle iterators that mark the begin and end of
+     * the particles in a particular cell. The last iterator is the first
+     * particle that is no longer in the cell.
+     *
+     * The number of elements in the returned range equals what the
+     * n_particles_in_cell() function returns.
      */
     particle_iterator_range
     particles_in_cell(
@@ -551,14 +564,6 @@ namespace Particles
      */
     PropertyPool &
     get_property_pool() const;
-
-    /**
-     * Return the number of particles in the given cell.
-     */
-    unsigned int
-    n_particles_in_cell(
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-      const;
 
     /**
      * Find and update the cells containing each particle for all locally owned
