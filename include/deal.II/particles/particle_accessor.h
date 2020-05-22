@@ -124,6 +124,15 @@ namespace Particles
     set_properties(const std::vector<double> &new_properties);
 
     /**
+     * Set the properties of this particle.
+     *
+     * @param [in] new_properties An ArrayView pointing to memory locations
+     * containing the new properties for this particle.
+     */
+    void
+    set_properties(const ArrayView<const double> &new_properties);
+
+    /**
      * Get write-access to properties of this particle.
      *
      * @return An ArrayView of the properties of this particle.
