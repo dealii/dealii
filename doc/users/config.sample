@@ -566,18 +566,6 @@
 #                                                                         #
 ###########################################################################
 
-#
-# C++14 support:
-#
-# SET(DEAL_II_WITH_CXX14 ON CACHE BOOL
-#   "deal.II using C++14 language standard"
-#   )
-#
-# A custom C++14 flag can be set by setting
-#
-#   SET(DEAL_II_CXX_VERSION_FLAG "-std=c++1y" CACHE STRING "")
-#
-
 
 #
 # Platform introspection:
