@@ -48,11 +48,14 @@ class SparseMatrix;
 template <typename number>
 class BlockSparseMatrix;
 
-namespace internals
+namespace internal
 {
-  template <typename number>
-  class GlobalRowsFromLocal;
-}
+  namespace AffineConstraints
+  {
+    template <typename number>
+    class GlobalRowsFromLocal;
+  }
+} // namespace internal
 
 namespace internal
 {
@@ -1560,9 +1563,9 @@ private:
    * the global row indices.
    */
   void
-  make_sorted_row_list(
-    const std::vector<size_type> &          local_dof_indices,
-    internals::GlobalRowsFromLocal<number> &global_rows) const;
+  make_sorted_row_list(const std::vector<size_type> &local_dof_indices,
+                       internal::AffineConstraints::GlobalRowsFromLocal<number>
+                         &global_rows) const;
 
   /**
    * Internal helper function for add_entries_local_to_global function.
@@ -1581,11 +1584,11 @@ private:
   template <typename MatrixScalar, typename VectorScalar>
   typename ProductType<VectorScalar, MatrixScalar>::type
   resolve_vector_entry(
-    const size_type                               i,
-    const internals::GlobalRowsFromLocal<number> &global_rows,
-    const Vector<VectorScalar> &                  local_vector,
-    const std::vector<size_type> &                local_dof_indices,
-    const FullMatrix<MatrixScalar> &              local_matrix) const;
+    const size_type                                                 i,
+    const internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows,
+    const Vector<VectorScalar> &    local_vector,
+    const std::vector<size_type> &  local_dof_indices,
+    const FullMatrix<MatrixScalar> &local_matrix) const;
 };
 
 /* ---------------- template and inline functions ----------------- */
