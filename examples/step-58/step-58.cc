@@ -156,7 +156,7 @@ namespace Step58
         sum += alpha * std::exp(-(r * r) / (R * R));
       }
 
-    return std::complex<double>(std::sqrt(sum), 0.);
+    return {std::sqrt(sum), 0.};
   }
 
 
