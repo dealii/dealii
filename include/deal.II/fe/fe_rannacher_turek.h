@@ -81,7 +81,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2015
  */
 template <int dim>
-class FE_RannacherTurek : public FE_Poly<PolynomialsRannacherTurek<dim>, dim>
+class FE_RannacherTurek : public FE_Poly<dim>
 {
 public:
   /**

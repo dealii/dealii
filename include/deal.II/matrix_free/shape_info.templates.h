@@ -136,31 +136,22 @@ namespace internal
         Assert(fe->n_components() == 1,
                ExcMessage("Expected a scalar element"));
 
-        const FE_Poly<TensorProductPolynomials<dim>, dim, dim> *fe_poly =
-          dynamic_cast<
-            const FE_Poly<TensorProductPolynomials<dim>, dim, dim> *>(fe);
-
-        const FE_Poly<
-          TensorProductPolynomials<dim,
-                                   Polynomials::PiecewisePolynomial<double>>,
-          dim,
-          dim> *fe_poly_piece =
-          dynamic_cast<const FE_Poly<
-            TensorProductPolynomials<dim,
-                                     Polynomials::PiecewisePolynomial<double>>,
-            dim,
-            dim> *>(fe);
+        const FE_Poly<dim, dim> *fe_poly =
+          dynamic_cast<const FE_Poly<dim, dim> *>(fe);
 
         const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim> *>(fe);
 
         const FE_Q_DG0<dim> *fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(fe);
 
         element_type = tensor_general;
-        if (fe_poly != nullptr)
+        if (fe_poly != nullptr &&
+            (dynamic_cast<const TensorProductPolynomials<dim> *>(
+               &fe_poly->get_poly_space()) != nullptr ||
+             dynamic_cast<const TensorProductPolynomials<
+                 dim,
+                 Polynomials::PiecewisePolynomial<double>> *>(
+               &fe_poly->get_poly_space()) != nullptr))
           scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
-        else if (fe_poly_piece != nullptr)
-          scalar_lexicographic =
-            fe_poly_piece->get_poly_space_numbering_inverse();
         else if (fe_dgp != nullptr)
           {
             scalar_lexicographic.resize(fe_dgp->dofs_per_cell);

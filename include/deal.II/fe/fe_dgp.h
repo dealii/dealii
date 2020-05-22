@@ -308,7 +308,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
 template <int dim, int spacedim = dim>
-class FE_DGP : public FE_Poly<PolynomialSpace<dim>, dim, spacedim>
+class FE_DGP : public FE_Poly<dim, spacedim>
 {
 public:
   /**

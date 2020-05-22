@@ -157,7 +157,7 @@ public:
    * Consider using evaluate() instead.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
@@ -172,13 +172,41 @@ public:
   compute_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
+   * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   */
+  virtual Tensor<1, dim>
+  compute_1st_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   */
+  virtual Tensor<2, dim>
+  compute_2nd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   */
+  virtual Tensor<3, dim>
+  compute_3rd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   */
+  virtual Tensor<4, dim>
+  compute_4th_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
    * Compute the gradient of the <tt>i</tt>th polynomial at unit point
    * <tt>p</tt>.
    *
    * Consider using evaluate() instead.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
@@ -187,7 +215,7 @@ public:
    * Consider using evaluate() instead.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the number of polynomials spanning the space represented by this
@@ -205,7 +233,7 @@ public:
   name() const override;
 
   /**
-   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   * @copydoc ScalarPolynomialsBase::clone()
    */
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
@@ -308,7 +336,7 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
 {
   const std::array<unsigned int, dim> indices = compute_index(i);
 
-  double v[dim][order + 1];
+  std::array<std::array<double, order + 1>, dim> v;
   {
     std::vector<double> tmp(order + 1);
     for (unsigned int d = 0; d < dim; ++d)
@@ -424,6 +452,45 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
     }
 }
 
+
+
+template <int dim>
+inline Tensor<1, dim>
+PolynomialSpace<dim>::compute_1st_derivative(const unsigned int i,
+                                             const Point<dim> & p) const
+{
+  return compute_derivative<1>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<2, dim>
+PolynomialSpace<dim>::compute_2nd_derivative(const unsigned int i,
+                                             const Point<dim> & p) const
+{
+  return compute_derivative<2>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<3, dim>
+PolynomialSpace<dim>::compute_3rd_derivative(const unsigned int i,
+                                             const Point<dim> & p) const
+{
+  return compute_derivative<3>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<4, dim>
+PolynomialSpace<dim>::compute_4th_derivative(const unsigned int i,
+                                             const Point<dim> & p) const
+{
+  return compute_derivative<4>(i, p);
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
