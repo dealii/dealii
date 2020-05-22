@@ -20,14 +20,10 @@
 #
 #   DEAL_II_HAVE_CXX17
 #
-#   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
-#   DEAL_II_HAVE_CXX14_CONSTEXPR
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-#   DEAL_II_DEPRECATED
-#
-#   DEAL_II_CONSTEXPR
 #   DEAL_II_FALLTHROUGH
+#   DEAL_II_CONSTEXPR
 #
 
 
@@ -38,9 +34,10 @@
 ########################################################################
 
 #
-# MSVC needs different compiler flags to turn warnings into errors
-# additionally a suitable exception handling model is required
+# Use compile flags specified in ${DEAL_II_CXX_FLAGS} for the following
+# tests:
 #
+
 IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   SET(_werror_flag "/WX /EHsc")
 ELSE()
@@ -48,6 +45,9 @@ ELSE()
 ENDIF()
 
 ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${_werror_flag}")
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+ENDIF()
 
 #
 # Rerun all checks if compile flags change:
@@ -60,7 +60,13 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
   DEAL_II_HAVE_CXX11_FEATURES
   DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
+  DEAL_II_HAVE_FP_EXCEPTIONS
+  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_CXX14_CONSTEXPR_BUG_OK
   )
+
 
 #
 # Test that the c++17 attributes are supported.
@@ -100,6 +106,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_CXX17_FEATURES)
 
+
 #
 # Some compilers treat lambdas as constexpr functions when compiling with
 # C++17 support even if they don't fulfill all the constexpr function
@@ -130,6 +137,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
 
+
 #
 # Check some generic C++14 features
 #
@@ -155,6 +163,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_CXX14_FEATURES)
 
+
 #
 # Clang-3.5* or older, bail out with a spurious error message in case
 # of an undeduced auto return type.
@@ -177,6 +186,7 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
+
 
 #
 # Check some generic C++11 features
@@ -215,6 +225,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_CXX11_FEATURES)
 
+
 #
 # clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
 #
@@ -225,8 +236,6 @@ CHECK_CXX_SOURCE_COMPILES(
   int main() { A a; std::bind(&A::foo,a)(); return 0; }
   "
   DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
-
-RESET_CMAKE_REQUIRED()
 
 IF(DEAL_II_HAVE_CXX17_FEATURES AND
    DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
@@ -259,83 +268,6 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
-
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${_werror_flag}")
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ENDIF()
-
-UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
-  "${CMAKE_REQUIRED_FLAGS}"
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
-  DEAL_II_HAVE_CXX14_CONSTEXPR
-  DEAL_II_HAVE_FP_EXCEPTIONS
-  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-  )
-
-#
-# Try to enable a fallthrough attribute. This is a language feature in C++17,
-# but a compiler extension in earlier language versions.
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main()
-  {
-    int i = 42;
-    int j = 10;
-    switch(i)
-      {
-      case 1:
-        ++j;
-        [[fallthrough]];
-      case 2:
-        ++j;
-        [[fallthrough]];
-      default:
-        break;
-      }
-   }
-   "
-   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-   )
-
-#
-# see if the current compiler configuration supports the GCC extension
-# __attribute__((fallthrough)) syntax instead
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main()
-  {
-    int i = 42;
-    int j = 10;
-    switch(i)
-      {
-      case 1:
-        ++j;
-        __attribute__((fallthrough));
-      case 2:
-        ++j;
-        __attribute__((fallthrough));
-      default:
-        break;
-      }
-  }
-  "
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
-  )
-
-IF(DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH)
-  SET(DEAL_II_FALLTHROUGH "[[fallthrough]]")
-ELSEIF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
-  SET(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
-ELSE()
-  SET(DEAL_II_FALLTHROUGH " ")
-ENDIF()
-
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
-
-RESET_CMAKE_REQUIRED()
 
 #
 # Check that we can use feenableexcept through the C++11 header file cfenv:
@@ -374,6 +306,7 @@ ELSE()
   CHECK_CXX_SOURCE_COMPILES("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ENDIF()
 
+
 #
 # Check whether the standard library provides operator* overloads for mixed
 # floating point multiplication of complex and real valued numbers.
@@ -398,6 +331,69 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
 
+
+#
+# Try to enable a fallthrough attribute. This is a language feature in C++17,
+# but a compiler extension in earlier language versions.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  int main()
+  {
+    int i = 42;
+    int j = 10;
+    switch(i)
+      {
+      case 1:
+        ++j;
+        [[fallthrough]];
+      case 2:
+        ++j;
+        [[fallthrough]];
+      default:
+        break;
+      }
+   }
+   "
+   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
+   )
+
+
+#
+# see if the current compiler configuration supports the GCC extension
+# __attribute__((fallthrough)) syntax instead
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  int main()
+  {
+    int i = 42;
+    int j = 10;
+    switch(i)
+      {
+      case 1:
+        ++j;
+        __attribute__((fallthrough));
+      case 2:
+        ++j;
+        __attribute__((fallthrough));
+      default:
+        break;
+      }
+  }
+  "
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  )
+
+IF(DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH)
+  SET(DEAL_II_FALLTHROUGH "[[fallthrough]]")
+ELSEIF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
+  SET(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
+ELSE()
+  SET(DEAL_II_FALLTHROUGH " ")
+ENDIF()
+
+
 #
 # Check for correct c++14 constexpr support.
 #
@@ -414,8 +410,8 @@ CHECK_CXX_SOURCE_COMPILES(
 # We only run this check if we have CXX14 support, otherwise the use of constexpr
 # is limited (non-const constexpr functions for example).
 #
-IF(DEAL_II_WITH_CXX14 AND NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  CHECK_CXX_SOURCE_COMPILES(
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  CHECK_CXX_COMPILER_BUG(
     "
     #define Assert(x,y) if (!(x)) throw y;
     void bar()
@@ -436,102 +432,12 @@ IF(DEAL_II_WITH_CXX14 AND NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       return n;
     }
     "
-    DEAL_II_HAVE_CXX14_CONSTEXPR)
+    DEAL_II_CXX14_CONSTEXPR_BUG)
 ENDIF()
 
-#
-# The macro DEAL_II_CONSTEXPR allows using c++ constexpr features in a portable way.
-# Here we enable it only when a constexpr function can call simple non-constexpr
-# functions. This requirement is probabely very conservative in most cases, but
-# it will prevent breaking builds with certain compilers.
-#
 SET(DEAL_II_CONSTEXPR "constexpr")
-IF (DEAL_II_HAVE_CXX14_CONSTEXPR)
-ELSE()
+IF(DEAL_II_CXX14_CONSTEXPR_BUG)
   SET(DEAL_II_CONSTEXPR " ")
-ENDIF()
-
-RESET_CMAKE_REQUIRED()
-
-
-#
-# GCC and some other compilers have an attribute of the form
-# __attribute__((deprecated)) that can be used to make the
-# compiler warn whenever a deprecated function is used. C++14
-# provides a standardized attribute of the form [[deprecated]
-# with the exact same functionality.
-# See if one of these attribute is available.
-#
-# If it is, set the variable DEAL_II_DEPRECATED to its value. If
-# it isn't, set it to an empty string (actually, to a single
-# space, since the empty string causes CMAKE to #undef the
-# variable in config.h), i.e., to something the compiler will
-# ignore
-#
-# - Wolfgang Bangerth, 2012
-#
-
-# first see if the compiler accepts the attribute
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          [[deprecated]] int old_fn ();
-          int old_fn () { return 0; }
-
-          struct [[deprecated]] bob
-          {
-            [[deprecated]] bob(int i);
-            [[deprecated]] void test();
-          };
-
-          enum color
-          {
-            red [[deprecated]]
-          };
-
-          template <int dim>
-          struct foo {};
-          using bar [[deprecated]] = foo<2>;
-
-          int main () {}
-  "
-  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
-  )
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          __attribute__((deprecated)) int old_fn ();
-          int old_fn () { return 0; }
-
-          struct __attribute__((deprecated)) bob
-          {
-            __attribute__((deprecated)) bob(int i);
-            __attribute__((deprecated)) void test();
-          };
-
-          enum color
-          {
-            red __attribute__((deprecated))
-          };
-
-          template <int dim>
-          struct foo {};
-          using bar __attribute__((deprecated)) = foo<2>;
-
-          int main () {}
-  "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
-  )
-
-RESET_CMAKE_REQUIRED()
-
-
-DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
-IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
-  SET(DEAL_II_DEPRECATED "[[deprecated]]")
-ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
-  SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
-ELSE()
-  SET(DEAL_II_DEPRECATED " ")
 ENDIF()
 
 
