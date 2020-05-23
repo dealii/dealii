@@ -135,8 +135,7 @@ namespace CUDAWrappers
       if (row < n_rows)
         {
           for (int j = row_ptr_dev[row]; j < row_ptr_dev[row + 1]; ++j)
-            dealii::LinearAlgebra::CUDAWrappers::atomicAdd_wrapper(
-              &sums[column_index_dev[j]], abs(val_dev[j]));
+            atomicAdd(&sums[column_index_dev[j]], abs(val_dev[j]));
         }
     }
 
