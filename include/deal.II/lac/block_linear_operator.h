@@ -699,9 +699,10 @@ block_operator(
  *
  * @ingroup LAOperators
  */
-template <typename Range,
-          typename Domain,
-          typename BlockPayload,
+template <typename Range  = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockPayload =
+            internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>,
           typename BlockMatrixType>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const BlockMatrixType &block_matrix)
@@ -869,7 +870,10 @@ block_diagonal_operator(
  *
  * @ingroup LAOperators
  */
-template <typename Range, typename Domain, typename BlockPayload>
+template <typename Range  = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockPayload =
+            internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>>
 LinearOperator<Domain, Range, typename BlockPayload::BlockType>
 block_forward_substitution(
   const BlockLinearOperator<Range, Domain, BlockPayload> &block_operator,
@@ -984,7 +988,10 @@ block_forward_substitution(
  *
  * @ingroup LAOperators
  */
-template <typename Range, typename Domain, typename BlockPayload>
+template <typename Range  = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockPayload =
+            internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>>
 LinearOperator<Domain, Range, typename BlockPayload::BlockType>
 block_back_substitution(
   const BlockLinearOperator<Range, Domain, BlockPayload> &block_operator,
