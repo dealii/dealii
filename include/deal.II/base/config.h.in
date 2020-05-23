@@ -68,20 +68,12 @@
 
 // defined for backwards compatibility with pre-C++11
 #define DEAL_II_WITH_CXX11
-#define DEAL_II_NOEXCEPT noexcept
 
 /***********************************************************************
  * Compiler bugs:
  *
  * For documentation see cmake/checks/check_03_compiler_bugs.cmake
  */
-
-#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
-#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
-#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
-#cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-#cmakedefine DEAL_II_CONSTEXPR_BUG
-
 
 /***********************************************************************
  * Compiler features:
@@ -193,10 +185,6 @@
 
 /* cmake/modules/FindSYMENGINE.cmake */
 #cmakedefine DEAL_II_SYMENGINE_WITH_LLVM
-
-/* cmake/configure/configure_1_threads.cmake */
-#cmakedefine DEAL_II_USE_MT_POSIX
-#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
