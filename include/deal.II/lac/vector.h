@@ -953,6 +953,16 @@ public:
   size() const;
 
   /**
+   * Return local dimension of the vector. Since this vector does not support
+   * distributed data this is always the same value as size().
+   *
+   * @note This function exists for compatibility with
+   * LinearAlgebra::ReadWriteVector.
+   */
+  size_type
+  local_size() const;
+
+  /**
    * Return whether the vector contains only elements with value zero. This
    * function is mainly for internal consistency checks and should seldom be
    * used when not in debug mode since it uses quite some time.
@@ -1085,6 +1095,16 @@ Vector<Number>::size() const
 {
   return values.size();
 }
+
+
+
+template <typename Number>
+inline typename Vector<Number>::size_type
+Vector<Number>::local_size() const
+{
+  return values.size();
+}
+
 
 
 template <typename Number>
