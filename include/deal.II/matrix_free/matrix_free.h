@@ -1983,11 +1983,11 @@ private:
    * This is the actual reinit function that sets up the indices for the
    * DoFHandler case.
    */
-  template <typename number2, template <int, int> class DoFHandlerType>
+  template <typename number2>
   void
   internal_reinit(
     const Mapping<dim> &                                   mapping,
-    const std::vector<const DoFHandlerType<dim, dim> *> &  dof_handler,
+    const std::vector<const DoFHandler<dim, dim> *> &      dof_handlers,
     const std::vector<const AffineConstraints<number2> *> &constraint,
     const std::vector<IndexSet> &                          locally_owned_set,
     const std::vector<hp::QCollection<1>> &                quad,
@@ -2009,51 +2009,15 @@ private:
   /**
    * Initializes the DoFHandlers based on a DoFHandler<dim> argument.
    */
-  template <typename DoFHandlerType>
   void
   initialize_dof_handlers(
-    const std::vector<const DoFHandlerType *> &dof_handlers,
-    const AdditionalData &                     additional_data);
-
-  /**
-   * Setup connectivity graph with information on the dependencies between
-   * block due to shared faces.
-   */
-  void
-  make_connectivity_graph_faces(DynamicSparsityPattern &connectivity);
-
-  /**
-   * This struct defines which DoFHandler has actually been given at
-   * construction, in order to define the correct behavior when querying the
-   * underlying DoFHandler.
-   */
-  struct DoFHandlers
-  {
-    DoFHandlers()
-      : active_dof_handler(usual)
-      , n_dof_handlers(0)
-    {}
-
-    std::vector<SmartPointer<const DoFHandler<dim>>> dof_handler;
-    std::vector<SmartPointer<const DoFHandler<dim>>> hp_dof_handler;
-    enum ActiveDoFHandler
-    {
-      /**
-       * Use DoFHandler.
-       */
-      usual,
-      /**
-       * Use hp::DoFHandler.
-       */
-      hp
-    } active_dof_handler;
-    unsigned int n_dof_handlers;
-  };
+    const std::vector<const DoFHandler<dim, dim> *> &dof_handlers,
+    const AdditionalData &                           additional_data);
 
   /**
    * Pointers to the DoFHandlers underlying the current problem.
    */
-  DoFHandlers dof_handlers;
+  std::vector<SmartPointer<const DoFHandler<dim>>> dof_handlers;
 
   /**
    * Contains the information about degrees of freedom on the individual cells
@@ -2213,8 +2177,8 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_components() const
 {
-  AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
-  return dof_handlers.n_dof_handlers;
+  AssertDimension(dof_handlers.size(), dof_info.size());
+  return dof_handlers.size();
 }
 
 
@@ -2224,9 +2188,9 @@ inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_base_elements(
   const unsigned int dof_no) const
 {
-  AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
-  AssertIndexRange(dof_no, dof_handlers.n_dof_handlers);
-  return dof_handlers.dof_handler[dof_no]->get_fe().n_base_elements();
+  AssertDimension(dof_handlers.size(), dof_info.size());
+  AssertIndexRange(dof_no, dof_handlers.size());
+  return dof_handlers[dof_no]->get_fe().n_base_elements();
 }
 
 
@@ -2841,7 +2805,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
-  std::vector<const DoFHandlerType *>             dof_handlers;
+  std::vector<const DoFHandler<dim, dim> *>       dof_handlers;
   std::vector<const AffineConstraints<number2> *> constraints;
   std::vector<QuadratureType>                     quads;
 
@@ -2877,7 +2841,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
-  std::vector<const DoFHandlerType *>             dof_handlers;
+  std::vector<const DoFHandler<dim, dim> *>       dof_handlers;
   std::vector<const AffineConstraints<number2> *> constraints;
 
   dof_handlers.push_back(&dof_handler);

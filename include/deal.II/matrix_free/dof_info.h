@@ -31,6 +31,7 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
+#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
 #include <array>
@@ -225,6 +226,20 @@ namespace internal
       make_connectivity_graph(const TaskInfo &                 task_info,
                               const std::vector<unsigned int> &renumbering,
                               DynamicSparsityPattern &connectivity) const;
+
+      /**
+       * In case face integrals are enabled, find out whether certain loops
+       * over the unknowns only access a subset of all the ghost dofs we keep
+       * in the main partitioner.
+       */
+      void
+      compute_tight_partitioners(
+        const Table<2, ShapeInfo<double>> &       shape_info,
+        const unsigned int                        n_owned_cells,
+        const unsigned int                        n_lanes,
+        const std::vector<FaceToCellTopology<1>> &inner_faces,
+        const std::vector<FaceToCellTopology<1>> &ghosted_faces,
+        const bool                                fill_cell_centric);
 
       /**
        * Compute a renumbering of the degrees of freedom to improve the data
