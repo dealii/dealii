@@ -98,7 +98,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-psabi")
 # Disable warnings regarding improper direct memory access
 # if compiling without C++17 support
 #
-IF(NOT DEAL_II_WITH_CXX17)
+IF(NOT DEAL_II_HAVE_CXX17)
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-class-memaccess")
 ENDIF()
 

@@ -202,7 +202,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  return Tensor<1, 0>();
+  return {};
 }
 
 
@@ -258,7 +258,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  return Tensor<2, 0>();
+  return {};
 }
 
 

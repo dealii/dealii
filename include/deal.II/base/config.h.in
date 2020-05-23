@@ -40,8 +40,6 @@
 #cmakedefine DEAL_II_WITH_ASSIMP
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
-#cmakedefine DEAL_II_WITH_CXX14
-#cmakedefine DEAL_II_WITH_CXX17
 #cmakedefine DEAL_II_WITH_GINKGO
 #cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_GMSH
@@ -66,9 +64,6 @@
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
-// defined for backwards compatibility with pre-C++11
-#define DEAL_II_WITH_CXX11
-
 /***********************************************************************
  * Compiler bugs:
  *
@@ -87,11 +82,9 @@
 #cmakedefine DEAL_II_HAVE_GLIBC_STACKTRACE
 #cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
-#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 #cmakedefine DEAL_II_ALWAYS_INLINE @DEAL_II_ALWAYS_INLINE@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
-#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 /*
  * A variable to tell if the compiler used in the current compilation process
@@ -138,11 +131,23 @@
  * For documentation see cmake/checks/check_01_cxx_features.cmake
  */
 
-#cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-#cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR
+#cmakedefine DEAL_II_HAVE_CXX14
+#cmakedefine DEAL_II_HAVE_CXX17
+
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
+
+#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
+#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
+
+// defined for backwards compatibility with older deal.II versions
+#define DEAL_II_WITH_CXX11
+#define DEAL_II_WITH_CXX14
+#ifdef DEAL_II_HAVE_CXX17
+#  define DEAL_II_WITH_CXX17
+#endif
 
 
 /***********************************************************************

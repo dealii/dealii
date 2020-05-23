@@ -34,22 +34,6 @@ ENDIF()
 
 
 #
-# gcc-4.8.1 has some problems with the constexpr "vertices_per_cell" in the
-# definition of alternating_form_at_vertices.
-#
-# TODO: Write a unit test.
-#
-# For now, just enable the workaround for Windows targets
-#
-# - Matthias Maier, 2013
-#
-IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
-    OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
-  SET(DEAL_II_CONSTEXPR_BUG TRUE)
-ENDIF()
-
-
-#
 # Intel 16.0.1 produces wrong code that creates a race condition in
 # tests/fe/curl_curl_01.debug but 16.0.2 is known to work. Blacklist this
 # version. Also see github.com/dealii/dealii/issues/2203

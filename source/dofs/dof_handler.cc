@@ -1169,9 +1169,7 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
               const unsigned int boundary_id = face->boundary_id();
 
               if (face->at_boundary() &&
-                  std::find(boundary_ids.begin(),
-                            boundary_ids.end(),
-                            boundary_id) != boundary_ids.end())
+                  boundary_ids.find(boundary_id) != boundary_ids.end())
                 {
                   cell->face(iface)->get_dof_indices(dofs_on_face);
                   for (unsigned int idof_face = 0; idof_face < dofs_per_face;

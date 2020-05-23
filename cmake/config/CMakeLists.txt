@@ -196,6 +196,8 @@ SET(_files
 FOREACH(_file ${_files})
   FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
   FILE(APPEND ${_file} "SET(DEAL_II_WITH_CXX11 ON)\n")
+  FILE(APPEND ${_file} "SET(DEAL_II_WITH_CXX14 ON)\n")
+  FILE(APPEND ${_file} "SET(DEAL_II_WITH_CXX17 ${DEAL_II_HAVE_CXX17})\n")
 ENDFOREACH()
 
 GET_CMAKE_PROPERTY(_res VARIABLES)

@@ -30,12 +30,9 @@
 
         -DDEAL_II_WITH_CUDA=ON
       </pre>
-      Depending on you system, this may be enough to get CUDA to work. If you
-      are using CUDA 9 or 10, you will need to turn off support for C++17:
-      <pre>
-
-        -DDEAL_II_WITH_CXX17=OFF
-      </pre>
+      Depending on you system, this may be enough to get CUDA to work. If
+      you are using CUDA 9 or CUDA 10, you will have to make sure that
+      C++17 is disabled.
       By default, we try to detect the compute capability of your device
       but you can easily set your own CUDA flags:
       <pre>

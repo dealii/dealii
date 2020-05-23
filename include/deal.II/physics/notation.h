@@ -682,7 +682,7 @@ namespace Physics
         indices_from_component(const unsigned int component_n, const bool)
         {
           AssertThrow(false, ExcNotImplemented());
-          return std::pair<unsigned int, unsigned int>();
+          return std::make_pair(0u, 0u);
         }
 
 
