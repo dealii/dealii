@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,10 +21,6 @@
 // between the vector components in the form of normal flux constraints on
 // the Stokes equations. Like matrix_vector_stokes_onedof except for
 // different constraints
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -55,6 +51,8 @@ std::ofstream logfile("output");
 #include <complex>
 #include <fstream>
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -170,10 +168,8 @@ test()
                                                constraints);
   constraints.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(dof_handler,
-                                 dofs_per_block,
-                                 stokes_sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, stokes_sub_blocks);
   {
     BlockDynamicSparsityPattern csp(2, 2);
 

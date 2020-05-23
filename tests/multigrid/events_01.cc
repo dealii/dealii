@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2018 by the deal.II authors
+ * Copyright (C) 2016 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -73,8 +73,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -144,7 +142,7 @@ namespace Step50
   LaplaceProblem<dim>::setup_system()
   {
     mg_dof_handler.distribute_dofs(fe);
-    mg_dof_handler.distribute_mg_dofs(fe);
+    mg_dof_handler.distribute_mg_dofs();
 
     DoFTools::extract_locally_relevant_dofs(mg_dof_handler,
                                             locally_relevant_set);
@@ -390,7 +388,7 @@ namespace Step50
     const MGCoarseGridBase<vector_t> &coarse_grid_solver)
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     typedef LA::MPI::PreconditionJacobi                  Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
@@ -400,12 +398,8 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
 
     auto print_transfer_to_mg = [](const bool start) {
       deallog << "transfer_to_mg " << (start ? "started" : "finished")
@@ -572,7 +566,6 @@ main(int argc, char *argv[])
     {
       deallog.depth_console(5);
 
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(3 /*degree*/);

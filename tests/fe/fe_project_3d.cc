@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,6 @@
  * Alexander Grayver, Maien Hamed
  */
 
-using namespace dealii;
 
 static const Point<3> vertices_affine[] = {
   Point<3>(-1., -1., -1.), Point<3>(0., -1., -1.),  Point<3>(1., -1., -1.),
@@ -216,7 +215,7 @@ void create_tria(Triangulation<3> &triangulation,
   std::vector<CellData<3>> cells(n_cells, CellData<3>());
   for (unsigned i = 0; i < cells.size(); ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<3>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -312,7 +311,7 @@ test(const FiniteElement<dim> &fe,
           fe_values[vec].get_function_divergences(v, div_v);
           fe_values[vec].get_function_curls(v, curl_v);
           fe_values[vec].get_function_hessians(v, hessians);
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const auto q_point : fe_values.quadrature_point_indices())
             {
               total_div += JxW_values[q_point] * div_v[q_point];
               total_curl += JxW_values[q_point] * curl_v[q_point];
@@ -333,8 +332,7 @@ test(const FiniteElement<dim> &fe,
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             {
               fe_face_values.reinit(cell, face);
               const std::vector<double> &face_JxW_values =
@@ -362,9 +360,7 @@ test(const FiniteElement<dim> &fe,
                     n_x_v[0] = (-normal[1] * face_values[q_point][0] +
                                 normal[0] * face_values[q_point][1]);
                   else if (dim == 3)
-                    cross_product(*reinterpret_cast<Tensor<1, dim> *>(&n_x_v),
-                                  normal,
-                                  face_values[q_point]);
+                    n_x_v = cross_product_3d(normal, face_values[q_point]);
 
                   if (cell->at_boundary(face))
                     boundary_tangentials += face_JxW_values[q_point] * n_x_v;
@@ -374,11 +370,10 @@ test(const FiniteElement<dim> &fe,
                   // boundary curl curl traces
                   if (dim == 3)
                     {
-                      Tensor<1, dim> n_x_curl_u;
-                      cross_product(n_x_curl_u,
-                                    normal,
-                                    *reinterpret_cast<Tensor<1, dim> *>(
-                                      &face_curls[q_point]));
+                      Tensor<1, dim> n_x_curl_u =
+                        cross_product_3d(normal,
+                                         *reinterpret_cast<Tensor<1, dim> *>(
+                                           &face_curls[q_point]));
                       if (cell->at_boundary(face))
                         boundary_curl_curl_traces +=
                           face_JxW_values[q_point] * n_x_curl_u;
@@ -413,10 +408,8 @@ test(const FiniteElement<dim> &fe,
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(7);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(7) << std::fixed;
 
   const static unsigned dim      = 3;
   unsigned              order    = 1;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,11 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <int rank, int dim, typename Number>
 class TensorFunction;
+#endif
 
 /**
  * This class is a model for a general function that, given a point at which
@@ -61,7 +63,7 @@ class TensorFunction;
  * // return all components at one point
  * void
  * vector_value(const Point<dim> &p,
- *              Vector<double> &  value) const;
+ *              Vector<double>   &value) const;
  * @endcode
  *
  * For more efficiency, there are other functions returning one or all
@@ -70,13 +72,13 @@ class TensorFunction;
  * // access to one component at several points
  * void
  * value_list(const std::vector<Point<dim>> &point_list,
- *            std::vector<double> &          value_list,
+ *            std::vector<double>           &value_list,
  *            const unsigned int             component = 0) const;
  *
  * // return all components at several points
  * void
  * vector_value_list(const std::vector<Point<dim>> &point_list,
- *                   std::vector<Vector<double>> &  value_list) const;
+ *                   std::vector<Vector<double>>   &value_list) const;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the function or
@@ -130,6 +132,7 @@ class TensorFunction;
  * argument of this class: it describes the scalar type to be used for each
  * component of your return values. It defaults to @p double, but in the
  * example above, it could be set to <code>std::complex@<double@></code>.
+ * step-58 is an example of this.
  *
  * @tparam dim The space dimension of the range space within which the domain
  *   $\Omega$ of the function lies. Consequently, the function will be
@@ -174,6 +177,11 @@ public:
    */
   Function(const unsigned int n_components = 1,
            const time_type    initial_time = 0.0);
+
+  /**
+   * Copy constructor.
+   */
+  Function(const Function &f) = default;
 
   /**
    * Virtual destructor; absolutely necessary in this case.
@@ -469,6 +477,14 @@ namespace Functions
       std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients)
       const override;
 
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & point,
+            const unsigned int component = 0) const override;
+
+    virtual RangeNumberType
+    laplacian(const Point<dim> & point,
+              const unsigned int component = 0) const override;
+
     std::size_t
     memory_consumption() const;
 
@@ -580,7 +596,7 @@ public:
    * <tt>ComponentSelectFunction@<dim, RangeNumberType@></tt> class can only
    * have same value for all components.
    *
-   * @note: we copy the underlying component value data from @p f from its
+   * @note We copy the underlying component value data from @p f from its
    * beginning. So the number of components of @p f cannot be less than the
    * calling object.
    */
@@ -647,10 +663,10 @@ protected:
  *
  * The class gains additional expressive power because the argument it takes
  * does not have to be a pointer to an actual function. Rather, it is a
- * function object, i.e., it can also be the result of call to std::bind (or
- * boost::bind) or some other object that can be called with a single
- * argument. For example, if you need a Function object that returns the norm
- * of a point, you could write it like so:
+ * function object, i.e., it can also be the result of a lambda function or some
+ * other object that can be called with a single argument. For
+ * example, if you need a Function object that returns the norm of a point, you
+ * could write it like so:
  * @code
  * template <int dim, typename RangeNumberType>
  * class Norm : public Function<dim, RangeNumberType>
@@ -700,7 +716,7 @@ protected:
  * or we could write it like so:
  * @code
  * ScalarFunctionFromFunctionObject<dim, RangeNumberType> my_distance_object(
- *   std::bind(&Point<dim>::distance, q, std::placeholders::_1));
+ *   [&q](const Point<dim> &p){return q.distance(p);});
  * @endcode
  * The savings in work to write this are apparent.
  *

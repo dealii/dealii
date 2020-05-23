@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int>
 class Mapping;
 template <int>
@@ -41,14 +42,14 @@ namespace hp
   template <int>
   class QCollection;
 }
-
+#endif
 
 
 /**
  * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz
- * and Babuska and its modification for the hp-FEM. This error indicator tries
- * to approximate the error per cell by integration of the jump of the
- * gradient of the solution along the faces of each cell.  It can be
+ * and Babuska (see @cite KGZB83) and its modification for the hp-FEM. This
+ * error indicator tries to approximate the error per cell by integration of the
+ * jump of the gradient of the solution along the faces of each cell.  It can be
  * understood as a gradient recovery estimator; see the survey of Ainsworth
  * and Oden, "A Posteriori Error Estimation in Finite Element Analysis"
  * (Wiley, 2000) for a complete discussion.
@@ -73,38 +74,38 @@ namespace hp
  * the conormal derivative $a\frac{du}{dn} = g$.
  *
  * The error estimator returns a vector of estimated errors per cell which can
- * be used to feed the GridRefinement::refine_fixed_fraction,
- * GridRefinement::refine_fixed_number, and similar functions. This vector
- * contains elements of data type @p float, rather than @p double, since
- * accuracy is not important in the current context.
- *
- * The full reference for the paper in which this error estimator is defined
- * is as follows:
- * @code{.bib}
- * @article{KGZB83,
- *   author  = {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
- *              and Babu\v{s}ka, I.},
- *   title   = {A posteriori error analysis and adaptive processes in the
- *              finite element method: Part {I}--Error Analysis},
- *   journal = {Int. J. Num. Meth. Engrg.},
- *   year    = {1983},
- *   volume  = {19},
- *   pages   = {1593--1619}
- * }
- * @endcode
+ * be used to feed the GridRefinement::refine_and_coarsen_fixed_fraction(),
+ * GridRefinement::refine_and_coarsen_fixed_number(), and similar functions.
+ * This vector contains elements of data type @p float, rather than @p double,
+ * since accuracy is not important in the current context.
  *
  *
  * <h3>Implementation</h3>
  *
- * In principle, the implementation of the error estimation is simple: let \f[
- * \eta_K^2 = \sum_{F\in\partial K} c_F \int_{\partial K_F} \left[a
- * \frac{\partial u_h}{\partial n}\right]^2 do \f] be the error estimator for
- * cell $K$. $[\cdot]$ denotes the jump of the argument at the face. In the
- * paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
+ * In principle, the implementation of the error estimation is simple: let
+ * @f[
+ *   \eta_K^2
+ *   =
+ *   \sum_{F\in\partial K}
+ *     c_F \int_{\partial K_F} \jump{a \frac{\partial u_h}{\partial n}}^2
+ * @f]
+ * be the error estimator for cell $K$. $\jump{\cdot}$ denotes the jump of the
+ * function in square brackets at the face, and $c_F$ is a factor discussed
+ * below. This is the general form of the interface terms of the error
+ * estimator derived by Kelly et al. in the paper referenced above. The overall
+ * error estimate is then computed as
+ * @f[
+ *   \eta^2 = \sum_K \eta_K^2
+ * @f]
+ * so that $\eta \approx \|\nabla (u-u_h)\|$ for the Laplace equation. The
+ * functions of this class compute a vector of values that corresponds to
+ * $\eta_K$ (i.e., the square root of the quantity above).
+ *
+ * In the paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
  * esoteric, stemming from interpolation estimates and stability constants which
  * may hold for the Poisson problem, but may not hold for more general
- * situations. Alternatively, we consider the case when $ c_F=\frac {h_F}{2p_F}
- * $, where $ h_F $ is face diagonal and $ p_F=max(p^+,p^-) $ is the maximum
+ * situations. Alternatively, we consider the case when $c_F=\frac {h_F}{2p_F}$,
+ * where $h_F$ is the diameter of the face and $p_F=max(p^+,p^-)$ is the maximum
  * polynomial degree of adjacent elements; or $c_F=h_K$. The choice between
  * these factors is done by means of the enumerator, provided as the last
  * argument in all functions.
@@ -156,14 +157,14 @@ namespace hp
  * finite element field and each component of the error estimator will then be
  * weighted by the respective component in this coefficient function. In the
  * other case, when all components have the same meaning (for example the
- * displacements in Lame's equations of elasticity), you can specify a scalar
- * coefficient which will then be used for all components.
+ * displacements in Lam&eacute;'s equations of elasticity), you can specify a
+ * scalar coefficient which will then be used for all components.
  *
  *
  * <h3>Boundary values</h3>
  *
  * If the face is at the boundary, i.e. there is no neighboring cell to which
- * the jump in the gradiend could be computed, there are two possibilities:
+ * the jump in the gradient could be computed, there are two possibilities:
  * <ul>
  * <li> The face belongs to a Dirichlet boundary. Then the face is not
  * considered, which can be justified looking at a dual problem technique and
@@ -550,7 +551,7 @@ public:
                  << arg1 << " specifies a function with " << arg2
                  << " vector components. However, the finite "
                     "element in use has "
-                 << arg2
+                 << arg3
                  << " components, and these two numbers need to match.");
   /**
    * Exception

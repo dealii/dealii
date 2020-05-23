@@ -1,0 +1,32 @@
+<h1>Results</h1>
+
+
+The output of this program is very similar to step-16 and we are not repeating the output here.
+
+We show the solutions on the initial mesh, the mesh after two
+and after five adaptive refinement steps.
+
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-0.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-2.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-5.png" alt="">
+
+
+Then we show the final grid (after 5 refinement steps) and the solution again,
+this time with a nicer 3d rendering (obtained using the DataOutBase::write_vtk
+function and the VTK-based VisIt visualization program) that better shows the
+sharpness of the jump on the refined mesh and the over- and undershoots of the
+solution along the interface:
+
+<img src="https://www.dealii.org/images/steps/developer/step-12.grid-5.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-12.3d-solution.png" alt="">
+
+
+And finally we show a plot of a 3d computation.
+
+<img src="https://www.dealii.org/images/steps/developer/step-12.sol-5-3d.png" alt="">
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+For ideas for further extensions, please see see step-12.

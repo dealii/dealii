@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,9 +28,6 @@
 #include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
-
-
-using namespace dealii;
 
 
 

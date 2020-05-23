@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,6 +41,7 @@
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
 
 template <int dim,
@@ -64,7 +65,7 @@ public:
     addit_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
-    addit_data.level_mg_handler = level;
+    addit_data.mg_level         = level;
     addit_data.mapping_update_flags_inner_faces =
       update_JxW_values | update_normal_vectors | update_jacobians;
     addit_data.mapping_update_flags_boundary_faces =
@@ -269,8 +270,7 @@ private:
           local_diagonal_vector[phif.static_dofs_per_cell];
         for (unsigned int i = 0; i < phif.static_dofs_per_cell; ++i)
           local_diagonal_vector[i] = 0.;
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           {
             phif.reinit(cell, face);
             VectorizedArray<number> sigmaF =
@@ -278,13 +278,10 @@ private:
                         phif.inverse_jacobian(0))[dim - 1]) *
               (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
 
-            std::array<types::boundary_id,
-                       VectorizedArray<number>::n_array_elements>
+            std::array<types::boundary_id, VectorizedArray<number>::size()>
                                     boundary_ids = data.get_faces_by_cells_boundary_id(cell, face);
             VectorizedArray<number> factor_boundary;
-            for (unsigned int v = 0;
-                 v < VectorizedArray<number>::n_array_elements;
-                 ++v)
+            for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
               // interior face
               if (boundary_ids[v] == numbers::invalid_boundary_id)
                 factor_boundary[v] = 0.5;
@@ -337,7 +334,7 @@ test()
   FE_DGQ<dim>     fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
   deallog << "Number of DoFs: " << dof.n_dofs() << std::endl;
 
   MappingQGeneric<dim>                                   mapping(fe_degree + 1);

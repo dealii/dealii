@@ -1,0 +1,153 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+Running the program with default parameters in release mode takes about 1
+minute on a 4 core machine (with hyperthreading):
+@verbatim
+# mpirun -np 4 ./step-69 | tee output
+Reading parameters and allocating objects... done
+
+    ####################################################
+    #########                                  #########
+    #########       create triangulation       #########
+    #########                                  #########
+    ####################################################
+
+Number of active cells:       36864
+
+    ####################################################
+    #########                                  #########
+    #########       compute offline data       #########
+    #########                                  #########
+    ####################################################
+
+Number of degrees of freedom: 37376
+
+    ####################################################
+    #########                                  #########
+    #########         set up time step         #########
+    #########                                  #########
+    ####################################################
+
+    ####################################################
+    #########                                  #########
+    #########    interpolate initial values    #########
+    #########                                  #########
+    #########                                  #########
+    ####################################################
+
+TimeLoop<dim>::interpolate_initial_values(t = 0)
+TimeLoop<dim>::output(t = 0, checkpoint = 0)
+
+    ####################################################
+    #########                                  #########
+    #########         enter main loop          #########
+    #########                                  #########
+    #########                                  #########
+    ####################################################
+
+    ####################################################
+    #########                                  #########
+    #########      Cycle  000001  (0.0%)       #########
+    #########      at time t = 0.00000000      #########
+    #########                                  #########
+    ####################################################
+
+[...]
+
+    ####################################################
+    #########                                  #########
+    #########     Cycle  007553  (100.0%)      #########
+    #########      at time t = 3.99984036      #########
+    #########                                  #########
+    ####################################################
+
+TimeLoop<dim>::output(t = 4.00038, checkpoint = 1)
+
++------------------------------------------------------------------------+------------+------------+
+| Total CPU time elapsed since start                                     |       357s |            |
+|                                                                        |            |            |
+| Section                                                    | no. calls |  CPU time  | % of total |
++------------------------------------------------------------+-----------+------------+------------+
+| discretization - setup                                     |         1 |     0.113s |         0% |
+| offline_data - assemble lumped mass matrix, and c_ij       |         1 |     0.167s |         0% |
+| offline_data - compute |c_ij|, and n_ij                    |         1 |   0.00255s |         0% |
+| offline_data - create sparsity pattern and set up matrices |         1 |    0.0224s |         0% |
+| offline_data - distribute dofs                             |         1 |    0.0617s |         0% |
+| offline_data - fix slip boundary c_ij                      |         1 |    0.0329s |         0% |
+| schlieren_postprocessor - compute schlieren plot           |       201 |     0.811s |      0.23% |
+| schlieren_postprocessor - prepare scratch space            |         1 |   7.6e-05s |         0% |
+| time_loop - setup scratch space                            |         1 |     0.127s |         0% |
+| time_loop - stalled output                                 |       200 |  0.000685s |         0% |
+| time_step - 1 compute d_ij                                 |      7553 |       240s |        67% |
+| time_step - 2 compute d_ii, and tau_max                    |      7553 |      11.5s |       3.2% |
+| time_step - 3 perform update                               |      7553 |       101s |        28% |
+| time_step - 4 fix boundary states                          |      7553 |     0.724s |       0.2% |
+| time_step - prepare scratch space                          |         1 |   0.00245s |         0% |
++------------------------------------------------------------+-----------+------------+------------+
+@endverbatim
+
+One thing that becomes evident is the fact that the program spends two
+thirds of the execution time computing the graph viscosity d_ij and about a
+third of the execution time in performing the update, where computing the
+flux $f(U)$ is the expensive operation. The preset default resolution is
+about 37k gridpoints, which amounts to about 148k spatial degrees of
+freedom in 2D. An animated schlieren plot of the solution looks as follows:
+
+<img src="https://www.dealii.org/images/steps/developer/step-69.coarse.gif" alt="" height="300">
+
+It is evident that 37k gridpoints for the first-order method is nowhere
+near the resolution needed to resolve any flow features. For comparison,
+here is a "reference" computation with a second-order method and about 9.5M
+gridpoints:
+
+<img src="https://www.dealii.org/images/steps/developer/step-69.2nd-order.t400.jpg" alt="" height="300">
+
+So, we give the first-order method a second chance and run it with about
+2.4M gridpoints on a small compute server:
+
+@verbatim
+# mpirun -np 16 ./step-69 | tee output
+
+[...]
+
+    ####################################################
+    #########                                  #########
+    #########     Cycle  070216  (100.0%)      #########
+    #########      at time t = 3.99999231      #########
+    #########                                  #########
+    ####################################################
+
+TimeLoop<dim>::output(t = 4.00006, checkpoint = 1)
+
+[...]
+
++------------------------------------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start                               |  6.75e+03s |            |
+|                                                                        |            |            |
+| Section                                                    | no. calls |  wall time | % of total |
++------------------------------------------------------------+-----------+------------+------------+
+| discretization - setup                                     |         1 |      1.97s |         0% |
+| offline_data - assemble lumped mass matrix, and c_ij       |         1 |      1.19s |         0% |
+| offline_data - compute |c_ij|, and n_ij                    |         1 |    0.0172s |         0% |
+| offline_data - create sparsity pattern and set up matrices |         1 |     0.413s |         0% |
+| offline_data - distribute dofs                             |         1 |      1.05s |         0% |
+| offline_data - fix slip boundary c_ij                      |         1 |     0.252s |         0% |
+| schlieren_postprocessor - compute schlieren plot           |       201 |      1.82s |         0% |
+| schlieren_postprocessor - prepare scratch space            |         1 |  0.000497s |         0% |
+| time_loop - setup scratch space                            |         1 |      1.45s |         0% |
+| time_loop - stalled output                                 |       200 |   0.00342s |         0% |
+| time_step - 1 compute d_ij                                 |     70216 |  4.38e+03s |        65% |
+| time_step - 2 compute d_ii, and tau_max                    |     70216 |       419s |       6.2% |
+| time_step - 3 perform update                               |     70216 |  1.87e+03s |        28% |
+| time_step - 4 fix boundary states                          |     70216 |        24s |      0.36% |
+| time_step - prepare scratch space                          |         1 |    0.0227s |         0% |
++------------------------------------------------------------+-----------+------------+------------+
+@endverbatim
+
+And with the following result:
+
+<img src="https://www.dealii.org/images/steps/developer/step-69.fine.gif" alt="" height="300">
+
+That's substantially better, although of course at the price of having run
+the code for roughly 2 hours on 16 cores.

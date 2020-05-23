@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class IndexSet;
+#endif
 
 namespace LinearAlgebra
 {
@@ -30,9 +33,9 @@ namespace LinearAlgebra
    * CommunicationPattern is an abstract class that is used to define a
    * communication plan that can be called repeatedly to efficiently obtain
    * off-processor elements. The idea is to decouple the communication pattern
-   * from the vectors. The goal is to reuse the same communication pattern for
-   * different vectors. This is similar to the way SparseMatrix and
-   * SparsityPattern works.
+   * from the data that needs to be communicated. The goal is to reuse the same
+   * communication pattern for different containers.
+   * This is similar to the way SparseMatrix and SparsityPattern works.
    *
    * @author Bruno Turcksin, 2015.
    */
@@ -45,10 +48,10 @@ namespace LinearAlgebra
     virtual ~CommunicationPatternBase() = default;
 
     /**
-     * Reinitialize the communication pattern. The first argument @p
-     * vector_space_vector_index_set is the index set associated to a
-     * VectorSpaceVector object. The second argument @p
-     * read_write_vector_index_set is the index set associated to a
+     * Reinitialize the communication pattern. The first argument
+     * `vector_space_vector_index_set` is the index set associated to a
+     * VectorSpaceVector object. The second argument
+     * `read_write_vector_index_set` is the index set associated to a
      * ReadWriteVector object.
      */
     virtual void
@@ -57,7 +60,7 @@ namespace LinearAlgebra
            const MPI_Comm &communicator) = 0;
 
     /**
-     * Return a constant reference to the underlying mpi communicator.
+     * Return a constant reference to the underlying MPI communicator.
      */
     virtual const MPI_Comm &
     get_mpi_communicator() const = 0;

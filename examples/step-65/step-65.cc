@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -60,8 +60,8 @@ namespace Step65
   // @sect3{Analytical solution and coefficient}
 
   // In this tutorial program, we want to solve the Poisson equation
-  // with a coefficient that jumps along a sphere of radius 0.5 and
-  // constant right hand side of value $f(\mathbf{x}) = -3$. (This
+  // with a coefficient that jumps along a sphere of radius 0.5, and
+  // using a constant right hand side of value $f(\mathbf{x}) = -3$. (This
   // setup is similar to step-5 and step-6, but the concrete values
   // for the coefficient and the right hand side are different.)
   // Due to the jump in the
@@ -101,7 +101,7 @@ namespace Step65
   template <int dim>
   double coefficient(const Point<dim> &p)
   {
-    if (p.square() < 0.5 * 0.5)
+    if (p.norm_square() < 0.25)
       return 0.5;
     else
       return 5.0;
@@ -111,12 +111,15 @@ namespace Step65
 
   // @sect3{The PoissonProblem class}
   //
-  // The implementation of the Poisson problem is very similar to what we used
-  // in the step-5 tutorial program. The two main differences are that we pass
-  // a mapping object to the various steps in the program in order to switch
-  // between two mapping representations as explained in the introduction, and
-  // the time object that will be used for measuring the run times in the
-  // various cases.
+  // The implementation of the Poisson problem is very similar to what
+  // we used in the step-5 tutorial program. The two main differences
+  // are that we pass a mapping object to the various steps in the
+  // program in order to switch between two mapping representations as
+  // explained in the introduction, and the `timer` object (of type
+  // TimerOutput) that will be used for measuring the run times in the
+  // various cases. (The concept of mapping objects was first
+  // introduced in step-10 and step-11, in case you want to look up
+  // the use of these classes.)
   template <int dim>
   class PoissonProblem
   {
@@ -148,8 +151,8 @@ namespace Step65
 
   // In the constructor, we set up the timer object to record wall times but
   // be quiet during the normal execution. We will query it for timing details
-  // in the PoissonProblem::run() function. Furthermore, we select a
-  // relatively high polynomial degree of three.
+  // in the `PoissonProblem::run()` function. Furthermore, we select a
+  // relatively high polynomial degree of three for the finite element in use.
   template <int dim>
   PoissonProblem<dim>::PoissonProblem()
     : fe(3)
@@ -161,73 +164,81 @@ namespace Step65
 
   // @sect3{Grid creation and initialization of the manifolds}
   //
-  // This function presents the typical usage of
+  // The next function presents the typical usage of
   // TransfiniteInterpolationManifold. The first step is to create the desired
   // grid, which can be done by composition of two grids from
   // GridGenerator. The inner ball mesh is simple enough: We run
-  // GridGenerator::hyper_cube centered in the origin with radius 0.5 (third
+  // GridGenerator::hyper_cube() centered at the origin with radius 0.5 (third
   // function argument). The second mesh is more interesting and constructed
   // as follows: We want to have a mesh that is spherical in the interior but
   // flat on the outer surface. Furthermore, the mesh topology of the inner
   // ball should be compatible with the outer grid in the sense that their
-  // vertices coincide to allow the two grid to be merged. The grid coming out
-  // of GridGenerator::hyper_shell fulfills the requirements on the inner side
-  // in case it is created with $2d$ coarse cells (6 coarse cells in 3D which
-  // we are going to use) &endash; this is the same number of cells as there
-  // are boundary faces for the ball. For the outer surface, we use the fact
-  // that the 6 faces on the surface of the shell without a manifold attached
-  // would degenerate to the surface of a cube. What we are still missing is
-  // the radius of the outer shell boundary. Since we desire a cube of extent
+  // vertices coincide so as to allow the two grid to be merged. The grid coming
+  // out of GridGenerator::hyper_shell fulfills the requirements on the inner
+  // side in case it is created with $2d$ coarse cells (6 coarse cells in 3D
+  // which we are going to use) &ndash; this is the same number of cells as
+  // there are boundary faces for the ball. For the outer surface, we use the
+  // fact that the 6 faces on the surface of the shell without a manifold
+  // attached would degenerate to the surface of a cube. What we are still
+  // missing is the radius of the outer shell boundary. Since we desire a cube
+  // of extent
   // $[-1, 1]$ and the 6-cell shell puts its 8 outer vertices at the 8
   // opposing diagonals, we must translate the points $(\pm 1, \pm 1, \pm 1)$
   // into a radius: Clearly, the radius must be $\sqrt{d}$ in $d$ dimensions,
   // i.e., $\sqrt{3}$ for the three-dimensional case we want to consider.
   //
-  // Thus, we have a plan: After creating the inner triangulation for the ball
-  // and the one for the outer shell, we merge those two grids but remove all
-  // manifolds from the resulting triangulation to ensure that we have full
-  // control over manifolds. In particular, we want additional points added on
-  // the boundary during refinement to follow a flat manifold description. To
-  // start the process of adding more appropriate manifold ids, we assign the
-  // manifold id 0 to all mesh entities (cells, faces, lines), which will
-  // later be associated with the TransfiniteInterpolationManifold. Then, we
-  // must identify the faces and lines that are along the sphere of radius 0.5
-  // and mark them with a different manifold id to then assign a
-  // SphericalManifold to those. We will choose the manifold id of 1. Since we
-  // have thrown away all manifolds that pre-existed after calling
-  // GridGenerator::hyper_ball(), we manually go through the cells of the mesh
-  // and all their faces. We have found a face on the sphere if all four
-  // vertices have a radius of 0.5, or, as we write in the program, have
-  // $r^2=0.25$. Note that we call `cell->face(f)->set_all_manifold_ids(1)` to
-  // set the manifold id both on the faces and the surrounding
-  // lines. Furthermore, we want to distinguish the cells inside the ball and
-  // outside the ball by a material id for visualization according to the
-  // picture in the introduction.
+  // Thus, we have a plan: After creating the inner triangulation for
+  // the ball and the one for the outer shell, we merge those two
+  // grids but remove all manifolds that the functions in
+  // GridGenerator may have set from the resulting triangulation, to
+  // ensure that we have full control over manifolds. In particular,
+  // we want additional points added on the boundary during refinement
+  // to follow a flat manifold description. To start the process of
+  // adding more appropriate manifold ids, we assign the manifold id 0
+  // to all mesh entities (cells, faces, lines), which will later be
+  // associated with the TransfiniteInterpolationManifold. Then, we
+  // must identify the faces and lines that are along the sphere of
+  // radius 0.5 and mark them with a different manifold id, so as to then
+  // assign a SphericalManifold to those. We will choose the manifold
+  // id of 1. Since we have thrown away all manifolds that pre-existed
+  // after calling GridGenerator::hyper_ball(), we manually go through
+  // the cells of the mesh and all their faces. We have found a face
+  // on the sphere if all four vertices have a radius of 0.5, or, as
+  // we write in the program, have $r^2-0.25 \approx 0$. Note that we call
+  // `cell->face(f)->set_all_manifold_ids(1)` to set the manifold id
+  // both on the faces and the surrounding lines. Furthermore, we want
+  // to distinguish the cells inside the ball and outside the ball by
+  // a material id for visualization, corresponding to the picture in the
+  // introduction.
   template <int dim>
   void PoissonProblem<dim>::create_grid()
   {
-    Triangulation<dim> tria_outer, tria_inner;
+    Triangulation<dim> tria_inner;
     GridGenerator::hyper_ball(tria_inner, Point<dim>(), 0.5);
+
+    Triangulation<dim> tria_outer;
     GridGenerator::hyper_shell(
       tria_outer, Point<dim>(), 0.5, std::sqrt(dim), 2 * dim);
+
     GridGenerator::merge_triangulations(tria_inner, tria_outer, triangulation);
+
     triangulation.reset_all_manifolds();
     triangulation.set_all_manifold_ids(0);
+
     for (const auto &cell : triangulation.cell_iterators())
       {
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const auto &face : cell->face_iterators())
           {
             bool face_at_sphere_boundary = true;
             for (unsigned int v = 0;
                  v < GeometryInfo<dim - 1>::vertices_per_cell;
                  ++v)
               {
-                if (std::abs(cell->face(f)->vertex(v).norm_square() - 0.25) >
-                    1e-12)
+                if (std::abs(face->vertex(v).norm_square() - 0.25) > 1e-12)
                   face_at_sphere_boundary = false;
               }
             if (face_at_sphere_boundary)
-              cell->face(f)->set_all_manifold_ids(1);
+              face->set_all_manifold_ids(1);
           }
         if (cell->center().norm_square() < 0.25)
           cell->set_material_id(1);
@@ -235,21 +246,24 @@ namespace Step65
           cell->set_material_id(0);
       }
 
-    // With all cells, faces and lines marked appropriately, we can attach the
-    // Manifold objects to those numbers. The entities with manifold id 1 will
-    // get a spherical manifold, whereas the other entities, which have the
-    // manifold id 0, will be assigned the
-    // TransfiniteInterpolationManifold. As mentioned in the introduction, we
-    // must explicitly initialize the manifold to the mesh by a call to
-    // TransfiniteInterpolationManifold::initialize() in order to pick up the
-    // coarse mesh cells and the manifolds attached to the boundaries of those
-    // cells. Note that the manifolds are allowed to go out of scope, because
-    // the Triangulation object internally calls Manifold::clone() to have a
-    // valid object around.
+    // With all cells, faces and lines marked appropriately, we can
+    // attach the Manifold objects to those numbers. The entities with
+    // manifold id 1 will get a spherical manifold, whereas the other
+    // entities, which have the manifold id 0, will be assigned the
+    // TransfiniteInterpolationManifold. As mentioned in the
+    // introduction, we must explicitly initialize the manifold with
+    // the current mesh using a call to
+    // TransfiniteInterpolationManifold::initialize() in order to pick
+    // up the coarse mesh cells and the manifolds attached to the
+    // boundaries of those cells. We also note that the manifold
+    // objects we create locally in this function are allowed to go
+    // out of scope (as they do at the end of the function scope),
+    // because the Triangulation object internally copies them.
     //
     // With all manifolds attached, we will finally go about and refine the
     // mesh a few times to create a sufficiently large test case.
     triangulation.set_manifold(1, SphericalManifold<dim>());
+
     TransfiniteInterpolationManifold<dim> transfinite_manifold;
     transfinite_manifold.initialize(triangulation);
     triangulation.set_manifold(0, transfinite_manifold);
@@ -261,14 +275,17 @@ namespace Step65
 
   // @sect3{Setup of data structures}
   //
-  // This function is well-known from other tutorials in that it enumerates
-  // the degrees of freedom, creates a constraint object and sets up a sparse
-  // matrix for the linear system. The only thing worth mentioning is the fact
-  // that we pass the mapping to the
-  // VectorTools::interpolate_boundary_values() function to ensure that our
-  // boundary values are evaluated on the high-order mesh used for
-  // assembly. In the present example, it does not really matter because the
-  // outer surfaces are flat, but for curved outer cells this is mandatory.
+  // The following function is well-known from other tutorials in that
+  // it enumerates the degrees of freedom, creates a constraint object
+  // and sets up a sparse matrix for the linear system. The only thing
+  // worth mentioning is the fact that the function receives a
+  // reference to a mapping object that we then pass to the
+  // VectorTools::interpolate_boundary_values() function to ensure
+  // that our boundary values are evaluated on the high-order mesh
+  // used for assembly. In the present example, it does not really
+  // matter because the outer surfaces are flat, but for curved outer
+  // cells this leads to more accurate approximation of the boundary
+  // values.
   template <int dim>
   void PoissonProblem<dim>::setup_system(const Mapping<dim> &mapping)
   {
@@ -280,10 +297,13 @@ namespace Step65
 
     {
       TimerOutput::Scope scope(timer, "Compute constraints");
+
       constraints.clear();
+
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       VectorTools::interpolate_boundary_values(
         mapping, dof_handler, 0, ExactSolution<dim>(), constraints);
+
       constraints.close();
     }
 
@@ -300,16 +320,16 @@ namespace Step65
 
   // @sect3{Assembly of the system matrix and right hand side}
   //
-  // This function is also well-known from the previous tutorial programs. One
-  // thing to note is that we set the number of quadrature points to the
-  // polynomial degree plus two, not the degree plus one as in most other
-  // tutorials. This is because we expect some extra accuracy as the mapping
-  // also involves a degree one more than the polynomials for the
-  // solution.
+  // The function that assembles the linear system is also well known
+  // from the previous tutorial programs. One thing to note is that we
+  // set the number of quadrature points to the polynomial degree plus
+  // two, not the degree plus one as in most other tutorials. This is
+  // because we expect some extra accuracy as the mapping also
+  // involves a degree one more than the polynomials for the solution.
   //
   // The only somewhat unusual code in the assembly is the way we compute the
   // cell matrix. Rather than using three nested loop over the quadrature
-  // point index, the row and column of the matrix, we first collect the
+  // point index, the row, and the column of the matrix, we first collect the
   // derivatives of the shape function, multiplied by the square root of the
   // product of the coefficient and the integration factor `JxW` in a separate
   // matrix `partial_matrix`. To compute the cell matrix, we then execute
@@ -327,7 +347,7 @@ namespace Step65
   // \sum_{k=1}^d\text{det}(J) w_q a(x)\frac{\partial \varphi_i(\boldsymbol
   // \xi_q)}{\partial x_k} \frac{\partial \varphi_j(\boldsymbol
   // \xi_q)}{\partial x_k}$, which is exactly the terms needed for the
-  // Laplacian.
+  // bilinear form of the Laplace equation.
   //
   // The reason for choosing this somewhat unusual scheme is due to the heavy
   // work involved in computing the cell matrix for a relatively high
@@ -353,8 +373,9 @@ namespace Step65
   void PoissonProblem<dim>::assemble_system(const Mapping<dim> &mapping)
   {
     TimerOutput::Scope scope(timer, "Assemble linear system");
-    QGauss<dim>        quadrature_formula(fe.degree + 2);
-    FEValues<dim>      fe_values(mapping,
+
+    const QGauss<dim> quadrature_formula(fe.degree + 2);
+    FEValues<dim>     fe_values(mapping,
                             fe,
                             quadrature_formula,
                             update_values | update_gradients |
@@ -372,6 +393,7 @@ namespace Step65
       {
         cell_rhs = 0.;
         fe_values.reinit(cell);
+
         for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
           {
             const double current_coefficient =
@@ -388,9 +410,10 @@ namespace Step65
                    fe_values.JxW(q_index));            // dx
               }
           }
-        partial_matrix.mTmult(cell_matrix, partial_matrix);
-        cell->get_dof_indices(local_dof_indices);
 
+        partial_matrix.mTmult(cell_matrix, partial_matrix);
+
+        cell->get_dof_indices(local_dof_indices);
         constraints.distribute_local_to_global(
           cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
@@ -401,17 +424,21 @@ namespace Step65
   // @sect3{Solution of the linear system}
   //
   // For solving the linear system, we pick a simple Jacobi-preconditioned
-  // variant, similar to the settings in the early tutorials.
+  // conjugate gradient solver, similar to the settings in the early tutorials.
   template <int dim>
   void PoissonProblem<dim>::solve()
   {
-    TimerOutput::Scope   scope(timer, "Solve linear system");
-    SolverControl        solver_control(1000, 1e-12);
-    SolverCG<>           solver(solver_control);
-    PreconditionJacobi<> preconditioner;
+    TimerOutput::Scope scope(timer, "Solve linear system");
+
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> solver(solver_control);
+
+    PreconditionJacobi<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix);
+
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
     constraints.distribute(solution);
+
     std::cout << "   Number of solver iterations:  "
               << solver_control.last_step() << std::endl;
   }
@@ -420,23 +447,37 @@ namespace Step65
 
   // @sect3{Output of the solution and computation of errors}
   //
-  // In this function, we do various post-processing steps with the
+  // In the next function we do various post-processing steps with the
   // solution, all of which involve the mapping in one way or the other.
   //
   // The first operation we do is to write the solution as well as the
-  // material ids to a vtu file. This is similar to what was done in many
+  // material ids to a VTU file. This is similar to what was done in many
   // other tutorial programs. The new ingredient presented in this tutorial
-  // program is the way we ensure that a high-order representation is written
+  // program is that we want to ensure that the data written to the file
+  // used for visualization is actually a faithful representation of what
+  // is used internally by deal.II. That is because most of the visualization
+  // data formats only represent cells by their vertex coordinates, but
+  // have no way of representing the curved boundaries that are used
+  // in deal.II when using higher order mappings -- in other words, what
+  // you see in the visualization tool is not actually what you are computing
+  // on. (The same, incidentally, is true when using higher order shape
+  // functions: Most visualization tools only render bilinear/trilinear
+  // representations. This is discussed in detail in DataOut::build_patches().)
+  //
+  // So we need to ensure that a high-order representation is written
   // to the file. We need to consider two particular topics. Firstly, we tell
   // the DataOut object via the DataOutBase::VtkFlags that we intend to
   // interpret the subdivisions of the elements as a high-order Lagrange
-  // polynomial. Recent visualization programs, like ParaView of version 5.5
-  // or newer, can then render a high-order solution (one typically needs to
-  // adjust a parameter called "nonlinear subdivision level"). Secondly, we
-  // need to make sure that the mapping is passed to the
+  // polynomial rather than a collection of bilinear patches.
+  // Recent visualization programs, like ParaView version 5.5
+  // or newer, can then render a high-order solution (see a <a
+  // href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output">wiki
+  // page</a> for more details).
+  // Secondly, we need to make sure that the mapping is passed to the
   // DataOut::build_patches() method. Finally, the DataOut class only prints
-  // curved boundary cells by default, so we need to ensure that even inner
-  // cells are printed in a curved representation via the mapping.
+  // curved faces for <i>boundary</i> cells by default, so we need to ensure
+  // that also inner cells are printed in a curved representation via the
+  // mapping.
   template <int dim>
   void PoissonProblem<dim>::postprocess(const Mapping<dim> &mapping)
   {
@@ -466,22 +507,26 @@ namespace Step65
          std::to_string(triangulation.n_global_levels() - 10 + 2 * dim) +
          ".vtu")
           .c_str());
+
       data_out.write_vtu(file);
     }
 
-    // The next operation in the postprocessing function is to compute the L2
-    // and H1 errors against the analytical solution. As the analytical
+    // The next operation in the postprocessing function is to compute the $L_2$
+    // and $H^1$ errors against the analytical solution. As the analytical
     // solution is a quadratic polynomial, we expect a very accurate result at
-    // this point. If we were solving on a simple mesh with affine element
-    // shapes, we would expect the numerical result to coincide with the
-    // analyical solution up to roundoff accuracy. However, since we are used
+    // this point. If we were solving on a simple mesh with planar faces and a
+    // coefficient whose jumps are aligned with the faces between cells, then
+    // we would expect the numerical result to coincide with the
+    // analytical solution up to roundoff accuracy. However, since we are using
     // deformed cells following a sphere, which are only tracked by
     // polynomials of degree 4 (one more than the degree for the finite
-    // elements), we will make an error around 1e-7. We could get more
-    // accuracy by increasing the polynomial degree or refining the mesh.
+    // elements), we will see that there is an error around $10^{-7}$. We could
+    // get more accuracy by increasing the polynomial degree or refining the
+    // mesh.
     {
       TimerOutput::Scope scope(timer, "Compute error norms");
-      Vector<double>     norm_per_cell_p(triangulation.n_active_cells());
+
+      Vector<double> norm_per_cell_p(triangulation.n_active_cells());
 
       VectorTools::integrate_difference(mapping,
                                         dof_handler,
@@ -505,7 +550,7 @@ namespace Step65
     }
 
     // The final post-processing operation we do here is to compute an error
-    // estimation with the KellyErrorEstimator. We use the exact same settings
+    // estimate with the KellyErrorEstimator. We use the exact same settings
     // as in the step-6 tutorial program, except for the fact that we also
     // hand in the mapping to ensure that errors are evaluated along the
     // curved element, consistent with the remainder of the program. However,
@@ -514,6 +559,7 @@ namespace Step65
     // sphere), as the focus here is on the cost of this operation.
     {
       TimerOutput::Scope scope(timer, "Compute error estimator");
+
       Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
       KellyErrorEstimator<dim>::estimate(
         mapping,
@@ -540,7 +586,7 @@ namespace Step65
   // postprocessing discussed above. The two instances differ in the way they
   // use the mapping. The first uses a conventional MappingQGeneric mapping
   // object which we initialize to a degree one more than we use for the
-  // finite element &endash; after all, we expect the geometry representation
+  // finite element &ndash; after all, we expect the geometry representation
   // to be the bottleneck as the analytic solution is only a quadratic
   // polynomial. (In reality, things are interlinked to quite some extent
   // because the evaluation of the polynomials in real coordinates involves

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,12 +87,28 @@ test(const double x, const double y)
   Rol::VectorAdaptor<VectorType> x_rol(x_rcp);
 
   Teuchos::ParameterList parlist;
-  // Set parameters.
-  parlist.sublist("Secant").set("Use as Preconditioner", false);
+
+#if DEAL_II_TRILINOS_VERSION_GTE(12, 18, 0)
+  // Define algorithm in three intuitive and easy steps.
+  //
+  // For the future developer: if this ever fails again, copy the relevant
+  // changes out of packages/rol/example/rosenbrock/example_01.cpp found in
+  // the Trilinos git repository - the package documentation might be
+  // outdated.
+  ROL::Ptr<ROL::Step<RealT>> step =
+    ROL::makePtr<ROL::LineSearchStep<RealT>>(parlist);
+  ROL::Ptr<ROL::StatusTest<RealT>> status =
+    ROL::makePtr<ROL::StatusTest<RealT>>(parlist);
+  ROL::Algorithm<RealT> algo(step, status, false);
+#else
   // Define algorithm.
   ROL::Algorithm<RealT> algo("Line Search", parlist);
+#endif
 
-  // Run Algorithm
+  // Set parameters.
+  parlist.sublist("Secant").set("Use as Preconditioner", false);
+
+  // Run Algorithm.
   algo.run(x_rol, quad_objective, true, *outStream);
 
   Teuchos::RCP<const VectorType> xg = x_rol.getVector();

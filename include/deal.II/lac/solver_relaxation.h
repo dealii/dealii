@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,11 +73,6 @@ public:
                    const AdditionalData &data = AdditionalData());
 
   /**
-   * Virtual destructor.
-   */
-  virtual ~SolverRelaxation();
-
-  /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =
    * R(x_k,b)$. The matrix <i>A</i> itself is only used to compute the
    * residual.
@@ -98,11 +93,6 @@ SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
   : SolverBase<VectorType>(cn)
 {}
 
-
-
-template <class VectorType>
-SolverRelaxation<VectorType>::~SolverRelaxation()
-{}
 
 
 template <class VectorType>

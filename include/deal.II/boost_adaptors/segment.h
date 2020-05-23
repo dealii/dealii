@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,15 @@
 #ifndef dealii_boost_adaptor_segment_h
 #define dealii_boost_adaptor_segment_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/point.h>
 
 #include <deal.II/boost_adaptors/point.h>
 
-#include <boost/geometry.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/geometry/geometries/segment.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

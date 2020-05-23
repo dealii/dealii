@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class TriaActiveIterator;
+#endif
 
 namespace MeshWorker
 {
@@ -117,7 +120,7 @@ namespace MeshWorker
    * identify the corresponding subface on either the current or the neighbor
    * faces.
    *
-   * This method externalises that logic (which is independent from user codes)
+   * This method externalizes that logic (which is independent from user codes)
    * and separates the assembly of face terms (internal faces, boundary faces,
    * or faces between different subdomain ids on parallel computations) from
    * the assembling on cells, allowing the user to specify two additional
@@ -125,7 +128,7 @@ namespace MeshWorker
    * are called automatically in each @p cell, according to the specific
    * AssembleFlags @p flags that are passed. The @p cell_worker is passed the
    * cell identifier, a ScratchData object, and a CopyData object, following
-   * the same principles of WorkStream::run. Internally the function passes to
+   * the same principles of WorkStream::run(). Internally the function passes to
    * @p boundary_worker, in addition to the above, also a @p face_no parameter
    * that identifies the face on which the integration should be performed. The
    * @p face_worker instead needs to identify the current face unambiguously
@@ -152,7 +155,62 @@ namespace MeshWorker
    *
    * The two data types ScratchData and CopyData need to have a working copy
    * constructor. ScratchData is only used in the worker function, while
-   * CopyData is the object passed from the worker to the copier.
+   * CopyData is the object passed from the worker to the copier. The CopyData
+   * object is reset to the value provided to this function every time this
+   * function visits a new cell (where it then calls the cell and face
+   * workers). In other words, no state carries over between calling the
+   * `copier` on one cell and the `cell_worker`/`face_worker`/`boundary_worker`
+   * functions on the next cell, and user code needs not reset the copy
+   * object either at the beginning of the cell integration or end of the
+   * copy operation. Resetting the state of the `copier ` inside of a
+   * `face_worker` or `boundary_worker` constitutes a bug, and may lead to
+   * some unexpected results. The following example shows what is not
+   * permissible, as the copier is potentially shared among numerous faces
+   * on a cell:
+   * @code
+   *
+   * using ScratchData      = MeshWorker::ScratchData<dim, spacedim>;
+   * using CopyData         = MeshWorker::CopyData<1, 1, 1>;
+   * using CellIteratorType = decltype(dof_handler.begin_active());
+   *
+   * ScratchData            scratch(...);
+   * CopyData               copy(...);
+   *
+   * std::function<void(const CellIteratorType &, ScratchData &, CopyData &)>
+   *   empty_cell_worker;
+   *
+   * auto boundary_worker = [...] (
+   *   const CellIteratorType &cell,
+   *   const unsigned int      face,
+   *   ScratchData            &scratch_data,
+   *   CopyData               &copy_data)
+   * {
+   *  const auto &fe_face_values = scratch_data.reinit(cell, face);
+   *  copy_data = CopyData(...); // This is an error, as we lose the
+   *                             // accumulation that has been performed on
+   *                             // other boundary faces of the same cell.
+   *
+   *  for (unsigned int q_point = 0;
+   *       q_point < fe_face_values.n_quadrature_points;
+   *       ++q_point)
+   *    {
+   *      copy_data.vectors[0][0] += 1.0 * fe_face_values.JxW(q_point);
+   *    }
+   * };
+   *
+   * double value = 0;
+   * auto copier = [...](const CopyData &copy_data)
+   * {
+   *   value += copy_data.vectors[0][0]; // Contributions from some faces may
+   *                                     // be missing.
+   * };
+   *
+   * MeshWorker::mesh_loop(dof_handler.active_cell_iterators(),
+   *                       empty_cell_worker, copier,
+   *                       scratch, copy,
+   *                       MeshWorker::assemble_boundary_faces,
+   *                       boundary_worker);
+   * @endcode
    *
    * The queue_length argument indicates the number of items that can be live at
    * any given time. Each item consists of chunk_size elements of the input
@@ -161,7 +219,7 @@ namespace MeshWorker
    *
    * If your data objects are large, or their constructors are expensive, it is
    * helpful to keep in mind that queue_length copies of the ScratchData object
-   * and queue_length*chunk_size copies of the CopyData object are generated.
+   * and `queue_length*chunk_size` copies of the CopyData object are generated.
    *
    * @note More information about requirements on template types and meaning
    * of @p queue_length and @p chunk_size can be found in the documentation of the
@@ -283,10 +341,9 @@ namespace MeshWorker
         cell_worker(cell, scratch, copy);
 
       if (flags & (work_on_faces | work_on_boundary))
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<CellIteratorBaseType::AccessorType::
-                                      Container::dimension>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no :
+             GeometryInfo<CellIteratorBaseType::AccessorType::Container::
+                            dimension>::face_indices())
           {
             if (cell->at_boundary(face_no) &&
                 !cell->has_periodic_neighbor(face_no))
@@ -306,7 +363,7 @@ namespace MeshWorker
                 if (neighbor->is_level_cell())
                   neighbor_subdomain_id = neighbor->level_subdomain_id();
                 // subdomain id is only valid for active cells
-                else if (neighbor->active())
+                else if (neighbor->is_active())
                   neighbor_subdomain_id = neighbor->subdomain_id();
 
                 const bool own_neighbor =
@@ -341,8 +398,8 @@ namespace MeshWorker
                     (periodic_neighbor &&
                      cell->periodic_neighbor_is_coarser(face_no)))
                   {
-                    Assert(!cell->has_children(), ExcInternalError());
-                    Assert(!neighbor->has_children(), ExcInternalError());
+                    Assert(cell->is_active(), ExcInternalError());
+                    Assert(neighbor->is_active(), ExcInternalError());
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.
@@ -695,36 +752,49 @@ namespace MeshWorker
       f_face_worker;
 
     if (cell_worker != nullptr)
-      f_cell_worker = std::bind(cell_worker,
-                                std::ref(main_class),
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3);
+      f_cell_worker = [&main_class,
+                       cell_worker](const CellIteratorType &cell_iterator,
+                                    ScratchData &           scratch_data,
+                                    CopyData &              copy_data) {
+        (main_class.*cell_worker)(cell_iterator, scratch_data, copy_data);
+      };
 
     if (boundary_worker != nullptr)
-      f_boundary_worker = std::bind(boundary_worker,
-                                    std::ref(main_class),
-                                    std::placeholders::_1,
-                                    std::placeholders::_2,
-                                    std::placeholders::_3,
-                                    std::placeholders::_4);
+      f_boundary_worker =
+        [&main_class, boundary_worker](const CellIteratorType &cell_iterator,
+                                       const unsigned int      face_no,
+                                       ScratchData &           scratch_data,
+                                       CopyData &              copy_data) {
+          (main_class.*
+           boundary_worker)(cell_iterator, face_no, scratch_data, copy_data);
+        };
 
     if (face_worker != nullptr)
-      f_face_worker = std::bind(face_worker,
-                                std::ref(main_class),
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3,
-                                std::placeholders::_4,
-                                std::placeholders::_5,
-                                std::placeholders::_6,
-                                std::placeholders::_7,
-                                std::placeholders::_8);
+      f_face_worker = [&main_class,
+                       face_worker](const CellIteratorType &cell_iterator_1,
+                                    const unsigned int      face_index_1,
+                                    const unsigned int      subface_index_1,
+                                    const CellIteratorType &cell_iterator_2,
+                                    const unsigned int      face_index_2,
+                                    const unsigned int      subface_index_2,
+                                    ScratchData &           scratch_data,
+                                    CopyData &              copy_data) {
+        (main_class.*face_worker)(cell_iterator_1,
+                                  face_index_1,
+                                  subface_index_1,
+                                  cell_iterator_2,
+                                  face_index_2,
+                                  subface_index_2,
+                                  scratch_data,
+                                  copy_data);
+      };
 
     mesh_loop(begin,
               end,
               f_cell_worker,
-              std::bind(copier, main_class, std::placeholders::_1),
+              [&main_class, copier](const CopyData &copy_data) {
+                (main_class.*copier)(copy_data);
+              },
               sample_scratch_data,
               sample_copy_data,
               flags,

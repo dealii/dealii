@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,9 @@
 #include <deal.II/lac/tensor_product_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 template <int dim, int size>
 void
@@ -76,7 +77,7 @@ do_test()
     v3(w1.size());
   convert_to_vectorized(w1, v1);
 
-  constexpr unsigned int macro_size = VectorizedArray<double>::n_array_elements;
+  constexpr unsigned int macro_size = VectorizedArray<double>::size();
   Vector<double>         vec_flat(v1.size() * macro_size);
   std::array<unsigned int, macro_size> offsets;
   for (unsigned int i = 0; i < macro_size; ++i)

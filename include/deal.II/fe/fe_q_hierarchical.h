@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -540,7 +540,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005, Denis Davydov, 2015
  */
 template <int dim>
-class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>, dim>
+class FE_Q_Hierarchical : public FE_Poly<dim>
 {
 public:
   /**

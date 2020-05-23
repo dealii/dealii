@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,9 +41,11 @@ DEAL_II_NAMESPACE_OPEN
  *@{
  */
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class BlockVectorBase;
-
+#endif
 
 /**
  * A class that can be used to determine whether a given type is a block
@@ -934,15 +936,6 @@ public:
   equ(const value_type a, const BlockVector2 &V);
 
   /**
-   * U=a*V+b*W. Replacing by sum.
-   */
-  void
-  equ(const value_type       a,
-      const BlockVectorBase &V,
-      const value_type       b,
-      const BlockVectorBase &W);
-
-  /**
    * Update the ghost values by calling <code>update_ghost_values</code> for
    * each block.
    */
@@ -1485,7 +1478,7 @@ template <class VectorType>
 inline typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i)
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  AssertIndexRange(i, n_blocks());
 
   return components[i];
 }
@@ -1496,7 +1489,7 @@ template <class VectorType>
 inline const typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i) const
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  AssertIndexRange(i, n_blocks());
 
   return components[i];
 }
@@ -1947,29 +1940,6 @@ BlockVectorBase<VectorType>::scale(const BlockVector2 &v)
 
 
 template <class VectorType>
-void
-BlockVectorBase<VectorType>::equ(const value_type                   a,
-                                 const BlockVectorBase<VectorType> &v,
-                                 const value_type                   b,
-                                 const BlockVectorBase<VectorType> &w)
-{
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
-
-  for (size_type i = 0; i < n_blocks(); ++i)
-    {
-      components[i].equ(a, v.components[i], b, w.components[i]);
-    }
-}
-
-
-
-template <class VectorType>
 std::size_t
 BlockVectorBase<VectorType>::memory_consumption() const
 {
@@ -2100,8 +2070,10 @@ BlockVectorBase<VectorType>::operator/=(const value_type factor)
   AssertIsFinite(factor);
   Assert(factor != 0., ExcDivideByZero());
 
+  const value_type inverse_factor = value_type(1.) / factor;
+
   for (size_type i = 0; i < n_blocks(); ++i)
-    components[i] /= factor;
+    components[i] *= inverse_factor;
 
   return *this;
 }

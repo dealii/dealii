@@ -127,6 +127,10 @@ IncludeCategories:
 # should not be caught here
   - Regex: "<[a-z_]+>"
     Priority: 100000
+# make sure that "../tests.h" appears before all other local include files
+# such that replacing Assert in tests also applies to the testing header files.
+  - Regex: "\\.\\./tests\\.h"
+    Priority: 200000
 
 IndentCaseLabels: true
 IndentPPDirectives: AfterHash

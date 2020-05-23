@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /*
  * Construct a class template which finds if a cell

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2018 by the deal.II authors
+ * Copyright (C) 2001 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -41,6 +41,7 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/data_out.h>
 
 // Just this one is new: it declares a class
 // DynamicSparsityPattern, which we will use and explain
@@ -83,6 +84,7 @@ namespace Step11
     void setup_system();
     void assemble_and_solve();
     void solve();
+    void write_high_order_mesh(const unsigned cycle);
 
     Triangulation<dim> triangulation;
     FE_Q<dim>          fe;
@@ -386,15 +388,65 @@ namespace Step11
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
   }
 
+
+
+  // Next, we write the solution as well as the
+  // material ids to a VTU file. This is similar to what was done in many
+  // other tutorial programs. The new ingredient presented in this tutorial
+  // program is that we want to ensure that the data written to the file
+  // used for visualization is actually a faithful representation of what
+  // is used internally by deal.II. That is because most of the visualization
+  // data formats only represent cells by their vertex coordinates, but
+  // have no way of representing the curved boundaries that are used
+  // in deal.II when using higher order mappings -- in other words, what
+  // you see in the visualization tool is not actually what you are computing
+  // on. (The same, incidentally, is true when using higher order shape
+  // functions: Most visualization tools only render bilinear/trilinear
+  // representations. This is discussed in detail in DataOut::build_patches().)
+  //
+  // So we need to ensure that a high-order representation is written
+  // to the file. We need to consider two particular topics. Firstly, we tell
+  // the DataOut object via the DataOutBase::VtkFlags that we intend to
+  // interpret the subdivisions of the elements as a high-order Lagrange
+  // polynomial rather than a collection of bilinear patches.
+  // Recent visualization programs, like ParaView version 5.5
+  // or newer, can then render a high-order solution (see a <a
+  // href="https://github.com/dealii/dealii/wiki/Notes-on-visualizing-high-order-output">wiki
+  // page</a> for more details). Secondly, we need to make sure that the mapping
+  // is passed to the DataOut::build_patches() method. Finally, the DataOut
+  // class only prints curved faces for <i>boundary</i> cells by default, so we
+  // need to ensure that also inner cells are printed in a curved representation
+  // via the mapping.
+  template <int dim>
+  void LaplaceProblem<dim>::write_high_order_mesh(const unsigned cycle)
+  {
+    DataOut<dim> data_out;
+
+    DataOutBase::VtkFlags flags;
+    flags.write_higher_order_cells = true;
+    data_out.set_flags(flags);
+
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
+
+    data_out.build_patches(mapping,
+                           mapping.get_degree(),
+                           DataOut<dim>::curved_inner_cells);
+
+    std::ofstream file("solution-c=" + std::to_string(cycle) +
+                       ".p=" + std::to_string(mapping.get_degree()) + ".vtu");
+
+    data_out.write_vtu(file);
+  }
 
 
   // Finally the main function controlling the different steps to be
@@ -419,6 +471,7 @@ namespace Step11
       {
         setup_system();
         assemble_and_solve();
+        write_high_order_mesh(cycle);
 
         triangulation.refine_global();
       }

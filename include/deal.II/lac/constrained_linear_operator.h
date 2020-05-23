@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_constrained_linear_operator_h
 #define dealii_constrained_linear_operator_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/linear_operator.h>

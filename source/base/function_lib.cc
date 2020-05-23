@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1933,7 +1933,7 @@ namespace Functions
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return std::cos(fourier_coefficients * p);
   }
 
@@ -1945,7 +1945,7 @@ namespace Functions
                                        const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
 
@@ -1957,7 +1957,7 @@ namespace Functions
                                         const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::cos(fourier_coefficients * p));
   }
@@ -1983,7 +1983,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return std::sin(fourier_coefficients * p);
   }
 
@@ -1995,7 +1995,7 @@ namespace Functions
                                      const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
 
@@ -2007,7 +2007,7 @@ namespace Functions
                                       const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::sin(fourier_coefficients * p));
   }
@@ -2039,7 +2039,7 @@ namespace Functions
                              const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2057,7 +2057,7 @@ namespace Functions
                                 const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
     Tensor<1, dim>     sum;
@@ -2075,7 +2075,7 @@ namespace Functions
                                  const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2113,7 +2113,7 @@ namespace Functions
                                const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2131,7 +2131,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
     Tensor<1, dim>     sum;
@@ -2149,7 +2149,7 @@ namespace Functions
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2180,8 +2180,7 @@ namespace Functions
   Monomial<dim>::value(const Point<dim> &p, const unsigned int component) const
   {
     (void)component;
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    AssertIndexRange(component, this->n_components);
 
     double prod = 1;
     for (unsigned int s = 0; s < dim; ++s)
@@ -2216,7 +2215,7 @@ namespace Functions
                           const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
     for (unsigned int d = 0; d < dim; ++d)
@@ -2748,7 +2747,7 @@ namespace Functions
                          const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     double sum = 0;
     for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
@@ -2790,7 +2789,7 @@ namespace Functions
                             const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
 

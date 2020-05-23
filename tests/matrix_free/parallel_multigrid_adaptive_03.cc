@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,7 +81,7 @@ public:
       addit_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
     addit_data.tasks_block_size = 3;
-    addit_data.level_mg_handler = level;
+    addit_data.mg_level         = level;
     AffineConstraints<double> constraints;
     if (level == numbers::invalid_unsigned_int)
       {
@@ -604,7 +604,7 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
     mg_interface_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<number>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<number>,
@@ -649,7 +649,7 @@ test()
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       deallog.push("nothread");
       do_test<dim, fe_degree, fe_degree + 1, Number>(dof, false);
@@ -674,5 +674,4 @@ main(int argc, char **argv)
   test<2, 1, double>();
   test<2, 2, float>();
   test<3, 1, double>();
-  test<3, 1, float>();
 }

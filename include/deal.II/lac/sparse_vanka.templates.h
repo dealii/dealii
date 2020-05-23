@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_sparse_vanka_templates_h
 #define dealii_sparse_vanka_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
@@ -652,10 +654,8 @@ template <typename number>
 std::size_t
 SparseBlockVanka<number>::memory_consumption() const
 {
-  std::size_t mem = SparseVanka<number>::memory_consumption();
-  for (size_type i = 0; i < dof_masks.size(); ++i)
-    mem += MemoryConsumption::memory_consumption(dof_masks[i]);
-  return mem;
+  return SparseVanka<number>::memory_consumption() +
+         MemoryConsumption::memory_consumption(dof_masks);
 }
 
 

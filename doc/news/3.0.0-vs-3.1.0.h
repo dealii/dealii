@@ -41,7 +41,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: In multithreading mode, the compile flags now also have 
+       New: In multithreading mode, the compile flags now also have
        <code class="program">_REENTRANT</code> defined. If this flag
        is defined, then the standard Unix headers also declare
        reentrant versions (with suffix <code class="program">_r</code>)
@@ -65,13 +65,13 @@ All entries are signed with the names of the author.
   <li> <p>
        New: the <code class="program">step-9</code> example program is
        now ready, showing several advanced programming techniques in
-       deal.II. 
+       deal.II.
        <br>
        (WB 2000/07/18)
        </p>
 
   <li> <p>
-       Changed: deal.II now uses the 
+       Changed: deal.II now uses the
        <code class="program">kdoc2</code> program to generate the API
        documentation. This makes up for much nices documentation and
        also works better than the previous <code class="program">kdoc1</code>.
@@ -92,8 +92,8 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fixed: the 
-       <code class="program">common/scripts/make_dependencies.pl</code> 
+       Fixed: the
+       <code class="program">common/scripts/make_dependencies.pl</code>
        script that sets up the dependencies for the make files had a
        problem when the path to the library included special characters
        such as `+'. This is now fixed.
@@ -126,16 +126,16 @@ All entries are signed with the names of the author.
   <li> <p>
        Improved: the <code class="program">configure</code> script is
        now used to select the compiler options. Previously, selection
-       of compiler options was done both in 
+       of compiler options was done both in
        <code class="program">configure</code> as well as in the global
-       options Makefile 
+       options Makefile
        <code class="program">common/Make.global_options</code>.
        <br>
        (WB 2000/06/02)
        </p>
 
   <li> <p>
-       Improved: Dependence on the files 
+       Improved: Dependence on the files
        <code class="file">forward_declarations.h</code> has been widely
        removed to improve compilation time
        <br>
@@ -144,7 +144,7 @@ All entries are signed with the names of the author.
 
 
   <li> <p>
-       Fix: <code class="program">configure</code> now uses 
+       Fix: <code class="program">configure</code> now uses
        <code class="program">config.guess</code> to determine the
        operating system and hardware platform.
        <br>
@@ -186,7 +186,7 @@ All entries are signed with the names of the author.
        <code>memory_consumption</code> that returns an
        estimate of the amount of memory (in bytes) used up by this
        class. Supporting functions to compute the size of STL vectors
-       and other objects can be found the 
+       and other objects can be found the
        <code>MemoryConsumption</code> namespace.
        <br>
        (WB 2000/11/27)
@@ -209,7 +209,7 @@ All entries are signed with the names of the author.
        faces in 3d computations).
        <br>
        (WB 2000/09/07)
-       </p>       
+       </p>
 
   <li> <p>
        New: There is a new <code>distance</code> function
@@ -217,9 +217,9 @@ All entries are signed with the names of the author.
        distance between two points.
        <br>
        (Ralf Hartmann 2000/09/06)
-       </p>   
+       </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>Timer</code> now uses the system
        function <code>getrusage (RUSAGE_CHILDREN,
        .)</code> that is need in multithreading. But still the <code
@@ -228,7 +228,7 @@ All entries are signed with the names of the author.
        0 (at least on Solaris7).
        <br>
        (Ralf Hartmann 2000/08/25)
-       </p>   
+       </p>
 
   <li> <p>
        New: There are now a set of functions
@@ -236,10 +236,10 @@ All entries are signed with the names of the author.
        product of tensors.
        <br>
        (WB 2000/07/23)
-       </p>       
+       </p>
 
   <li> <p>
-       New: The classes 
+       New: The classes
        <code>Patterns::Integer</code>
        and <code>Patterns::Double</code> now allow that
        a range may be specified in which the parameter shall
@@ -321,7 +321,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: There are now functions 
+       New: There are now functions
        <code>SparsityPattern::symmetrize</code> and
        <code>SparseMatrix::symmetrize</code> that
        generate a symmetric matrix from a non-symmetric one.
@@ -338,13 +338,13 @@ All entries are signed with the names of the author.
        (WB 2000/11/27)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>
        SparseMatrix<number>::n_actually_nonzero_elements</code>
        returns the number of entries that are actually nonzero.
        <br>
        (Ralf Hartmann 2000/11/22)
-       </p>       
+       </p>
 
   <li> <p>
        Fixed: unlike announced in the docs, the
@@ -353,11 +353,10 @@ All entries are signed with the names of the author.
        fixed now.
        <br>
        (GK 2000/08/28)
-       </p>       
+       </p>
 
   <li> <p>
-       Improved: <code>PreconditionBlockSOR</code><code
-       class="member">::Tvmult(...)</code> is implemented.
+       Improved: <code>PreconditionBlockSOR::Tvmult()</code> is implemented.
        <br>
        (GK 2000/07/07)
        </p>
@@ -368,7 +367,7 @@ All entries are signed with the names of the author.
        of <code>SolverBicgstab::AdditionalData</code>.
        <br>
        (GK 2000/07/07)
-       </p>       
+       </p>
 
   <li> <p>
        New: <code>SolverRichardson</code> has a
@@ -388,13 +387,13 @@ All entries are signed with the names of the author.
        (GK 2000/06/30)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: For recognizing a diverging solver before the maximum
-       number of steps is reached, 
-       <code>SolverControl</code> returns 
+       number of steps is reached,
+       <code>SolverControl</code> returns
        <code>failure</code> also if the residual
        increases over the start residual by a specific factor. This
-       factor is given to the <code>SolverControl</code> 
+       factor is given to the <code>SolverControl</code>
        object by the <code>set_failure_criterion</code>
        function. After calling the latter function, checking of this
        additional failure criterion may again be disabled by calling
@@ -429,7 +428,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: 
+       Fix:
        <code>SparsityPattern::print_gnuplot</code>
        wrote rows and columns exchanged. Since most matrices have
        symmetric sparsity patterns, this has gone unnoticed by now.
@@ -438,7 +437,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: the 
+       Fix: the
        <code>FullMatrix::Tvmult</code> function
        suffered from the same problems as the
        <code>FullMatrix::Tmmult</code> function. This
@@ -464,10 +463,10 @@ All entries are signed with the names of the author.
   <li> <p>
        New: <code>BlockIndices</code>: Class that
        manages the conversion of global indices into a block
-       vector/matrix/... to the indices local to each of the blocks. 
+       vector/matrix/... to the indices local to each of the blocks.
        <br>
        (WB 2000/05/08)
-       </p>  
+       </p>
 
   <li> <p>
        New: <code>BlockSparsityPattern</code> and
@@ -475,23 +474,23 @@ All entries are signed with the names of the author.
        represent matrices that are composed of sparse matrices.
        <br>
        (WB 2000/05/08)
-       </p>  
+       </p>
 
   <li> <p>
-       Fix: the 
+       Fix: the
        <code>FullMatrix::mmult</code> and
        <code>FullMatrix::Tmmult</code> code don't
        resize their output argument any more, as this is not common
-       style in the library. Furthermore, 
+       style in the library. Furthermore,
        <code>FullMatrix::Tmmult</code> was utterly
-       broken. 
+       broken.
        <br>
        (WB 2000/05/08)
        </p>
 
   <li> <p>
        Change: the <code>matrix_norm</code> functions
-       of sparse and full matrices are renamed to 
+       of sparse and full matrices are renamed to
        <code>matrix_norm_square</code>, since they in
        fact return the square of the norm. This should avoid confusion
        in some cases.
@@ -500,7 +499,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: the ``copy-like'' constructor of 
+       Fix: the ``copy-like'' constructor of
        <code>SparsityPattern</code> that copies another
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.
@@ -519,7 +518,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: there are now functions <code>Vector::swap</code> 
+       New: there are now functions <code>Vector::swap</code>
        and <code>BlockVector::swap</code>, as well as
        global functions <code>swap(u,v)</code> that
        exchange the data of two vectors without needing a temporary
@@ -537,7 +536,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        Change: the solver classes in LAC lost their first template
-       argument. Their names are now 
+       argument. Their names are now
        <code>SolverXX&lt;VECTOR&gt;</code>, where
        <code>XX</code> denotes the name of the solver
        (e.g. CG, GMRES, etc). Furthermore, the
@@ -587,17 +586,17 @@ All entries are signed with the names of the author.
   <li> <p>
        Extend: <code>DoFTools::extract_boundary_dofs</code>
        now allows to also specify which boundary conditions shall be
-       considered. 
+       considered.
        <br>
        (WB 2000/12/04)
        </p>
 
   <li> <p>
-       New: some arguments of the functions 
+       New: some arguments of the functions
        <code>DoFHandler::n_boundary_dofs</code>,
        <code>DoFTools::extract_boundary_dofs</code>,
        and
-       <code>DoFTools::map_dof_to_boundary_indices</code> 
+       <code>DoFTools::map_dof_to_boundary_indices</code>
        are changed from <code>list</code> to
        <code>set</code>, since that resembles more
        closely the purpose of the parameter, and makes computations
@@ -655,9 +654,9 @@ All entries are signed with the names of the author.
        class can handle boundary information in 3d as well
        (i.e. lines and quads in 3d with special material IDs).
        <br>
-       (<a href="mailto://ms@biomech.tu-graz.ac.at">Michael 
+       (<a href="mailto://ms@biomech.tu-graz.ac.at">Michael
         Stadler</a> 2000/10/11)
-       </p>       
+       </p>
 
   <li> <p>
        Extended: The <code>GridIn</code>
@@ -666,7 +665,7 @@ All entries are signed with the names of the author.
        <br>
        (<a href="mailto://ms@biomech.tu-graz.ac.at">Michael
         Stadler</a> 2000/10/11)
-       </p>       
+       </p>
 
   <li> <p>
        New: The <code>GridRefinement::refine_and_coarsen_optimize</code>
@@ -674,7 +673,7 @@ All entries are signed with the names of the author.
        refinement and coarsening.
        <br>
        (Thomas Richter 2000/10/10)
-       </p>       
+       </p>
 
   <li> <p>
        Extended: The <code>GridIn::delete_unused_vertices</code>
@@ -688,14 +687,14 @@ All entries are signed with the names of the author.
        to the triangulation object.
        <br>
        (WB 2000/09/26)
-       </p>       
+       </p>
 
   <li> <p>
        New: The <code>GridIn</code>
        class can now read the basics of grids in DB Mesh format.
        <br>
        (WB 2000/09/26)
-       </p>       
+       </p>
 
   <li> <p>
        Extended: The <code>KellyErrorEstimator</code>
@@ -704,7 +703,7 @@ All entries are signed with the names of the author.
        <code>DoFHandler</code> object.
        <br>
        (WB 2000/09/11)
-       </p>       
+       </p>
 
   <li> <p>
        New: The <code>DataOut_Faces</code> class allows to
@@ -713,10 +712,10 @@ All entries are signed with the names of the author.
        cuts through the domain.
        <br>
        (WB 2000/09/07)
-       </p>       
+       </p>
 
   <li> <p>
-       Removed: The 
+       Removed: The
        <code>DataOut_Old</code> class has finally gone for
        good. It was already deprecated in version 3.0, and has been
        superceded for a long time by the framework of classes around
@@ -738,7 +737,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Changed: The 
+       Changed: The
        <code>map_dof_to_boundary_index</code>
        functions have been moved from the <code>DoFHandler</code>
        to the <code>DoFTools</code> class, in order to
@@ -817,7 +816,7 @@ All entries are signed with the names of the author.
        were dormant, since the values of finite elements are always
        computed for the presently available Lagrange elements, but
        would have been activated once there are other classes of
-       elements. 
+       elements.
        <br>
        (Ralf Hartmann 2000/07/20)
        </p>
@@ -834,13 +833,12 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: Function <code>VectorTools</code><code
-       class="member">::compute_mean_value</code> integrates the mean
-       value of one component of a finite element function.
+       New: Function <code>VectorTools::compute_mean_value()</code> integrates
+       the mean value of one component of a finite element function.
        <br>
        (GK 2000/07/12)
        </p>
-       
+
   <li> <p>
        New: The new function <code>get_face</code>
        of <code>FEFaceValues</code> and <code
@@ -864,7 +862,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: slight bug in 
+       Fix: slight bug in
        <code>DataOut::build_patches</code>
        in multithreaded mode fixed.
        <br>
@@ -883,7 +881,7 @@ All entries are signed with the names of the author.
        </p>
 
        <p>
-       Removed: The obsolete 
+       Removed: The obsolete
        <code>MatrixCreator::create_interpolation_matrix</code>
        function is now removed.
        </p>
@@ -916,14 +914,14 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Changed: enum 
-       <code>MeshSmoothing</code> is moved into the 
+       Changed: enum
+       <code>MeshSmoothing</code> is moved into the
        <code>Triangulation</code> class.
        <br>
        (Ralf Hartmann 2000/05/18)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>Triangulation<dim>::patch_level_1</code>
        is a new mesh smoothing. A mesh of patch level 1 consists of
        patches, i.e. they consists of cells that are all refined at
@@ -941,14 +939,14 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Changed: the 
+       Changed: the
        <code>MatrixTools::apply_boundary_values</code>
        now uses a much faster algorithm when working on matrices with
        symmetric sparsity patterns. On the other hand, it does no more
        eliminate whole rows when a matrix has a non-symmetric sparsity
        pattern, or if the user (through a new flag) tells the function
        that this is not necessary, for example if the matrix itself is
-       non-symmetric. 
+       non-symmetric.
        </p>
 
        <p>
@@ -997,40 +995,40 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Changed: The computation of the Jacobian matrices in the 
+       Changed: The computation of the Jacobian matrices in the
        <code>FEValues</code> class is now done more
        efficiently. The speedup is in the range of a factor of 40 for
-       3D. 
+       3D.
        <br>
        (John Burnell, WB 2000/05/16)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Change: <code>DoFTools::make_hanging_node_constraints ()</code>
        does not use the user flags any more, and can thus run in
-       parallel more than once. 
+       parallel more than once.
        <br>
        (WB 2000/05/15)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Extended: <code>DoFTools::make_sparsity_pattern ()</code>
        now accepts a template parameter as sparsity pattern. This
-       allows to use this function for the usual 
-       <code>SparsityPattern</code>, or for 
+       allows to use this function for the usual
+       <code>SparsityPattern</code>, or for
        <code>BlockSparsityPattern</code> arguments.
        <br>
        (WB 2000/05/15)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>DoFTools::extract_hanging_node_dofs ()</code>
        identifies nodes that will be constrained by hanging node constraints.
        <br>
        (WB 2000/05/12)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>DoFRenumbering::sort_selected_dofs_back ()</code>
        sorts selected degrees of freedom to the end of the index
        range.
@@ -1038,7 +1036,7 @@ All entries are signed with the names of the author.
        (WB 2000/05/12)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Change: the return value of
        <code>DoFHandler::max_couplings_between_dofs ()</code>
        is bounded by <code>DoFHandler::n_dofs()</code>.
@@ -1046,23 +1044,23 @@ All entries are signed with the names of the author.
        (Ralf Hartmann 2000/05/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>FEValuesBase::get_cell ()</code>
        returns present cell.
        <br>
        (Ralf Hartmann 2000/05/11)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Fix: <code>FESystem::reinit()</code> generated
-       an exception if <code>update_support_points</code> 
+       an exception if <code>update_support_points</code>
        was set.
        <br>
        (WB 2000/05/10)
        </p>
 
-  <li> <p> 
-       New: <code>IntergridMap::get_{source,destination}_grid</code> 
+  <li> <p>
+       New: <code>IntergridMap::get_{source,destination}_grid</code>
        functions return the grids for which the map was created.
        <br>
        (WB 2000/04/19)
@@ -1077,7 +1075,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: <code>DoFTools::extract_boundary_dofs</code> 
+       New: <code>DoFTools::extract_boundary_dofs</code>
        finds all degrees of freedom which are at the boundary and belong to
        specified components.
        <br>
@@ -1085,7 +1083,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: <code>DoFTools::compute_intergrid_constraints</code> 
+       New: <code>DoFTools::compute_intergrid_constraints</code>
        allows to use different discretization grids for different
        variables.
        <br>
@@ -1095,7 +1093,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: <code>DataOut::clear_data_vectors</code>
        allows to re-use an object without deleting the <code
-       class="class">DoFHandler</code>. 
+       class="class">DoFHandler</code>.
        <br>
        (GK 2000/04/05)
        </p>

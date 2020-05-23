@@ -17,6 +17,8 @@
 #define dealii_vector_element_access_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/trilinos_epetra_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 

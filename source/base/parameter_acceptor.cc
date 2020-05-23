@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2019 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -56,82 +56,29 @@ void
 ParameterAcceptor::initialize(
   const std::string &                 filename,
   const std::string &                 output_filename,
-  const ParameterHandler::OutputStyle output_style_for_prm_format,
-  ParameterHandler &                  prm)
+  const ParameterHandler::OutputStyle output_style_for_output_filename,
+  ParameterHandler &                  prm,
+  const ParameterHandler::OutputStyle output_style_for_filename)
 {
   declare_all_parameters(prm);
   if (!filename.empty())
     {
-      // check the extension of input file
-      if (filename.substr(filename.find_last_of('.') + 1) == "prm")
+      try
         {
-          try
-            {
-              prm.parse_input(filename);
-            }
-          catch (const dealii::PathSearch::ExcFileNotFound &)
-            {
-              std::ofstream out(filename);
-              Assert(out, ExcIO());
-              prm.print_parameters(out, ParameterHandler::Text);
-              out.close();
-              AssertThrow(false,
-                          ExcMessage("You specified <" + filename +
-                                     "> as input " +
-                                     "parameter file, but it does not exist. " +
-                                     "We created it for you."));
-            }
+          prm.parse_input(filename);
         }
-      else if (filename.substr(filename.find_last_of('.') + 1) == "xml")
+      catch (const dealii::PathSearch::ExcFileNotFound &)
         {
-          std::ifstream is(filename);
-          if (!is)
-            {
-              std::ofstream out(filename);
-              Assert(out, ExcIO());
-              prm.print_parameters(out, ParameterHandler::XML);
-              out.close();
-              AssertThrow(false,
-                          ExcMessage("You specified <" + filename +
-                                     "> as input " +
-                                     "parameter file, but it does not exist. " +
-                                     "We created it for you."));
-            }
-          prm.parse_input_from_xml(is);
+          prm.print_parameters(filename, output_style_for_filename);
+          AssertThrow(false,
+                      ExcMessage("You specified <" + filename + "> as input " +
+                                 "parameter file, but it does not exist. " +
+                                 "We created it for you."));
         }
-      else
-        AssertThrow(
-          false,
-          ExcMessage(
-            "Invalid extension of parameter file. Please use .prm or .xml"));
     }
 
   if (!output_filename.empty())
-    {
-      std::ofstream outfile(output_filename.c_str());
-      Assert(outfile, ExcIO());
-      std::string extension =
-        output_filename.substr(output_filename.find_last_of('.') + 1);
-
-      if (extension == "prm")
-        {
-          outfile << "# Parameter file generated with " << std::endl
-                  << "# DEAL_II_PACKAGE_VERSION = " << DEAL_II_PACKAGE_VERSION
-                  << std::endl;
-          Assert(
-            output_style_for_prm_format == ParameterHandler::Text ||
-              output_style_for_prm_format == ParameterHandler::ShortText,
-            ExcMessage(
-              "Only Text or ShortText can be specified in output_style_for_prm_format."))
-            prm.print_parameters(outfile, output_style_for_prm_format);
-        }
-      else if (extension == "xml")
-        prm.print_parameters(outfile, ParameterHandler::XML);
-      else if (extension == "latex" || extension == "tex")
-        prm.print_parameters(outfile, ParameterHandler::LaTeX);
-      else
-        AssertThrow(false, ExcNotImplemented());
-    }
+    prm.print_parameters(output_filename, output_style_for_output_filename);
 
   // Finally do the parsing.
   parse_all_parameters(prm);

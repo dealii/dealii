@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/signaling_nan.h>
 
 #include <deal.II/lac/lapack_support.h>
-#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <array>
@@ -211,6 +210,28 @@ namespace Utilities
 
 #ifndef DOXYGEN
 
+namespace internal
+{
+  namespace UtilitiesImplementation
+  {
+    // We want to avoid including our own LAPACK wrapper header in any external
+    // headers to avoid possible conflicts with other packages that may define
+    // their own such header. At the same time we want to be able to call some
+    // LAPACK functions from the template functions below. To resolve both
+    // problems define some extra wrappers here that can be in the header:
+    template <typename Number>
+    void
+    call_stev(const char            jobz,
+              const types::blas_int n,
+              Number *              d,
+              Number *              e,
+              Number *              z,
+              const types::blas_int ldz,
+              Number *              work,
+              types::blas_int *     info);
+  } // namespace UtilitiesImplementation
+} // namespace internal
+
 namespace Utilities
 {
   namespace LinearAlgebra
@@ -380,14 +401,14 @@ namespace Utilities
       std::vector<double>   work;    // ^^
       types::blas_int       info;
       // call lapack_templates.h wrapper:
-      stev("N",
-           &n,
-           diagonal.data(),
-           subdiagonal.data(),
-           Z.data(),
-           &ldz,
-           work.data(),
-           &info);
+      internal::UtilitiesImplementation::call_stev('N',
+                                                   n,
+                                                   diagonal.data(),
+                                                   subdiagonal.data(),
+                                                   Z.data(),
+                                                   ldz,
+                                                   work.data(),
+                                                   &info);
 
       Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
 
@@ -445,11 +466,11 @@ namespace Utilities
       // algorithm verbatim:
       //
       // [Y]=chebyshev_filter_scaled(X, m, a, b, aL).
-      // e=(b−a)/2; c=(a+b)/2; σ=e/(c−aL); τ=2/σ;
-      // Y=(H∗X−c∗X)∗(σ/e);
+      // e=(b-a)/2; c=(a+b)/2; σ=e/(c-aL); τ=2/σ;
+      // Y=(H∗X-c∗X)∗(σ/e);
       // for i=2 to m do
-      //   σnew =1/(τ −σ);
-      //   Yt =(H∗Y−c∗Y)∗(2∗σnew/e)−(σ∗σnew)∗X;
+      //   σnew =1/(τ - σ);
+      //   Yt =(H∗Y - c∗Y)∗(2∗σnew/e)-(σ∗σnew)∗X;
       //   X =Y; Y =Yt; σ =σnew;
 
       const double e     = (b - a) / 2.;

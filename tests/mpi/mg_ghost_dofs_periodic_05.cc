@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,7 @@ test()
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (f / 2 != 1 && cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f + 10);
 
@@ -72,7 +72,7 @@ test()
   deallog << "Number of cells: " << tria.n_global_active_cells() << std::endl
           << "Number of DoFs: " << dof_handler.n_dofs() << std::endl;
 
-  dof_handler.distribute_mg_dofs(fe);
+  dof_handler.distribute_mg_dofs();
   deallog << "Number of DoFs per level: ";
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
     deallog << dof_handler.n_dofs(level) << " ";

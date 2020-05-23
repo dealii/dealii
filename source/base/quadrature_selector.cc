@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,10 +25,15 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
                                            const unsigned int order)
 {
   if (s == "gauss")
-    {
-      AssertThrow(order >= 1, ExcInvalidQGaussOrder(order));
-      return QGauss<dim>(order);
-    }
+    return QGauss<dim>(order);
+  else if (s == "gauss_lobatto")
+    return QGaussLobatto<dim>(order);
+  else if (s == "gauss_chebyshev")
+    return QGaussChebyshev<dim>(order);
+  else if (s == "gauss_radau_chebyshev")
+    return QGaussRadauChebyshev<dim>(order);
+  else if (s == "gauss_lobatto_chebyshev")
+    return QGaussLobattoChebyshev<dim>(order);
   else
     {
       AssertThrow(order == 0, ExcInvalidOrder(s, order));
@@ -68,7 +73,8 @@ template <int dim>
 std::string
 QuadratureSelector<dim>::get_quadrature_names()
 {
-  return std::string("gauss|midpoint|milne|simpson|trapez|weddle");
+  return std::string(
+    "gauss|gauss_lobatto|gauss_chebyshev|gauss_radau_chebyshev|gauss_lobatto_chebyshev|midpoint|milne|simpson|trapez|weddle");
 }
 
 

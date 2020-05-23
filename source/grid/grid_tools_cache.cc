@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,6 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
-
-#include <boost/geometry.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -114,6 +112,7 @@ namespace GridTools
         for (const auto &it : used_vertices)
           vertices[i++] = std::make_pair(it.second, it.first);
         used_vertices_rtree = pack_rtree(vertices);
+        update_flags        = update_flags & ~update_used_vertices_rtree;
       }
     return used_vertices_rtree;
   }
@@ -137,6 +136,7 @@ namespace GridTools
           boxes[i++] = std::make_pair(mapping->get_bounding_box(cell), cell);
 
         cell_bounding_boxes_rtree = pack_rtree(boxes);
+        update_flags = update_flags & ~update_cell_bounding_boxes_rtree;
       }
     return cell_bounding_boxes_rtree;
   }
@@ -181,7 +181,7 @@ namespace GridTools
 
         std::vector<BoundingBox<spacedim>> bbox_v(1, bbox);
         if (const auto tria_mpi =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &(*tria)))
           {
             covering_rtree = GridTools::build_global_description_tree(

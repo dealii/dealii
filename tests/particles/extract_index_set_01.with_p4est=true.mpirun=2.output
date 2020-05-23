@@ -1,0 +1,11 @@
+
+DEAL:0:2d/2d::Local set: {0, 2, [11,13], [15,17], 19}
+DEAL:0:2d/2d::
+DEAL:0:3d/3d::Local set: {[1,2], 6, [8,11], 13, 17, 19}
+DEAL:0:3d/3d::
+
+DEAL:1:2d/2d::Local set: {1, [3,10], 14, 18}
+DEAL:1:2d/2d::
+DEAL:1:3d/3d::Local set: {0, [3,5], 7, 12, [14,16], 18}
+DEAL:1:3d/3d::
+

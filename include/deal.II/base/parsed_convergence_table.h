@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_integrate_difference.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -200,7 +200,7 @@ public:
    * output_table() also writes in this file in the format deduced from its
    * extension;
    * @param precision How many digits to use when writing the error;
-   * @param compute_error Control wether the filling of the table is enabled
+   * @param compute_error Control whether the filling of the table is enabled
    * or not. This flag may be used to disable at run time any error computation;
    *
    * The parameters you specify with this constructor can be written to a
@@ -245,13 +245,13 @@ public:
   ParsedConvergenceTable(
     const std::vector<std::string> &                    component_names,
     const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms,
-    const double &                                      exponent,
+    const double                                        exponent,
     const std::set<std::string> &                       extra_columns,
     const std::string &                                 rate_key,
     const std::string &                                 rate_mode,
     const std::string &                                 error_file_name,
-    const unsigned int &                                precision,
-    const bool &                                        compute_error);
+    const unsigned int                                  precision,
+    const bool                                          compute_error);
 
   /**
    * Attach all the parameters in this class to entries of the parameter
@@ -362,7 +362,7 @@ public:
   void
   add_extra_column(const std::string &            column_name,
                    const std::function<double()> &custom_function,
-                   const bool &                   compute_rate = true);
+                   const bool                     compute_rate = true);
 
   /**
    * Difference between two solutions in the same vector space.
@@ -566,7 +566,7 @@ ParsedConvergenceTable::error_from_exact(
       AssertDimension(exact.n_components, n_components);
       AssertDimension(dh.get_fe().n_components(), n_components);
 
-      const unsigned int n_active_cells =
+      const types::global_cell_index n_active_cells =
         dh.get_triangulation().n_global_active_cells();
       const unsigned int n_dofs = dh.n_dofs();
 

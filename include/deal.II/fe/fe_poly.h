@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,10 @@
 #define dealii_fe_poly_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe.h>
@@ -29,8 +32,10 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class gives a unified framework for the implementation of
- * FiniteElement classes based on polynomial spaces like the
- * TensorProductPolynomials or PolynomialSpace classes.
+ * FiniteElement classes based on scalar polynomial spaces like the
+ * TensorProductPolynomials or PolynomialSpace classes. This
+ * class has a corresponding class for tensor-valued finite
+ * elements in the FE_PolyTensor class.
  *
  * Every class that has the following public member variables and
  * functions can be used as template parameter @p PolynomialType.
@@ -38,12 +43,12 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  *  static const unsigned int dimension;
  *
- *  void compute (const Point<dim>            &unit_point,
- *                std::vector<double>         &values,
- *                std::vector<Tensor<1,dim> > &grads,
- *                std::vector<Tensor<2,dim> > &grad_grads,
- *                std::vector<Tensor<3,dim> > &third_derivatives,
- *                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+ *  void evaluate (const Point<dim>            &unit_point,
+ *                 std::vector<double>         &values,
+ *                 std::vector<Tensor<1,dim> > &grads,
+ *                 std::vector<Tensor<2,dim> > &grad_grads,
+ *                 std::vector<Tensor<3,dim> > &third_derivatives,
+ *                 std::vector<Tensor<4,dim> > &fourth_derivatives) const;
  *
  *  double compute_value (const unsigned int i,
  *                        const Point<dim> &p) const;
@@ -66,19 +71,22 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann 2004, Guido Kanschat, 2009
  */
 
-template <class PolynomialType,
-          int dim      = PolynomialType::dimension,
-          int spacedim = dim>
+template <int dim, int spacedim = dim>
 class FE_Poly : public FiniteElement<dim, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Poly(const PolynomialType &            poly_space,
+  FE_Poly(const ScalarPolynomialsBase<dim> &poly_space,
           const FiniteElementData<dim> &    fe_data,
           const std::vector<bool> &         restriction_is_additive_flags,
           const std::vector<ComponentMask> &nonzero_components);
+
+  /**
+   * Copy constructor.
+   */
+  FE_Poly(const FE_Poly &fe);
 
   /**
    * Return the polynomial degree of this finite element, i.e. the value
@@ -90,6 +98,12 @@ public:
   // for documentation, see the FiniteElement base class
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
+
+  /**
+   * Return the underlying polynomial space.
+   */
+  const ScalarPolynomialsBase<dim> &
+  get_poly_space() const;
 
   /**
    * Return the numbering of the underlying polynomial space compared to
@@ -223,6 +237,12 @@ public:
                                  const Point<dim> & p,
                                  const unsigned int component) const override;
 
+  /**
+   * Return an estimate (in bytes) for the memory consumption of this object.
+   */
+  virtual std::size_t
+  memory_consumption() const override;
+
 protected:
   /*
    * NOTE: The following function has its definition inlined into the class
@@ -301,12 +321,12 @@ protected:
                         update_3rd_derivatives))
       for (unsigned int i = 0; i < n_q_points; ++i)
         {
-          poly_space.compute(quadrature.point(i),
-                             values,
-                             grads,
-                             grad_grads,
-                             third_derivatives,
-                             fourth_derivatives);
+          poly_space->evaluate(quadrature.point(i),
+                               values,
+                               grads,
+                               grad_grads,
+                               third_derivatives,
+                               fourth_derivatives);
 
           // the values of shape functions at quadrature points don't change.
           // consequently, write these values right into the output array if
@@ -445,6 +465,30 @@ protected:
   };
 
   /**
+   * Correct the shape Hessians by subtracting the terms corresponding to the
+   * Jacobian pushed forward gradient.
+   *
+   * Before the correction, the Hessians would be given by
+   * @f[
+   * D_{ijk} = \frac{d^2\phi_i}{d \hat x_J d \hat x_K} (J_{jJ})^{-1}
+   * (J_{kK})^{-1},
+   * @f]
+   * where $J_{iI}=\frac{d x_i}{d \hat x_I}$. After the correction, the
+   * correct Hessians would be given by
+   * @f[
+   * \frac{d^2 \phi_i}{d x_j d x_k} = D_{ijk} - H_{mjk} \frac{d \phi_i}{d x_m},
+   * @f]
+   * where $H_{ijk}$ is the Jacobian pushed-forward derivative.
+   */
+  void
+  correct_hessians(
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &                mapping_data,
+    const unsigned int n_q_points) const;
+
+  /**
    * Correct the shape third derivatives by subtracting the terms
    * corresponding to the Jacobian pushed forward gradient and second
    * derivative.
@@ -472,14 +516,13 @@ protected:
       &output_data,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &                mapping_data,
-    const unsigned int n_q_points,
-    const unsigned int dof) const;
+    const unsigned int n_q_points) const;
+
 
   /**
-   * The polynomial space. Its type is given by the template parameter
-   * PolynomialType.
+   * The polynomial space.
    */
-  PolynomialType poly_space;
+  const std::unique_ptr<ScalarPolynomialsBase<dim>> poly_space;
 };
 
 /*@}*/

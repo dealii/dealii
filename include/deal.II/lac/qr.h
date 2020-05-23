@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,12 @@
 #ifndef dealii_qr_h
 #define dealii_qr_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
-#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/utilities.h>
 
 #include <boost/signals2/signal.hpp>
@@ -44,7 +45,7 @@ class BaseQR
   /**
    * Number type for R matrix.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
 protected:
   /**
@@ -241,7 +242,7 @@ public:
   /**
    * Number type for R matrix.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
   /**
    * Default constructor.
@@ -350,7 +351,7 @@ public:
   /**
    * Number type for R matrix.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
   /**
    * Default constructor.
@@ -431,6 +432,41 @@ private:
 // -------------------  inline and template functions ----------------
 #ifndef DOXYGEN
 
+namespace internal
+{
+  namespace QRImplementation
+  {
+    // We want to avoid including our own LAPACK wrapper header in any external
+    // headers to avoid possible conflicts with other packages that may define
+    // their own such header. At the same time we want to be able to call some
+    // LAPACK functions from the template functions below. To resolve both
+    // problems define some extra wrappers here that can be in the header:
+    template <typename Number>
+    void
+    call_trmv(const char            uplo,
+              const char            trans,
+              const char            diag,
+              const types::blas_int n,
+              const Number *        a,
+              const types::blas_int lda,
+              Number *              x,
+              const types::blas_int incx);
+
+    template <typename Number>
+    void
+    call_trtrs(const char            uplo,
+               const char            trans,
+               const char            diag,
+               const types::blas_int n,
+               const types::blas_int nrhs,
+               const Number *        a,
+               const types::blas_int lda,
+               Number *              b,
+               const types::blas_int ldb,
+               types::blas_int *     info);
+  } // namespace QRImplementation
+} // namespace internal
+
 
 
 template <typename VectorType>
@@ -480,16 +516,16 @@ BaseQR<VectorType>::solve(Vector<Number> &      x,
   const int N     = this->current_size;
   const int n_rhs = 1;
   int       info  = 0;
-  trtrs("U",
-        transpose ? "T" : "N",
-        "N",
-        &N,
-        &n_rhs,
-        &this->R(0, 0),
-        &lda,
-        &x(0),
-        &ldb,
-        &info);
+  internal::QRImplementation::call_trtrs('U',
+                                         transpose ? 'T' : 'N',
+                                         'N',
+                                         N,
+                                         n_rhs,
+                                         &this->R(0, 0),
+                                         lda,
+                                         &x(0),
+                                         ldb,
+                                         &info);
 }
 
 
@@ -577,8 +613,8 @@ ImplicitQR<VectorType>::append_column(const VectorType &column)
       const int N     = this->current_size;
       const int n_rhs = 1;
       int       info  = 0;
-      trtrs(
-        "U", "T", "N", &N, &n_rhs, &this->R(0, 0), &lda, &u(0), &ldb, &info);
+      internal::QRImplementation::call_trtrs(
+        'U', 'T', 'N', N, n_rhs, &this->R(0, 0), lda, &u(0), ldb, &info);
 
       // finally get the diagonal element:
       // rho2 = |column|^2 - |u|^2
@@ -613,8 +649,8 @@ void
 ImplicitQR<VectorType>::apply_givens_rotation(const unsigned int i,
                                               const unsigned int k)
 {
-  Assert(i < k, ExcIndexRange(i, 0, k));
-  Assert(k < this->current_size, ExcIndexRange(k, 0, this->current_size));
+  AssertIndexRange(i, k);
+  AssertIndexRange(k, this->current_size);
   const std::array<Number, 3> csr =
     dealii::Utilities::LinearAlgebra::givens_rotation<Number>(this->R(i, k),
                                                               this->R(k, k));
@@ -749,8 +785,8 @@ void
 QR<VectorType>::apply_givens_rotation(const unsigned int i,
                                       const unsigned int k)
 {
-  Assert(i < k, ExcIndexRange(i, 0, k));
-  Assert(k < this->current_size, ExcIndexRange(k, 0, this->current_size));
+  AssertIndexRange(i, k);
+  AssertIndexRange(k, this->current_size);
   const std::array<Number, 3> csr =
     dealii::Utilities::LinearAlgebra::givens_rotation<Number>(this->R(i, k),
                                                               this->R(k, k));
@@ -786,7 +822,7 @@ template <typename VectorType>
 void
 QR<VectorType>::remove_column(const unsigned int k)
 {
-  Assert(k < this->current_size, ExcIndexRange(k, 0, this->current_size));
+  AssertIndexRange(k, this->current_size);
   Assert(this->current_size > 0,
          ExcMessage("Can not remove a column if QR is empty"));
   // apply a sequence of Givens rotations
@@ -850,7 +886,8 @@ QR<VectorType>::multiply_with_A(VectorType &y, const Vector<Number> &x) const
   const int      N    = this->current_size;
   const int      lda  = N;
   const int      incx = 1;
-  trmv("U", "N", "N", &N, &this->R(0, 0), &lda, &x1[0], &incx);
+  internal::QRImplementation::call_trmv(
+    'U', 'N', 'N', N, &this->R(0, 0), lda, &x1[0], incx);
 
   multiply_with_Q(y, x1);
 }
@@ -866,7 +903,8 @@ QR<VectorType>::multiply_with_AT(Vector<Number> &y, const VectorType &x) const
   const int N    = this->current_size;
   const int lda  = N;
   const int incx = 1;
-  trmv("U", "T", "N", &N, &this->R(0, 0), &lda, &y[0], &incx);
+  internal::QRImplementation::call_trmv(
+    'U', 'T', 'N', N, &this->R(0, 0), lda, &y[0], incx);
 }
 
 #endif // no DOXYGEN

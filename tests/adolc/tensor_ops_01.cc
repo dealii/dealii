@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim,
           typename number_t,
@@ -81,10 +80,11 @@ test_tensor()
 
   // Contractions
   const ad_number_t ad_res1 = scalar_product(adt1, adt2);
-  const ad_number_t ad_res2 = double_contract(adt1, adt2);
-  //  ad_res1 = double_contract(adt1,t1); // TODO: Not defined. Conflicting
-  //  number types ad_res1 = double_contract(t1,adt2); // TODO: Not defined.
-  //  Conflicting number types
+  const ad_number_t ad_res2 = double_contract<0, 0, 1, 1>(adt1, adt2);
+  // TODO: Not defined. Conflicting number types
+  // ad_res1 = double_contract(adt1,t1);
+  // TODO: Not defined. Conflicting number types
+  // ad_res1 = double_contract(t1,adt2);
   AD_Tensor adt7 = adt1 * adt2;
   adt7           = t1 * adt2;
   adt7           = adt1 * t1;

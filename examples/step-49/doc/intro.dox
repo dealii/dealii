@@ -6,12 +6,16 @@ were contributed by Yuhan Zhou, Wolfgang Bangerth, and David Wells.</i>
 This tutorial is an extension to step-1 and demonstrates several ways to
 obtain more involved meshes than the ones shown there.
 
+@note This tutorial is also available as a Jupyter Python notebook that
+  uses the deal.II python interface. The notebook is available in the
+  same directory as the original C++ program.
+
 Generating complex geometries is a challenging task, especially in three space
 dimensions. We will discuss several ways to do this, but this list is not
 exhaustive. Additionally, there is not one approach that fits all problems.
 
 This example program shows some of ways to create and modify meshes for
-computations and outputs them as <code>.eps</code> files in much the same way
+computations and outputs them as <code>.vtu</code> files in much the same way
 as we do in step-1. No other computations or adaptive
 refinements are done; the idea is that you can use the techniques used here as
 building blocks in other, more involved simulators. Please note that the
@@ -54,7 +58,7 @@ If there is no good fit in the GridGenerator namespace for what you want to
 do, you can always create a
 Triangulation in your program "by hand". For that, you need a list of vertices
 with their coordinates and a list of cells referencing those vertices. You can
-find an example in the function create_coarse_grid in step-14.
+find an example in the function <tt>create_coarse_grid()</tt> in step-14.
 All the functions in GridGenerator are implemented in this fashion.
 
 We are happy to accept more functions to be added to GridGenerator. So, if
@@ -69,37 +73,41 @@ disk. How this is done is explained in step-5 and can be seen in the function
 <code>grid_1</code> in this example, see the code below.
 
 Meshes can be generated from different tools like <a
-href="http://geuz.org/gmsh/" target="_top">gmsh</a>, <a
+href="http://gmsh.info" target="_top">gmsh</a>, <a
 href="https://lagrit.lanl.gov/" target="_top">lagrit</a> and <a
 href="http://cubit.sandia.gov/" target="_top">cubit</a>. See the
 documentation of GridIn for more information. The problem is that deal.II
 needs meshes that only consist of quadrilaterals and hexahedra -- tetrahedral
 meshes won't work (this means tools like tetgen can not be used directly).
 
-We will describe a possible workflow using Gmsh. Gmsh is the smallest and
+We will describe a possible workflow using %Gmsh. %Gmsh is the smallest and
 most quickly set up open source tool we are aware of. It can generate
-unstructured 2d quad meshes, but in 3d it can only extrude 2d meshes to
-get hexahedral meshes. 3D meshing of unstructured geometry into hexahedra is not
-supported at the time of writing this tutorial (early 2013).
+unstructured 2d quad meshes. In 3d, it can extrude 2d meshes to
+get hexahedral meshes; 3D meshing of unstructured geometry into hexahedra is
+possible, though there are some issues with the quality of these meshes
+that imply that these meshes only sometimes work in deal.II.
 
-In Gmsh, a mesh is described in a text based <code>.geo</code> file, that can
-contain computations, loops, variables, etc. It is very flexible. The mesh is
-generated from a surface representation, which is build from a list of line
-loops, which is build from a list of lines, which are in turn built from
+In %Gmsh, a mesh is fundamentally described in a text-based
+<code>.geo</code> file whose format can
+contain computations, loops, variables, etc. This format is quite flexible
+in allowing the description of complex geometries. The mesh is then
+generated from a surface representation, which is built from a list of line
+loops, which is built from a list of lines, which are in turn built from
 points. The <code>.geo</code> script can be written and edited by hand or it
-can be generated automatically by creating objects graphically inside Gmsh. In
+can be generated automatically by creating objects graphically inside %Gmsh. In
 many cases it is best to combine both approaches. The file can be easily
-reloaded by pressing "reload" under the "Geometry" tab.
+reloaded by pressing "reload" under the "Geometry" tab if you want to write
+it by hand and see the effects in the graphical user interface of gmsh.
 
-This tutorial contains an example <code>.geo</code> file, that describes a box
+This tutorial contains an example <code>.geo</code> file that describes a box
 with two objects cut out in the interior. This is how
-<code>example.geo</code> looks like in Gmsh (displaying the boundary
+<code>example.geo</code> looks like in %Gmsh (displaying the boundary
 indicators as well as the mesh discussed further down below):
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
 
 You might want to open the <code>example.geo</code> file in a text editor (it
-is located in the same directory as the <code>step-49.cc</code> source file) to
+is located in the same directory as the <tt>step-49.cc</tt> source file) to
 see how it is structured. You can see how the boundary of the domain is
 composed of a number of lines and how later on we combine several lines into
 "physical lines" (or "physical surfaces") that list the logical lines'
@@ -107,12 +115,12 @@ numbers. "Physical" object are the ones that carry information about the
 boundary indicator (see @ref GlossBoundaryIndicator "this glossary entry").
 
 @note It is important that this file contain "physical lines" and "physical
-surfaces". These give the boundary indicators and material ids for use
-in deal.II. Without these physical entities, nothing will be imported into
-deal.II.
+  surfaces". These give the boundary indicators and material ids for use
+  in deal.II. Without these physical entities, nothing will be imported into
+  deal.II.
 
 deal.II's GridIn class can read the <code>.msh</code> format written by
-Gmsh and that contains a mesh created for the geometry described by the
+%Gmsh and that contains a mesh created for the geometry described by the
 <code>.geo</code> file. You generate the <code>.msh</code> from the
 <code>.geo</code> by running the commands
 
@@ -120,12 +128,25 @@ Gmsh and that contains a mesh created for the geometry described by the
 gmsh -2 example.geo
 @endcode
 
-on the command line, or by clicking "Mesh" and then "2D" inside Gmsh after
+on the command line, or by clicking "Mesh" and then "2D" inside %Gmsh after
 loading the file.  Now this is the mesh read from the <code>.msh</code> file
 and saved again by deal.II as an image (see the <code>grid_1</code> function
 of the current program):
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
+
+@note %Gmsh has a number of other interfaces by which one can describe
+  geometries to it. In particular, it has the ability to interface with
+  scripting languages like Python and Julia, but it can also be scripted
+  from C++. These interfaces are useful if one doesn't just want to generate
+  a mesh for a single geometry (in which case the graphical interface or,
+  in simple cases, a hand-written `.geo` file is probably the simplest
+  approach), but instead wants to do parametric studies over the geometry
+  for which it is necessary to generate many meshes for geometries that
+  differ in certain parameters. Another case where this is useful is if there
+  is already a CAD geometry for which one only needs a mesh; indeed, this
+  can be done from within deal.II using the
+  Gmsh::create_triangulation_from_boundary_curve() function.
 
 
 <h3>Modifying a Mesh</h3>
@@ -192,9 +213,18 @@ demonstrated in <code>grid_7()</code> and the result is as follows:
 This function is primarily intended to negate some of the superconvergence
 effects one gets when studying convergence on regular meshes, as well as to
 suppress some optimizations in deal.II that can exploit the fact that cells
-are similar in shape. In practice, it is of course always better to
-work with a sequence of unstructured meshes (see possible extensions at the
-end of the this section).
+are similar in shape. (Superconvergence refers to the fact that if a mesh
+has certain symmetries -- for example, if the edges running into a vertex
+are symmetric to this vertex, and if this is so for all vertices of a cell
+-- that the solution is then often convergent with a higher order than one
+would have expected from the usual error analysis. In the end, this
+is a result of the fact that if one were to make a Taylor expansion of the
+error, the symmetry leads to the fact that the expected next term of the
+expansion happens to be zero, and the error order is determined by the
+*second next* term. A distorted mesh does not have these symmetries and
+consequently the error reflects what one will see when solving the equation
+on *any* kind of mesh, rather than showing something that is only reflective
+of a particular situation.)
 
 
 <h4>Merging Meshes</h4>
@@ -253,7 +283,7 @@ GridGenerator::extrude_triangulation(). See the <code>grid_4()</code> function
 in this tutorial for an example. Note that for this particular case, the given
 result could also be achieved using the 3d version of
 GridGenerator::hyper_cube_with_cylindrical_hole(). The main usage is a 2d
-mesh, generated for example with Gmsh, that is read in from a
+mesh, generated for example with %Gmsh, that is read in from a
 <code>.msh</code> file as described above. This is the output from grid_4():
 
 <table width="60%" align="center">
@@ -277,16 +307,3 @@ refinement. This is not difficult &mdash; in fact, there is nothing else to do
 often not the case if you have a more complex geometry and more steps than
 just creating the mesh are necessary. We will go over some of these steps in
 the <a href="#Results">results section</a> below.
-
-
-<!--
-
-Possible Extensions
-
-- Modify a mesh:
-  - change boundary indicators
-  - relax inner vertices
-- Database of unstructured meshes for convergence studies
-- discuss GridTools::extract_boundary_mesh
-- how to remove or disable a cell inside a mesh
--->

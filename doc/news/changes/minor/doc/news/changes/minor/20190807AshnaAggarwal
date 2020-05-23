@@ -1,6 +1,0 @@
-Improved: Fixed typos in step 4 documentation, including 
-"The deal.II library is build around..." to "The deal.II library is built around..." 
-and several capitlization mistakes. Also added hyperlink to step 7 to elucidate 
-how to check validity of numerical solution. 
-<br>
-(Ashna Aggarwal, 2019/08/07)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,17 +12,6 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
-
-
-for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
-  {
-    template void internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
-      reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
-  }
-
 
 
 for (deal_II_dimension : DIMENSIONS;
@@ -66,11 +55,18 @@ for (deal_II_dimension : DIMENSIONS;
         const std::vector<hp::QCollection<1>> &,
         const AdditionalData &);
 
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<deal_II_scalar_vectorized>::reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
+    template const DoFHandler<deal_II_dimension> &
+    MatrixFree<deal_II_dimension,
+               deal_II_scalar_vectorized::value_type,
+               deal_II_scalar_vectorized>::
+      get_dof_handler<DoFHandler<deal_II_dimension>>(const unsigned int) const;
+
+    template const hp::DoFHandler<deal_II_dimension>
+      &MatrixFree<deal_II_dimension,
+                  deal_II_scalar_vectorized::value_type,
+                  deal_II_scalar_vectorized>::
+        get_dof_handler<hp::DoFHandler<deal_II_dimension>>(const unsigned int)
+          const;
   }
 
 

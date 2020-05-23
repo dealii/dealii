@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,8 +20,6 @@
 // function Laplacians on a hypecube mesh with adaptive refinement.
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include "get_functions_common.h"
 

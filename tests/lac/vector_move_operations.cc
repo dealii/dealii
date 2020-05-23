@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@ main()
   {
     Vector<double> temp(10);
     Vector<double> w(std::move(temp));
-    deallog << "move constructor:  " << w;
+    deallog << "move constructor:  " << w << std::endl;
   }
 
   deallog << std::endl;
@@ -36,21 +36,21 @@ main()
     for (unsigned int i = 0; i < u.size(); ++i)
       u[i] = (double)(i + 1);
 
-    deallog << "vector:          " << u;
+    deallog << "vector:          " << u << std::endl;
 
     Vector<double> v;
     v = u;
-    deallog << "copy assignment: " << v;
-    deallog << "old object:      " << u;
+    deallog << "copy assignment: " << v << std::endl;
+    deallog << "old object:      " << u << std::endl;
 
     v = std::move(u);
-    deallog << "move assignment: " << v;
+    deallog << "move assignment: " << v << std::endl;
     deallog << "old object size: " << u.size() << std::endl;
 
     // and swap again with different sizes
     u.reinit(0);
     u = std::move(v);
-    deallog << "move assignment: " << u;
+    deallog << "move assignment: " << u << std::endl;
     deallog << "old object size: " << v.size() << std::endl;
   }
 }

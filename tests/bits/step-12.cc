@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -216,7 +216,7 @@ DGTransportEquation<dim>::assemble_boundary_term(
   Vector<double> &         cell_vector) const
 {
   const std::vector<double> &        JxW     = fe_v.get_JxW_values();
-  const std::vector<Tensor<1, dim>> &normals = fe_v.get_all_normal_vectors();
+  const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
   std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
   std::vector<double>     g(fe_v.n_quadrature_points);
@@ -249,7 +249,7 @@ DGTransportEquation<dim>::assemble_face_term1(
   FullMatrix<double> &         ue_vi_matrix) const
 {
   const std::vector<double> &        JxW     = fe_v.get_JxW_values();
-  const std::vector<Tensor<1, dim>> &normals = fe_v.get_all_normal_vectors();
+  const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
   std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
   beta_function.value_list(fe_v.get_quadrature_points(), beta);
@@ -282,7 +282,7 @@ DGTransportEquation<dim>::assemble_face_term2(
   FullMatrix<double> &         ue_ve_matrix) const
 {
   const std::vector<double> &        JxW     = fe_v.get_JxW_values();
-  const std::vector<Tensor<1, dim>> &normals = fe_v.get_all_normal_vectors();
+  const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
   std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
 
@@ -462,9 +462,7 @@ DGMethod<dim>::assemble_system1()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
@@ -637,9 +635,7 @@ DGMethod<dim>::assemble_system2()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2019 by the deal.II authors
+ * Copyright (C) 2011 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -500,29 +500,8 @@ namespace Step48
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3);
-
-    std::ofstream output(
-      filename + "." +
-      Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                               4) +
-      ".vtu");
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(timestep_number, 3) +
-                              "." + Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream master_output((filename + ".pvtu"));
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
   }
 
 
@@ -550,13 +529,11 @@ namespace Step48
             << Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) << std::endl;
       pcout << "Number of threads on each rank: "
             << MultithreadInfo::n_threads() << std::endl;
-      const unsigned int n_vect_doubles =
-        VectorizedArray<double>::n_array_elements;
-      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+      const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
+            << Utilities::System::get_current_vectorization_level() << ")"
             << std::endl
             << std::endl;
     }

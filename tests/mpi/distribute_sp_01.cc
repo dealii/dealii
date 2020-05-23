@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,8 @@
 
 
 
-// check SparsityTools::distribute_sparsity_pattern
+// check SparsityTools::distribute_sparsity_pattern with the slow part of
+// supplying the number of rows on all processes
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>

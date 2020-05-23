@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,11 +42,33 @@ namespace Differentiation
         const SD::types::substitution_map &substitution_map);
 
       /**
+       * Convert to a map of Expressions from its SymEngine counterpart.
+       */
+      SD::types::substitution_map
+      convert_basic_map_to_expression_map(
+        const SymEngine::map_basic_basic &substitution_map);
+
+      /**
        * Convert a vector of Expressions to its SymEngine counterpart.
        */
       SymEngine::vec_basic
       convert_expression_vector_to_basic_vector(
         const SD::types::symbol_vector &symbol_vector);
+
+      /**
+       * Convert to a vector of Expressions from its SymEngine counterpart.
+       */
+      SD::types::symbol_vector
+      convert_basic_vector_to_expression_vector(
+        const SymEngine::vec_basic &symbol_vector);
+
+      /**
+       * Convert to a vector of pairs of Expressions from its SymEngine
+       * counterpart.
+       */
+      std::vector<std::pair<Expression, Expression>>
+      convert_basic_pair_vector_to_expression_pair_vector(
+        const SymEngine::vec_pair &symbol_value_vector);
 
       /**
        * Extract the symbols (key entries) from a substitution map.

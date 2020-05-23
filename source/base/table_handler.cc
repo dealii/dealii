@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,10 +55,10 @@ namespace internal
     catch (...)
       {}
 
-    // ... then with unsigned long long int...
+    // ... then with std::uint64_t...
     try
       {
-        return boost::get<unsigned long long int>(value);
+        return boost::get<std::uint64_t>(value);
       }
     catch (...)
       {}
@@ -433,7 +433,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
               out << std::setw(column_widths[j]);
               out << key << " | ";
             }
-          out << std::endl;
+          out << '\n';
 
           // write the body
           for (unsigned int i = 0; i < nrows; ++i)
@@ -602,14 +602,14 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
   // write_text() to use the cache
   AssertThrow(out, ExcIO());
   if (with_header)
-    out << "\\documentclass[10pt]{report}" << std::endl
-        << "\\usepackage{float}" << std::endl
-        << std::endl
-        << std::endl
-        << "\\begin{document}" << std::endl;
+    out << "\\documentclass[10pt]{report}" << '\n'
+        << "\\usepackage{float}" << '\n'
+        << '\n'
+        << '\n'
+        << "\\begin{document}" << '\n';
 
-  out << "\\begin{table}[H]" << std::endl
-      << "\\begin{center}" << std::endl
+  out << "\\begin{table}[H]" << '\n'
+      << "\\begin{center}" << '\n'
       << "\\begin{tabular}{|";
 
   // first pad the table from below if necessary
@@ -657,7 +657,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           out << col_iter->second.tex_format << "|";
         }
     }
-  out << "} \\hline" << std::endl;
+  out << "} \\hline" << '\n';
 
   // write the caption line of the table
 
@@ -673,7 +673,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           // avoid use of `tex_supercaptions[key]'
           std::map<std::string, std::string>::const_iterator
             tex_super_cap_iter = tex_supercaptions.find(key);
-          out << std::endl
+          out << '\n'
               << "\\multicolumn{" << n_subcolumns << "}{|c|}{"
               << tex_super_cap_iter->second << "}";
         }
@@ -688,7 +688,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
       if (j < column_order.size() - 1)
         out << " & ";
     }
-  out << "\\\\ \\hline" << std::endl;
+  out << "\\\\ \\hline" << '\n';
 
   // write the n rows
   const unsigned int nrows = n_rows();
@@ -718,18 +718,23 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           if (j < n_cols - 1)
             out << " & ";
         }
-      out << "\\\\ \\hline" << std::endl;
+      out << "\\\\ \\hline" << '\n';
     }
 
-  out << "\\end{tabular}" << std::endl << "\\end{center}" << std::endl;
+  out << "\\end{tabular}" << '\n' << "\\end{center}" << '\n';
   if (!tex_table_caption.empty())
-    out << "\\caption{" << tex_table_caption << "}" << std::endl;
+    out << "\\caption{" << tex_table_caption << "}" << '\n';
   if (!tex_table_label.empty())
-    out << "\\label{" << tex_table_label << "}" << std::endl;
-  out << "\\end{table}" << std::endl;
+    out << "\\label{" << tex_table_label << "}" << '\n';
+  out << "\\end{table}" << '\n';
   if (with_header)
-    out << "\\end{document}" << std::endl;
+    out << "\\end{document}" << '\n';
+
+  // Now flush all of the data we've put into the stream to make it
+  // sure it really gets written.
+  out << std::flush;
 }
+
 
 
 void

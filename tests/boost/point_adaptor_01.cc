@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,10 @@
 // Check that boost adaptors for points work
 
 #include <deal.II/boost_adaptors/point.h>
+
+#include <boost/geometry/algorithms/equals.hpp>
+#include <boost/geometry/algorithms/make.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
 
 #include "../tests.h"
 

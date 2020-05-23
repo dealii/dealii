@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
@@ -42,6 +41,8 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/bandwidth.hpp>
@@ -51,6 +52,8 @@
 #include <boost/graph/properties.hpp>
 #include <boost/random.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
+#undef BOOST_BIND_GLOBAL_PLACEHOLDERS
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cmath>
@@ -457,7 +460,7 @@ namespace DoFRenumbering
                   locally_active_dofs.is_element(starting_index),
                   ExcMessage(
                     "You specified global degree of freedom " +
-                    Utilities::to_string(starting_index) +
+                    std::to_string(starting_index) +
                     " as a starting index, but this index is not among the "
                     "locally active ones on this processor, as required "
                     "for this function."));
@@ -867,8 +870,8 @@ namespace DoFRenumbering
     const unsigned int n_buckets = fe_collection.n_components();
     std::vector<types::global_dof_index> shifts(n_buckets);
 
-    if (const parallel::Triangulation<dim, spacedim> *tria =
-          (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *tria =
+          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &start->get_dof_handler().get_triangulation())))
       {
 #ifdef DEAL_II_WITH_MPI
@@ -1170,8 +1173,8 @@ namespace DoFRenumbering
     const unsigned int                   n_buckets = fe_collection.n_blocks();
     std::vector<types::global_dof_index> shifts(n_buckets);
 
-    if (const parallel::Triangulation<dim, spacedim> *tria =
-          (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *tria =
+          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &start->get_dof_handler().get_triangulation())))
       {
 #ifdef DEAL_II_WITH_MPI
@@ -1368,8 +1371,8 @@ namespace DoFRenumbering
     // DoFs for all previous processes
     types::global_dof_index my_starting_index = 0;
 
-    if (const parallel::Triangulation<dim, spacedim> *tria =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+    if (const parallel::TriangulationBase<dim, spacedim> *tria =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &dof_handler.get_triangulation()))
       {
 #ifdef DEAL_II_WITH_MPI
@@ -1586,12 +1589,11 @@ namespace DoFRenumbering
     const typename std::vector<typename DoFHandlerType::active_cell_iterator>
       &cells)
   {
-    if (const parallel::Triangulation<DoFHandlerType::dimension,
-                                      DoFHandlerType::space_dimension> *p =
-          dynamic_cast<
-            const parallel::Triangulation<DoFHandlerType::dimension,
-                                          DoFHandlerType::space_dimension> *>(
-            &dof.get_triangulation()))
+    if (const parallel::TriangulationBase<DoFHandlerType::dimension,
+                                          DoFHandlerType::space_dimension> *p =
+          dynamic_cast<const parallel::TriangulationBase<
+            DoFHandlerType::dimension,
+            DoFHandlerType::space_dimension> *>(&dof.get_triangulation()))
       {
         AssertDimension(cells.size(), p->n_locally_owned_active_cells());
       }
@@ -1753,11 +1755,12 @@ namespace DoFRenumbering
     const Tensor<1, DoFHandlerType::space_dimension> &direction,
     const bool                                        dof_wise_renumbering)
   {
-    Assert((dynamic_cast<
-              const parallel::Triangulation<DoFHandlerType::dimension,
-                                            DoFHandlerType::space_dimension> *>(
-              &dof.get_triangulation()) == nullptr),
-           ExcNotImplemented());
+    Assert(
+      (dynamic_cast<
+         const parallel::TriangulationBase<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+         &dof.get_triangulation()) == nullptr),
+      ExcNotImplemented());
 
     if (dof_wise_renumbering == false)
       {
@@ -2198,8 +2201,8 @@ namespace DoFRenumbering
   {
     Assert(
       (!dynamic_cast<
-        const parallel::Triangulation<DoFHandlerType::dimension,
-                                      DoFHandlerType::space_dimension> *>(
+        const parallel::TriangulationBase<DoFHandlerType::dimension,
+                                          DoFHandlerType::space_dimension> *>(
         &dof_handler.get_triangulation())),
       ExcMessage(
         "Parallel triangulations are already enumerated according to their MPI process id."));

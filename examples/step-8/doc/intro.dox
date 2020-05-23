@@ -12,23 +12,72 @@ understood as well.
 
 @dealiiVideoLecture{19}
 
-In this tutorial program we will want to solve the elastic equations. They are
-an extension to Laplace's equation with a vector-valued solution that
+In this tutorial program we will want to solve the
+<a href="https://en.wikipedia.org/wiki/Linear_elasticity">elastic equations</a>.
+They are an extension to Laplace's equation with a vector-valued solution that
 describes the displacement in each space direction of a rigid body
 which is subject to a force. Of course, the force is also
 vector-valued, meaning that in each point it has a direction and an
-absolute value. The elastic equations are the following:
+absolute value.
+
+One can write the elasticity equations in a number of ways. The one that shows
+the symmetry with the Laplace equation in the most obvious way is to write it
+as
 @f[
   -
-  \partial_j (c_{ijkl} \partial_k u_l)
+  \text{div}\,
+  ({\mathbf C} \nabla \mathbf{u})
+  =
+  \mathbf f,
+@f]
+where $\mathbf u$ is the vector-valued displacement at each point,
+$\mathbf f$ the force, and ${\mathbf C}$ is a rank-4 tensor (i.e., it has four
+indices) that encodes the stress-strain relationship -- in essence,
+it represents the
+<a href="https://en.wikipedia.org/wiki/Hooke%27s_law">"spring constant"</a> in
+Hookes law that relates the displacement to the forces. ${\mathbf C}$ will, in many
+cases, depend on $\mathbf x$ if the body whose deformation we want to
+simulate is composed of different materials.
+
+While the form of the equations above is correct, it is not the way
+they are usually derived. In truth, the gradient of the displacement
+$\nabla\mathbf u$ (a matrix) has no physical meaning whereas its
+symmetrized version,
+@f[
+\varepsilon(\mathbf u)_{kl} =\frac{1}{2}(\partial_k u_l + \partial_l u_k),
+@f]
+does and is typically called the "strain". (Here and in the following,
+$\partial_k=\frac{\partial}{\partial x_k}$. We will also use the
+<a href="https://en.wikipedia.org/wiki/Einstein_notation">Einstein summation
+convention</a> that whenever the same index appears twice in an equation,
+summation over this index is implied; we will, however, not distinguish
+between upper and lower indices.)
+With this definition of the strain, the elasticity equations
+then read as
+@f[
+  -
+  \text{div}\,
+  ({\mathbf C} \varepsilon(\mathbf u))
+  =
+  \mathbf f,
+@f]
+which you can think of as the more natural generalization of the Laplace
+equation to vector-valued problems. (The form shown first is equivalent to
+this form because the tensor ${\mathbf C}$ has certain symmetries, namely that
+$C_{ijkl}=C_{ijlk}$, and consequently ${\mathbf C} \varepsilon(\mathbf u)_{kl}
+= {\mathbf C} \nabla\mathbf u$.)
+
+One can of course alternatively write these equations in component form:
+@f[
+  -
+  \partial_j (c_{ijkl} \varepsilon_{kl})
   =
   f_i,
   \qquad
-  i=1\ldots d,
+  i=1\ldots d.
 @f]
-where the values $c_{ijkl}$ are the stiffness coefficients and
-will usually depend on the space coordinates. In
-many cases, one knows that the material under consideration is
+
+In many cases, one knows that the material under consideration is
 isotropic, in which case by introduction of the two coefficients
 $\lambda$ and $\mu$ the coefficient tensor reduces to
 @f[

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,9 +50,8 @@ FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree)
   Assert(degree > 0,
          ExcMessage("FE_Trace can only be used for polynomial degrees "
                     "greater than zero"));
-  std::vector<unsigned int> renumber(this->dofs_per_face);
-  FETools::hierarchic_to_lexicographic_numbering<dim - 1>(degree, renumber);
-  this->poly_space.set_numbering(renumber);
+  this->poly_space.set_numbering(
+    FETools::hierarchic_to_lexicographic_numbering<dim - 1>(degree));
 
   // Initialize face support points
   this->unit_face_support_points = fe_q.get_unit_face_support_points();
@@ -102,10 +101,8 @@ FE_TraceQ<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // FE_TraceQ shares the numbering of elemental degrees of freedom with FE_Q
   // except for the missing interior ones (quad dofs in 2D and hex dofs in

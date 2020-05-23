@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 
 #include <map>
@@ -31,6 +32,7 @@
 // some constructs with MPI data
 // types. Therefore, create some dummies
 using MPI_Comm     = int;
+using MPI_Request  = int;
 using MPI_Datatype = int;
 using MPI_Op       = int;
 #  ifndef MPI_COMM_WORLD
@@ -38,6 +40,9 @@ using MPI_Op       = int;
 #  endif
 #  ifndef MPI_COMM_SELF
 #    define MPI_COMM_SELF 0
+#  endif
+#  ifndef MPI_REQUEST_NULL
+#    define MPI_REQUEST_NULL 0
 #  endif
 #  ifndef MPI_MIN
 #    define MPI_MIN 0
@@ -87,6 +92,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // Forward type declarations to allow MPI sums over tensorial types
+#ifndef DOXYGEN
 template <int rank, int dim, typename Number>
 class Tensor;
 template <int rank, int dim, typename Number>
@@ -94,9 +100,27 @@ class SymmetricTensor;
 template <typename Number>
 class SparseMatrix;
 class IndexSet;
+#endif
 
 namespace Utilities
 {
+  /**
+   * Given the total number of elements @p total_size, create an evenly
+   * distributed 1:1 partitioning of the elements for across @p n_partitions.
+   * The local sizes will be equal to the @p total_size divided by the number
+   * of partitions plus the remainder being divided amongst the first
+   * processes. Each process will store a contiguous subset of indices, and the
+   * index set on process p+1 starts at the index one larger than the last one
+   * stored on process p.
+   * For example, a @p total_size of 11 with 3 processes will result
+   * in the IndexSets { [0,4), [4,8), [8,11)] }, and this function will
+   * return the @p my_partition_id 's IndexSet.
+   */
+  IndexSet
+  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
+                                         const unsigned int n_partitions,
+                                         const IndexSet::size_type total_size);
+
   /**
    * A namespace for utility functions that abstract certain operations using
    * the Message Passing Interface (MPI) or provide fallback operations in
@@ -189,10 +213,193 @@ namespace Utilities
      * can interact without interfering with each other.
      *
      * When no longer needed, the communicator created here needs to be
-     * destroyed using <code>MPI_Comm_free</code>.
+     * destroyed using free_communicator().
+     *
+     * This function is equivalent to calling
+     * <code>MPI_Comm_dup(mpi_communicator, &return_value);</code>.
      */
     MPI_Comm
     duplicate_communicator(const MPI_Comm &mpi_communicator);
+
+    /**
+     * Free the given
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator that was duplicated using duplicate_communicator().
+     *
+     * The argument is passed by reference and will be invalidated and set to
+     * the MPI null handle. This function is equivalent to calling
+     * <code>MPI_Comm_free(&mpi_communicator);</code>.
+     */
+    void
+    free_communicator(MPI_Comm &mpi_communicator);
+
+    /**
+     * Helper class to automatically duplicate and free an MPI
+     * @ref GlossMPICommunicator "communicator".
+     *
+     * This class duplicates the communicator given in the constructor
+     * using duplicate_communicator() and frees it automatically when
+     * this object gets destroyed by calling free_communicator(). You
+     * can access the wrapped communicator using operator*.
+     *
+     * This class exists to easily allow duplicating communicators without
+     * having to worry when and how to free it after usage.
+     */
+    class DuplicatedCommunicator
+    {
+    public:
+      /**
+       * Create a duplicate of the given @p communicator.
+       */
+      explicit DuplicatedCommunicator(const MPI_Comm &communicator)
+        : comm(duplicate_communicator(communicator))
+      {}
+
+      /**
+       * Do not allow making copies.
+       */
+      DuplicatedCommunicator(const DuplicatedCommunicator &) = delete;
+
+      /**
+       * The destructor will free the communicator automatically.
+       */
+      ~DuplicatedCommunicator()
+      {
+        free_communicator(comm);
+      }
+
+      /**
+       * Access the stored communicator.
+       */
+      const MPI_Comm &operator*() const
+      {
+        return comm;
+      }
+
+
+      /**
+       * Do not allow assignment of this class.
+       */
+      DuplicatedCommunicator &
+      operator=(const DuplicatedCommunicator &) = delete;
+
+    private:
+      /**
+       * The communicator of course.
+       */
+      MPI_Comm comm;
+    };
+
+    /**
+     * This class represents a mutex to guard a critical section for a set of
+     * processors in a parallel computation using MPI.
+     *
+     * The lock() commands waits until all MPI ranks in the communicator have
+     * released a previous lock using unlock().
+     *
+     * A typical usage involves guarding a critical section using a lock guard:
+     * @code
+     * {
+     *   static CollectiveMutex      mutex;
+     *   CollectiveMutex::ScopedLock lock(mutex, comm);
+     *   // [ critical code to be guarded]
+     * }
+     * @endcode
+     *
+     * Here, the critical code will finish on all processors before the mutex
+     * can be acquired again (for example by a second execution of the block
+     * above. The critical code block typically involves MPI communication that
+     * would yield incorrect results without the lock. For example, if the code
+     * contains nonblocking receives with MPI_ANY_SOURCE, packets can be
+     * confused between iterations.
+     *
+     * Note that the mutex needs to be the same instance between calls to the
+     * same critical region. While not required, this can be achieved by making
+     * the instance static (like in the example above). The variable can also be
+     * a global variable, or a member variable of the object to which the
+     * executing function belongs.
+     */
+    class CollectiveMutex
+    {
+    public:
+      /**
+       * This helper class provides a scoped lock for the CollectiveMutex.
+       *
+       * See the class documentation of CollectiveMutex for details.
+       */
+      class ScopedLock
+      {
+      public:
+        /**
+         * Constructor. Blocks until it can acquire the lock.
+         */
+        explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm &comm)
+          : mutex(mutex)
+          , comm(comm)
+        {
+          mutex.lock(comm);
+        }
+
+        /**
+         * Destructor. Releases the lock.
+         */
+        ~ScopedLock()
+        {
+          mutex.unlock(comm);
+        }
+
+      private:
+        /**
+         * A reference to the mutex.
+         */
+        CollectiveMutex &mutex;
+        /**
+         * The communicator.
+         */
+        const MPI_Comm comm;
+      };
+
+      /**
+       * Constructor of this class.
+       */
+      explicit CollectiveMutex();
+
+      /**
+       * Destroy the mutex. Assumes the lock is not currently held.
+       */
+      ~CollectiveMutex();
+
+      /**
+       * Acquire the mutex and, if necessary, wait until we can do so.
+       *
+       * This is a collective call that needs to be executed by all processors
+       * in the communicator.
+       */
+      void
+      lock(MPI_Comm comm);
+
+      /**
+       * Release the lock.
+       *
+       * This is a collective call that needs to be executed by all processors
+       * in the communicator.
+       */
+      void
+      unlock(MPI_Comm comm);
+
+    private:
+      /**
+       * Keep track if we have this lock right now.
+       */
+      bool locked;
+
+      /**
+       * The request to keep track of the non-blocking barrier.
+       */
+      MPI_Request request;
+    };
+
+
 
     /**
      * If @p comm is an intracommunicator, this function returns a new
@@ -238,8 +445,20 @@ namespace Utilities
      * process p.
      */
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &           comm,
-                                  const IndexSet::size_type &local_size);
+    create_ascending_partitioning(const MPI_Comm &          comm,
+                                  const IndexSet::size_type local_size);
+
+    /**
+     * Given the total number of elements @p total_size, create an evenly
+     * distributed 1:1 partitioning of the elements across the
+     * MPI communicator @p comm.
+     * Uses @p comm to determine number of partitions and processor ID to call the
+     * @p create_evenly_distributed_partitioning() function above.
+     */
+    IndexSet
+    create_evenly_distributed_partitioning(
+      const MPI_Comm &          comm,
+      const IndexSet::size_type total_size);
 
 #ifdef DEAL_II_WITH_MPI
     /**
@@ -530,6 +749,40 @@ namespace Utilities
     min_max_avg(const double my_value, const MPI_Comm &mpi_communicator);
 
     /**
+     * Same as above but returning the sum, average, minimum, maximum,
+     * process id of minimum and maximum as a collective operation on the
+     * given MPI
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator for each entry of the vector.
+     *
+     * @note This function performs a single reduction sweep.
+     *
+     * @pre Size of the input vector has to be the same on all processes.
+     */
+    std::vector<MinMaxAvg>
+    min_max_avg(const std::vector<double> &my_value,
+                const MPI_Comm &           mpi_communicator);
+
+
+    /**
+     * Same as above but returning the sum, average, minimum, maximum,
+     * process id of minimum and maximum as a collective operation on the
+     * given MPI
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator for each entry of the ArrayView.
+     *
+     * @note This function performs a single reduction sweep.
+     *
+     * @pre Size of the input ArrayView has to be the same on all processes
+     *   and the input and output ArrayVew have to have the same size.
+     */
+    void
+    min_max_avg(const ArrayView<const double> &my_values,
+                const ArrayView<MinMaxAvg> &   result,
+                const MPI_Comm &               mpi_communicator);
+
+
+    /**
      * A class that is used to initialize the MPI system at the beginning of a
      * program and to shut it down again at the end. It also allows you to
      * control the number of threads used within each MPI process.
@@ -630,6 +883,47 @@ namespace Utilities
        * MPI process.
        */
       ~MPI_InitFinalize();
+
+      /**
+       * Register a reference to an MPI_Request
+       * on which we need to call `MPI_Wait` before calling `MPI_Finalize`.
+       *
+       * The object @p request needs to exist when MPI_Finalize is called, which means the
+       * request is typically statically allocated. Otherwise, you need to call
+       * unregister_request() before the request goes out of scope. Note that it
+       * is acceptable for a request to be already waited on (and consequently
+       * reset to MPI_REQUEST_NULL).
+       *
+       * It is acceptable to call this function more than once with the same
+       * instance (as it is done in the example below).
+       *
+       * Typically, this function is used by CollectiveMutex and not directly,
+       * but it can also be used directly like this:
+       * @code
+       * void my_fancy_communication()
+       * {
+       *   static MPI_Request request = MPI_REQUEST_NULL;
+       *   MPI_InitFinalize::register_request(request);
+       *   MPI_Wait(&request, MPI_STATUS_IGNORE);
+       *   // [some algorithm that is not safe to be executed twice in a row.]
+       *   MPI_IBarrier(comm, &request);
+       * }
+       * @endcode
+       */
+      static void
+      register_request(MPI_Request &request);
+
+      /**
+       * Unregister a request previously added using register_request().
+       */
+      static void
+      unregister_request(MPI_Request &request);
+
+    private:
+      /**
+       * Requests to MPI_Wait before finalizing
+       */
+      static std::set<MPI_Request *> requests;
     };
 
     /**
@@ -654,8 +948,11 @@ namespace Utilities
      * @param[in] comm MPI communicator.
      *
      * @param[in] objects_to_send A map from the rank (unsigned int) of the
-     *  process meant to receive the data and the object to send (the type T
-     *  must be serializable for this function to work properly).
+     *  process meant to receive the data and the object to send (the type `T`
+     *  must be serializable for this function to work properly). If this
+     *  map contains an entry with a key equal to the rank of the current
+     *  process (i.e., an instruction to a process to send data to itself),
+     *  then this data item is simply copied to the returned object.
      *
      * @return A map from the rank (unsigned int) of the process
      *  which sent the data and object received.
@@ -710,446 +1007,6 @@ namespace Utilities
            const unsigned int root_process = 0);
 
     /**
-     * An interface to be able to use the ConsensusAlgorithm classes. The main
-     * functionality of the implementations is to return a list of process ranks
-     * this process wants data from and to deal with the optional payload of the
-     * messages sent/received by the ConsensusAlgorithm classes.
-     *
-     * There are two kinds of messages:
-     * - send/request message: A message consisting of a data request
-     *   which should be answered by another process. This message is
-     *   considered as a request message by the receiving rank.
-     * - recv message: The answer to a send/request message.
-     *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
-     *
-     * @note Since the payloads of the messages are optional, users have
-     *       to deal with buffers themselves. The ConsensusAlgorithm classes 1)
-     *       deliver only references to empty vectors (of size 0)
-     *       the data to be sent can be inserted to or read from, and
-     *       2) communicate these vectors blindly.
-     *
-     * @author Peter Munch, 2019
-     */
-    template <typename T1, typename T2>
-    class ConsensusAlgorithmProcess
-    {
-    public:
-      /**
-       * @return A vector of ranks this process wants to send a request to.
-       *
-       * @note This is the only method which has to be implemented since the
-       *       payloads of the messages are optional.
-       */
-      virtual std::vector<unsigned int>
-      compute_targets() = 0;
-
-      /**
-       * Add to the request to the process with the specified rank a payload.
-       *
-       * @param[in]  other_rank rank of the process
-       * @param[out] send_buffer data to be sent part of the request (optional)
-       *
-       * @note The buffer is empty. Before using it, you have to set its size.
-       */
-      virtual void
-      pack_recv_buffer(const int other_rank, std::vector<T1> &send_buffer);
-
-      /**
-       * Prepare the buffer where the payload of the answer of the request to
-       * the process with the specified rank is saved in. The most obvious task
-       * is to resize the buffer, since it is empty when the function is called.
-       *
-       * @param[in]  other_rank rank of the process
-       * @param[out] recv_buffer data to be sent part of the request (optional)
-       */
-      virtual void
-      prepare_recv_buffer(const int other_rank, std::vector<T2> &recv_buffer);
-
-      /**
-       * Prepare the buffer where the payload of the answer of the request to
-       * the process with the specified rank is saved in.
-       *
-       * @param[in]  other_rank rank of the process
-       * @param[in]  buffer_recv received payload (optional)
-       * @param[out] request_buffer payload to be sent as part of the request
-       *             (optional)
-       *
-       * @note The request_buffer is empty. Before using it, you have to set
-       *       its size.
-       */
-      virtual void
-      process_request(const unsigned int     other_rank,
-                      const std::vector<T1> &buffer_recv,
-                      std::vector<T2> &      request_buffer);
-
-      /**
-       * Process the payload of the answer of the request to the process with
-       * the specified rank.
-       *
-       * @param[in] other_rank rank of the process
-       * @param[in] recv_buffer data to be sent part of the request (optional)
-       */
-      virtual void
-      unpack_recv_buffer(const int              other_rank,
-                         const std::vector<T2> &recv_buffer);
-    };
-
-    /**
-     * The task of the implementations of this class is to provide the
-     * communication patterns to retrieve data from other processes in a
-     * dynamic-sparse way.
-     *
-     * Dynamic-sparse means in this context:
-     * - by the time this function is called, the other processes do
-     *   not know yet that they have to answer requests
-     * - each process only has to communicate with a small subset of
-     *   processes of the MPI communicator
-     *
-     * Naturally, the user has to provide:
-     * - a communicator
-     * - for each rank a list of ranks of processes this process should
-     *   communicate to
-     * - a functionality to pack/unpack data to be sent/received
-     *
-     * The latter two features should be implemented in a class derived from
-     * ConsensusAlgorithmProcess.
-     *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
-     *
-     * @author Peter Munch, 2019
-     */
-    template <typename T1, typename T2>
-    class ConsensusAlgorithm
-    {
-    public:
-      ConsensusAlgorithm(ConsensusAlgorithmProcess<T1, T2> &process,
-                         const MPI_Comm &                   comm);
-
-      /**
-       * Destructor.
-       */
-      virtual ~ConsensusAlgorithm() = default;
-
-      virtual void
-      run() = 0;
-
-    protected:
-      /**
-       * Reference to the process provided by the user.
-       */
-      ConsensusAlgorithmProcess<T1, T2> &process;
-
-      /**
-       * MPI communicator.
-       */
-      const MPI_Comm &comm;
-
-      /**
-       * Rank of this process.
-       */
-      const unsigned int my_rank;
-
-      /**
-       * Number of processes in the communicator.
-       */
-      const unsigned int n_procs;
-    };
-
-    /**
-     * This class implements ConsensusAlgorithm, using only point-to-point
-     * communications and a single IBarrier.
-     *
-     * @note This class closely follows the paper Hoefner et. al. "Scalable
-     *       Communication Protocols for Dynamic Sparse Data Exchange".
-     *       Since the algorithm shown there is not considering payloads, the
-     *       algorithm has been  modified here in such a way that synchronous
-     *       sends (Issend) have been replaced by equivalent Isend/Irecv, where
-     *       Irecv receives the answer to a request (with payload).
-     *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
-     *
-     * @author Peter Munch, 2019
-     */
-    template <typename T1, typename T2>
-    class ConsensusAlgorithm_NBX : public ConsensusAlgorithm<T1, T2>
-    {
-    public:
-      // Unique tags to be used during Isend and Irecv
-      static const unsigned int tag_request  = 12;
-      static const unsigned int tag_delivery = 13;
-
-      /**
-       * Constructor.
-       *
-       * @param process Process to be run during consensus algorithm.
-       * @param comm MPI Communicator
-       */
-      ConsensusAlgorithm_NBX(ConsensusAlgorithmProcess<T1, T2> &process,
-                             const MPI_Comm &                   comm);
-
-      /**
-       * Destructor.
-       */
-      virtual ~ConsensusAlgorithm_NBX() = default;
-
-      /**
-       * Run consensus algorithm.
-       */
-      virtual void
-      run() override;
-
-    private:
-#ifdef DEAL_II_WITH_MPI
-      /**
-       * List of processes this process wants to send requests to.
-       */
-      std::vector<unsigned int> targets;
-
-      /**
-       * Buffers for sending requests.
-       */
-      std::vector<std::vector<T1>> send_buffers;
-
-      /**
-       * Requests for sending requests.
-       */
-      std::vector<MPI_Request> send_requests;
-
-      /**
-       * Buffers for receiving answers to requests.
-       */
-      std::vector<std::vector<T2>> recv_buffers;
-
-
-      /**
-       * Requests for receiving answers to requests.
-       */
-      std::vector<MPI_Request> recv_requests;
-
-      /**
-       * Buffers for sending answers to requests.
-       */
-      std::vector<std::vector<T2>> request_buffers;
-
-      /**
-       * Requests for sending answers to requests.
-       */
-      std::vector<std::shared_ptr<MPI_Request>> request_requests;
-
-      // request for barrier
-      MPI_Request barrier_request;
-#endif
-
-#ifdef DEBUG
-      /**
-       * List of processes who have made a request to this process.
-       */
-      std::set<unsigned int> requesting_processes;
-#endif
-
-      /**
-       * Check if all request answers have been received by this rank.
-       */
-      bool
-      check_own_state();
-
-      /**
-       * Signal to all other ranks that this rank has received all request
-       * answers via entering IBarrier.
-       */
-      void
-      signal_finish();
-
-      /**
-       * Check if all ranks have received all their request answers, i.e.
-       * all ranks have reached the IBarrier.
-       */
-      bool
-      check_global_state();
-
-      /**
-       * A request message from another rank has been received: process the
-       * request and send an answer.
-       */
-      void
-      process_requests();
-
-      /**
-       * Start to send all requests via ISend and post IRecvs for the incoming
-       * answer messages.
-       */
-      void
-      start_communication();
-
-      /**
-       * After all rank has received all answers, the MPI data structures can be
-       * freed and the received answers can be processed.
-       */
-      void
-      clean_up_and_end_communication();
-    };
-
-    /**
-     * This class implements ConsensusAlgorithm, using a two step approach. In
-     * the first step the source ranks are determined and in the second step
-     * a static sparse data exchange is performed.
-     *
-     * @note In contrast to ConsensusAlgorithm_NBX, this class splits the same
-     *       task into two distinct steps. In the first step, all processes are
-     *       identified who want to send a request to this process. In the
-     *       second step, the data is exchanged. However, since - in the second
-     *       step - now it is clear how many requests have to be answered, i.e.
-     *       when this process can stop waiting for requests, no IBarrier is
-     *       needed.
-     *
-     * @note The function compute_point_to_point_communication_pattern() is used
-     *       to determine the source processes, which implements a
-     *       PEX-algorithm from Hoefner et. al. "Scalable Communication
-     *       Protocols for Dynamic Sparse Data Exchange"
-     *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
-     *
-     * @author Peter Munch, 2019
-     */
-    template <typename T1, typename T2>
-    class ConsensusAlgorithm_PEX : public ConsensusAlgorithm<T1, T2>
-    {
-    public:
-      // Unique tags to be used during Isend and Irecv
-      static const unsigned int tag_request  = 14;
-      static const unsigned int tag_delivery = 15;
-
-      /**
-       * Constructor.
-       *
-       * @param process Process to be run during consensus algorithm.
-       * @param comm MPI Communicator
-       */
-      ConsensusAlgorithm_PEX(ConsensusAlgorithmProcess<T1, T2> &process,
-                             const MPI_Comm &                   comm);
-
-      /**
-       * Destructor.
-       */
-      virtual ~ConsensusAlgorithm_PEX() = default;
-
-      /**
-       * Run consensus algorithm.
-       */
-      virtual void
-      run() override;
-
-    private:
-#ifdef DEAL_II_WITH_MPI
-      /**
-       * List of ranks of processes this processes wants to send a request to.
-       */
-      std::vector<unsigned int> targets;
-
-      /**
-       * List of ranks of processes wanting to send a request to this process.
-       */
-      std::vector<unsigned int> sources;
-
-      // data structures to send and receive requests
-
-      /**
-       * Buffers for sending requests.
-       */
-      std::vector<std::vector<T1>> send_buffers;
-
-      /**
-       * Buffers for receiving answers to requests.
-       */
-      std::vector<std::vector<T2>> recv_buffers;
-
-      /**
-       * Requests for sending requests and receiving answers to requests.
-       */
-      std::vector<MPI_Request> send_and_recv_buffers;
-
-      /**
-       * Buffers for sending answers to requests.
-       */
-      std::vector<std::vector<T2>> requests_buffers;
-
-      /**
-       * Requests for sending answers to requests.
-       */
-      std::vector<MPI_Request> requests_answers;
-#endif
-
-      /**
-       * The ith request message from another rank has been received: process
-       * the request and send an answer.
-       */
-      void
-      process_requests(int index);
-
-      /**
-       * Start to send all requests via ISend and post IRecvs for the incoming
-       * answer messages.
-       */
-      unsigned int
-      start_communication();
-
-      /**
-       * After all answers have been exchanged, the MPI data structures can be
-       * freed and the received answers can be processed.
-       */
-      void
-      clean_up_and_end_communication();
-    };
-
-    /**
-     * A class which delegates its task to other ConsensusAlgorithm
-     * implementations depending on the number of processes in the
-     * MPI communicator. For a small number of processes it uses
-     * ConsensusAlgorithm_PEX and for large number of processes
-     * ConsensusAlgorithm_NBX. The threshold depends if the program is
-     * compiled in debug or release mode.
-     *
-     * @tparam T1 the type of the elements of the vector to sent
-     * @tparam T2 the type of the elements of the vector to received
-     *
-     * @author Peter Munch, 2019
-     */
-    template <typename T1, typename T2>
-    class ConsensusAlgorithmSelector : public ConsensusAlgorithm<T1, T2>
-    {
-    public:
-      /**
-       * Constructor.
-       *
-       * @param process Process to be run during consensus algorithm.
-       * @param comm MPI Communicator.
-       */
-      ConsensusAlgorithmSelector(ConsensusAlgorithmProcess<T1, T2> &process,
-                                 const MPI_Comm &                   comm);
-
-      /**
-       * Destructor.
-       */
-      virtual ~ConsensusAlgorithmSelector() = default;
-
-      /**
-       * Run consensus algorithm. The function call is delegated to another
-       * ConsensusAlgorithm implementation.
-       */
-      virtual void
-      run() override;
-
-    private:
-      // Pointer to the actual ConsensusAlgorithm implementation.
-      std::shared_ptr<ConsensusAlgorithm<T1, T2>> consensus_algo;
-    };
-
-    /**
      * Given a partitioned index set space, compute the owning MPI process rank
      * of each element of a second index set according to the partitioned index
      * set. A natural usage of this function is to compute for each ghosted
@@ -1158,9 +1015,9 @@ namespace Utilities
      * One might think: "But we know which rank a ghost DoF belongs to based on
      * the subdomain id of the cell it is on". But this heuristic fails for DoFs
      * on interfaces between ghost cells with different subdomain_ids, or
-     * between a ghost cell and an artificial cell. Furthermore, this class
+     * between a ghost cell and an artificial cell. Furthermore, this function
      * enables a completely abstract exchange of information without the help of
-     * the grid in terms of neighbors.
+     * the mesh in terms of neighbors.
      *
      * The first argument passed to this function, @p owned_indices, must
      * uniquely partition an index space between all processes.
@@ -1197,6 +1054,24 @@ namespace Utilities
     compute_index_owner(const IndexSet &owned_indices,
                         const IndexSet &indices_to_look_up,
                         const MPI_Comm &comm);
+
+    /**
+     * Compute the union of the input vectors @p vec of all processes in the
+     *   MPI communicator @p comm.
+     *
+     * @note This is a collective operation. The result will available on all
+     *   processes.
+     */
+    template <typename T>
+    std::vector<T>
+    compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm);
+
+    /**
+     * The same as above but for std::set.
+     */
+    template <typename T>
+    std::set<T>
+    compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
 
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
@@ -1248,25 +1123,41 @@ namespace Utilities
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
-      Assert(objects_to_send.size() == 0,
+      Assert(objects_to_send.size() < 2,
              ExcMessage("Cannot send to more than one processor."));
       Assert(objects_to_send.find(0) != objects_to_send.end() ||
                objects_to_send.size() == 0,
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
+      const auto my_proc = this_mpi_process(comm);
 
-      std::vector<unsigned int> send_to(objects_to_send.size());
-      {
-        unsigned int i = 0;
-        for (const auto &m : objects_to_send)
-          send_to[i++] = m.first;
-      }
-      AssertDimension(send_to.size(), objects_to_send.size());
+      std::map<unsigned int, T> received_objects;
 
-      const auto receive_from =
-        Utilities::MPI::compute_point_to_point_communication_pattern(comm,
-                                                                     send_to);
+      std::vector<unsigned int> send_to;
+      send_to.reserve(objects_to_send.size());
+      for (const auto &m : objects_to_send)
+        if (m.first == my_proc)
+          received_objects[my_proc] = m.second;
+        else
+          send_to.emplace_back(m.first);
+
+      const unsigned int n_point_point_communications =
+        Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
+
+      // Protect the following communication:
+      static CollectiveMutex      mutex;
+      CollectiveMutex::ScopedLock lock(mutex, comm);
+
+      // If we have something to send, or we expect something from other
+      // processors, we need to visit one of the two scopes below. Otherwise,
+      // no other action is required by this mpi process, and we can safely
+      // return.
+      if (send_to.size() == 0 && n_point_point_communications == 0)
+        return received_objects;
+
+      const int mpi_tag =
+        internal::Tags::compute_point_to_point_communication_pattern;
 
       // Sending buffers
       std::vector<std::vector<char>> buffers_to_send(send_to.size());
@@ -1274,31 +1165,31 @@ namespace Utilities
       {
         unsigned int i = 0;
         for (const auto &rank_obj : objects_to_send)
-          {
-            const auto &rank   = rank_obj.first;
-            buffers_to_send[i] = Utilities::pack(rank_obj.second);
-            const int ierr     = MPI_Isend(buffers_to_send[i].data(),
-                                       buffers_to_send[i].size(),
-                                       MPI_CHAR,
-                                       rank,
-                                       21,
-                                       comm,
-                                       &buffer_send_requests[i]);
-            AssertThrowMPI(ierr);
-            ++i;
-          }
+          if (rank_obj.first != my_proc)
+            {
+              const auto &rank   = rank_obj.first;
+              buffers_to_send[i] = Utilities::pack(rank_obj.second);
+              const int ierr     = MPI_Isend(buffers_to_send[i].data(),
+                                         buffers_to_send[i].size(),
+                                         MPI_CHAR,
+                                         rank,
+                                         mpi_tag,
+                                         comm,
+                                         &buffer_send_requests[i]);
+              AssertThrowMPI(ierr);
+              ++i;
+            }
       }
 
-      // Receiving buffers
-      std::map<unsigned int, T> received_objects;
+      // Fill the output map
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
-        for (unsigned int i = 0; i < receive_from.size(); ++i)
+        for (unsigned int i = 0; i < n_point_point_communications; ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
-            int        ierr = MPI_Probe(MPI_ANY_SOURCE, 21, comm, &status);
+            int        ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
             AssertThrowMPI(ierr);
 
             // Length of the message
@@ -1311,8 +1202,13 @@ namespace Utilities
             const unsigned int rank = status.MPI_SOURCE;
 
             // Actually receive the message
-            ierr = MPI_Recv(
-              buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
+            ierr = MPI_Recv(buffer.data(),
+                            len,
+                            MPI_CHAR,
+                            status.MPI_SOURCE,
+                            status.MPI_TAG,
+                            comm,
+                            MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
             Assert(received_objects.find(rank) == received_objects.end(),
                    ExcInternalError(
@@ -1322,9 +1218,10 @@ namespace Utilities
       }
 
       // Wait to have sent all objects.
-      MPI_Waitall(send_to.size(),
-                  buffer_send_requests.data(),
-                  MPI_STATUSES_IGNORE);
+      const int ierr = MPI_Waitall(send_to.size(),
+                                   buffer_send_requests.data(),
+                                   MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
 
       return received_objects;
 #  endif // deal.II with MPI
@@ -1334,6 +1231,9 @@ namespace Utilities
     std::vector<T>
     all_gather(const MPI_Comm &comm, const T &object)
     {
+      if (job_supports_mpi() == false)
+        return {object};
+
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
       std::vector<T> v(1, object);
@@ -1401,7 +1301,7 @@ namespace Utilities
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
       const auto my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
 
-      Assert(root_process < n_procs, ExcIndexRange(root_process, 0, n_procs));
+      AssertIndexRange(root_process, n_procs);
 
       std::vector<char> buffer       = Utilities::pack(object_to_send);
       int               n_local_data = buffer.size();

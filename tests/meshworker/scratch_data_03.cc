@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -116,8 +116,6 @@ test()
       const auto &JxW = s.get_JxW_values();
       const auto &p   = s.get_quadrature_points();
 
-      c = 0;
-
       c.local_dof_indices[0] = s.get_local_dof_indices();
 
       for (unsigned int q = 0; q < p.size(); ++q)
@@ -204,7 +202,7 @@ test()
     constraints.distribute_local_to_global(
       c.matrices[0], c.vectors[0], c.local_dof_indices[0], matrix, rhs);
 
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       constraints.distribute_local_to_global(c.matrices[1 + f],
                                              c.local_dof_indices[0],
                                              c.local_dof_indices[1 + f],

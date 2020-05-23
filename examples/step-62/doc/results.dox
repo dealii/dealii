@@ -2,7 +2,7 @@
 
 <h3>Resonance frequency and bandgap</h3>
 
-The results are analyzed in the 
+The results are analyzed in the
 [jupyter notebook](https://github.com/dealii/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
 with the following code
 @code{.py}
@@ -74,7 +74,7 @@ Q = \frac{f_r}{\Delta f} = \frac{\omega_r}{\Delta \omega} =
 @f]
 
 The square of the amplitude of the mechanical resonance $a^2$ as a function of the frequency
-has a gaussian shape 
+has a gaussian shape
 @f[
 a^2 = a_\textrm{max}^2\frac{\omega^2\Gamma^2}{(\omega_r^2-\omega^2)^2+\Gamma^2\omega^2}
 @f]
@@ -106,7 +106,7 @@ through the device.
 
 <h3>Mode profile</h3>
 
-We can inspect the mode profile with Paraview or Visit. 
+We can inspect the mode profile with Paraview or VisIt.
 As we have discussed, at resonance all the mechanical
 energy is transmitted and the amplitude of motion is amplified inside the cavity.
 It can be observed that the PMLs are quite effective to truncate the solution.

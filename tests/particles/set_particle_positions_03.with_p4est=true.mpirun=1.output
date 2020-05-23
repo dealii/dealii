@@ -1,0 +1,12 @@
+
+DEAL:0:2d/2d::Particle id : 0 Particle location: 0.184019 0.139438
+DEAL:0:2d/2d::Particle id : 1 Particle location: 0.178310 0.179844
+DEAL:0:2d/2d::Displacement
+DEAL:0:2d/2d::Particle id : 0 Particle location: 0.384019 0.139438
+DEAL:0:2d/2d::Particle id : 1 Particle location: 0.378310 0.179844
+DEAL:0::---
+DEAL:0:3d/3d::Particle id : 0 Particle location: 0.184019 0.139438 0.178310
+DEAL:0:3d/3d::Particle id : 1 Particle location: 0.179844 0.191165 0.119755
+DEAL:0:3d/3d::Displacement
+DEAL:0:3d/3d::Particle id : 0 Particle location: 0.384019 0.139438 0.178310
+DEAL:0:3d/3d::Particle id : 1 Particle location: 0.379844 0.191165 0.119755

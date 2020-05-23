@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -55,7 +55,6 @@
 
 const unsigned int dim = 2; // run in 2d to save time
 
-using namespace dealii;
 
 const double eps = 1e-10;
 

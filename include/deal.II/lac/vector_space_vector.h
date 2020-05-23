@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class IndexSet;
 namespace LinearAlgebra
 {
@@ -34,6 +36,7 @@ namespace LinearAlgebra
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
+#endif
 
 namespace LinearAlgebra
 {
@@ -268,6 +271,22 @@ namespace LinearAlgebra
     virtual ~VectorSpaceVector() = default;
   };
   /*@}*/
+} // namespace LinearAlgebra
+
+// ---------------------------- Free functions --------------------------
+
+namespace LinearAlgebra
+{
+  /**
+   * Shift all entries of the vector by a constant factor so that the mean
+   * value of the vector becomes zero.
+   */
+  template <typename Number>
+  void
+  set_zero_mean_value(VectorSpaceVector<Number> &vector)
+  {
+    vector.add(-vector.mean_value());
+  }
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE

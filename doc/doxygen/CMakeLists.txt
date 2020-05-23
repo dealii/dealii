@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -65,7 +65,7 @@ IF(DEAL_II_DOXYGEN_USE_MATHJAX)
       "/usr/share/yelp/mathjax"
       DOC "Root path of MathJax.js"
       )
-    IF(MATHJAX MATCHES "-NOTFOUND")
+    IF(MATHJAX_PATH MATCHES "MATHJAX_PATH-NOTFOUND")
       MESSAGE(FATAL_ERROR "MathJax was not found.")
     ENDIF()
   ENDIF()
@@ -116,8 +116,8 @@ CONFIGURE_FILE(
 # doxygen-generated HTML files.
 SET(_last_year "1997")
 FILE(GLOB _source_files
-     "${CMAKE_SOURCE_DIR}/source/*/*.cc" 
-     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h" 
+     "${CMAKE_SOURCE_DIR}/source/*/*.cc"
+     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h"
      "${CMAKE_SOURCE_DIR}/examples/*/*.cc")
 FOREACH (_source ${_source_files})
   FILE(READ "${_source}" contents)
@@ -284,8 +284,10 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     > ${CMAKE_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
     || ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doxygen.log ${CMAKE_BINARY_DIR}/doxygen.err
-  COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.py
+  COMMAND ${PERL_EXECUTABLE}
+  ARGS
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.pl
+  COMMAND ${CMAKE_COMMAND} -E echo "-- Documentation is available at ${CMAKE_CURRENT_BINARY_DIR}/deal.II/index.html"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial

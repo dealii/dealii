@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,12 +100,10 @@ test(const bool hanging_nodes = true)
     sparse_matrix.reinit(csp);
   }
 
-  DiagonalMatrix<LinearAlgebra::distributed::Vector<double>> diagonal_matrix;
-  {
-    LinearAlgebra::distributed::Vector<double> dummy;
-    dummy.reinit(owned_set, relevant_set, MPI_COMM_WORLD);
-    diagonal_matrix.reinit(dummy);
-  }
+  DiagonalMatrix<LinearAlgebra::distributed::Vector<double>> diagonal_matrix(
+    LinearAlgebra::distributed::Vector<double>(owned_set,
+                                               relevant_set,
+                                               MPI_COMM_WORLD));
 
   {
     QGauss<dim> quadrature_formula(fe_degree + 1);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,15 +106,9 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   const unsigned int       n_q_points = q_iterated.size();
 
   // we then need to define a renumbering vector that allows us to go from a
-  // lexicographic numbering scheme to a hierarchic one.  this fragment is
-  // taking almost verbatim from the MappingQ class.
-  std::vector<unsigned int> renumber(n_q_points);
-  std::vector<unsigned int> dpo(dim + 1, 1U);
-  for (unsigned int i = 1; i < dpo.size(); ++i)
-    dpo[i] = dpo[i - 1] * (map_degree - 1);
-
-  FETools::lexicographic_to_hierarchic_numbering(
-    FiniteElementData<dim>(dpo, 1, map_degree), renumber);
+  // lexicographic numbering scheme to a hierarchic one.
+  const std::vector<unsigned int> renumber =
+    FETools::lexicographic_to_hierarchic_numbering<dim>(map_degree);
 
   // finally we assign the quadrature points in the required order.
   for (unsigned int q = 0; q < n_q_points; ++q)
@@ -193,7 +187,7 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, mapping_q_eulerian.euler_dof_handler);
 
-  Assert(mg_vector || dof_cell->active() == true, ExcInactiveCell());
+  Assert(mg_vector || dof_cell->is_active() == true, ExcInactiveCell());
 
   // our quadrature rule is chosen so that each quadrature point corresponds
   // to a support point in the undeformed configuration. We can then query

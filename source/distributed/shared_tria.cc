@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,9 +42,9 @@ namespace parallel
                      smooth_grid,
       const bool     allow_artificial_cells,
       const Settings settings)
-      : dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator,
-                                                       smooth_grid,
-                                                       false)
+      : dealii::parallel::TriangulationBase<dim, spacedim>(mpi_communicator,
+                                                           smooth_grid,
+                                                           false)
       , settings(settings)
       , allow_artificial_cells(allow_artificial_cells)
     {
@@ -65,6 +65,15 @@ namespace parallel
         Assert(allow_artificial_cells,
                ExcMessage("construct_multigrid_hierarchy requires "
                           "allow_artificial_cells to be set to true."));
+    }
+
+
+
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return (settings & construct_multigrid_hierarchy);
     }
 
 
@@ -228,7 +237,7 @@ namespace parallel
                       // also keep its level subdomain id since it is either
                       // owned by this processor or in the ghost layer of the
                       // active mesh.
-                      if (!cell->has_children() &&
+                      if (cell->is_active() &&
                           cell->subdomain_id() !=
                             numbers::artificial_subdomain_id)
                         continue;
@@ -382,6 +391,19 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
+    Triangulation<dim, spacedim>::create_triangulation(
+      const TriangulationDescription::Description<dim, spacedim>
+        &construction_data)
+    {
+      (void)construction_data;
+
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
@@ -392,22 +414,10 @@ namespace parallel
         ExcMessage(
           "Cannot use this function on parallel::distributed::Triangulation."));
 
-      dealii::parallel::Triangulation<dim, spacedim>::copy_triangulation(
+      dealii::parallel::TriangulationBase<dim, spacedim>::copy_triangulation(
         other_tria);
       partition();
       this->update_number_cache();
-    }
-
-
-
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
-    {
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
-
-      if (settings & construct_multigrid_hierarchy)
-        parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
     }
   } // namespace shared
 } // namespace parallel
@@ -426,7 +436,12 @@ namespace parallel
       return true;
     }
 
-
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    {
+      return false;
+    }
 
     template <int dim, int spacedim>
     const std::vector<unsigned int> &

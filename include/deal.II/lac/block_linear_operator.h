@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
-
+#ifndef DOXYGEN
 namespace internal
 {
   namespace BlockLinearOperatorImplementation
@@ -45,6 +45,7 @@ template <typename Range  = BlockVector<double>,
           typename BlockPayload =
             internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>>
 class BlockLinearOperator;
+#endif
 
 template <typename Range  = BlockVector<double>,
           typename Domain = Range,
@@ -639,8 +640,8 @@ block_operator(const BlockMatrixType &block_matrix)
 #ifdef DEBUG
     const unsigned int m = block_matrix.n_block_rows();
     const unsigned int n = block_matrix.n_block_cols();
-    Assert(i < m, ExcIndexRange(i, 0, m));
-    Assert(j < n, ExcIndexRange(j, 0, n));
+    AssertIndexRange(i, m);
+    AssertIndexRange(j, n);
 #endif
 
     return BlockType(block_matrix.block(i, j));
@@ -706,8 +707,8 @@ block_operator(
   return_op.n_block_cols = []() -> unsigned int { return n; };
 
   return_op.block = [ops](unsigned int i, unsigned int j) -> BlockType {
-    Assert(i < m, ExcIndexRange(i, 0, m));
-    Assert(j < n, ExcIndexRange(j, 0, n));
+    AssertIndexRange(i, m);
+    AssertIndexRange(j, n);
 
     return ops[i][j];
   };
@@ -760,8 +761,8 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
     const unsigned int m = block_matrix.n_block_rows();
     const unsigned int n = block_matrix.n_block_cols();
     Assert(m == n, ExcDimensionMismatch(m, n));
-    Assert(i < m, ExcIndexRange(i, 0, m));
-    Assert(j < n, ExcIndexRange(j, 0, n));
+    AssertIndexRange(i, m);
+    AssertIndexRange(j, n);
 #endif
     if (i == j)
       return BlockType(block_matrix.block(i, j));

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,7 +137,7 @@ check(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   deallog << "Global  dofs: " << mg_dof_handler.n_dofs() << std::endl;
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
@@ -160,7 +160,7 @@ check(const FiniteElement<dim> &fe)
   mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mg_dof_handler);
+  transfer.build(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));
@@ -174,9 +174,8 @@ check(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // TODO: do in 1d
   check(FESystem<2>(FE_Q<2>(1), 2));

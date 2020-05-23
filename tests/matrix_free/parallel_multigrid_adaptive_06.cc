@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -210,7 +209,7 @@ template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void
 do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 {
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     {
       deallog.push("float");
     }
@@ -311,7 +310,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       AffineConstraints<double> level_constraints;
       IndexSet                  relevant_dofs;
@@ -377,7 +376,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
 
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.pop();
 
   fine_matrix.clear();
@@ -415,7 +414,7 @@ test(const unsigned int nbands = 1)
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       do_test<dim, fe_degree, fe_degree + 1, double>(dof, nbands);
     }
@@ -427,12 +426,8 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
-
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-    }
+  mpi_initlog();
+  deallog << std::setprecision(4);
 
   {
     deallog.push("2d");

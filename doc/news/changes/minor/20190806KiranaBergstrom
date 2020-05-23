@@ -1,4 +1,0 @@
-Fixed: step-20 tutorial permeability computation now uses Tensor::norm_square instead
-of Point::square on a difference of points.
-<br>
-(Kirana Bergstrom, 2019/08/06)

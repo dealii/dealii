@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -979,7 +979,7 @@ std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceP<dim, spacedim>::get_constant_modes() const
 {
   Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (unsigned int face : GeometryInfo<dim>::face_indices())
     constant_modes(0, face * this->dofs_per_face) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,7 @@ void
 check(const unsigned int testcase)
 {
   std::vector<Point<dim>> vertices;
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
     vertices.push_back(GeometryInfo<dim>::unit_cell_vertex(v));
 
   switch (testcase)
@@ -59,7 +59,7 @@ check(const unsigned int testcase)
   std::vector<CellData<dim>> cells;
   {
     CellData<dim> cell;
-    for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+    for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
       cell.vertices[j] = j;
     cells.push_back(cell);
   }

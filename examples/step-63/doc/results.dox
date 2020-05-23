@@ -69,11 +69,11 @@ the number of iterations necessary to obtain convergence from GMRES:
   <th>48</th>
   <td>3</th>
   <td>3</th>
-  <td>3</th> 
+  <td>3</th>
   <th></th>
   <td>3</th>
   <td>3</th>
-  <td>3</th> 
+  <td>3</th>
 </tr>
 <tr>
   <th>128</th>
@@ -82,10 +82,10 @@ the number of iterations necessary to obtain convergence from GMRES:
   <td>6</th>
   <td>6</th>
   <td>6</th>
-  <th></th> 
+  <th></th>
   <td>6</th>
   <td>6</th>
-  <td>6</th> 
+  <td>6</th>
 </tr>
 <tr>
   <th>512</th>
@@ -97,7 +97,7 @@ the number of iterations necessary to obtain convergence from GMRES:
   <th></th>
   <td>9</th>
   <td>9</th>
-  <td>9</th>  
+  <td>9</th>
 </tr>
 <tr>
   <th>2048</th>
@@ -105,11 +105,11 @@ the number of iterations necessary to obtain convergence from GMRES:
   <th>2176</th>
   <td>15</th>
   <td>15</th>
-  <td>15</th> 
+  <td>15</th>
   <th></th>
   <td>13</th>
   <td>13</th>
-  <td>13</th> 
+  <td>13</th>
 </tr>
 <tr>
   <th>8192</th>
@@ -117,11 +117,11 @@ the number of iterations necessary to obtain convergence from GMRES:
   <th>8448</th>
   <td>18</th>
   <td>18</th>
-  <td>18</th> 
+  <td>18</th>
   <th></th>
   <td>15</th>
   <td>15</th>
-  <td>15</th> 
+  <td>15</th>
 </tr>
 <tr>
   <th>32768</th>
@@ -129,11 +129,11 @@ the number of iterations necessary to obtain convergence from GMRES:
   <th>33280</th>
   <td>20</th>
   <td>20</th>
-  <td>20</th> 
+  <td>20</th>
   <th></th>
   <td>16</th>
   <td>16</th>
-  <td>16</th> 
+  <td>16</th>
 </tr>
 <tr>
   <th>131072</th>
@@ -141,11 +141,11 @@ the number of iterations necessary to obtain convergence from GMRES:
   <th>132096</th>
   <td>20</th>
   <td>20</th>
-  <td>20</th> 
+  <td>20</th>
   <th></th>
   <td>16</th>
   <td>16</th>
-  <td>16</th> 
+  <td>16</th>
 </tr>
 </table>
 
@@ -200,11 +200,11 @@ On the other hand, the situation is different for multiplicative smoothers:
   <th>48</th>
   <td>2</th>
   <td>2</th>
-  <td>3</th> 
+  <td>3</th>
   <th></th>
   <td>2</th>
   <td>2</th>
-  <td>3</th> 
+  <td>3</th>
 </tr>
 <tr>
   <th>128</th>
@@ -213,10 +213,10 @@ On the other hand, the situation is different for multiplicative smoothers:
   <td>5</th>
   <td>5</th>
   <td>7</th>
-  <th></th> 
+  <th></th>
   <td>5</th>
   <td>5</th>
-  <td>7</th> 
+  <td>7</th>
 </tr>
 <tr>
   <th>512</th>
@@ -228,7 +228,7 @@ On the other hand, the situation is different for multiplicative smoothers:
   <th></th>
   <td>7</th>
   <td>7</th>
-  <td>12</th>  
+  <td>12</th>
 </tr>
 <tr>
   <th>2048</th>
@@ -237,10 +237,10 @@ On the other hand, the situation is different for multiplicative smoothers:
   <td>10</th>
   <td>12</th>
   <td>15</th>
-  <th></th> 
+  <th></th>
   <td>8</th>
   <td>10</th>
-  <td>17</th> 
+  <td>17</th>
 </tr>
 <tr>
   <th>8192</th>
@@ -248,11 +248,11 @@ On the other hand, the situation is different for multiplicative smoothers:
   <th>8448</th>
   <td>11</th>
   <td>15</th>
-  <td>19</th> 
+  <td>19</th>
   <th></th>
   <td>10</th>
   <td>11</th>
-  <td>20</th> 
+  <td>20</th>
 </tr>
 <tr>
   <th>32768</th>
@@ -260,11 +260,11 @@ On the other hand, the situation is different for multiplicative smoothers:
   <th>33280</th>
   <td>12</th>
   <td>16</th>
-  <td>20</th> 
+  <td>20</th>
   <th></th>
   <td>10</th>
   <td>12</th>
-  <td>21</th> 
+  <td>21</th>
 </tr>
 <tr>
   <th>131072</th>
@@ -272,11 +272,11 @@ On the other hand, the situation is different for multiplicative smoothers:
   <th>132096</th>
   <td>12</th>
   <td>16</th>
-  <td>19</th> 
+  <td>19</th>
   <th></th>
   <td>11</th>
   <td>12</th>
-  <td>21</th> 
+  <td>21</th>
 </tr>
 </table>
 
@@ -448,7 +448,7 @@ smoother over another. Obviously we must examine the cost of an
 iteration. Block smoothers here are at a disadvantage as they are
 having to construct and invert a cell matrix for each cell. Here is a
 comparison of solve times for a $Q_3$ element with 74,496 DoFs:
- 
+
 <table align="center" class="doxtable">
 <tr>
   <th colspan="1">$Q_3$</th>

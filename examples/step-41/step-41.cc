@@ -121,10 +121,6 @@ namespace Step41
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & /*p*/,
                          const unsigned int component = 0) const override
     {
@@ -141,10 +137,6 @@ namespace Step41
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & /*p*/,
                          const unsigned int component = 0) const override
     {
@@ -163,10 +155,6 @@ namespace Step41
   class Obstacle : public Function<dim>
   {
   public:
-    Obstacle()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override
     {
@@ -280,8 +268,8 @@ namespace Step41
     system_matrix = 0;
     system_rhs    = 0;
 
-    const QGauss<dim>        quadrature_formula(fe.degree + 1);
-    const RightHandSide<dim> right_hand_side;
+    const QGauss<dim>  quadrature_formula(fe.degree + 1);
+    RightHandSide<dim> right_hand_side;
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,

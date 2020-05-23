@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 
 template <typename VECTOR>
 void
@@ -255,6 +254,7 @@ main(int argc, char *argv[])
       deallog.pop();
     }
 
+#ifdef DEAL_II_TRILINOS_WITH_MUELU
     {
       deallog.push("PreconditionAMGMueLu");
       typedef TrilinosWrappers::PreconditionAMGMueLu PREC;
@@ -262,6 +262,7 @@ main(int argc, char *argv[])
       test_preconditioner<PREC>(A, c);
       deallog.pop();
     }
+#endif
 
     {
       deallog.push("PreconditionChebyshev");

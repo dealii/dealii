@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -193,7 +193,7 @@ test()
 
       // Check that all the vertices are within the sphere
       // (sphere with thickness 100. *std::numeric_limits<double>::epsilon())
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         AssertThrow(std::fabs(center.distance(tria.begin_active()->vertex(v))) <
                       radius + 100. * std::numeric_limits<double>::epsilon(),
                     ExcInternalError());

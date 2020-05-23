@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/numerics/data_out_rotation.h>
 
 #include "../tests.h"
+
 #include "data_out_common.h"
 
 

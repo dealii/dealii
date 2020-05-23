@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019-2016 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -679,7 +679,7 @@ namespace LinearAlgebra
         const int err = target_vector.Import(multivector, import, Insert);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+                               std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
@@ -694,7 +694,7 @@ namespace LinearAlgebra
         const int err = target_vector.Import(multivector, import, Add);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+                               std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
@@ -709,7 +709,7 @@ namespace LinearAlgebra
         const int err = target_vector.Import(multivector, import, Add);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+                               std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
@@ -739,7 +739,7 @@ namespace LinearAlgebra
         const int err = target_vector.Import(multivector, import, Add);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+                               std::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();

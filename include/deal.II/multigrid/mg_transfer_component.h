@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,9 +38,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declaration
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class DoFHandler;
+#endif
 
 /*
  * MGTransferBase is defined in mg_base.h
@@ -81,6 +83,22 @@ protected:
    */
   template <int dim, int spacedim>
   void
+  build(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Actually build the prolongation matrices for each level.
+   *
+   * This function is only called by derived classes. These can also set the
+   * member variables <code>selected_component</code> and
+   * <code>mg_selected_component</code> member variables to restrict the
+   * transfer matrices to certain components. Furthermore, they use
+   * <code>target_component</code> and <code>mg_target_component</code> for
+   * re-ordering and grouping of components.
+   *
+   * @deprecated Use build() instead.
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED void
   build_matrices(const DoFHandler<dim, spacedim> &dof,
                  const DoFHandler<dim, spacedim> &mg_dof);
 
@@ -128,7 +146,7 @@ protected:
   std::vector<std::vector<types::global_dof_index>> mg_component_start;
 
   /**
-   * Call build_matrices() function first.
+   * Call build() function first.
    */
   DeclException0(ExcMatricesNotBuilt);
 
@@ -218,9 +236,11 @@ public:
    * It also affects the behavior of the <tt>selected</tt> argument
    *
    * @arg boundary_indices: holds the boundary indices on each level.
+   *
+   * @deprecated Use build() instead.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   build_matrices(
     const DoFHandler<dim, spacedim> &dof,
     const DoFHandler<dim, spacedim> &mg_dof,
@@ -232,6 +252,43 @@ public:
       std::vector<unsigned int>(),
     const std::vector<std::set<types::global_dof_index>> &boundary_indices =
       std::vector<std::set<types::global_dof_index>>());
+
+  /**
+   * Actually build the prolongation matrices for grouped components.
+   *
+   * This function is a front-end for the same function in
+   * MGTransferComponentBase.
+   *
+   * @arg selected Number of the block of the global vector to be copied from
+   * and to the multilevel vector. This number refers to the renumbering by
+   * <tt>target_component</tt>.
+   *
+   * @arg mg_selected Number of the block for which the transfer matrices
+   * should be built.
+   *
+   * If <tt>mg_target_component</tt> is present, this refers to the renumbered
+   * components.
+   *
+   * @arg target_component this argument allows grouping and renumbering of
+   * components in the fine-level vector (see DoFRenumbering::component_wise).
+   *
+   * @arg mg_target_component this argument allows grouping and renumbering
+   * of components in the level vectors (see DoFRenumbering::component_wise).
+   * It also affects the behavior of the <tt>selected</tt> argument
+   *
+   * @arg boundary_indices holds the boundary indices on each level.
+   */
+  template <int dim, int spacedim>
+  void
+  build(const DoFHandler<dim, spacedim> &dof,
+        unsigned int                     selected,
+        unsigned int                     mg_selected,
+        const std::vector<unsigned int> &target_component =
+          std::vector<unsigned int>(),
+        const std::vector<unsigned int> &mg_target_component =
+          std::vector<unsigned int>(),
+        const std::vector<std::set<types::global_dof_index>> &boundary_indices =
+          std::vector<std::set<types::global_dof_index>>());
 
   /**
    * Change selected component. Handle with care!

@@ -8,7 +8,7 @@ DEAL:cg::Starting value 0.121094
 DEAL:cg::Convergence step 48 value 5.33692e-13
 @endcode
 
-The first three lines is what we wrote to <code>cout</code>. The last
+The first two lines is what we wrote to <code>cout</code>. The last
 two lines were generated without our intervention by the CG
 solver. The first two lines state the residual at the start of the
 iteration, while the last line tells us that the solver needed 47
@@ -19,49 +19,35 @@ sometimes useful for debugging purposes, but often clutters up the
 screen display.
 
 Apart from the output shown above, the program generated the file
-<code>solution.gpl</code>, which is in GNUPLOT format. It can be
-viewed as follows: invoke GNUPLOT and enter the following sequence of
-commands at its prompt:
-@code
-examples/\step-3> gnuplot
+<code>solution.vtk</code>, which is in the VTK format that is widely
+used by many visualization programs today -- including the two
+heavy-weights <a href="https://www.llnl.gov/visit">VisIt</a> and
+<a href="https://www.paraview.org">Paraview</a> that are the most
+commonly used programs for this purpose today.
 
-        G N U P L O T
-        Version 3.7 patchlevel 3
-        last modified Thu Dec 12 13:00:00 GMT 2002
-        System: Linux 2.6.11.4-21.10-default
-
-        Copyright(C) 1986 - 1993, 1998 - 2002
-        Thomas Williams, Colin Kelley and many others
-
-        Type `help` to access the on-line reference manual
-        The gnuplot FAQ is available from
-        http://www.gnuplot.info/gnuplot-faq.html
-
-        Send comments and requests for help to <info-gnuplot@dartmouth.edu>
-        Send bugs, suggestions and mods to <bug-gnuplot@dartmouth.edu>
-
-
-Terminal type set to 'x11'
-gnuplot> set style data lines
-gnuplot> splot "solution.gpl"
-@endcode
-This produces the picture of the solution below left. Alternatively,
-you can order GNUPLOT to do some hidden line removal by the command
-@code
-gnuplot> set hidden3d
-@endcode
-to get the result at the right:
-
+Using VisIt, it is not very difficult to generate a picture of the
+solution like this:
 <table width="60%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-1.png" alt="">
-    </td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-2.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-3.solution-3.png" alt="Visualization of the solution of step-3">
     </td>
   </tr>
 </table>
+It shows both the solution and the mesh, elevated above the $x$-$y$ plane
+based on the value of the solution at each point. Of course the solution
+here is not particularly exciting, but that is a result of both what the
+Laplace equation represents and the right hand side $f(\mathbf x)=1$ we
+have chosen for this program: The Laplace equation describes (among many
+other uses) the vertical deformation of a membrane subject to an external
+(also vertical) force. In the current example, the membrane's borders
+are clamped to a square frame with no vertical variation; a constant
+force density will therefore intuitively lead to a membrane that
+simply bulges upward -- like the one shown above.
+
+VisIt and Paraview both allow playing with various kinds of visualizations
+of the solution. Several video lectures show how to use these programs.
+@dealiiVideoLectureSeeAlso{11,32}
 
 
 
@@ -82,27 +68,29 @@ suggestions:
   </li>
 
   <li>
-  Change the boundary condition: The code uses the <code>ZeroFunction</code>
+  Change the boundary condition: The code uses the Functions::ZeroFunction
   function to generate zero boundary conditions. However, you may want to try
-  non-zero constant boundary values using <code>ConstantFunction&lt;2&gt;
-  (1)</code> instead of <code>ZeroFunction&lt;2&gt; ()</code> to have unit
-  Dirichlet boundary values. More exotic functions are described in the
-  documentation of the <code>Functions</code> namespace, and you may pick one
-  to describe your particular boundary values.
+  non-zero constant boundary values using
+  <code>ConstantFunction&lt;2&gt;(1)</code> instead of
+  <code>ZeroFunction&lt;2&gt;()</code> to have unit Dirichlet boundary
+  values. More exotic functions are described in the documentation of the
+  Functions namespace, and you may pick one to describe your particular boundary
+  values.
   </li>
 
   <li> Modify the type of boundary condition: Presently, what happens
   is that we use Dirichlet boundary values all around, since the
   default is that all boundary parts have boundary indicator zero, and
   then we tell the
-  <code>VectorTools::interpolate_boundary_values</code> function to
+  VectorTools::interpolate_boundary_values() function to
   interpolate boundary values to zero on all boundary components with
   indicator zero.  <p> We can change this behavior if we assign parts
   of the boundary different indicators. For example, try this
-  immediately after calling <code>GridGenerator::hyper_cube</code>:
+  immediately after calling GridGenerator::hyper_cube():
   @code
   triangulation.begin_active()->face(0)->set_boundary_id(1);
   @endcode
+
   What this does is it first asks the triangulation to
   return an iterator that points to the first active cell. Of course,
   this being the coarse mesh for the triangulation of a square, the
@@ -114,7 +102,7 @@ suggestions:
   parents, i.e. even on the finest mesh, the faces on one side of the
   square have boundary indicator 1. Later, when we get to
   interpolating boundary conditions, the
-  <code>interpolate_boundary_values</code> will only produce boundary
+  VectorTools::interpolate_boundary_values() call will only produce boundary
   values for those faces that have zero boundary indicator, and leave
   those faces alone that have a different boundary indicator. What
   this then does is to impose Dirichlet boundary conditions on the
@@ -125,27 +113,20 @@ suggestions:
   run the program.
 
   An alternative way to change the boundary indicator is to label
-  the boundaries by the cartesian coordinates of the face centers.
+  the boundaries based on the Cartesian coordinates of the face centers.
   For example, we can label all of the cells along the top and
   bottom boundaries with a boundary indicator 1 by checking to
   see if the cell centers' y-coordinates are within a tolerance
   (here 1e-12) of -1 and 1. Try this immediately after calling
-  <code>GridGenerator::hyper_cube</code>, as before:
+  GridGenerator::hyper_cube(), as before:
   @code
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-        for (unsigned int face_number = 0;
-             face_number < GeometryInfo<2>::faces_per_cell;
-             ++face_number)
-          if ((std::fabs(cell->face(face_number)->center()(1) - (-1)) <
-               1e-12) ||
-              (std::fabs(cell->face(face_number)->center()(1) - (1)) < 1e-12))
-            cell->face(face_number)->set_boundary_id(1);
-    }
-    @code
-    Although this code is significantly longer than before, it is
-    useful for complex geometries, as it does not require knowledge
-    of face labels.
+  for (auto &face : triangulation.active_face_iterators())
+    if (std::fabs(face->center()(1) - (-1.0)) < 1e-12 ||
+        std::fabs(face->center()(1) - (1.0)) < 1e-12)
+      face->set_boundary_id(1);
+  @endcode
+  Although this code is a bit longer than before, it is useful for
+  complex geometries, as it does not require knowledge of face labels.
 
   <li>
   A slight variation of the last point would be to set different boundary
@@ -153,10 +134,10 @@ suggestions:
   boundary indicator one. In practice, what you have to do is to add a second
   call to <code>interpolate_boundary_values</code> for boundary indicator one:
   @code
-  VectorTools::interpolate_boundary_values (dof_handler,
-					    1,
-					    ConstantFunction<2>(1.),
-					    boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler,
+					   1,
+					   ConstantFunction<2>(1.),
+					   boundary_values);
   @endcode
   If you have this call immediately after the first one to this function, then
   it will interpolate boundary values on faces with boundary indicator 1 to the
@@ -171,13 +152,13 @@ suggestions:
   already here. For example, we could evaluate the value of the solution in a
   single point and compare the value for different %numbers of global
   refinement (the number of global refinement steps is set in
-  <code>LaplaceProblem::make_grid_and_dofs</code> above). To evaluate the
+  <code>LaplaceProblem::make_grid</code> above). To evaluate the
   solution at a point, say at $(\frac 13, \frac 13)$, we could add the
   following code to the <code>LaplaceProblem::output_results</code> function:
   @code
     std::cout << "Solution at (1/3,1/3): "
-              << VectorTools::point_value (dof_handler, solution,
-                                           Point<2>(1./3, 1./3))
+              << VectorTools::point_value(dof_handler, solution,
+                                          Point<2>(1./3, 1./3))
               << std::endl;
   @endcode
   For 1 through 9 global refinement steps, we then get the following sequence
@@ -238,3 +219,274 @@ suggestions:
   Again, the difference between two adjacent values goes down by about a
   factor of four, indicating convergence as ${\cal O}(h^2)$.
 </ul>
+
+
+
+<h3>Using %HDF5 to output the solution and additional data</h3>
+
+%HDF5 is a commonly used format that can be read by many scripting
+languages (e.g. R or Python). It is not difficult to get deal.II to
+produce some %HDF5 files that can then be used in external scripts to
+postprocess some of the data generated by this program. Here are some
+ideas on what is possible.
+
+
+<h4> Changing the output to .h5</h4>
+
+To fully make use of the automation we first need to introduce a private variable for the number of
+global refinement steps <code>unsigned int n_refinement_steps </code>, which will be used for the output filename.
+In <code>make_grid()</code> we then replace <code>triangulation.refine_global(5);</code> with
+@code
+n_refinement_steps = 5;
+triangulation.refine_global(n_refinement_steps);
+@endcode
+The deal.II library has two different %HDF5 bindings, one in the HDF5
+namespace (for interfacing to general-purpose data files)
+and another one in DataOut (specifically for writing files for the
+visualization of solutions).
+Although the HDF5 deal.II binding supports both serial and MPI, the %HDF5 DataOut binding
+only supports parallel output.
+For this reason we need to initialize an MPI
+communicator with only one processor. This is done by adding the following code.
+@code
+int main(int argc, char* argv[])
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  ...
+}
+@endcode
+Next we change the `Step3::output_results()` output routine as
+described in the DataOutBase namespace documentation:
+@code
+const std::string filename_h5 = "solution_" + std::to_string(n_refinement_steps) + ".h5";
+DataOutBase::DataOutFilterFlags flags(true, true);
+DataOutBase::DataOutFilter data_filter(flags);
+data_out.write_filtered_data(data_filter);
+data_out.write_hdf5_parallel(data_filter, filename_h5, MPI_COMM_WORLD);
+@endcode
+The resulting file can then be visualized just like the VTK file that
+the original version of the tutorial produces; but, since %HDF5 is a
+more general file format, it can also easily be processed in scripting
+languages for other purposes.
+
+
+<h4> Adding the point value and the mean (see extension above) into the .h5 file</h4>
+
+After outputting the solution, the file can be opened again to include
+more datasets.  This allows us to keep all the necessary information
+of our experiment in a single result file, which can then be read and
+processed by some postprocessing script.
+(Have a look at HDF5::Group::write_dataset() for further
+information on the possible output options.)
+
+To make this happen, we first include the necessary header into our file:
+@code
+#include <deal.II/base/hdf5.h>
+@endcode
+Adding the following lines to the end
+of our output routine adds the information about the value of the
+solution at a particular point, as well as the mean value of the
+solution, to our %HDF5 file:
+@code
+HDF5::File data_file(filename_h5, HDF5::File::FileAccessMode::open, MPI_COMM_WORLD);
+Vector<double> point_value(1);
+point_value[0] = VectorTools::point_value(dof_handler, solution,
+                                          Point<2>(1./3, 1./3));
+data_file.write_dataset("point_value", point_value);
+Vector<double> mean_value(1);
+mean_value[0] = VectorTools::compute_mean_value(dof_handler,
+                                                QGauss<2>(fe.degree + 1),
+                                                solution, 0);
+data_file.write_dataset("mean_value",mean_value);
+@endcode
+
+
+
+<h3> Using R and ggplot2 to generate plots</h3>
+
+The data put into %HDF5 files above can then be used from scripting
+languages for further postprocessing. In the following, let us show
+how this can, in particular, be done with the
+<a href="https://en.wikipedia.org/wiki/R_(programming_language)">R
+programming language</a>, a widely used language in statistical data
+analysis. (Similar things can also be done in Python, for example.)
+If you are unfamiliar with R and ggplot2 you could check out the data carpentry course on R
+<a href="https://datacarpentry.org/R-ecology-lesson/index.html">here</a>.
+Furthermore, since most search engines struggle with searches of the form "R + topic",
+we recommend using the specializes service <a
+href="http://rseek.org">RSeek </a> instead.
+
+The most prominent difference between R and other languages is that
+the assignment operator (`a = 5`) is typically written as
+`a <- 5`. As the latter is considered standard we will use it in our examples as well.
+To open the `.h5` file in R you have to install the <a href="https://bioconductor.org/packages/release/bioc/html/rhdf5.html">rhdf5</a> package, which is a part of the Bioconductor package.
+
+First we will include all necessary packages and have a look at how the data is structured in our file.
+@code{.r}
+library(rhdf5)     # library for handling HDF5 files
+library(ggplot2)   # main plotting library
+library(grDevices) # needed for output to PDF
+library(viridis)   # contains good colormaps for sequential data
+
+refinement <- 5
+h5f <- H5Fopen(paste("solution_",refinement,".h5",sep=""))
+print(h5f)
+@endcode
+This gives the following output
+@code{.unparsed}
+HDF5 FILE
+   name /
+filename
+
+    name       otype  dclass     dim
+0 cells       H5I_DATASET INTEGER  x 1024
+1 mean_value  H5I_DATASET FLOAT   1
+2 nodes       H5I_DATASET FLOAT    x 1089
+3 point_value H5I_DATASET FLOAT   1
+4 solution    H5I_DATASET FLOAT    x 1089
+@endcode
+The datasets can be accessed by <code>h5f\$name</code>. The function
+<code>dim(h5f\$cells)</code> gives us the dimensions of the matrix
+that is used to store our cells.
+We can see the following three matrices, as well as the two
+additional data points we added.
+<ul>
+<li> <code>cells</code>: a 4x1024 matrix that stores the  (C++) vertex indices for each cell
+<li> <code>nodes</code>: a 2x1089 matrix storing the position values (x,y) for our cell vertices
+<li> <code>solution</code>: a 1x1089 matrix storing the values of our solution at each vertex
+</ul>
+Now we can use this data to generate various plots. Plotting with ggplot2 usually splits into two steps.
+At first the data needs to be manipulated and added to a <code>data.frame</code>.
+After that, a <code>ggplot</code> object is constructed and manipulated by adding plot elements to it.
+
+<code>nodes</code> and <code>cells</code> contain all the information we need to plot our grid.
+The following code wraps all the data into one dataframe for plotting our grid:
+@code{.r}
+# Counting in R starts at 1 instead of 0, so we need to increment all
+# vertex indices by one:
+cell_ids <- h5f$cells+1
+
+# Store the x and y positions of each vertex in one big vector in a
+# cell by cell fashion (every 4 entries belong to one cell):
+cells_x <- h5f$nodes[1,][cell_ids]
+cells_y <- h5f$nodes[2,][cell_ids]
+
+# Construct a vector that stores the matching cell by cell grouping
+# (1,1,1,1,2,2,2,2,...):
+groups <- rep(1:ncol(cell_ids),each=4)
+
+# Finally put everything into one dataframe:
+meshdata <- data.frame(x = cells_x, y = cells_y, id = groups)
+@endcode
+
+With the finished dataframe we have everything we need to plot our grid:
+@code{.r}
+pdf (paste("grid_",refinement,".pdf",sep=""),width = 5,height = 5) # Open new PDF file
+plt <- ggplot(meshdata,aes(x=x,y=y,group=id))                      # Construction of our plot
+                                                                   # object, at first only data
+
+plt <- plt + geom_polygon(fill="white",colour="black")             # Actual plotting of the grid as polygons
+plt <- plt + ggtitle(paste("grid at refinement level #",refinement))
+
+print(plt)                                                         # Show the current state of the plot/add it to the pdf
+dev.off()                                                          # Close PDF file
+@endcode
+
+The contents of this file then look as follows (not very exciting, but
+you get the idea):
+<table width="60%" align="center">
+  <tr>
+   <td align="center">
+     <img src="https://www.dealii.org/images/steps/developer/step-3.extensions.grid_5.png" alt="Grid after 5 refinement steps of step-3">
+   </td>
+  </tr>
+</table>
+
+We can also visualize the solution itself, and this is going to look
+more interesting.
+To make a 2D pseudocolor plot of our solution we will use <code>geom_raster</code>.
+This function needs a structured grid, i.e. uniform in x and y directions.
+Luckily our data at this point is structured in the right way.
+The following code plots a pseudocolor representation of our surface into a new PDF:
+@code{.r}
+pdf (paste("pseudocolor_",refinement,".pdf",sep=""),width = 5,height = 4.2) # Open new PDF file
+colordata <- data.frame(x = h5f$nodes[1,],y = h5f$nodes[2,] , solution = h5f$solution[1,])
+plt <- ggplot(colordata,aes(x=x,y=y,fill=solution))
+plt <- plt + geom_raster(interpolate=TRUE)
+plt <- plt + scale_fill_viridis()
+plt <- plt + ggtitle(paste("solution at refinement level #",refinement))
+
+print(plt)
+dev.off()
+H5Fclose(h5f) # Close the HDF5 file
+@endcode
+This is now going to look as follows:
+<table width="60%" align="center">
+ <tr>
+   <td align="center">
+     <img src="https://www.dealii.org/images/steps/developer/step-3.extensions.pseudocolor_5.png" alt="Solution after 5 refinement steps of step-3">
+   </td>
+ </tr>
+</table>
+
+For plotting the converge curves we need to re-run the C++ code multiple times with different values for <code>n_refinement_steps</code>
+starting from 1.
+Since every file only contains a single data point we need to loop over them and concatenate the results into a single vector.
+@code{.r}
+n_ref <- 8   # Maximum refinement level for which results are existing
+
+# First we initiate all vectors with the results of the first level
+h5f   <- H5Fopen("solution_1.h5")
+dofs  <- dim(h5f$solution)[2]
+mean  <- h5f$mean_value
+point <- h5f$point_value
+H5Fclose(h5f)
+
+for (reflevel in 2:n_ref)
+{
+   h5f   <- H5Fopen(paste("solution_",reflevel,".h5",sep=""))
+   dofs  <- c(dofs,dim(h5f\$solution)[2])
+   mean  <- c(mean,h5f\$mean_value)
+   point <- c(point,h5f\$point_value)
+   H5Fclose(h5f)
+}
+@endcode
+As we are not interested in the values themselves but rather in the error compared to a "exact" solution we will
+assume our highest refinement level to be that solution and omit it from the data.
+@code{.r}
+# Calculate the error w.r.t. our maximum refinement step
+mean_error  <- abs(mean[1:n_ref-1]-mean[n_ref])
+point_error <- abs(point[1:n_ref-1]-point[n_ref])
+
+# Remove the highest value from our DoF data
+dofs     <- dofs[1:n_ref-1]
+convdata <- data.frame(dofs = dofs, mean_value= mean_error, point_value = point_error)
+@endcode
+Now we have all the data available to generate our plots.
+It is often useful to plot errors on a log-log scale, which is
+accomplished in the following code:
+@code
+pdf (paste("convergence.pdf",sep=""),width = 5,height = 4.2)
+plt <- ggplot(convdata,mapping=aes(x = dofs, y = mean_value))
+plt <- plt+geom_line()
+plt <- plt+labs(x="#DoFs",y = "mean value error")
+plt <- plt+scale_x_log10()+scale_y_log10()
+print(plt)
+
+plt <- ggplot(convdata,mapping=aes(x = dofs, y = point_value))
+plt <- plt+geom_line()
+plt <- plt+labs(x="#DoFs",y = "point value error")
+plt <- plt+scale_x_log10()+scale_y_log10()
+print(plt)
+
+dev.off()
+@endcode
+This results in the following plot that shows how the errors in the
+mean value and the solution value at the chosen point nicely converge
+to zero:
+<table style="width:50%" align="center">
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_mean.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
+  </tr>
+</table>

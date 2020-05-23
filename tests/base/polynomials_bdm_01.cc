@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ void
 plot(const PolynomialsBDM<dim> &poly)
 {
   QTrapez<1>                  base_quadrature;
-  QIterated<dim>              quadrature(base_quadrature, poly.degree() + 4);
+  QIterated<dim>              quadrature(base_quadrature, poly.degree() + 3);
   std::vector<Tensor<1, dim>> values(poly.n());
   std::vector<Tensor<2, dim>> grads;
   std::vector<Tensor<3, dim>> grads2;
@@ -41,12 +41,13 @@ plot(const PolynomialsBDM<dim> &poly)
 
   for (unsigned int k = 0; k < quadrature.size(); ++k)
     {
-      if (k % (poly.degree() + 5) == 0)
-        deallog << "BDM" << poly.degree() << '<' << dim << '>' << std::endl;
+      if (k % (poly.degree() + 4) == 0)
+        deallog << "BDM" << poly.degree() - 1 << '<' << dim << '>' << std::endl;
 
-      deallog << "BDM" << poly.degree() << '<' << dim << '>' << '\t'
+      deallog << "BDM" << poly.degree() - 1 << '<' << dim << '>' << '\t'
               << quadrature.point(k);
-      poly.compute(quadrature.point(k), values, grads, grads2, thirds, fourths);
+      poly.evaluate(
+        quadrature.point(k), values, grads, grads2, thirds, fourths);
 
       for (unsigned int i = 0; i < poly.n(); ++i)
         for (unsigned int d = 0; d < dim; ++d)

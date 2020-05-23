@@ -67,13 +67,35 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
         DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
                         lda>> &,
       unsigned int);
+
+    template void
+    FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+      const TriaIterator<
+        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
+                        lda>> &,
+      const TriaIterator<TriaAccessor<deal_II_dimension - 1,
+                                      deal_II_dimension,
+                                      deal_II_space_dimension>> &);
+
     template void
     FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
         DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
                         lda>> &,
-      unsigned int,
-      unsigned int);
+      const unsigned int,
+      const unsigned int);
+
+    template void
+    FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+      const TriaIterator<
+        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
+                        lda>> &,
+      const TriaIterator<TriaAccessor<deal_II_dimension - 1,
+                                      deal_II_dimension,
+                                      deal_II_space_dimension>> &,
+      const TriaIterator<TriaAccessor<deal_II_dimension - 1,
+                                      deal_II_dimension,
+                                      deal_II_space_dimension>> &);
 #endif
   }
 

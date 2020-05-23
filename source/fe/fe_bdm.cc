@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,14 +38,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_BDM<dim>::FE_BDM(const unsigned int deg)
-  : FE_PolyTensor<PolynomialsBDM<dim>, dim>(
-      deg,
+  : FE_PolyTensor<dim>(
+      PolynomialsBDM<dim>(deg),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 1,
                              FiniteElementData<dim>::Hdiv),
       get_ria_vector(deg),
-      std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
+      std::vector<ComponentMask>(PolynomialsBDM<dim>::n_polynomials(deg),
                                  std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -149,7 +149,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   unsigned int dbase = 0;
   // The index of the first generalized support point on this face or the cell
   unsigned int pbase = 0;
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (auto f : GeometryInfo<dim>::face_indices())
     {
       // Old version with no moments in 2D. See comment below in
       // initialize_support_points()
@@ -222,12 +222,12 @@ FE_BDM<dim>::get_dpo_vector(const unsigned int deg)
   // the element is face-based and we have as many degrees of freedom
   // on the faces as there are polynomials of degree up to
   // deg. Observe the odd convention of
-  // PolynomialSpace::compute_n_pols()!
+  // PolynomialSpace::n_polynomials()!
 
   std::vector<unsigned int> dpo(dim + 1, 0u);
   dpo[dim] =
-    (deg > 1 ? dim * PolynomialSpace<dim>::compute_n_pols(deg - 1) : 0u);
-  dpo[dim - 1] = PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
+    (deg > 1 ? dim * PolynomialSpace<dim>::n_polynomials(deg - 1) : 0u);
+  dpo[dim - 1] = PolynomialSpace<dim - 1>::n_polynomials(deg + 1);
 
   return dpo;
 }
@@ -244,9 +244,9 @@ FE_BDM<dim>::get_ria_vector(const unsigned int deg)
       return std::vector<bool>();
     }
 
-  const unsigned int dofs_per_cell = PolynomialsBDM<dim>::compute_n_pols(deg);
+  const unsigned int dofs_per_cell = PolynomialsBDM<dim>::n_polynomials(deg);
   const unsigned int dofs_per_face =
-    PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
+    PolynomialSpace<dim - 1>::n_polynomials(deg + 1);
 
   Assert(GeometryInfo<dim>::faces_per_cell * dofs_per_face <= dofs_per_cell,
          ExcInternalError());
@@ -294,12 +294,12 @@ namespace internal
         for (unsigned int k = 0; k < quadrature.size(); ++k)
           {
             test_values[k].resize(poly.n());
-            poly.compute(quadrature.point(k),
-                         test_values[k],
-                         dummy1,
-                         dummy2,
-                         dummy3,
-                         dummy4);
+            poly.evaluate(quadrature.point(k),
+                          test_values[k],
+                          dummy1,
+                          dummy2,
+                          dummy3,
+                          dummy4);
             for (unsigned int i = 0; i < poly.n(); ++i)
               {
                 test_values[k][i] *= quadrature.weight(k);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,28 +15,18 @@
 
 
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/random.hpp>
-
 #include <cmath>
 #include <map>
 
 #ifdef DEAL_II_WITH_MUPARSER
 #  include <muParser.h>
-#else
-
-
-
-namespace fparser
-{
-  class FunctionParser
-  {};
-} // namespace fparser
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -88,9 +78,11 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 }
 
 
-// We deliberately delay the definition of the default destructor
-// so that we don't need to include the definition of mu::Parser
-// in the header file.
+
+// Note: we explicitly define the destructor here (instead of silently using
+// the default destructor by declaring nothing in the header) since we do not
+// expect muParser.h to be available in user projects: i.e., the destructor
+// must be defined in the source file.
 template <int dim>
 FunctionParser<dim>::~FunctionParser() = default;
 
@@ -112,166 +104,31 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
               ExcMessage("Wrong number of variables"));
 
-  // We check that the number of
-  // components of this function
-  // matches the number of components
-  // passed in as a vector of
-  // strings.
+  // We check that the number of components of this function matches the
+  // number of components passed in as a vector of strings.
   AssertThrow(this->n_components == expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
 
-  // Now we define how many variables
-  // we expect to read in.  We
-  // distinguish between two cases:
-  // Time dependent problems, and not
-  // time dependent problems. In the
-  // first case the number of
-  // variables is given by the
-  // dimension plus one. In the other
-  // case, the number of variables is
-  // equal to the dimension. Once we
-  // parsed the variables string, if
-  // none of this is the case, then
-  // an exception is thrown.
+  // Now we define how many variables we expect to read in.  We distinguish
+  // between two cases: Time dependent problems, and not time dependent
+  // problems. In the first case the number of variables is given by the
+  // dimension plus one. In the other case, the number of variables is equal
+  // to the dimension. Once we parsed the variables string, if none of this is
+  // the case, then an exception is thrown.
   if (time_dependent)
     n_vars = dim + 1;
   else
     n_vars = dim;
 
-  // create a parser object for the current thread we can then query
-  // in value() and vector_value(). this is not strictly necessary
-  // because a user may never call these functions on the current
-  // thread, but it gets us error messages about wrong formulas right
-  // away
+  // create a parser object for the current thread we can then query in
+  // value() and vector_value(). this is not strictly necessary because a user
+  // may never call these functions on the current thread, but it gets us
+  // error messages about wrong formulas right away
   init_muparser();
 
   // finally set the initialization bit
   initialized = true;
 }
-
-
-
-namespace internal
-{
-  // convert double into int
-  int
-  mu_round(double val)
-  {
-    return static_cast<int>(val + ((val >= 0.0) ? 0.5 : -0.5));
-  }
-
-  double
-  mu_if(double condition, double thenvalue, double elsevalue)
-  {
-    if (mu_round(condition))
-      return thenvalue;
-    else
-      return elsevalue;
-  }
-
-  double
-  mu_or(double left, double right)
-  {
-    return (mu_round(left)) || (mu_round(right));
-  }
-
-  double
-  mu_and(double left, double right)
-  {
-    return (mu_round(left)) && (mu_round(right));
-  }
-
-  double
-  mu_int(double value)
-  {
-    return static_cast<double>(mu_round(value));
-  }
-
-  double
-  mu_ceil(double value)
-  {
-    return std::ceil(value);
-  }
-
-  double
-  mu_floor(double value)
-  {
-    return std::floor(value);
-  }
-
-  double
-  mu_cot(double value)
-  {
-    return 1.0 / std::tan(value);
-  }
-
-  double
-  mu_csc(double value)
-  {
-    return 1.0 / std::sin(value);
-  }
-
-  double
-  mu_sec(double value)
-  {
-    return 1.0 / std::cos(value);
-  }
-
-  double
-  mu_log(double value)
-  {
-    return std::log(value);
-  }
-
-  double
-  mu_pow(double a, double b)
-  {
-    return std::pow(a, b);
-  }
-
-  double
-  mu_erfc(double value)
-  {
-    return std::erfc(value);
-  }
-
-  // returns a random value in the range [0,1] initializing the generator
-  // with the given seed
-  double
-  mu_rand_seed(double seed)
-  {
-    static Threads::Mutex       rand_mutex;
-    std::lock_guard<std::mutex> lock(rand_mutex);
-
-    static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                           1);
-
-    // for each seed an unique random number generator is created,
-    // which is initialized with the seed itself
-    // we could use std::mt19937 but doing so results in compiler-dependent
-    // output.
-    static std::map<double, boost::random::mt19937> rng_map;
-
-    if (rng_map.find(seed) == rng_map.end())
-      rng_map[seed] = boost::random::mt19937(static_cast<unsigned int>(seed));
-
-    return uniform_distribution(rng_map[seed]);
-  }
-
-  // returns a random value in the range [0,1]
-  double
-  mu_rand()
-  {
-    static Threads::Mutex                             rand_mutex;
-    std::lock_guard<std::mutex>                       lock(rand_mutex);
-    static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                           1);
-    static boost::random::mt19937                     rng(
-                          static_cast<unsigned long>(std::time(nullptr)));
-    return uniform_distribution(rng);
-  }
-
-} // namespace internal
 
 
 
@@ -292,32 +149,53 @@ FunctionParser<dim>::init_muparser() const
     {
       fp.get().emplace_back(new mu::Parser());
 
-      for (std::map<std::string, double>::const_iterator constant =
-             constants.begin();
-           constant != constants.end();
-           ++constant)
+      for (const auto &constant : constants)
         {
-          fp.get()[component]->DefineConst(constant->first, constant->second);
+          fp.get()[component]->DefineConst(constant.first, constant.second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
         fp.get()[component]->DefineVar(var_names[iv], &vars.get()[iv]);
 
       // define some compatibility functions:
-      fp.get()[component]->DefineFun("if", internal::mu_if, true);
-      fp.get()[component]->DefineOprt("|", internal::mu_or, 1);
-      fp.get()[component]->DefineOprt("&", internal::mu_and, 2);
-      fp.get()[component]->DefineFun("int", internal::mu_int, true);
-      fp.get()[component]->DefineFun("ceil", internal::mu_ceil, true);
-      fp.get()[component]->DefineFun("cot", internal::mu_cot, true);
-      fp.get()[component]->DefineFun("csc", internal::mu_csc, true);
-      fp.get()[component]->DefineFun("floor", internal::mu_floor, true);
-      fp.get()[component]->DefineFun("sec", internal::mu_sec, true);
-      fp.get()[component]->DefineFun("log", internal::mu_log, true);
-      fp.get()[component]->DefineFun("pow", internal::mu_pow, true);
-      fp.get()[component]->DefineFun("erfc", internal::mu_erfc, true);
-      fp.get()[component]->DefineFun("rand_seed", internal::mu_rand_seed, true);
-      fp.get()[component]->DefineFun("rand", internal::mu_rand, true);
+      fp.get()[component]->DefineFun("if",
+                                     internal::FunctionParser::mu_if,
+                                     true);
+      fp.get()[component]->DefineOprt("|", internal::FunctionParser::mu_or, 1);
+      fp.get()[component]->DefineOprt("&", internal::FunctionParser::mu_and, 2);
+      fp.get()[component]->DefineFun("int",
+                                     internal::FunctionParser::mu_int,
+                                     true);
+      fp.get()[component]->DefineFun("ceil",
+                                     internal::FunctionParser::mu_ceil,
+                                     true);
+      fp.get()[component]->DefineFun("cot",
+                                     internal::FunctionParser::mu_cot,
+                                     true);
+      fp.get()[component]->DefineFun("csc",
+                                     internal::FunctionParser::mu_csc,
+                                     true);
+      fp.get()[component]->DefineFun("floor",
+                                     internal::FunctionParser::mu_floor,
+                                     true);
+      fp.get()[component]->DefineFun("sec",
+                                     internal::FunctionParser::mu_sec,
+                                     true);
+      fp.get()[component]->DefineFun("log",
+                                     internal::FunctionParser::mu_log,
+                                     true);
+      fp.get()[component]->DefineFun("pow",
+                                     internal::FunctionParser::mu_pow,
+                                     true);
+      fp.get()[component]->DefineFun("erfc",
+                                     internal::FunctionParser::mu_erfc,
+                                     true);
+      fp.get()[component]->DefineFun("rand_seed",
+                                     internal::FunctionParser::mu_rand_seed,
+                                     true);
+      fp.get()[component]->DefineFun("rand",
+                                     internal::FunctionParser::mu_rand,
+                                     true);
 
       try
         {
@@ -330,55 +208,17 @@ FunctionParser<dim>::init_muparser() const
           // we may find after function names
           std::string transformed_expression = expressions[component];
 
-          const char *function_names[] = {// functions predefined by muparser
-                                          "sin",
-                                          "cos",
-                                          "tan",
-                                          "asin",
-                                          "acos",
-                                          "atan",
-                                          "sinh",
-                                          "cosh",
-                                          "tanh",
-                                          "asinh",
-                                          "acosh",
-                                          "atanh",
-                                          "atan2",
-                                          "log2",
-                                          "log10",
-                                          "log",
-                                          "ln",
-                                          "exp",
-                                          "sqrt",
-                                          "sign",
-                                          "rint",
-                                          "abs",
-                                          "min",
-                                          "max",
-                                          "sum",
-                                          "avg",
-                                          // functions we define ourselves above
-                                          "if",
-                                          "int",
-                                          "ceil",
-                                          "cot",
-                                          "csc",
-                                          "floor",
-                                          "sec",
-                                          "pow",
-                                          "erfc",
-                                          "rand",
-                                          "rand_seed"};
-          for (const auto &function_name_c_string : function_names)
+          for (const auto &current_function_name :
+               internal::FunctionParser::function_names)
             {
-              const std::string  function_name        = function_name_c_string;
-              const unsigned int function_name_length = function_name.size();
+              const unsigned int function_name_length =
+                current_function_name.size();
 
               std::string::size_type pos = 0;
               while (true)
                 {
                   // try to find any occurrences of the function name
-                  pos = transformed_expression.find(function_name, pos);
+                  pos = transformed_expression.find(current_function_name, pos);
                   if (pos == std::string::npos)
                     break;
 
@@ -437,8 +277,7 @@ FunctionParser<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
   Assert(initialized == true, ExcNotInitialized());
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  AssertIndexRange(component, this->n_components);
 
   // initialize the parser if that hasn't happened yet on the current thread
   if (fp.get().size() == 0)
@@ -500,7 +339,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const std::map<std::string, double> &,
                                 const bool)
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
 }
 
 template <int dim>
@@ -510,7 +349,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const std::map<std::string, double> &,
                                 const bool)
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
 }
 
 
@@ -519,7 +358,7 @@ template <int dim>
 double
 FunctionParser<dim>::value(const Point<dim> &, unsigned int) const
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
   return 0.;
 }
 
@@ -528,7 +367,7 @@ template <int dim>
 void
 FunctionParser<dim>::vector_value(const Point<dim> &, Vector<double> &) const
 {
-  Assert(false, ExcNeedsFunctionparser());
+  AssertThrow(false, ExcNeedsFunctionparser());
 }
 
 

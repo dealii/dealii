@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,15 +95,21 @@ Manifold<dim, spacedim>::get_new_point(
   for (unsigned int i = 1; i < n_points; ++i)
     {
       double weight = 0.0;
-      if ((weights[permutation[i]] + w) < tol)
+      if (std::abs(weights[permutation[i]] + w) < tol)
         weight = 0.0;
       else
         weight = w / (weights[permutation[i]] + w);
 
       if (std::abs(weight) > 1e-14)
-        p = get_intermediate_point(p,
-                                   surrounding_points[permutation[i]],
-                                   1.0 - weight);
+        {
+          p = get_intermediate_point(p,
+                                     surrounding_points[permutation[i]],
+                                     1.0 - weight);
+        }
+      else
+        {
+          p = surrounding_points[permutation[i]];
+        }
       w += weights[permutation[i]];
     }
 
@@ -896,16 +902,14 @@ FlatManifold<dim, spacedim>::normal_vector(
   while (true)
     {
       Point<spacedim> F;
-      for (unsigned int v = 0; v < GeometryInfo<facedim>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
         F += face->vertex(v) *
              GeometryInfo<facedim>::d_linear_shape_function(xi, v);
 
       for (unsigned int i = 0; i < facedim; ++i)
         {
           grad_F[i] = 0;
-          for (unsigned int v = 0; v < GeometryInfo<facedim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
             grad_F[i] +=
               face->vertex(v) *
               GeometryInfo<facedim>::d_linear_shape_function_gradient(xi, v)[i];

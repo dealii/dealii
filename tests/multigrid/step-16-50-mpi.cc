@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2018 by the deal.II authors
+ * Copyright (C) 2003 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -79,10 +79,6 @@ namespace LA
 
 namespace Step50
 {
-  using namespace dealii;
-
-
-
   template <int dim>
   class LaplaceProblem
   {
@@ -196,7 +192,7 @@ namespace Step50
   LaplaceProblem<dim>::setup_system()
   {
     mg_dof_handler.distribute_dofs(fe);
-    mg_dof_handler.distribute_mg_dofs(fe);
+    mg_dof_handler.distribute_mg_dofs();
 
     DoFTools::extract_locally_relevant_dofs(mg_dof_handler,
                                             locally_relevant_set);
@@ -439,7 +435,7 @@ namespace Step50
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build(mg_dof_handler);
 
     matrix_t &coarse_matrix = mg_matrices[0];
 
@@ -458,12 +454,8 @@ namespace Step50
     mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
     mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(
@@ -564,7 +556,6 @@ main(int argc, char *argv[])
 
   try
     {
-      using namespace dealii;
       using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(1 /*degree*/);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,61 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      namespace GridRefinement
+      {
+        /**
+         * Compute the global max and min of the criteria vector. These are
+         * returned only on the processor with rank zero, all others get a pair
+         * of zeros.
+         */
+        template <typename number>
+        std::pair<number, number>
+        compute_global_min_and_max_at_root(
+          const dealii::Vector<number> &criteria,
+          MPI_Comm                      mpi_communicator);
+
+        namespace RefineAndCoarsenFixedNumber
+        {
+          /**
+           * Compute a threshold value so that exactly n_target_cells have a
+           * value that is larger.
+           */
+          template <typename number>
+          number
+          compute_threshold(const dealii::Vector<number> &   criteria,
+                            const std::pair<double, double> &global_min_and_max,
+                            const types::global_cell_index   n_target_cells,
+                            MPI_Comm                         mpi_communicator);
+        } // namespace RefineAndCoarsenFixedNumber
+
+        namespace RefineAndCoarsenFixedFraction
+        {
+          /**
+           * Compute a threshold value so that the error accumulated over all
+           * criteria[i] so that
+           *     criteria[i] > threshold
+           * is larger than target_error.
+           */
+          template <typename number>
+          number
+          compute_threshold(const dealii::Vector<number> &   criteria,
+                            const std::pair<double, double> &global_min_and_max,
+                            const double                     target_error,
+                            MPI_Comm                         mpi_communicator);
+        } // namespace RefineAndCoarsenFixedFraction
+      }   // namespace GridRefinement
+    }     // namespace distributed
+  }       // namespace parallel
+} // namespace internal
+
+
 
 namespace parallel
 {
@@ -76,10 +131,10 @@ namespace parallel
       refine_and_coarsen_fixed_number(
         parallel::distributed::Triangulation<dim, spacedim> &tria,
         const dealii::Vector<Number> &                       criteria,
-        const double       top_fraction_of_cells,
-        const double       bottom_fraction_of_cells,
-        const unsigned int max_n_cells =
-          std::numeric_limits<unsigned int>::max());
+        const double                   top_fraction_of_cells,
+        const double                   bottom_fraction_of_cells,
+        const types::global_cell_index max_n_cells =
+          std::numeric_limits<types::global_cell_index>::max());
 
       /**
        * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ print_info(const Triangulation<dim, spacedim> &tria)
     {
       deallog << "C: " << cell << ", manifold id: " << (int)cell->manifold_id()
               << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           deallog << "f: " << cell->face(f)
                   << ", boundary id: " << (int)cell->face(f)->boundary_id()
@@ -75,7 +75,7 @@ test()
            e < static_cast<signed int>(GeometryInfo<dim>::lines_per_cell);
            ++e)
         cell->line(e)->set_manifold_id(e);
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           cell->face(f)->set_boundary_id(f);
           for (signed int e = 0;

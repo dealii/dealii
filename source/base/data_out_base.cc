@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,153 +79,6 @@ namespace
 namespace
 {
 #ifdef DEAL_II_WITH_ZLIB
-  // the functions in this namespace are
-  // taken from the libb64 project, see
-  // http://sourceforge.net/projects/libb64
-  //
-  // libb64 has been placed in the public
-  // domain
-  namespace base64
-  {
-    using base64_encodestep = enum { step_A, step_B, step_C };
-
-    using base64_encodestate = struct
-    {
-      base64_encodestep step;
-      char              result;
-    };
-
-    void
-    base64_init_encodestate(base64_encodestate *state_in)
-    {
-      state_in->step   = step_A;
-      state_in->result = 0;
-    }
-
-    inline char
-    base64_encode_value(char value_in)
-    {
-      static const char *encoding =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-      if (value_in > 63)
-        return '=';
-      return encoding[static_cast<int>(value_in)];
-    }
-
-    int
-    base64_encode_block(const char *        plaintext_in,
-                        int                 length_in,
-                        char *              code_out,
-                        base64_encodestate *state_in)
-    {
-      const char *      plainchar    = plaintext_in;
-      const char *const plaintextend = plaintext_in + length_in;
-      char *            codechar     = code_out;
-      char              result;
-
-      result = state_in->result;
-
-      switch (state_in->step)
-        {
-          while (true)
-            {
-              DEAL_II_FALLTHROUGH;
-              case step_A:
-                {
-                  if (plainchar == plaintextend)
-                    {
-                      state_in->result = result;
-                      state_in->step   = step_A;
-                      return codechar - code_out;
-                    }
-                  const char fragment = *plainchar++;
-                  result              = (fragment & 0x0fc) >> 2;
-                  *codechar++         = base64_encode_value(result);
-                  result              = (fragment & 0x003) << 4;
-                  DEAL_II_FALLTHROUGH;
-                }
-              case step_B:
-                {
-                  if (plainchar == plaintextend)
-                    {
-                      state_in->result = result;
-                      state_in->step   = step_B;
-                      return codechar - code_out;
-                    }
-                  const char fragment = *plainchar++;
-                  result |= (fragment & 0x0f0) >> 4;
-                  *codechar++ = base64_encode_value(result);
-                  result      = (fragment & 0x00f) << 2;
-                  DEAL_II_FALLTHROUGH;
-                }
-              case step_C:
-                {
-                  if (plainchar == plaintextend)
-                    {
-                      state_in->result = result;
-                      state_in->step   = step_C;
-                      return codechar - code_out;
-                    }
-                  const char fragment = *plainchar++;
-                  result |= (fragment & 0x0c0) >> 6;
-                  *codechar++ = base64_encode_value(result);
-                  result      = (fragment & 0x03f) >> 0;
-                  *codechar++ = base64_encode_value(result);
-                }
-            }
-        }
-      /* control should not reach here */
-      return codechar - code_out;
-    }
-
-    int
-    base64_encode_blockend(char *code_out, base64_encodestate *state_in)
-    {
-      char *codechar = code_out;
-
-      switch (state_in->step)
-        {
-          case step_B:
-            *codechar++ = base64_encode_value(state_in->result);
-            *codechar++ = '=';
-            *codechar++ = '=';
-            break;
-          case step_C:
-            *codechar++ = base64_encode_value(state_in->result);
-            *codechar++ = '=';
-            break;
-          case step_A:
-            break;
-        }
-      *codechar++ = '\0';
-
-      return codechar - code_out;
-    }
-  } // namespace base64
-
-
-  /**
-   * Do a base64 encoding of the given data.
-   *
-   * The function allocates memory as necessary and returns a pointer to it. The
-   * calling function must release this memory again.
-   */
-  char *
-  encode_block(const char *data, const int data_size)
-  {
-    base64::base64_encodestate state;
-    base64::base64_init_encodestate(&state);
-
-    char *encoded_data = new char[2 * data_size + 1];
-
-    const int encoded_length_data =
-      base64::base64_encode_block(data, data_size, encoded_data, &state);
-    base64::base64_encode_blockend(encoded_data + encoded_length_data, &state);
-
-    return encoded_data;
-  }
-
-
   /**
    * Convert between the enum specified inside VtkFlags and the preprocessor
    * constant defined by zlib.
@@ -263,16 +116,20 @@ namespace
     if (data.size() != 0)
       {
         // allocate a buffer for compressing data and do so
-        uLongf compressed_data_length = compressBound(data.size() * sizeof(T));
-        char * compressed_data        = new char[compressed_data_length];
-        int    err =
-          compress2(reinterpret_cast<Bytef *>(compressed_data),
+        auto compressed_data_length = compressBound(data.size() * sizeof(T));
+        std::vector<unsigned char> compressed_data(compressed_data_length);
+
+        int err =
+          compress2(&compressed_data[0],
                     &compressed_data_length,
                     reinterpret_cast<const Bytef *>(data.data()),
                     data.size() * sizeof(T),
                     get_zlib_compression_level(flags.compression_level));
         (void)err;
         Assert(err == Z_OK, ExcInternalError());
+
+        // Discard the unnecessary bytes
+        compressed_data.resize(compressed_data_length);
 
         // now encode the compression header
         const uint32_t compression_header[4] = {
@@ -283,19 +140,12 @@ namespace
           static_cast<uint32_t>(
             compressed_data_length)}; /* list of compressed sizes of blocks */
 
-        char *encoded_header =
-          encode_block(reinterpret_cast<const char *>(&compression_header[0]),
-                       4 * sizeof(compression_header[0]));
-        output_stream << encoded_header;
-        delete[] encoded_header;
+        const auto header_start =
+          reinterpret_cast<const unsigned char *>(&compression_header[0]);
 
-        // next do the compressed data encoding in base64
-        char *encoded_data =
-          encode_block(compressed_data, compressed_data_length);
-        delete[] compressed_data;
-
-        output_stream << encoded_data;
-        delete[] encoded_data;
+        output_stream << Utilities::encode_base64(
+                           {header_start, header_start + 4 * sizeof(uint32_t)})
+                      << Utilities::encode_base64(compressed_data);
       }
   }
 #endif
@@ -384,6 +234,14 @@ namespace DataOutBase
       bool
       operator<(const EpsCell2d &) const;
     };
+
+    bool
+    EpsCell2d::operator<(const EpsCell2d &e) const
+    {
+      // note the "wrong" order in which we sort the elements
+      return depth > e.depth;
+    }
+
 
 
     /**
@@ -723,18 +581,15 @@ namespace
         switch (dim)
           {
             case 3:
-              Assert(zstep < n_subdivisions + 1,
-                     ExcIndexRange(zstep, 0, n_subdivisions + 1));
+              AssertIndexRange(zstep, n_subdivisions + 1);
               point_no += (n_subdivisions + 1) * (n_subdivisions + 1) * zstep;
               DEAL_II_FALLTHROUGH;
             case 2:
-              Assert(ystep < n_subdivisions + 1,
-                     ExcIndexRange(ystep, 0, n_subdivisions + 1));
+              AssertIndexRange(ystep, n_subdivisions + 1);
               point_no += (n_subdivisions + 1) * ystep;
               DEAL_II_FALLTHROUGH;
             case 1:
-              Assert(xstep < n_subdivisions + 1,
-                     ExcIndexRange(xstep, 0, n_subdivisions + 1));
+              AssertIndexRange(xstep, n_subdivisions + 1);
               point_no += xstep;
               DEAL_II_FALLTHROUGH;
             case 0:
@@ -1760,10 +1615,10 @@ namespace DataOutBase
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       neighbors[i] = no_neighbor;
 
-    Assert(dim <= spacedim, ExcIndexRange(dim, 0, spacedim));
+    AssertIndexRange(dim, spacedim + 1);
     Assert(spacedim <= 3, ExcNotImplemented());
   }
 
@@ -1775,11 +1630,11 @@ namespace DataOutBase
   {
     // TODO: make tolerance relative
     const double epsilon = 3e-16;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
         return false;
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       if (neighbors[i] != patch.neighbors[i])
         return false;
 
@@ -1871,7 +1726,7 @@ namespace DataOutBase
 
     // TODO: make tolerance relative
     const double epsilon = 3e-16;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
         return false;
 
@@ -2274,15 +2129,6 @@ namespace DataOutBase
     rgb_values.red = rgb_values.blue = rgb_values.green =
       1 - (x - xmin) / (xmax - xmin);
     return rgb_values;
-  }
-
-
-
-  bool
-  EpsCell2d::operator<(const EpsCell2d &e) const
-  {
-    // note the "wrong" order in which we sort the elements
-    return depth > e.depth;
   }
 
 
@@ -2985,29 +2831,6 @@ namespace DataOutBase
   write_ucd(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const UcdFlags &flags,
-    std::ostream &  out)
-  {
-    write_ucd(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_ucd(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -3092,30 +2915,6 @@ namespace DataOutBase
     // assert the stream is still ok
     AssertThrow(out, ExcIO());
   }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_dx(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const DXFlags &flags,
-    std::ostream & out)
-  {
-    write_dx(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
-  }
-
 
 
   template <int dim, int spacedim>
@@ -3406,29 +3205,6 @@ namespace DataOutBase
   write_gnuplot(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const GnuplotFlags &flags,
-    std::ostream &      out)
-  {
-    write_gnuplot(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_gnuplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -3627,29 +3403,6 @@ namespace DataOutBase
     out.flush();
 
     AssertThrow(out, ExcIO());
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_povray(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const PovrayFlags &flags,
-    std::ostream &     out)
-  {
-    write_povray(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
   }
 
 
@@ -3986,21 +3739,6 @@ namespace DataOutBase
   write_eps(
     const std::vector<Patch<dim, spacedim>> & /*patches*/,
     const std::vector<std::string> & /*data_names*/,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const EpsFlags & /*flags*/,
-    std::ostream & /*out*/)
-  {
-    // not implemented, see the documentation of the function
-    AssertThrow(dim == 2, ExcNotImplemented());
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_eps(
-    const std::vector<Patch<dim, spacedim>> & /*patches*/,
-    const std::vector<std::string> & /*data_names*/,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -4012,30 +3750,6 @@ namespace DataOutBase
     // not implemented, see the documentation of the function
     AssertThrow(dim == 2, ExcNotImplemented());
   }
-
-
-
-  template <int spacedim>
-  void
-  write_eps(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const EpsFlags &flags,
-    std::ostream &  out)
-  {
-    write_eps(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
-  }
-
 
 
   template <int spacedim>
@@ -4357,29 +4071,6 @@ namespace DataOutBase
   write_gmv(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const GmvFlags &flags,
-    std::ostream &  out)
-  {
-    write_gmv(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_gmv(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -4508,29 +4199,6 @@ namespace DataOutBase
 
     // assert the stream is still ok
     AssertThrow(out, ExcIO());
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_tecplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const TecplotFlags &flags,
-    std::ostream &      out)
-  {
-    write_tecplot(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
   }
 
 
@@ -4763,42 +4431,6 @@ namespace DataOutBase
 
 #endif
   //---------------------------------------------------------------------------
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_tecplot_binary(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out)
-  {
-    const unsigned int size = nonscalar_data_ranges.size();
-    std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      new_nonscalar_data_ranges(size);
-    for (unsigned int i = 0; i < size; ++i)
-      {
-        new_nonscalar_data_ranges[i] =
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>(
-            std::get<0>(nonscalar_data_ranges[i]),
-            std::get<1>(nonscalar_data_ranges[i]),
-            std::get<2>(nonscalar_data_ranges[i]),
-            DataComponentInterpretation::component_is_part_of_vector);
-      }
-
-    write_tecplot_binary(
-      patches, data_names, new_nonscalar_data_ranges, flags, out);
-  }
 
 
 
@@ -5132,41 +4764,6 @@ namespace DataOutBase
   write_vtk(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out)
-  {
-    const unsigned int size = nonscalar_data_ranges.size();
-    std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      new_nonscalar_data_ranges(size);
-    for (unsigned int i = 0; i < size; ++i)
-      {
-        new_nonscalar_data_ranges[i] =
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>(
-            std::get<0>(nonscalar_data_ranges[i]),
-            std::get<1>(nonscalar_data_ranges[i]),
-            std::get<2>(nonscalar_data_ranges[i]),
-            DataComponentInterpretation::component_is_part_of_vector);
-      }
-
-    write_vtk(patches, data_names, new_nonscalar_data_ranges, flags, out);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_vtk(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -5229,15 +4826,17 @@ namespace DataOutBase
         ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0) +
          (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
       if (n_metadata > 0)
-        out << "FIELD FieldData " << n_metadata << "\n";
+        {
+          out << "FIELD FieldData " << n_metadata << "\n";
 
-      if (flags.cycle != std::numeric_limits<unsigned int>::min())
-        {
-          out << "CYCLE 1 1 int\n" << flags.cycle << "\n";
-        }
-      if (flags.time != std::numeric_limits<double>::min())
-        {
-          out << "TIME 1 1 double\n" << flags.time << "\n";
+          if (flags.cycle != std::numeric_limits<unsigned int>::min())
+            {
+              out << "CYCLE 1 1 int\n" << flags.cycle << "\n";
+            }
+          if (flags.time != std::numeric_limits<double>::min())
+            {
+              out << "TIME 1 1 double\n" << flags.time << "\n";
+            }
         }
     }
 
@@ -5320,6 +4919,10 @@ namespace DataOutBase
     std::vector<bool> data_set_written(n_data_sets, false);
     for (const auto &nonscalar_data_range : nonscalar_data_ranges)
       {
+        AssertThrow(std::get<3>(nonscalar_data_range) !=
+                      DataComponentInterpretation::component_is_part_of_tensor,
+                    ExcNotImplemented());
+
         AssertThrow(std::get<1>(nonscalar_data_range) >=
                       std::get<0>(nonscalar_data_range),
                     ExcLowerRange(std::get<1>(nonscalar_data_range),
@@ -5460,25 +5063,6 @@ namespace DataOutBase
   write_vtu(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out)
-  {
-    write_vtu_header(out, flags);
-    write_vtu_main(patches, data_names, nonscalar_data_ranges, flags, out);
-    write_vtu_footer(out);
-
-    out << std::flush;
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_vtu(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -5494,42 +5078,6 @@ namespace DataOutBase
 
     out << std::flush;
   }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_vtu_main(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out)
-  {
-    const unsigned int size = nonscalar_data_ranges.size();
-    std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      new_nonscalar_data_ranges(size);
-    for (unsigned int i = 0; i < size; ++i)
-      {
-        new_nonscalar_data_ranges[i] =
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>(
-            std::get<0>(nonscalar_data_ranges[i]),
-            std::get<1>(nonscalar_data_ranges[i]),
-            std::get<2>(nonscalar_data_ranges[i]),
-            DataComponentInterpretation::component_is_part_of_vector);
-      }
-
-    write_vtu_main(patches, data_names, new_nonscalar_data_ranges, flags, out);
-  }
-
 
 
   template <int dim, int spacedim>
@@ -5930,39 +5478,6 @@ namespace DataOutBase
     std::ostream &                  out,
     const std::vector<std::string> &piece_names,
     const std::vector<std::string> &data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &nonscalar_data_ranges)
-  {
-    const unsigned int size = nonscalar_data_ranges.size();
-    std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      new_nonscalar_data_ranges(size);
-    for (unsigned int i = 0; i < size; ++i)
-      {
-        new_nonscalar_data_ranges[i] =
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>(
-            std::get<0>(nonscalar_data_ranges[i]),
-            std::get<1>(nonscalar_data_ranges[i]),
-            std::get<2>(nonscalar_data_ranges[i]),
-            DataComponentInterpretation::component_is_part_of_vector);
-      }
-
-    write_pvtu_record(out, piece_names, data_names, new_nonscalar_data_ranges);
-  }
-
-
-
-  void
-  write_pvtu_record(
-    std::ostream &                  out,
-    const std::vector<std::string> &piece_names,
-    const std::vector<std::string> &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -6185,20 +5700,6 @@ namespace DataOutBase
   write_svg(
     const std::vector<Patch<dim, spacedim>> &,
     const std::vector<std::string> &,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &,
-    const SvgFlags &,
-    std::ostream &)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_svg(
-    const std::vector<Patch<dim, spacedim>> &,
-    const std::vector<std::string> &,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -6209,32 +5710,6 @@ namespace DataOutBase
   {
     Assert(false, ExcNotImplemented());
   }
-
-
-
-  template <int spacedim>
-  void
-  write_svg(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &
-    /*nonscalar_data_ranges*/,
-    const SvgFlags &flags,
-    std::ostream &  out)
-  {
-    write_svg(
-      patches,
-      data_names,
-      std::vector<
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>>{},
-      flags,
-      out);
-  }
-
-
 
   template <int spacedim>
   void
@@ -6277,9 +5752,10 @@ namespace DataOutBase
 
     projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < first_patch.data.n_rows()) ||
-             first_patch.data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, first_patch.data.n_rows()));
+    if (first_patch.data.n_rows() != 0)
+      {
+        AssertIndexRange(flags.height_vector, first_patch.data.n_rows());
+      }
 
     double x_min = projected_point[0];
     double x_max = x_min;
@@ -6484,9 +5960,10 @@ namespace DataOutBase
 
     projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < first_patch.data.n_rows()) ||
-             first_patch.data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, first_patch.data.n_rows()));
+    if (first_patch.data.n_rows() != 0)
+      {
+        AssertIndexRange(flags.height_vector, first_patch.data.n_rows());
+      }
 
     point[0] = projected_point[0];
     point[1] = projected_point[1];
@@ -7198,42 +6675,6 @@ namespace DataOutBase
   write_deal_II_intermediate(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                              nonscalar_data_ranges,
-    const Deal_II_IntermediateFlags &flags,
-    std::ostream &                   out)
-  {
-    const unsigned int size = nonscalar_data_ranges.size();
-    std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      new_nonscalar_data_ranges(size);
-    for (unsigned int i = 0; i < size; ++i)
-      {
-        new_nonscalar_data_ranges[i] =
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>(
-            std::get<0>(nonscalar_data_ranges[i]),
-            std::get<1>(nonscalar_data_ranges[i]),
-            std::get<2>(nonscalar_data_ranges[i]),
-            DataComponentInterpretation::component_is_part_of_vector);
-      }
-
-    write_deal_II_intermediate(
-      patches, data_names, new_nonscalar_data_ranges, flags, out);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_deal_II_intermediate(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -7247,7 +6688,7 @@ namespace DataOutBase
 
     // first write tokens indicating the template parameters. we need this in
     // here because we may want to read in data again even if we don't know in
-    // advance the template parameters, see step-19
+    // advance the template parameters:
     out << dim << ' ' << spacedim << '\n';
 
     // then write a header
@@ -7498,12 +6939,23 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   ierr = MPI_File_seek_shared(fh, header_size, MPI_SEEK_SET);
   AssertThrowMPI(ierr);
   {
+    const auto &patches = get_patches();
+    const types::global_dof_index my_n_patches = patches.size();
+    const types::global_dof_index global_n_patches =
+      Utilities::MPI::sum(my_n_patches, comm);
+
+    // Do not write pieces with 0 cells as this will crash paraview if this is
+    // the first piece written. But if nobody has any pieces to write (file is
+    // empty), let processor 0 write their empty data, otherwise the vtk file is
+    // invalid.
     std::stringstream ss;
-    DataOutBase::write_vtu_main(get_patches(),
-                                get_dataset_names(),
-                                get_nonscalar_data_ranges(),
-                                vtk_flags,
-                                ss);
+    if (my_n_patches > 0 || (global_n_patches == 0 && myrank == 0))
+      DataOutBase::write_vtu_main(patches,
+                                  get_dataset_names(),
+                                  get_nonscalar_data_ranges(),
+                                  vtk_flags,
+                                  ss);
+
     ierr = MPI_File_write_ordered(fh,
                                   DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
                                   ss.str().size(),
@@ -7541,6 +6993,86 @@ DataOutInterface<dim, spacedim>::write_pvtu_record(
                                  piece_names,
                                  get_dataset_names(),
                                  get_nonscalar_data_ranges());
+}
+
+
+template <int dim, int spacedim>
+std::string
+DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
+  const std::string &directory,
+  const std::string &filename_without_extension,
+  const unsigned int counter,
+  const MPI_Comm &   mpi_communicator,
+  const unsigned int n_digits_for_counter,
+  const unsigned int n_groups) const
+{
+  const unsigned int rank = Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_ranks =
+    Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int n_files_written =
+    (n_groups == 0 || n_groups > n_ranks) ? n_ranks : n_groups;
+
+  Assert(n_files_written >= 1, ExcInternalError());
+  // the "-1" is needed since we use C++ style counting starting with 0, so
+  // writing 10 files means the filename runs from 0 to 9
+  const unsigned int n_digits =
+    Utilities::needed_digits(std::max(0, int(n_files_written) - 1));
+
+  const unsigned int color = rank % n_files_written;
+  const std::string  filename =
+    directory + filename_without_extension + "_" +
+    Utilities::int_to_string(counter, n_digits_for_counter) + "." +
+    Utilities::int_to_string(color, n_digits) + ".vtu";
+
+  if (n_groups == 0 || n_groups > n_ranks)
+    {
+      // every processor writes one file
+      std::ofstream output(filename.c_str());
+      this->write_vtu(output);
+    }
+  else if (n_groups == 1)
+    {
+      // write only a single data file in parallel
+      this->write_vtu_in_parallel(filename.c_str(), mpi_communicator);
+    }
+  else
+    {
+#ifdef DEAL_II_WITH_MPI
+      // write n_groups data files
+      MPI_Comm comm_group;
+      int ierr = MPI_Comm_split(mpi_communicator, color, rank, &comm_group);
+      AssertThrowMPI(ierr);
+      this->write_vtu_in_parallel(filename.c_str(), comm_group);
+      ierr = MPI_Comm_free(&comm_group);
+      AssertThrowMPI(ierr);
+#else
+      AssertThrow(false, ExcMessage("Logical error. Should not arrive here."));
+#endif
+    }
+
+  // write pvtu record
+  const std::string filename_master =
+    filename_without_extension + "_" +
+    Utilities::int_to_string(counter, n_digits_for_counter) + ".pvtu";
+
+  if (rank == 0)
+    {
+      std::vector<std::string> filename_vector;
+      for (unsigned int i = 0; i < n_files_written; ++i)
+        {
+          const std::string filename =
+            filename_without_extension + "_" +
+            Utilities::int_to_string(counter, n_digits_for_counter) + "." +
+            Utilities::int_to_string(i, n_digits) + ".vtu";
+
+          filename_vector.emplace_back(filename);
+        }
+
+      std::ofstream master_output((directory + filename_master).c_str());
+      this->write_pvtu_record(master_output, filename_vector);
+    }
+
+  return filename_master;
 }
 
 
@@ -7698,43 +7230,6 @@ DataOutInterface<dim, spacedim>::write_filtered_data(
   DataOutBase::write_filtered_data(get_patches(),
                                    get_dataset_names(),
                                    get_nonscalar_data_ranges(),
-                                   filtered_data);
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutBase::write_filtered_data(
-  const std::vector<Patch<dim, spacedim>> &patches,
-  const std::vector<std::string> &         data_names,
-  const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-    &                         nonscalar_data_ranges,
-  DataOutBase::DataOutFilter &filtered_data)
-{
-  const unsigned int size = nonscalar_data_ranges.size();
-  std::vector<
-    std::tuple<unsigned int,
-               unsigned int,
-               std::string,
-               DataComponentInterpretation::DataComponentInterpretation>>
-    new_nonscalar_data_ranges(size);
-  for (unsigned int i = 0; i < size; ++i)
-    {
-      new_nonscalar_data_ranges[i] =
-        std::tuple<unsigned int,
-                   unsigned int,
-                   std::string,
-                   DataComponentInterpretation::DataComponentInterpretation>(
-          std::get<0>(nonscalar_data_ranges[i]),
-          std::get<1>(nonscalar_data_ranges[i]),
-          std::get<2>(nonscalar_data_ranges[i]),
-          DataComponentInterpretation::component_is_part_of_vector);
-    }
-
-  DataOutBase::write_filtered_data(patches,
-                                   data_names,
-                                   new_nonscalar_data_ranges,
                                    filtered_data);
 }
 
@@ -7946,8 +7441,7 @@ DataOutBase::write_hdf5_parallel(
   hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
     pt_data_memory_dataspace;
   herr_t status;
-  unsigned int local_node_cell_count[2], global_node_cell_count[2],
-    global_node_cell_offsets[2];
+  unsigned int local_node_cell_count[2];
   hsize_t count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
   std::vector<double> node_data_vec;
   std::vector<unsigned int> cell_data_vec;
@@ -7980,6 +7474,10 @@ DataOutBase::write_hdf5_parallel(
 
   // Compute the global total number of nodes/cells and determine the offset of
   // the data for this process
+
+  unsigned int global_node_cell_count[2] = {0, 0};
+  unsigned int global_node_cell_offsets[2] = {0, 0};
+
 #  ifdef DEAL_II_WITH_MPI
   ierr = MPI_Allreduce(local_node_cell_count,
                        global_node_cell_count,
@@ -7988,15 +7486,13 @@ DataOutBase::write_hdf5_parallel(
                        MPI_SUM,
                        comm);
   AssertThrowMPI(ierr);
-  ierr = MPI_Scan(local_node_cell_count,
-                  global_node_cell_offsets,
-                  2,
-                  MPI_UNSIGNED,
-                  MPI_SUM,
-                  comm);
+  ierr = MPI_Exscan(local_node_cell_count,
+                    global_node_cell_offsets,
+                    2,
+                    MPI_UNSIGNED,
+                    MPI_SUM,
+                    comm);
   AssertThrowMPI(ierr);
-  global_node_cell_offsets[0] -= local_node_cell_count[0];
-  global_node_cell_offsets[1] -= local_node_cell_count[1];
 #  else
   global_node_cell_count[0] = local_node_cell_count[0];
   global_node_cell_count[1] = local_node_cell_count[1];
@@ -8519,29 +8015,6 @@ DataOutInterface<dim, spacedim>::get_nonscalar_data_ranges() const
 }
 
 
-
-template <int dim, int spacedim>
-std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-DataOutInterface<dim, spacedim>::get_vector_data_ranges() const
-{
-  const auto &nonscalar_data_ranges = get_nonscalar_data_ranges();
-
-  const unsigned int size = nonscalar_data_ranges.size();
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-    vector_data_ranges(size);
-  for (unsigned int i = 0; i < size; ++i)
-    {
-      vector_data_ranges[i] =
-        std::tuple<unsigned int, unsigned int, std::string>(
-          std::get<0>(nonscalar_data_ranges[i]),
-          std::get<1>(nonscalar_data_ranges[i]),
-          std::get<2>(nonscalar_data_ranges[i]));
-    }
-  return vector_data_ranges;
-}
-
-
-
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::validate_dataset_names() const
@@ -8763,7 +8236,7 @@ DataOutReader<dim, spacedim>::merge(const DataOutReader<dim, spacedim> &source)
 
   // adjust patch neighbors
   for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-    for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
+    for (unsigned int n : GeometryInfo<dim>::face_indices())
       if (patches[i].neighbors[n] !=
           dealii::DataOutBase::Patch<dim, spacedim>::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
@@ -8974,11 +8447,11 @@ namespace DataOutBase
         << '\n';
 
     // then write all the data that is in this patch
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
     out << '\n';
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       out << patch.neighbors[i] << ' ';
     out << '\n';
 
@@ -9023,10 +8496,10 @@ namespace DataOutBase
 
 
     // then read all the data that is in this patch
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       in >> patch.neighbors[i];
 
     in >> patch.patch_index >> patch.n_subdivisions;

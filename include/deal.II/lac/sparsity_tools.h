@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -246,26 +246,41 @@ namespace SparsityTools
   /**
    * Communicate rows in a dynamic sparsity pattern over MPI.
    *
-   * @param dsp A dynamic sparsity pattern that has been built locally and for
-   * which we need to exchange entries with other processors to make sure that
-   * each processor knows all the elements of the rows of a matrix it stores
-   * and that may eventually be written to. This sparsity pattern will be
-   * changed as a result of this function: All entries in rows that belong to
-   * a different processor are sent to them and added there.
+   * @param[in,out] dsp A dynamic sparsity pattern that has been built locally
+   * and for which we need to exchange entries with other processors to make
+   * sure that each processor knows all the elements of the rows of a matrix
+   * it stores and that may eventually be written to. This sparsity pattern
+   * will be changed as a result of this function: All entries in rows that
+   * belong to a different processor are sent to them and added there.
    *
-   * @param rows_per_cpu A vector containing the number of of rows per CPU for
-   * determining ownership. This is typically the value returned by
-   * DoFHandler::n_locally_owned_dofs_per_processor.
+   * @param locally_owned_rows An IndexSet describing the rows owned by the
+   * calling MPI process. The index set shall be one-to-one among the
+   * processors in the communicator.
    *
    * @param mpi_comm The MPI communicator shared between the processors that
    * participate in this operation.
    *
-   * @param myrange The range of elements stored locally. This should be the
-   * one used in the constructor of the DynamicSparsityPattern, and should
-   * also be the locally relevant set. Only rows contained in myrange are
-   * checked in dsp for transfer. This function needs to be used with
-   * PETScWrappers::MPI::SparseMatrix for it to work correctly in a parallel
-   * computation.
+   * @param locally_relevant_rows The range of elements stored on the local
+   * MPI process. This should be the one used in the constructor of the
+   * DynamicSparsityPattern, and should also be the locally relevant set. Only
+   * rows contained in this set are checked in dsp for transfer. This function
+   * needs to be used with PETScWrappers::MPI::SparseMatrix for it to work
+   * correctly in a parallel computation.
+   */
+  void
+  distribute_sparsity_pattern(DynamicSparsityPattern &dsp,
+                              const IndexSet &        locally_owned_rows,
+                              const MPI_Comm &        mpi_comm,
+                              const IndexSet &        locally_relevant_rows);
+
+  /**
+   * Communicate rows in a dynamic sparsity pattern over MPI, similar to the
+   * one above but using a vector `rows_per_cpu` containing the number of
+   * rows per CPU for determining ownership. This is typically the value
+   * returned by DoFHandler::n_locally_owned_dofs_per_processor -- given that
+   * the construction of the input to this function involves all-to-all
+   * communication, it is typically slower than the function above for more
+   * than a thousand of processes (and quick enough also for small sizes).
    */
   void
   distribute_sparsity_pattern(
@@ -279,12 +294,24 @@ namespace SparsityTools
    * instead.
    *
    * @param[in,out] dsp The locally built sparsity pattern to be modified.
-   * @param owned_set_per_cpu Typically the value given by
-   * DoFHandler::locally_owned_dofs_per_processor.
+   *
+   * @param locally_owned_rows An IndexSet describing the rows owned by the
+   * calling MPI process. The index set shall be one-to-one among the
+   * processors in the communicator.
    *
    * @param mpi_comm The MPI communicator to use.
    *
-   * @param myrange Typically the locally relevant DoFs.
+   * @param locally_relevant_rows Typically the locally relevant DoFs.
+   */
+  void
+  distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
+                              const IndexSet &             locally_owned_rows,
+                              const MPI_Comm &             mpi_comm,
+                              const IndexSet &locally_relevant_rows);
+
+  /**
+   * @deprecated Use the distribute_sparsity_pattern() with a single index set
+   * for the present MPI process only.
    */
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
@@ -304,17 +331,28 @@ namespace SparsityTools
    * we need to extend according to the sparsity of rows stored on other MPI
    * processes.
    *
-   * @param owned_rows_per_processor A vector containing owned rows for each
-   * process in the MPI communicator. This input should be the same on all MPI
-   * processes.
+   * @param locally_owned_rows An IndexSet describing the rows owned by the
+   * calling MPI process. The index set shall be one-to-one among the
+   * processors in the communicator.
    *
    * @param mpi_comm The MPI communicator shared between the processors that
    * participate in this operation.
    *
-   * @param ghost_range The range of rows this MPI process needs to gather.
-   * Only a part which is not included in the locally owned rows will be used.
+   * @param locally_relevant_rows The range of rows this MPI process needs to
+   * gather. Only the part which is not included in the locally owned rows will
+   * be used.
    */
   void
+  gather_sparsity_pattern(DynamicSparsityPattern &dsp,
+                          const IndexSet &        locally_owned_rows,
+                          const MPI_Comm &        mpi_comm,
+                          const IndexSet &        locally_relevant_rows);
+
+  /**
+   * @deprecated Use the gather_sparsity_pattern() method with the index set
+   * for the present processor only.
+   */
+  DEAL_II_DEPRECATED void
   gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
                           const std::vector<IndexSet> &owned_rows_per_processor,
                           const MPI_Comm &             mpi_comm,

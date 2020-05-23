@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ test()
     }
 
   std::vector<CellData<dim>> cells(1);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     cells[0].vertices[i] = i;
   cells[0].material_id = 0;
 
@@ -74,7 +74,7 @@ test()
   if (dim == 2)
     {
       subcelldata.boundary_lines.resize(GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::face_indices())
         {
           subcelldata.boundary_lines[i].vertices[0] = i;
           subcelldata.boundary_lines[i].vertices[1] = (i + 1) % 4;
@@ -84,7 +84,7 @@ test()
   else if (dim == 3)
     {
       subcelldata.boundary_quads.resize(GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
                ++i)

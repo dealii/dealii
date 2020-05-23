@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ check()
 
 
     dof.distribute_dofs(fe);
-    dof.distribute_mg_dofs(fe);
+    dof.distribute_mg_dofs();
     deallog << "check " << dim << " level  distribute " << dof.has_active_dofs()
             << ' ' << dof.has_level_dofs() << std::endl;
 

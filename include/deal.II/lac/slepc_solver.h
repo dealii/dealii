@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -209,13 +209,6 @@ namespace SLEPcWrappers
           std::vector<OutputVector> &      real_eigenvectors,
           std::vector<OutputVector> &      imag_eigenvectors,
           const unsigned int               n_eigenpairs = 1);
-
-    /**
-     * Set the initial vector for the solver.
-     */
-    DEAL_II_DEPRECATED
-    void
-    set_initial_vector(const PETScWrappers::VectorBase &this_initial_vector);
 
     /**
      * Set the initial vector space for the solver.

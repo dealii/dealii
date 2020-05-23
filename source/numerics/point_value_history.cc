@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@
 #include <deal.II/lac/vector_element_access.h>
 
 #include <deal.II/numerics/point_value_history.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_point_value.h>
 
 #include <algorithm>
 
@@ -96,7 +96,7 @@ PointValueHistory<dim>::PointValueHistory(
   indep_names = std::vector<std::string>();
 
   tria_listener = dof_handler.get_triangulation().signals.any_change.connect(
-    std::bind(&PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
+    [this]() { this->tria_change_listener(); });
 }
 
 
@@ -128,8 +128,7 @@ PointValueHistory<dim>::PointValueHistory(
     {
       tria_listener =
         dof_handler->get_triangulation().signals.any_change.connect(
-          std::bind(&PointValueHistory<dim>::tria_change_listener,
-                    std::ref(*this)));
+          [this]() { this->tria_change_listener(); });
     }
 }
 
@@ -162,8 +161,7 @@ PointValueHistory<dim>::operator=(const PointValueHistory &point_value_history)
     {
       tria_listener =
         dof_handler->get_triangulation().signals.any_change.connect(
-          std::bind(&PointValueHistory<dim>::tria_change_listener,
-                    std::ref(*this)));
+          [this]() { this->tria_change_listener(); });
     }
 
   return *this;
@@ -306,17 +304,13 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
     new_point_geometry_data(location, current_points, new_solution_indices);
   point_geometry_data.push_back(new_point_geometry_data);
 
-  std::map<std::string, std::vector<std::vector<double>>>::iterator
-    data_store_begin = data_store.begin();
-  for (; data_store_begin != data_store.end(); ++data_store_begin)
+  for (auto &data_entry : data_store)
     {
-      // add an extra row to each vector
-      // entry
+      // add an extra row to each vector entry
       const ComponentMask &current_mask =
-        (component_mask.find(data_store_begin->first))->second;
+        (component_mask.find(data_entry.first))->second;
       unsigned int n_stored = current_mask.n_selected_components();
-      data_store_begin->second.resize(data_store_begin->second.size() +
-                                      n_stored);
+      data_entry.second.resize(data_entry.second.size() + n_stored);
     }
 }
 
@@ -446,17 +440,13 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
 
       point_geometry_data.push_back(new_point_geometry_data);
 
-      std::map<std::string, std::vector<std::vector<double>>>::iterator
-        data_store_begin = data_store.begin();
-      for (; data_store_begin != data_store.end(); ++data_store_begin)
+      for (auto &data_entry : data_store)
         {
-          // add an extra row to each vector
-          // entry
+          // add an extra row to each vector entry
           const ComponentMask current_mask =
-            (component_mask.find(data_store_begin->first))->second;
+            (component_mask.find(data_entry.first))->second;
           unsigned int n_stored = current_mask.n_selected_components();
-          data_store_begin->second.resize(data_store_begin->second.size() +
-                                          n_stored);
+          data_entry.second.resize(data_entry.second.size() + n_stored);
         }
     }
 }
@@ -1025,9 +1015,9 @@ PointValueHistory<dim>::write_gnuplot(
 
       if (indep_names.size() > 0)
         {
-          for (unsigned int name = 0; name < indep_names.size(); name++)
+          for (const auto &indep_name : indep_names)
             {
-              to_gnuplot << "<" << indep_names[name] << "> ";
+              to_gnuplot << "<" << indep_name << "> ";
             }
           to_gnuplot << "\n";
         }
@@ -1129,9 +1119,9 @@ PointValueHistory<dim>::write_gnuplot(
 
           if (indep_names.size() > 0)
             {
-              for (unsigned int name = 0; name < indep_names.size(); name++)
+              for (const auto &indep_name : indep_names)
                 {
-                  to_gnuplot << "<" << indep_names[name] << "> ";
+                  to_gnuplot << "<" << indep_name << "> ";
                 }
             }
           else
@@ -1142,16 +1132,13 @@ PointValueHistory<dim>::write_gnuplot(
                 }
             }
 
-          for (std::map<std::string, std::vector<std::vector<double>>>::iterator
-                 data_store_begin = data_store.begin();
-               data_store_begin != data_store.end();
-               ++data_store_begin)
+          for (const auto &data_entry : data_store)
             {
               typename std::map<std::string, ComponentMask>::iterator mask =
-                component_mask.find(data_store_begin->first);
+                component_mask.find(data_entry.first);
               unsigned int n_stored = mask->second.n_selected_components();
               std::vector<std::string> names =
-                (component_names_map.find(data_store_begin->first))->second;
+                (component_names_map.find(data_entry.first))->second;
 
               if (names.size() > 0)
                 {
@@ -1167,8 +1154,8 @@ PointValueHistory<dim>::write_gnuplot(
                   for (unsigned int component = 0; component < n_stored;
                        component++)
                     {
-                      to_gnuplot << "<" << data_store_begin->first << "_"
-                                 << component << "> ";
+                      to_gnuplot << "<" << data_entry.first << "_" << component
+                                 << "> ";
                     }
                 }
             }
@@ -1184,14 +1171,10 @@ PointValueHistory<dim>::write_gnuplot(
                   to_gnuplot << " " << independent_values[component][key];
                 }
 
-              for (std::map<std::string,
-                            std::vector<std::vector<double>>>::iterator
-                     data_store_begin = data_store.begin();
-                   data_store_begin != data_store.end();
-                   ++data_store_begin)
+              for (const auto &data_entry : data_store)
                 {
                   typename std::map<std::string, ComponentMask>::iterator mask =
-                    component_mask.find(data_store_begin->first);
+                    component_mask.find(data_entry.first);
                   unsigned int n_stored = mask->second.n_selected_components();
 
                   for (unsigned int component = 0; component < n_stored;
@@ -1199,9 +1182,8 @@ PointValueHistory<dim>::write_gnuplot(
                     {
                       to_gnuplot
                         << " "
-                        << (data_store_begin
-                              ->second)[data_store_index * n_stored + component]
-                                       [key];
+                        << (data_entry.second)[data_store_index * n_stored +
+                                               component][key];
                     }
                 }
               to_gnuplot << "\n";
@@ -1379,9 +1361,9 @@ PointValueHistory<dim>::status(std::ostream &out)
       if (indep_names.size() > 0)
         {
           out << "Names: ";
-          for (unsigned int name = 0; name < indep_names.size(); name++)
+          for (const auto &indep_name : indep_names)
             {
-              out << "<" << indep_names[name] << "> ";
+              out << "<" << indep_name << "> ";
             }
           out << "\n";
         }
@@ -1391,17 +1373,15 @@ PointValueHistory<dim>::status(std::ostream &out)
       out << "No independent values stored\n";
     }
 
-  std::map<std::string, std::vector<std::vector<double>>>::iterator
-    data_store_begin = data_store.begin();
-  if (data_store_begin != data_store.end())
+  if (data_store.begin() != data_store.end())
     {
       out
         << "Mnemonic: data set size (mask size, n true components) : n data sets\n";
     }
-  for (; data_store_begin != data_store.end(); ++data_store_begin)
+  for (const auto &data_entry : data_store)
     {
       // Find field mnemonic
-      std::string vector_name = data_store_begin->first;
+      std::string vector_name = data_entry.first;
       typename std::map<std::string, ComponentMask>::iterator mask =
         component_mask.find(vector_name);
       Assert(mask != component_mask.end(),
@@ -1411,18 +1391,16 @@ PointValueHistory<dim>::status(std::ostream &out)
       Assert(component_names != component_names_map.end(),
              ExcMessage("vector_name not in class"));
 
-      if (data_store_begin->second.size() != 0)
+      if (data_entry.second.size() != 0)
         {
-          out << data_store_begin->first << ": "
-              << data_store_begin->second.size() << " (";
+          out << data_entry.first << ": " << data_entry.second.size() << " (";
           out << mask->second.size() << ", "
               << mask->second.n_selected_components() << ") : ";
-          out << (data_store_begin->second)[0].size() << "\n";
+          out << (data_entry.second)[0].size() << "\n";
         }
       else
         {
-          out << data_store_begin->first << ": "
-              << data_store_begin->second.size() << " (";
+          out << data_entry.first << ": " << data_entry.second.size() << " (";
           out << mask->second.size() << ", "
               << mask->second.n_selected_components() << ") : ";
           out << "No points added"
@@ -1459,14 +1437,12 @@ PointValueHistory<dim>::deep_check(const bool strict)
               return false;
             }
         }
-      std::map<std::string, std::vector<std::vector<double>>>::iterator
-        data_store_begin = data_store.begin();
       if (have_dof_handler)
         {
-          for (; data_store_begin != data_store.end(); ++data_store_begin)
+          for (const auto &data_entry : data_store)
             {
-              Assert(data_store_begin->second.size() > 0, ExcInternalError());
-              if ((data_store_begin->second)[0].size() != dataset_key.size())
+              Assert(data_entry.second.size() > 0, ExcInternalError());
+              if ((data_entry.second)[0].size() != dataset_key.size())
                 return false;
               // this loop only tests one
               // member for each name,
@@ -1489,13 +1465,11 @@ PointValueHistory<dim>::deep_check(const bool strict)
 
   if (have_dof_handler)
     {
-      std::map<std::string, std::vector<std::vector<double>>>::iterator
-        data_store_begin = data_store.begin();
-      for (; data_store_begin != data_store.end(); ++data_store_begin)
+      for (const auto &data_entry : data_store)
         {
-          Assert(data_store_begin->second.size() > 0, ExcInternalError());
+          Assert(data_entry.second.size() > 0, ExcInternalError());
 
-          if (std::abs(static_cast<int>((data_store_begin->second)[0].size()) -
+          if (std::abs(static_cast<int>((data_entry.second)[0].size()) -
                        static_cast<int>(dataset_key.size())) >= 2)
             return false;
           // this loop only tests one member

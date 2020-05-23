@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,8 +61,7 @@ void check(Triangulation<3> &tria)
   // active cells on the refined side don't
   // have any children)
   for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
       {
         const Triangulation<dim>::face_iterator face = cell->face(face_no);
 
@@ -112,7 +111,8 @@ void check(Triangulation<3> &tria)
                 // we used to abort in the
                 // following call, due to a
                 // wrong Assert condition:
-                cell->neighbor_child_on_subface(face_no, subface_no);
+                auto dummy =
+                  cell->neighbor_child_on_subface(face_no, subface_no);
               }
           }
       }

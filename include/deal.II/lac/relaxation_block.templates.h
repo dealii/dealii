@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_relaxation_block_templates_h
 #define dealii_relaxation_block_templates_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/relaxation_block.h>
@@ -47,11 +49,8 @@ inline std::size_t
 RelaxationBlock<MatrixType, InverseNumberType, VectorType>::AdditionalData::
   memory_consumption() const
 {
-  std::size_t result =
-    sizeof(*this) + block_list.memory_consumption() - sizeof(block_list);
-  for (unsigned int i = 0; i < order.size(); ++i)
-    result += MemoryConsumption::memory_consumption(order[i]);
-  return result;
+  return sizeof(*this) + block_list.memory_consumption() - sizeof(block_list) +
+         MemoryConsumption::memory_consumption(order);
 }
 
 
@@ -100,15 +99,13 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks()
   else
     {
       // compute blocks in parallel
-      parallel::apply_to_subranges(
-        0,
-        this->additional_data->block_list.n_rows(),
-        std::bind(&RelaxationBlock<MatrixType, InverseNumberType, VectorType>::
-                    block_kernel,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2),
-        16);
+      parallel::apply_to_subranges(0,
+                                   this->additional_data->block_list.n_rows(),
+                                   [this](const size_type block_begin,
+                                          const size_type block_end) {
+                                     this->block_kernel(block_begin, block_end);
+                                   },
+                                   16);
     }
   this->inverses_computed(true);
 }

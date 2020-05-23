@@ -17,6 +17,8 @@
 #define dealii_fe_poly_face_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/std_cxx14/memory.h>
 
@@ -133,12 +135,12 @@ protected:
                                  std::vector<double>(n_q_points));
         for (unsigned int i = 0; i < n_q_points; ++i)
           {
-            poly_space.compute(quadrature.point(i),
-                               values,
-                               grads,
-                               grad_grads,
-                               empty_vector_of_3rd_order_tensors,
-                               empty_vector_of_4th_order_tensors);
+            poly_space.evaluate(quadrature.point(i),
+                                values,
+                                grads,
+                                grad_grads,
+                                empty_vector_of_3rd_order_tensors,
+                                empty_vector_of_4th_order_tensors);
 
             for (unsigned int k = 0; k < poly_space.n(); ++k)
               data.shape_values[k][i] = values[k];

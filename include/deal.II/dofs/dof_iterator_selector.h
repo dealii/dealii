@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int, int, int>
 class DoFInvalidAccessor;
 
@@ -35,6 +37,7 @@ template <typename Accessor>
 class TriaIterator;
 template <typename Accessor>
 class TriaActiveIterator;
+#endif
 
 namespace internal
 {

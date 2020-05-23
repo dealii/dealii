@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../lapack/create_matrix.h"
 #include "../tests.h"
+
+#include "../lapack/create_matrix.h"
 
 // test saving and loading of the State and Property of distributed
 // ScaLAPACKMatrices

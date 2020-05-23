@@ -81,15 +81,6 @@ namespace parallel
      * soltrans.interpolate(interpolated_solution);
      * @endcode
      *
-     * Different from PETSc and Trilinos vectors,
-     * LinearAlgebra::distributed::Vector allows writing into ghost elements.
-     * For a ghosted vector the interpolation step can be accomplished via
-     * @code
-     * interpolated_solution.zero_out_ghosts();
-     * soltrans.interpolate(interpolated_solution);
-     * interpolated_solution.update_ghost_values();
-     * @endcode
-     *
      * As the grid is distributed, it is important to note that the old
      * solution(s) must be copied to one that also provides access to the
      * locally relevant DoF values (these values required for the interpolation
@@ -113,12 +104,25 @@ namespace parallel
      *                     locally_relevant_dofs,
      *                     mpi_communicator);
      * old_solution = solution;
+     *
+     * // Initialize SolutionTransfer object
+     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
+     * soltrans.prepare_for_coarsening_and_refinement(old_solution);
      * ...
      * // Refine grid
      * // Recreate locally_owned_dofs and locally_relevant_dofs index sets
      * ...
      * solution.reinit(locally_owned_dofs, mpi_communicator);
-     * soltrans.refine_interpolate(old_solution, solution);
+     * soltrans.interpolate(solution);
+     * @endcode
+     *
+     * Different from PETSc and Trilinos vectors,
+     * LinearAlgebra::distributed::Vector allows writing into ghost elements.
+     * For a ghosted vector the interpolation step can be accomplished via
+     * @code
+     * interpolated_solution.zero_out_ghosts();
+     * soltrans.interpolate(interpolated_solution);
+     * interpolated_solution.update_ghost_values();
      * @endcode
      *
      * <h3>Use for Serialization</h3>

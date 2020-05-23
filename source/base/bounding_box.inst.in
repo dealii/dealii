@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,4 +17,6 @@
 for (deal_II_dimension : SPACE_DIMENSIONS; number : REAL_SCALARS)
   {
     template class BoundingBox<deal_II_dimension, number>;
+
+    template BoundingBox<deal_II_dimension, number> create_unit_bounding_box();
   }

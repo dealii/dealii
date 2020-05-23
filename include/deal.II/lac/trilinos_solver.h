@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,8 +39,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
   // forward declarations
+#    ifndef DOXYGEN
   class SparseMatrix;
   class PreconditionBase;
+#    endif
 
 
   /**

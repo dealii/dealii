@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -256,6 +256,7 @@ namespace Differentiation
 
 #  ifdef DEAL_II_WITH_ADOLC
 
+#    ifndef DOXYGEN
     // Specialization for taped ADOL-C auto-differentiable numbers.
 
     template <typename ADNumberType>
@@ -273,6 +274,7 @@ namespace Differentiation
       , vbufsize(0u)
       , tbufsize(0u)
     {}
+#    endif
 
 
     template <typename ADNumberType>
@@ -364,7 +366,7 @@ namespace Differentiation
       //               >>> File or directory not found! <<<
       // , every time a query is made about a non-existent tape.
       // So either way we have to guard that check with something more
-      // conervative so that we don't output useless messages for our users.
+      // conservative so that we don't output useless messages for our users.
       const std::vector<typename Types<ADNumberType>::tape_index>
                  registered_tape_indices = get_registered_tape_indices();
       const auto it = std::find(registered_tape_indices.begin(),
@@ -1464,6 +1466,7 @@ namespace Differentiation
     }
 
 
+#  ifndef DOXYGEN
     template <typename ADNumberType>
     std::vector<double>
     TapedDrivers<
@@ -1477,6 +1480,7 @@ namespace Differentiation
       std::copy(in.begin(), in.end(), out.begin());
       return out;
     }
+#  endif
 
 
     // -------------   TapelessDrivers   -------------
@@ -1674,15 +1678,14 @@ namespace Differentiation
               AssertThrow(
                 n_live_variables == 0,
                 ExcMessage(
-                  "There are currently " +
-                  Utilities::to_string(n_live_variables) +
+                  "There are currently " + std::to_string(n_live_variables) +
                   " live "
                   "adtl::adouble variables in existence. They currently "
                   "assume " +
-                  Utilities::to_string(n_set_directional_derivatives) +
+                  std::to_string(n_set_directional_derivatives) +
                   " directional derivatives "
                   "but you wish to increase this to " +
-                  Utilities::to_string(n_directional_derivatives) +
+                  std::to_string(n_directional_derivatives) +
                   ". \n"
                   "To safely change (or more specifically in this case, "
                   "increase) the number of directional derivatives, there "
@@ -1716,6 +1719,7 @@ namespace Differentiation
     // reverse mode to compute the first derivatives (and, if supported,
     // forward mode for the second).
 
+#  ifndef DOXYGEN
     template <typename ADNumberType, typename ScalarType>
     TapelessDrivers<
       ADNumberType,
@@ -1726,6 +1730,7 @@ namespace Differentiation
           NumberTypes::sacado_rad_dfad>::type>::TapelessDrivers()
       : dependent_variable_marking_safe(false)
     {}
+#  endif
 
 
     template <typename ADNumberType, typename ScalarType>
@@ -1984,6 +1989,7 @@ namespace Differentiation
     // forward mode to compute the first (and, if supported, second)
     // derivatives.
 
+#  ifndef DOXYGEN
     template <typename ADNumberType, typename ScalarType>
     TapelessDrivers<
       ADNumberType,
@@ -1996,6 +2002,7 @@ namespace Differentiation
           NumberTypes::sacado_dfad_dfad>::type>::TapelessDrivers()
       : dependent_variable_marking_safe(false)
     {}
+#  endif
 
 
     template <typename ADNumberType, typename ScalarType>

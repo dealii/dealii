@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,7 @@
 
 
 #include "../tests.h"
+
 #include "dof_tools_common.h"
 #include "dof_tools_common_fake_hp.h"
 
@@ -32,14 +33,14 @@ check_this(const DoFHandlerType &dof_handler)
 
   deallog << "n_dofs:" << dof_handler.n_dofs() << std::endl;
 
-  std::vector<types::global_dof_index> dofs_per_component(n_components);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   for (unsigned int i = 0; i < n_components; ++i)
     deallog << ' ' << dofs_per_component[i];
   deallog << std::endl;
 
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component, true);
+  dofs_per_component = DoFTools::count_dofs_per_fe_component(dof_handler, true);
 
   for (unsigned int i = 0; i < n_components; ++i)
     deallog << ' ' << dofs_per_component[i];
@@ -48,21 +49,20 @@ check_this(const DoFHandlerType &dof_handler)
   if (n_components > 1)
     {
       std::vector<unsigned int> target_component(n_components, 0U);
-      dofs_per_component.resize(1);
-      DoFTools::count_dofs_per_component(dof_handler,
-                                         dofs_per_component,
-                                         false,
-                                         target_component);
+      dofs_per_component =
+        DoFTools::count_dofs_per_fe_component(dof_handler,
+                                              false,
+                                              target_component);
       for (unsigned int i = 0;
            i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
         deallog << ' ' << dofs_per_component[i];
       deallog << std::endl;
 
-      DoFTools::count_dofs_per_component(dof_handler,
-                                         dofs_per_component,
-                                         true,
-                                         target_component);
+      dofs_per_component =
+        DoFTools::count_dofs_per_fe_component(dof_handler,
+                                              true,
+                                              target_component);
       for (unsigned int i = 0;
            i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
@@ -73,19 +73,19 @@ check_this(const DoFHandlerType &dof_handler)
         target_component[i] = 1;
       dofs_per_component.resize(2);
 
-      DoFTools::count_dofs_per_component(dof_handler,
-                                         dofs_per_component,
-                                         false,
-                                         target_component);
+      dofs_per_component =
+        DoFTools::count_dofs_per_fe_component(dof_handler,
+                                              false,
+                                              target_component);
       for (unsigned int i = 0;
            i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
         deallog << ' ' << dofs_per_component[i];
       deallog << std::endl;
-      DoFTools::count_dofs_per_component(dof_handler,
-                                         dofs_per_component,
-                                         true,
-                                         target_component);
+      dofs_per_component =
+        DoFTools::count_dofs_per_fe_component(dof_handler,
+                                              true,
+                                              target_component);
       for (unsigned int i = 0;
            i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)

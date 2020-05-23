@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -52,7 +52,6 @@
 // this is a slightly modified version from the example by Sam Cox from the
 // mailing
 
-using namespace dealii;
 
 namespace LA
 {
@@ -151,11 +150,10 @@ SeventhProblem<dim>::setup_system()
   constraints.close();
   DynamicSparsityPattern csp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
-  SparsityTools::distribute_sparsity_pattern(
-    csp,
-    dof_handler.compute_n_locally_owned_dofs_per_processor(),
-    mpi_communicator,
-    locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(csp,
+                                             locally_owned_dofs,
+                                             mpi_communicator,
+                                             locally_relevant_dofs);
   system_matrix.reinit(locally_owned_dofs,
                        locally_owned_dofs,
                        csp,

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2019 by the deal.II authors
+ * Copyright (C) 2001 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -734,25 +734,29 @@ namespace Step13
     template <int dim>
     void Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
     {
-      Threads::Task<> rhs_task =
+      Threads::Task<void> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
+
+      auto worker =
+        [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+               AssemblyScratchData &scratch_data,
+               AssemblyCopyData &   copy_data) {
+          this->local_assemble_matrix(cell, scratch_data, copy_data);
+        };
+
+      auto copier = [this, &linear_system](const AssemblyCopyData &copy_data) {
+        this->copy_local_to_global(copy_data, linear_system);
+      };
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
-                      std::bind(&Solver<dim>::local_assemble_matrix,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&Solver<dim>::copy_local_to_global,
-                                this,
-                                std::placeholders::_1,
-                                std::ref(linear_system)),
+                      worker,
+                      copier,
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
-      // The syntax above using <code>std::bind</code> requires
+      // The syntax above requires
       // some explanation. There are multiple version of
       // WorkStream::run that expect different arguments. In step-9,
       // we used one version that took a pair of iterators, a pair of
@@ -783,58 +787,19 @@ namespace Step13
       // function that just takes function objects -- objects that
       // have an <code>operator()</code> and that consequently can be
       // called like functions, whatever they really represent. The
-      // typical way to generate such function objects is using
-      // <code>std::bind</code> (or, if the compiler is too old, a
-      // replacement for it, which we generically call
-      // <code>std::bind</code>) which takes a pointer to a
-      // (member) function and then <i>binds</i> individual arguments
-      // to fixed values. For example, you can create a function that
-      // takes an iterator, a scratch object and a copy object by
-      // taking the address of a member function and binding the
-      // (implicit) argument to the object on which it is to work to
-      // <code>*this</code>. This is what we do in the first call
-      // above. In the second call, we need to create a function
-      // object that takes a copy object, and we do so by taking the
-      // address of a member function that takes an implicit pointer
-      // to <code>*this</code>, a reference to a copy object, and a
-      // reference to a linear system, and binding the first and third
-      // of these, leaving something that has only one open argument
-      // that can then be filled by WorkStream::run().
+      // typical way to generate such function objects is using a
+      // <a href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
+      // function</a> that wraps the function call including the individual
+      // arguments with fixed values. All the arguments that are part of the
+      // outer function signature are specified as regular function arguments in
+      // the lambda function. The fixed values are passed into the lambda
+      // function using the capture list (`[...]`). It is possible to use a
+      // capture default or to list all the variables that are to be bound to
+      // the lambda explicitly. For the sake of clarity we decided to omit
+      // the capture default here, but that capture list could equally well be
+      // `[&]`, meaning that all used variables are copied into the lambda by
+      // reference.
       //
-      // There remains the question of what the
-      // <code>std::placeholders::_1</code>, <code>std::placeholders::_2</code>,
-      // etc., mean. (These arguments are called <i>placeholders</i>.) The idea
-      // of using <code>std::bind</code> in the first of the two cases above is
-      // that it produces an object that can be called with three arguments. But
-      // how are the three arguments the function object is being called with
-      // going to be distributed to the four arguments
-      // <code>local_assemble_matrix()</code> (including the implicit
-      // <code>this</code> pointer)? As specified, the first argument
-      // given to the function object will become the first argument
-      // given to <code>local_assemble_matrix()</code>, the second the
-      // second, etc. This is trivial here, but allows for interesting
-      // games in other circumstances. Consider, for example, having a
-      // function <code>void f(double x, double y)</code>. Then,
-      // creating a variable <code>p</code> of type
-      // <code>std::function@<void f(double,double)@></code> and
-      // initializing <code>p=std::bind(&f, std::placeholders::_2,
-      // std::placeholders::_1)</code> then calling <code>p(1,2)</code> will
-      // result in calling <code>f(2,1)</code>.
-      //
-      // @note An alternative to using <code>std::bind</code> is to use C++'s
-      // version of <a
-      // href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
-      // functions</a>. In essence, a lambda function is a function without a
-      // name that is defined right at the one place where it is going to be
-      // used -- i.e., where we pass the third and fourth argument to
-      // WorkStream::run. The functions one would define in these locations
-      // would take 3 and 1 arguments, respectively, and all they do is call
-      // <code>Solver::local_assemble_matrix</code> and
-      // <code>Solver::copy_local_to_global</code> with the required number of
-      // arguments, utilizing what the lambda function has gotten as arguments
-      // itself. We won't show the syntax this would require since it is no
-      // less confusing than the one used above.
-
       // At this point, we have assembled the matrix and condensed
       // it. The right hand side may or may not have been completely
       // assembled, but we would like to condense the right hand side
@@ -984,7 +949,7 @@ namespace Step13
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task =
+      Threads::Task<void> side_task =
         Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
 
       DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -1013,10 +978,10 @@ namespace Step13
     template <int dim>
     void Solver<dim>::LinearSystem::solve(Vector<double> &solution) const
     {
-      SolverControl solver_control(1000, 1e-12);
-      SolverCG<>    cg(solver_control);
+      SolverControl            solver_control(1000, 1e-12);
+      SolverCG<Vector<double>> cg(solver_control);
 
-      PreconditionSSOR<> preconditioner;
+      PreconditionSSOR<SparseMatrix<double>> preconditioner;
       preconditioner.initialize(matrix, 1.2);
 
       cg.solve(matrix, solution, rhs, preconditioner);
@@ -1250,20 +1215,10 @@ namespace Step13
   // the sine-factor with <code>y</code> replaced by <code>z</code> and so
   // on. Given this, the following two classes are probably straightforward
   // from the previous examples.
-  //
-  // As in previous examples, the C++ language forces us to declare and define
-  // a constructor to the following classes even though they are empty. This
-  // is due to the fact that the base class has no default constructor
-  // (i.e. one without arguments), even though it has a constructor which has
-  // default values for all arguments.
   template <int dim>
   class Solution : public Function<dim>
   {
   public:
-    Solution()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component) const override;
   };
@@ -1288,10 +1243,6 @@ namespace Step13
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component) const override;
   };
@@ -1406,10 +1357,10 @@ namespace Step13
     Triangulation<dim> triangulation;
     GridGenerator::hyper_cube(triangulation, -1, 1);
     triangulation.refine_global(2);
-    const FE_Q<dim>          fe(1);
-    const QGauss<dim>        quadrature(4);
-    const RightHandSide<dim> rhs_function;
-    const Solution<dim>      boundary_values;
+    const FE_Q<dim>    fe(1);
+    const QGauss<dim>  quadrature(4);
+    RightHandSide<dim> rhs_function;
+    Solution<dim>      boundary_values;
 
     // Create a solver object of the kind indicated by the argument to this
     // function. If the name is not recognized, throw an exception!

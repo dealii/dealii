@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,14 +49,6 @@ MGTransferBlockBase::MGTransferBlockBase(const MGConstrainedDoFs &mg_c)
 
 
 
-MGTransferBlockBase::MGTransferBlockBase(
-  const AffineConstraints<double> & /*c*/,
-  const MGConstrainedDoFs &mg_c)
-  : n_mg_blocks(0)
-  , mg_constrained_dofs(&mg_c)
-{}
-
-
 template <typename number>
 MGTransferBlock<number>::MGTransferBlock()
   : memory(nullptr, typeid(*this).name())
@@ -93,6 +85,14 @@ MGTransferBlock<number>::prolongate(const unsigned int         to_level,
          ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
   Assert(dst.n_blocks() == this->n_mg_blocks,
          ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
+
+#ifdef DEBUG
+  if (this->mg_constrained_dofs != nullptr)
+    Assert(this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+               .get_local_lines()
+               .size() == 0,
+           ExcNotImplemented());
+#endif
 
   // Multiplicate with prolongation
   // matrix, but only those blocks
@@ -262,16 +262,6 @@ MGTransferBlockSelect<number>::MGTransferBlockSelect(
 
 
 template <typename number>
-MGTransferBlockSelect<number>::MGTransferBlockSelect(
-  const AffineConstraints<double> & /*c*/,
-  const MGConstrainedDoFs &mg_c)
-  : MGTransferBlockBase(mg_c)
-  , selected_block(0)
-{}
-
-
-
-template <typename number>
 void
 MGTransferBlockSelect<number>::prolongate(const unsigned int    to_level,
                                           Vector<number> &      dst,
@@ -279,6 +269,14 @@ MGTransferBlockSelect<number>::prolongate(const unsigned int    to_level,
 {
   Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
+
+#ifdef DEBUG
+  if (this->mg_constrained_dofs != nullptr)
+    Assert(this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+               .get_local_lines()
+               .size() == 0,
+           ExcNotImplemented());
+#endif
 
   prolongation_matrices[to_level - 1]
     ->block(selected_block, selected_block)

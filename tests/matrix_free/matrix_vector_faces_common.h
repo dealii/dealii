@@ -1,6 +1,6 @@
 //------------------  matrix_vector_faces_common.h  ------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -165,17 +165,14 @@ private:
           {
             value_type average_value =
               (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(0.5);
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             value_type average_valgrad =
               fe_eval.get_normal_derivative(q) +
               fe_eval_neighbor.get_normal_derivative(q);
             average_valgrad =
               average_value * sigmaF -
               average_valgrad *
-                make_vectorized_array<number,
-                                      VectorizedArrayType::n_array_elements>(
-                  0.5);
+                make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -369,17 +366,14 @@ private:
           {
             value_type average_value =
               (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(0.5);
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             value_type average_valgrad =
               fe_eval.get_normal_derivative(q) +
               fe_eval_neighbor.get_normal_derivative(q);
             average_valgrad =
               average_value * sigmaF -
               average_valgrad *
-                make_vectorized_array<number,
-                                      VectorizedArrayType::n_array_elements>(
-                  0.5);
+                make_vectorized_array<number, VectorizedArrayType::size()>(0.5);
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -592,9 +586,7 @@ private:
             const VectorizedArrayType normal_times_advection =
               advection * phi_m.get_normal_vector(q);
             const value_type flux_times_normal =
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(
-                0.5) *
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
                std::abs(normal_times_advection) * (u_minus - u_plus));
             phi_m.submit_value(-flux_times_normal, q);
@@ -628,8 +620,7 @@ private:
                                 number,
                                 VectorizedArrayType>::value_type value_type;
     value_type                                                   u_plus;
-    u_plus =
-      make_vectorized_array<number, VectorizedArrayType::n_array_elements>(1.3);
+    u_plus = make_vectorized_array<number, VectorizedArrayType::size()>(1.3);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -642,9 +633,7 @@ private:
             const VectorizedArrayType normal_times_advection =
               advection * fe_eval.get_normal_vector(q);
             const value_type flux_times_normal =
-              make_vectorized_array<number,
-                                    VectorizedArrayType::n_array_elements>(
-                0.5) *
+              make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
                std::abs(normal_times_advection) * (u_minus - u_plus));
             fe_eval.submit_value(-flux_times_normal, q);
@@ -719,13 +708,13 @@ MatrixIntegrator<dim>::face(
               info1.fe_values(0).normal_vector(0)));
   double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
                    std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::ip_matrix(dinfo1.matrix(0, false).matrix,
-                                        dinfo1.matrix(0, true).matrix,
-                                        dinfo2.matrix(0, true).matrix,
-                                        dinfo2.matrix(0, false).matrix,
-                                        info1.fe_values(0),
-                                        info2.fe_values(0),
-                                        penalty);
+  LocalIntegrators::Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
+                                       dinfo1.matrix(0, true).matrix,
+                                       dinfo2.matrix(0, true).matrix,
+                                       dinfo2.matrix(0, false).matrix,
+                                       info1.fe_values(0),
+                                       info2.fe_values(0),
+                                       penalty);
 }
 
 
@@ -744,9 +733,9 @@ MatrixIntegrator<dim>::boundary(
                 [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
               info.fe_values(0).normal_vector(0)));
   double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::nitsche_matrix(dinfo.matrix(0, false).matrix,
-                                             info.fe_values(0),
-                                             penalty);
+  LocalIntegrators::Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
+                                            info.fe_values(0),
+                                            penalty);
 }
 
 
@@ -761,7 +750,7 @@ do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints,
         const bool                       also_test_parallel = false)
 {
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.push("float");
 
   deallog << "Testing " << dof.get_fe().get_name();
@@ -815,6 +804,11 @@ do_test(const DoFHandler<dim> &          dof,
 
   matrix.vmult(out, in);
 
+  // zero constrained dofs
+  for (unsigned int i = 0; i < dof.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      out(i) = 0;
+
   MatrixFree<dim, number, VectorizedArrayType> mf_data;
   const QGauss<1> quad(n_q_points_1d > 0 ? n_q_points_1d :
                                            dof.get_fe().degree + 1);
@@ -867,7 +861,7 @@ do_test(const DoFHandler<dim> &          dof,
     }
   deallog << std::endl;
 
-  if (types_are_equal<number, float>::value == true)
+  if (std::is_same<number, float>::value == true)
     deallog.pop();
 }
 

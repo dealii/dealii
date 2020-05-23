@@ -1,4 +1,4 @@
 
-DEAL::ExcIndexRange (scalar.component, 0, fe_values_views_cache.scalars.size())
-DEAL::ExcIndexRange (scalar.component, 0, fe_values_views_cache.scalars.size())
-DEAL::ExcIndexRange (scalar.component, 0, fe_values_views_cache.scalars.size())
+DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>::type)>:: type>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
+DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>::type)>:: type>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
+DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>::type)>:: type>((scalar.component), 0, (fe_values_views_cache.scalars.size()))

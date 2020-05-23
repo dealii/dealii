@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,8 @@
 #include <deal.II/base/tensor.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <boost/geometry.hpp>
+#include <boost/geometry/core/cs.hpp>
+#include <boost/geometry/geometries/point.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
@@ -307,7 +308,7 @@ public:
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
-   * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
+   * <tt>p</tt>, i.e. the $l_2$ norm of the difference between the
    * vectors representing the two points.
    *
    * @note This function can also be used in CUDA device code.
@@ -568,10 +569,12 @@ inline DEAL_II_CUDA_HOST_DEV
                              typename EnableIfScalar<OtherNumber>::type>::type>
   Point<dim, Number>::operator/(const OtherNumber factor) const
 {
-  Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] = this->operator[](i) / factor;
-  return tmp;
+  const Tensor<1, dim, Number> &base_object = *this;
+  return Point<
+    dim,
+    typename ProductType<Number,
+                         typename EnableIfScalar<OtherNumber>::type>::type>(
+    dealii::operator/(base_object, factor));
 }
 
 

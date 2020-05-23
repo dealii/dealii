@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>

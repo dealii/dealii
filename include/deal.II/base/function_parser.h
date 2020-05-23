@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,10 +36,11 @@ namespace mu
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class Vector;
-
+#endif
 
 /**
  * This class implements a function object that gets its value by parsing a
@@ -90,8 +91,8 @@ class Vector;
  * @code
  * // set up problem:
  * std::string variables = "x,y";
- * std::string expression = "cos(x)+sqrt(y)";
- * std::map<std::string,double> constants;
+ * std::string expression = "cos(x) + sqrt(y)";
+ * std::map<std::string, double> constants;
  *
  * // FunctionParser with 2 variables and 1 component:
  * FunctionParser<2> fp(1);
@@ -112,7 +113,7 @@ class Vector;
  * The second example is a bit more complex:
  * @code
  * // Define some constants that will be used by the function parser
- * std::map<std::string,double> constants;
+ * std::map<std::string, double> constants;
  * constants["pi"] = numbers::PI;
  *
  * // Define the variables that will be used inside the expressions
@@ -161,7 +162,7 @@ class Vector;
  * at http://muparser.beltoforion.de/ .
  *
  * For a wrapper of the FunctionParser class that supports ParameterHandler,
- * see ParsedFunction.
+ * see Functions::ParsedFunction.
  *
  * Vector-valued functions can either be declared using strings where the
  * function components are separated by semicolons, or using a vector of
@@ -185,10 +186,8 @@ class Vector;
  *    function.initialize(variables,
  *                        expression,
  *                        constants,
- *                        true);        // This tells the parser that
- *                                      // it is a time-dependent function
- *                                      // and there is another variable
- *                                      // to be taken into account (t).
+ * // Treat the last variable ("t") as time.
+ *                        true);
  * @endcode
  *
  * The following is another example of how to instantiate a vector valued
@@ -212,6 +211,11 @@ class Vector;
  *                        constants);
  * @endcode
  *
+ * @note The difference between this class and the SymbolicFunction class is
+ * that the SymbolicFunction class allows to compute first and second order
+ * derivatives (in a symbolic way), while this class computes first order
+ * derivatives only, using finite differences. For complicated expressions,
+ * this class is generally faster than SymbolicFunction.
  *
  * @ingroup functions
  * @author Luca Heltai, Timo Heister 2005, 2014
@@ -221,13 +225,12 @@ class FunctionParser : public AutoDerivativeFunction<dim>
 {
 public:
   /**
-   * Constructor for parsed functions. Its arguments are the same of
-   * the base class Function, with the additional parameter @p h, used
-   * for the computation of gradients using finite differences. This
-   * object needs to be initialized with the initialize() method
-   * before you can use it. If an attempt to use this function is made
-   * before the initialize() method has been called, then an exception
-   * is thrown.
+   * Constructor. Its arguments are the same of the base class Function, with
+   * the additional parameter @p h, used for the computation of gradients
+   * using finite differences. This object needs to be initialized with the
+   * initialize() method before you can use it. If an attempt to use this
+   * function is made before the initialize() method has been called, then an
+   * exception is thrown.
    */
   FunctionParser(const unsigned int n_components = 1,
                  const double       initial_time = 0.0,
@@ -237,7 +240,7 @@ public:
    * Constructor for parsed functions. Takes directly a semi-colon separated
    * list of expressions (one for each component of the function), an optional
    * comma-separated list of constants, variable names and step size for the
-   * computation of first order derivatives by finite difference.
+   * computation of first order derivatives by finite differences.
    */
   FunctionParser(const std::string &expression,
                  const std::string &constants      = "",
@@ -246,10 +249,35 @@ public:
                  const double h = 1e-8);
 
   /**
-   * Destructor. Explicitly delete the FunctionParser objects (there is one
-   * for each component of the function).
+   * Copy constructor. Objects of this type can not be copied, and
+   * consequently this constructor is deleted.
    */
-  ~FunctionParser() override;
+  FunctionParser(const FunctionParser &) = delete;
+
+  /**
+   * Move constructor. Objects of this type can not be moved, and
+   * consequently this constructor is deleted.
+   */
+  FunctionParser(FunctionParser &&) = delete;
+
+  /**
+   * Destructor.
+   */
+  virtual ~FunctionParser() override;
+
+  /**
+   * Copy operator. Objects of this type can not be copied, and
+   * consequently this operator is deleted.
+   */
+  FunctionParser &
+  operator=(const FunctionParser &) = delete;
+
+  /**
+   * Move operator. Objects of this type can not be moved, and
+   * consequently this operator is deleted.
+   */
+  FunctionParser &
+  operator=(FunctionParser &&) = delete;
 
   /**
    * Type for the constant map. Used by the initialize() method.
@@ -257,14 +285,9 @@ public:
   using ConstMap = std::map<std::string, double>;
 
   /**
-   * Iterator for the constants map. Used by the initialize() method.
-   */
-  using ConstMapIterator = ConstMap::iterator;
-
-  /**
-   * Initialize the function.  This methods accepts the following parameters:
+   * Initialize the object by setting the actual parsed functions.
    *
-   * <b>vars</b>: a string with the variables that will be used by the
+   * @param[in] vars a string with the variables that will be used by the
    * expressions to be evaluated. Note that the variables can have any name
    * (of course different from the function names defined above!), but the
    * order IS important. The first variable will correspond to the first
@@ -273,27 +296,27 @@ public:
    * time dependent, then it is necessary to specify it by setting the
    * <code>time_dependent</code> parameter to true.  An exception is thrown if
    * the number of variables specified here is different from dim (if this
-   * function is not time-dependent) or from dim+1 (if it is time- dependent).
+   * function is not time-dependent) or from dim+1 (if it is time-dependent).
    *
-   * <b>expressions</b>: a list of strings containing the expressions that
-   * will be byte compiled by the internal parser (FunctionParser). Note that
+   * @param[in] expressions a list of strings containing the expressions that
+   * will be byte compiled by the internal parser (muParser). Note that
    * the size of this vector must match exactly the number of components of
    * the FunctionParser, as declared in the constructor. If this is not the
    * case, an exception is thrown.
    *
-   * <b>constants</b>: a map of constants used to pass any necessary constant
+   * @param[in] constants a map of constants used to pass any necessary constant
    * that we want to specify in our expressions (in the example above the
    * number pi). An expression is valid if and only if it contains only
    * defined variables and defined constants (other than the functions
    * specified above). If a constant is given whose name is not valid (eg:
    * <code>constants["sin"] = 1.5;</code>) an exception is thrown.
    *
-   * <b>time_dependent</b>. If this is a time dependent function, then the
-   * last variable declared in <b>vars</b> is assumed to be the time variable,
-   * and this->get_time() is used to initialize it when evaluating the
-   * function. Naturally the number of variables parsed by the initialize()
-   * method in this case is dim+1. The value of this parameter defaults to
-   * false, i.e. do not consider time.
+   * @param[in] time_dependent If this is a time dependent function, then the
+   * last variable declared in @p vars is assumed to be the time variable, and
+   * FunctionTime::get_time() is used to initialize it when evaluating the
+   * function. Naturally the number of variables parsed by initialize() in
+   * this case is dim+1. The value of this parameter defaults to false, i.e.,
+   * do not consider time.
    */
   void
   initialize(const std::string &             vars,
@@ -324,8 +347,8 @@ public:
 
   /**
    * Return the value of the function at the given point. Unless there is only
-   * one component (i.e. the function is scalar), you should state the
-   * component you want to have evaluated; it defaults to zero, i.e. the first
+   * one component (i.e., the function is scalar), you should state the
+   * component you want to have evaluated; it defaults to zero, i.e., the first
    * component.
    */
   virtual double

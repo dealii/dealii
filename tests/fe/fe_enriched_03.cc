@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class EnrichmentFunction : public Function<dim>
@@ -97,8 +96,7 @@ test2()
                                                    dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       {
         fe_face_values.reinit(cell, face);
         const unsigned int                     n_q_points = quadrature.size();
@@ -107,7 +105,7 @@ test2()
           fe_face_values.get_quadrature_points();
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const auto q_point : fe_face_values.quadrature_point_indices())
             deallog << "dof=" << i << " qp=" << q_points[q_point]
                     << " f(qp)=" << function.value(q_points[q_point])
                     << " N(qp)=" << fe_face_values.shape_value(i, q_point)
@@ -121,10 +119,8 @@ test2()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
   try

@@ -52,20 +52,15 @@ test()
   auto cell = dh.begin_active();
   cell->set_future_fe_index(1);
 
-  // try to set future index to an invalid one
-  try
-    {
-      (++cell)->set_future_fe_index(2);
-    }
-  catch (const ExcIndexRange &)
-    {
-      deallog << "Set to 2 failed" << std::endl;
-    }
-
   // verify flags
   for (const auto &cell : dh.active_cell_iterators())
-    deallog << "cell:" << cell->id().to_string()
-            << ", future_fe:" << cell->future_fe_index() << std::endl;
+    {
+      deallog << "cell:" << cell->id().to_string()
+              << ", future_fe:" << cell->future_fe_index() << std::endl;
+      Assert(&(dh.get_fe(cell->future_fe_index())) == &(cell->get_future_fe()),
+             ExcMessage(
+               "DoFCellAccessor::get_future_fe() returns the wrong object."));
+    }
 
   // clear all flags and check if all were cleared
   for (const auto &cell : dh.active_cell_iterators())

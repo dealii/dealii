@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -274,6 +274,15 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
+  Particle<dim, spacedim>::set_id(const types::particle_index &new_id)
+  {
+    id = new_id;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   Particle<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
   {
     property_pool = &new_property_pool;
@@ -300,9 +309,9 @@ namespace Particles
         std::string(
           "You are trying to assign properties with an incompatible length. ") +
         "The particle has space to store " +
-        Utilities::to_string(old_properties.size()) + " properties, " +
+        std::to_string(old_properties.size()) + " properties, " +
         "and this function tries to assign" +
-        Utilities::to_string(new_properties.size()) + " properties. " +
+        std::to_string(new_properties.size()) + " properties. " +
         "This is not allowed."));
 
     if (old_properties.size() > 0)

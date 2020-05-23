@@ -1,4 +1,4 @@
 
-DEAL::ExcIndexRange (tensor.first_tensor_component, 0, fe_values_views_cache.second_order_tensors.size())
-DEAL::ExcIndexRange (tensor.first_tensor_component, 0, fe_values_views_cache.second_order_tensors.size())
-DEAL::ExcIndexRange (tensor.first_tensor_component, 0, fe_values_views_cache.second_order_tensors.size())
+DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(tensor.first_tensor_component), decltype(fe_values_views_cache.second_order_tensors.size())>::type)>:: type>((tensor.first_tensor_component), 0, (fe_values_views_cache.second_order_tensors.size()))
+DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(tensor.first_tensor_component), decltype(fe_values_views_cache.second_order_tensors.size())>::type)>:: type>((tensor.first_tensor_component), 0, (fe_values_views_cache.second_order_tensors.size()))
+DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(tensor.first_tensor_component), decltype(fe_values_views_cache.second_order_tensors.size())>::type)>:: type>((tensor.first_tensor_component), 0, (fe_values_views_cache.second_order_tensors.size()))

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,12 @@
 #ifndef dealii_error_estimator_templates_h
 #define dealii_error_estimator_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/distributed/tria.h>
@@ -363,7 +364,7 @@ namespace internal
     // change the sign. We take the outward normal.
 
     parallel_data.normal_vectors =
-      fe_face_values_cell.get_present_fe_values().get_all_normal_vectors();
+      fe_face_values_cell.get_present_fe_values().get_normal_vectors();
 
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
@@ -768,8 +769,7 @@ namespace internal
           }
 
         parallel_data.neighbor_normal_vectors =
-          fe_face_values_neighbor.get_present_fe_values()
-            .get_all_normal_vectors();
+          fe_face_values_neighbor.get_present_fe_values().get_normal_vectors();
       }
     else
       {
@@ -845,7 +845,7 @@ namespace internal
         // get an iterator pointing to the cell behind the present subface
         const typename DoFHandlerType::active_cell_iterator neighbor_child =
           cell->neighbor_child_on_subface(face_no, subface_no);
-        Assert(!neighbor_child->has_children(), ExcInternalError());
+        Assert(neighbor_child->is_active(), ExcInternalError());
 
         // restrict the finite element on the present cell to the subface
         fe_subface_values.reinit(cell,
@@ -880,7 +880,7 @@ namespace internal
 
         // call generic evaluate function
         parallel_data.neighbor_normal_vectors =
-          fe_subface_values.get_present_fe_values().get_all_normal_vectors();
+          fe_subface_values.get_present_fe_values().get_normal_vectors();
 
         local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
           integrate_over_face(parallel_data, face, fe_face_values);
@@ -941,8 +941,7 @@ namespace internal
     local_face_integrals.clear();
 
     // loop over all faces of this cell
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
       {
         const typename DoFHandlerType::face_iterator face = cell->face(face_no);
 
@@ -1307,15 +1306,21 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     dof_handler.begin_active(),
     static_cast<typename DoFHandlerType::active_cell_iterator>(
       dof_handler.end()),
-    std::bind(&internal::estimate_one_cell<InputVector, DoFHandlerType>,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::placeholders::_3,
-              std::ref(solutions),
-              strategy),
-    std::bind(&internal::copy_local_to_global<DoFHandlerType>,
-              std::placeholders::_1,
-              std::ref(face_integrals)),
+    [&solutions, strategy](
+      const typename DoFHandlerType::active_cell_iterator &cell,
+      internal::ParallelData<DoFHandlerType, typename InputVector::value_type>
+        &parallel_data,
+      std::map<typename DoFHandlerType::face_iterator, std::vector<double>>
+        &local_face_integrals) {
+      internal::estimate_one_cell(
+        cell, parallel_data, local_face_integrals, solutions, strategy);
+    },
+    [&face_integrals](
+      const std::map<typename DoFHandlerType::face_iterator,
+                     std::vector<double>> &local_face_integrals) {
+      internal::copy_local_to_global<DoFHandlerType>(local_face_integrals,
+                                                     face_integrals);
+    },
     parallel_data,
     sample_local_face_integrals);
 
@@ -1344,9 +1349,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
          (cell->material_id() == material_id)))
       {
         // loop over all faces of this cell
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             Assert(face_integrals.find(cell->face(face_no)) !=
                      face_integrals.end(),

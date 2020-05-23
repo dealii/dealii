@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,9 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // Forward declaration of class ScaLAPACKMatrix for ProcessGrid
+#  ifndef DOXYGEN
 template <typename NumberType>
 class ScaLAPACKMatrix;
-
+#  endif
 
 namespace Utilities
 {

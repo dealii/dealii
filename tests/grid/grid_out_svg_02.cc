@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,6 @@
 
 // Check SVG output with a GridGenerator function.
 
-using namespace dealii;
 
 Triangulation<2, 2>
 create_grid()
@@ -49,7 +48,7 @@ create_grid()
 
       for (; cell != endc; ++cell)
         {
-          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+          for (const unsigned int v : GeometryInfo<2>::vertex_indices())
             {
               const double distance_from_center =
                 center.distance(cell->vertex(v));
@@ -86,6 +85,11 @@ main()
   svg_flags.level_height_factor            = .5;
   svg_flags.height                         = 0;
   svg_flags.width                          = 2000;
+  svg_flags.label_level_number             = true;
+  svg_flags.label_cell_index               = true;
+  svg_flags.draw_legend                    = true;
+  svg_flags.draw_colorbar                  = true;
+
   grid_out.set_flags(svg_flags);
   grid_out.write_svg(create_grid(), deallog.get_file_stream());
 

@@ -1,4 +1,0 @@
-Changed: The step-1 program no longer uses EPS to output the meshes,
-but the far more modern SVG format.
-<br>
-(Wolfgang Bangerth, 2019/08/03)

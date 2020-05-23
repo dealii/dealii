@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,19 +110,6 @@ namespace SLEPcWrappers
         AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
       }
 #  endif
-  }
-
-  void
-  SolverBase::set_initial_vector(
-    const PETScWrappers::VectorBase &this_initial_vector)
-  {
-    Assert(this_initial_vector.l2_norm() > 0.0,
-           ExcMessage("Initial vector should be nonzero."));
-
-    Vec                  vec  = this_initial_vector;
-    const PetscErrorCode ierr = EPSSetInitialSpace(eps, 1, &vec);
-
-    AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
   void

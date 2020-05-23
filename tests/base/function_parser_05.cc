@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,9 @@ test2()
 
   // Output the evaluated function
   deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
-          << " @ " << point << " is " << result << std::endl;
+          << " @ " << point << " is " << std::flush;
+  result.print(deallog.get_file_stream(), 4, false);
+  deallog.get_file_stream() << "DEAL::" << std::endl;
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,10 +85,6 @@ public:
              VectorMemory<VectorType> &mem,
              const AdditionalData &    data = AdditionalData());
 
-  /**
-   * Virtual destructor.
-   */
-  virtual ~EigenPower();
 
   /**
    * Power method. @p x is the (not necessarily normalized, but nonzero) start
@@ -176,12 +172,6 @@ public:
                VectorMemory<VectorType> &mem,
                const AdditionalData &    data = AdditionalData());
 
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~EigenInverse();
-
   /**
    * Inverse method. @p value is the start guess for the eigenvalue and @p x
    * is the (not necessarily normalized, but nonzero) start vector for the
@@ -210,12 +200,6 @@ EigenPower<VectorType>::EigenPower(SolverControl &           cn,
                                    const AdditionalData &    data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{}
-
-
-
-template <class VectorType>
-EigenPower<VectorType>::~EigenPower()
 {}
 
 
@@ -299,12 +283,6 @@ EigenInverse<VectorType>::EigenInverse(SolverControl &           cn,
                                        const AdditionalData &    data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{}
-
-
-
-template <class VectorType>
-EigenInverse<VectorType>::~EigenInverse()
 {}
 
 

@@ -432,7 +432,7 @@ void BLAS_DGER (BLAS_INT *m, BLAS_INT *n, double *alpha,
     } \
 }
 
-void BLAS_ZGERU (BLAS_INT *m, BLAS_INT *n, double *alpha,
+void BLAS_ZGER (BLAS_INT *m, BLAS_INT *n, double *alpha,
 	double *X, BLAS_INT *incx, double *Y, BLAS_INT *incy,
 	double *A, BLAS_INT *lda) ;
 

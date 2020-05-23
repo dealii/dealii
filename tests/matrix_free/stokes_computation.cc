@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,6 @@ double pressure_scaling = 1.0;
 
 namespace StokesClass
 {
-  using namespace dealii;
   class QuietException
   {};
 
@@ -486,9 +485,7 @@ namespace StokesClass
           {
             VectorizedArray<number> return_value =
               make_vectorized_array<number>(1.);
-            for (unsigned int i = 0;
-                 i < VectorizedArray<number>::n_array_elements;
-                 ++i)
+            for (unsigned int i = 0; i < VectorizedArray<number>::size(); ++i)
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
@@ -623,9 +620,7 @@ namespace StokesClass
           {
             VectorizedArray<number> return_value =
               make_vectorized_array<number>(1.);
-            for (unsigned int i = 0;
-                 i < VectorizedArray<number>::n_array_elements;
-                 ++i)
+            for (unsigned int i = 0; i < VectorizedArray<number>::size(); ++i)
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
@@ -803,9 +798,7 @@ namespace StokesClass
           {
             VectorizedArray<number> return_value =
               make_vectorized_array<number>(1.);
-            for (unsigned int i = 0;
-                 i < VectorizedArray<number>::n_array_elements;
-                 ++i)
+            for (unsigned int i = 0; i < VectorizedArray<number>::size(); ++i)
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
@@ -1133,7 +1126,7 @@ namespace StokesClass
           MatrixFree<dim, double>::AdditionalData::none;
         additional_data.mapping_update_flags =
           (update_gradients | update_JxW_values | update_quadrature_points);
-        additional_data.level_mg_handler = level;
+        additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, double>> mg_mf_storage_level(
           new MatrixFree<dim, double>());
         mg_mf_storage_level->reinit(dof_handler_u,
@@ -1228,9 +1221,7 @@ namespace StokesClass
             for (unsigned int d = 0; d < dim; ++d)
               rhs_u[d] = make_vectorized_array<double>(1.0);
             VectorizedArray<double> rhs_p = make_vectorized_array<double>(1.0);
-            for (unsigned int i = 0;
-                 i < VectorizedArray<double>::n_array_elements;
-                 ++i)
+            for (unsigned int i = 0; i < VectorizedArray<double>::size(); ++i)
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)

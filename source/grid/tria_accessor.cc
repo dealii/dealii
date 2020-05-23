@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1265,7 +1265,7 @@ namespace
   measure(const TriaAccessor<2, 2, 2> &accessor)
   {
     unsigned int vertex_indices[GeometryInfo<2>::vertices_per_cell];
-    for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<2>::vertex_indices())
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<2>(
@@ -1277,7 +1277,7 @@ namespace
   measure(const TriaAccessor<3, 3, 3> &accessor)
   {
     unsigned int vertex_indices[GeometryInfo<3>::vertices_per_cell];
-    for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<3>::vertex_indices())
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<3>(
@@ -1286,8 +1286,11 @@ namespace
 
 
   // a 2d face in 3d space
+
+  // a 2d face in 3d space
+  template <int dim>
   double
-  measure(const dealii::TriaAccessor<2, 3, 3> &accessor)
+  measure(const TriaAccessor<2, dim, 3> &accessor)
   {
     // If the face is planar, the diagonal from vertex 0 to vertex 3,
     // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
@@ -1308,11 +1311,97 @@ namespace
     if (std::abs((v03 * normal) * (v03 * normal) /
                  ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
       {
-        Assert(
-          false,
-          ExcMessage(
-            "Computing the measure of a nonplanar face is not implemented!"));
-        return std::numeric_limits<double>::quiet_NaN();
+        // If the vectors are non planar we integrate the norm of the normal
+        // vector using a numerical Gauss scheme of order 4. In particular we
+        // consider a bilinear quad x(u,v) = (1-v)((1-u)v_0 + u v_1) +
+        // v((1-u)v_2 + u v_3), consequently we compute the normal vector as
+        // n(u,v) = t_u x t_v = w_1 + u w_2 + v w_3. The integrand function is
+        // || n(u,v) || = sqrt(a + b u^2 + c v^2 + d u + e v + f uv).
+        // We integrate it using a QGauss<2> (4) computed explicitly.
+        const Tensor<1, 3> w_1 =
+          cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
+                           accessor.vertex(2) - accessor.vertex(0));
+        const Tensor<1, 3> w_2 =
+          cross_product_3d(accessor.vertex(1) - accessor.vertex(0),
+                           accessor.vertex(3) - accessor.vertex(2) -
+                             accessor.vertex(1) + accessor.vertex(0));
+        const Tensor<1, 3> w_3 =
+          cross_product_3d(accessor.vertex(3) - accessor.vertex(2) -
+                             accessor.vertex(1) + accessor.vertex(0),
+                           accessor.vertex(2) - accessor.vertex(0));
+
+        double a = scalar_product(w_1, w_1);
+        double b = scalar_product(w_2, w_2);
+        double c = scalar_product(w_3, w_3);
+        double d = scalar_product(w_1, w_2);
+        double e = scalar_product(w_1, w_3);
+        double f = scalar_product(w_2, w_3);
+
+        return 0.03025074832140047 *
+                 std::sqrt(a + 0.0048207809894260144 * b +
+                           0.0048207809894260144 * c + 0.13886368840594743 * d +
+                           0.13886368840594743 * e +
+                           0.0096415619788520288 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.0048207809894260144 * b +
+                           0.10890625570683385 * c + 0.13886368840594743 * d +
+                           0.66001895641514374 * e + 0.045826333352825557 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.0048207809894260144 * b +
+                           0.44888729929169013 * c + 0.13886368840594743 * d +
+                           1.3399810435848563 * e + 0.09303735505312187 * f) +
+               0.03025074832140047 *
+                 std::sqrt(a + 0.0048207809894260144 * b +
+                           0.86595709258347853 * c + 0.13886368840594743 * d +
+                           1.8611363115940525 * e + 0.12922212642709538 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.10890625570683385 * b +
+                           0.0048207809894260144 * c + 0.66001895641514374 * d +
+                           0.13886368840594743 * e + 0.045826333352825557 * f) +
+               0.10632332575267359 *
+                 std::sqrt(a + 0.10890625570683385 * b +
+                           0.10890625570683385 * c + 0.66001895641514374 * d +
+                           0.66001895641514374 * e + 0.2178125114136677 * f) +
+               0.10632332575267359 *
+                 std::sqrt(a + 0.10890625570683385 * b +
+                           0.44888729929169013 * c + 0.66001895641514374 * d +
+                           1.3399810435848563 * e + 0.44220644500147605 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.10890625570683385 * b +
+                           0.86595709258347853 * c + 0.66001895641514374 * d +
+                           1.8611363115940525 * e + 0.61419262306231814 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.44888729929169013 * b +
+                           0.0048207809894260144 * c + 1.3399810435848563 * d +
+                           0.13886368840594743 * e + 0.09303735505312187 * f) +
+               0.10632332575267359 *
+                 std::sqrt(a + 0.44888729929169013 * b +
+                           0.10890625570683385 * c + 1.3399810435848563 * d +
+                           0.66001895641514374 * e + 0.44220644500147605 * f) +
+               0.10632332575267359 *
+                 std::sqrt(a + 0.44888729929169013 * b +
+                           0.44888729929169013 * c + 1.3399810435848563 * d +
+                           1.3399810435848563 * e + 0.89777459858338027 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.44888729929169013 * b +
+                           0.86595709258347853 * c + 1.3399810435848563 * d +
+                           1.8611363115940525 * e + 1.2469436885317342 * f) +
+               0.03025074832140047 *
+                 std::sqrt(a + 0.86595709258347853 * b +
+                           0.0048207809894260144 * c + 1.8611363115940525 * d +
+                           0.13886368840594743 * e + 0.12922212642709538 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.86595709258347853 * b +
+                           0.10890625570683385 * c + 1.8611363115940525 * d +
+                           0.66001895641514374 * e + 0.61419262306231814 * f) +
+               0.056712962962962937 *
+                 std::sqrt(a + 0.86595709258347853 * b +
+                           0.44888729929169013 * c + 1.8611363115940525 * d +
+                           1.3399810435848563 * e + 1.2469436885317342 * f) +
+               0.03025074832140047 *
+                 std::sqrt(a + 0.86595709258347853 * b +
+                           0.86595709258347853 * c + 1.8611363115940525 * d +
+                           1.8611363115940525 * e + 1.7319141851669571 * f);
       }
 
     // the face is planar. then its area is 1/2 of the norm of the
@@ -1470,7 +1559,7 @@ double
 TriaAccessor<1, 1, 1>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
-  Assert(axis == 0, ExcIndexRange(axis, 0, 1));
+  AssertIndexRange(axis, 1);
 
   return this->diameter();
 }
@@ -1481,7 +1570,7 @@ double
 TriaAccessor<1, 1, 2>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
-  Assert(axis == 0, ExcIndexRange(axis, 0, 1));
+  AssertIndexRange(axis, 1);
 
   return this->diameter();
 }
@@ -1495,7 +1584,7 @@ TriaAccessor<2, 2, 2>::extent_in_direction(const unsigned int axis) const
     {2, 3},  /// Lines along x-axis, see GeometryInfo
     {0, 1}}; /// Lines along y-axis
 
-  Assert(axis < 2, ExcIndexRange(axis, 0, 2));
+  AssertIndexRange(axis, 2);
 
   return std::max(this->line(lines[axis][0])->diameter(),
                   this->line(lines[axis][1])->diameter());
@@ -1509,7 +1598,7 @@ TriaAccessor<2, 2, 3>::extent_in_direction(const unsigned int axis) const
     {2, 3},  /// Lines along x-axis, see GeometryInfo
     {0, 1}}; /// Lines along y-axis
 
-  Assert(axis < 2, ExcIndexRange(axis, 0, 2));
+  AssertIndexRange(axis, 2);
 
   return std::max(this->line(lines[axis][0])->diameter(),
                   this->line(lines[axis][1])->diameter());
@@ -1525,7 +1614,7 @@ TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
     {0, 1, 4, 5},    /// Lines along y-axis
     {8, 9, 10, 11}}; /// Lines along z-axis
 
-  Assert(axis < 3, ExcIndexRange(axis, 0, 3));
+  AssertIndexRange(axis, 3);
 
   double lengths[4] = {this->line(lines[axis][0])->diameter(),
                        this->line(lines[axis][1])->diameter(),
@@ -1570,7 +1659,7 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point(
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> p;
   std::array<double, GeometryInfo<structdim>::vertices_per_cell>          w;
 
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
     {
       p[i] = this->vertex(i);
       w[i] = GeometryInfo<structdim>::d_linear_shape_function(coordinates, i);
@@ -1690,17 +1779,16 @@ TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   // copy vertices to avoid expensive resolution of vertex index inside loop
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
     vertices;
-  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
     vertices[v] = this->vertex(v);
   for (unsigned int d = 0; d < spacedim; ++d)
-    for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell;
-         ++v)
+    for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
       for (unsigned int e = 0; e < structdim; ++e)
         A[d][e] += vertices[v][d] * TransformR2UAffine<structdim>::KA[v][e];
 
   // b = vertex * Kb
   Tensor<1, spacedim> b = point;
-  for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
     b -= vertices[v] * TransformR2UAffine<structdim>::Kb[v];
 
   DerivativeForm<1, spacedim, structdim> A_inv = A.covariant_form().transpose();
@@ -1718,8 +1806,7 @@ TriaAccessor<structdim, dim, spacedim>::center(
     {
       Assert(use_interpolation == false, ExcNotImplemented());
       Point<spacedim> p;
-      for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
         p += vertex(v);
       return p / GeometryInfo<structdim>::vertices_per_cell;
     }
@@ -1945,8 +2032,7 @@ CellAccessor<dim, spacedim>::set_material_id(
   const types::material_id mat_id) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(mat_id < numbers::invalid_material_id,
-         ExcIndexRange(mat_id, 0, numbers::invalid_material_id));
+  AssertIndexRange(mat_id, numbers::invalid_material_id);
   this->tria->levels[this->present_level]
     ->cells.boundary_or_material_id[this->present_index]
     .material_id = mat_id;
@@ -1974,7 +2060,7 @@ CellAccessor<dim, spacedim>::set_subdomain_id(
   const types::subdomain_id new_subdomain_id) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
+  Assert(this->is_active(),
          ExcMessage("set_subdomain_id() can only be called on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index] =
     new_subdomain_id;
@@ -2079,8 +2165,7 @@ template <int dim, int spacedim>
 unsigned int
 CellAccessor<dim, spacedim>::active_cell_index() const
 {
-  Assert(this->has_children() == false,
-         TriaAccessorExceptions::ExcCellNotActive());
+  Assert(this->is_active(), TriaAccessorExceptions::ExcCellNotActive());
   return this->tria->levels[this->present_level]
     ->active_cell_indices[this->present_index];
 }
@@ -2179,7 +2264,9 @@ CellAccessor<dim, spacedim>::id() const
   Assert(ptr.level() == 0, ExcInternalError());
   const unsigned int coarse_index = ptr.index();
 
-  return {coarse_index, n_child_indices, id.data()};
+  return {this->tria->coarse_cell_index_to_coarse_cell_id(coarse_index),
+          n_child_indices,
+          id.data()};
 }
 
 
@@ -2232,9 +2319,7 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
     // neighbors and find the number
     // the hard way
     {
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         if (neighbor_cell->face_index(face_no) == this_face_index)
           return face_no;
 
@@ -2325,9 +2410,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // we need to loop over all faces
           // and subfaces and find the
           // number the hard way
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<2>::faces_per_cell;
-               ++face_no)
+          for (const unsigned int face_no : GeometryInfo<2>::face_indices())
             {
               if (face_no != face_no_guess)
                 {
@@ -2398,9 +2481,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
 
           // if the guess was false, then we need to loop over all faces and
           // subfaces and find the number the hard way
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<3>::faces_per_cell;
-               ++face_no)
+          for (const unsigned int face_no : GeometryInfo<3>::face_indices())
             {
               if (face_no == face_no_guess)
                 continue;
@@ -2787,8 +2868,7 @@ bool
 CellAccessor<dim, spacedim>::at_boundary(const unsigned int i) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(i < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
 
   return (neighbor_index(i) == -1);
 }
@@ -2919,8 +2999,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
           const typename Triangulation<dim, spacedim>::face_iterator
                              mother_face    = this->face(face);
           const unsigned int total_children = mother_face->number_of_children();
-          Assert(subface < total_children,
-                 ExcIndexRange(subface, 0, total_children));
+          AssertIndexRange(subface, total_children);
           Assert(total_children <= GeometryInfo<3>::max_children_per_face,
                  ExcInternalError());
 

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2018 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,7 +29,7 @@
 // have to be modified:
 // - <code>StokesProblem<dim>::setup_dofs()</code>:
 //   To populate an AffineConstraints object with periodicity constraints
-// - <code>StokesProblem<dim>::run()</code>:
+// - <code>StokesProblem<dim>::create_mesh()</code>:
 //   To supply a distributed triangulation with periodicity information.
 //
 // The rest of the program is identical to step-22, so let us skip this part
@@ -354,7 +354,6 @@ namespace Step45
   }
 
 
-  // @sect3{Setting up periodicity constraints on distributed triangulations}
   template <int dim>
   void StokesProblem<dim>::setup_dofs()
   {
@@ -364,10 +363,8 @@ namespace Step45
     block_component[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, block_component);
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -431,7 +428,7 @@ namespace Step45
       // For setting up the constraints, we first store the periodicity
       // information in an auxiliary object of type
       // <code>std::vector@<GridTools::PeriodicFacePair<typename
-      // DoFHandler@<dim@>::cell_iterator@> </code>. The periodic boundaries
+      // DoFHandler@<dim@>::%cell_iterator@> </code>. The periodic boundaries
       // have the boundary indicators 2 (x=0) and 3 (y=0). All the other
       // parameters we have set up before. In this case the direction does not
       // matter. Due to $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is
@@ -739,27 +736,8 @@ namespace Step45
     data_out.add_data_vector(subdomain, "subdomain");
     data_out.build_patches(mapping, degree + 1);
 
-    std::ofstream output(
-      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + "." +
-      Utilities::int_to_string(triangulation.locally_owned_subdomain(), 2) +
-      ".vtu");
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.push_back(std::string("solution-") +
-                              Utilities::int_to_string(refinement_cycle, 2) +
-                              "." + Utilities::int_to_string(i, 2) + ".vtu");
-        const std::string pvtu_master_filename =
-          ("solution-" + Utilities::int_to_string(refinement_cycle, 2) +
-           ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename);
-        data_out.write_pvtu_record(pvtu_master, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", refinement_cycle, MPI_COMM_WORLD, 2);
   }
 
 

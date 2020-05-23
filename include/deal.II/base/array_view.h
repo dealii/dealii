@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,6 +130,11 @@ public:
    */
   ArrayView(const ArrayView<typename std::remove_cv<value_type>::type,
                             MemorySpaceType> &view);
+
+  /**
+   * A constructor that automatically creates a view from a value_type object.
+   */
+  explicit ArrayView(value_type &element);
 
   /**
    * A constructor that automatically creates a view from a std::vector object.
@@ -368,6 +373,14 @@ ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
 
 
 template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(ElementType &element)
+  : starting_element(&element)
+  , n_elements(1)
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
     &view)
@@ -515,7 +528,7 @@ template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
   ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
-  Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
+  AssertIndexRange(i, n_elements);
   Assert(
     (std::is_same<MemorySpaceType, MemorySpace::Host>::value),
     ExcMessage(

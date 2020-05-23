@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@
  *
  * Finally, we have several auxiliary classes, namely MGLevelObject,
  * which stores an object on each level*
- * 
+ *
  * See the step-16, step-16b, and step-39 example programs on how to use this
  * functionality.
 

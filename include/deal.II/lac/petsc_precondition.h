@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,10 +32,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   // forward declarations
+#    ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
   class SolverBase;
-
+#    endif
 
   /**
    * Base class for preconditioner classes using the PETSc functionality. The
@@ -78,6 +79,12 @@ namespace PETScWrappers
      */
     void
     vmult(VectorBase &dst, const VectorBase &src) const;
+
+    /**
+     * Apply the transpose preconditioner once to the given src vector.
+     */
+    void
+    Tvmult(VectorBase &dst, const VectorBase &src) const;
 
 
     /**
@@ -668,7 +675,7 @@ namespace PETScWrappers
   /**
    * A class that implements the interface to use the BoomerAMG algebraic
    * multigrid preconditioner from the HYPRE suite. Note that PETSc has to be
-   * configured with HYPRE (e.g. with --download-hypre=1).
+   * configured with HYPRE (e.g. with \--download-hypre=1).
    *
    * The preconditioner does support parallel distributed computations. See
    * step-40 for an example.
@@ -790,7 +797,7 @@ namespace PETScWrappers
   /**
    * A class that implements the interface to use the ParaSails sparse
    * approximate inverse preconditioner from the HYPRE suite. Note that PETSc
-   * has to be configured with HYPRE (e.g. with --download-hypre=1).
+   * has to be configured with HYPRE (e.g. with \--download-hypre=1).
    *
    * ParaSails uses least-squares minimization to compute a sparse approximate
    * inverse. The sparsity pattern used is the pattern of a power of a

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -98,10 +98,6 @@ namespace Step59
   class Solution : public Function<dim>
   {
   public:
-    Solution()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> &p,
                          const unsigned int = 0) const override final
     {
@@ -135,10 +131,6 @@ namespace Step59
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> &p,
                          const unsigned int = 0) const override final
     {
@@ -826,9 +818,7 @@ namespace Step59
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < dim; ++e)
             if (d != e)
-              for (unsigned int v = 0;
-                   v < VectorizedArray<number>::n_array_elements;
-                   ++v)
+              for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
                 AssertThrow(inverse_jacobian[d][e][v] == 0.,
                             ExcNotImplemented());
 
@@ -1049,7 +1039,7 @@ namespace Step59
           (update_gradients | update_JxW_values);
         additional_data.mapping_update_flags_boundary_faces =
           (update_gradients | update_JxW_values);
-        additional_data.level_mg_handler = level;
+        additional_data.mg_level = level;
         const auto mg_mf_storage_level =
           std::make_shared<MatrixFree<dim, float>>();
         mg_mf_storage_level->reinit(dof_handler,
@@ -1092,9 +1082,7 @@ namespace Step59
             VectorizedArray<double> rhs_val = VectorizedArray<double>();
             Point<dim, VectorizedArray<double>> point_batch =
               phi.quadrature_point(q);
-            for (unsigned int v = 0;
-                 v < VectorizedArray<double>::n_array_elements;
-                 ++v)
+            for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
               {
                 Point<dim> single_point;
                 for (unsigned int d = 0; d < dim; ++d)
@@ -1151,9 +1139,7 @@ namespace Step59
             Point<dim, VectorizedArray<double>> point_batch =
               phi_face.quadrature_point(q);
 
-            for (unsigned int v = 0;
-                 v < VectorizedArray<double>::n_array_elements;
-                 ++v)
+            for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
               {
                 Point<dim> single_point;
                 for (unsigned int d = 0; d < dim; ++d)

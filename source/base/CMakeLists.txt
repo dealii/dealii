@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,6 +25,7 @@ SET(_unity_include_src
   bounding_box.cc
   conditional_ostream.cc
   convergence_table.cc
+  discrete_time.cc
   event.cc
   exceptions.cc
   flow_function.cc
@@ -45,6 +46,9 @@ SET(_unity_include_src
   logstream.cc
   hdf5.cc
   mpi.cc
+  mpi_consensus_algorithms.cc
+  mpi_noncontiguous_partitioner.cc
+  mu_parser_internal.cc
   multithread_info.cc
   named_selection.cc
   numbers.cc
@@ -59,6 +63,7 @@ SET(_unity_include_src
   polynomial.cc
   polynomials_abf.cc
   polynomials_adini.cc
+  tensor_polynomials_base.cc
   polynomials_bernstein.cc
   polynomials_bdm.cc
   polynomials_bernardi_raugel.cc
@@ -74,14 +79,16 @@ SET(_unity_include_src
   quadrature.cc
   quadrature_lib.cc
   quadrature_selector.cc
+  scalar_polynomials_base.cc
   subscriptor.cc
+  symbolic_function.cc
   table_handler.cc
   tensor_function.cc
+  tensor_function_parser.cc
   tensor_product_polynomials.cc
   tensor_product_polynomials_bubbles.cc
   tensor_product_polynomials_const.cc
   thread_management.cc
-  tensor.cc
   timer.cc
   time_stepping.cc
   utilities.cc
@@ -120,12 +127,14 @@ SET(_inst
   geometric_utilities.inst.in
   hdf5.inst.in
   mpi.inst.in
+  mpi_noncontiguous_partitioner.inst.in
   partitioner.inst.in
   partitioner.cuda.inst.in
   polynomials_rannacher_turek.inst.in
   symmetric_tensor.inst.in
-  tensor.inst.in
+  symbolic_function.inst.in
   tensor_function.inst.in
+  tensor_function_parser.inst.in
   time_stepping.inst.in
   )
 

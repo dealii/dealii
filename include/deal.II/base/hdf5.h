@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,12 +32,14 @@ DEAL_II_NAMESPACE_OPEN
 // links because they are longer than 80 characters
 // clang-format off
 /**
- * Namespace containing the HDF5 interface.
+ * Namespace containing deal.II's HDF5 interface.
  *
  * The [Hierarchical Data Format (HDF)](https://www.hdfgroup.org/) is a cross
  * platform and a high I/O performance format designed to store large amounts of
  * data. It supports serial and MPI I/O access. This set of classes provides an
  * interface to the [HDF5 library](https://www.hdfgroup.org/downloads/hdf5/).
+ *
+ * The tutorial step-62 shows how to use deal.II's HDF5 interface.
  *
  * # Groups, Datasets and attributes
  * An HDF5 file is organized in
@@ -54,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * An example is shown below
  * @code
- * HDF5::File data_file(filename, HDF5::File::Mode::create);
+ * HDF5::File data_file(filename, HDF5::File::FileAccessMode::create);
  * double double_attribute = 2.2;
  * data_file.set_attribute("double_attribute", double_attribute);
  * auto group = data_file.create_group("group");
@@ -94,16 +96,21 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The example below shows how to write a simple rectangular hyperslab. The
  * offset defines the origin of the hyperslab in the original dataset. The
- * dimensions of the hyperslab are `hyperslab_dimensions = {2, 5}`.
+ * dimensions of the hyperslab are `hyperslab_dimensions = {2, 5}`. Note that
+ * each process can write a hyperslab with a different size. If a process does
+ * not write any data at all, the process should call the function
+ * DataSet::write_none() because the operation is *collective* and all the MPI
+ * processes have to contribute to the call, even if they don't have data to
+ * write.
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
  *   {
- *     // data can be std::vector, FullMatrix or Vector
- *     FullMatrix<double> data = {...};
- *     std::vector<hsize_t> hyperslab_dimensions = {2, 3};
+ *     // hyperslab_data can be std::vector, FullMatrix or Vector
+ *     FullMatrix<double> hyperslab_data = {...};
  *     std::vector<hsize_t> hyperslab_offset     = {1, 2};
+ *     std::vector<hsize_t> hyperslab_dimensions = {2, 3};
  *     dataset.write_hyperslab(hyperslab_data,
  *                             hyperslab_offset,
  *                             hyperslab_dimensions);
@@ -116,12 +123,17 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The function
  * DataSet::write_hyperslab(const Container &,const std::vector<hsize_t> &, const std::vector<hsize_t> &)
- * is used to write and simple hyperslabs and the function
+ * is used to write simple hyperslabs and the function
  * DataSet::write_hyperslab(const Container &,const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
  * is used to write complex hyperslabs.
  *
  * ## Write unordered data in parallel
- * The example below shows how to write a selection of data.
+ * The example below shows how to write a selection of data. Note that each
+ * process can write a different amount of data. If a process does not write
+ * any data at all, the process should call the function
+ * DataSet::write_none() because the operation is *collective* and all the MPI
+ * processes have to contribute to the call, even if they don't have data to
+ * write. A more detailed example can be found in step-62.
  * @code
  * std::vector<hsize_t> dataset_dimensions = {50, 30};
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
@@ -228,11 +240,11 @@ DEAL_II_NAMESPACE_OPEN
  * auto dataset = group.create_dataset<double>("name", dataset_dimensions);
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
  *   {
- *     // data can be std::vector, FullMatrix or Vector
- *     std::vector<double> data = {0,1,2,3,4,5};
+ *     // hyperslab_data can be std::vector, FullMatrix or Vector
+ *     std::vector<double> hyperslab_data = {0,1,2,3,4,5};
  *     // hyperslab of rank 2. dim_0 = 2 and dim_1 = 3
- *     std::vector<hsize_t> hyperslab_dimensions = {2, 3};
  *     std::vector<hsize_t> hyperslab_offset     = {1, 2};
+ *     std::vector<hsize_t> hyperslab_dimensions = {2, 3};
  *     dataset.write_hyperslab(hyperslab_data,
  *                             hyperslab_offset,
  *                             hyperslab_dimensions);
@@ -249,10 +261,22 @@ DEAL_II_NAMESPACE_OPEN
  * 4 5
  * @endcode
  *
+ * # Complex numbers and HDF5
+ * There is no official HDF5 format to store `std::complex` numbers in a HDF5
+ * file. But the *de facto* standard is to store the `std::complex` number in a
+ * compound type in which `r` corresponds to the real part and `i` corresponds
+ * to the imaginary part. In this interface we define two compound types one for
+ * `std::complex<double>` which corresponds to `(double,double)` and another
+ * one for `std::complex<float>` which corresponds to `(float,float)`. These two
+ * types correspond respectively to the types of python/numpy/h5py:
+ * `complex128` and `complex64`. This means that the files generated by this
+ * interface will be read correctly by python/numpy/h5py and at the same time
+ * this interface is able to read the files generated by python/numpy/h5py.
+ *
  * # Data exchange with python scripts
  * The HDF5 format can be used to exchange data with python scripts. The strings
- * are stored as HDF5 variable-length UTF-8 strings and the complex numbers are
- * stored as HDF5 compound datatypes compatible with
+ * are stored as HDF5 variable-length UTF-8 strings and the complex numbers, as
+ * explained above, are stored as HDF5 compound datatypes compatible with
  * [h5py](https://www.h5py.org/) and [numpy](http://www.numpy.org/).
  *
  * The following python script writes the parameters for a deal.II simulation:
@@ -267,10 +291,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * C++ deal.II simulation with MPI HDF5:
  * @code
- * hdf5::File data_file("simulation.hdf5",
- *                      MPI_COMM_WORLD,
- *                      HDF5::FileAccessMode::Mode::open);
- * hdf5::Group data = data_file.open_group("data");
+ * HDF5::File data_file("simulation.hdf5",
+ *                      HDF5::File::FileAccessMode::open,
+ *                      MPI_COMM_WORLD);
+ * HDF5::Group data = data_file.open_group("data");
  *
  * auto nb_frequency_points = data.get_attribute<int>("nb_frequency_points");
  * auto rho = data.get_attribute<double>("rho");
@@ -695,14 +719,20 @@ namespace HDF5
 
     /**
      * This function does not write any data, but it can contribute to a
-     * collective write call. @p number can be `float`, `double`,
-     * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
+     * collective write call. In the context of a collective MPI write call,
+     * if a process does not write any data at all, the process should call
+     * this function because the operation is *collective* and all the MPI
+     * processes have to contribute to the call, even if they don't have data
+     * to write. @p number can be `float`, `double`, `std::complex<float>`,
+     * `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     *
+     * An example of how to use this function can be found in step-62.
      */
     template <typename number>
     void

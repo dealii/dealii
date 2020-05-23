@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,7 +117,7 @@ namespace internal
     template <int structdim>
     inline TriaObject<structdim>::TriaObject()
     {
-      for (unsigned int i = 0; i < GeometryInfo<structdim>::faces_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<structdim>::face_indices())
         faces[i] = -1;
     }
 
@@ -167,8 +167,7 @@ namespace internal
     inline int
     TriaObject<structdim>::face(const unsigned int i) const
     {
-      Assert(i < GeometryInfo<structdim>::faces_per_cell,
-             ExcIndexRange(i, 0, GeometryInfo<structdim>::faces_per_cell));
+      AssertIndexRange(i, GeometryInfo<structdim>::faces_per_cell);
       return faces[i];
     }
 
@@ -178,8 +177,7 @@ namespace internal
     inline void
     TriaObject<structdim>::set_face(const unsigned int i, const int index)
     {
-      Assert(i < GeometryInfo<structdim>::faces_per_cell,
-             ExcIndexRange(i, 0, GeometryInfo<structdim>::faces_per_cell));
+      AssertIndexRange(i, GeometryInfo<structdim>::faces_per_cell);
       faces[i] = index;
     }
 

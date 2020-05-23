@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,8 @@
 #define dealii_matrix_free_dof_info_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/vectorization.h>
@@ -28,6 +30,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/face_info.h>
+#include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
 #include <array>
@@ -40,8 +43,38 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    /**
+     * A struct that takes entries describing a constraint and puts them into
+     * a sorted list where duplicates are filtered out
+     */
     template <typename Number>
-    struct ConstraintValues;
+    struct ConstraintValues
+    {
+      ConstraintValues();
+
+      /**
+       * This function inserts some constrained entries to the collection of
+       * all values. It stores the (reordered) numbering of the dofs
+       * (according to the ordering that matches with the function) in
+       * new_indices, and returns the storage position the double array for
+       * access later on.
+       */
+      template <typename number2>
+      unsigned short
+      insert_entries(
+        const std::vector<std::pair<types::global_dof_index, number2>>
+          &entries);
+
+      std::vector<std::pair<types::global_dof_index, double>>
+                                           constraint_entries;
+      std::vector<types::global_dof_index> constraint_indices;
+
+      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
+      std::map<std::vector<Number>,
+               types::global_dof_index,
+               FPArrayComparator<Number>>
+        constraints;
+    };
 
     /**
      * The class that stores the indices of the degrees of freedom for all the
@@ -72,10 +105,12 @@ namespace internal
        * caches, saving one global vector access for the case where this is
        * applied rather than `vector = 0.;`.
        *
-       * Size of the chunk is set to 64 kByte which generally fits to current
-       * caches.
+       * We set the granularity to 64 - that is a number sufficiently large
+       * to minimize loop peel overhead within the work (and compatible with
+       * vectorization lengths of up to 16) and small enough to not waste on
+       * the size of the individual chunks.
        */
-      static const unsigned int chunk_size_zero_vector = 8192;
+      static const unsigned int chunk_size_zero_vector = 64;
 
       /**
        * Default empty constructor.
@@ -139,7 +174,7 @@ namespace internal
       read_dof_indices(
         const std::vector<types::global_dof_index> &local_indices,
         const std::vector<unsigned int> &           lexicographic_inv,
-        const AffineConstraints<number> &           constraints,
+        const dealii::AffineConstraints<number> &   constraints,
         const unsigned int                          cell_number,
         ConstraintValues<double> &                  constraint_values,
         bool &                                      cell_at_boundary);
@@ -374,7 +409,7 @@ namespace internal
        * cells batched together. As opposed to the other classes which are
        * templated on the number type, this class as a pure index container is
        * not templated, so we need to keep the information otherwise contained
-       * in VectorizedArrayType::n_array_elements.
+       * in VectorizedArrayType::size().
        */
       unsigned int vectorization_length;
 
@@ -473,13 +508,20 @@ namespace internal
        * vector partitioner stored in @p vector_partitioner. These
        * partitioners are used in specialized loops that only import parts of
        * the ghosted region for reducing the amount of communication. There
-       * are three variants of the partitioner initialized, one that queries
-       * only the cell values, one that additionally describes the indices for
-       * evaluating the function values on the faces, and one that describes
-       * the indices for evaluation both the function values and the gradients
-       * on the faces adjacent to the locally owned cells.
+       * are five variants of the partitioner initialized:
+       * - one that queries only the cell values,
+       * - one that additionally describes the indices for
+       *   evaluating the function values on relevant faces,
+       * - one that describes the indices for evaluation both the function
+       *   values and the gradients on relevant faces adjacent to the locally
+       *   owned cells,
+       * - one that additionally describes the indices for
+       *   evaluating the function values on all faces, and
+       * - one that describes the indices for evaluation both the function
+       *   values and the gradients on all faces adjacent to the locally owned
+       *   cells.
        */
-      std::array<std::shared_ptr<const Utilities::MPI::Partitioner>, 3>
+      std::array<std::shared_ptr<const Utilities::MPI::Partitioner>, 5>
         vector_partitioner_face_variants;
 
       /**
@@ -597,7 +639,33 @@ namespace internal
       /**
        * Stores the actual ranges in the vector to be cleared.
        */
-      std::vector<unsigned int> vector_zero_range_list;
+      std::vector<std::pair<unsigned int, unsigned int>> vector_zero_range_list;
+
+      /**
+       * Stores an integer to each partition in TaskInfo that indicates when
+       * to schedule operations that will be done before any access to vector
+       * entries.
+       */
+      std::vector<unsigned int> cell_loop_pre_list_index;
+
+      /**
+       * Stores the actual ranges of the operation before any access to vector
+       * entries.
+       */
+      std::vector<std::pair<unsigned int, unsigned int>> cell_loop_pre_list;
+
+      /**
+       * Stores an integer to each partition in TaskInfo that indicates when
+       * to schedule operations that will be done after all access to vector
+       * entries.
+       */
+      std::vector<unsigned int> cell_loop_post_list_index;
+
+      /**
+       * Stores the actual ranges of the operation after all access to vector
+       * entries.
+       */
+      std::vector<std::pair<unsigned int, unsigned int>> cell_loop_post_list;
     };
 
 

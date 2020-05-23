@@ -13,7 +13,7 @@ Of more interest is to evaluate some aspects of the multigrid solver.
 When we run this program in 2D for quadratic ($Q_2$) elements, we get the
 following output (when run on one core in release mode):
 @code
-Vectorization over 2 doubles = 128 bits (SSE2), VECTORIZATION_LEVEL=1
+Vectorization over 2 doubles = 128 bits (SSE2)
 Cycle 0
 Number of degrees of freedom: 81
 Total setup time               (wall) 0.00159788s
@@ -68,7 +68,7 @@ use uniform mesh refinement, we get eight times as many elements and
 approximately eight times as many degrees of freedom with each cycle:
 
 @code
-Vectorization over 2 doubles = 128 bits (SSE2), VECTORIZATION_LEVEL=1
+Vectorization over 2 doubles = 128 bits (SSE2)
 Cycle 0
 Number of degrees of freedom: 125
 Total setup time               (wall) 0.00231099s
@@ -107,7 +107,7 @@ degree_finite_element=4;</code> at the top of the program, we get the
 following program output:
 
 @code
-Vectorization over 2 doubles = 128 bits (SSE2), VECTORIZATION_LEVEL=1
+Vectorization over 2 doubles = 128 bits (SSE2)
 Cycle 0
 Number of degrees of freedom: 729
 Total setup time               (wall) 0.00633097s
@@ -160,7 +160,7 @@ Finally, let us look at the timings with degree 8, which corresponds to
 another round of mesh refinement in the lower order methods:
 
 @code
-Vectorization over 2 doubles = 128 bits (SSE2), VECTORIZATION_LEVEL=1
+Vectorization over 2 doubles = 128 bits (SSE2)
 Cycle 0
 Number of degrees of freedom: 4913
 Total setup time               (wall) 0.0842004s

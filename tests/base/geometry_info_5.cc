@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,8 @@ test()
   deallog << "Checking in " << dim << "d" << std::endl;
 
   // check phi_i(v_j) = delta_{ij}
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         const Tensor<1, dim> phi_i_grad =
           GeometryInfo<dim>::d_linear_shape_function_gradient(
@@ -46,10 +46,10 @@ test()
   // gradient of the sum of shape functions
   // is zero. do so at every vertex, and then
   // at the center
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
     {
       Tensor<1, dim> s;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         s += GeometryInfo<dim>::d_linear_shape_function_gradient(
           GeometryInfo<dim>::unit_cell_vertex(v), i);
       AssertThrow(s.norm() == 0, ExcInternalError());
@@ -62,7 +62,7 @@ test()
       center[i] = 0.5;
 
     Tensor<1, dim> s;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       s += GeometryInfo<dim>::d_linear_shape_function_gradient(center, i);
     AssertThrow(s.norm() == 0, ExcInternalError());
 

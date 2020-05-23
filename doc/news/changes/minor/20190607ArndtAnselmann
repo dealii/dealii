@@ -1,3 +1,0 @@
-Unified DoFTools::extract_dofs() for DoFHandler and hp::DoFHandler.
-<br>
-(Daniel Arndt, Mathias Anselmann, 2019/06/07)

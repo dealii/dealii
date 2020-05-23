@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,6 +35,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
@@ -43,7 +45,7 @@ template <typename Matrix>
 class BlockMatrixBase;
 template <typename number>
 class SparseILU;
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
 namespace Utilities
 {
   namespace MPI
@@ -53,13 +55,14 @@ namespace Utilities
     sum(const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
   }
 } // namespace Utilities
-#  endif
+#    endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
 }
+#    endif
 #  endif
 
 /**
@@ -2414,7 +2417,7 @@ template <typename number>
 inline typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return const_iterator(this, cols->rowstart[r]);
 }
@@ -2425,7 +2428,7 @@ template <typename number>
 inline typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return const_iterator(this, cols->rowstart[r + 1]);
 }
@@ -2436,7 +2439,7 @@ template <typename number>
 inline typename SparseMatrix<number>::iterator
 SparseMatrix<number>::begin(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return iterator(this, cols->rowstart[r]);
 }
@@ -2447,7 +2450,7 @@ template <typename number>
 inline typename SparseMatrix<number>::iterator
 SparseMatrix<number>::end(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
 
   return iterator(this, cols->rowstart[r + 1]);
 }

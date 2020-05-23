@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -354,7 +354,8 @@ ElasticProblem<dim>::setup_system()
     dof_handler); // do renumberring; must be done
                   // right after distributing DoF !!!
   DoFRenumbering::component_wise(dof_handler, block_component);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
   deallog << "dofs per block:  U=" << dofs_per_block[u_block]
           << " L=" << dofs_per_block[lambda_block] << std::endl;

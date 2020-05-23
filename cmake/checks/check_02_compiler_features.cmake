@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -127,7 +127,7 @@ CHECK_CXX_COMPILER_BUG(
 # - Matthias Maier, rewritten 2012
 #
 IF(NOT(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND
-       DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR))
+       DEAL_II_HAVE_CXX14_CONSTEXPR))
   CHECK_CXX_SOURCE_COMPILES(
     "
     bool f() { return true; }
@@ -448,22 +448,21 @@ RESET_CMAKE_REQUIRED()
 # ICC also emits a warning but passes for unsupported linkers
 # unless we turn diagnostic warnings into errors.
 #
-# Wolfgang Bangerth, Matthias Maier, Daniel Arndt, 2015, 2018
+# We also test linker support with "-shared -fPIC". This catches an
+# incompatibility where LLD refuses to produce a shared object from an
+# object file compiled by the Intel Compiler:
 #
+#   ld.lld: error: can't create dynamic relocation R_X86_64_64 against symbol:
+#   __gxx_personality_v0 in readonly segment; recompile object files with -fPIC
+#   or pass '-Wl,-z,notext' to allow text relocations in the output
+#
+# even if we actually had -fPIC option present. If we add -Wl,-z,notext, it
+# will link, but the produced libdeal_II.so is faulty and will crash randomly.
+#
+# Wolfgang Bangerth, Matthias Maier, Daniel Arndt, Binrui Dong, 2015, 2018-2020
+#
+
 IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
-  ENDIF()
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    int main() { return 0; }
-    "
-    DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
-  RESET_CMAKE_REQUIRED()
 
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
@@ -471,17 +470,34 @@ IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
   ENDIF()
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-shared")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fPIC")
+
+  #
+  # Check for ld.lld and ld.gold support:
+  #
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <iostream>
+    void foo() { std::cout << \"Hello, world!\" << std::endl; }
+    "
+    DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+
+  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=gold")
   CHECK_CXX_SOURCE_COMPILES(
     "
-    int main() { return 0; }
+    #include <iostream>
+    void foo() { std::cout << \"Hello, world!\" << std::endl; }
     "
     DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-  RESET_CMAKE_REQUIRED()
 
   IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
   ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
     ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
   ENDIF()
+
+  RESET_CMAKE_REQUIRED()
 ENDIF()

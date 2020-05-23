@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// this test documents two unrelated bugs in DataOut when used with a Filter (by
+// This test documents two unrelated bugs in DataOut when used with a Filter (by
 // deriving from DataOut):
 // 1. The patch index computation in data_out.cc is wrong and causes an SIGV (or
 // an Assert after adding that):
@@ -37,7 +37,7 @@ dealii::TriaIterator<dealii::CellAccessor<2, 2> >] 466: The violated condition
 was: 466:     cell_and_index->second < patches.size() 466: The name and call
 sequence of the exception was: 466:     ExcInternalError()
 */
-// 2. DataOut used begi_active() instead of first_cell() in two places which
+// 2. DataOut used begin_active() instead of first_cell() in two places which
 // caused a wrong patch to be generated when the first active cell is not picked
 // by the filter.
 
@@ -70,8 +70,7 @@ public:
   virtual typename DataOut<dim>::cell_iterator
   first_cell()
   {
-    typename DataOut<dim>::active_cell_iterator cell =
-      this->dofs->begin_active();
+    auto cell = this->dofs->begin_active();
     while ((cell != this->dofs->end()) &&
            (cell->subdomain_id() != subdomain_id))
       ++cell;
@@ -86,8 +85,9 @@ public:
       {
         const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
-        return ++(FilteredIterator<typename DataOut<dim>::active_cell_iterator>(
-          predicate, old_cell));
+        return ++(
+          FilteredIterator<typename Triangulation<dim>::active_cell_iterator>(
+            predicate, old_cell));
       }
     else
       return old_cell;
@@ -112,14 +112,11 @@ check()
 
   // this should skip the first cell
   typename Triangulation<dim>::active_cell_iterator it = tria.begin_active();
-  //++it;
   it->set_subdomain_id(1);
 
   FE_DGQ<dim>     fe(0);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
-
-  //  DataOut<dim> data_out;
 
   // we pick only subdomain==0 which will
   // skip the first of the four cells
@@ -139,10 +136,8 @@ check()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   check<2>();
 

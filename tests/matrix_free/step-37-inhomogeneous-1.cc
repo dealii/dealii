@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -58,8 +58,6 @@
 
 namespace Step37
 {
-  using namespace dealii;
-
   const unsigned int degree_finite_element = 2;
 
   template <int dim>
@@ -459,7 +457,7 @@ namespace Step37
           MatrixFree<dim, float>::AdditionalData::none;
         additional_data.mapping_update_flags =
           (update_gradients | update_JxW_values | update_quadrature_points);
-        additional_data.level_mg_handler = level;
+        additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
         mg_mf_storage_level->reinit(dof_handler,

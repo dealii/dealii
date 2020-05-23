@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe.h>
@@ -32,24 +33,17 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class gives a unified framework for the implementation of
- * FiniteElement classes based on Tensor valued polynomial spaces like
- * PolynomialsBDM and PolynomialsRaviartThomas.
+ * This class provides a unified framework for the implementation of
+ * FiniteElement classes based on tensor-valued polynomial spaces like
+ * PolynomialsBDM and PolynomialsRaviartThomas. In this, it is the
+ * tensor-valued equivalent of the FE_Poly class.
  *
  * In essence, what this class requires is that a derived class describes
  * to it a (vector-valued) polynomial space in which every polynomial
- * has exactly @p dim vector components. The polynomial space is described
- * through the @p PolynomialType template argument, which needs to provide
- * a function of the following signature:
- * @code
- * void compute (const Point<dim>            &unit_point,
- *               std::vector<Tensor<1,dim> > &values,
- *               std::vector<Tensor<2,dim> > &grads,
- *               std::vector<Tensor<3,dim> > &grad_grads) const;
- * @endcode
- *
- * For more information on the template parameter <tt>spacedim</tt>, see the
- * documentation for the class Triangulation.
+ * has exactly @p dim vector components. The classes that provide such
+ * implementations are all derived from the TensorPolynomialsBase
+ * class, and an object of one of these derived types needs to be
+ * provided to the constructor of this class.
  *
  *
  * <h3>Deriving classes</h3>
@@ -57,13 +51,16 @@ DEAL_II_NAMESPACE_OPEN
  * This class is not a fully implemented FiniteElement class, but implements
  * some common features of vector valued elements based on vector valued
  * polynomial classes. What's missing here in particular is information on the
- * topological location of the node values, and derived classes need to provide
+ * topological location of the node values (i.e., whether a degree of freedom
+ * is logically at a vertex, edge, face, or the interior of a cell --
+ * information that determines the continuity properties of the associated
+ * shape functions across cell interfaces), and derived classes need to provide
  * this information.
  *
  * Similarly, in many cases, node functionals depend on the shape of the mesh
  * cell, since they evaluate normal or tangential components on the faces. In
  * order to allow for a set of transformations, the variable #mapping_kind has
- * been introduced. It should needs be set in the constructor of a derived
+ * been introduced. It needs be set in the constructor of a derived
  * class.
  *
  * Any derived class must decide on the polynomial space to use.  This
@@ -137,25 +134,31 @@ DEAL_II_NAMESPACE_OPEN
  * mappings, then @p mapping_kind may be a vector with the same number
  * of elements as there are shape functions.
  *
- * @see PolynomialsBDM, PolynomialsRaviartThomas
+ * @see TensorPolynomialsBase
  * @ingroup febase
  * @author Guido Kanschat
  * @date 2005
  */
-template <class PolynomialType, int dim, int spacedim = dim>
+template <int dim, int spacedim = dim>
 class FE_PolyTensor : public FiniteElement<dim, spacedim>
 {
 public:
   /**
-   * Constructor.
-   *
-   * @arg @c degree: constructor argument for poly. May be different from @p
-   * fe_data.degree.
+   * Constructor. This constructor does a deep copy of the polynomials
+   * object via the TensorPolynomialsBase::clone() function and stores
+   * a pointer to the copy. As a consequence, the calling site can
+   * simply pass a temporary object as the first argument.
    */
-  FE_PolyTensor(const unsigned int                degree,
+  FE_PolyTensor(const TensorPolynomialsBase<dim> &polynomials,
                 const FiniteElementData<dim> &    fe_data,
                 const std::vector<bool> &         restriction_is_additive_flags,
                 const std::vector<ComponentMask> &nonzero_components);
+
+
+  /**
+   * Copy constructor.
+   */
+  FE_PolyTensor(const FE_PolyTensor &fe);
 
   // for documentation, see the FiniteElement base class
   virtual UpdateFlags
@@ -318,12 +321,12 @@ protected:
     if (update_flags & (update_values | update_gradients))
       for (unsigned int k = 0; k < n_q_points; ++k)
         {
-          poly_space.compute(quadrature.point(k),
-                             values,
-                             grads,
-                             grad_grads,
-                             third_derivatives,
-                             fourth_derivatives);
+          poly_space->evaluate(quadrature.point(k),
+                               values,
+                               grads,
+                               grad_grads,
+                               third_derivatives,
+                               fourth_derivatives);
 
           if (update_flags & update_values)
             {
@@ -468,10 +471,10 @@ protected:
 
 
   /**
-   * The polynomial space. Its type is given by the template parameter
-   * PolynomialType.
+   * A copy of the object passed to the constructor that describes the
+   * polynomial space.
    */
-  PolynomialType poly_space;
+  const std::unique_ptr<const TensorPolynomialsBase<dim>> poly_space;
 
   /**
    * The inverse of the matrix <i>a<sub>ij</sub></i> of node values
@@ -489,7 +492,7 @@ protected:
   /**
    * A mutex to be used to guard access to the variables below.
    */
-  mutable Threads::Mutex cache_mutex;
+  mutable std::mutex cache_mutex;
 
   /**
    * If a shape function is computed at a single point, we must compute all of

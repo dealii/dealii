@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,12 +31,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#  ifndef DOXYGEN
 template <typename Number>
 class BlockVectorBase;
-
-/*! @addtogroup TrilinosWrappers
- *@{
- */
 
 namespace TrilinosWrappers
 {
@@ -46,8 +43,15 @@ namespace TrilinosWrappers
     class BlockVector;
   }
   class BlockSparseMatrix;
+} // namespace TrilinosWrappers
+#  endif
 
+/*! @addtogroup TrilinosWrappers
+ *@{
+ */
 
+namespace TrilinosWrappers
+{
   namespace MPI
   {
     /**

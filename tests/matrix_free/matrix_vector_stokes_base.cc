@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim, int degree_p, typename BlockVectorType>
 class MatrixFreeTest : public MatrixFreeOperators::Base<dim, BlockVectorType>
@@ -149,8 +148,8 @@ test()
   DoFTools::make_hanging_node_constraints(dof_p, constraints_p);
   constraints_p.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(dof, dofs_per_block, stokes_sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof, stokes_sub_blocks);
   {
     BlockDynamicSparsityPattern csp(2, 2);
 

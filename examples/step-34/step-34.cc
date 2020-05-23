@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1078,7 +1078,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step34;
 
       const unsigned int degree         = 1;

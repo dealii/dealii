@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,16 @@
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/iostreams/copy.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
+#undef BOOST_BIND_GLOBAL_PLACEHOLDERS
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <bitset>
@@ -44,6 +52,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <string>
 
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
 #  include <unistd.h>
@@ -380,6 +389,88 @@ namespace Utilities
 
 
   std::string
+  compress(const std::string &input)
+  {
+#ifdef DEAL_II_WITH_ZLIB
+    namespace bio = boost::iostreams;
+
+    std::stringstream compressed;
+    std::stringstream origin(input);
+
+    bio::filtering_streambuf<bio::input> out;
+    out.push(bio::gzip_compressor(
+      bio::gzip_params(boost::iostreams::gzip::default_compression)));
+    out.push(origin);
+    bio::copy(out, compressed);
+
+    return compressed.str();
+#else
+    return input;
+#endif
+  }
+
+
+
+  std::string
+  decompress(const std::string &compressed_input)
+  {
+#ifdef DEAL_II_WITH_ZLIB
+    namespace bio = boost::iostreams;
+
+    std::stringstream compressed(compressed_input);
+    std::stringstream decompressed;
+
+    bio::filtering_streambuf<bio::input> out;
+    out.push(bio::gzip_decompressor());
+    out.push(compressed);
+    bio::copy(out, decompressed);
+
+    return decompressed.str();
+#else
+    return compressed_input;
+#endif
+  }
+
+
+
+  std::string
+  encode_base64(const std::vector<unsigned char> &binary_input)
+  {
+    using namespace boost::archive::iterators;
+    using It = base64_from_binary<
+      transform_width<std::vector<unsigned char>::const_iterator, 6, 8>>;
+    auto base64 = std::string(It(binary_input.begin()), It(binary_input.end()));
+    // Add padding.
+    return base64.append((3 - binary_input.size() % 3) % 3, '=');
+  }
+
+
+
+  std::vector<unsigned char>
+  decode_base64(const std::string &base64_input)
+  {
+    using namespace boost::archive::iterators;
+    using It =
+      transform_width<binary_from_base64<std::string::const_iterator>, 8, 6>;
+    auto binary = std::vector<unsigned char>(It(base64_input.begin()),
+                                             It(base64_input.end()));
+    // Remove padding.
+    auto length = base64_input.size();
+    if (binary.size() > 2 && base64_input[length - 1] == '=' &&
+        base64_input[length - 2] == '=')
+      {
+        binary.erase(binary.end() - 2, binary.end());
+      }
+    else if (binary.size() > 1 && base64_input[length - 1] == '=')
+      {
+        binary.erase(binary.end() - 1, binary.end());
+      }
+    return binary;
+  }
+
+
+
+  std::string
   int_to_string(const unsigned int value, const unsigned int digits)
   {
     return to_string(value, digits);
@@ -391,11 +482,20 @@ namespace Utilities
   std::string
   to_string(const number value, const unsigned int digits)
   {
-    std::string lc_string = boost::lexical_cast<std::string>(value);
+    // For integer data types, use the standard std::to_string()
+    // function. On the other hand, that function is defined in terms
+    // of std::sprintf, which does not use the usual std::iostream
+    // interface and tries to render floating point numbers in awkward
+    // ways (see
+    // https://en.cppreference.com/w/cpp/string/basic_string/to_string). So
+    // resort to boost::lexical_cast for all other types (in
+    // particular for floating point types.
+    std::string lc_string = (std::is_integral<number>::value ?
+                               std::to_string(value) :
+                               boost::lexical_cast<std::string>(value));
 
-    if (digits == numbers::invalid_unsigned_int)
-      return lc_string;
-    else if (lc_string.size() < digits)
+    if ((digits != numbers::invalid_unsigned_int) &&
+        (lc_string.size() < digits))
       {
         // We have to add the padding zeroes in front of the number
         const unsigned int padding_position = (lc_string[0] == '-') ? 1 : 0;
@@ -403,8 +503,10 @@ namespace Utilities
         const std::string padding(digits - lc_string.size(), '0');
         lc_string.insert(padding_position, padding);
       }
+
     return lc_string;
   }
+
 
 
   std::string
@@ -466,22 +568,41 @@ namespace Utilities
   unsigned int
   needed_digits(const unsigned int max_number)
   {
-    if (max_number < 10)
-      return 1;
-    if (max_number < 100)
-      return 2;
-    if (max_number < 1000)
-      return 3;
-    if (max_number < 10000)
-      return 4;
-    if (max_number < 100000)
-      return 5;
-    if (max_number < 1000000)
-      return 6;
-    AssertThrow(false, ExcInvalidNumber(max_number));
-    return 0;
+    if (max_number > 0)
+      return static_cast<int>(
+        std::ceil(std::log10(std::fabs(max_number + 0.1))));
+
+    return 1;
   }
 
+
+
+  template <typename Number>
+  Number
+  truncate_to_n_digits(const Number number, const unsigned int n_digits)
+  {
+    AssertThrow(n_digits >= 1, ExcMessage("invalid parameter."));
+
+    if (!(std::fabs(number) > std::numeric_limits<Number>::min()))
+      return number;
+
+    const int order =
+      static_cast<int>(std::floor(std::log10(std::fabs(number))));
+
+    const int shift = -order + static_cast<int>(n_digits) - 1;
+
+    Assert(shift <= static_cast<int>(std::floor(
+                      std::log10(std::numeric_limits<Number>::max()))),
+           ExcMessage(
+             "Overflow. Use a smaller value for n_digits and/or make sure "
+             "that the absolute value of 'number' does not become too small."));
+
+    const Number factor = std::pow(10.0, static_cast<Number>(shift));
+
+    const Number number_cutoff = std::trunc(number * factor) / factor;
+
+    return number_cutoff;
+  }
 
 
   int
@@ -792,119 +913,6 @@ namespace Utilities
 
 
 
-  std::vector<unsigned int>
-  reverse_permutation(const std::vector<unsigned int> &permutation)
-  {
-    const unsigned int n = permutation.size();
-
-    std::vector<unsigned int> out(n);
-    for (unsigned int i = 0; i < n; ++i)
-      out[i] = n - 1 - permutation[i];
-
-    return out;
-  }
-
-
-
-  std::vector<unsigned int>
-  invert_permutation(const std::vector<unsigned int> &permutation)
-  {
-    const unsigned int n = permutation.size();
-
-    std::vector<unsigned int> out(n, numbers::invalid_unsigned_int);
-
-    for (unsigned int i = 0; i < n; ++i)
-      {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
-        out[permutation[i]] = i;
-      }
-
-    // check that we have actually reached
-    // all indices
-    for (unsigned int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
-
-    return out;
-  }
-
-  std::vector<unsigned long long int>
-  reverse_permutation(const std::vector<unsigned long long int> &permutation)
-  {
-    const unsigned long long int n = permutation.size();
-
-    std::vector<unsigned long long int> out(n);
-    for (unsigned long long int i = 0; i < n; ++i)
-      out[i] = n - 1 - permutation[i];
-
-    return out;
-  }
-
-
-
-  std::vector<unsigned long long int>
-  invert_permutation(const std::vector<unsigned long long int> &permutation)
-  {
-    const unsigned long long int n = permutation.size();
-
-    std::vector<unsigned long long int> out(n, numbers::invalid_unsigned_int);
-
-    for (unsigned long long int i = 0; i < n; ++i)
-      {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
-        out[permutation[i]] = i;
-      }
-
-    // check that we have actually reached
-    // all indices
-    for (unsigned long long int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
-
-    return out;
-  }
-
-
-  template <typename Integer>
-  std::vector<Integer>
-  reverse_permutation(const std::vector<Integer> &permutation)
-  {
-    const unsigned int n = permutation.size();
-
-    std::vector<Integer> out(n);
-    for (unsigned int i = 0; i < n; ++i)
-      out[i] = n - 1 - permutation[i];
-
-    return out;
-  }
-
-
-
-  template <typename Integer>
-  std::vector<Integer>
-  invert_permutation(const std::vector<Integer> &permutation)
-  {
-    const unsigned int n = permutation.size();
-
-    std::vector<Integer> out(n, numbers::invalid_unsigned_int);
-
-    for (unsigned int i = 0; i < n; ++i)
-      {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
-        out[permutation[i]] = i;
-      }
-
-    // check that we have actually reached
-    // all indices
-    for (unsigned int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
-
-    return out;
-  }
-
-
-
   namespace System
   {
 #if defined(__linux__)
@@ -936,24 +944,24 @@ namespace Utilities
     const std::string
     get_current_vectorization_level()
     {
-      switch (DEAL_II_COMPILER_VECTORIZATION_LEVEL)
+      switch (DEAL_II_VECTORIZATION_WIDTH_IN_BITS)
         {
           case 0:
             return "disabled";
-          case 1:
+          case 128:
 #ifdef __ALTIVEC__
             return "AltiVec";
 #else
             return "SSE2";
 #endif
-          case 2:
+          case 256:
             return "AVX";
-          case 3:
+          case 512:
             return "AVX512";
           default:
             AssertThrow(false,
                         ExcInternalError(
-                          "Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
+                          "Invalid DEAL_II_VECTORIZATION_WIDTH_IN_BITS."));
             return "ERROR";
         }
     }
@@ -1045,14 +1053,14 @@ namespace Utilities
 #ifndef DEAL_II_MSVC
       const int ierr = ::posix_memalign(memptr, alignment, size);
 
-      AssertThrow(ierr == 0, ExcOutOfMemory());
-      AssertThrow(*memptr != nullptr, ExcOutOfMemory());
+      AssertThrow(ierr == 0, ExcOutOfMemory(size));
+      AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #else
       // Windows does not appear to have posix_memalign. just use the
       // regular malloc in that case
       *memptr = malloc(size);
       (void)alignment;
-      AssertThrow(*memptr != 0, ExcOutOfMemory());
+      AssertThrow(*memptr != 0, ExcOutOfMemory(size));
 #endif
     }
 
@@ -1228,6 +1236,11 @@ namespace Utilities
   template std::string
   to_string<long double>(long double, unsigned int);
 
+  template double
+  truncate_to_n_digits(const double, const unsigned int);
+  template float
+  truncate_to_n_digits(const float, const unsigned int);
+
   template std::vector<std::array<std::uint64_t, 1>>
   inverse_Hilbert_space_filling_curve<1, double>(
     const std::vector<Point<1, double>> &,
@@ -1259,6 +1272,8 @@ namespace Utilities
   pack_integers<2>(const std::array<std::uint64_t, 2> &, const int);
   template std::uint64_t
   pack_integers<3>(const std::array<std::uint64_t, 3> &, const int);
+
+
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

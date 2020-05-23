@@ -17,6 +17,23 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+namespace internal
+{
+  namespace AffineConstraintsImplementation
+  {
+    template void
+    set_zero_all(
+      const std::vector<types::global_dof_index> &                  cm,
+      LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA> &vec);
+
+    template void
+    set_zero_all(
+      const std::vector<types::global_dof_index> &                   cm,
+      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec);
+  } // namespace AffineConstraintsImplementation
+} // namespace internal
+
 template void
 AffineConstraints<float>::set_zero<
   LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>(

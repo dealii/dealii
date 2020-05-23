@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 template <class PolynomialType,
           int dim      = PolynomialType::dimension,
           int spacedim = dim>
-class FE_Q_Base : public FE_Poly<PolynomialType, dim, spacedim>
+class FE_Q_Base : public FE_Poly<dim, spacedim>
 {
 public:
   /**

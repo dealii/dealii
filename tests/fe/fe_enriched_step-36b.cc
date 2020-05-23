@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,6 @@
 
 const unsigned int dim = 3;
 
-using namespace dealii;
 
 /**
  * Coulomb potential
@@ -390,7 +389,7 @@ namespace Step36
          cell != dof_handler.end();
          ++cell)
       if (cell_is_pou(cell))
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (!cell->at_boundary(f))
             {
               bool face_is_on_interface = false;
@@ -481,7 +480,7 @@ namespace Step36
 
           if (cell->active_fe_index() == 0) // plain FE
             {
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const auto q_point : fe_values.quadrature_point_indices())
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   for (unsigned int j = i; j < dofs_per_cell; ++j)
                     {
@@ -519,8 +518,8 @@ namespace Step36
 
                       if (i_group == fe_group && j_group == fe_group) // fe - fe
                         {
-                          for (unsigned int q_point = 0; q_point < n_q_points;
-                               ++q_point)
+                          for (const auto q_point :
+                               fe_values.quadrature_point_indices())
                             {
                               cell_stiffness_matrix(i, j) +=
                                 (fe_values[fe_extractor].gradient(i, q_point) *
@@ -541,8 +540,8 @@ namespace Step36
                       else if (i_group == fe_group &&
                                j_group == pou_group) // fe - pou
                         {
-                          for (unsigned int q_point = 0; q_point < n_q_points;
-                               ++q_point)
+                          for (const auto q_point :
+                               fe_values.quadrature_point_indices())
                             {
                               cell_stiffness_matrix(i, j) +=
                                 (fe_values[fe_extractor].gradient(i, q_point) *
@@ -568,8 +567,8 @@ namespace Step36
                       else if (i_group == pou_group &&
                                j_group == fe_group) // pou - fe
                         {
-                          for (unsigned int q_point = 0; q_point < n_q_points;
-                               ++q_point)
+                          for (const auto q_point :
+                               fe_values.quadrature_point_indices())
                             {
                               cell_stiffness_matrix(i, j) +=
                                 ((fe_values[pou_extractor].gradient(i,
@@ -598,8 +597,8 @@ namespace Step36
                           Assert(i_group == pou_group && j_group == pou_group,
                                  ExcInternalError());
 
-                          for (unsigned int q_point = 0; q_point < n_q_points;
-                               ++q_point)
+                          for (const auto q_point :
+                               fe_values.quadrature_point_indices())
                             {
                               cell_stiffness_matrix(i, j) +=
                                 ((fe_values[pou_extractor].gradient(i,

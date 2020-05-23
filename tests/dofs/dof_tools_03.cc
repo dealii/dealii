@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
+
 #include "dof_tools_common.h"
 #include "dof_tools_common_fake_hp.h"
 

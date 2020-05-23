@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------
 #
-# Copyright (C) 2016 by the deal.II authors
+# Copyright (C) 2016 - 2019 by the deal.II authors
 #
 # This file is part of the deal.II library.
 #
@@ -16,13 +16,31 @@
 import unittest
 from PyDealII.Debug import *
 
-
 class TestCellAccessorWrapper(unittest.TestCase):
 
     def setUp(self):
         self.triangulation = Triangulation('2D')
         self.triangulation.generate_hyper_cube()
         self.triangulation.refine_global(1)
+
+    def test_faces(self):
+        for cell in self.triangulation.active_cells():
+            faces = cell.faces()
+            self.assertEqual(len(faces), 4)
+
+    def test_at_boundary(self):
+        for cell in self.triangulation.active_cells():
+            self.assertEqual(cell.at_boundary(), cell.has_boundary_lines()) 
+
+    def test_faces(self):
+        n_neighbors = 0
+        for cell in self.triangulation.active_cells():
+            faces = cell.faces()
+            for i in range(len(faces)):
+                if not faces[i].at_boundary():
+                    neighbor = cell.neighbor(i)
+                    n_neighbors += 1
+        self.assertEqual(n_neighbors, 8)
 
     def test_material_id(self):
         material_id = 0

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup fe
  */
 template <int dim>
-class FE_BDM : public FE_PolyTensor<PolynomialsBDM<dim>, dim>
+class FE_BDM : public FE_PolyTensor<dim>
 {
 public:
   /**

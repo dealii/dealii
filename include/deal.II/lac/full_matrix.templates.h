@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,11 +137,8 @@ FullMatrix<number> &
 FullMatrix<number>::operator*=(const number factor)
 {
   AssertIsFinite(factor);
-
-  number *      p = &(*this)(0, 0);
-  const number *e = &(*this)(0, 0) + n() * m();
-  while (p != e)
-    *p++ *= factor;
+  for (number &v : this->values)
+    v *= factor;
 
   return *this;
 }
@@ -153,18 +150,9 @@ FullMatrix<number> &
 FullMatrix<number>::operator/=(const number factor)
 {
   AssertIsFinite(factor);
-
-  number *      p = &(*this)(0, 0);
-  const number *e = &(*this)(0, 0) + n() * m();
-
   const number factor_inv = number(1.) / factor;
 
-  AssertIsFinite(factor_inv);
-
-  while (p != e)
-    *p++ *= factor_inv;
-
-  return *this;
+  return *this *= factor_inv;
 }
 
 
@@ -187,7 +175,7 @@ FullMatrix<number>::vmult(Vector<number2> &      dst,
   // get access to the data in order to
   // avoid copying it when using the ()
   // operator
-  const number2 * src_ptr = &(*const_cast<Vector<number2> *>(&src))(0);
+  const number2 * src_ptr = src.begin();
   const size_type size_m = m(), size_n = n();
   for (size_type i = 0; i < size_m; ++i)
     {
@@ -582,11 +570,11 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
   // arrange the loops in a way that we keep write operations low, (writing is
   // usually more costly than reading), even though we need to access the data
   // in src not in a contiguous way.
-  for (size_type i = 0; i < m; i++)
-    for (size_type j = 0; j < n; j++)
+  for (size_type i = 0; i < m; ++i)
+    for (size_type j = 0; j < n; ++j)
       {
         number2 add_value = adding ? dst(i, j) : 0.;
-        for (size_type k = 0; k < l; k++)
+        for (size_type k = 0; k < l; ++k)
           add_value += static_cast<number2>((*this)(i, k)) *
                        static_cast<number2>((src(k, j)));
         dst(i, j) = add_value;
@@ -687,11 +675,11 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
   // optimized gemm operation in case the matrix is big, so this shouldn't be
   // too bad.
   else
-    for (size_type i = 0; i < m; i++)
-      for (size_type j = 0; j < n; j++)
+    for (size_type i = 0; i < m; ++i)
+      for (size_type j = 0; j < n; ++j)
         {
           number2 add_value = adding ? dst(i, j) : 0.;
-          for (size_type k = 0; k < l; k++)
+          for (size_type k = 0; k < l; ++k)
             add_value += static_cast<number2>((*this)(k, i)) *
                          static_cast<number2>((src(k, j)));
           dst(i, j) = add_value;
@@ -788,11 +776,11 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
   else
     // arrange the loops in a way that we keep write operations low, (writing is
     // usually more costly than reading).
-    for (size_type i = 0; i < m; i++)
-      for (size_type j = 0; j < n; j++)
+    for (size_type i = 0; i < m; ++i)
+      for (size_type j = 0; j < n; ++j)
         {
           number2 add_value = adding ? dst(i, j) : 0.;
-          for (size_type k = 0; k < l; k++)
+          for (size_type k = 0; k < l; ++k)
             add_value += static_cast<number2>((*this)(i, k)) *
                          static_cast<number2>(src(j, k));
           dst(i, j) = add_value;
@@ -873,11 +861,11 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
   // in the calling matrix in a non-contiguous way, possibly leading to cache
   // misses. However, we should usually end up in the optimized gemm operation
   // in case the matrix is big, so this shouldn't be too bad.
-  for (size_type i = 0; i < m; i++)
-    for (size_type j = 0; j < n; j++)
+  for (size_type i = 0; i < m; ++i)
+    for (size_type j = 0; j < n; ++j)
       {
         number2 add_value = adding ? dst(i, j) : 0.;
-        for (size_type k = 0; k < l; k++)
+        for (size_type k = 0; k < l; ++k)
           add_value += static_cast<number2>((*this)(k, i)) *
                        static_cast<number2>(src(j, k));
         dst(i, j) = add_value;
@@ -1560,13 +1548,13 @@ FullMatrix<number>::cholesky(const FullMatrix<number2> &A)
       /* reinit *this to 0 */
       this->reinit(A.m(), A.n());
 
-      for (size_type i = 0; i < this->n_cols(); i++)
+      for (size_type i = 0; i < this->n_cols(); ++i)
         {
           double SLik2 = 0.0;
-          for (size_type j = 0; j < i; j++)
+          for (size_type j = 0; j < i; ++j)
             {
               double SLikLjk = 0.0;
-              for (size_type k = 0; k < j; k++)
+              for (size_type k = 0; k < j; ++k)
                 {
                   SLikLjk += (*this)(i, k) * (*this)(j, k);
                 };
@@ -1591,9 +1579,9 @@ FullMatrix<number>::outer_product(const Vector<number2> &V,
          ExcMessage("Vectors V, W must be the same size."));
   this->reinit(V.size(), V.size());
 
-  for (size_type i = 0; i < this->n(); i++)
+  for (size_type i = 0; i < this->n(); ++i)
     {
-      for (size_type j = 0; j < this->n(); j++)
+      for (size_type j = 0; j < this->n(); ++j)
         {
           (*this)(i, j) = V(i) * W(j);
         }
@@ -1697,8 +1685,8 @@ FullMatrix<number>::copy_from(const Tensor<2, dim> &T,
   AssertIndexRange(src_r_i, src_r_j + 1);
   AssertIndexRange(src_c_i, src_c_j + 1);
 
-  for (size_type i = 0; i < src_r_j - src_r_i + 1; i++)
-    for (size_type j = 0; j < src_c_j - src_c_i + 1; j++)
+  for (size_type i = 0; i < src_r_j - src_r_i + 1; ++i)
+    for (size_type j = 0; j < src_c_j - src_c_i + 1; ++j)
       {
         const unsigned int src_r_index = static_cast<unsigned int>(i + src_r_i);
         const unsigned int src_c_index = static_cast<unsigned int>(j + src_c_i);
@@ -1725,8 +1713,8 @@ void FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
   AssertIndexRange(src_r_i, src_r_j + 1);
   AssertIndexRange(src_c_j, src_c_j + 1);
 
-  for (size_type i = 0; i < src_r_j - src_r_i + 1; i++)
-    for (size_type j = 0; j < src_c_j - src_c_i + 1; j++)
+  for (size_type i = 0; i < src_r_j - src_r_i + 1; ++i)
+    for (size_type j = 0; j < src_c_j - src_c_i + 1; ++j)
       {
         const unsigned int dst_r_index = static_cast<unsigned int>(i + dst_r);
         const unsigned int dst_c_index = static_cast<unsigned int>(j + dst_c);

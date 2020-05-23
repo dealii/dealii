@@ -1,7 +1,0 @@
-Fixed: When compiling with CUDA support, the call to
-LinearAlgebra::distributed::Vector::compress() would failed if the vector's
-memory space was MemorySpace::Host, the header
-deal.II/lac/la_parallel_vector.templates.h was included, and the call was done
-in a .cu file.
-<br>
-(Bruno Turcksin, 2019/07/23)

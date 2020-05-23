@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -356,8 +356,8 @@ DynamicSparsityPattern::max_entries_per_row() const
 bool
 DynamicSparsityPattern::exists(const size_type i, const size_type j) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  AssertIndexRange(i, rows);
+  AssertIndexRange(j, cols);
   Assert(
     rowset.size() == 0 || rowset.is_element(i),
     ExcMessage(
@@ -387,30 +387,23 @@ DynamicSparsityPattern::symmetrize()
 {
   Assert(rows == cols, ExcNotQuadratic());
 
-  // loop over all elements presently
-  // in the sparsity pattern and add
-  // the transpose element. note:
+  // loop over all elements presently in the sparsity pattern and add the
+  // transpose element. note:
   //
-  // 1. that the sparsity pattern
-  // changes which we work on, but
-  // not the present row
+  // 1. that the sparsity pattern changes which we work on, but not the present
+  // row
   //
-  // 2. that the @p{add} function can
-  // be called on elements that
-  // already exist without any harm
+  // 2. that the @p{add} function can be called on elements that already exist
+  // without any harm
   for (size_type row = 0; row < lines.size(); ++row)
     {
       const size_type rowindex =
         rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
-           j != lines[row].entries.end();
-           ++j)
-        // add the transpose entry if
-        // this is not the diagonal
-        if (rowindex != *j)
-          add(*j, rowindex);
+      for (const size_type row_entry : lines[row].entries)
+        // add the transpose entry if this is not the diagonal
+        if (rowindex != row_entry)
+          add(row_entry, rowindex);
     }
 }
 
@@ -664,14 +657,8 @@ DynamicSparsityPattern::column_index(
   const DynamicSparsityPattern::size_type row,
   const DynamicSparsityPattern::size_type col) const
 {
-  Assert(row < n_rows(),
-         ExcIndexRangeType<DynamicSparsityPattern::size_type>(row,
-                                                              0,
-                                                              n_rows()));
-  Assert(col < n_cols(),
-         ExcIndexRangeType<DynamicSparsityPattern::size_type>(row,
-                                                              0,
-                                                              n_cols()));
+  AssertIndexRange(row, n_rows());
+  AssertIndexRange(col, n_cols());
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const DynamicSparsityPattern::size_type local_row =

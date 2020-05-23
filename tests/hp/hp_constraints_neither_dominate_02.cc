@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,6 @@ unsigned int counter = 0;
 
 const double eps = 1e-10;
 
-using namespace dealii;
 
 template <int dim>
 struct less_than_key
@@ -243,7 +242,7 @@ test2cells(const FiniteElement<dim> &fe_0,
     {
       const unsigned int fe_index = cell->active_fe_index();
       local_face_dof_indices.resize(fe_collection[fe_index].dofs_per_face);
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (std::abs(cell->face(f)->center()[0]) < 0.1)
           {
             // deallog << "cell="<<cell<<" face="<<f<<std::endl;

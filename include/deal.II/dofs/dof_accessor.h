@@ -29,6 +29,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class FullMatrix;
 template <typename number>
@@ -41,7 +43,6 @@ class TriaRawIterator;
 
 template <int, int>
 class FiniteElement;
-
 
 namespace internal
 {
@@ -67,6 +68,7 @@ namespace internal
     }
   } // namespace hp
 } // namespace internal
+#endif
 
 // note: the file dof_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates and thus makes
@@ -1474,6 +1476,13 @@ public:
   face(const unsigned int i) const;
 
   /**
+   * Return an array of iterators to all faces of this cell.
+   */
+  inline std::array<face_iterator,
+                    GeometryInfo<DoFHandlerType::dimension>::faces_per_cell>
+  face_iterators() const;
+
+  /**
    * Return the result of the @p neighbor_child_on_subface function of the
    * base class, but convert it so that one can also access the DoF data (the
    * function in the base class only returns an iterator with access to the
@@ -1943,6 +1952,28 @@ public:
   /**
    * @{
    */
+
+  /**
+   * Return the finite element that will be assigned to this cell next time the
+   * triangulation gets refined and coarsened. If no future finite element has
+   * been specified for this cell via the set_future_fe_index() function, the
+   * active one will remain unchanged, in which case the active finite element
+   * will be returned.
+   *
+   * For non-hp DoF handlers, this is of course always the same element,
+   * independent of the cell we are presently on, but for hp DoF handlers, this
+   * may change from cell to cell.
+   *
+   * @note Since degrees of freedom only exist on active cells for
+   * hp::DoFHandler (i.e., there is currently no implementation of multilevel
+   * hp::DoFHandler objects), it does not make sense to query the finite
+   * element on non-active cells since they do not have finite element spaces
+   * associated with them without having any degrees of freedom. Consequently,
+   * this function will produce an exception when called on non-active cells.
+   */
+  const FiniteElement<DoFHandlerType::dimension,
+                      DoFHandlerType::space_dimension> &
+  get_future_fe() const;
 
   /**
    * Return the fe_index of the finite element that will be assigned to this

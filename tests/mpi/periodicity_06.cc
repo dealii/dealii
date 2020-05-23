@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -81,7 +81,7 @@ test(const unsigned numRefinementLevels = 2)
 
   // mark faces
   for (auto &cell : triangulation.active_cell_iterators())
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       {
         const Point<dim> &face_center = cell->face(f)->center();
         if (cell->face(f)->at_boundary())
@@ -188,7 +188,8 @@ test(const unsigned numRefinementLevels = 2)
   constraints.close();
 
   const std::vector<IndexSet> &locally_owned_dofs =
-    dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
   AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,

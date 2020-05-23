@@ -60,13 +60,13 @@ test()
         if (!(cell->is_artificial()))
           cell->set_active_fe_index(myid);
 
-        deallog << "myid=" << myid << " cellid=" << cell->id()
+        deallog << "cellid=" << cell->id()
                 << " fe_index=" << cell->active_fe_index() << std::endl;
       }
 
   // ----- transfer -----
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
+  const parallel::CellWeights<dim> cell_weights(
+    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
 
   tria.repartition();
 
@@ -75,9 +75,14 @@ test()
   // ------ verify ------
   // check if all children adopted the correct id
   for (auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << "myid=" << myid << " cellid=" << cell->id()
-              << " fe_index=" << cell->active_fe_index() << std::endl;
+    if (!cell->is_artificial())
+      {
+        deallog << "cellid=" << cell->id()
+                << " fe_index=" << cell->active_fe_index();
+        if (cell->is_ghost())
+          deallog << " ghost";
+        deallog << std::endl;
+      }
 
   // for further calculations, distribute dofs, i.e.
   // dh.distribute_dofs(fe_collection);

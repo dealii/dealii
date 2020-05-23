@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Definition of a finite element with zero degrees of freedom.  This class is
+ * Definition of a finite element space with zero degrees of freedom and that,
+ * consequently, can only represent a single function: the zero function.
+ * This class is
  * useful (in the context of an hp method) to represent empty cells in the
  * triangulation on which no degrees of freedom should be allocated, or to
  * describe a field that is extended by zero to a part of the domain where we

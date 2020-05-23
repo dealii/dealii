@@ -17,35 +17,35 @@ DEAL:2d:cg::Convergence step 26 value 2.2e-07
 DEAL:2d::Distribute error: 0
 DEAL:2d::
 DEAL:2d::
-DEAL:2d::   Number of active cells:             363
-DEAL:2d::   Number of degrees of freedom:       1600
+DEAL:2d::   Number of active cells:             360
+DEAL:2d::   Number of degrees of freedom:       1588
 DEAL:2d::   Number of hanging node constraints: 36
 DEAL:2d::   Total number of constraints:        284
-DEAL:2d::  Reference matrix nonzeros: 24284, actually: 17700
-DEAL:2d::  Test matrix 1 nonzeros: 24284, actually: 17700
+DEAL:2d::  Reference matrix nonzeros: 24092, actually: 17520
+DEAL:2d::  Test matrix 1 nonzeros: 24092, actually: 17520
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
-DEAL:2d::  Test matrix 2 nonzeros: 24284, actually: 17700
+DEAL:2d::  Test matrix 2 nonzeros: 24092, actually: 17520
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
 DEAL:2d:cg::Starting value 20.
-DEAL:2d:cg::Convergence step 48 value 1.8e-07
+DEAL:2d:cg::Convergence step 47 value 2.5e-07
 DEAL:2d::Distribute error: 0
 DEAL:2d::
 DEAL:2d::
-DEAL:2d::   Number of active cells:             696
-DEAL:2d::   Number of degrees of freedom:       3006
+DEAL:2d::   Number of active cells:             690
+DEAL:2d::   Number of degrees of freedom:       2982
 DEAL:2d::   Number of hanging node constraints: 108
 DEAL:2d::   Total number of constraints:        408
-DEAL:2d::  Reference matrix nonzeros: 46796, actually: 36608
-DEAL:2d::  Test matrix 1 nonzeros: 46796, actually: 36608
+DEAL:2d::  Reference matrix nonzeros: 46420, actually: 36248
+DEAL:2d::  Test matrix 1 nonzeros: 46420, actually: 36248
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
-DEAL:2d::  Test matrix 2 nonzeros: 46796, actually: 36608
+DEAL:2d::  Test matrix 2 nonzeros: 46420, actually: 36248
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
 DEAL:2d:cg::Starting value 23.
-DEAL:2d:cg::Convergence step 74 value 2.8e-07
+DEAL:2d:cg::Convergence step 74 value 2.5e-07
 DEAL:2d::Distribute error: 0
 DEAL:3d::
 DEAL:3d::
@@ -65,33 +65,33 @@ DEAL:3d:cg::Convergence step 1 value 0
 DEAL:3d::Distribute error: 0
 DEAL:3d::
 DEAL:3d::
-DEAL:3d::   Number of active cells:             29
-DEAL:3d::   Number of degrees of freedom:       74
-DEAL:3d::   Number of hanging node constraints: 20
-DEAL:3d::   Total number of constraints:        68
-DEAL:3d::  Reference matrix nonzeros: 1302, actually: 86
-DEAL:3d::  Test matrix 1 nonzeros: 1302, actually: 86
+DEAL:3d::   Number of active cells:             22
+DEAL:3d::   Number of degrees of freedom:       60
+DEAL:3d::   Number of hanging node constraints: 16
+DEAL:3d::   Total number of constraints:        56
+DEAL:3d::  Reference matrix nonzeros: 1006, actually: 66
+DEAL:3d::  Test matrix 1 nonzeros: 1006, actually: 66
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d::  Test matrix 2 nonzeros: 1302, actually: 86
+DEAL:3d::  Test matrix 2 nonzeros: 1006, actually: 66
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d:cg::Starting value 2.2
-DEAL:3d:cg::Convergence step 4 value 4.2e-09
+DEAL:3d:cg::Starting value 1.9
+DEAL:3d:cg::Convergence step 3 value 0
 DEAL:3d::Distribute error: 0
 DEAL:3d::
 DEAL:3d::
-DEAL:3d::   Number of active cells:             120
-DEAL:3d::   Number of degrees of freedom:       230
-DEAL:3d::   Number of hanging node constraints: 61
-DEAL:3d::   Total number of constraints:        182
-DEAL:3d::  Reference matrix nonzeros: 4702, actually: 696
-DEAL:3d::  Test matrix 1 nonzeros: 4702, actually: 696
+DEAL:3d::   Number of active cells:             92
+DEAL:3d::   Number of degrees of freedom:       189
+DEAL:3d::   Number of hanging node constraints: 55
+DEAL:3d::   Total number of constraints:        158
+DEAL:3d::  Reference matrix nonzeros: 3767, actually: 415
+DEAL:3d::  Test matrix 1 nonzeros: 3767, actually: 415
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d::  Test matrix 2 nonzeros: 4702, actually: 696
+DEAL:3d::  Test matrix 2 nonzeros: 3767, actually: 415
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d:cg::Starting value 3.1
-DEAL:3d:cg::Convergence step 7 value 2.3e-09
+DEAL:3d:cg::Starting value 2.9
+DEAL:3d:cg::Convergence step 6 value 1.1e-08
 DEAL:3d::Distribute error: 0

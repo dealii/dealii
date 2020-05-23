@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/numerics/coarsening_strategies.h>
+#include <deal.II/numerics/adaptation_strategies.h>
 
 #include <algorithm>
 #include <functional>
@@ -102,7 +102,7 @@ DEAL_II_NAMESPACE_OPEN
  *   for transfer.
  *
  * @ingroup numerics
- * @author Marc Fehling, 2019
+ * @author Marc Fehling, 2019 - 2020
  */
 template <int dim, int spacedim = dim, typename VectorType = Vector<double>>
 class CellDataTransfer
@@ -120,14 +120,22 @@ public:
    * @param[in] triangulation The triangulation on which all operations will
    *   happen. At the time when this constructor is called, the refinement
    *   in question has not happened yet.
+   * @param[in] refinement_strategy Function deciding how data will be stored on
+   *   refined cells from its parent cell.
    * @param[in] coarsening_strategy Function deciding which data to store on
    *   a cell whose children will get coarsened into.
    */
   CellDataTransfer(
-    const Triangulation<dim, spacedim> &                triangulation,
+    const Triangulation<dim, spacedim> &triangulation,
+    const std::function<std::vector<value_type>(
+      const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+      const value_type parent_value)>   refinement_strategy =
+      &AdaptationStrategies::Refinement::preserve<dim, spacedim, value_type>,
     const std::function<value_type(
-      const std::vector<value_type> &children_indices)> coarsening_strategy =
-      &CoarseningStrategies::check_equality<value_type>);
+      const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+      const std::vector<value_type> &children_values)> coarsening_strategy =
+      &AdaptationStrategies::Coarsening::
+        check_equality<dim, spacedim, value_type>);
 
   /**
    * Prepare the current object for coarsening and refinement.
@@ -158,10 +166,20 @@ private:
     triangulation;
 
   /**
+   * Function deciding how data will be stored on refined cells from its parent
+   * cell.
+   */
+  const std::function<std::vector<value_type>(
+    const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+    const value_type                                            parent_value)>
+    refinement_strategy;
+
+  /**
    * Function deciding on how to process data from children to be stored on the
    * parent cell.
    */
   const std::function<value_type(
+    const typename Triangulation<dim, spacedim>::cell_iterator &parent,
     const std::vector<value_type> &children_indices)>
     coarsening_strategy;
 

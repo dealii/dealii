@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 
@@ -289,11 +288,8 @@ namespace DoFTools
 
         // finally copy the list into the mask
         std::fill(master_dof_mask.begin(), master_dof_mask.end(), false);
-        for (std::vector<types::global_dof_index>::const_iterator i =
-               master_dof_list.begin();
-             i != master_dof_list.end();
-             ++i)
-          master_dof_mask[*i] = true;
+        for (const auto dof : master_dof_list)
+          master_dof_mask[dof] = true;
       }
 
 
@@ -550,90 +546,47 @@ namespace DoFTools
     } // namespace
 
 
-    template <typename number>
-    void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1> &,
-                                     AffineConstraints<number> &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
 
-
-    template <typename number>
-    void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
+    template <typename number, int spacedim>
     void
     make_hp_hanging_node_constraints(
-      const dealii::hp::DoFHandler<1> & /*dof_handler*/,
+      const dealii::hp::DoFHandler<1, spacedim> & /*dof_handler*/,
       AffineConstraints<number> & /*constraints*/)
     {
-      // we may have to compute constraints for vertices. gotta think about that
-      // a bit more
-
-      // TODO[WB]: think about what to do here...
+      // nothing to do for dof handlers in 1d
     }
 
 
-    template <typename number>
+    template <typename number, int spacedim>
     void
     make_oldstyle_hanging_node_constraints(
-      const dealii::hp::DoFHandler<1> & /*dof_handler*/,
+      const dealii::hp::DoFHandler<1, spacedim> & /*dof_handler*/,
       AffineConstraints<number> & /*constraints*/,
       std::integral_constant<int, 1>)
     {
-      // we may have to compute constraints for vertices. gotta think about that
-      // a bit more
-
-      // TODO[WB]: think about what to do here...
+      // nothing to do for dof handlers in 1d
     }
 
 
-    template <typename number>
+    template <typename number, int spacedim>
     void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
-                                     AffineConstraints<number> &)
+    make_hp_hanging_node_constraints(
+      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      AffineConstraints<number> & /*constraints*/)
     {
-      // nothing to do for regular dof handlers in 1d
+      // nothing to do for dof handlers in 1d
     }
 
 
-    template <typename number>
+    template <typename number, int spacedim>
     void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
+    make_oldstyle_hanging_node_constraints(
+      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      AffineConstraints<number> & /*constraints*/,
+      std::integral_constant<int, 1>)
     {
-      // nothing to do for regular dof handlers in 1d
+      // nothing to do for dof handlers in 1d
     }
-
-
-    template <typename number>
-    void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 3> &,
-                                     AffineConstraints<number> &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
-    void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 3> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
 
     template <typename DoFHandlerType, typename number>
     void
@@ -667,8 +620,7 @@ namespace DoFTools
           if (cell->is_artificial())
             continue;
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children())
               {
                 // in any case, faces can have at most two active fe indices,
@@ -816,8 +768,7 @@ namespace DoFTools
           if (cell->is_artificial())
             continue;
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children())
               {
                 // first of all, make sure that we treat a case which is
@@ -1089,8 +1040,7 @@ namespace DoFTools
           if (cell->is_artificial())
             continue;
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face : GeometryInfo<dim>::face_indices())
             if (cell->face(face)->has_children())
               {
                 // first of all, make sure that we treat a case which is
@@ -1827,7 +1777,8 @@ namespace DoFTools
       const ComponentMask &                        component_mask,
       const bool                                   face_orientation,
       const bool                                   face_flip,
-      const bool                                   face_rotation)
+      const bool                                   face_rotation,
+      const number                                 periodicity_factor)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -1868,7 +1819,8 @@ namespace DoFTools
                                           component_mask,
                                           face_orientation,
                                           face_flip,
-                                          face_rotation);
+                                          face_rotation,
+                                          periodicity_factor);
             }
           return;
         }
@@ -1970,19 +1922,19 @@ namespace DoFTools
 
           // We have to be careful to treat so called "identity
           // constraints" special. These are constraints of the form
-          // x1 == factor * x_2. In this case, if the constraint
-          // x2 == 1./factor * x1 already exists we are in trouble.
+          // x1 == constraint_factor * x_2. In this case, if the constraint
+          // x2 == 1./constraint_factor * x1 already exists we are in trouble.
           //
           // Consequently, we have to check that we have indeed such an
           // "identity constraint". We do this by looping over all entries
           // of the row of the transformation matrix and check whether we
           // find exactly one nonzero entry. If this is the case, set
           // "is_identity_constrained" to true and record the corresponding
-          // index and factor.
+          // index and constraint_factor.
 
           bool         is_identity_constrained = false;
           unsigned int target                  = numbers::invalid_unsigned_int;
-          double       factor                  = 1.;
+          number       constraint_factor       = periodicity_factor;
 
           constexpr double eps = 1.e-13;
           for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
@@ -2000,7 +1952,7 @@ namespace DoFTools
                     }
                   is_identity_constrained = true;
                   target                  = jj;
-                  factor                  = entry;
+                  constraint_factor       = entry * periodicity_factor;
                 }
             }
 
@@ -2056,11 +2008,11 @@ namespace DoFTools
                !affine_constraints.is_constrained(dof_right)))
             {
               std::swap(dof_left, dof_right);
-              factor = 1. / factor;
+              constraint_factor = 1. / constraint_factor;
             }
 
           // Next, we try to enter the constraint
-          //   dof_left = factor * dof_right;
+          //   dof_left = constraint_factor * dof_right;
 
           // If both degrees of freedom are constrained, there is nothing we
           // can do. Simply continue with the next dof.
@@ -2072,8 +2024,8 @@ namespace DoFTools
           // constraint does not create a constraint cycle. Thus, check for
           // a dependency cycle:
 
-          bool   constraints_are_cyclic = true;
-          number cycle_factor           = factor;
+          bool   constraints_are_cyclic  = true;
+          number cycle_constraint_factor = constraint_factor;
 
           for (auto test_dof = dof_right; test_dof != dof_left;)
             {
@@ -2088,7 +2040,7 @@ namespace DoFTools
               if (constraint_entries.size() == 1)
                 {
                   test_dof = constraint_entries[0].first;
-                  cycle_factor *= constraint_entries[0].second;
+                  cycle_constraint_factor *= constraint_entries[0].second;
                 }
               else
                 {
@@ -2098,23 +2050,50 @@ namespace DoFTools
             }
 
           // In case of a dependency cycle we, either
-          //  - do nothing if cycle_factor == 1. In this case all degrees
+          //  - do nothing if cycle_constraint_factor == 1. In this case all
+          //    degrees
           //    of freedom are already periodically constrained,
           //  - otherwise, force all dofs to zero (by setting dof_left to
           //    zero). The reasoning behind this is the fact that
-          //    cycle_factor != 1 occurs in situations such as
+          //    cycle_constraint_factor != 1 occurs in situations such as
           //    x1 == x2 and x2 == -1. * x1. This system is only solved by
           //    x_1 = x_2 = 0.
 
           if (constraints_are_cyclic)
             {
-              if (std::abs(cycle_factor - 1.) > eps)
+              if (std::abs(cycle_constraint_factor - 1.) > eps)
                 affine_constraints.add_line(dof_left);
             }
           else
             {
               affine_constraints.add_line(dof_left);
-              affine_constraints.add_entry(dof_left, dof_right, factor);
+              affine_constraints.add_entry(dof_left,
+                                           dof_right,
+                                           constraint_factor);
+              // The number 1e10 in the assert below is arbitrary. If the
+              // absolute value of constraint_factor is too large, then probably
+              // the absolute value of periodicity_factor is too large or too
+              // small. This would be equivalent to an evanescent wave that has
+              // a very small wavelength. A quick calculation shows that if
+              // |periodicity_factor| > 1e10 -> |np.exp(ikd)|> 1e10, therefore k
+              // is imaginary (evanescent wave) and the evanescent wavelength is
+              // 0.27 times smaller than the dimension of the structure,
+              // lambda=((2*pi)/log(1e10))*d. Imaginary wavenumbers can be
+              // interesting in some cases
+              // (https://doi.org/10.1103/PhysRevA.94.033813).In order to
+              // implement the case of in which the wavevector can be imaginary
+              // it would be necessary to rewrite this function and the dof
+              // ordering method should be modified.
+              // Let's take the following constraint a*x1 + b*x2 = 0. You could
+              // just always pick x1 = b/a*x2, but in practice this is not so
+              // stable if a could be a small number -- intended to be zero, but
+              // just very small due to roundoff. Of course, constraining x2 in
+              // terms of x1 has the same problem. So one chooses x1 = b/a*x2 if
+              // |b|<|a|, and x2 = a/b*x1 if |a|<|b|.
+              Assert(
+                std::abs(constraint_factor) < 1e10,
+                ExcMessage(
+                  "The periodicity constraint is too large. The parameter periodicity_factor might be too large or too small."));
             }
         } /* for dofs_per_face */
     }
@@ -2231,7 +2210,8 @@ namespace DoFTools
     const bool                                   face_flip,
     const bool                                   face_rotation,
     const FullMatrix<double> &                   matrix,
-    const std::vector<unsigned int> &            first_vector_components)
+    const std::vector<unsigned int> &            first_vector_components,
+    const number                                 periodicity_factor)
   {
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2369,7 +2349,8 @@ namespace DoFTools
                                          face_flip,
                                          face_rotation,
                                          matrix,
-                                         first_vector_components);
+                                         first_vector_components,
+                                         periodicity_factor);
           }
       }
     else
@@ -2406,7 +2387,8 @@ namespace DoFTools
                                             component_mask,
                                             face_orientation,
                                             face_flip,
-                                            face_rotation);
+                                            face_rotation,
+                                            periodicity_factor);
               }
             else
               {
@@ -2420,7 +2402,8 @@ namespace DoFTools
                                             component_mask,
                                             face_orientation,
                                             face_flip,
-                                            face_rotation);
+                                            face_rotation,
+                                            periodicity_factor);
               }
           }
         else
@@ -2442,7 +2425,8 @@ namespace DoFTools
                                         face_orientation ?
                                           face_rotation ^ face_flip :
                                           face_flip,
-                                        face_rotation);
+                                        face_rotation,
+                                        periodicity_factor);
           }
       }
   }
@@ -2457,7 +2441,8 @@ namespace DoFTools
       &                              periodic_faces,
     AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask,
-    const std::vector<unsigned int> &first_vector_components)
+    const std::vector<unsigned int> &first_vector_components,
+    const number                     periodicity_factor)
   {
     // Loop over all periodic faces...
     for (auto &pair : periodic_faces)
@@ -2481,7 +2466,8 @@ namespace DoFTools
                                      pair.orientation[1],
                                      pair.orientation[2],
                                      pair.matrix,
-                                     first_vector_components);
+                                     first_vector_components,
+                                     periodicity_factor);
       }
   }
 
@@ -2494,14 +2480,14 @@ namespace DoFTools
   make_periodicity_constraints(const DoFHandlerType &             dof_handler,
                                const types::boundary_id           b_id1,
                                const types::boundary_id           b_id2,
-                               const int                          direction,
+                               const unsigned int                 direction,
                                dealii::AffineConstraints<number> &constraints,
-                               const ComponentMask &component_mask)
+                               const ComponentMask &component_mask,
+                               const number         periodicity_factor)
   {
     static const int space_dim = DoFHandlerType::space_dimension;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     Assert(b_id1 != b_id2,
            ExcMessage("The boundary indicators b_id1 and b_id2 must be "
@@ -2517,7 +2503,9 @@ namespace DoFTools
 
     make_periodicity_constraints<DoFHandlerType>(matched_faces,
                                                  constraints,
-                                                 component_mask);
+                                                 component_mask,
+                                                 std::vector<unsigned int>(),
+                                                 periodicity_factor);
   }
 
 
@@ -2526,17 +2514,17 @@ namespace DoFTools
   void
   make_periodicity_constraints(const DoFHandlerType &     dof_handler,
                                const types::boundary_id   b_id,
-                               const int                  direction,
+                               const unsigned int         direction,
                                AffineConstraints<number> &constraints,
-                               const ComponentMask &      component_mask)
+                               const ComponentMask &      component_mask,
+                               const number               periodicity_factor)
   {
     static const int dim       = DoFHandlerType::dimension;
     static const int space_dim = DoFHandlerType::space_dimension;
     (void)dim;
     (void)space_dim;
 
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     Assert(dim == space_dim, ExcNotImplemented());
 
@@ -2552,7 +2540,9 @@ namespace DoFTools
 
     make_periodicity_constraints<DoFHandlerType>(matched_faces,
                                                  constraints,
-                                                 component_mask);
+                                                 component_mask,
+                                                 std::vector<unsigned int>(),
+                                                 periodicity_factor);
   }
 
 
@@ -2788,9 +2778,10 @@ namespace DoFTools
             MPI_Comm communicator = MPI_COMM_SELF;
             try
               {
-                const typename dealii::parallel::Triangulation<dim, spacedim>
+                const typename dealii::parallel::TriangulationBase<dim,
+                                                                   spacedim>
                   &tria = dynamic_cast<const typename dealii::parallel::
-                                         Triangulation<dim, spacedim> &>(
+                                         TriangulationBase<dim, spacedim> &>(
                     coarse_to_fine_grid_map.get_destination_grid()
                       .get_triangulation());
                 communicator          = tria.get_communicator();
@@ -2818,23 +2809,41 @@ namespace DoFTools
 #endif
           }
 
+        auto worker =
+          [coarse_component,
+           &coarse_grid,
+           &coarse_to_fine_grid_map,
+           &parameter_dofs](const typename dealii::DoFHandler<dim, spacedim>::
+                              active_cell_iterator &            cell,
+                            const Assembler::Scratch &          scratch_data,
+                            Assembler::CopyData<dim, spacedim> &copy_data) {
+            compute_intergrid_weights_3<dim, spacedim>(cell,
+                                                       scratch_data,
+                                                       copy_data,
+                                                       coarse_component,
+                                                       coarse_grid.get_fe(),
+                                                       coarse_to_fine_grid_map,
+                                                       parameter_dofs);
+          };
+
+        auto copier =
+          [coarse_component,
+           &coarse_grid,
+           &weight_mapping,
+           is_called_in_parallel,
+           &weights](const Assembler::CopyData<dim, spacedim> &copy_data) {
+            copy_intergrid_weights_3<dim, spacedim>(copy_data,
+                                                    coarse_component,
+                                                    coarse_grid.get_fe(),
+                                                    weight_mapping,
+                                                    is_called_in_parallel,
+                                                    weights);
+          };
+
         WorkStream::run(coarse_grid.begin_active(),
                         coarse_grid.end(),
-                        std::bind(&compute_intergrid_weights_3<dim, spacedim>,
-                                  std::placeholders::_1,
-                                  std::placeholders::_2,
-                                  std::placeholders::_3,
-                                  coarse_component,
-                                  std::cref(coarse_grid.get_fe()),
-                                  std::cref(coarse_to_fine_grid_map),
-                                  std::cref(parameter_dofs)),
-                        std::bind(&copy_intergrid_weights_3<dim, spacedim>,
-                                  std::placeholders::_1,
-                                  coarse_component,
-                                  std::cref(coarse_grid.get_fe()),
-                                  std::cref(weight_mapping),
-                                  is_called_in_parallel,
-                                  std::ref(weights)),
+                        worker,
+                        copier,
                         scratch,
                         copy_data);
 
@@ -2912,10 +2921,7 @@ namespace DoFTools
 #ifdef DEBUG
         // if in debug mode, check whether the coarse grid is indeed coarser
         // everywhere than the fine grid
-        for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-               cell = coarse_grid.begin_active();
-             cell != coarse_grid.end();
-             ++cell)
+        for (const auto &cell : coarse_grid.active_cell_iterators())
           Assert(cell->level() <= coarse_to_fine_grid_map[cell]->level(),
                  ExcGridNotCoarser());
 #endif
@@ -2970,10 +2976,7 @@ namespace DoFTools
           std::vector<types::global_dof_index> local_dof_indices(
             fine_fe.dofs_per_cell);
 
-          for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = fine_grid.begin_active();
-               cell != fine_grid.end();
-               ++cell)
+          for (const auto &cell : fine_grid.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 cell->get_dof_indices(local_dof_indices);
@@ -3000,10 +3003,7 @@ namespace DoFTools
           std::vector<types::global_dof_index> local_dof_indices(
             fine_fe.dofs_per_cell);
           unsigned int next_free_index = 0;
-          for (typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = fine_grid.begin_active();
-               cell != fine_grid.end();
-               ++cell)
+          for (const auto &cell : fine_grid.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 cell->get_dof_indices(local_dof_indices);
@@ -3131,15 +3131,15 @@ namespace DoFTools
 
     // get an array in which we store which dof on the coarse grid is a
     // parameter and which is not
-    std::vector<bool> coarse_dof_is_parameter(coarse_grid.n_dofs());
-    if (true)
-      {
-        std::vector<bool> mask(coarse_grid.get_fe(0).n_components(), false);
-        mask[coarse_component] = true;
+    IndexSet coarse_dof_is_parameter;
+    {
+      std::vector<bool> mask(coarse_grid.get_fe(0).n_components(), false);
+      mask[coarse_component] = true;
+
+      coarse_dof_is_parameter =
         extract_dofs<DoFHandler<dim, spacedim>>(coarse_grid,
-                                                ComponentMask(mask),
-                                                coarse_dof_is_parameter);
-      }
+                                                ComponentMask(mask));
+    }
 
     // now we know that the weights in each row constitute a constraint. enter
     // this into the constraints object
@@ -3155,7 +3155,7 @@ namespace DoFTools
     for (types::global_dof_index parameter_dof = 0;
          parameter_dof < n_coarse_dofs;
          ++parameter_dof)
-      if (coarse_dof_is_parameter[parameter_dof] == true)
+      if (coarse_dof_is_parameter.is_element(parameter_dof))
         {
           // if this is the line of a parameter dof on the coarse grid, then it
           // should have at least one dependent node on the fine grid
@@ -3307,9 +3307,9 @@ namespace DoFTools
     const types::global_dof_index n_global_parm_dofs =
       std::count_if(weight_mapping.begin(),
                     weight_mapping.end(),
-                    std::bind(std::not_equal_to<types::global_dof_index>(),
-                              std::placeholders::_1,
-                              numbers::invalid_dof_index));
+                    [](const types::global_dof_index dof) {
+                      return dof != numbers::invalid_dof_index;
+                    });
 
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping(
@@ -3392,9 +3392,7 @@ namespace DoFTools
           cell_dofs.resize(fe.dofs_per_cell);
           cell->get_dof_indices(cell_dofs);
 
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
             {
               const typename DoFHandlerType<dim, spacedim>::face_iterator face =
                 cell->face(face_no);

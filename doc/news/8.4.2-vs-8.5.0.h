@@ -772,13 +772,13 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: The GridOut::write_mesh_per_processor_as_vtu() function now works for a mesh whose multilevel hierarchy is not distributed, as well as a mesh whose level_subdomain_ids do not necessarily match its subdomain_ids for every active cell.  
+  Fixed: The GridOut::write_mesh_per_processor_as_vtu() function now works for a mesh whose multilevel hierarchy is not distributed, as well as a mesh whose level_subdomain_ids do not necessarily match its subdomain_ids for every active cell.
   <br>
   (Conrad Clevenger, 2017/02/09)
  </li>
 
  <li>
-  Fixed: Patterns::Selection now ignores spaces at the beginning and the end 
+  Fixed: Patterns::Selection now ignores spaces at the beginning and the end
   of the sequence string.
   <br>
   (Rajat Arora, 2017/02/09)
@@ -910,7 +910,7 @@ inconvenience this causes.
  <li>
   Fixed: A bug in the rotation matrix used in step-18 has now been corrected.
   This tutorial now uses the function
-  Physics::Transformations::Rotations::rotation_matrix_3d to compute the 3d 
+  Physics::Transformations::Rotations::rotation_matrix_3d to compute the 3d
   rotation matrix.
   <br>
   (Jean-Paul Pelteret, Paul Kuberry, 2017/01/09)
@@ -946,7 +946,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The MPI_Comm used in MatrixFree is not configurable via 
+  Improved: The MPI_Comm used in MatrixFree is not configurable via
   AdditionalData anymore but set to the MPI_Comm of the Triangulation.
   <br>
   (Daniel Arndt, 2017/01/08)
@@ -1102,7 +1102,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Automatically recreate changes.h from files in 
+  New: Automatically recreate changes.h from files in
   subfolders of ./doc/news
   <br>
   (Daniel Arndt, 2016/11/18)
@@ -2092,7 +2092,7 @@ inconvenience this causes.
 
  <li>
   Fixed: Double contraction of two SymmetricTensor<..,VectorizedArray<T>> now
-  works. Introduced internal::NumberType<T> with static member 
+  works. Introduced internal::NumberType<T> with static member
   internal::Numbertype::value to be called instead of the constructor Number()
   in symmetric_tensor.h.
   <br>

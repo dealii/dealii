@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,9 +35,8 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
-#include "create_mesh.h"
 
-std::ofstream logfile("output");
+#include "create_mesh.h"
 
 
 
@@ -96,7 +95,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

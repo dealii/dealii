@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,7 @@
  * AffineConstraints::distribute() function. Note that the
  * AffineConstraints::condense() function is applied to matrix and right hand
  * side of the linear system, while the AffineConstraints::distribute()
- * function is applied to the solution vector. This is the method used in
- * the first few tutorial programs, see for example step-6.
+ * function is applied to the solution vector.
  *
  * This scheme of first building a linear system and then eliminating
  * constrained degrees of freedom is inefficient, and a bottleneck if there
@@ -165,8 +164,7 @@
  * auxiliary vectors (e.g. methods using explicit orthogonalization
  * procedures).
  * Nevertheless, this process is more efficient due to its lower
- * memory consumption and is discussed in the first few programs
- * of the @ref Tutorial , for example in step-6.
+ * memory consumption.
  *
  * The condensation functions exist for different argument types: SparsityPattern,
  * SparseMatrix and
@@ -181,7 +179,7 @@
  * see the discussion below.
  *
  *
- * <h5>Condensing vectors</h5>
+ * <h4>Condensing vectors</h4>
  *
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a

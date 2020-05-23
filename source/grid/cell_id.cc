@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 CellId::CellId()
-  : coarse_cell_id(numbers::invalid_unsigned_int)
+  : coarse_cell_id(numbers::invalid_coarse_cell_id)
   , n_child_indices(numbers::invalid_unsigned_int)
 {
   // initialize the child indices to invalid values
@@ -35,7 +35,7 @@ CellId::CellId()
 
 
 
-CellId::CellId(const unsigned int               coarse_cell_id,
+CellId::CellId(const types::coarse_cell_id      coarse_cell_id,
                const std::vector<std::uint8_t> &id)
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(id.size())
@@ -46,9 +46,9 @@ CellId::CellId(const unsigned int               coarse_cell_id,
 
 
 
-CellId::CellId(const unsigned int  coarse_cell_id,
-               const unsigned int  n_child_indices,
-               const std::uint8_t *id)
+CellId::CellId(const types::coarse_cell_id coarse_cell_id,
+               const unsigned int          n_child_indices,
+               const std::uint8_t *        id)
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(n_child_indices)
 {
@@ -158,9 +158,8 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 CellId::to_cell(const Triangulation<dim, spacedim> &tria) const
 {
-  typename Triangulation<dim, spacedim>::cell_iterator cell(&tria,
-                                                            0,
-                                                            coarse_cell_id);
+  typename Triangulation<dim, spacedim>::cell_iterator cell(
+    &tria, 0, tria.coarse_cell_id_to_coarse_cell_index(coarse_cell_id));
 
   for (unsigned int i = 0; i < n_child_indices; ++i)
     cell = cell->child(static_cast<unsigned int>(child_indices[i]));

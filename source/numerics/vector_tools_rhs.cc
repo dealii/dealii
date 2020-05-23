@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/numerics/vector_tools.templates.h>
+#include <deal.II/numerics/vector_tools_rhs.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

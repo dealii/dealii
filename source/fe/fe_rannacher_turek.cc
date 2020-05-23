@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,14 +32,13 @@ template <int dim>
 FE_RannacherTurek<dim>::FE_RannacherTurek(
   const unsigned int order,
   const unsigned int n_face_support_points)
-  : FE_Poly<PolynomialsRannacherTurek<dim>, dim>(
-      PolynomialsRannacherTurek<dim>(),
-      FiniteElementData<dim>(this->get_dpo_vector(),
-                             1,
-                             2,
-                             FiniteElementData<dim>::L2),
-      std::vector<bool>(4, false), // restriction not implemented
-      std::vector<ComponentMask>(4, std::vector<bool>(1, true)))
+  : FE_Poly<dim>(PolynomialsRannacherTurek<dim>(),
+                 FiniteElementData<dim>(this->get_dpo_vector(),
+                                        1,
+                                        2,
+                                        FiniteElementData<dim>::L2),
+                 std::vector<bool>(4, false), // restriction not implemented
+                 std::vector<ComponentMask>(4, std::vector<bool>(1, true)))
   , order(order)
   , n_face_support_points(n_face_support_points)
 {
@@ -123,8 +122,7 @@ FE_RannacherTurek<dim>::convert_generalized_support_point_values_to_dof_values(
 
   std::vector<Vector<double>>::const_iterator value =
     support_point_values.begin();
-  for (unsigned int face = 0; face < dealii::GeometryInfo<dim>::faces_per_cell;
-       ++face)
+  for (const unsigned int face : dealii::GeometryInfo<dim>::face_indices())
     {
       for (unsigned int q = 0; q < q_points_per_face; ++q)
         {

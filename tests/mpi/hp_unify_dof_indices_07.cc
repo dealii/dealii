@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,9 +70,7 @@ test()
   Assert(triangulation.n_global_active_cells() == 2, ExcInternalError());
   Assert(triangulation.n_active_cells() == 2, ExcInternalError());
 
-  hp::FECollection<dim> fe;
-  fe.push_back(FE_Q<dim>(2));
-  fe.push_back(FE_Q<dim>(2));
+  hp::FECollection<dim> fe(FE_Q<dim>(2), FE_Q<dim>(2));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
   if (dof_handler.begin_active()->is_locally_owned())

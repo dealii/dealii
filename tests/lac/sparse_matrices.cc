@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,8 +27,9 @@
 #include <deal.II/lac/sparse_matrix_ez.templates.h>
 #include <deal.II/lac/vector.h>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 
@@ -281,16 +282,14 @@ check_conjugate(std::ostream &out)
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile << std::setprecision(3);
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const unsigned int size       = 5;
   const unsigned int row_length = 3;
 
   check_ez_iterator();
-  check_conjugate(logfile);
+  check_conjugate(deallog.get_file_stream());
 
   FDMatrix     testproblem(size, size);
   unsigned int dim = (size - 1) * (size - 1);

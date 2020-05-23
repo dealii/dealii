@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_fe_tools_extrapolate_templates_H
 #define dealii_fe_tools_extrapolate_templates_H
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
@@ -532,7 +534,7 @@ namespace FETools
           // check if at least one child is locally owned on our process
           for (unsigned int child_n = 0; child_n < dealii_cell->n_children();
                ++child_n)
-            if (dealii_cell->child(child_n)->active())
+            if (dealii_cell->child(child_n)->is_active())
               if (dealii_cell->child(child_n)->is_locally_owned())
                 {
                   locally_owned_children = true;
@@ -588,7 +590,7 @@ namespace FETools
         Vector<value_type> &   interpolated_values,
         std::vector<CellData> &new_needs)
     {
-      if (!dealii_cell->has_children())
+      if (dealii_cell->is_active())
         {
           if (dealii_cell->is_locally_owned())
             {
@@ -728,7 +730,7 @@ namespace FETools
         dealii_cell->get_dof_handler().get_fe();
       const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-      if (!dealii_cell->has_children())
+      if (dealii_cell->is_active())
         {
           if (dealii_cell->is_locally_owned())
             {
@@ -878,7 +880,7 @@ namespace FETools
 
           for (unsigned int child_n = 0; child_n < dealii_cell->n_children();
                ++child_n)
-            if (dealii_cell->child(child_n)->active())
+            if (dealii_cell->child(child_n)->is_active())
               if (dealii_cell->child(child_n)->is_locally_owned())
                 {
                   locally_owned_children = true;
@@ -1148,6 +1150,14 @@ namespace FETools
       std::vector<MPI_Request>                 requests(cells_to_send.size());
       std::vector<unsigned int>                destinations;
 
+      // Protect the communication below:
+      static Utilities::MPI::CollectiveMutex      mutex;
+      Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, communicator);
+
+      // We pick a new tag in each round. Wrap around after 10 rounds:
+      const int mpi_tag =
+        Utilities::MPI::internal::Tags::fe_tools_extrapolate + round % 10;
+
       // send data
       unsigned int idx = 0;
       for (typename std::vector<CellData>::const_iterator it =
@@ -1162,7 +1172,7 @@ namespace FETools
                                      buffer->size(),
                                      MPI_BYTE,
                                      it->receiver,
-                                     round,
+                                     mpi_tag,
                                      communicator,
                                      &requests[idx]);
           AssertThrowMPI(ierr);
@@ -1180,9 +1190,10 @@ namespace FETools
       for (unsigned int index = 0; index < n_senders; ++index)
         {
           MPI_Status status;
-          int        len;
-          int ierr = MPI_Probe(MPI_ANY_SOURCE, round, communicator, &status);
+          int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, communicator, &status);
           AssertThrowMPI(ierr);
+
+          int len;
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
           AssertThrowMPI(ierr);
           receive.resize(len);
@@ -1414,9 +1425,8 @@ namespace FETools
             if (cell->is_ghost())
               {
                 cell->get_dof_indices(indices);
-                for (unsigned int face = 0;
-                     face < GeometryInfo<dim>::faces_per_cell;
-                     ++face)
+                for (const unsigned int face :
+                     GeometryInfo<dim>::face_indices())
                   if (!cell->at_boundary(face))
                     {
                       const typename DoFHandler<dim, spacedim>::cell_iterator
@@ -1719,7 +1729,7 @@ namespace FETools
                                                               dof2.end(level);
 
           for (; cell != endc; ++cell)
-            if (!cell->active())
+            if (!cell->is_active())
               {
                 // check whether this
                 // cell has active
@@ -1727,7 +1737,7 @@ namespace FETools
                 bool active_children = false;
                 for (unsigned int child_n = 0; child_n < cell->n_children();
                      ++child_n)
-                  if (cell->child(child_n)->active())
+                  if (cell->child(child_n)->is_active())
                     {
                       active_children = true;
                       break;

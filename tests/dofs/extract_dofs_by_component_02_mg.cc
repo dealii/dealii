@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ check()
   FESystem<dim>   element(FE_Q<dim>(2), 1, FE_Nedelec<dim>(0), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
-  dof.distribute_mg_dofs(element);
+  dof.distribute_mg_dofs();
 
   // try all possible block
   // masks, which we encode as bit
@@ -87,10 +87,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   deallog.push("2d");
   check<2>();

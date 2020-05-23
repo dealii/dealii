@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,8 +53,6 @@
 
 namespace Step37
 {
-  using namespace dealii;
-
   const unsigned int degree_finite_element = 2;
 
 
@@ -218,7 +216,7 @@ namespace Step37
     typename MatrixFree<dim, number>::AdditionalData additional_data;
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::partition_color;
-    additional_data.level_mg_handler = level;
+    additional_data.mg_level = level;
     additional_data.mapping_update_flags =
       (update_gradients | update_JxW_values | update_quadrature_points);
     data.reinit(dof_handler,
@@ -416,7 +414,7 @@ namespace Step37
     mg_constraints.clear_elements();
 
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
@@ -575,7 +573,7 @@ namespace Step37
   LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
     mg_coarse.initialize(coarse_matrix);
@@ -593,7 +591,7 @@ namespace Step37
     mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
 
     Multigrid<Vector<double>> mg(
-      dof_handler, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+      mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
       preconditioner(dof_handler, mg, mg_transfer);
 

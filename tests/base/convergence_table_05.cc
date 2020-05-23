@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,7 @@
 #include "../tests.h"
 
 // test the method evaluate_convergence_rates with key column given by
-// unsigned long long int
+// 64 bit dof indices
 
 int
 main()
@@ -33,8 +33,8 @@ main()
 
   ConvergenceTable t;
 
-  const unsigned long long int t1 = 100;
-  const unsigned long long int t2 = 400;
+  const std::uint64_t t1 = 100;
+  const std::uint64_t t2 = 400;
   t.add_value("cells", t1);
   t.add_value("error", 0.1);
   t.add_value("cells", t2);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,8 +64,6 @@
 // The last step is as in all previous programs:
 namespace Step11
 {
-  using namespace dealii;
-
   // Then we declare a class which represents the solution of a Laplace
   // problem. As this example program is based on step-5, the class looks
   // rather the same, with the sole structural difference that the functions

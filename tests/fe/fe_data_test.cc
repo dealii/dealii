@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -255,15 +255,12 @@ test_fe_datas()
               << fe_data->get_unit_face_support_points().size() << std::endl;
       deallog << "generalized_support_points="
               << fe_data->get_generalized_support_points().size() << std::endl;
-      deallog << "generalized_face_support_points="
-              << fe_data->get_generalized_face_support_points().size()
-              << std::endl;
 
       deallog << "face_to_equivalent_cell_index:";
       for (unsigned int i = 0; i < fe_data->dofs_per_face; ++i)
         deallog << ' ' << fe_data->face_to_cell_index(i, 0);
       deallog << std::endl;
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           deallog << "face_to_cell_index:";
           for (unsigned int i = 0; i < fe_data->dofs_per_face; ++i)
@@ -271,7 +268,7 @@ test_fe_datas()
           deallog << std::endl;
         }
 
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           deallog << "support on face " << f << ':';
           for (unsigned int s = 0; s < fe_data->dofs_per_cell; ++s)

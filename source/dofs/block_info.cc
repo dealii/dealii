@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,9 +33,8 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
 {
   if (!levels_only && dof.has_active_dofs())
     {
-      const FiniteElement<dim, spacedim> & fe = dof.get_fe();
-      std::vector<types::global_dof_index> sizes(fe.n_blocks());
-      DoFTools::count_dofs_per_block(dof, sizes);
+      const std::vector<types::global_dof_index> sizes =
+        DoFTools::count_dofs_per_fe_block(dof);
       bi_global.reinit(sizes);
     }
 
@@ -52,6 +51,21 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
         levels[i].reinit(sizes[i]);
     }
 }
+
+
+
+template <int dim, int spacedim>
+void
+BlockInfo::initialize(const hp::DoFHandler<dim, spacedim> &dof,
+                      bool                                 levels_only,
+                      bool                                 active_only)
+{
+  AssertThrow(false, ExcNotImplemented());
+  (void)dof;
+  (void)levels_only;
+  (void)active_only;
+}
+
 
 
 template <int dim, int spacedim>
@@ -71,6 +85,15 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
   bi_local.reinit(sizes);
 }
 
+
+
+template <int dim, int spacedim>
+void
+BlockInfo::initialize_local(const hp::DoFHandler<dim, spacedim> &dof)
+{
+  AssertThrow(false, ExcNotImplemented());
+  (void)dof;
+}
 
 // explicit instantiations
 #include "block_info.inst"

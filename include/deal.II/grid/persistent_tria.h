@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -201,6 +201,16 @@ public:
   create_triangulation(const std::vector<Point<spacedim>> &vertices,
                        const std::vector<CellData<dim>> &  cells,
                        const SubCellData &subcelldata) override;
+
+  /*
+   * @copydoc Triangulation::create_triangulation()
+   *
+   * @note Not inmplemented yet.
+   */
+  virtual void
+  create_triangulation(
+    const TriangulationDescription::Description<dim, spacedim>
+      &construction_data) override;
 
   /**
    * An overload of the respective function of the base class.

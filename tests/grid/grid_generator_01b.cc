@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,6 +56,8 @@ int
 main()
 {
   initlog();
+
+  deallog.get_file_stream() << std::setprecision(9);
 
   deallog.push("2d");
   test<2>(deallog.get_file_stream());

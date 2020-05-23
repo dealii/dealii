@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_p4est_wrappers_h
 #define dealii_p4est_wrappers_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/geometry_info.h>
 
@@ -38,6 +40,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 namespace parallel
 {
   namespace distributed
@@ -46,7 +50,7 @@ namespace parallel
     class Triangulation;
   }
 } // namespace parallel
-
+#  endif
 
 namespace internal
 {
@@ -61,6 +65,20 @@ namespace internal
      */
     template <int>
     struct types;
+
+    // these struct mimics p4est for 1D
+    template <>
+    struct types<1>
+    {
+      // id of a quadrant is an integeger
+      using quadrant = int;
+
+      // maximum number of children
+      static const int max_n_child_indices_bits = 27;
+
+      // number of bits the data type of id has
+      static const int n_bits = std::numeric_limits<quadrant>::digits;
+    };
 
     template <>
     struct types<2>
@@ -523,18 +541,6 @@ namespace internal
     bool
     tree_exists_locally(const typename types<dim>::forest *parallel_forest,
                         const typename types<dim>::topidx  coarse_grid_cell);
-
-
-
-    /**
-     * Compute the ghost neighbors surrounding each vertex by querying p4est
-     */
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors(
-      const dealii::parallel::distributed::Triangulation<dim, spacedim> &tria,
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-      typename dealii::internal::p4est::types<dim>::ghost * parallel_ghost);
 
   } // namespace p4est
 } // namespace internal

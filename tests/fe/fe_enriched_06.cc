@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,6 @@ const double eps = 1e-10;
 // argument for build_patches()
 const unsigned int patches = 10;
 
-using namespace dealii;
 
 // uncomment when debugging
 // #define DATA_OUT_FE_ENRICHED
@@ -145,7 +144,7 @@ test5()
         fe_values.get_function_values(solution, solution_values);
 
         deallog << " cell=" << cell->center() << std::endl;
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // find non-zero shape_value
             deallog << " qp=" << q_points[q_point]
@@ -183,10 +182,8 @@ test5()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(4);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(4) << std::fixed;
   deallog.depth_console(0);
 
   try

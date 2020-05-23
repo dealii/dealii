@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,6 @@ bfloat(C(3)), nouns;
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class LegendreFunction : public Function<dim>
@@ -105,8 +104,13 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
   Vector<double> values(dof_handler.n_dofs());
 
   VectorTools::interpolate(dof_handler, func, values);
-  const unsigned int      N = 4;
-  FESeries::Legendre<dim> legendre(N, fe_collection, quadrature_formula);
+
+  const unsigned int              N = 4;
+  const std::vector<unsigned int> n_coefficients_per_direction(
+    fe_collection.size(), N);
+  FESeries::Legendre<dim> legendre(n_coefficients_per_direction,
+                                   fe_collection,
+                                   quadrature_formula);
 
   Table<1, double> coeff_out(N);
   Vector<double>   local_dof_values;

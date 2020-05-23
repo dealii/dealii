@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,8 +16,11 @@
 #ifndef dealii_fe_function_h
 #define dealii_fe_function_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx17/optional.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
 
@@ -30,15 +33,16 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/optional.hpp>
-
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 namespace VectorTools
 {
   class ExcPointNotAvailableHere;
 }
+#endif
 
 namespace Functions
 {
@@ -473,9 +477,9 @@ namespace Functions
     /**
      * Given a cell, return the reference coordinates of the given point
      * within this cell if it indeed lies within the cell. Otherwise return an
-     * uninitialized boost::optional object.
+     * uninitialized std_cxx17::optional object.
      */
-    boost::optional<Point<dim>>
+    std_cxx17::optional<Point<dim>>
     get_reference_coordinates(
       const typename DoFHandlerType::active_cell_iterator &cell,
       const Point<dim> &                                   point) const;

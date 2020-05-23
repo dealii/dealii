@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 #include <deal.II/base/derivative_form.h>
 
 #include "../tests.h"
+
 #include "Sacado.hpp"
 
 // Compute the derivative of F: R^dim -> R^spacedim

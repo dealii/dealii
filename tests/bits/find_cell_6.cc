@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -91,7 +91,7 @@ check1()
       for (Triangulation<3>::active_cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<3>::face_indices())
           {
             if (cell->face(f)->at_boundary() && (Testing::rand() % 5) == 1)
               cell->set_refine_flag();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_sparse_mic_h
 #define dealii_sparse_mic_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/sparse_decomposition.h>
 #include <deal.II/lac/sparse_matrix.h>

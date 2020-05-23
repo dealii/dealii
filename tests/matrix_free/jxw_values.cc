@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,9 +31,9 @@
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim>
@@ -101,7 +101,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(3);
 
   test<2>();

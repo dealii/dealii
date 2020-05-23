@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,8 +26,11 @@
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/smartpointer.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/deprecated_function_map.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/dof_levels.h>
@@ -44,6 +47,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class FiniteElement;
 template <int dim, int spacedim>
@@ -73,7 +78,7 @@ namespace internal
     struct Implementation;
   }
 } // namespace internal
-
+#endif
 
 /**
  * Given a triangulation and a description of a finite element, this
@@ -105,7 +110,7 @@ namespace internal
  * triangulation data. These iterators are built on top of those of the
  * Triangulation class, but offer the additional information on degrees of
  * freedom functionality compared to pure triangulation iterators. The order
- * in which dof iterators are presented by the <tt>++</tt> and <tt>--</tt>
+ * in which dof iterators are presented by the <tt>++</tt> and <tt>\--</tt>
  * operators is the same as that for the corresponding iterators traversing
  * the triangulation on which this DoFHandler is constructed.
  *
@@ -159,7 +164,7 @@ namespace internal
  * renumbering. Using this array, the renumber_dofs() function of the present
  * class is called, which actually performs the change from old DoF indices to
  * the ones given in the array. In some cases, however, a user may want to
- * compute her own renumbering order; in this case, one can allocate an array
+ * compute their own renumbering order; in this case, one can allocate an array
  * with one element per degree of freedom and fill it with the number that the
  * respective degree of freedom shall be assigned. This number may, for
  * example, be obtained by sorting the support points of the degrees of
@@ -405,21 +410,6 @@ public:
   static const bool is_hp_dof_handler = false;
 
   /**
-   * When the arrays holding the DoF indices are set up, but before they are
-   * filled with actual values, they are set to an invalid value, in order to
-   * monitor possible problems. This invalid value is the constant defined
-   * here.
-   *
-   * Please note that you should not rely on it having a certain value, but
-   * rather take its symbolic name.
-   *
-   * @deprecated Use numbers::invalid_dof_index instead.
-   */
-  DEAL_II_DEPRECATED
-  static const types::global_dof_index invalid_dof_index =
-    numbers::invalid_dof_index;
-
-  /**
    * The default index of the finite element to be used on a given cell. Since
    * the present class only supports the same finite element to be used on all
    * cells, the index of the finite element needs to be the same on all cells
@@ -527,18 +517,6 @@ public:
    */
   virtual void
   distribute_dofs(const FiniteElement<dim, spacedim> &fe);
-
-  /**
-   * Distribute level degrees of freedom on each level for geometric
-   * multigrid. The active DoFs need to be distributed using distribute_dofs()
-   * before calling this function and the @p fe needs to be identical to the
-   * finite element passed to distribute_dofs().
-   *
-   * @deprecated Use the version without parameter instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual void
-  distribute_mg_dofs(const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Distribute level degrees of freedom on each level for geometric
@@ -716,7 +694,7 @@ public:
   /**
    * Iterator to the first active cell on level @p level. If the given level
    * does not contain any active cells (i.e., all cells on this level are
-   * further refined, then this function returns
+   * further refined), then this function returns
    * <code>end_active(level)</code> so that loops of the kind
    * @code
    *   for (cell=dof_handler.begin_active(level);
@@ -950,15 +928,17 @@ public:
   n_dofs(const unsigned int level) const;
 
   /**
-   * Return the number of degrees of freedom located on the boundary.
+   * Return the number of locally owned degrees of freedom located on the
+   * boundary.
    */
   types::global_dof_index
   n_boundary_dofs() const;
 
   /**
-   * Return the number of degrees of freedom located on those parts of the
-   * boundary which have a boundary indicator listed in the given set. The
-   * reason that a @p map rather than a @p set is used is the same as
+   * Return the number of locally owned degrees of freedom located on those
+   * parts of the boundary which have a boundary indicator listed in the given
+   * set.
+   * The reason that a @p map rather than a @p set is used is the same as
    * described in the documentation of that variant of
    * DoFTools::make_boundary_sparsity_pattern() that takes a map.
    *
@@ -1016,7 +996,7 @@ public:
    * cells owned by other processors may be theirs, and degrees of freedom on
    * ghost cells are also not necessarily included.
    */
-  unsigned int
+  types::global_dof_index
   n_locally_owned_dofs() const;
 
   /**
@@ -1035,77 +1015,16 @@ public:
   locally_owned_mg_dofs(const unsigned int level) const;
 
   /**
-   * Compute a vector with the locally owned DoFs of each processor.
-   *
-   * This function involves global communication via the @p MPI_Allgather
-   * function, so it must be called on all processors participating in the MPI
-   * communicator underlying the triangulation.
-   *
-   * If you are only interested in the number of elements each processor owns
-   * then compute_n_locally_owned_dofs_per_processor() is a better choice.
-   *
-   * If this is a sequential DoFHandler, then the vector has a single element
-   * that equals the IndexSet representing the entire range [0,n_dofs()]. (Here,
-   * "sequential" means that either the whole program does not use MPI, or that
-   * it uses MPI but only uses a single MPI process, or that there are multiple
-   * MPI processes but the Triangulation on which this DoFHandler builds works
-   * only on one MPI process.)
-   */
-  std::vector<IndexSet>
-  compute_locally_owned_dofs_per_processor() const;
-
-  /**
-   * Compute a vector with the number of degrees of freedom each
-   * processor that participates in this triangulation owns locally. The sum
-   * of all these numbers equals the number of degrees of freedom that exist
-   * globally, i.e. what n_dofs() returns.
-   *
-   * This function involves global communication via the @p MPI_Allgather
-   * function, so it must be called on all processors participating in the MPI
-   * communicator underlying the triangulation.
-   *
-   * Each element of the vector returned by this function equals the number of
-   * elements of the corresponding sets returned by
-   * compute_locally_owned_dofs_per_processor().
-   *
-   * If this is a sequential DoFHandler, then the vector has a single element
-   * equal to n_dofs(). (Here, "sequential" means that either the whole program
-   * does not use MPI, or that it uses MPI but only uses a single MPI process,
-   * or that there are multiple MPI processes but the Triangulation on which
-   * this DoFHandler builds works only on one MPI process.)
-   */
-  std::vector<types::global_dof_index>
-  compute_n_locally_owned_dofs_per_processor() const;
-
-  /**
-   * Compute a vector with the locally owned DoFs of each processor on
-   * the given level @p level for geometric multigrid.
-   *
-   * This function involves global communication via the @p MPI_Allgather
-   * function, so it must be called on all processors participating in the MPI
-   * communicator underlying the triangulation.
-   *
-   * If this is a sequential DoFHandler, then the vector has a single element
-   * that equals the IndexSet representing the entire range [0,n_dofs()]. (Here,
-   * "sequential" means that either the whole program does not use MPI, or that
-   * it uses MPI but only uses a single MPI process, or that there are multiple
-   * MPI processes but the Triangulation on which this DoFHandler builds works
-   * only on one MPI process.)
-   */
-  std::vector<IndexSet>
-  compute_locally_owned_mg_dofs_per_processor(const unsigned int level) const;
-
-  /**
    * Return a vector that stores the locally owned DoFs of each processor.
    *
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the index sets of all processors by default any more due to a possibly
    * large memory footprint on many processors. As a consequence, this
-   * function needs to call compute_locally_owned_dofs_per_processor() upon
-   * the first invocation, including global communication. Use
-   * compute_locally_owned_dofs_per_processor() instead if using up to a few
-   * thousands of MPI ranks or some variant involving local communication with
-   * more processors.
+   * function needs to call `Utilities::all_gather(comm, locally_owned_dofs())`
+   * upon the first invocation, including global communication. Use
+   * `Utilities::all_gather(comm, dof_handler.locally_owned_dofs())` instead if
+   * using up to a few thousands of MPI ranks or some variant involving local
+   * communication with more processors.
    */
   DEAL_II_DEPRECATED const std::vector<IndexSet> &
                            locally_owned_dofs_per_processor() const;
@@ -1119,11 +1038,12 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the numbers of dofs of all processors by default any more due to a
    * possibly large memory footprint on many processors. As a consequence,
-   * this function needs to call compute_n_locally_owned_dofs_per_processor()
-   * upon the first invocation, including global communication. Use
-   * compute_n_locally_owned_dofs_per_processor() instead if using up to a few
-   * thousands of MPI ranks or some variant involving local communication with
-   * more processors.
+   * this function needs to call `Utilities::all_gather(comm,
+   * n_locally_owned_dofs()` upon the first invocation, including global
+   * communication. Use `Utilities::all_gather(comm,
+   * dof_handler.n_locally_owned_dofs()` instead if using up to a few thousands
+   * of MPI ranks or some variant involving local communication with more
+   * processors.
    */
   DEAL_II_DEPRECATED const std::vector<types::global_dof_index> &
                            n_locally_owned_dofs_per_processor() const;
@@ -1135,9 +1055,10 @@ public:
    * @deprecated As of deal.II version 9.2, we do not populate a vector with
    * the index sets of all processors by default any more due to a possibly
    * large memory footprint on many processors. As a consequence, this
-   * function needs to call compute_locally_owned_dofs_mg_per_processor() upon
-   * the first invocation, including global communication. Use
-   * compute_locally_owned_mg_dofs_per_processor() instead if using up to a few
+   * function needs to call `Utilities::all_gather(comm,
+   * locally_owned_dofs_mg())` upon the first invocation, including global
+   * communication. Use `Utilities::all_gather(comm,
+   * dof_handler.locally_owned_dofs_mg())` instead if using up to a few
    * thousands of MPI ranks or some variant involving local communication with
    * more processors.
    */
@@ -1194,7 +1115,19 @@ public:
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization.
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * Exception
@@ -1488,7 +1421,7 @@ DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
+types::global_dof_index
 DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 {
   return number_cache.n_locally_owned_dofs;
@@ -1528,10 +1461,20 @@ DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   if (number_cache.n_locally_owned_dofs_per_processor.empty() &&
       number_cache.n_global_dofs > 0)
     {
+      MPI_Comm comm;
+
+      const parallel::TriangulationBase<dim, spacedim> *tr =
+        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &this->get_triangulation()));
+      if (tr != nullptr)
+        comm = tr->get_communicator();
+      else
+        comm = MPI_COMM_SELF;
+
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         number_cache)
         .n_locally_owned_dofs_per_processor =
-        compute_n_locally_owned_dofs_per_processor();
+        number_cache.get_n_locally_owned_dofs_per_processor(comm);
     }
   return number_cache.n_locally_owned_dofs_per_processor;
 }
@@ -1545,10 +1488,20 @@ DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor() const
   if (number_cache.locally_owned_dofs_per_processor.empty() &&
       number_cache.n_global_dofs > 0)
     {
+      MPI_Comm comm;
+
+      const parallel::TriangulationBase<dim, spacedim> *tr =
+        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &this->get_triangulation()));
+      if (tr != nullptr)
+        comm = tr->get_communicator();
+      else
+        comm = MPI_COMM_SELF;
+
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         number_cache)
         .locally_owned_dofs_per_processor =
-        compute_locally_owned_dofs_per_processor();
+        number_cache.get_locally_owned_dofs_per_processor(comm);
     }
   return number_cache.locally_owned_dofs_per_processor;
 }
@@ -1570,69 +1523,22 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
   if (mg_number_cache[level].locally_owned_dofs_per_processor.empty() &&
       mg_number_cache[level].n_global_dofs > 0)
     {
+      MPI_Comm comm;
+
+      const parallel::TriangulationBase<dim, spacedim> *tr =
+        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &this->get_triangulation()));
+      if (tr != nullptr)
+        comm = tr->get_communicator();
+      else
+        comm = MPI_COMM_SELF;
+
       const_cast<dealii::internal::DoFHandlerImplementation::NumberCache &>(
         mg_number_cache[level])
         .locally_owned_dofs_per_processor =
-        compute_locally_owned_mg_dofs_per_processor(level);
+        mg_number_cache[level].get_locally_owned_dofs_per_processor(comm);
     }
   return mg_number_cache[level].locally_owned_dofs_per_processor;
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<types::global_dof_index>
-DoFHandler<dim, spacedim>::compute_n_locally_owned_dofs_per_processor() const
-{
-  const parallel::Triangulation<dim, spacedim> *tr =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-      &this->get_triangulation()));
-  if (tr != nullptr)
-    return number_cache.get_n_locally_owned_dofs_per_processor(
-      tr->get_communicator());
-  else
-    return number_cache.get_n_locally_owned_dofs_per_processor(MPI_COMM_SELF);
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<IndexSet>
-DoFHandler<dim, spacedim>::compute_locally_owned_dofs_per_processor() const
-{
-  const parallel::Triangulation<dim, spacedim> *tr =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-      &this->get_triangulation()));
-  if (tr != nullptr)
-    return number_cache.get_locally_owned_dofs_per_processor(
-      tr->get_communicator());
-  else
-    return number_cache.get_locally_owned_dofs_per_processor(MPI_COMM_SELF);
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<IndexSet>
-DoFHandler<dim, spacedim>::compute_locally_owned_mg_dofs_per_processor(
-  const unsigned int level) const
-{
-  Assert(level < this->get_triangulation().n_global_levels(),
-         ExcMessage("The given level index exceeds the number of levels "
-                    "present in the triangulation"));
-  Assert(
-    mg_number_cache.size() == this->get_triangulation().n_global_levels(),
-    ExcMessage(
-      "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
-  const parallel::Triangulation<dim, spacedim> *tr =
-    (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-      &this->get_triangulation()));
-  if (tr != nullptr)
-    return mg_number_cache[level].get_locally_owned_dofs_per_processor(
-      tr->get_communicator());
-  else
-    return mg_number_cache[level].get_locally_owned_dofs_per_processor(
-      MPI_COMM_SELF);
 }
 
 

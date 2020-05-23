@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,9 +64,9 @@ template <int dim>
 void
 check_renumbering(hp::DoFHandler<dim> &dof)
 {
-  for (unsigned int i = 0; i < dof.get_fe().size(); ++i)
+  for (unsigned int i = 0; i < dof.get_fe_collection().size(); ++i)
     {
-      const FiniteElement<dim> &element = dof.get_fe()[i];
+      const FiniteElement<dim> &element = dof.get_fe_collection()[i];
       deallog << element.get_name() << std::endl;
     }
 

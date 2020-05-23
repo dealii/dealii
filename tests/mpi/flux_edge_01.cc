@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,8 +62,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   template <int dim>
   class InteriorPenaltyProblem
   {
@@ -115,7 +113,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
 
@@ -210,7 +208,6 @@ namespace Step39
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   using namespace Step39;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,12 +47,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 namespace LinearAlgebra
 {
   // Forward declaration
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
+#  endif
 
 /**
  * @addtogroup TrilinosWrappers
@@ -1197,16 +1200,6 @@ namespace TrilinosWrappers
       trilinos_vector();
 
       /**
-       * Return a const reference to the underlying Trilinos Epetra_Map that
-       * sets the parallel partitioning of the vector.
-       *
-       * @deprecated Use trilinos_partitioner() instead.
-       */
-      DEAL_II_DEPRECATED
-      const Epetra_Map &
-      vector_partitioner() const;
-
-      /**
        * Return a const reference to the underlying Trilinos Epetra_BlockMap
        * that sets the parallel partitioning of the vector.
        */
@@ -2136,15 +2129,6 @@ namespace TrilinosWrappers
     Vector::trilinos_vector()
     {
       return *vector;
-    }
-
-
-
-    inline const Epetra_Map &
-    Vector::vector_partitioner() const
-    {
-      // TODO A dynamic_cast fails here. This is suspicious.
-      return static_cast<const Epetra_Map &>(vector->Map()); // NOLINT
     }
 
 

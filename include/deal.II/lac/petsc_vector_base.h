@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,9 +36,15 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#    ifndef DOXYGEN
 template <typename number>
 class Vector;
 
+namespace PETScWrappers
+{
+  class VectorBase;
+}
+#    endif
 
 /**
  * A namespace in which wrapper classes for PETSc objects reside.
@@ -49,9 +55,6 @@ class Vector;
  */
 namespace PETScWrappers
 {
-  // forward declaration
-  class VectorBase;
-
   /**
    * @cond internal
    */
@@ -686,20 +689,6 @@ namespace PETScWrappers
      */
     void
     equ(const PetscScalar a, const VectorBase &V);
-
-    /**
-     * Compute the elementwise ratio of the two given vectors, that is let
-     * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
-     * compute the cellwise ratio of true to estimated error.
-     *
-     * This vector is appropriately scaled to hold the result.
-     *
-     * If any of the <tt>b[i]</tt> is zero, the result is undefined. No
-     * attempt is made to catch such situations.
-     */
-    DEAL_II_DEPRECATED
-    void
-    ratio(const VectorBase &a, const VectorBase &b);
 
     /**
      * Prints the PETSc vector object values using PETSc internal vector

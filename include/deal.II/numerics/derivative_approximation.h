@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -186,8 +186,7 @@ namespace DerivativeApproximation
                        const unsigned int                   component = 0);
 
   /**
-   * Call the @p interpolate function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Call the function above with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim,
             template <int, int> class DoFHandlerType,
@@ -228,8 +227,7 @@ namespace DerivativeApproximation
                                 const unsigned int component = 0);
 
   /**
-   * Call the @p interpolate function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Call the function above with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim,
             template <int, int> class DoFHandlerType,
@@ -309,11 +307,16 @@ namespace DerivativeApproximation
    * Exception
    */
   DeclExceptionMsg(ExcInsufficientDirections,
-                   "We have encountered a cell on which the number of linearly "
+                   "While computing a finite difference approximation to "
+                   "derivatives, the algorithm encountered a cell on which "
+                   "the number of linearly "
                    "independent directions that span the matrix Y (discussed "
                    "in the documentation of the DerivativeApproximation "
                    "class) is not equal to dim. The matrix Y then is "
-                   "rank deficient and can not be inverted.");
+                   "rank deficient and can not be inverted. A common reason "
+                   "why this might be happening is if a cell has neither "
+                   "left/right (or up/down, or front/back) neighbors, for "
+                   "example because the mesh is too coarse.");
 } // namespace DerivativeApproximation
 
 

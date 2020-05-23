@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -242,7 +242,7 @@ void concentric_disks(Triangulation<2> &         tria,
         1); // not faces ... for Transfinite interpolation
       for (unsigned int k = 0; k < gp.n_balls; ++k)
         {
-          for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+          for (const unsigned int f : GeometryInfo<2>::face_indices())
             {
               const Point<2> p0 = cell->face(f)->vertex(0),
                              p1 = cell->face(f)->vertex(1);

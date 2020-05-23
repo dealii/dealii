@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Test that a coupling matrix can be constructed for each pair of dimension
 // and immersed dimension, with a non trivial component selection in both

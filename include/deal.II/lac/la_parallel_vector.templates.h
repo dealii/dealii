@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -152,13 +152,15 @@ namespace LinearAlgebra
         }
 
         static void
-        import(const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
-               ::dealii::VectorOperation::values operation,
-               std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-                               communication_pattern,
-               const IndexSet &locally_owned_elem,
-               ::dealii::MemorySpace::
-                 MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
+        import(
+          const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
+          ::dealii::VectorOperation::values                       operation,
+          const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+            &             communication_pattern,
+          const IndexSet &locally_owned_elem,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::Host>
+            &data)
         {
           Assert(
             (operation == ::dealii::VectorOperation::add) ||
@@ -379,15 +381,15 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
     {
 #ifdef DEAL_II_WITH_MPI
-      for (size_type j = 0; j < compress_requests.size(); j++)
+      for (auto &compress_request : compress_requests)
         {
-          const int ierr = MPI_Request_free(&compress_requests[j]);
+          const int ierr = MPI_Request_free(&compress_request);
           AssertThrowMPI(ierr);
         }
       compress_requests.clear();
-      for (size_type j = 0; j < update_ghost_values_requests.size(); j++)
+      for (auto &update_ghost_values_request : update_ghost_values_requests)
         {
-          const int ierr = MPI_Request_free(&update_ghost_values_requests[j]);
+          const int ierr = MPI_Request_free(&update_ghost_values_request);
           AssertThrowMPI(ierr);
         }
       update_ghost_values_requests.clear();
@@ -747,106 +749,6 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_PETSC
-
-    namespace petsc_helpers
-    {
-      template <typename PETSC_Number, typename Number>
-      void
-      copy_petsc_vector(const PETSC_Number *petsc_start_ptr,
-                        const PETSC_Number *petsc_end_ptr,
-                        Number *            ptr)
-      {
-        std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
-      }
-
-      template <typename PETSC_Number, typename Number>
-      void
-      copy_petsc_vector(const std::complex<PETSC_Number> *petsc_start_ptr,
-                        const std::complex<PETSC_Number> *petsc_end_ptr,
-                        std::complex<Number> *            ptr)
-      {
-        std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
-      }
-
-      template <typename PETSC_Number, typename Number>
-      void
-      copy_petsc_vector(const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
-                        const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
-                        Number * /*ptr*/)
-      {
-        AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
-      }
-    } // namespace petsc_helpers
-
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator=(const PETScWrappers::MPI::Vector &petsc_vec)
-    {
-      // TODO: We would like to use the same compact infrastructure as for the
-      // Trilinos vector below, but the interface through ReadWriteVector does
-      // not support overlapping (ghosted) PETSc vectors, which we need for
-      // backward compatibility.
-
-      Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
-             StandardExceptions::ExcInvalidState());
-
-      // get a representation of the vector and copy it
-      PetscScalar *  start_ptr;
-      PetscErrorCode ierr =
-        VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      const size_type vec_size = local_size();
-      petsc_helpers::copy_petsc_vector(start_ptr,
-                                       start_ptr + vec_size,
-                                       begin());
-
-      // restore the representation of the vector
-      ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-      // spread ghost values between processes?
-      if (vector_is_ghosted || petsc_vec.has_ghost_elements())
-        update_ghost_values();
-
-      // return a reference to this object per normal c++ operator overloading
-      // semantics
-      return *this;
-    }
-
-#endif
-
-
-
-#ifdef DEAL_II_WITH_TRILINOS
-
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType> &
-    Vector<Number, MemorySpaceType>::
-    operator=(const TrilinosWrappers::MPI::Vector &trilinos_vec)
-    {
-#  ifdef DEAL_II_WITH_MPI
-      IndexSet combined_set = partitioner->locally_owned_range();
-      combined_set.add_indices(partitioner->ghost_indices());
-      ReadWriteVector<Number> rw_vector(combined_set);
-      rw_vector.import(trilinos_vec, VectorOperation::insert);
-      import(rw_vector, VectorOperation::insert);
-
-      if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
-        update_ghost_values();
-#  else
-      AssertThrow(false, ExcNotImplemented());
-#  endif
-
-      return *this;
-    }
-
-#endif
-
-
-
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::compress(
@@ -895,11 +797,10 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::compress_start(
-      const unsigned int                counter,
+      const unsigned int                communication_channel,
       ::dealii::VectorOperation::values operation)
     {
-      (void)counter;
-      (void)operation;
+      AssertIndexRange(communication_channel, 200);
       Assert(vector_is_ghosted == false,
              ExcMessage("Cannot call compress() on a ghosted vector"));
 
@@ -912,30 +813,32 @@ namespace LinearAlgebra
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
     defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          Assert(
-            (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
-            ExcMessage(
-              "Using MemorySpace::CUDA only allowed if the code is compiled with a CUDA compiler!"));
-          if (import_data.values_dev == nullptr)
-            import_data.values_dev.reset(
-              Utilities::CUDA::allocate_device_data<Number>(
-                partitioner->n_import_indices()));
-#  else
-#    ifdef DEAL_II_MPI_WITH_CUDA_SUPPORT
-          static_assert(
-            std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
-            "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
-#    endif
-          if (import_data.values == nullptr)
+          if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
             {
-              Number *new_val;
-              Utilities::System::posix_memalign(
-                reinterpret_cast<void **>(&new_val),
-                64,
-                sizeof(Number) * partitioner->n_import_indices());
-              import_data.values.reset(new_val);
+              if (import_data.values_dev == nullptr)
+                import_data.values_dev.reset(
+                  Utilities::CUDA::allocate_device_data<Number>(
+                    partitioner->n_import_indices()));
             }
+          else
 #  endif
+            {
+#  if !defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+              static_assert(
+                std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
+                "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
+#  endif
+              if (import_data.values == nullptr)
+                {
+                  Number *new_val;
+                  Utilities::System::posix_memalign(
+                    reinterpret_cast<void **>(&new_val),
+                    64,
+                    sizeof(Number) * partitioner->n_import_indices());
+                  import_data.values.reset(new_val);
+                }
+            }
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
@@ -968,7 +871,7 @@ namespace LinearAlgebra
         {
           partitioner->import_from_ghosted_array_start(
             operation,
-            counter,
+            communication_channel,
             ArrayView<Number, MemorySpace::CUDA>(
               data.values_dev.get() + partitioner->local_size(),
               partitioner->n_ghost_indices()),
@@ -981,7 +884,7 @@ namespace LinearAlgebra
         {
           partitioner->import_from_ghosted_array_start(
             operation,
-            counter,
+            communication_channel,
             ArrayView<Number, MemorySpace::Host>(
               data.values.get() + partitioner->local_size(),
               partitioner->n_ghost_indices()),
@@ -989,6 +892,9 @@ namespace LinearAlgebra
               import_data.values.get(), partitioner->n_import_indices()),
             compress_requests);
         }
+#else
+      (void)communication_channel;
+      (void)operation;
 #endif
     }
 
@@ -1072,8 +978,9 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::update_ghost_values_start(
-      const unsigned int counter) const
+      const unsigned int communication_channel) const
     {
+      AssertIndexRange(communication_channel, 200);
 #ifdef DEAL_II_WITH_MPI
       // nothing to do when we neither have import nor ghost indices.
       if (partitioner->n_ghost_indices() == 0 &&
@@ -1137,7 +1044,7 @@ namespace LinearAlgebra
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
         defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
-        counter,
+        communication_channel,
         ArrayView<const Number, MemorySpace::Host>(data.values.get(),
                                                    partitioner->local_size()),
         ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
@@ -1148,7 +1055,7 @@ namespace LinearAlgebra
         update_ghost_values_requests);
 #  else
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
-        counter,
+        communication_channel,
         ArrayView<const Number, MemorySpace::CUDA>(data.values_dev.get(),
                                                    partitioner->local_size()),
         ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
@@ -1160,7 +1067,7 @@ namespace LinearAlgebra
 #  endif
 
 #else
-      (void)counter;
+      (void)communication_channel;
 #endif
     }
 
@@ -1612,39 +1519,6 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::sadd(
-      const Number                           x,
-      const Number                           a,
-      const Vector<Number, MemorySpaceType> &v,
-      const Number                           b,
-      const Vector<Number, MemorySpaceType> &w)
-    {
-      AssertIsFinite(x);
-      AssertIsFinite(a);
-      AssertIsFinite(b);
-
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
-
-      dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::sadd_xavbw(
-          thread_loop_partitioner,
-          partitioner->local_size(),
-          x,
-          a,
-          b,
-          v.data,
-          w.data,
-          data);
-
-      if (vector_is_ghosted)
-        update_ghost_values();
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator*=(const Number factor)
     {
@@ -1712,36 +1586,6 @@ namespace LinearAlgebra
         functions<Number, Number, MemorySpaceType>::equ_au(
           thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
 
-
-      if (vector_is_ghosted)
-        update_ghost_values();
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::equ(
-      const Number                           a,
-      const Vector<Number, MemorySpaceType> &v,
-      const Number                           b,
-      const Vector<Number, MemorySpaceType> &w)
-    {
-      AssertIsFinite(a);
-      AssertIsFinite(b);
-
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
-
-      dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::equ_aubv(
-          thread_loop_partitioner,
-          partitioner->local_size(),
-          a,
-          b,
-          v.data,
-          w.data,
-          data);
 
       if (vector_is_ghosted)
         update_ghost_values();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_vector_memory_templates_h
 #define dealii_vector_memory_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/std_cxx14/memory.h>
@@ -132,8 +134,7 @@ GrowingVectorMemory<VectorType>::alloc()
     }
 
   // no free vector found, so let's just allocate a new one
-  get_pool().data->emplace_back(
-    entry_type(true, std_cxx14::make_unique<VectorType>()));
+  get_pool().data->emplace_back(true, std_cxx14::make_unique<VectorType>());
 
   return get_pool().data->back().second.get();
 }

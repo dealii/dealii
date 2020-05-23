@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,12 +16,14 @@
 #ifndef dealii_boost_adaptor_bounding_box_h
 #define dealii_boost_adaptor_bounding_box_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/bounding_box.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <deal.II/boost_adaptors/point.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/geometries.hpp>
 
 namespace boost
 {

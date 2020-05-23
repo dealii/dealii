@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -286,6 +286,7 @@ namespace PETScWrappers
     MatrixBase::Tmmult(C, B, V);
   }
 
+#  ifndef DOXYGEN
   // Explicit instantiations
   //
   template SparseMatrix::SparseMatrix(const SparsityPattern &, const bool);
@@ -301,6 +302,7 @@ namespace PETScWrappers
   SparseMatrix::do_reinit(const SparsityPattern &, const bool);
   template void
   SparseMatrix::do_reinit(const DynamicSparsityPattern &, const bool);
+#  endif
 } // namespace PETScWrappers
 
 

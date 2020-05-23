@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -53,8 +53,6 @@
 
 namespace Step22
 {
-  using namespace dealii;
-
   template <int dim>
   class StokesProblem
   {
@@ -325,10 +323,8 @@ namespace Step22
     block_component[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, block_component);
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -398,7 +394,8 @@ namespace Step22
     constraints.close();
 
     const std::vector<IndexSet> &locally_owned_dofs =
-      dof_handler.compute_locally_owned_dofs_per_processor();
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.locally_owned_dofs());
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -821,7 +818,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
       using namespace Step22;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

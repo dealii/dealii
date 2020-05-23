@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -686,7 +686,7 @@ namespace MeshWorker
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim, spacedim>::fe_values(unsigned int i) const
   {
-    Assert(i < fevalv.size(), ExcIndexRange(i, 0, fevalv.size()));
+    AssertIndexRange(i, fevalv.size());
     return *fevalv[i];
   }
 

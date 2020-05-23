@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 #ifndef dealii_mg_transfer_internal_h
 #define dealii_mg_transfer_internal_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/mg_level_object.h>
 
@@ -42,7 +44,7 @@ namespace internal
     template <int dim, int spacedim>
     void
     fill_copy_indices(
-      const DoFHandler<dim, spacedim> &mg_dof,
+      const DoFHandler<dim, spacedim> &dof_handler,
       const MGConstrainedDoFs *        mg_constrained_dofs,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
@@ -120,8 +122,10 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const DoFHandler<dim> &                 mg_dof,
-      const MGConstrainedDoFs *               mg_constrained_dofs,
+      const DoFHandler<dim> &  dof_handler,
+      const MGConstrainedDoFs *mg_constrained_dofs,
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &                                     external_partitioners,
       ElementInfo<Number> &                   elem_info,
       std::vector<std::vector<unsigned int>> &level_dof_indices,
       std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
@@ -129,10 +133,9 @@ namespace internal
       std::vector<unsigned int> &n_owned_level_cells,
       std::vector<std::vector<std::vector<unsigned short>>> &dirichlet_indices,
       std::vector<std::vector<Number>> &                     weights_on_refined,
-      std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-        &copy_indices_global_mine,
-      MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
-        &ghosted_level_vector);
+      std::vector<Table<2, unsigned int>> &copy_indices_global_mine,
+      MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &vector_partitioners);
 
   } // namespace MGTransfer
 } // namespace internal

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2018 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -68,5 +68,5 @@ DEAL_II_PACKAGE_HANDLE(GINKGO
   INCLUDE_DIRS REQUIRED GINKGO_INCLUDE_DIR
   USER_INCLUDE_DIRS REQUIRED GINKGO_INCLUDE_DIR
   CLEAR
-    GINKGO_INCLUDE_DIR 
+    GINKGO_LIBRARY GINKGO_REFERENCE_LIBRARY GINKGO_OMP_LIBRARY GINKGO_CUDA_LIBRARY GINKGO_INCLUDE_DIR
   )

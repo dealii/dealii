@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// Test DoFTools::count_dofs_per_block
+// Test DoFTools::count_dofs_per_fe_block
 //
 // like the test without the hp_ prefix, but for hp::DoFHandler
 
@@ -98,8 +98,8 @@ test()
       triangulation.execute_coarsening_and_refinement();
       dof_handler.distribute_dofs(fe);
 
-      std::vector<types::global_dof_index> dofs_per_block(fe.n_components());
-      DoFTools::count_dofs_per_block(dof_handler, dofs_per_block);
+      const std::vector<types::global_dof_index> dofs_per_block =
+        DoFTools::count_dofs_per_fe_block(dof_handler);
 
       AssertThrow(std::accumulate(dofs_per_block.begin(),
                                   dofs_per_block.end(),

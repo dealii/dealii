@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/qprojector.h>
+
 #include <deal.II/fe/mapping.h>
 
 #include <cmath>
@@ -31,22 +33,38 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A class providing a mapping from the reference cell to cells that are
- * axiparallel.
+ * axiparallel, i.e., that have the shape of rectangles (in 2d) or
+ * boxes (in 3d) with edges parallel to the coordinate directions. The
+ * class therefore provides functionality that is equivalent to what,
+ * for example, MappingQ would provide for such cells. However, knowledge
+ * of the shape of cells allows this class to be substantially more
+ * efficient.
  *
- * This class maps the unit cell to a grid cell with surfaces parallel to the
- * coordinate lines/planes. It is specifically developed for Cartesian meshes.
- * In other words, the mapping is meant for cells for which the mapping from
+ * Specifically, the mapping is meant for cells for which the mapping from
  * the reference to the real cell is a scaling along the coordinate
  * directions: The transformation from reference coordinates $\hat {\mathbf
  * x}$ to real coordinates $\mathbf x$ on each cell is of the form
  * @f{align*}{
- * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 \\ 0 & h_y
- * \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
+ *   {\mathbf x}(\hat {\mathbf x})
+ *   =
+ *   \begin{pmatrix}
+ *     h_x & 0 \\
+ *     0 & h_y
+ *   \end{pmatrix}
+ *   \hat{\mathbf x}
+ *   + {\mathbf v}_0
  * @f}
  * in 2d, and
  * @f{align*}{
- * {\mathbf x}(\hat {\mathbf x}) = \begin{pmatrix} h_x & 0 & 0 \\ 0 & h_y & 0
- * \\ 0 & 0 & h_z \end{pmatrix} \hat{\mathbf x} + {\mathbf v}_0
+ *   {\mathbf x}(\hat {\mathbf x})
+ *   =
+ *   \begin{pmatrix}
+ *     h_x & 0 & 0 \\
+ *     0 & h_y & 0 \\
+ *     0 & 0 & h_z
+ *   \end{pmatrix}
+ *   \hat{\mathbf x}
+ *   + {\mathbf v}_0
  * @f}
  * in 3d, where ${\mathbf v}_0$ is the bottom left vertex and $h_x,h_y,h_z$
  * are the extents of the cell along the axes.
@@ -164,7 +182,7 @@ private:
     InternalData(const Quadrature<dim> &quadrature);
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;
@@ -239,24 +257,89 @@ private:
    * @}
    */
 
-
-
   /**
-   * Do the computation for the <tt>fill_*</tt> functions.
+   * Update the cell_extents field of the incoming InternalData object with the
+   * size of the incoming cell.
    */
   void
-  compute_fill(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-               const unsigned int               face_no,
-               const unsigned int               sub_no,
-               const CellSimilarity::Similarity cell_similarity,
-               const InternalData &             data,
-               std::vector<Point<dim>> &        quadrature_points,
-               std::vector<Tensor<1, dim>> &    normal_vectors) const;
+  update_cell_extents(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const InternalData &                                        data) const;
 
   /**
-   * Value to indicate that a given face or subface number is invalid.
+   * Compute the quadrature points if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   *
+   * Called from fill_fe_values.
    */
-  static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
+  void
+  maybe_update_cell_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const InternalData &                                        data,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Compute the quadrature points if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   *
+   * Called from fill_fe_face_values.
+   */
+  void
+  maybe_update_face_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const InternalData &                                        data,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Compute the quadrature points if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   *
+   * Called from fill_fe_subface_values.
+   */
+  void
+  maybe_update_subface_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const unsigned int                                          sub_no,
+    const InternalData &                                        data,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Transform quadrature points in InternalData to real space by scaling unit
+   * coordinates with cell_extends in each direction.
+   *
+   * Called from the various maybe_update_*_quadrature_points functions.
+   */
+  void
+  transform_quadrature_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const InternalData &                                        data,
+    const typename QProjector<dim>::DataSetDescriptor &         offset,
+    std::vector<Point<dim>> &quadrature_points) const;
+
+  /**
+   * Compute the normal vectors if the UpdateFlags of the incoming InternalData
+   * object say that they should be updated.
+   */
+  void
+  maybe_update_normal_vectors(
+    const unsigned int           face_no,
+    const InternalData &         data,
+    std::vector<Tensor<1, dim>> &normal_vectors) const;
+
+  /**
+   * Since the Jacobian is constant for this mapping all derivatives of the
+   * Jacobian are identically zero. Fill these quantities with zeros if the
+   * corresponding update flags say that they should be updated.
+   */
+  void
+  maybe_update_jacobian_derivatives(
+    const InternalData &             data,
+    const CellSimilarity::Similarity cell_similarity,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
 };
 
 /*@}*/

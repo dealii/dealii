@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -714,12 +714,22 @@ namespace TensorAccessors
       {
         // Some auto-differentiable numbers need explicit
         // zero initialization.
-        T1 result = dealii::internal::NumberType<T1>::value(0.0);
-        for (unsigned int i = 0; i < dim; ++i)
-          result +=
-            Contract2<no_contr - 1, dim>::template contract2<T1>(left[i],
-                                                                 right[i]);
-        return result;
+        if (dim == 0)
+          {
+            T1 result = dealii::internal::NumberType<T1>::value(0.0);
+            return result;
+          }
+        else
+          {
+            T1 result =
+              Contract2<no_contr - 1, dim>::template contract2<T1>(left[0],
+                                                                   right[0]);
+            for (unsigned int i = 1; i < dim; ++i)
+              result +=
+                Contract2<no_contr - 1, dim>::template contract2<T1>(left[i],
+                                                                     right[i]);
+            return result;
+          }
       }
     };
 

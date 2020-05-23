@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,9 +29,9 @@
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
 
 template <int dim>
 void

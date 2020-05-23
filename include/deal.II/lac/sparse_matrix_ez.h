@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,10 +28,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
 class FullMatrix;
+#  endif
 
 /**
  * @addtogroup Matrix1
@@ -446,10 +449,11 @@ public:
    * away and only non-zero data is added. The default value is <tt>true</tt>,
    * i.e., zero values won't be added into the matrix.
    *
-   * If anyway a new element will be inserted and it does not exist, allocates
-   * the entry.
+   * If this function sets the value of an element that does not yet exist,
+   * then it allocates an entry for it. (Unless `elide_zero_values` is `true`
+   * as mentioned above.)
    *
-   * @note You may need to insert some zero elements to keep a symmetric
+   * @note You may need to insert zero elements if you want to keep a symmetric
    * sparsity pattern for the matrix.
    */
   void
@@ -459,9 +463,14 @@ public:
       const bool      elide_zero_values = true);
 
   /**
-   * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
-   * does not exist. Filters out zeroes automatically. If <tt>value</tt> is
-   * not a finite number an exception is thrown.
+   * Add @p value to the element <tt>(i,j)</tt>.
+   *
+   * If this function adds to the value of an element that does not yet exist,
+   * then it allocates an entry for it.
+   *
+   * The function filters out zeroes automatically, i.e., it does not create
+   * new entries when adding zero to a matrix element for which no entry
+   * currently exists.
    */
   void
   add(const size_type i, const size_type j, const number value);
@@ -1101,8 +1110,8 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::Entry *
 SparseMatrixEZ<number>::locate(const size_type row, const size_type col)
 {
-  Assert(row < m(), ExcIndexRange(row, 0, m()));
-  Assert(col < n(), ExcIndexRange(col, 0, n()));
+  AssertIndexRange(row, m());
+  AssertIndexRange(col, n());
 
   const RowInfo & r   = row_info[row];
   const size_type end = r.start + r.length;
@@ -1132,8 +1141,8 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::Entry *
 SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
 {
-  Assert(row < m(), ExcIndexRange(row, 0, m()));
-  Assert(col < n(), ExcIndexRange(col, 0, n()));
+  AssertIndexRange(row, m());
+  AssertIndexRange(col, n());
 
   RowInfo &       r   = row_info[row];
   const size_type end = r.start + r.length;
@@ -1235,8 +1244,8 @@ SparseMatrixEZ<number>::set(const size_type i,
 {
   AssertIsFinite(value);
 
-  Assert(i < m(), ExcIndexRange(i, 0, m()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  AssertIndexRange(i, m());
+  AssertIndexRange(j, n());
 
   if (elide_zero_values && value == 0.)
     {
@@ -1261,8 +1270,8 @@ SparseMatrixEZ<number>::add(const size_type i,
 {
   AssertIsFinite(value);
 
-  Assert(i < m(), ExcIndexRange(i, 0, m()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  AssertIndexRange(i, m());
+  AssertIndexRange(j, n());
 
   // ignore zero additions
   if (std::abs(value) == 0.)
@@ -1383,7 +1392,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   const_iterator result(this, r, 0);
   return result;
 }
@@ -1392,7 +1401,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   const_iterator result(this, r + 1, 0);
   return result;
 }

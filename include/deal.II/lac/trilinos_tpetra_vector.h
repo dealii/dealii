@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,9 +43,18 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   // Forward declaration
+#  ifndef DOXYGEN
   template <typename Number>
   class ReadWriteVector;
+#  endif
 
+  /**
+   * A namespace for classes that provide wrappers for Trilinos' Tpetra vectors.
+   *
+   * This namespace provides wrappers for the Tpetra::Vector class from the
+   * Tpetra package (https://trilinos.github.io/tpetra.html) that is part of
+   * Trilinos.
+   */
   namespace TpetraWrappers
   {
     /**

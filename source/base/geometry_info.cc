@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,6 +52,15 @@ constexpr std::array<std::array<unsigned int, dim>,
 template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_direction;
+
+template <int dim>
+constexpr std::array<Tensor<1, dim>, GeometryInfo<dim>::faces_per_cell>
+  GeometryInfo<dim>::unit_normal_vector;
+
+template <int dim>
+constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
+                     GeometryInfo<dim>::faces_per_cell>
+  GeometryInfo<dim>::unit_tangential_vectors;
 
 template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>

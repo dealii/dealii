@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,11 +21,13 @@
 
 #include <deal.II/base/exceptions.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/variant.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
 #include <map>
@@ -36,17 +38,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 class TableHandler;
+#endif
 
 namespace internal
 {
   /**
    * A <tt>TableEntry</tt> stores the value of a table entry. It can either be
-   * of type int, unsigned int, double or std::string. In essence, this
-   * structure is the same as <code>boost::variant@<int,unsigned
-   * int,double,std::string@></code> but we wrap this object in a structure
-   * for which we can write a function that can serialize it. This is also why
-   * the function is not in fact of type boost::any.
+   * of type int, unsigned int, std::uint64_t, double or std::string. In
+   * essence, this structure is the same as <code>boost::variant@<int,unsigned
+   * int,std::uint64_t,double,std::string@></code> but we wrap this object in a
+   * structure for which we can write a function that can serialize it. This is
+   * also why the function is not in fact of type boost::any.
    */
   struct TableEntry
   {
@@ -65,9 +70,9 @@ namespace internal
 
     /**
      * Return the value stored by this object. The template type T must be one
-     * of <code>int,unsigned int,double,std::string</code> and it must match
-     * the data type of the object originally stored in this TableEntry
-     * object.
+     * of <code>int,unsigned int,std::uint64_t,double,std::string</code> and it
+     * must match the data type of the object originally stored in this
+     * TableEntry object.
      */
     template <typename T>
     T
@@ -75,7 +80,7 @@ namespace internal
 
     /**
      * Return the numeric value of this object if data has been stored in it
-     * either as an integer, an unsigned integer, or a double.
+     * either as an integer, an unsigned integer,std::uint64_t, or a double.
      *
      * @return double
      */
@@ -124,14 +129,26 @@ namespace internal
     void
     load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization.
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   private:
     /**
      * Abbreviation for the data type stored by this object.
      */
-    using value_type = boost::
-      variant<int, unsigned int, unsigned long long int, double, std::string>;
+    using value_type =
+      boost::variant<int, unsigned int, std::uint64_t, double, std::string>;
 
     /**
      * Stored value.
@@ -177,8 +194,8 @@ namespace internal
  * <h3>Example</h3>
  *
  * This is a simple example demonstrating the usage of this class. The first
- * column includes the numbers <tt>i=1..n</tt>, the second $1^2$...$n^2$, the
- * third $sqrt(1)...sqrt(n)$, where the second and third columns are merged
+ * column includes the numbers $i=1 \dots n$, the second $1^2 \dots n^2$, the
+ * third $\sqrt{1}\dots\sqrt{n}$, where the second and third columns are merged
  * into one supercolumn with the superkey <tt>squares and roots</tt>.
  * Additionally the first column is aligned to the right (the default was
  * <tt>centered</tt>) and the precision of the square roots are set to be 6
@@ -186,22 +203,21 @@ namespace internal
  *
  * @code
  * TableHandler table;
- *
- * for (unsigned int i=1; i<=n; ++i)
+ * for (unsigned int i = 1; i <= n; ++i)
  *   {
  *     table.add_value("numbers", i);
- *     table.add_value("squares", i*i);
- *     table.add_value("square roots", std::sqrt(1.*i));
+ *     table.add_value("squares", i * i);
+ *     table.add_value("square roots", std::sqrt(i));
  *   }
- *                                  // merge the second and third column
+ * // merge the second and third column
  * table.add_column_to_supercolumn("squares", "squares and roots");
  * table.add_column_to_supercolumn("square roots", "squares and roots");
  *
- *                                  // additional settings
+ * // additional settings
  * table.set_tex_format("numbers", "r");
  * table.set_precision("square roots", 6);
  *
- *                                  // output
+ * // output
  * std::ofstream out_file("number_table.tex");
  * table.write_tex(out_file);
  * out_file.close();
@@ -390,7 +406,7 @@ public:
    * Adds a column (if not yet existent) with the key <tt>key</tt> and adds
    * the value of type <tt>T</tt> to the column. Values of type <tt>T</tt>
    * must be convertible to one of <code>int, unsigned int, double,
-   * std::string</code> or a compiler error will result.
+   * std::uint64_t, std::string</code> or a compiler error will result.
    */
   template <typename T>
   void
@@ -627,16 +643,34 @@ protected:
     pad_column_below(const unsigned int length);
 
     /**
-     * Read or write the data of this object to or from a stream for the
-     * purpose of serialization.
+     * Write the data of this object to a stream for the purpose of
+     * serialization.
      */
     template <class Archive>
     void
     save(Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization.
+     */
     template <class Archive>
     void
     load(Archive &ar, const unsigned int version);
+
+#ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization.
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
 
     /**
@@ -826,8 +860,7 @@ namespace internal
         char c = 's';
         ar &c &*p;
       }
-    else if (const unsigned long long int *p =
-               boost::get<unsigned long long int>(&value))
+    else if (const std::uint64_t *p = boost::get<std::uint64_t>(&value))
       {
         char c = 'l';
         ar &c &*p;
@@ -885,8 +918,8 @@ namespace internal
 
         case 'l':
           {
-            unsigned long long int val;
-            ar &                   val;
+            std::uint64_t val;
+            ar &          val;
             value = val;
             break;
           }

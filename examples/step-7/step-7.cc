@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -178,10 +178,6 @@ namespace Step7
   class Solution : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    Solution()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -278,10 +274,6 @@ namespace Step7
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
@@ -449,7 +441,7 @@ namespace Step7
 
   // @sect3{The HelmholtzProblem class implementation}
 
-  // @sect4{HelmholtzProblem::HelmholtzProblem}
+  // @sect4{HelmholtzProblem::HelmholtzProblem constructor}
 
   // In the constructor of this class, we only set the variables passed as
   // arguments, and associate the DoF handler object with the triangulation
@@ -463,7 +455,7 @@ namespace Step7
   {}
 
 
-  // @sect4{HelmholtzProblem::~HelmholtzProblem}
+  // @sect4{HelmholtzProblem::~HelmholtzProblem destructor}
 
   // This is no different than before:
   template <int dim>
@@ -595,8 +587,8 @@ namespace Step7
     // Note that the operations we will do with the right hand side object are
     // only querying data, never changing the object. We can therefore declare
     // it <code>const</code>:
-    const RightHandSide<dim> right_hand_side;
-    std::vector<double>      rhs_values(n_q_points);
+    RightHandSide<dim>  right_hand_side;
+    std::vector<double> rhs_values(n_q_points);
 
     // Finally we define an object denoting the exact solution function. We
     // will use it to compute the Neumann values at the boundary from
@@ -605,7 +597,7 @@ namespace Step7
     // Neumann values are prescribed. We will, however, be a little bit lazy
     // and use what we already have in information. Real-life programs would
     // to go other ways here, of course.
-    const Solution<dim> exact_solution;
+    Solution<dim> exact_solution;
 
     // Now for the main loop over all cells. This is mostly unchanged from
     // previous examples, so we only comment on the things that have changed.
@@ -649,11 +641,8 @@ namespace Step7
         // <code>run()</code> function further below. (The default value of
         // boundary indicators is <code>0</code>, so faces can only have an
         // indicator equal to <code>1</code> if we have explicitly set it.)
-        for (unsigned int face_number = 0;
-             face_number < GeometryInfo<dim>::faces_per_cell;
-             ++face_number)
-          if (cell->face(face_number)->at_boundary() &&
-              (cell->face(face_number)->boundary_id() == 1))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && (face->boundary_id() == 1))
             {
               // If we came into here, then we have found an external face
               // belonging to Gamma2. Next, we have to compute the values of
@@ -661,7 +650,7 @@ namespace Step7
               // need for the computation of the contour integral. This is
               // done using the <code>reinit</code> function which we already
               // know from the FEValue class:
-              fe_face_values.reinit(cell, face_number);
+              fe_face_values.reinit(cell, face);
 
               // And we can then perform the integration by using a loop over
               // all quadrature points.
@@ -735,10 +724,10 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12);
-    SolverCG<>    cg(solver_control);
+    SolverControl            solver_control(1000, 1e-12);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -979,14 +968,12 @@ namespace Step7
             triangulation.refine_global(3);
 
             for (const auto &cell : triangulation.cell_iterators())
-              for (unsigned int face_number = 0;
-                   face_number < GeometryInfo<dim>::faces_per_cell;
-                   ++face_number)
+              for (const auto &face : cell->face_iterators())
                 {
-                  const auto center = cell->face(face_number)->center();
+                  const auto center = face->center();
                   if ((std::fabs(center(0) - (-1)) < 1e-12) ||
                       (std::fabs(center(1) - (-1)) < 1e-12))
-                    cell->face(face_number)->set_boundary_id(1);
+                    face->set_boundary_id(1);
                 }
           }
         else

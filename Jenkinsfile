@@ -36,6 +36,15 @@ pipeline
       {
         stage("permission")
         {
+          // skip permission check on master and release branches
+          when {
+              not {
+	        anyOf {
+	          branch 'master'
+		  branch pattern: "dealii-*", comparator: "GLOB"
+		}
+	      }
+          }
           steps
           {
             githubNotify context: 'CI', description: 'need ready to test label and /rebuild',  status: 'PENDING'
@@ -112,31 +121,33 @@ pipeline
             failure {
               githubNotify context: 'CI', description: 'serial build failed',  status: 'FAILURE'
             }
-      }
+          }
 
           steps
           {
-          timeout(time: 6, unit: 'HOURS')
-          {
-            sh "echo \"building on node ${env.NODE_NAME}\""
-            sh '''#!/bin/bash
-               set -e
-               export NP=`grep -c ^processor /proc/cpuinfo`
-               export TEST_TIME_LIMIT=1200
-               mkdir -p /home/dealii/build
-               cd /home/dealii/build
-               cmake -G "Ninja" \
-                 -D DEAL_II_CXX_FLAGS='-Werror' \
-                 -D CMAKE_BUILD_TYPE=Debug \
-                 -D DEAL_II_WITH_MPI=OFF \
-                 -D DEAL_II_UNITY_BUILD=ON \
-                 $WORKSPACE/
-               time ninja -j $NP
-               time ninja test # quicktests
-               time ninja setup_tests
-               time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
-            '''
-          }
+            timeout(time: 6, unit: 'HOURS')
+            {
+              sh "echo \"building on node ${env.NODE_NAME}\""
+              sh '''#!/bin/bash
+                 set -e
+                 set -x
+                 export NP=`grep -c ^processor /proc/cpuinfo`
+                 export TEST_TIME_LIMIT=1200
+                 mkdir -p /home/dealii/build
+                 cd /home/dealii/build
+                 cmake -G "Ninja" \
+                   -D DEAL_II_CXX_FLAGS='-Werror' \
+                   -D CMAKE_BUILD_TYPE=Debug \
+                   -D DEAL_II_WITH_MPI=OFF \
+                   -D DEAL_II_WITH_CXX14=OFF \
+                   -D DEAL_II_UNITY_BUILD=ON \
+                   $WORKSPACE/
+                 time ninja -j $NP
+                 time ninja test # quicktests
+                 time ninja setup_tests
+                 time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
+              '''
+            }
           }
         }
 
@@ -170,26 +181,27 @@ pipeline
 
           steps
           {
-          timeout(time: 6, unit: 'HOURS')
-          {
-            sh "echo \"building on node ${env.NODE_NAME}\""
-            sh '''#!/bin/bash
-                set -e
-                export NP=`grep -c ^processor /proc/cpuinfo`
-                mkdir -p /home/dealii/build
-                cd /home/dealii/build
-                cmake -G "Ninja" \
-                  -D DEAL_II_CXX_FLAGS='-Werror' \
-                  -D CMAKE_BUILD_TYPE=Debug \
-                  -D DEAL_II_WITH_MPI=ON \
-                  -D DEAL_II_UNITY_BUILD=OFF \
-                  $WORKSPACE/
-                time ninja -j $NP
-                time ninja test # quicktests
-                time ninja setup_tests
-                time ctest -R "all-headers|multigrid/transfer" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
-            '''
-          }
+            timeout(time: 6, unit: 'HOURS')
+            {
+              sh "echo \"building on node ${env.NODE_NAME}\""
+              sh '''#!/bin/bash
+                  set -e
+                  set -x
+                  export NP=`grep -c ^processor /proc/cpuinfo`
+                  mkdir -p /home/dealii/build
+                  cd /home/dealii/build
+                  cmake -G "Ninja" \
+                    -D DEAL_II_CXX_FLAGS='-Werror' \
+                    -D CMAKE_BUILD_TYPE=Debug \
+                    -D DEAL_II_WITH_MPI=ON \
+                    -D DEAL_II_UNITY_BUILD=OFF \
+                    $WORKSPACE/
+                  time ninja -j $NP
+                  time ninja test # quicktests
+                  time ninja setup_tests
+                  time ctest -R "all-headers|multigrid/transfer|matrix_free/matrix_" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
+              '''
+            }
           }
 
         }

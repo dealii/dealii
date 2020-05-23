@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,6 @@
 
 // test VectorTools::interpolate_to_different_mesh in parallel
 
-using namespace dealii;
 
 namespace LA
 {

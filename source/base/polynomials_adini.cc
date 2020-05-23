@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomials_adini.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 #define ENTER_COEFFICIENTS(                                   \
   koefs, z, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \
@@ -35,16 +36,21 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-PolynomialsAdini::PolynomialsAdini()
-  : coef(12, 12)
+
+template <int dim>
+PolynomialsAdini<dim>::PolynomialsAdini()
+  : ScalarPolynomialsBase<dim>(3, 12)
+  , coef(12, 12)
   , dx(12, 12)
   , dy(12, 12)
   , dxx(12, 12)
   , dyy(12, 12)
   , dxy(12, 12)
 {
-  //                       1  x  y  xx yy xy 3x 3y xyy xxy 3xy x3y
-  //                       0  1  2  3  4  5  6  7  8  9 10 11
+  Assert(dim == 2, ExcNotImplemented());
+
+  //                          1  x  y  xx yy xy 3x 3y xyy xxy 3xy x3y
+  //                          0  1  2  3  4  5  6  7  8   9   10  11
   ENTER_COEFFICIENTS(coef, 0, 1, 0, 0, -3, -3, -1, 2, 2, 3, 3, -2, -2);
   ENTER_COEFFICIENTS(coef, 1, 0, 1, 0, -2, 0, -1, 1, 0, 0, 2, -1, 0);
   ENTER_COEFFICIENTS(coef, 2, 0, 0, 1, 0, -2, -1, 0, 1, 2, 0, 0, -1);
@@ -84,7 +90,6 @@ PolynomialsAdini::PolynomialsAdini()
   ENTER_COEFFICIENTS(dy, 10, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0);
   ENTER_COEFFICIENTS(dy, 11, 0, 0, 0, 0, 0, -2, 0, 0, 3, 0, 0, 0);
 
-  //                       0  1  2  3  4  5  6  7  8  9 10 11
   ENTER_COEFFICIENTS(dxx, 0, -6, 12, 6, 0, 0, -12, 0, 0, 0, 0, 0, 0);
   ENTER_COEFFICIENTS(dxx, 1, -4, 6, 4, 0, 0, -6, 0, 0, 0, 0, 0, 0);
   ENTER_COEFFICIENTS(dxx, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -125,12 +130,34 @@ PolynomialsAdini::PolynomialsAdini()
   ENTER_COEFFICIENTS(dxy, 11, 0, 0, -2, 0, 3, 0, 0, 0, 0, 0, 0, 0);
 }
 
+
+
+template <int dim>
 void
-PolynomialsAdini::compute(const Point<2> &           unit_point,
-                          std::vector<double> &      values,
-                          std::vector<Tensor<1, 2>> &grads,
-                          std::vector<Tensor<2, 2>> &grad_grads) const
+PolynomialsAdini<dim>::evaluate(
+  const Point<dim> &           unit_point,
+  std::vector<double> &        values,
+  std::vector<Tensor<1, dim>> &grads,
+  std::vector<Tensor<2, dim>> &grad_grads,
+  std::vector<Tensor<3, dim>> &third_derivatives,
+  std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
+  const unsigned int n_pols = this->n();
+  (void)n_pols;
+
+  Assert(values.size() == n_pols || values.size() == 0,
+         ExcDimensionMismatch(values.size(), n_pols));
+  Assert(grads.size() == n_pols || grads.size() == 0,
+         ExcDimensionMismatch(grads.size(), n_pols));
+  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+         ExcDimensionMismatch(grad_grads.size(), n_pols));
+  (void)third_derivatives;
+  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
+         ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  (void)fourth_derivatives;
+  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
+         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+
   if (values.empty() == false) // do not bother if empty
     {
       for (unsigned int i = 0; i < values.size(); ++i)
@@ -154,11 +181,16 @@ PolynomialsAdini::compute(const Point<2> &           unit_point,
           grad_grads[i] = compute_grad_grad(i, unit_point);
         }
     }
+
   return;
 }
 
+
+
+template <int dim>
 double
-PolynomialsAdini::compute_value(const unsigned int i, const Point<2> &p) const
+PolynomialsAdini<dim>::compute_value(const unsigned int i,
+                                     const Point<dim> & p) const
 {
   const double x = p(0);
   const double y = p(1);
@@ -169,12 +201,16 @@ PolynomialsAdini::compute_value(const unsigned int i, const Point<2> &p) const
          coef(11, i) * x * y * y * y;
 }
 
-Tensor<1, 2>
-PolynomialsAdini::compute_grad(const unsigned int i, const Point<2> &p) const
+
+
+template <int dim>
+Tensor<1, dim>
+PolynomialsAdini<dim>::compute_grad(const unsigned int i,
+                                    const Point<dim> & p) const
 {
-  const double x = p(0);
-  const double y = p(1);
-  Tensor<1, 2> tensor;
+  const double   x = p(0);
+  const double   y = p(1);
+  Tensor<1, dim> tensor;
   tensor[0] = dx(0, i) + dx(1, i) * x + dx(2, i) * y + dx(3, i) * x * x +
               dx(4, i) * y * y + dx(5, i) * x * y + dx(6, i) * x * x * x +
               dx(7, i) * y * y * y + dx(8, i) * x * y * y +
@@ -189,13 +225,16 @@ PolynomialsAdini::compute_grad(const unsigned int i, const Point<2> &p) const
   return tensor;
 }
 
-Tensor<2, 2>
-PolynomialsAdini::compute_grad_grad(const unsigned int i,
-                                    const Point<2> &   p) const
+
+
+template <int dim>
+Tensor<2, dim>
+PolynomialsAdini<dim>::compute_grad_grad(const unsigned int i,
+                                         const Point<dim> & p) const
 {
-  const double x = p(0);
-  const double y = p(1);
-  Tensor<2, 2> tensor;
+  const double   x = p(0);
+  const double   y = p(1);
+  Tensor<2, dim> tensor;
   tensor[0][0] = dxx(0, i) + dxx(1, i) * x + dxx(2, i) * y + dxx(3, i) * x * x +
                  dxx(4, i) * y * y + dxx(5, i) * x * y + dxx(6, i) * x * x * x +
                  dxx(7, i) * y * y * y + dxx(8, i) * x * y * y +
@@ -215,5 +254,20 @@ PolynomialsAdini::compute_grad_grad(const unsigned int i,
   return tensor;
 }
 
+
+
+template <int dim>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+PolynomialsAdini<dim>::clone() const
+{
+  return std_cxx14::make_unique<PolynomialsAdini<dim>>(*this);
+}
+
+
+
+template class PolynomialsAdini<0>;
+template class PolynomialsAdini<1>;
+template class PolynomialsAdini<2>;
+template class PolynomialsAdini<3>;
 
 DEAL_II_NAMESPACE_CLOSE

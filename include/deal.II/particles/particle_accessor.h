@@ -16,6 +16,8 @@
 #ifndef dealii_particles_particle_accessor_h
 #define dealii_particles_particle_accessor_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
 
 #include <deal.II/grid/tria.h>
@@ -26,10 +28,13 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  // Forward declarations
+#ifndef DOXYGEN
   template <int, int>
   class ParticleIterator;
   template <int, int>
   class ParticleHandler;
+#endif
 
   /**
    * Accessor class used by ParticleIterator to access particle data.

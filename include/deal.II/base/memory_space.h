@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,7 @@ namespace MemorySpace
     /**
      * Pointer to data on the host.
      */
-    std::unique_ptr<Number[], decltype(&free)> values;
+    std::unique_ptr<Number[], decltype(&std::free)> values;
 
     /**
      * Pointer to data on the device.
@@ -114,7 +114,7 @@ namespace MemorySpace
   struct MemorySpaceData<Number, Host>
   {
     MemorySpaceData()
-      : values(nullptr, &free)
+      : values(nullptr, &std::free)
     {}
 
     void
@@ -129,7 +129,7 @@ namespace MemorySpace
       std::copy(begin, begin + n_elements, values.get());
     }
 
-    std::unique_ptr<Number[], decltype(&free)> values;
+    std::unique_ptr<Number[], decltype(&std::free)> values;
 
     // This is not used but it allows to simplify the code until we start using
     // CUDA-aware MPI.
@@ -153,7 +153,7 @@ namespace MemorySpace
   struct MemorySpaceData<Number, CUDA>
   {
     MemorySpaceData()
-      : values(nullptr, &free)
+      : values(nullptr, &std::free)
       , values_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
     {}
 
@@ -179,8 +179,8 @@ namespace MemorySpace
       AssertCuda(cuda_error_code);
     }
 
-    std::unique_ptr<Number[], decltype(&free)>    values;
-    std::unique_ptr<Number[], void (*)(Number *)> values_dev;
+    std::unique_ptr<Number[], decltype(&std::free)> values;
+    std::unique_ptr<Number[], void (*)(Number *)>   values_dev;
   };
 
 

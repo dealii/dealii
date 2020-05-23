@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,6 @@
 // transform_unit_to_real_cell, we lost nearly all digits of precision due to
 // roundoff.
 
-using namespace dealii;
 
 class RefineTest
 {

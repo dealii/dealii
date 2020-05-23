@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,14 +46,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_ABF<dim>::FE_ABF(const unsigned int deg)
-  : FE_PolyTensor<PolynomialsABF<dim>, dim>(
-      deg,
+  : FE_PolyTensor<dim>(
+      PolynomialsABF<dim>(deg),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 2,
                              FiniteElementData<dim>::Hdiv),
-      std::vector<bool>(PolynomialsABF<dim>::compute_n_pols(deg), true),
-      std::vector<ComponentMask>(PolynomialsABF<dim>::compute_n_pols(deg),
+      std::vector<bool>(PolynomialsABF<dim>::n_polynomials(deg), true),
+      std::vector<ComponentMask>(PolynomialsABF<dim>::n_polynomials(deg),
                                  std::vector<bool>(dim, true)))
   , rt_order(deg)
 {
@@ -333,7 +333,7 @@ FE_ABF<dim>::initialize_restriction()
   const unsigned int n_face_points = q_base.size();
   // First, compute interpolation on
   // subfaces
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (unsigned int face : GeometryInfo<dim>::face_indices())
     {
       // The shape functions of the
       // child cell are evaluated
@@ -491,10 +491,8 @@ bool
 FE_ABF<dim>::has_support_on_face(const unsigned int shape_index,
                                  const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // Return computed values if we
   // know them easily. Otherwise, it
@@ -548,7 +546,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 
   const unsigned int n_face_points = boundary_weights.size(0);
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (unsigned int face : GeometryInfo<dim>::face_indices())
     for (unsigned int k = 0; k < n_face_points; ++k)
       for (unsigned int i = 0; i < boundary_weights.size(1); ++i)
         {
@@ -582,7 +580,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
           support_point_values[k + start_cell_points][d];
 
   // Face integral of ABF terms
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (unsigned int face : GeometryInfo<dim>::face_indices())
     {
       const double n_orient = GeometryInfo<dim>::unit_normal_orientation[face];
       for (unsigned int fp = 0; fp < n_face_points; ++fp)

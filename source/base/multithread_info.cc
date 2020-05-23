@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,9 +28,9 @@
 #include <algorithm>
 
 #ifdef DEAL_II_WITH_THREADS
-#  include <deal.II/base/thread_management.h>
-
+#  define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #  include <tbb/task_scheduler_init.h>
+#  undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #endif
 
 DEAL_II_NAMESPACE_OPEN

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,15 +37,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
-  : FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>(
-      deg,
+  : FE_PolyTensor<dim>(
+      PolynomialsRT_Bubbles<dim>(deg),
       FiniteElementData<dim>(get_dpo_vector(deg),
                              dim,
                              deg + 1,
                              FiniteElementData<dim>::Hdiv),
       get_ria_vector(deg),
-      std::vector<ComponentMask>(PolynomialsRT_Bubbles<dim>::compute_n_pols(
-                                   deg),
+      std::vector<ComponentMask>(PolynomialsRT_Bubbles<dim>::n_polynomials(deg),
                                  std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
@@ -240,7 +239,7 @@ std::vector<bool>
 FE_RT_Bubbles<dim>::get_ria_vector(const unsigned int deg)
 {
   const unsigned int dofs_per_cell =
-    PolynomialsRT_Bubbles<dim>::compute_n_pols(deg);
+    PolynomialsRT_Bubbles<dim>::n_polynomials(deg);
   unsigned int dofs_per_face = deg + 1;
   for (unsigned int d = 2; d < dim; ++d)
     dofs_per_face *= deg + 1;

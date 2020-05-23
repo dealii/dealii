@@ -31,7 +31,6 @@ TimestepControl::TimestepControl(double start,
   : start_val(start)
   , final_val(final)
   , tolerance_val(tolerance)
-  , strategy_val(uniform)
   , start_step_val(start_step)
   , max_step_val(max_step)
   , min_step_val(0)
@@ -41,7 +40,6 @@ TimestepControl::TimestepControl(double start,
   , next_print_val(print_step > 0. ? start_val + print_step : start_val - 1.)
 {
   now_val = start_val;
-  strcpy(format, "T.%06.3f");
 
   // avoid compiler warning
   (void)min_step_val;
@@ -54,13 +52,10 @@ TimestepControl::declare_parameters(ParameterHandler &param)
 {
   param.declare_entry("Start", "0.", Patterns::Double());
   param.declare_entry("Final", "1.", Patterns::Double());
-  param.declare_entry("First step", "1.e-2", Patterns::Double());
-  param.declare_entry("Max step", "1.", Patterns::Double());
-  param.declare_entry("Tolerance", "1.e-2", Patterns::Double());
+  param.declare_entry("First step", "1.e-2", Patterns::Double(0.));
+  param.declare_entry("Max step", "1.", Patterns::Double(0.));
+  param.declare_entry("Tolerance", "1.e-2", Patterns::Double(0.));
   param.declare_entry("Print step", "-1.", Patterns::Double());
-  param.declare_entry("Strategy",
-                      "uniform",
-                      Patterns::Selection("uniform|doubling"));
 }
 
 
@@ -73,12 +68,7 @@ TimestepControl::parse_parameters(ParameterHandler &param)
   max_step(param.get_double("Max step"));
   final(param.get_double("Final"));
   tolerance(param.get_double("Tolerance"));
-  print_step                 = param.get_double("Print step");
-  const std::string strategy = param.get("Strategy");
-  if (strategy == std::string("uniform"))
-    strategy_val = uniform;
-  else if (strategy == std::string("doubling"))
-    strategy_val = doubling;
+  print_step = param.get_double("Print step");
 }
 
 
@@ -86,41 +76,24 @@ TimestepControl::parse_parameters(ParameterHandler &param)
 bool
 TimestepControl::advance()
 {
-  bool   changed = false;
-  double s       = step_val;
-
-  // Do time step control, but not in
-  // first step.
-  if (now_val != start())
-    {
-      if (strategy_val == doubling && 2 * s <= tolerance_val)
-        s *= 2;
-      if (s > max_step_val)
-        s = max_step_val;
-    }
+  bool changed = false;
 
   // Try incrementing time by s
-  double h = now_val + s;
-  changed  = s != step_val;
+  double now_trial = now_val + step_val;
+  current_step_val = step_val;
 
-  step_val         = s;
-  current_step_val = s;
-  // If we just missed the final
-  // time, increase the step size a
-  // bit. This way, we avoid a very
-  // small final step. If the step
-  // shot over the final time, adjust
-  // it so we hit the final time
-  // exactly.
-  double s1 = .01 * s;
-  if (h > final_val - s1)
+  // If we just missed the final time, increase the step size a bit. This way,
+  // we avoid a very small final step. If the step shot over the final time,
+  // adjust it so we hit the final time exactly.
+  double s1 = .01 * step_val;
+  if (now_trial > final_val - s1)
     {
       current_step_val = final_val - now_val;
-      h                = final_val;
+      now_trial        = final_val;
       changed          = true;
     }
 
-  now_val = h;
+  now_val = now_trial;
   return changed;
 }
 

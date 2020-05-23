@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,10 +18,6 @@
 // same test as matrix_vector_stokes_noflux, but allocating FEEvaluation on
 // the heap (using AlignedVector) instead of allocating it on the stack. Tests
 // also copy constructors of FEEvaluation.
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/utilities.h>
@@ -51,6 +47,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -187,10 +185,8 @@ test()
   DoFTools::make_hanging_node_constraints(dof_handler_p, constraints_p);
   constraints_p.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(dof_handler,
-                                 dofs_per_block,
-                                 stokes_sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, stokes_sub_blocks);
 
   // std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -338,7 +334,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

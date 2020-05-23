@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,12 +27,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
+#ifndef DOXYGEN
 template <typename Number>
 class Vector;
 template <typename Range, typename Domain, typename Payload>
 class LinearOperator;
 template <typename Range = Vector<double>>
 class PackagedOperation;
+#endif
 
 
 /**
@@ -61,33 +63,33 @@ class PackagedOperation;
  *
  * As an example consider the addition of multiple vectors
  * @code
- *   dealii::Vector<double> a, b, c, d;
+ *   Vector<double> a, b, c, d;
  *   // ..
- *   dealii::Vector<double> result = a + b - c + d;
+ *   Vector<double> result = a + b - c + d;
  * @endcode
  * or the computation of a residual $b-Ax$:
  * @code
- *   dealii::SparseMatrix<double> A;
- *   dealii::Vector<double> b, x;
+ *   SparseMatrix<double> A;
+ *   Vector<double> b, x;
  *   // ..
  *   const auto op_a = linear_operator(A);
  *
- *   dealii::Vector<double> residual =  b - op_a * x;
+ *   auto residual =  b - op_a * x;
  * @endcode
  * The expression <code>residual</code> is of type
- * <code>PackagedOperation<dealii::Vector<double>></code>. It stores
+ * <code>PackagedOperation<Vector<double>></code>. It stores
  * references to <code>A</code>, <code>b</code> and <code>x</code> and defers
  * the actual computation until <code>apply</code>, or <code>apply_add</code>
  * are explicitly invoked,
  * @code
- *   dealii::Vector<double> y;
+ *   Vector<double> y;
  *   residual.reinit_vector(y);
  *   residual.apply(y);
  *   residual.apply_add(y);
  * @endcode
  * or until the @p PackagedOperation object is implicitly converted:
  * @code
- *   dealii::Vector<double> y;
+ *   Vector<double> y;
  *   y = residual;
  *   y += residual;
  *   y -= residual;

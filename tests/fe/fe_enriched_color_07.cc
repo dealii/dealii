@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -752,7 +752,7 @@ EstimateEnrichmentFunction::assemble_system()
       rhs_values.resize(n_q_points);
       rhs.value_list(fe_values.get_quadrature_points(), rhs_values);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const auto q_index : fe_values.quadrature_point_indices())
         {
           double radius = center.distance(fe_values.quadrature_point(q_index));
 
@@ -1521,7 +1521,7 @@ LaplaceProblem<dim>::assemble_system()
                                   tmp_rhs_value);
 
             // add tmp to the total one at quadrature points
-            for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for (const auto q_point : fe_values.quadrature_point_indices())
               {
                 rhs_value[q_point] += tmp_rhs_value[q_point];
               }
@@ -1534,7 +1534,7 @@ LaplaceProblem<dim>::assemble_system()
         cell_system_matrix = 0;
         cell_rhs           = 0;
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = i; j < dofs_per_cell; ++j)

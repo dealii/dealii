@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,11 +22,6 @@ for (deal_II_dimension : DIMENSIONS)
                                     std::ostream &) const;
     template void GridOut::write_mathgl(
       const Triangulation<deal_II_dimension> &, std::ostream &) const;
-#endif
-
-#if deal_II_dimension != 2
-    template void GridOut::write_svg(const Triangulation<deal_II_dimension> &,
-                                     std::ostream &) const;
 #endif
 
     template void GridOut::write_msh(const Triangulation<deal_II_dimension> &,
@@ -72,13 +67,18 @@ for (deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension < deal_II_space_dimension
-
-#  if deal_II_dimension != 2
+#if deal_II_dimension <= deal_II_space_dimension
+    // Instantiate write_svg exception for the <2,2> case for which there
+    // is an overload that takes care of that case.
+#  if !(deal_II_dimension == 2 && deal_II_space_dimension == 2)
     template void GridOut::write_svg(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       std::ostream &) const;
 #  endif
+#endif
+
+
+#if deal_II_dimension < deal_II_space_dimension
 
     template void GridOut::write_msh(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,

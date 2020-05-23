@@ -1,0 +1,74 @@
+
+DEAL::ShortPRM format: 
+DEAL::========================================
+set A double = 1
+subsection Section two
+  set Another double = 2
+end
+
+DEAL::ShortXML format: 
+DEAL::========================================
+<?xml version="1.0" encoding="utf-8"?>
+<ParameterHandler><A_20double>1</A_20double><Section_20two><Another_20double>2</Another_20double></Section_20two></ParameterHandler>
+
+DEAL::ShortJSON format: 
+DEAL::========================================
+{
+    "A_20double": "1",
+    "Section_20two":
+    {
+        "Another_20double": "2"
+    }
+}
+
+DEAL::ShortLaTeX format: 
+DEAL::========================================
+\subsection{Global parameters}
+\label{parameters:global}
+
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt A double}
+\phantomsection\label{parameters:A double}
+\label{parameters:A_20double}
+
+
+\index[prmindex]{A double}
+\index[prmindexfull]{A double}
+{\it Value:} 1
+
+
+{\it Default:} 1
+
+
+\end{itemize}
+
+
+
+\subsection{Parameters in section \tt Section two}
+\label{parameters:Section_20two}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt Another double}
+\phantomsection\label{parameters:Section two/Another double}
+\label{parameters:Section_20two/Another_20double}
+
+
+\index[prmindex]{Another double}
+\index[prmindexfull]{Section two!Another double}
+{\it Value:} 2
+
+
+{\it Default:} 2
+
+
+\end{itemize}
+
+DEAL::Short | Description format: 
+DEAL::========================================
+Listing of Parameters:
+
+set A double  =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
+subsection Section two
+  set Another double  =   A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE
+

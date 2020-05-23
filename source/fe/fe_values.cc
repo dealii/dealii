@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -147,8 +147,7 @@ namespace FEValuesViews
     , shape_function_data(this->fe_values->fe->dofs_per_cell)
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
-    Assert(component < fe.n_components(),
-           ExcIndexRange(component, 0, fe.n_components()));
+    AssertIndexRange(component, fe.n_components());
 
     // TODO: we'd like to use the fields with the same name as these
     // variables from FEValuesBase, but they aren't initialized yet
@@ -193,10 +192,7 @@ namespace FEValuesViews
     , shape_function_data(this->fe_values->fe->dofs_per_cell)
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
-    Assert(first_vector_component + spacedim - 1 < fe.n_components(),
-           ExcIndexRange(first_vector_component + spacedim - 1,
-                         0,
-                         fe.n_components()));
+    AssertIndexRange(first_vector_component + spacedim - 1, fe.n_components());
 
     // TODO: we'd like to use the fields with the same name as these
     // variables from FEValuesBase, but they aren't initialized yet
@@ -364,10 +360,7 @@ namespace FEValuesViews
     , shape_function_data(this->fe_values->fe->dofs_per_cell)
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
-    Assert(first_tensor_component + dim * dim - 1 < fe.n_components(),
-           ExcIndexRange(first_tensor_component + dim * dim - 1,
-                         0,
-                         fe.n_components()));
+    AssertIndexRange(first_tensor_component + dim * dim - 1, fe.n_components());
     // TODO: we'd like to use the fields with the same name as these
     // variables from FEValuesBase, but they aren't initialized yet
     // at the time we get here, so re-create it all
@@ -2745,7 +2738,7 @@ private:
  * be possible to call FEValues::reinit() with a tria iterator only; this class
  * makes this possible, but whenever one of the functions of FEValues tries to
  * call any of the functions of this class, an exception will be raised
- * reminding the user that if she wants to use these features, then the FEValues
+ * reminding the user that if they want to use these features, then the FEValues
  * object has to be reinitialized with a cell iterator that allows to extract
  * degree of freedom information.
  *
@@ -2847,7 +2840,7 @@ FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
   const IndexSet &              in,
   Vector<IndexSet::value_type> &out) const
 {
-  Assert(cell->has_children() == false, ExcNotImplemented());
+  Assert(cell->is_active(), ExcNotImplemented());
 
   std::vector<types::global_dof_index> dof_indices(
     cell->get_fe().dofs_per_cell);
@@ -4203,18 +4196,6 @@ FEValuesBase<dim, spacedim>::get_cell() const
 
 template <int dim, int spacedim>
 const std::vector<Tensor<1, spacedim>> &
-FEValuesBase<dim, spacedim>::get_all_normal_vectors() const
-{
-  Assert(this->update_flags & update_normal_vectors,
-         (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
-           "update_normal_vectors")));
-  return get_normal_vectors();
-}
-
-
-
-template <int dim, int spacedim>
-const std::vector<Tensor<1, spacedim>> &
 FEValuesBase<dim, spacedim>::get_normal_vectors() const
 {
   Assert(this->update_flags & update_normal_vectors,
@@ -4303,13 +4284,11 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
           // triangulations
           invalidate_present_cell();
           tria_listener_refinement =
-            cell->get_triangulation().signals.any_change.connect(std::bind(
-              &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-              std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+            cell->get_triangulation().signals.any_change.connect(
+              [this]() { this->invalidate_present_cell(); });
           tria_listener_mesh_transform =
-            cell->get_triangulation().signals.mesh_movement.connect(std::bind(
-              &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-              std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+            cell->get_triangulation().signals.mesh_movement.connect(
+              [this]() { this->invalidate_present_cell(); });
         }
     }
   else
@@ -4318,13 +4297,11 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
       // at least subscribe to the triangulation to get notified of
       // changes
       tria_listener_refinement =
-        cell->get_triangulation().signals.post_refinement.connect(std::bind(
-          &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-          std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+        cell->get_triangulation().signals.post_refinement.connect(
+          [this]() { this->invalidate_present_cell(); });
       tria_listener_mesh_transform =
-        cell->get_triangulation().signals.mesh_movement.connect(std::bind(
-          &FEValuesBase<dim, spacedim>::invalidate_present_cell,
-          std::ref(static_cast<FEValuesBase<dim, spacedim> &>(*this))));
+        cell->get_triangulation().signals.mesh_movement.connect(
+          [this]() { this->invalidate_present_cell(); });
     }
 }
 
@@ -4771,8 +4748,7 @@ FEFaceValues<dim, spacedim>::reinit(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
 
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
@@ -4789,13 +4765,25 @@ FEFaceValues<dim, spacedim>::reinit(
 
 
 template <int dim, int spacedim>
+template <template <int, int> class DoFHandlerType, bool lda>
+void
+FEFaceValues<dim, spacedim>::reinit(
+  const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>, lda>> &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &             face)
+{
+  const auto face_n = cell->face_iterator_to_index(face);
+  reinit(cell, face_n);
+}
+
+
+
+template <int dim, int spacedim>
 void
 FEFaceValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no)
 {
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
@@ -4806,6 +4794,18 @@ FEFaceValues<dim, spacedim>::reinit(
   // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit(face_no);
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEFaceValues<dim, spacedim>::reinit(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &face)
+{
+  const auto face_n = cell->face_iterator_to_index(face);
+  reinit(cell, face_n);
 }
 
 
@@ -4949,8 +4949,7 @@ FESubfaceValues<dim, spacedim>::reinit(
            static_cast<const FiniteElementData<dim> &>(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
   // We would like to check for subface_no < cell->face(face_no)->n_children(),
   // but unfortunately the current function is also called for
   // faces without children (see tests/fe/mapping.cc). Therefore,
@@ -4985,16 +4984,38 @@ FESubfaceValues<dim, spacedim>::reinit(
 
 
 template <int dim, int spacedim>
+template <template <int, int> class DoFHandlerType, bool lda>
+void
+FESubfaceValues<dim, spacedim>::reinit(
+  const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>, lda>> &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &             face,
+  const typename Triangulation<dim, spacedim>::face_iterator &subface)
+{
+  reinit(cell,
+         cell->face_iterator_to_index(face),
+         face->child_iterator_to_index(subface));
+}
+
+
+
+template <int dim, int spacedim>
 void
 FESubfaceValues<dim, spacedim>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          subface_no)
 {
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert(subface_no < cell->face(face_no)->n_children(),
-         ExcIndexRange(subface_no, 0, cell->face(face_no)->n_children()));
+  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  // We would like to check for subface_no < cell->face(face_no)->n_children(),
+  // but unfortunately the current function is also called for
+  // faces without children for periodic faces, which have hanging nodes on
+  // the other side (see include/deal.II/matrix_free/mapping_info.templates.h).
+  AssertIndexRange(subface_no,
+                   (cell->has_periodic_neighbor(face_no) ?
+                      cell->periodic_neighbor(face_no)
+                        ->face(cell->periodic_neighbor_face_no(face_no))
+                        ->n_children() :
+                      cell->face(face_no)->n_children()));
 
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
@@ -5005,6 +5026,20 @@ FESubfaceValues<dim, spacedim>::reinit(
   // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit(face_no, subface_no);
+}
+
+
+
+template <int dim, int spacedim>
+void
+FESubfaceValues<dim, spacedim>::reinit(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &face,
+  const typename Triangulation<dim, spacedim>::face_iterator &subface)
+{
+  reinit(cell,
+         cell->face_iterator_to_index(face),
+         face->child_iterator_to_index(subface));
 }
 
 

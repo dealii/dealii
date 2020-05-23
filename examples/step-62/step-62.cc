@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -66,7 +66,7 @@
 #include <deal.II/numerics/vector_tools.h>
 
 // We need this header for the function GridTools::find_active_cell_around_point
-// that we use in the function `ElasticWave<dim>::store_frequency_step_data()`
+// that we use in the function `ElasticWave::store_frequency_step_data()`
 #include <deal.II/grid/grid_tools.h>
 
 namespace step62
@@ -346,7 +346,7 @@ namespace step62
     HDF5::DataSet frequency_dataset;
     HDF5::DataSet probe_positions_dataset;
 
-    // HDF5 dataset that stores the values of the energy measured by the proble.
+    // HDF5 dataset that stores the values of the energy measured by the probe.
     HDF5::DataSet displacement;
 
 
@@ -358,7 +358,7 @@ namespace step62
 
   // @sect3{Implementation of the auxiliary classes}
 
-  // @sect4{The `RightHandSide` class}
+  // @sect4{The `RightHandSide` class implementation}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
   // the HDF5::Group::get_attribute() function.
@@ -420,7 +420,7 @@ namespace step62
 
 
 
-  // @sect4{The `PML` class}
+  // @sect4{The `PML` class implementation}
 
   // As before, the constructor reads all the parameters from the HDF5::Group
   // `data` using the HDF5::Group::get_attribute() function. As we have
@@ -483,7 +483,7 @@ namespace step62
 
 
 
-  // @sect4{The `Rho` class}
+  // @sect4{The `Rho` class implementation}
 
   // This class is used to define the mass density. As we have explaine before,
   // a phononic superlattice cavity is formed by two
@@ -646,7 +646,7 @@ namespace step62
 
 
 
-  // @sect4{The `Parameters` class}
+  // @sect4{The `Parameters` class implementation}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
   // the HDF5::Group::get_attribute() function.
@@ -677,7 +677,7 @@ namespace step62
 
 
 
-  // @sect4{The `QuadratureCache` class}
+  // @sect4{The `QuadratureCache` class implementation}
 
   // We need to reserve enough space for the mass and stiffness matrices and the
   // right hand side vector.
@@ -764,11 +764,10 @@ namespace step62
     DynamicSparsityPattern dsp(locally_relevant_dofs);
 
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      dsp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      mpi_communicator,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(dsp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
 
     system_matrix.reinit(locally_owned_dofs,
                          locally_owned_dofs,
@@ -1105,17 +1104,10 @@ namespace step62
     // been described in step-40.
     if (parameters.save_vtu_files)
       {
-        std::vector<std::string> solution_names(1, "displacement_x");
-        if (dim >= 2)
-          {
-            solution_names.emplace_back("displacement_y");
-          }
-        if (dim == 3)
-          {
-            solution_names.emplace_back("displacement_z");
-          }
+        std::vector<std::string> solution_names(dim, "displacement");
         std::vector<DataComponentInterpretation::DataComponentInterpretation>
-          interpretation(dim, DataComponentInterpretation::component_is_scalar);
+          interpretation(
+            dim, DataComponentInterpretation::component_is_part_of_vector);
 
         DataOut<dim> data_out;
         data_out.add_data_vector(dof_handler,

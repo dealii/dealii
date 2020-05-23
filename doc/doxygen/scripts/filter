@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2007 - 2018 by the deal.II authors
+## Copyright (C) 2007 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -59,6 +59,11 @@ while (<>)
     {
         s/::dealii::(.*)\\$/::\1        \\/g;
         s/dealii::(.*)\\$/\1        \\/g;
+    }
+    elsif (m/using namespace dealii::/)
+    {
+        # namespace declarations (see, e.g., step-40) in source code don't work
+        # if we cut off the 'dealii::' part, so leave it in that case.
     }
     else
     {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,14 +97,14 @@ check(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   DoFRenumbering::component_wise(mg_dof_handler);
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     DoFRenumbering::component_wise(mg_dof_handler, level);
 
   MGTransferPrebuilt<Vector<double>> transfer;
-  transfer.build_matrices(mg_dof_handler);
+  transfer.build(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
                                  mg_dof_handler.n_dofs(0));
@@ -126,9 +126,8 @@ check(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // TODO: do in 1d
   check(FESystem<2>(FE_Q<2>(1), 2));

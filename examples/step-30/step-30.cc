@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -451,9 +451,7 @@ namespace Step30
 
         cell->get_dof_indices(dofs);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
+        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
             const auto face = cell->face(face_no);
 
@@ -643,8 +641,8 @@ namespace Step30
   template <int dim>
   void DGMethod<dim>::solve(Vector<double> &solution)
   {
-    SolverControl      solver_control(1000, 1e-12, false, false);
-    SolverRichardson<> solver(solver_control);
+    SolverControl                    solver_control(1000, 1e-12, false, false);
+    SolverRichardson<Vector<double>> solver(solver_control);
 
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
@@ -726,9 +724,7 @@ namespace Step30
           Point<dim> jump;
           Point<dim> area;
 
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (unsigned int face_no : GeometryInfo<dim>::face_indices())
             {
               const auto face = cell->face(face_no);
 
@@ -905,9 +901,10 @@ namespace Step30
 
   // @sect3{The Rest}
   //
-  // The remaining part of the program is again unmodified. Only the creation
-  // of the original triangulation is changed in order to reproduce the new
-  // domain.
+  // The remaining part of the program very much follows the scheme of
+  // previous tutorial programs. We output the mesh in VTU format (just
+  // as we did in step-1, for example), and the visualization output
+  // in VTU format as we almost always do.
   template <int dim>
   void DGMethod<dim>::output_results(const unsigned int cycle) const
   {
@@ -917,42 +914,31 @@ namespace Step30
     else
       refine_type = ".iso";
 
-    std::string filename = "grid-";
-    filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
+    {
+      const std::string filename =
+        "grid-" + std::to_string(cycle) + refine_type + ".svg";
+      std::cout << "   Writing grid to <" << filename << ">..." << std::endl;
+      std::ofstream svg_output(filename);
 
-    filename += refine_type + ".eps";
-    std::cout << "Writing grid to <" << filename << ">..." << std::endl;
-    std::ofstream eps_output(filename);
+      GridOut grid_out;
+      grid_out.write_svg(triangulation, svg_output);
+    }
 
-    GridOut grid_out;
-    grid_out.write_eps(triangulation, eps_output);
+    {
+      const std::string filename =
+        "sol-" + std::to_string(cycle) + refine_type + ".vtu";
+      std::cout << "   Writing solution to <" << filename << ">..."
+                << std::endl;
+      std::ofstream gnuplot_output(filename);
 
-    filename = "grid-";
-    filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector(solution2, "u");
 
-    filename += refine_type + ".gnuplot";
-    std::cout << "Writing grid to <" << filename << ">..." << std::endl;
-    std::ofstream gnuplot_grid_output(filename);
+      data_out.build_patches(degree);
 
-    grid_out.write_gnuplot(triangulation, gnuplot_grid_output);
-
-    filename = "sol-";
-    filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
-
-    filename += refine_type + ".gnuplot";
-    std::cout << "Writing solution to <" << filename << ">..." << std::endl;
-    std::ofstream gnuplot_output(filename);
-
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution2, "u");
-
-    data_out.build_patches(degree);
-
-    data_out.write_gnuplot(gnuplot_output);
+      data_out.write_vtu(gnuplot_output);
+    }
   }
 
 
@@ -997,11 +983,13 @@ namespace Step30
 
         Timer assemble_timer;
         assemble_system();
-        std::cout << "Time of assemble_system: " << assemble_timer.cpu_time()
+        std::cout << "   Time of assemble_system: " << assemble_timer.cpu_time()
                   << std::endl;
         solve(solution2);
 
         output_results(cycle);
+
+        std::cout << std::endl;
       }
   }
 } // namespace Step30
@@ -1012,7 +1000,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step30;
 
       // If you want to run the program in 3D, simply change the following

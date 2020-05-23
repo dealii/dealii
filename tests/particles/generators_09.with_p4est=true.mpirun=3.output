@@ -1,0 +1,22 @@
+
+DEAL:2d/2d::OK
+DEAL:2d/3d::OK
+DEAL:3d/3d::OK
+DEAL:2d/2d::OK
+DEAL:2d/3d::OK
+DEAL:3d/3d::OK
+EAL:2d/3d::Locally owned active cells: 0
+DEAL:2d/3d::Global particles: 1
+DEAL:2d/3d::OK
+DEAL:3d/3d::Locally owned active cells: 0
+DEAL:3d/3d::Global particles: 1
+DEAL:3d/3d::OK
+DEAL:2d/2d::Locally owned active cells: 0
+DEAL:2d/2d::Global particles: 1
+DEAL:2d/2d::OK
+DEAL:2d/3d::Locally owned active cells: 0
+DEAL:2d/3d::Global particles: 1
+DEAL:2d/3d::OK
+DEAL:3d/3d::Locally owned active cells: 0
+DEAL:3d/3d::Global particles: 1
+DEAL:3d/3d::OK

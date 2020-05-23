@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,13 +82,12 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  DoFHandler<dim>  mgdof(tr);
-  DoFHandler<dim> &dof = mgdof;
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof);
-  vector<types::global_dof_index> ndofs(fe.n_blocks());
-  DoFTools::count_dofs_per_block(mgdof, ndofs);
+  const vector<types::global_dof_index> ndofs =
+    DoFTools::count_dofs_per_fe_block(mgdof);
 
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l);
@@ -110,7 +109,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
     }
 
   MGTransferBlockSelect<double> transfer;
-  transfer.build_matrices(dof, mgdof, selected);
+  transfer.build(mgdof, selected);
 
   // First, prolongate the constant
   // function from the coarsest mesh
@@ -172,9 +171,8 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   FE_DGQ<2>                q0(0);
   FE_DGQ<2>                q1(1);

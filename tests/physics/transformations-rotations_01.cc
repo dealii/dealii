@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using namespace dealii::Physics;
 
 
@@ -95,9 +94,8 @@ normalise(const Point<3> &p)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   const double deg_to_rad = numbers::PI / 180.0;
 

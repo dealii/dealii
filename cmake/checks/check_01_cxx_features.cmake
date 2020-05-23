@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,8 +23,7 @@
 #
 #   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-#   DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
-#   DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+#   DEAL_II_HAVE_CXX14_CONSTEXPR
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #
@@ -581,8 +580,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
-  DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+  DEAL_II_HAVE_CXX14_CONSTEXPR
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
   )
@@ -728,31 +726,45 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
 
 #
+# Check for correct c++14 constexpr support.
+#
 # As long as there exists an argument value such that an invocation of the
 # function or constructor could be an evaluated subexpression of a core constant
 # expression, C++14 allows to call non-constexpr functions from constexpr
-# functions. Unfortunately, not all compilers obey the standard in this regard.
+# functions.
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  void bar()
-  {}
+# Unfortunately, not all compilers obey the standard in this regard. In some
+# cases, MSVC 2019 crashes with an internal compiler error when we
+# declare the respective functions as 'constexpr' even though the test below
+# passes, see #9080.
+#
+# We only run this check if we have CXX14 support, otherwise the use of constexpr
+# is limited (non-const constexpr functions for example).
+#
+IF(DEAL_II_WITH_CXX14 AND NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #define Assert(x,y) if (!(x)) throw y;
+    void bar()
+    {}
 
-  constexpr int
-  foo(const int n)
-  {
-    if(!(n >= 0))
-      bar();
-    return n;
-  }
+    constexpr int
+    foo(const int n)
+    {
+      Assert(n>0, \"hello\");
+      if(!(n >= 0))
+        bar();
+      return n;
+    }
 
-  int main()
-  {
-    constexpr unsigned int n=foo(1);
-    return n;
-  }
-  "
-  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+    int main()
+    {
+      constexpr unsigned int n=foo(1);
+      return n;
+    }
+    "
+    DEAL_II_HAVE_CXX14_CONSTEXPR)
+ENDIF()
 
 #
 # The macro DEAL_II_CONSTEXPR allows using c++ constexpr features in a portable way.
@@ -760,28 +772,10 @@ CHECK_CXX_SOURCE_COMPILES(
 # functions. This requirement is probabely very conservative in most cases, but
 # it will prevent breaking builds with certain compilers.
 #
-IF (DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+IF (DEAL_II_HAVE_CXX14_CONSTEXPR)
   SET(DEAL_II_CONSTEXPR "constexpr")
 ELSE()
   SET(DEAL_II_CONSTEXPR " ")
 ENDIF()
-
-#
-# Not all compilers with C++17 support include the new special math
-# functions. Check this separately so that we can use C++17 compilers that don't
-# support it.
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <cmath>
-
-  int main()
-  {
-    std::cyl_bessel_j(1.0, 1.0);
-    std::cyl_bessel_jf(1.0f, 1.0f);
-    std::cyl_bessel_jl(1.0, 1.0);
-  }
-  "
-  DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS)
 
 RESET_CMAKE_REQUIRED()

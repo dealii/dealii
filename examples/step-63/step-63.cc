@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
  *
- * Authors: Thomas Clevenger, Clemson University
- *          Timo Heister, University of Utah
+ * Authors: Thomas C. Clevenger, Clemson University
+ *          Timo Heister, Clemson University and University of Utah
  */
 
 // @sect3{Include files}
@@ -364,10 +364,6 @@ namespace Step63
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -410,10 +406,6 @@ namespace Step63
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -459,7 +451,7 @@ namespace Step63
 
 
 
-  // @sect3{Streamline diffusion}
+  // @sect3{Streamline diffusion implementation}
 
   // The streamline diffusion method has a stabilization constant that
   // we need to be able to compute. The choice of how this parameter
@@ -496,7 +488,7 @@ namespace Step63
   class AdvectionProblem
   {
   public:
-    AdvectionProblem(Settings settings);
+    AdvectionProblem(const Settings &settings);
     void run();
 
   private:
@@ -556,7 +548,7 @@ namespace Step63
 
 
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem(Settings settings)
+  AdvectionProblem<dim>::AdvectionProblem(const Settings &settings)
     : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
     , dof_handler(triangulation)
     , fe(settings.fe_degree)
@@ -724,8 +716,8 @@ namespace Step63
 
     scratch_data.fe_values.reinit(cell);
 
-    const RightHandSide<dim> right_hand_side;
-    std::vector<double>      rhs_values(n_q_points);
+    RightHandSide<dim>  right_hand_side;
+    std::vector<double> rhs_values(n_q_points);
 
     right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
                                rhs_values);
@@ -896,7 +888,7 @@ namespace Step63
   // relaxation parameter.
 
   // Since multiplicative methods tend to be more powerful than additive method,
-  // fewer smoothing steps are required to see convergence indepedent of mesh
+  // fewer smoothing steps are required to see convergence independent of mesh
   // size. The same holds for block smoothers over point smoothers. This is
   // reflected in the choice for the number of smoothing steps for each type of
   // smoother below.
@@ -1041,7 +1033,7 @@ namespace Step63
   // The last thing to note is that since our problem is non-symmetric, we must
   // use an appropriate Krylov subspace method. We choose here to
   // use GMRES since it offers the guarantee of residual reduction in each
-  // iteration. The major disavantage of GMRES is that, for each iteration, we
+  // iteration. The major disavantage of GMRES is that, for each iteration,
   // the number of stored temporary vectors increases by one, and one also needs
   // to compute a scalar product with all previously stored vectors. This is
   // rather expensive. This requirement is relaxed by using the restarted GMRES
@@ -1055,7 +1047,7 @@ namespace Step63
   // iteration counts by using a powerful GMG preconditioner, so we have picked
   // the restart length such that all of the results shown below converge prior
   // to restart happening, and thus we have a standard GMRES method. If the user
-  // is interested, another sutaible method offered in deal.II would be
+  // is interested, another suitable method offered in deal.II would be
   // BiCGStab.
 
   template <int dim>
@@ -1068,7 +1060,7 @@ namespace Step63
 
     using Transfer = MGTransferPrebuilt<Vector<double>>;
     Transfer mg_transfer(mg_constrained_dofs);
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrices[0]);
@@ -1091,8 +1083,8 @@ namespace Step63
 
     std::cout << "     Solving with GMRES to tol " << solve_tolerance << "..."
               << std::endl;
-    SolverGMRES<> solver(solver_control,
-                         SolverGMRES<>::AdditionalData(50, true));
+    SolverGMRES<Vector<double>> solver(
+      solver_control, SolverGMRES<Vector<double>>::AdditionalData(50, true));
 
     Timer time;
     time.start();
@@ -1231,7 +1223,7 @@ namespace Step63
 } // namespace Step63
 
 
-// @sect4{The <code>main</code> function}
+// @sect3{The <code>main</code> function}
 
 // Finally, the main function is like most tutorials. The only
 // interesting bit is that we require the user to pass a `.prm` file

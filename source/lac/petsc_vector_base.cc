@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,9 +32,10 @@ namespace PETScWrappers
 {
   namespace internal
   {
+#  ifndef DOXYGEN
     VectorReference::operator PetscScalar() const
     {
-      Assert(index < vector.size(), ExcIndexRange(index, 0, vector.size()));
+      AssertIndexRange(index, vector.size());
 
       // The vector may have ghost entries. In that case, we first need to
       // figure out which elements we own locally, then get a pointer to the
@@ -109,6 +110,7 @@ namespace PETScWrappers
 
       return value;
     }
+#  endif
   } // namespace internal
 
   VectorBase::VectorBase()
@@ -820,16 +822,6 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     *this *= a;
-  }
-
-
-
-  void
-  VectorBase::ratio(const VectorBase &a, const VectorBase &b)
-  {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseDivide(vector, a, b);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 

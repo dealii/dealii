@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,31 +42,6 @@ namespace internal
   {
     namespace
     {
-      // get the renumbering for faces
-      template <int dim>
-      inline std::vector<unsigned int>
-      face_lexicographic_to_hierarchic_numbering(const unsigned int degree)
-      {
-        std::vector<unsigned int> dpo(dim, 1U);
-        for (unsigned int i = 1; i < dpo.size(); ++i)
-          dpo[i] = dpo[i - 1] * (degree - 1);
-        const dealii::FiniteElementData<dim - 1> face_data(dpo, 1, degree);
-        std::vector<unsigned int> face_renumber(face_data.dofs_per_cell);
-        FETools::lexicographic_to_hierarchic_numbering(face_data,
-                                                       face_renumber);
-        return face_renumber;
-      }
-
-      // dummy specialization for dim == 1 to avoid linker errors
-      template <>
-      inline std::vector<unsigned int>
-      face_lexicographic_to_hierarchic_numbering<1>(const unsigned int)
-      {
-        return std::vector<unsigned int>();
-      }
-
-
-
       // in get_restriction_matrix() and get_prolongation_matrix(), want to undo
       // tensorization on inner loops for performance reasons. this clears a
       // dim-array
@@ -206,12 +181,11 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     // use that the element evaluates to 1 at index 0 and along the line at
     // zero
     const std::vector<unsigned int> &index_map_inverse =
-      fe.poly_space.get_numbering_inverse();
+      fe.get_poly_space_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
-        q_deg);
+      FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_deg);
     Assert(std::abs(
-             fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
+             fe.poly_space->compute_value(index_map_inverse[0], Point<dim>()) -
              1.) < 1e-14,
            ExcInternalError());
 
@@ -221,7 +195,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
           Point<dim> p;
           p[0] = constraint_points[i](0);
           fe.interface_constraints(i, face_index_map[j]) =
-            fe.poly_space.compute_value(index_map_inverse[j], p);
+            fe.poly_space->compute_value(index_map_inverse[j], p);
 
           // if the value is small up to round-off, then simply set it to zero
           // to avoid unwanted fill-in of the constraint matrices (which would
@@ -342,12 +316,11 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
     // use that the element evaluates to 1 at index 0 and along the line at
     // zero
     const std::vector<unsigned int> &index_map_inverse =
-      fe.poly_space.get_numbering_inverse();
+      fe.get_poly_space_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
-        q_deg);
+      FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_deg);
     Assert(std::abs(
-             fe.poly_space.compute_value(index_map_inverse[0], Point<dim>()) -
+             fe.poly_space->compute_value(index_map_inverse[0], Point<dim>()) -
              1.) < 1e-14,
            ExcInternalError());
 
@@ -412,8 +385,8 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
               indices[1] * (q_deg + 1) + indices[0];
 
             fe.interface_constraints(i, face_index_map[j]) =
-              fe.poly_space.compute_value(index_map_inverse[new_index],
-                                          constraint_point);
+              fe.poly_space->compute_value(index_map_inverse[new_index],
+                                           constraint_point);
 
             // if the value is small up to round-off, then simply set it to
             // zero to avoid unwanted fill-in of the constraint matrices
@@ -434,7 +407,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::FE_Q_Base(
   const PolynomialType &        poly_space,
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &     restriction_is_additive_flags)
-  : FE_Poly<PolynomialType, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       poly_space,
       fe_data,
       restriction_is_additive_flags,
@@ -467,14 +440,44 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize(
            q_dofs_per_cell + dim == this->dofs_per_cell,
          ExcInternalError());
 
-  {
-    std::vector<unsigned int>    renumber(q_dofs_per_cell);
-    const FiniteElementData<dim> fe(get_dpo_vector(q_degree), 1, q_degree);
-    FETools::hierarchic_to_lexicographic_numbering(fe, renumber);
+  [this, q_dofs_per_cell]() {
+    std::vector<unsigned int> renumber =
+      FETools::hierarchic_to_lexicographic_numbering<dim>(q_degree);
     for (unsigned int i = q_dofs_per_cell; i < this->dofs_per_cell; ++i)
       renumber.push_back(i);
-    this->poly_space.set_numbering(renumber);
-  }
+    auto *tensor_poly_space_ptr =
+      dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+    if (tensor_poly_space_ptr != nullptr)
+      {
+        tensor_poly_space_ptr->set_numbering(renumber);
+        return;
+      }
+    auto *tensor_piecewise_poly_space_ptr = dynamic_cast<
+      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>
+        *>(this->poly_space.get());
+    if (tensor_piecewise_poly_space_ptr != nullptr)
+      {
+        tensor_piecewise_poly_space_ptr->set_numbering(renumber);
+        return;
+      }
+    auto *tensor_bubbles_poly_space_ptr =
+      dynamic_cast<TensorProductPolynomialsBubbles<dim> *>(
+        this->poly_space.get());
+    if (tensor_bubbles_poly_space_ptr != nullptr)
+      {
+        tensor_bubbles_poly_space_ptr->set_numbering(renumber);
+        return;
+      }
+    auto *tensor_const_poly_space_ptr =
+      dynamic_cast<TensorProductPolynomialsConst<dim> *>(
+        this->poly_space.get());
+    if (tensor_const_poly_space_ptr != nullptr)
+      {
+        tensor_const_poly_space_ptr->set_numbering(renumber);
+        return;
+      }
+    Assert(false, ExcNotImplemented());
+  }();
 
   // Finally fill in support points on cell and face and initialize
   // constraints. All of this can happen in parallel
@@ -530,12 +533,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
 
           // FE_Q element evaluates to 1 in unit support point and to zero in
           // all other points by construction
-          Assert(std::abs(this->poly_space.compute_value(j, p) - 1.) < 1e-13,
+          Assert(std::abs(this->poly_space->compute_value(j, p) - 1.) < 1e-13,
                  ExcInternalError());
 
           for (unsigned int i = 0; i < source_q_dofs_per_cell; ++i)
             interpolation_matrix(j, i) =
-              source_fe->poly_space.compute_value(i, p);
+              source_fe->poly_space->compute_value(i, p);
         }
 
       // for FE_Q_DG0, add one last row of identity
@@ -777,9 +780,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        this->get_poly_space_numbering_inverse();
       const std::vector<unsigned int> &index_map_inverse_other =
-        fe_q_other->poly_space.get_numbering_inverse();
+        fe_q_other->get_poly_space_numbering_inverse();
 
       for (unsigned int i = 0; i < p - 1; ++i)
         for (unsigned int j = 0; j < q - 1; ++j)
@@ -839,9 +842,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_quad_dof_identities(
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        this->get_poly_space_numbering_inverse();
       const std::vector<unsigned int> &index_map_inverse_other =
-        fe_q_other->poly_space.get_numbering_inverse();
+        fe_q_other->get_poly_space_numbering_inverse();
 
       for (unsigned int i1 = 0; i1 < p - 1; ++i1)
         for (unsigned int i2 = 0; i2 < p - 1; ++i2)
@@ -899,7 +902,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_support_points(
   const std::vector<Point<1>> &points)
 {
   const std::vector<unsigned int> &index_map_inverse =
-    this->poly_space.get_numbering_inverse();
+    this->get_poly_space_numbering_inverse();
 
   // We can compute the support points by computing the tensor
   // product of the 1d set of points. We could do this by hand, but it's
@@ -932,8 +935,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
 
   // find renumbering of faces and assign from values of quadrature
   const std::vector<unsigned int> face_index_map =
-    internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(
-      q_degree);
+    FETools::lexicographic_to_hierarchic_numbering<dim - 1>(q_degree);
 
   // We can compute the support points by computing the tensor
   // product of the 1d set of points. We could do this by hand, but it's
@@ -1034,10 +1036,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
   const bool         face_flip,
   const bool         face_rotation) const
 {
-  Assert(face_index < this->dofs_per_face,
-         ExcIndexRange(face_index, 0, this->dofs_per_face));
-  Assert(face < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_index, this->dofs_per_face);
+  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
 
   // TODO: we could presumably solve the 3d case below using the
   // adjust_quad_dof_index_for_face_orientation_table field. for the
@@ -1172,17 +1172,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -1211,7 +1206,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
       // current numbering gives the identity operation
       for (unsigned int i = 0; i < q_dofs_per_cell; ++i)
         {
-          Assert(std::fabs(1. - this->poly_space.compute_value(
+          Assert(std::fabs(1. - this->poly_space->compute_value(
                                   i, this->unit_support_points[i])) < eps,
                  ExcInternalError("The Lagrange polynomial does not evaluate "
                                   "to one or zero in a nodal point. "
@@ -1221,7 +1216,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                                   "prevents the sum to be one."));
           for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
             if (j != i)
-              Assert(std::fabs(this->poly_space.compute_value(
+              Assert(std::fabs(this->poly_space->compute_value(
                        i, this->unit_support_points[j])) < eps,
                      ExcInternalError(
                        "The Lagrange polynomial does not evaluate "
@@ -1240,8 +1235,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
       const unsigned int            dofs1d = q_degree + 1;
       std::vector<Table<2, double>> subcell_evaluations(
         dim, Table<2, double>(dofs1d, dofs1d));
+
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        this->get_poly_space_numbering_inverse();
 
       // helper value: step size how to walk through diagonal and how many
       // points we have left apart from the first dimension
@@ -1274,7 +1270,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                 Point<dim> point;
                 point[0] = p_cell[d];
                 const double cell_value =
-                  this->poly_space.compute_value(index_map_inverse[i], point);
+                  this->poly_space->compute_value(index_map_inverse[i], point);
 
                 // cut off values that are too small. note that we have here
                 // Lagrange interpolation functions, so they should be zero at
@@ -1316,7 +1312,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
                   subcell_evaluations[d](j_indices[d - 1], i_indices[d - 1]);
 
               // innermost sum where we actually compute. the same as
-              // prolongate(j,i) = this->poly_space.compute_value (i, p_cell)
+              // prolongate(j,i) = this->poly_space->compute_value (i, p_cell)
               for (unsigned int jj = 0; jj < dofs1d; ++jj)
                 {
                   const unsigned int j_ind = index_map_inverse[j + jj];
@@ -1374,17 +1370,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -1422,7 +1413,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
 
       const double                     eps = 1e-15 * q_degree * dim;
       const std::vector<unsigned int> &index_map_inverse =
-        this->poly_space.get_numbering_inverse();
+        this->get_poly_space_numbering_inverse();
 
       const unsigned int          dofs1d = q_degree + 1;
       std::vector<Tensor<1, dim>> evaluations1d(dofs1d);
@@ -1452,8 +1443,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
                     Point<dim> point;
                     point[0] = p_subcell[d];
                     evaluations1d[j][d] =
-                      this->poly_space.compute_value(index_map_inverse[j],
-                                                     point);
+                      this->poly_space->compute_value(index_map_inverse[j],
+                                                      point);
                   }
               unsigned int j_indices[dim];
               internal::FE_Q_Base::zero_indices<dim>(j_indices);
@@ -1521,10 +1512,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // in 1d, things are simple. since there is only one degree of freedom per
   // vertex in this class, the first is on vertex 0 (==face 0 in some sense),

@@ -1,0 +1,14 @@
+
+DEAL:0::ghost targets: p1 n_indices=1   
+DEAL:0::import targets: p2 n_indices=1   
+DEAL:0::import indices: [0 1) 
+
+DEAL:1::ghost targets: p2 n_indices=1   
+DEAL:1::import targets: p0 n_indices=1   
+DEAL:1::import indices: [0 1) 
+
+
+DEAL:2::ghost targets: p0 n_indices=1   
+DEAL:2::import targets: p1 n_indices=1   
+DEAL:2::import indices: [0 1) 
+

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -985,8 +985,7 @@ namespace DerivativeApproximation
              ExcVectorLengthVsNActiveCells(
                derivative_norm.size(),
                dof_handler.get_triangulation().n_active_cells()));
-      Assert(component < dof_handler.get_fe(0).n_components(),
-             ExcIndexRange(component, 0, dof_handler.get_fe(0).n_components()));
+      AssertIndexRange(component, dof_handler.get_fe(0).n_components());
 
       using Iterators = std::tuple<
         TriaActiveIterator<
@@ -1002,19 +1001,17 @@ namespace DerivativeApproximation
       WorkStream::run(
         begin,
         end,
-        static_cast<std::function<void(SynchronousIterators<Iterators> const &,
-                                       Assembler::Scratch const &,
-                                       Assembler::CopyData &)>>(
-          std::bind(&approximate<DerivativeDescription,
-                                 dim,
-                                 DoFHandlerType,
-                                 InputVector,
-                                 spacedim>,
-                    std::placeholders::_1,
-                    std::cref(mapping),
-                    std::cref(dof_handler),
-                    std::cref(solution),
-                    component)),
+        [&mapping, &dof_handler, &solution, component](
+          SynchronousIterators<Iterators> const &cell,
+          Assembler::Scratch const &,
+          Assembler::CopyData &) {
+          approximate<DerivativeDescription,
+                      dim,
+                      DoFHandlerType,
+                      InputVector,
+                      spacedim>(
+            cell, mapping, dof_handler, solution, component);
+        },
         std::function<void(internal::Assembler::CopyData const &)>(),
         internal::Assembler::Scratch(),
         internal::Assembler::CopyData());

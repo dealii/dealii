@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2019 by the deal.II authors
+ * Copyright (C) 2010 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -41,6 +41,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -141,10 +142,6 @@ namespace Step38
   class Solution : public Function<dim>
   {
   public:
-    Solution()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -202,10 +199,6 @@ namespace Step38
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
@@ -378,7 +371,7 @@ namespace Step38
     std::vector<double>                  rhs_values(n_q_points);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    const RightHandSide<spacedim> rhs;
+    RightHandSide<spacedim> rhs;
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
@@ -431,9 +424,9 @@ namespace Step38
   void LaplaceBeltramiProblem<spacedim>::solve()
   {
     SolverControl solver_control(solution.size(), 1e-7 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -539,7 +532,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step38;
 
       LaplaceBeltramiProblem<3> laplace_beltrami;

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -131,8 +131,6 @@ test()
     const auto &local_dof_values = s.get_local_dof_values("solution", energy);
     const auto &u                = s.get_values("solution", scalar, energy);
     const auto &grad_u           = s.get_gradients("solution", scalar, energy);
-
-    c = 0;
 
     c.local_dof_indices[0] = s.get_local_dof_indices();
 

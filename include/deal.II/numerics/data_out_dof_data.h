@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/data_out_base.h>
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -210,6 +211,10 @@ namespace internal
      * a derived template class that can be instantiated for each vector type.
      * Since the vectors all have the same interface, this is no big problem,
      * as they can all use the same general templatized code.
+     *
+     * @note This class is an example of the
+     * <a href="https://www.artima.com/cppsource/type_erasure.html">type
+     * erasure</a> design pattern.
      *
      * @author Wolfgang Bangerth, 2004
      */
@@ -604,9 +609,6 @@ public:
   using cell_iterator =
     typename Triangulation<DoFHandlerType::dimension,
                            DoFHandlerType::space_dimension>::cell_iterator;
-  using active_cell_iterator = typename Triangulation<
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>::active_cell_iterator;
 
 public:
   /**
@@ -731,6 +733,11 @@ public:
    * @note The actual type for the vector argument may be any vector type from
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
+   *
+   * @note When working in parallel, the vector to be written needs to be ghosted
+   * with read access to all degrees of freedom on the locally owned cells, see
+   * the step-40 or step-37 tutorial programs for details, i.e., it might be
+   * necessary to call data.update_ghost_values().
    */
   template <class VectorType>
   void
@@ -773,14 +780,15 @@ public:
    * discussion of the arguments except the first one) and allows to set a
    * vector with its own DoFHandler object. This DoFHandler needs to be
    * compatible with the other DoFHandler objects assigned with calls to @p
-   * add_data_vector or @p attach_dof_handler, in the sense that the
+   * add_data_vector or @p attach_dof_handler, in the sense that all of the
    * DoFHandler objects need to be based on the same triangulation. This
-   * function allows you to export data from multiple DoFHandlers that
-   * describe different solution components.
+   * function allows you to export data from multiple DoFHandler objects that
+   * describe different solution components. An example of using this function
+   * is given in step-61.
    *
    * Since this function takes a DoFHandler object and hence naturally
    * represents dof data, the data vector type argument present in the other
-   * methods above is skipped.
+   * methods above is not necessary.
    */
   template <class VectorType>
   void
@@ -851,6 +859,42 @@ public:
                   const VectorType &    data,
                   const DataPostprocessor<DoFHandlerType::space_dimension>
                     &data_postprocessor);
+
+  /**
+   * Add a multilevel data vector.
+   *
+   * This function adds the vector-valued multilevel vector @p data in the
+   * form of a vector on each level that belongs to the DoFHandler @p
+   * dof_handler to the graphical output. This function is typically used in
+   * conjunction with a call to set_cell_selection() that selects cells on a
+   * specific level and not the active cells (the default).
+   *
+   * A vector @p data can be obtained in several ways, for example by using
+   * Multigrid::solution or Multigrid::defect during or after a multigrid
+   * cycle or by interpolating a solution via
+   * MGTransferMatrixFree::interpolate_to_mg().
+   *
+   * The handling of @p names and @p data_component_interpretation is identical
+   * to the add_data_vector() function.
+   */
+  template <class VectorType>
+  void
+  add_mg_data_vector(
+    const DoFHandlerType &           dof_handler,
+    const MGLevelObject<VectorType> &data,
+    const std::vector<std::string> & names,
+    const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      &data_component_interpretation = std::vector<
+        DataComponentInterpretation::DataComponentInterpretation>());
+
+  /**
+   * Scalar version of the function above.
+   */
+  template <class VectorType>
+  void
+  add_mg_data_vector(const DoFHandlerType &           dof_handler,
+                     const MGLevelObject<VectorType> &data,
+                     const std::string &              name);
 
   /**
    * Release the pointers to the data vectors. This allows output of a new set
@@ -997,6 +1041,11 @@ protected:
   template <class, int, int>
   friend class DataOut_DoFData;
 
+  /**
+   */
+  template <int, class>
+  friend class MGDataOut;
+
 private:
   /**
    * Common function called by the four public add_data_vector methods.
@@ -1123,19 +1172,32 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
                     "Either you called this function on objects that "
                     "are empty, or you may have forgotten to call "
                     "the 'build_patches()' function."));
-  // check equality of component
-  // names
+  // Check equality of component names
   Assert(get_dataset_names() == source.get_dataset_names(),
          Exceptions::DataOutImplementation::ExcIncompatibleDatasetNames());
-  // make sure patches are compatible. we'll
-  // assume that if the first respective
-  // patches are ok that all the other ones
-  // are ok as well
+
+  // Make sure patches are compatible. Ideally, we would check that all input
+  // patches from both collections are all compatible, but we'll be content
+  // with checking that just the first ones from both sources are.
+  //
+  // We check compatibility by testing that both sets of patches result
+  // from the same number of subdivisions, and that they have the same
+  // number of source vectors (they really should, since we already checked
+  // that there are the same number of source components above, but you
+  // never know). This implies that the data should have the same number of
+  // columns. They should really have the same number of rows as well,
+  // but depending on whether a patch has points included or not, the
+  // number of rows may or may not include coordinates for the points,
+  // and the comparison has to account for that because in each source
+  // stream, the patches may include some that have points included.
   Assert(patches[0].n_subdivisions == source_patches[0].n_subdivisions,
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
   Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
+         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  Assert((patches[0].data.n_rows() +
+          (patches[0].points_are_available ? 0 : patch_space_dim)) ==
+           (source_patches[0].data.n_rows() +
+            (source_patches[0].points_are_available ? 0 : patch_space_dim)),
          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
@@ -1170,8 +1232,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   // perform shift, if so desired
   if (shift != Point<patch_space_dim>())
     for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-      for (unsigned int v = 0; v < GeometryInfo<patch_dim>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : GeometryInfo<patch_dim>::vertex_indices())
         patches[i].vertices[v] += shift;
 
   // adjust patch numbers
@@ -1180,7 +1241,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
 
   // adjust patch neighbors
   for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-    for (unsigned int n = 0; n < GeometryInfo<patch_dim>::faces_per_cell; ++n)
+    for (const unsigned int n : GeometryInfo<patch_dim>::face_indices())
       if (patches[i].neighbors[n] != Patch::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
 }

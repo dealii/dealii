@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2019 by the deal.II authors
+ * Copyright (C) 2006 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -341,12 +341,12 @@ namespace Step24
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-          if (cell->at_boundary(f))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
               cell_matrix = 0;
 
-              fe_values.reinit(cell, f);
+              fe_values.reinit(cell, face);
 
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -393,7 +393,7 @@ namespace Step24
   void TATForwardProblem<dim>::solve_p()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs_p.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
     cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity());
 
@@ -407,7 +407,7 @@ namespace Step24
   void TATForwardProblem<dim>::solve_v()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs_v.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
     cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity());
 
@@ -535,7 +535,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step24;
 
       TATForwardProblem<2> forward_problem_solver;

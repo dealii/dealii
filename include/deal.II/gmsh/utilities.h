@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,14 +37,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A collection of Gmsh related utilities and classes.
+ * A collection of %Gmsh related utilities and classes.
  *
  * @author Luca Heltai, Dirk Peschka, 2018
  */
 namespace Gmsh
 {
   /**
-   * A parameter class used to pass options to the Gmsh executable.
+   * A parameter class used to pass options to the %Gmsh executable.
    *
    * @author Luca Heltai, 2018
    */
@@ -64,9 +64,9 @@ namespace Gmsh
     add_parameters(ParameterHandler &prm);
 
     /**
-     * The characteristic length used for the definition of the Gmsh grid.
+     * The characteristic length used for the definition of the %Gmsh grid.
      *
-     * Gmsh will try to make sure that the size of each edge is as close as
+     * %Gmsh will try to make sure that the size of each edge is as close as
      * possible to this value.
      */
     double characteristic_length = 1.0;
@@ -82,8 +82,8 @@ namespace Gmsh
 
 #  ifdef DEAL_II_WITH_OPENCASCADE
   /**
-   * Given a smooth closed curve creates a triangulation from it using
-   * Gmsh.
+   * Given a smooth closed curve, create a triangulation from it using
+   * %Gmsh.
    *
    * The input curve @p boundary should be closed.
    *

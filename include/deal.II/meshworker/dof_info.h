@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,9 +34,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
+  // Forward declaration
+#ifndef DOXYGEN
   template <int dim, class DOFINFO>
   class DoFInfoBox;
-
+#endif
 
   /**
    * A class containing information on geometry and degrees of freedom of a
@@ -233,6 +235,12 @@ namespace MeshWorker
     DoFInfoBox(const DoFInfoBox<dim, DOFINFO> &);
 
     /**
+     * Copy assignment operator, taking another object as seed.
+     */
+    DoFInfoBox &
+    operator=(const DoFInfoBox<dim, DOFINFO> &);
+
+    /**
      * Reset all the availability flags.
      */
     void
@@ -425,7 +433,7 @@ namespace MeshWorker
     : cell(seed)
     , cell_valid(true)
   {
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = seed;
         interior[i]                = seed;
@@ -441,7 +449,7 @@ namespace MeshWorker
     : cell(other.cell)
     , cell_valid(other.cell_valid)
   {
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = other.exterior[i];
         interior[i]                = other.interior[i];
@@ -452,11 +460,28 @@ namespace MeshWorker
 
 
   template <int dim, class DOFINFO>
+  inline DoFInfoBox<dim, DOFINFO> &
+  DoFInfoBox<dim, DOFINFO>::operator=(const DoFInfoBox<dim, DOFINFO> &other)
+  {
+    cell       = other.cell;
+    cell_valid = other.cell_valid;
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
+      {
+        exterior[i]                = other.exterior[i];
+        interior[i]                = other.interior[i];
+        interior_face_available[i] = false;
+        exterior_face_available[i] = false;
+      }
+    return *this;
+  }
+
+
+  template <int dim, class DOFINFO>
   inline void
   DoFInfoBox<dim, DOFINFO>::reset()
   {
     cell_valid = false;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         interior_face_available[i] = false;
         exterior_face_available[i] = false;
@@ -473,7 +498,7 @@ namespace MeshWorker
       return;
 
     assembler.assemble(cell);
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i : GeometryInfo<dim>::face_indices())
       {
         // Only do something if data available
         if (interior_face_available[i])

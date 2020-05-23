@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,20 +53,19 @@ check_this(const DoFHandler<dim> &dof_handler)
   IndexSet locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-  std::vector<bool> is_hanging_node_constrained(n_dofs);
-  DoFTools::extract_hanging_node_dofs(dof_handler, is_hanging_node_constrained);
+  const IndexSet is_hanging_node_constrained =
+    DoFTools::extract_hanging_node_dofs(dof_handler);
 
   AffineConstraints<double> constraints(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 
   for (const auto &dof : locally_relevant_dofs)
-    if (is_hanging_node_constrained[dof])
+    if (is_hanging_node_constrained.is_element(dof))
       AssertThrow(constraints.is_constrained(dof), ExcInternalError());
 
-  AssertThrow((unsigned int)(std::count(is_hanging_node_constrained.begin(),
-                                        is_hanging_node_constrained.end(),
-                                        true)) == constraints.n_constraints(),
+  AssertThrow(is_hanging_node_constrained.n_elements() ==
+                constraints.n_constraints(),
               ExcInternalError());
 
   deallog << "OK" << std::endl;

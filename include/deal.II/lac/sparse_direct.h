@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -55,10 +54,7 @@ namespace types
  * systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and direct
  * sparse LU factorization. Matrices may have symmetric or unsymmetric
  * sparsity patterns, and may have unsymmetric entries. The use of this class
- * is explained in the
- * @ref step_22 "step-22"
- * and
- * @ref step_29 "step-29"
+ * is explained in the step-22 and step-29
  * tutorial programs.
  *
  * This matrix class implements the usual interface of preconditioners, that
@@ -231,20 +227,37 @@ public:
   /**
    * Solve for a certain right hand side vector. This function may be called
    * multiple times for different right hand side vectors after the matrix has
-   * been factorized. This yields a big saving in computing time, since the
-   * actual solution is fast, compared to the factorization of the matrix.
+   * been factorized. This yields substantial savings in computing time, since
+   * the actual solution is fast, compared to the factorization of the matrix.
    *
    * The solution will be returned in place of the right hand side vector.
    *
-   * If the factorization has not happened before, strange things will happen.
-   * Note that we can't actually call the factorize() function from here if it
-   * has not yet been called, since we have no access to the actual matrix.
+   * @param[in,out] rhs_and_solution A vector that contains the right hand side
+   *   $b$ of a linear system $Ax=b$ upon calling this function, and that
+   *   contains the solution $x$ of the linear system after calling this
+   *   function.
+   * @param[in] transpose If set to true, this function solves the linear
+   *   $A^T x = b$ instead of $Ax=b$.
    *
-   * If @p transpose is set to true this function solves for the transpose of
-   * the matrix, i.e. $x=A^{-T}b$.
+   * @pre You need to call factorize() before this function can be called.
    */
   void
   solve(Vector<double> &rhs_and_solution, const bool transpose = false) const;
+
+  /**
+   * Like the previous function, but for a complex-valued right hand side
+   * and solution vector.
+   *
+   * If the matrix that was previously factorized had complex-valued entries,
+   * then the `rhs_and_solution` vector will, upon return from this function,
+   * simply contain the solution of the linear system $Ax=b$. If the matrix
+   * was real-valued, then this is also true, but the solution will simply
+   * be computed by applying the factorized $A^{-1}$ to both the
+   * real and imaginary parts of the right hand side vector.
+   */
+  void
+  solve(Vector<std::complex<double>> &rhs_and_solution,
+        const bool                    transpose = false) const;
 
   /**
    * Same as before, but for block vectors.
@@ -252,6 +265,13 @@ public:
   void
   solve(BlockVector<double> &rhs_and_solution,
         const bool           transpose = false) const;
+
+  /**
+   * Same as before, but for complex-valued block vectors.
+   */
+  void
+  solve(BlockVector<std::complex<double>> &rhs_and_solution,
+        const bool                         transpose = false) const;
 
   /**
    * Call the two functions factorize() and solve() in that order, i.e.
@@ -266,6 +286,15 @@ public:
         const bool      transpose = false);
 
   /**
+   * Same as before, but for complex-valued solution vectors.
+   */
+  template <class Matrix>
+  void
+  solve(const Matrix &                matrix,
+        Vector<std::complex<double>> &rhs_and_solution,
+        const bool                    transpose = false);
+
+  /**
    * Same as before, but for block vectors.
    */
   template <class Matrix>
@@ -273,6 +302,15 @@ public:
   solve(const Matrix &       matrix,
         BlockVector<double> &rhs_and_solution,
         const bool           transpose = false);
+
+  /**
+   * Same as before, but for complex-valued block vectors.
+   */
+  template <class Matrix>
+  void
+  solve(const Matrix &                     matrix,
+        BlockVector<std::complex<double>> &rhs_and_solution,
+        const bool                         transpose = false);
 
   /**
    * @}
@@ -306,9 +344,12 @@ public:
         "want to check your assembly procedure. Similarly, a "
         "matrix can be rank deficient if you forgot to apply the "
         "appropriate boundary conditions. For example, the "
-        "Laplace equation without boundary conditions has a "
-        "single zero eigenvalue and its rank is therefore "
-        "deficient by one."
+        "Laplace equation for a problem where only Neumann boundary "
+        "conditions are posed (or where you forget to apply Dirichlet "
+        "boundary conditions) has exactly one eigenvalue equal to zero "
+        "and its rank is therefore deficient by one. Finally, the matrix "
+        "may be rank deficient because you are using a quadrature "
+        "formula with too few quadrature points."
         "\n\n"
         "The other common situation is that you run out of memory. "
         "On a typical laptop or desktop, it should easily be possible "
@@ -321,14 +362,15 @@ public:
 
 private:
   /**
-   * The dimension of the range space.
+   * The dimension of the range space, i.e., the number of rows of the matrix.
    */
-  size_type _m;
+  size_type n_rows;
 
   /**
-   * The dimension of the domain space.
+   * The dimension of the domain space, i.e., the number of columns of the
+   * matrix.
    */
-  size_type _n;
+  size_type n_cols;
 
   /**
    * The UMFPACK routines allocate objects in which they store information
@@ -363,11 +405,20 @@ private:
   sort_arrays(const BlockSparseMatrix<number> &);
 
   /**
-   * The arrays in which we store the data for the solver.
+   * The arrays in which we store the data for the solver. These are documented
+   * in the descriptions of the umfpack_*_symbolic() and umfpack_*_numeric()
+   * functions, but in short:
+   * - `Ap` is the array saying which row starts where in `Ai`
+   * - `Ai` is the array that stores the column indices of nonzero entries
+   * - `Ax` is the array that stores the values of nonzero entries; if the
+   *   matrix is complex-valued, then it stores the real parts
+   * - `Az` is the array that stores the imaginary parts of nonzero entries,
+   *   and is used only if the matrix is complex-valued.
    */
   std::vector<types::suitesparse_index> Ap;
   std::vector<types::suitesparse_index> Ai;
   std::vector<double>                   Ax;
+  std::vector<double>                   Az;
 
   /**
    * Control and work arrays for the solver routines.

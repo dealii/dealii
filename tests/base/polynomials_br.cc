@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,7 +88,7 @@ check_poly_q(const PolynomialsBernardiRaugel<dim> &poly)
         deallog << ", " << points[i][d];
       deallog << ")" << std::endl;
 
-      poly.compute(points[i], values, grads, grads2, thirds, fourths);
+      poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 
       // loop through the Q_1^d shape functions
       for (unsigned int j = 0; j < dim * GeometryInfo<dim>::vertices_per_cell;
@@ -148,7 +148,7 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
         deallog << ", " << points[i][d];
       deallog << ")" << std::endl;
 
-      poly.compute(points[i], values, grads, grads2, thirds, fourths);
+      poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 
       // loop through the bubble shape functions
       for (unsigned int j = dim * GeometryInfo<dim>::vertices_per_cell;

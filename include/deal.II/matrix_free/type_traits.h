@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifndef DOXYGEN
 namespace internal
 {
   //
@@ -322,6 +322,7 @@ namespace internal
 
 
 } // namespace internal
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ test_vertices_orientation(
       Assert(face->at_boundary(), ExcInternalError());
 
       deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
         {
           deallog << "  " << cell->vertex(k) << std::endl;
           Assert(std::fabs(cell->vertex(k).distance(Point<spacedim>()) - 1) <
@@ -63,7 +63,7 @@ test_vertices_orientation(
         }
 
       deallog << "Volume face: " << face << " with vertices:" << std::endl;
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
         {
           deallog << "  " << face->vertex(k) << std::endl;
           Assert(std::fabs(face->vertex(k).distance(Point<spacedim>()) - 1) <
@@ -91,8 +91,7 @@ save_mesh(const Triangulation<dim, spacedim> &tria)
 int
 main()
 {
-  ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
 
   {
@@ -111,7 +110,7 @@ main()
            volume_mesh.begin_active();
          cell != volume_mesh.end();
          ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(f))
           cell->face(f)->set_all_boundary_ids(1);
     GridTools::copy_boundary_to_manifold_id(volume_mesh);

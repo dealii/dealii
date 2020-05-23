@@ -1,0 +1,56 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2010 - 2020 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+  {
+    namespace TriangulationDescription
+    \{
+      namespace Utilities
+      \{
+#if deal_II_dimension <= deal_II_space_dimension
+        template Description<deal_II_dimension, deal_II_space_dimension>
+        create_description_from_triangulation(
+          const dealii::Triangulation<deal_II_dimension,
+                                      deal_II_space_dimension> &tria,
+          const MPI_Comm                                        comm,
+          const TriangulationDescription::Settings              settings,
+          const unsigned int                                    my_rank_in);
+
+        template Description<deal_II_dimension, deal_II_space_dimension>
+        create_description_from_triangulation_in_groups(
+          const std::function<void(
+            dealii::Triangulation<deal_II_dimension, deal_II_space_dimension>
+              &)> &               serial_grid_generator,
+          const std::function<void(
+            dealii::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+            const MPI_Comm,
+            const unsigned int)> &serial_grid_partitioner,
+          const MPI_Comm          comm,
+          const int               group_size,
+          const typename Triangulation<deal_II_dimension,
+                                       deal_II_space_dimension>::MeshSmoothing
+            smoothing,
+          const TriangulationDescription::Settings);
+#endif
+      \}
+    \}
+  }
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template struct CellData<deal_II_dimension>;
+  }

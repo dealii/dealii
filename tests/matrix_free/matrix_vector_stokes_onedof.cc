@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,10 +19,6 @@
 // of a deal.II sparse matrix. Similar to matrix_vector_stokes_noflux but
 // putting all degrees of freedom into a single DoFHandler, where the
 // selection is done through FEEvaluation
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -53,6 +49,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 
 

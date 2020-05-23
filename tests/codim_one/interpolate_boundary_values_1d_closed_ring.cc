@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 void
@@ -84,7 +83,7 @@ test()
              dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(f) &&
               (cell->face(f)->boundary_id() == boundary_id))
             for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;

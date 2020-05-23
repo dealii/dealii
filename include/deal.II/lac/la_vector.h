@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -159,6 +159,15 @@ namespace LinearAlgebra
     virtual void
     reinit(const VectorSpaceVector<Number> &V,
            const bool omit_zeroing_entries = false) override;
+
+    /**
+     * Returns `false` as this is a serial vector.
+     *
+     * This functionality only needs to be called if using MPI based vectors and
+     * exists in other objects for compatibility.
+     */
+    bool
+    has_ghost_elements() const;
 
     /**
      * Copies the data of the input vector @p in_vector.
@@ -500,13 +509,28 @@ namespace LinearAlgebra
 
 
 /**
- * Declare dealii::LinearAlgebra::Vector< Number > as serial vector.
+ * Declare dealii::LinearAlgebra::Vector as serial vector.
  *
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::Vector<Number>> : std::true_type
 {};
+
+#ifndef DOXYGEN
+/*----------------------- Inline functions ----------------------------------*/
+
+namespace LinearAlgebra
+{
+  template <typename Number>
+  inline bool
+  Vector<Number>::has_ghost_elements() const
+  {
+    return false;
+  }
+} // namespace LinearAlgebra
+
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

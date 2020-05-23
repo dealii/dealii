@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
 #include <boost/serialization/map.hpp>
@@ -44,8 +45,21 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Manifold;
+
+template <int dim>
+struct CellData;
+
+struct SubCellData;
+
+namespace TriangulationDescription
+{
+  template <int, int>
+  struct Description;
+}
 
 namespace GridTools
 {
@@ -91,191 +105,7 @@ namespace hp
   template <int dim, int spacedim>
   class DoFHandler;
 }
-
-
-/*------------------------------------------------------------------------*/
-
-/**
- * The CellData class (and the related SubCellData class) is used to
- * provide a comprehensive, but minimal, description of the cells when
- * creating a triangulation via Triangulation::create_triangulation().
- * Specifically, each CellData object -- describing one cell in a
- * triangulation -- has member variables for indices of the $2^d$ vertices
- * (the actual coordinates of the vertices are described in a separate
- * vector passed to Triangulation::create_triangulation(), so the CellData
- * object only needs to store indices into that vector), the material
- * id of the cell that can be used in applications to describe which
- * part of the domain a cell belongs to (see
- * @ref GlossMaterialId "the glossary entry on material ids"),
- * and a manifold id that is used to describe the geometry object
- * that is responsible for this cell (see
- * @ref GlossManifoldIndicator "the glossary entry on manifold ids")
- * to describe the manifold this object belongs to.
- *
- * This structure is also used to represent data for faces and edges when used
- * as a member of the SubCellData class. In this case, the template argument
- * @p structdim of an object will be less than the dimension @p dim of the
- * triangulation. If this is so, then #vertices array represents the indices of
- * the vertices of one face or edge of one of the cells passed to
- * Triangulation::create_triangulation(). Furthermore, for faces the
- * material id has no meaning, and the @p material_id field is reused
- * to store a @p boundary_id instead to designate which part of the boundary
- * the face or edge belongs to (see
- * @ref GlossBoundaryIndicator "the glossary entry on boundary ids").
- *
- * An example showing how this class can be used is in the
- * <code>create_coarse_grid()</code> function of step-14. There are also
- * many more use cases in the implementation of the functions of the
- * GridGenerator namespace.
- *
- * @ingroup grid
- */
-template <int structdim>
-struct CellData
-{
-  /**
-   * Indices of the vertices of this cell. These indices correspond
-   * to entries in the vector of vertex locations passed to
-   * Triangulation::create_triangulation().
-   */
-  unsigned int vertices[GeometryInfo<structdim>::vertices_per_cell];
-
-  /**
-   * Material or boundary indicator of this cell.
-   * This field is a union that stores <i>either</i> a boundary or
-   * a material id, depending on whether the current object is used
-   * to describe a cell (in a vector of CellData objects) or a
-   * face or edge (as part of a SubCellData object).
-   */
-  union
-  {
-    /**
-     * The material id of the cell being described. See the documentation
-     * of the CellData class for examples of how to use this field.
-     *
-     * This variable can only be used if the current object is used to
-     * describe a cell, i.e., if @p structdim equals the dimension
-     * @p dim of a triangulation.
-     */
-    types::material_id material_id;
-
-    /**
-     * The boundary id of a face or edge being described. See the documentation
-     * of the CellData class for examples of how to use this field.
-     *
-     * This variable can only be used if the current object is used to
-     * describe a face or edge, i.e., if @p structdim is less than the dimension
-     * @p dim of a triangulation. In this case, the CellData object this
-     * variable belongs to will be part of a SubCellData object.
-     */
-    types::boundary_id boundary_id;
-  };
-
-  /**
-   * Manifold identifier of this object. This identifier should be used to
-   * identify the manifold to which this object belongs, and from which this
-   * object will collect information on how to add points upon refinement.
-   *
-   * See the documentation of the CellData class for examples of how to use
-   * this field.
-   */
-  types::manifold_id manifold_id;
-
-  /**
-   * Default constructor. Sets the member variables to the following values:
-   *
-   * - vertex indices to invalid values
-   * - boundary or material id zero (the default for boundary or material ids)
-   * - manifold id to numbers::flat_manifold_id
-   */
-  CellData();
-};
-
-
-
-/**
- * The SubCellData class is used to describe information about faces and
- * edges at the boundary of a mesh when creating a triangulation via
- * Triangulation::create_triangulation(). It contains member variables
- * that describe boundary edges and boundary quads.
- *
- * The class has no template argument and is used both in the description
- * of boundary edges in 2d (in which case the contents of the
- * @p boundary_quads member variable are ignored), as well as in the
- * description of boundary edges and faces in 3d (in which case both the
- * @p boundary_lines and @p boundary_quads members may be used). It is also
- * used as the argument to Triangulation::create_triangulation() in 1d,
- * where the contents of objects of the current type are simply ignored.
- *
- * By default, Triangulation::create_triangulation() simply assigns
- * default boundary indicators and manifold indicators to edges and
- * quads at the boundary of the mesh. (See the glossary entries on
- * @ref GlossBoundaryIndicator "boundary ids"
- * and
- * @ref GlossManifoldIndicator "manifold ids"
- * for more information on what they represent.) As a consequence,
- * it is not <i>necessary</i> to explicitly describe the properties
- * of boundary objects. In all cases, these properties can also be
- * set at a later time, once the triangulation has already been
- * created. On the other hand, it is sometimes convenient to describe
- * boundary indicators or manifold ids at the time of creation. In
- * these cases, the current class can be used by filling the
- * @p boundary_lines and @p boundary_quads vectors with
- * CellData<1> and CellData<2> objects that correspond to boundary
- * edges and quads for which properties other than the default
- * values should be used.
- *
- * Each entry in the @p boundary_lines and @p boundary_quads vectors
- * then needs to correspond to an edge or quad of the cells that
- * are described by the vector of CellData objects passed to
- * Triangulation::create_triangulation(). I.e., the vertex indices
- * stored in each entry need to correspond to an edge or face
- * of the triangulation that has the same set of vertex indices,
- * and in the same order. For these boundary edges or quads, one can
- * then set either or both the CellData::boundary_id and
- * CellData::manifold_id.
- *
- * There are also use cases where one may want to set the manifold id
- * of an <i>interior</i> edge or face. Such faces, identified by
- * their vertex indices, may also appear in the
- * @p boundary_lines and @p boundary_quads vectors (despite the names of
- * these member variables). However, it is then obviously not allowed
- * to set a boundary id (because the object is not actually part of
- * the boundary). As a consequence, to be valid, the CellData::boundary_id
- * of interior edges or faces needs to equal
- * numbers::internal_face_boundary_id.
- *
- * @ingroup grid
- */
-struct SubCellData
-{
-  /**
-   * A vector of CellData<1> objects that describe boundary and manifold
-   * information for edges of 2d or 3d triangulations.
-   *
-   * This vector may not be used in the creation of 1d triangulations.
-   */
-  std::vector<CellData<1>> boundary_lines;
-
-  /**
-   * A vector of CellData<2> objects that describe boundary and manifold
-   * information for quads of 3d triangulations.
-   *
-   * This vector may not be used in the creation of 1d or 2d triangulations.
-   */
-  std::vector<CellData<2>> boundary_quads;
-
-  /**
-   * Determine whether the member variables above which may not be used in a
-   * given dimension are really empty. In other words, this function returns
-   * whether
-   * both @p boundary_lines and @p boundary_quads are empty vectors
-   * when @p dim equals one, and whether the @p boundary_quads
-   * vector is empty when @p dim equals two.
-   */
-  bool
-  check_consistency(const unsigned int dim) const;
-};
+#endif
 
 
 /*------------------------------------------------------------------------*/
@@ -997,7 +827,7 @@ namespace internal
  *   triangulation.set_all_manifold_ids_on_boundary(42);
  *
  *   // set_manifold stores a copy of its second argument,
- *   // so a temporary is ookay
+ *   // so a temporary is okay
  *   triangulation.set_manifold(42, PolarManifold<2>());
  *   for (unsigned int i = 0; i < 4; ++i)
  *     {
@@ -1100,8 +930,10 @@ namespace internal
  *       // triangulation that we want to be informed about mesh refinement
  *       previous_cell = current_cell;
  *       previous_cell->get_triangulation().signals.post_refinement.connect(
- *         std::bind (&FEValues<dim>::invalidate_previous_cell,
- *                    std::ref (*this)));
+ *         [this]()
+ *         {
+ *           this->invalidate_previous_cell();
+ *         });
  *     }
  *   else
  *    previous_cell = current_cell;
@@ -1798,25 +1630,6 @@ public:
   set_manifold(const types::manifold_id       number,
                const Manifold<dim, spacedim> &manifold_object);
 
-
-  /**
-   * Reset those parts of the triangulation with the given manifold_id
-   * to use a FlatManifold object. This is the default state of a
-   * non-curved triangulation, and undoes assignment of a different
-   * Manifold object by the function of same name and two arguments.
-   *
-   * @ingroup manifold
-   *
-   * @deprecated This method has been deprecated. Use
-   * Triangulation::reset_manifold() instead.
-   *
-   * @see
-   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_manifold(const types::manifold_id number);
-
   /**
    * Reset those parts of the triangulation with the given
    * @p manifold_number to use a FlatManifold object. This is the
@@ -1895,30 +1708,32 @@ public:
 
   /**
    * Return a vector containing all boundary indicators assigned to boundary
-   * faces of this Triangulation object. Note, that each boundary indicator is
-   * reported only once. The size of the return vector will represent the
-   * number of different indicators (which is greater or equal one).
+   * faces of active cells of this Triangulation object. Note, that each
+   * boundary indicator is reported only once. The size of the return vector
+   * will represent the number of different indicators (which is greater or
+   * equal one).
    *
    * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  std::vector<types::boundary_id>
+  virtual std::vector<types::boundary_id>
   get_boundary_ids() const;
 
   /**
    * Return a vector containing all manifold indicators assigned to the
-   * objects of this Triangulation. Note, that each manifold indicator is
-   * reported only once. The size of the return vector will represent the
-   * number of different indicators (which is greater or equal one).
+   * objects of the active cells of this Triangulation. Note, that each
+   * manifold indicator is reported only once. The size of the return vector
+   * will represent the number of different indicators (which is greater or
+   * equal one).
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  std::vector<types::manifold_id>
+  virtual std::vector<types::manifold_id>
   get_manifold_ids() const;
 
   /**
@@ -1999,6 +1814,20 @@ public:
   create_triangulation(const std::vector<Point<spacedim>> &vertices,
                        const std::vector<CellData<dim>> &  cells,
                        const SubCellData &                 subcelldata);
+
+  /**
+   * Create a triangulation from the provided
+   * TriangulationDescription::Description.
+   *
+   * @note The namespace TriangulationDescription::Utilities contains functions
+   *       to create TriangulationDescription::Description.
+   *
+   * @param construction_data The data needed for this process.
+   */
+  virtual void
+  create_triangulation(
+    const TriangulationDescription::Description<dim, spacedim>
+      &construction_data);
 
   /**
    * For backward compatibility, only. This function takes the cell data in
@@ -3160,7 +2989,7 @@ public:
    * may return a value greater than the number of active cells reported by
    * the triangulation object on the current processor.
    */
-  virtual types::global_dof_index
+  virtual types::global_cell_index
   n_global_active_cells() const;
 
 
@@ -3481,8 +3310,19 @@ public:
     std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
   get_periodic_face_map() const;
 
-
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization.
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * @name Exceptions
@@ -3952,6 +3792,40 @@ private:
   fix_coarsen_flags();
 
   /**
+   * Translate the unique id of a coarse cell to its index. See the glossary
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
+   *
+   * @note For serial and shared triangulation both id and index are the same.
+   *       For distributed triangulations setting both might differ, since the
+   *       id might correspond to a global id and the index to a local id.
+   *
+   * @param coarse_cell_id Unique id of the coarse cell.
+   * @return Index of the coarse cell within the current triangulation.
+   */
+  virtual unsigned int
+  coarse_cell_id_to_coarse_cell_index(
+    const types::coarse_cell_id coarse_cell_id) const;
+
+
+  /**
+   * Translate the index of coarse cell to its unique id. See the glossary
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
+   *
+   * @note See the note of the method
+   * coarse_cell_id_to_coarse_cell_index().
+   *
+   * @param coarse_cell_index Index of the coarse cell.
+   * @return Id of the coarse cell.
+   */
+  virtual types::coarse_cell_id
+  coarse_cell_index_to_coarse_cell_id(
+    const unsigned int coarse_cell_index) const;
+
+  /**
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
@@ -4066,6 +3940,8 @@ private:
   template <typename>
   friend class dealii::internal::TriangulationImplementation::TriaObjects;
 
+  friend class CellId;
+
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
 #ifndef DEAL_II_MSVC
@@ -4077,19 +3953,6 @@ private:
 
 
 #ifndef DOXYGEN
-
-
-template <int structdim>
-inline CellData<structdim>::CellData()
-{
-  for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
-    vertices[i] = numbers::invalid_unsigned_int;
-
-  material_id = 0;
-
-  // And the manifold to be invalid
-  manifold_id = numbers::flat_manifold_id;
-}
 
 
 
@@ -4136,8 +3999,7 @@ template <int dim, int spacedim>
 inline bool
 Triangulation<dim, spacedim>::vertex_used(const unsigned int index) const
 {
-  Assert(index < vertices_used.size(),
-         ExcIndexRange(index, 0, vertices_used.size()));
+  AssertIndexRange(index, vertices_used.size());
   return vertices_used[index];
 }
 
@@ -4278,6 +4140,27 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // the triangulation
   signals.create();
 }
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
+Triangulation<dim, spacedim>::coarse_cell_id_to_coarse_cell_index(
+  const types::coarse_cell_id coarse_cell_id) const
+{
+  return coarse_cell_id;
+}
+
+
+
+template <int dim, int spacedim>
+inline types::coarse_cell_id
+Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
+  const unsigned int coarse_cell_index) const
+{
+  return coarse_cell_index;
+}
+
 
 
 /* -------------- declaration of explicit specializations ------------- */

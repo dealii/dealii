@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,9 +73,7 @@ refine_mesh(Triangulation<dim> &triangulation)
        cell != triangulation.end();
        ++cell)
     {
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =
@@ -131,7 +129,7 @@ initialize(const DoFHandler<dim> &dof, MGLevelObject<Vector<double>> &u)
            ++cell)
         {
           cell->get_mg_dof_indices(dof_indices);
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
             {
               cell->face(f)->get_mg_dof_indices(cell->level(), face_indices);
               if (cell->face(f)->at_boundary())
@@ -221,11 +219,11 @@ check_simple(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   DoFHandler<dim> mgdof_renumbered(tr);
   mgdof_renumbered.distribute_dofs(fe);
-  mgdof_renumbered.distribute_mg_dofs(fe);
+  mgdof_renumbered.distribute_mg_dofs();
 
   std::vector<unsigned int> block_component(4, 0);
   block_component[2] = 1;
@@ -243,11 +241,11 @@ check_simple(const FiniteElement<dim> &fe)
                                             dirichlet_boundary_functions);
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
-  transfer.build_matrices(mgdof);
+  transfer.build(mgdof);
 
   MGTransferPrebuilt<Vector<double>> transfer_renumbered(
     mg_constrained_dofs_renumbered);
-  transfer_renumbered.build_matrices(mgdof_renumbered);
+  transfer_renumbered.build(mgdof_renumbered);
 
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof, u);
@@ -285,9 +283,8 @@ check_simple(const FiniteElement<dim> &fe)
 int
 main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   // check_simple (FESystem<2>(FE_Q<2>(1), 2));
   check_simple(FESystem<2>(FE_Q<2>(1), 4));

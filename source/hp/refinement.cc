@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,12 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/grid_refinement.h>
@@ -84,100 +88,316 @@ namespace hp
 
     template <int dim, typename Number, int spacedim>
     void
-    p_adaptivity_from_threshold(
+    p_adaptivity_from_absolute_threshold(
       const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               smoothness_indicators,
-      const double                         p_refine_fraction,
-      const double                         p_coarsen_fraction)
+      const Vector<Number> &               criteria,
+      const Number                         p_refine_threshold,
+      const Number                         p_coarsen_threshold,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
-                      smoothness_indicators.size());
-      Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
-             dealii::GridRefinement::ExcInvalidParameterValue());
-      Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
-             dealii::GridRefinement::ExcInvalidParameterValue());
+                      criteria.size());
 
-      // We first have to determine the maximal and minimal values of the
-      // smoothness indicators of all flagged cells. We start with the minimal
-      // and maximal values of all cells, a range within which the minimal and
-      // maximal values on cells flagged for refinement must surely lie.
-      Number max_smoothness_refine =
-               *std::min_element(smoothness_indicators.begin(),
-                                 smoothness_indicators.end()),
-             min_smoothness_refine =
-               *std::max_element(smoothness_indicators.begin(),
-                                 smoothness_indicators.end());
-      Number max_smoothness_coarsen = max_smoothness_refine,
-             min_smoothness_coarsen = min_smoothness_refine;
-
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned())
-          {
-            if (cell->refine_flag_set())
-              {
-                max_smoothness_refine =
-                  std::max(max_smoothness_refine,
-                           smoothness_indicators(cell->active_cell_index()));
-                min_smoothness_refine =
-                  std::min(min_smoothness_refine,
-                           smoothness_indicators(cell->active_cell_index()));
-              }
-            else if (cell->coarsen_flag_set())
-              {
-                max_smoothness_coarsen =
-                  std::max(max_smoothness_coarsen,
-                           smoothness_indicators(cell->active_cell_index()));
-                min_smoothness_coarsen =
-                  std::min(min_smoothness_coarsen,
-                           smoothness_indicators(cell->active_cell_index()));
-              }
-          }
-
-      if (const parallel::Triangulation<dim, spacedim> *parallel_tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-              &dof_handler.get_triangulation()))
-        {
-          max_smoothness_refine =
-            Utilities::MPI::max(max_smoothness_refine,
-                                parallel_tria->get_communicator());
-          min_smoothness_refine =
-            Utilities::MPI::min(min_smoothness_refine,
-                                parallel_tria->get_communicator());
-          max_smoothness_coarsen =
-            Utilities::MPI::max(max_smoothness_coarsen,
-                                parallel_tria->get_communicator());
-          min_smoothness_coarsen =
-            Utilities::MPI::min(min_smoothness_coarsen,
-                                parallel_tria->get_communicator());
-        }
-
-      // Absent any better strategies, we will set the threshold by linear
-      // interpolation for both classes of cells individually.
-      const Number threshold_smoothness_refine =
-                     min_smoothness_refine +
-                     p_refine_fraction *
-                       (max_smoothness_refine - min_smoothness_refine),
-                   threshold_smoothness_coarsen =
-                     min_smoothness_coarsen +
-                     p_coarsen_fraction *
-                       (max_smoothness_coarsen - min_smoothness_coarsen);
-
-      // We then compare each cell's smoothness indicator with the corresponding
-      // threshold.
       std::vector<bool> p_flags(
         dof_handler.get_triangulation().n_active_cells(), false);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() &&
             ((cell->refine_flag_set() &&
-              (smoothness_indicators(cell->active_cell_index()) >
-               threshold_smoothness_refine)) ||
+              compare_refine(criteria[cell->active_cell_index()],
+                             p_refine_threshold)) ||
              (cell->coarsen_flag_set() &&
-              (smoothness_indicators(cell->active_cell_index()) <
-               threshold_smoothness_coarsen))))
+              compare_coarsen(criteria[cell->active_cell_index()],
+                              p_coarsen_threshold))))
           p_flags[cell->active_cell_index()] = true;
 
       p_adaptivity_from_flags(dof_handler, p_flags);
+    }
+
+
+
+    template <int dim, typename Number, int spacedim>
+    void
+    p_adaptivity_from_relative_threshold(
+      const hp::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &               criteria,
+      const double                         p_refine_fraction,
+      const double                         p_coarsen_fraction,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
+    {
+      AssertDimension(dof_handler.get_triangulation().n_active_cells(),
+                      criteria.size());
+      Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
+             dealii::GridRefinement::ExcInvalidParameterValue());
+      Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
+             dealii::GridRefinement::ExcInvalidParameterValue());
+
+      // We first have to determine the maximal and minimal values of the
+      // criteria of all flagged cells.
+      Number max_criterion_refine  = std::numeric_limits<Number>::lowest(),
+             min_criterion_refine  = std::numeric_limits<Number>::max();
+      Number max_criterion_coarsen = max_criterion_refine,
+             min_criterion_coarsen = min_criterion_refine;
+
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (cell->is_locally_owned())
+          {
+            if (cell->refine_flag_set())
+              {
+                max_criterion_refine =
+                  std::max(max_criterion_refine,
+                           criteria(cell->active_cell_index()));
+                min_criterion_refine =
+                  std::min(min_criterion_refine,
+                           criteria(cell->active_cell_index()));
+              }
+            else if (cell->coarsen_flag_set())
+              {
+                max_criterion_coarsen =
+                  std::max(max_criterion_coarsen,
+                           criteria(cell->active_cell_index()));
+                min_criterion_coarsen =
+                  std::min(min_criterion_coarsen,
+                           criteria(cell->active_cell_index()));
+              }
+          }
+
+      const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &dof_handler.get_triangulation());
+      if (parallel_tria != nullptr &&
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) == nullptr)
+        {
+          max_criterion_refine =
+            Utilities::MPI::max(max_criterion_refine,
+                                parallel_tria->get_communicator());
+          min_criterion_refine =
+            Utilities::MPI::min(min_criterion_refine,
+                                parallel_tria->get_communicator());
+          max_criterion_coarsen =
+            Utilities::MPI::max(max_criterion_coarsen,
+                                parallel_tria->get_communicator());
+          min_criterion_coarsen =
+            Utilities::MPI::min(min_criterion_coarsen,
+                                parallel_tria->get_communicator());
+        }
+
+      // Absent any better strategies, we will set the threshold by linear
+      // interpolation for both classes of cells individually.
+      const Number threshold_refine =
+                     min_criterion_refine +
+                     p_refine_fraction *
+                       (max_criterion_refine - min_criterion_refine),
+                   threshold_coarsen =
+                     min_criterion_coarsen +
+                     p_coarsen_fraction *
+                       (max_criterion_coarsen - min_criterion_coarsen);
+
+      p_adaptivity_from_absolute_threshold(dof_handler,
+                                           criteria,
+                                           threshold_refine,
+                                           threshold_coarsen,
+                                           compare_refine,
+                                           compare_coarsen);
+    }
+
+
+
+    template <int dim, typename Number, int spacedim>
+    void
+    p_adaptivity_fixed_number(
+      const hp::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &               criteria,
+      const double                         p_refine_fraction,
+      const double                         p_coarsen_fraction,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
+    {
+      AssertDimension(dof_handler.get_triangulation().n_active_cells(),
+                      criteria.size());
+      Assert((p_refine_fraction >= 0) && (p_refine_fraction <= 1),
+             dealii::GridRefinement::ExcInvalidParameterValue());
+      Assert((p_coarsen_fraction >= 0) && (p_coarsen_fraction <= 1),
+             dealii::GridRefinement::ExcInvalidParameterValue());
+
+      // ComparisonFunction returning 'true' or 'false' for any set of
+      // parameters. These will be used to overwrite user-provided comparison
+      // functions whenever no actual comparison is required in the decision
+      // process, i.e. when no or all cells will be refined or coarsened.
+      const ComparisonFunction<Number> compare_false =
+        [](const Number &, const Number &) { return false; };
+      const ComparisonFunction<Number> compare_true =
+        [](const Number &, const Number &) { return true; };
+
+      // 1.) First extract from the vector of indicators the ones that
+      //     correspond to cells that we locally own.
+      unsigned int   n_flags_refinement = 0;
+      unsigned int   n_flags_coarsening = 0;
+      Vector<Number> indicators_refinement(
+        dof_handler.get_triangulation().n_active_cells());
+      Vector<Number> indicators_coarsening(
+        dof_handler.get_triangulation().n_active_cells());
+      for (const auto &cell :
+           dof_handler.get_triangulation().active_cell_iterators())
+        if (!cell->is_artificial() && cell->is_locally_owned())
+          {
+            if (cell->refine_flag_set())
+              indicators_refinement(n_flags_refinement++) =
+                criteria(cell->active_cell_index());
+            else if (cell->coarsen_flag_set())
+              indicators_coarsening(n_flags_coarsening++) =
+                criteria(cell->active_cell_index());
+          }
+      indicators_refinement.grow_or_shrink(n_flags_refinement);
+      indicators_coarsening.grow_or_shrink(n_flags_coarsening);
+
+      // 2.) Determine the number of cells for p-refinement and p-coarsening on
+      //     basis of the flagged cells.
+      //
+      // 3.) Find thresholds for p-refinment and p-coarsening on only those
+      //     cells flagged for adaptation.
+      //
+      //     For cases in which no or all cells flagged for refinement and/or
+      //     coarsening are subject to p-adaptation, we usually pick thresholds
+      //     that apply to all or none of the cells at once. However here, we
+      //     do not know which threshold would suffice for this task because the
+      //     user could provide any comparison function. Thus if necessary, we
+      //     overwrite the user's choice with suitable functions simplying
+      //     returning 'true' and 'false' for any cell with reference wrappers.
+      //     Thus, no function object copies are stored.
+      //
+      // 4.) Perform p-adaptation with absolute thresholds.
+      Number threshold_refinement      = 0.;
+      Number threshold_coarsening      = 0.;
+      auto   reference_compare_refine  = std::cref(compare_refine);
+      auto   reference_compare_coarsen = std::cref(compare_coarsen);
+
+      const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &dof_handler.get_triangulation());
+      if (parallel_tria != nullptr &&
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()) == nullptr)
+        {
+#ifndef DEAL_II_WITH_P4EST
+          Assert(false, ExcInternalError());
+#else
+          //
+          // parallel implementation with distributed memory
+          //
+
+          MPI_Comm mpi_communicator = parallel_tria->get_communicator();
+
+          // 2.) Communicate the number of cells scheduled for p-adaptation
+          //     globally.
+          const unsigned int n_global_flags_refinement =
+            Utilities::MPI::sum(n_flags_refinement, mpi_communicator);
+          const unsigned int n_global_flags_coarsening =
+            Utilities::MPI::sum(n_flags_coarsening, mpi_communicator);
+
+          const unsigned int target_index_refinement =
+            static_cast<unsigned int>(
+              std::floor(p_refine_fraction * n_global_flags_refinement));
+          const unsigned int target_index_coarsening =
+            static_cast<unsigned int>(
+              std::ceil((1 - p_coarsen_fraction) * n_global_flags_coarsening));
+
+          // 3.) Figure out the global max and min of the criteria. We don't
+          //     need it here, but it's a collective communication call.
+          const std::pair<Number, Number> global_min_max_refinement =
+            dealii::internal::parallel::distributed::GridRefinement::
+              compute_global_min_and_max_at_root(indicators_refinement,
+                                                 mpi_communicator);
+
+          const std::pair<Number, Number> global_min_max_coarsening =
+            dealii::internal::parallel::distributed::GridRefinement::
+              compute_global_min_and_max_at_root(indicators_coarsening,
+                                                 mpi_communicator);
+
+          // 3.) Compute thresholds if necessary.
+          if (target_index_refinement == 0)
+            reference_compare_refine = std::cref(compare_false);
+          else if (target_index_refinement == n_global_flags_refinement)
+            reference_compare_refine = std::cref(compare_true);
+          else
+            threshold_refinement = dealii::internal::parallel::distributed::
+              GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
+                indicators_refinement,
+                global_min_max_refinement,
+                target_index_refinement,
+                mpi_communicator);
+
+          if (target_index_coarsening == n_global_flags_coarsening)
+            reference_compare_coarsen = std::cref(compare_false);
+          else if (target_index_coarsening == 0)
+            reference_compare_coarsen = std::cref(compare_true);
+          else
+            threshold_coarsening = dealii::internal::parallel::distributed::
+              GridRefinement::RefineAndCoarsenFixedNumber::compute_threshold(
+                indicators_coarsening,
+                global_min_max_coarsening,
+                target_index_coarsening,
+                mpi_communicator);
+#endif
+        }
+      else
+        {
+          //
+          // serial implementation (and parallel::shared implementation)
+          //
+
+          // 2.) Determine the number of cells scheduled for p-adaptation.
+          const unsigned int n_p_refine_cells = static_cast<unsigned int>(
+            std::floor(p_refine_fraction * n_flags_refinement));
+          const unsigned int n_p_coarsen_cells = static_cast<unsigned int>(
+            std::floor(p_coarsen_fraction * n_flags_coarsening));
+
+          // 3.) Compute thresholds if necessary.
+          if (n_p_refine_cells == 0)
+            reference_compare_refine = std::cref(compare_false);
+          else if (n_p_refine_cells == n_flags_refinement)
+            reference_compare_refine = std::cref(compare_true);
+          else
+            {
+              std::nth_element(indicators_refinement.begin(),
+                               indicators_refinement.begin() +
+                                 n_p_refine_cells - 1,
+                               indicators_refinement.end(),
+                               std::greater<Number>());
+              threshold_refinement =
+                *(indicators_refinement.begin() + n_p_refine_cells - 1);
+            }
+
+          if (n_p_coarsen_cells == 0)
+            reference_compare_coarsen = std::cref(compare_false);
+          else if (n_p_coarsen_cells == n_flags_coarsening)
+            reference_compare_coarsen = std::cref(compare_true);
+          else
+            {
+              std::nth_element(indicators_coarsening.begin(),
+                               indicators_coarsening.begin() +
+                                 n_p_coarsen_cells - 1,
+                               indicators_coarsening.end(),
+                               std::less<Number>());
+              threshold_coarsening =
+                *(indicators_coarsening.begin() + n_p_coarsen_cells - 1);
+            }
+        }
+
+      // 4.) Finally perform adaptation.
+      p_adaptivity_from_absolute_threshold(dof_handler,
+                                           criteria,
+                                           threshold_refinement,
+                                           threshold_coarsening,
+                                           std::cref(reference_compare_refine),
+                                           std::cref(
+                                             reference_compare_coarsen));
     }
 
 
@@ -235,24 +455,30 @@ namespace hp
 
     template <int dim, typename Number, int spacedim>
     void
-    p_adaptivity_from_prediction(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               error_indicators,
-      const Vector<Number> &               predicted_errors)
+    p_adaptivity_from_reference(
+      const hp::DoFHandler<dim, spacedim> &                      dof_handler,
+      const Vector<Number> &                                     criteria,
+      const Vector<Number> &                                     references,
+      const ComparisonFunction<typename identity<Number>::type> &compare_refine,
+      const ComparisonFunction<typename identity<Number>::type>
+        &compare_coarsen)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
-                      error_indicators.size());
+                      criteria.size());
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
-                      predicted_errors.size());
+                      references.size());
 
       std::vector<bool> p_flags(
         dof_handler.get_triangulation().n_active_cells(), false);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() &&
-            ((cell->refine_flag_set() || cell->coarsen_flag_set()) &&
-             (error_indicators[cell->active_cell_index()] <
-              predicted_errors[cell->active_cell_index()])))
+            ((cell->refine_flag_set() &&
+              compare_refine(criteria[cell->active_cell_index()],
+                             references[cell->active_cell_index()])) ||
+             (cell->coarsen_flag_set() &&
+              compare_coarsen(criteria[cell->active_cell_index()],
+                              references[cell->active_cell_index()]))))
           p_flags[cell->active_cell_index()] = true;
 
       p_adaptivity_from_flags(dof_handler, p_flags);
@@ -281,48 +507,107 @@ namespace hp
       Assert(0 < gamma_h, dealii::GridRefinement::ExcInvalidParameterValue());
       Assert(0 < gamma_n, dealii::GridRefinement::ExcInvalidParameterValue());
 
+      // auxiliary variables
+      unsigned int future_fe_degree       = numbers::invalid_unsigned_int;
+      unsigned int parent_future_fe_index = numbers::invalid_unsigned_int;
+      // store all determined future finite element indices on parent cells for
+      // coarsening
+      std::map<typename hp::DoFHandler<dim, spacedim>::cell_iterator,
+               unsigned int>
+        future_fe_indices_on_coarsened_cells;
+
+      // deep copy error indicators
+      predicted_errors = error_indicators;
+
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            const unsigned int active_cell_index = cell->active_cell_index();
-
-            if (cell->future_fe_index_set()) // p adaptation
+            // current cell will not be adapted
+            if (!(cell->future_fe_index_set()) && !(cell->refine_flag_set()) &&
+                !(cell->coarsen_flag_set()))
               {
-                Assert(!cell->refine_flag_set() && !cell->coarsen_flag_set(),
-                       ExcMessage("Cell has to be either flagged for h or p "
-                                  "adaptation, and not for both!"));
+                predicted_errors[cell->active_cell_index()] *= gamma_n;
+                continue;
+              }
 
-                const int degree_difference =
+            // current cell will be adapted
+            // determine degree of its future finite element
+            if (cell->coarsen_flag_set())
+              {
+                // cell will be coarsened, thus determine future finite element
+                // on parent cell
+                const auto &parent = cell->parent();
+                if (future_fe_indices_on_coarsened_cells.find(parent) ==
+                    future_fe_indices_on_coarsened_cells.end())
+                  {
+                    std::set<unsigned int> fe_indices_children;
+                    for (unsigned int child_index = 0;
+                         child_index < parent->n_children();
+                         ++child_index)
+                      {
+                        const auto &child = parent->child(child_index);
+                        Assert(child->is_active() && child->coarsen_flag_set(),
+                               typename dealii::Triangulation<
+                                 dim>::ExcInconsistentCoarseningFlags());
+
+                        fe_indices_children.insert(child->future_fe_index());
+                      }
+                    Assert(!fe_indices_children.empty(), ExcInternalError());
+
+                    parent_future_fe_index =
+                      dof_handler.get_fe_collection()
+                        .find_dominated_fe_extended(fe_indices_children,
+                                                    /*codim=*/0);
+
+                    Assert(
+                      parent_future_fe_index != numbers::invalid_unsigned_int,
+                      typename dealii::hp::FECollection<
+                        dim>::ExcNoDominatedFiniteElementAmongstChildren());
+
+                    future_fe_indices_on_coarsened_cells.insert(
+                      {parent, parent_future_fe_index});
+                  }
+                else
+                  {
+                    parent_future_fe_index =
+                      future_fe_indices_on_coarsened_cells[parent];
+                  }
+
+                future_fe_degree =
+                  dof_handler.get_fe_collection()[parent_future_fe_index]
+                    .degree;
+              }
+            else
+              {
+                // future finite element on current cell is already set
+                future_fe_degree =
                   dof_handler.get_fe_collection()[cell->future_fe_index()]
-                    .degree -
-                  cell->get_fe().degree;
+                    .degree;
+              }
 
-                predicted_errors[active_cell_index] =
-                  error_indicators[active_cell_index] *
-                  std::pow(gamma_p, degree_difference);
-              }
-            else if (cell->refine_flag_set()) // h refinement
+            // step 1: exponential decay with p-adaptation
+            if (cell->future_fe_index_set())
               {
-                Assert(
-                  cell->refine_flag_set() ==
-                    RefinementCase<dim>::isotropic_refinement,
-                  ExcMessage(
-                    "Error prediction is only valid for isotropic refinement!"));
+                predicted_errors[cell->active_cell_index()] *=
+                  std::pow(gamma_p, future_fe_degree - cell->get_fe().degree);
+              }
 
-                predicted_errors[active_cell_index] =
-                  error_indicators[active_cell_index] *
-                  (gamma_h * std::pow(.5, dim + cell->get_fe().degree));
-              }
-            else if (cell->coarsen_flag_set()) // h coarsening
+            // step 2: algebraic decay with h-adaptation
+            if (cell->refine_flag_set())
               {
-                predicted_errors[active_cell_index] =
-                  error_indicators[active_cell_index] /
-                  (gamma_h * std::pow(.5, cell->get_fe().degree));
+                predicted_errors[cell->active_cell_index()] *=
+                  (gamma_h * std::pow(.5, future_fe_degree));
+
+                // predicted error will be split on children cells
+                // after adaptation via CellDataTransfer
               }
-            else // no changes
+            else if (cell->coarsen_flag_set())
               {
-                predicted_errors[active_cell_index] =
-                  error_indicators[active_cell_index] * gamma_n;
+                predicted_errors[cell->active_cell_index()] /=
+                  (gamma_h * std::pow(.5, future_fe_degree));
+
+                // predicted error will be summed up on parent cell
+                // after adaptation via CellDataTransfer
               }
           }
     }
@@ -369,7 +654,7 @@ namespace hp
                      ++child_index)
                   {
                     const auto &child = parent->child(child_index);
-                    if (child->active())
+                    if (child->is_active())
                       {
                         if (child->coarsen_flag_set())
                           ++h_flagged_children;
@@ -390,7 +675,8 @@ namespace hp
                   // drop all h coarsening flags.
                   for (unsigned int child_index = 0; child_index < n_children;
                        ++child_index)
-                    parent->child(child_index)->clear_coarsen_flag();
+                    if (parent->child(child_index)->is_active())
+                      parent->child(child_index)->clear_coarsen_flag();
               }
           }
     }

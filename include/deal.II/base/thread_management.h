@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/multithread_info.h>
+#  include <deal.II/base/std_cxx17/tuple.h>
 #  include <deal.II/base/template_constraints.h>
 
 #  include <condition_variable>
@@ -29,16 +30,16 @@
 #  include <list>
 #  include <memory>
 #  include <mutex>
+#  include <thread>
 #  include <tuple>
 #  include <utility>
 #  include <vector>
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_THREADS
 #    include <thread>
-#    ifdef DEAL_II_USE_MT_POSIX
-#      include <pthread.h>
-#    endif
+#    define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #    include <tbb/task.h>
+#    undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #    include <tbb/tbb_stddef.h>
 #  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -195,10 +196,9 @@ namespace Threads
     }
 
     /**
-     * Wait for the condition to be signalled. Signal variables need to be
+     * Wait for the condition to be signaled. Signal variables need to be
      * guarded by a mutex which needs to be given to this function as an
-     * argument, see the man page of <code>pthread_cond_wait</code> for a
-     * description of the mechanisms.
+     * argument.
      *
      * The mutex is assumed held at the entry to this function but is released
      * upon exit.
@@ -217,71 +217,6 @@ namespace Threads
     std::condition_variable condition_variable;
   };
 
-#  ifdef DEAL_II_USE_MT_POSIX
-  /**
-   * Implementation of a thread barrier class, based on the POSIX thread
-   * functions. POSIX barriers are a relatively new feature and are not
-   * supported on all systems.
-   *
-   * If the configuration detected the absence of these functions, then
-   * barriers will not be available, and creating objects of this class will
-   * result in an exception been thrown unless the count given for the parties
-   * waiting for the barrier is equal to one (as in this case waiting for the
-   * barrier is a no-operation, and we can dispense with the POSIX functions
-   * at all). The rest of the threading functionality will be available in its
-   * full extent, though, even if POSIX barriers are not available.
-   *
-   * @deprecated This class is deprecated. It is easily possible to implement
-   *   its functionality with the facilities provided by C++11.
-   *
-   * @author Wolfgang Bangerth, 2002
-   */
-  class DEAL_II_DEPRECATED PosixThreadBarrier
-  {
-  public:
-    /**
-     * Constructor. Initialize the underlying POSIX barrier data structure.
-     */
-    PosixThreadBarrier(const unsigned int count,
-                       const char *       name = nullptr,
-                       void *             arg  = nullptr);
-
-    /**
-     * Destructor. Release all resources.
-     */
-    ~PosixThreadBarrier();
-
-    /**
-     * Wait for all threads to reach this point. The return value is zero for
-     * all participating threads except for one, for which the return value is
-     * some non-zero value. The operating system picks the special thread by
-     * some not further known method.
-     */
-    int
-    wait();
-
-  private:
-    /**
-     * Data object storing the POSIX data which we need to call the POSIX
-     * functions.
-     */
-#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-    pthread_barrier_t barrier;
-#    else
-    unsigned int count;
-#    endif
-  };
-
-
-  /**
-   * If using POSIX functions, then alias the POSIX wrapper classes to the
-   * names we use throughout the library.
-   *
-   * @deprecated Like the PosixThreadBarrier class, this `using` declaration
-   *   is deprecated.
-   */
-  using Barrier DEAL_II_DEPRECATED = PosixThreadBarrier;
-#  endif
 } // namespace Threads
 
 
@@ -306,7 +241,8 @@ namespace Threads
    * Note that this means that only threads created and terminated through the
    * interfaces of this namespace are taken care of. If threads are created by
    * directly calling the respective functions of the operating system (e.g.
-   * <code>pthread_create</code> for the POSIX thread interface), or if they
+   * <code>pthread_create</code> for the POSIX thread interface, or
+   * `std::thread` for C++11 facilities), or if they
    * are killed (e.g. either through <code>pthread_exit</code> from the
    * spawned thread, or <code>pthread_kill</code> from another thread), then
    * these events are not registered and counted for the result of this
@@ -676,7 +612,7 @@ namespace Threads
        * anyway since they can not both join the same thread. That said, more
        * recent C++ standards do not appear to have the requirement any more
        * that the only thread that can call join() is the one that created the
-       * thread. Neither does pthread_join appear to have this requirement any
+       * thread. Neither does `pthread_join` appear to have this requirement any
        * more.  Consequently, we can in fact join from different threads and
        * we test this in base/thread_validity_07.
        */
@@ -1096,8 +1032,9 @@ namespace Threads
   inline Thread<RT>
   new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return new_thread(std::function<RT()>(
-      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
+    auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
+    return new_thread(
+      [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
   }
 
 
@@ -1113,6 +1050,7 @@ namespace Threads
              typename identity<C>::type &c,
              typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1129,6 +1067,7 @@ namespace Threads
              typename identity<const C>::type &c,
              typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1292,10 +1231,10 @@ namespace Threads
       TaskDescriptor();
 
       /**
-       * Copy constructor. Throws an exception since we want to make sure that
-       * each TaskDescriptor object corresponds to exactly one task.
+       * Copy constructor. Objects of this type can not be copied, and so this
+       * constructor is `delete`d and can't be called.
        */
-      TaskDescriptor(const TaskDescriptor &);
+      TaskDescriptor(const TaskDescriptor &) = delete;
 
       /**
        * Destructor.
@@ -1303,11 +1242,11 @@ namespace Threads
       ~TaskDescriptor();
 
       /**
-       * Copy operator. Throws an exception since we want to make sure that
-       * each TaskDescriptor object corresponds to exactly one task.
+       * Copy operator. Objects of this type can not be copied, and so this
+       * operator is `delete`d and can't be called.
        */
       TaskDescriptor &
-      operator=(const TaskDescriptor &);
+      operator=(const TaskDescriptor &) = delete;
 
       /**
        * Queue up the task to the scheduler. We need to do this in a separate
@@ -1370,17 +1309,6 @@ namespace Threads
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &)
-      : task_is_done(false)
-    {
-      // we shouldn't be getting here -- task descriptors
-      // can't be copied
-      Assert(false, ExcInternalError());
-    }
-
-
-
-    template <typename RT>
     inline TaskDescriptor<RT>::~TaskDescriptor()
     {
       // wait for the task to complete for sure
@@ -1399,17 +1327,6 @@ namespace Threads
       AssertNothrow(task != nullptr, ExcInternalError());
       AssertNothrow(task->ref_count() == 0, ExcInternalError());
       task->destroy(*task);
-    }
-
-
-    template <typename RT>
-    TaskDescriptor<RT> &
-    TaskDescriptor<RT>::operator=(const TaskDescriptor &)
-    {
-      // we shouldn't be getting here -- task descriptors
-      // can't be copied
-      Assert(false, ExcInternalError());
-      return *this;
     }
 
 
@@ -1753,8 +1670,9 @@ namespace Threads
   inline Task<RT>
   new_task(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return new_task(std::function<RT()>(
-      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
+    auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
+    return new_task(
+      [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
   }
 
 
@@ -1770,6 +1688,7 @@ namespace Threads
            typename identity<C>::type &c,
            typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1786,6 +1705,7 @@ namespace Threads
            typename identity<const C>::type &c,
            typename identity<Args>::type... args)
   {
+    // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
@@ -1821,6 +1741,21 @@ namespace Threads
       return *this;
     }
 
+
+    /**
+     * Return how many tasks have been put into this group. This
+     * function does not distinguish how many of these tasks have
+     * already run and have finished, are still waiting to be
+     * scheduled to a CPU resource, or are currently running. Tasks
+     * that have been joined already are also still counted.
+     */
+    std::size_t
+    size() const
+    {
+      return tasks.size();
+    }
+
+
     /**
      * Wait for all tasks in the collection to finish. It is not a problem if
      * some of them have already been waited for, i.e. you may call this
@@ -1830,10 +1765,8 @@ namespace Threads
     void
     join_all() const
     {
-      for (typename std::list<Task<RT>>::const_iterator t = tasks.begin();
-           t != tasks.end();
-           ++t)
-        t->join();
+      for (auto &t : tasks)
+        t.join();
     }
 
   private:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-7
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
@@ -330,8 +325,7 @@ HelmholtzProblem<dim>::assemble_system()
                             rhs_values[q_point] * fe_values.JxW(q_point));
           }
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary() &&
             (cell->face(face)->boundary_id() == 1))
           {
@@ -502,9 +496,7 @@ HelmholtzProblem<dim>::run()
                                                        triangulation.begin(),
                                                      endc = triangulation.end();
           for (; cell != endc; ++cell)
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               if ((cell->face(face)->center()(0) == -1) ||
                   (cell->face(face)->center()(1) == -1))
                 cell->face(face)->set_boundary_id(1);
@@ -667,6 +659,7 @@ HelmholtzProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
 

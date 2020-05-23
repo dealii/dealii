@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ namespace internal
 
 template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
-  : FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(
           internal::FE_DGQ::get_QGaussLobatto_points(degree))),
@@ -93,7 +93,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
 template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ(
   const std::vector<Polynomials::Polynomial<double>> &polynomials)
-  : FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Poly<dim, spacedim>(
       TensorProductPolynomials<dim>(polynomials),
       FiniteElementData<dim>(get_dpo_vector(polynomials.size() - 1),
                              1,
@@ -304,10 +304,10 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
       // shape functions there
       const Point<dim> p = this->unit_support_points[j];
       for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-        cell_interpolation(j, i) = this->poly_space.compute_value(i, p);
+        cell_interpolation(j, i) = this->poly_space->compute_value(i, p);
 
       for (unsigned int i = 0; i < source_fe.dofs_per_cell; ++i)
-        source_interpolation(j, i) = source_fe.poly_space.compute_value(i, p);
+        source_interpolation(j, i) = source_fe.poly_space->compute_value(i, p);
     }
 
   // then compute the
@@ -400,17 +400,12 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -480,17 +475,12 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -719,10 +709,8 @@ bool
 FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
                                            const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   unsigned int n = this->degree + 1;
 
@@ -819,16 +807,6 @@ FE_DGQ<dim, spacedim>::get_constant_modes() const
 
 
 
-template <int dim, int spacedim>
-std::size_t
-FE_DGQ<dim, spacedim>::memory_consumption() const
-{
-  Assert(false, ExcNotImplemented());
-  return 0;
-}
-
-
-
 // ------------------------------ FE_DGQArbitraryNodes -----------------------
 
 template <int dim, int spacedim>
@@ -854,8 +832,11 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   bool                equidistant = true;
   std::vector<double> points(this->degree + 1);
 
+  auto *const polynomial_space =
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+  Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
-    this->poly_space.get_numbering_inverse();
+    polynomial_space->get_numbering_inverse();
   for (unsigned int j = 0; j <= this->degree; j++)
     points[j] = this->unit_support_points[lexicographic[j]][0];
 
@@ -967,9 +948,12 @@ std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 {
   // Construct a dummy quadrature formula containing the FE's nodes:
-  std::vector<Point<1>>     qpoints(this->degree + 1);
+  std::vector<Point<1>> qpoints(this->degree + 1);
+  auto *const           polynomial_space =
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
+  Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
-    this->poly_space.get_numbering_inverse();
+    polynomial_space->get_numbering_inverse();
   for (unsigned int i = 0; i <= this->degree; ++i)
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
   Quadrature<1> pquadrature(qpoints);

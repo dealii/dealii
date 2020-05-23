@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,15 +26,16 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#ifndef DOXYGEN
 template <int, typename>
 class Table;
+#endif
 
 /**
  * We collect here some helper functions used in the Manifold<dim,spacedim>
@@ -162,6 +163,8 @@ namespace Manifolds
                                  const bool with_interpolation = false);
 } // namespace Manifolds
 
+
+
 /**
  * Manifolds are used to describe the geometry of boundaries of domains as
  * well as the geometry of the interior. Manifold objects are therefore
@@ -171,7 +174,9 @@ namespace Manifolds
  *
  * Manifolds are best understood by using the language of differential
  * geometry, but their common uses can be easily described simply through
- * examples.
+ * examples. An exhaustive discussion of how, where, and why this class
+ * is used is provided in the
+ * @ref geometry_paper "geometry paper".
  *
  *
  * <h3>Common use case: Creating a new vertex</h3>

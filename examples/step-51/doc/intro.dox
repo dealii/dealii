@@ -29,7 +29,7 @@ for systems of equations in 2 or 3 dimensions.
 <h4> Reducing the size of the linear system </h4>
 To alleviate the computational cost of solving such large linear systems,
 the hybridizable discontinuous Galerkin (HDG) methodology was introduced
-by Cockburn and co-workers (see the references in the recent HDG overview 
+by Cockburn and co-workers (see the references in the recent HDG overview
 article by Nguyen and Peraire @cite Ngu2012).
 
 The HDG method achieves this goal by formulating the mathematical problem using
@@ -50,7 +50,7 @@ The Dirichlet-to-Neumann map concept then permits the following solution procedu
 skeleton of the triangulation.  The global problem is then to solve for the
 trace values, which are the only globally coupled unknowns.
   <li>  Use the known skeleton values as Dirichlet data for solving local
-element-level solutions.  This is known as the 'local solver', and is an 
+element-level solutions.  This is known as the 'local solver', and is an
 <i>embarrassingly parallel</i> element-by-element solution process.
 </ol>
 
@@ -58,17 +58,17 @@ element-level solutions.  This is known as the 'local solver', and is an
 The above procedure also has a linear algebra interpretation---referred to
 as <i>static condensation</i>---that was exploited to reduce the size of the
 global linear system by Guyan in the context of continuous Finite Elements
-@cite G65, and by Fraeijs de Veubeke for mixed methods @cite F65. In the 
+@cite G65, and by Fraeijs de Veubeke for mixed methods @cite F65. In the
 latter case (mixed formulation), the system reduction was achieved through the
 use of discontinuous fluxes combined with the introduction of an additional
-auxiliary <i>hybrid</i> variable that approximates the trace of the unknown 
+auxiliary <i>hybrid</i> variable that approximates the trace of the unknown
 at the boundary of every element. This procedure became known as hybridization
 and---by analogy---is the reason why the local discontinuous Galerkin method
-introduced by Cockburn, Gopalakrishnan, and Lazarov in 2009 @cite CGL2009, and 
-subsequently developed by their collaborators, eventually came to be known as 
+introduced by Cockburn, Gopalakrishnan, and Lazarov in 2009 @cite CGL2009, and
+subsequently developed by their collaborators, eventually came to be known as
 the <i>hybridizable discontinuous Galerkin</i> (HDG) method.
 
-Let us write the complete linear system associated to the HDG problem as a 
+Let us write the complete linear system associated to the HDG problem as a
 block system with the discrete DG (cell interior) variables $U$ as first block
 and the skeleton (face) variables $\Lambda$ as the second block:
 @f{eqnarray*}

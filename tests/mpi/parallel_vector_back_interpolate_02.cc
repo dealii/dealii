@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,8 +71,8 @@ test()
   std::vector<IndexSet> owned_partitioning1;
   std::vector<IndexSet> relevant_partitioning1;
   {
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof1, dofs_per_block);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof1);
     const unsigned int n1 = dofs_per_block[0], n2 = dofs_per_block[1];
 
     owned_partitioning1.push_back(locally_owned_dofs1.get_view(0, n1));

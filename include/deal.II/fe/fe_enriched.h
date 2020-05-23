@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -735,6 +735,7 @@ namespace ColorEnriched
   using predicate_function = std::function<bool(
     const typename Triangulation<dim, spacedim>::cell_iterator &)>;
 
+#ifndef DOXYGEN
   namespace internal
   {
     /**
@@ -922,7 +923,8 @@ namespace ColorEnriched
         &fe_enriched, // FE multiplied by enrichment function
       const FE_Nothing<dim, spacedim> &fe_nothing,
       hp::FECollection<dim, spacedim> &fe_collection);
-  } // namespace internal
+  }    // namespace internal
+#endif // DOXYGEN
 
 
 

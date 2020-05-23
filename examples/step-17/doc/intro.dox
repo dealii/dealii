@@ -1,7 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-<h2>Overview</h2>
+<h3>Overview</h3>
 
 This program does not introduce any new mathematical ideas; in fact, all it
 does is to do the exact same computations that step-8
@@ -30,11 +30,11 @@ near-equivalents <code>PETScWrappers::MPI::Vector</code> and
 every processor in the MPI network only stores
 a part of the matrix or vector. More specifically, each processor will
 only store those rows of the matrix that correspond to a degree of
-freedom it "owns". For vectors, they either store only elements that 
+freedom it "owns". For vectors, they either store only elements that
 correspond to degrees of freedom the processor owns (this is what is
 necessary for the right hand side), or also some additional elements
 that make sure that every processor has access the solution components
-that live on the cells the processor owns (so-called 
+that live on the cells the processor owns (so-called
 @ref GlossLocallyActiveDof "locally active DoFs") or also on neighboring cells
 (so-called @ref GlossLocallyRelevantDof "locally relevant DoFs").
 
@@ -50,12 +50,12 @@ time, PETSc also provides dummy MPI stubs, so you can run this program on a
 single machine if PETSc was configured without MPI.
 
 
-<h2>Parallelizing software with MPI</h2>
+<h3>Parallelizing software with MPI</h3>
 
 Developing software to run in %parallel via MPI requires a bit of a change in
 mindset because one typically has to split up all data structures so that
 every processor only stores a piece of the entire problem. As a consequence,
-you can't typically access all components of a solution vector on each 
+you can't typically access all components of a solution vector on each
 processor -- each processor may simply not have enough memory to hold the
 entire solution vector. Because data is split up or "distributed" across
 processors, we call the programming model used by MPI "distributed memory
@@ -63,15 +63,15 @@ computing" (as opposed to "shared memory computing", which would mean
 that multiple processors can all access all data within one memory
 space, for example whenever multiple cores in a single machine work
 on a common task). Some of the fundamentals of distributed memory
-computing are discussed in the 
+computing are discussed in the
 @ref distributed "Parallel computing with multiple processors using distributed memory"
 documentation module, which is itself a sub-module of the
-@ref Parallel "Parallel computing" module. 
+@ref Parallel "Parallel computing" module.
 
 In general, to be truly able to scale to large numbers of processors, one
 needs to split between the available processors <i>every</i> data structure
 whose size scales with the size of the overall problem. (For a definition
-of what it means for a program to "scale", see 
+of what it means for a program to "scale", see
 @ref GlossParallelScaling "this glossary entry".) This includes, for
 example, the triangulation, the matrix, and all global vectors (solution, right
 hand side). If one doesn't split all of these objects, one of those will be
@@ -128,13 +128,13 @@ into the mail and it will be delivered. But that's the extent to which
 you can control things. If you want the receiver to do something
 with the content of the letter, for example return to you data you want
 from over there, then two things need to happen: (i) the receiver needs
-to actually go check whether there is anything in her mailbox, and (ii) if
+to actually go check whether there is anything in their mailbox, and (ii) if
 there is, react appropriately, for example by sending data back. If you
 wait for this return message but the original receiver was distracted
 and not paying attention, then you're out of luck: you'll simply have to
 wait until your requested over there will be worked on. In some cases,
 bugs will lead the original receiver to never check your mail, and in that
-case you will wait forever -- this is called a <i>deadlock</i>. 
+case you will wait forever -- this is called a <i>deadlock</i>.
 (@dealiiVideoLectureSeeAlso{39,41,41.25,41.5})
 
 In practice, one does not usually program at the level of sending and
@@ -172,12 +172,12 @@ function calls. That said, you do have to understand the general
 philosophy behind MPI as outlined above.
 
 
-<h2>What this program does</h2>
+<h3>What this program does</h3>
 
 The techniques this program then demonstrates are:
 - How to use the PETSc wrapper classes; this will already be visible in the
   declaration of the principal class of this program, <code>ElasticProblem</code>.
-- How to partition the mesh into subdomains; this happens in the 
+- How to partition the mesh into subdomains; this happens in the
   <code>ElasticProblem::setup_system()</code> function.
 - How to parallelize operations for jobs running on an MPI network; here, this
   is something one has to pay attention to in a number of places, most

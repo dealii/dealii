@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,12 @@
 #ifndef dealii_face_setup_internal_h
 #define dealii_face_setup_internal_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
+
+#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -127,7 +131,6 @@ namespace internal
 
       std::vector<FaceCategory>          face_is_owned;
       std::vector<bool>                  at_processor_boundary;
-      std::vector<unsigned int>          cells_close_to_boundary;
       std::vector<FaceToCellTopology<1>> inner_faces;
       std::vector<FaceToCellTopology<1>> boundary_faces;
       std::vector<FaceToCellTopology<1>> inner_ghost_faces;
@@ -169,7 +172,7 @@ namespace internal
       std::vector<std::pair<unsigned int, unsigned int>> &cell_levels)
     {
       use_active_cells =
-        additional_data.level_mg_handler == numbers::invalid_unsigned_int;
+        additional_data.mg_level == numbers::invalid_unsigned_int;
 
 #  ifdef DEBUG
       // safety check
@@ -178,7 +181,7 @@ namespace internal
           {
             typename dealii::Triangulation<dim>::cell_iterator dcell(
               &triangulation, cell_level.first, cell_level.second);
-            Assert(dcell->active(), ExcInternalError());
+            Assert(dcell->is_active(), ExcInternalError());
           }
 #  endif
 
@@ -186,7 +189,6 @@ namespace internal
       // interesting
 
       at_processor_boundary.resize(cell_levels.size(), false);
-      cells_close_to_boundary.clear();
       face_is_owned.resize(dim > 1 ? triangulation.n_raw_faces() :
                                      triangulation.n_vertices(),
                            FaceCategory::locally_active_done_elsewhere);
@@ -195,7 +197,8 @@ namespace internal
       // boundaries as evenly as possible between the processors
       std::map<types::subdomain_id, FaceIdentifier>
         inner_faces_at_proc_boundary;
-      if (dynamic_cast<const parallel::Triangulation<dim> *>(&triangulation))
+      if (triangulation.locally_owned_subdomain() !=
+          numbers::invalid_subdomain_id)
         {
           const types::subdomain_id my_domain =
             triangulation.locally_owned_subdomain();
@@ -205,8 +208,7 @@ namespace internal
                 continue;
               typename dealii::Triangulation<dim>::cell_iterator dcell(
                 &triangulation, cell_levels[i].first, cell_levels[i].second);
-              for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                   ++f)
+              for (const unsigned int f : GeometryInfo<dim>::face_indices())
                 {
                   if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                     continue;
@@ -219,7 +221,12 @@ namespace internal
                   // faces properly
                   const CellId id_mine = dcell->id();
                   if (use_active_cells && neighbor->has_children())
-                    for (unsigned int c = 0; c < dcell->face(f)->n_children();
+                    for (unsigned int c = 0;
+                         c < (dcell->has_periodic_neighbor(f) ?
+                                dcell->periodic_neighbor(f)
+                                  ->face(dcell->periodic_neighbor_face_no(f))
+                                  ->n_children() :
+                                dcell->face(f)->n_children());
                          ++c)
                       {
                         typename dealii::Triangulation<dim>::cell_iterator
@@ -289,9 +296,9 @@ namespace internal
               // looking at the length of the lists of faces
 #  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
               MPI_Comm comm = MPI_COMM_SELF;
-              if (const parallel::Triangulation<dim> *ptria =
-                    dynamic_cast<const parallel::Triangulation<dim> *>(
-                      &triangulation))
+              if (const dealii::parallel::TriangulationBase<dim> *ptria =
+                    dynamic_cast<const dealii::parallel::TriangulationBase<dim>
+                                   *>(&triangulation))
                 comm = ptria->get_communicator();
 
               MPI_Status   status;
@@ -568,8 +575,8 @@ namespace internal
           typename dealii::Triangulation<dim>::cell_iterator dcell(
             &triangulation, cell_levels[i].first, cell_levels[i].second);
           if (use_active_cells)
-            Assert(dcell->active(), ExcNotImplemented());
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            Assert(dcell->is_active(), ExcNotImplemented());
+          for (auto f : GeometryInfo<dim>::face_indices())
             {
               if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                 face_is_owned[dcell->face(f)->index()] =
@@ -579,7 +586,7 @@ namespace internal
               // inside the domain in case of multigrid separately
               else if ((dcell->at_boundary(f) == false ||
                         dcell->has_periodic_neighbor(f)) &&
-                       additional_data.level_mg_handler !=
+                       additional_data.mg_level !=
                          numbers::invalid_unsigned_int &&
                        dcell->neighbor_or_periodic_neighbor(f)->level() <
                          dcell->level())
@@ -613,8 +620,8 @@ namespace internal
                   // side). We process a face locally when we are more refined
                   // (in the active cell case) or when the face is listed in
                   // the `shared_faces` data structure that we built above.
-                  if ((id1 == id2 && (use_active_cells == false ||
-                                      neighbor->has_children() == false)) ||
+                  if ((id1 == id2 &&
+                       (use_active_cells == false || neighbor->is_active())) ||
                       dcell->level() > neighbor->level() ||
                       std::binary_search(
                         inner_faces_at_proc_boundary[id2].shared_faces.begin(),
@@ -646,12 +653,7 @@ namespace internal
                                         neighbor->level_subdomain_id());
                     }
                   else if (additional_data.hold_all_faces_to_owned_cells ==
-                           false)
-                    {
-                      // mark the cell to be close to the boundary
-                      cells_close_to_boundary.emplace_back(i);
-                    }
-                  else
+                           true)
                     {
                       // add all cells to ghost layer...
                       face_is_owned[dcell->face(f)->index()] =
@@ -721,18 +723,6 @@ namespace internal
       // cells
       for (const auto &ghost_cell : ghost_cells)
         cell_levels.push_back(ghost_cell);
-
-      // step 3: clean up the cells close to the boundary
-      std::sort(cells_close_to_boundary.begin(), cells_close_to_boundary.end());
-      cells_close_to_boundary.erase(std::unique(cells_close_to_boundary.begin(),
-                                                cells_close_to_boundary.end()),
-                                    cells_close_to_boundary.end());
-      std::vector<unsigned int> final_cells;
-      final_cells.reserve(cells_close_to_boundary.size());
-      for (unsigned int i = 0; i < cells_close_to_boundary.size(); ++i)
-        if (at_processor_boundary[cells_close_to_boundary[i]] == false)
-          final_cells.push_back(cells_close_to_boundary[i]);
-      cells_close_to_boundary = std::move(final_cells);
     }
 
 
@@ -784,8 +774,7 @@ namespace internal
                   &triangulation,
                   cell_levels[cell].first,
                   cell_levels[cell].second);
-                for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                     ++f)
+                for (const unsigned int f : GeometryInfo<dim>::face_indices())
                   {
                     // boundary face
                     if (face_is_owned[dcell->face(f)->index()] ==
@@ -895,6 +884,10 @@ namespace internal
                                 if (face_is_owned[dcell->face(f)->index()] ==
                                     FaceCategory::locally_active_done_here)
                                   {
+                                    Assert(use_active_cells ||
+                                             dcell->level() ==
+                                               neighbor->level(),
+                                           ExcInternalError());
                                     ++inner_counter;
                                     inner_faces.push_back(create_face(
                                       f,
@@ -1014,7 +1007,7 @@ namespace internal
      * face number, subface index and orientation are the same. This is used
      * to batch similar faces together for vectorization.
      */
-    bool
+    inline bool
     compare_faces_for_vectorization(const FaceToCellTopology<1> &face1,
                                     const FaceToCellTopology<1> &face2)
     {

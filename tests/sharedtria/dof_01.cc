@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,7 +117,8 @@ test()
 
       const std::vector<types::global_dof_index>
         n_locally_owned_dofs_per_processor =
-          dof_handler.compute_n_locally_owned_dofs_per_processor();
+          Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                     dof_handler.n_locally_owned_dofs());
       Assert(dof_handler.n_locally_owned_dofs() ==
                n_locally_owned_dofs_per_processor[triangulation
                                                     .locally_owned_subdomain()],
@@ -135,7 +136,8 @@ test()
              ExcInternalError());
 
       const std::vector<IndexSet> locally_owned_dofs_per_processor =
-        dof_handler.compute_locally_owned_dofs_per_processor();
+        Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                   dof_handler.locally_owned_dofs());
       IndexSet all(N);
       for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
         {

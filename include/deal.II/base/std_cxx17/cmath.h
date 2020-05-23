@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,16 +17,16 @@
 
 #include <deal.II/base/config.h>
 
-#ifndef DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+#ifndef __cpp_lib_math_special_functions
 #  include <boost/math/special_functions/bessel.hpp>
-#endif // DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+#endif // __cpp_lib_math_special_functions
 
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
-#ifndef DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+#ifndef __cpp_lib_math_special_functions
   double (&cyl_bessel_j)(double,
                          double) = boost::math::cyl_bessel_j<double, double>;
   float (&cyl_bessel_jf)(float,
@@ -37,7 +37,7 @@ namespace std_cxx17
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
   using std::cyl_bessel_jl;
-#endif // DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+#endif // __cpp_lib_math_special_functions
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 

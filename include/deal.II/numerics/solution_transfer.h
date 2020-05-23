@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -216,12 +216,12 @@ DEAL_II_NAMESPACE_OPEN
  * the children cells are needed. Hence this interpolation and the storing of
  * the interpolated values of each of the discrete functions that we want to
  * interpolate needs to take place before these children cells are coarsened
- * (and deleted!!). Again a pointers for the relevant cells is set to point to
+ * (and deleted!!). Again a pointer for each relevant cell is set to point to
  * these values (see below). Additionally the DoF indices of the cells that
  * will not be coarsened need to be stored according to the solution transfer
- * while pure refinement (cf there). All this is performed by
+ * with pure refinement (cf there). All this is performed by
  * <tt>prepare_for_coarsening_and_refinement(all_in)</tt> where the
- * <tt>vector<Vector<number> >vector all_in</tt> includes all discrete
+ * <tt>vector<Vector<number> > all_in</tt> includes all discrete
  * functions to be interpolated onto the new grid.
  *
  * As we need two different kinds of pointers (<tt>vector<unsigned int> *</tt>

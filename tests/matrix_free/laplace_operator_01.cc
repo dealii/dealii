@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -203,32 +203,18 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  deallog.push(Utilities::int_to_string(myid));
+  mpi_initlog();
+  deallog.push("0");
 
-  if (myid == 0)
-    {
-      initlog();
-      deallog << std::setprecision(4);
+  deallog.push("2d");
+  test<2, 1>();
+  test<2, 2>();
+  deallog.pop();
 
-      deallog.push("2d");
-      test<2, 1>();
-      test<2, 2>();
-      deallog.pop();
-
-      deallog.push("3d");
-      test<3, 1>();
-      test<3, 2>();
-      deallog.pop();
-    }
-  else
-    {
-      test<2, 1>();
-      test<2, 2>();
-      test<3, 1>();
-      test<3, 2>();
-    }
+  deallog.push("3d");
+  test<3, 1>();
+  test<3, 2>();
+  deallog.pop();
 }

@@ -104,7 +104,7 @@ which is similar but the `import()` stage may involve MPI communication:
 @code
   IndexSet locally_owned_dofs, locally_relevant_dofs;
   ...fill the two IndexSet objects...
-  
+
   // Create the ReadWriteVector using an IndexSet instead of the size
   LinearAlgebra::ReadWriteVector<double> owned_rw_vector(locally_owned_dofs);
 
@@ -130,7 +130,7 @@ elements of the vector. Typically, these are the
 which implies that they overlap between different MPI
 processes. Consequently, the elements stored in that vector on one
 machine may not coincide with the ones stored by the GPU on that
-machine, requiring MPI communication to import them. 
+machine, requiring MPI communication to import them.
 
 In all of these cases, while importing a vector, values can either be
 inserted (using VectorOperation::insert) or added to prior content of

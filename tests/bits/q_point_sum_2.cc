@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ check(const Triangulation<dim> &tria, const unsigned int order)
       // and make sure that the
       // result of the integration is
       // close to zero
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(f))
           {
             fe_face_values.reinit(cell, f);
@@ -76,7 +76,7 @@ check(const Triangulation<dim> &tria, const unsigned int order)
 
       // now same for subface
       // integration
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(f))
           for (unsigned int sf = 0;
                sf < GeometryInfo<dim>::max_children_per_face;

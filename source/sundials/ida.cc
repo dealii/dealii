@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2015 - 2019 by the deal.II authors
+//    Copyright (C) 2015 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 #    include <deal.II/lac/petsc_block_vector.h>
 #    include <deal.II/lac/petsc_vector.h>
 #  endif
-#  include <deal.II/base/utilities.h>
 
 #  include <deal.II/sundials/copy.h>
 

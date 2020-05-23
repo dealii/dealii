@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 namespace hp
 {
   template <int, int>
@@ -49,6 +51,7 @@ namespace internal
     struct Implementation;
   }
 } // namespace internal
+#endif
 
 
 namespace internal
@@ -405,8 +408,7 @@ namespace internal
                             const unsigned int local_index) const
     {
       (void)fe_index;
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      AssertIndexRange(obj_index, dof_offsets.size());
 
       // make sure we are on an object for which DoFs have been
       // allocated at all
@@ -438,8 +440,7 @@ namespace internal
                             const types::global_dof_index global_index)
     {
       (void)fe_index;
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      AssertIndexRange(obj_index, dof_offsets.size());
 
       // make sure we are on an
       // object for which DoFs have
@@ -462,8 +463,7 @@ namespace internal
     inline unsigned int
     DoFLevel::active_fe_index(const unsigned int obj_index) const
     {
-      Assert(obj_index < active_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, active_fe_indices.size()));
+      AssertIndexRange(obj_index, active_fe_indices.size());
 
       if (is_compressed_entry(active_fe_indices[obj_index]) == false)
         return active_fe_indices[obj_index];
@@ -486,8 +486,7 @@ namespace internal
     DoFLevel::set_active_fe_index(const unsigned int obj_index,
                                   const unsigned int fe_index)
     {
-      Assert(obj_index < active_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, active_fe_indices.size()));
+      AssertIndexRange(obj_index, active_fe_indices.size());
 
       // check whether the given fe_index is within the range of
       // values that we interpret as "not compressed". if not, then
@@ -513,8 +512,7 @@ namespace internal
     inline unsigned int
     DoFLevel::future_fe_index(const unsigned int obj_index) const
     {
-      Assert(obj_index < future_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, future_fe_indices.size()));
+      AssertIndexRange(obj_index, future_fe_indices.size());
 
       if (future_fe_index_set(obj_index))
         return future_fe_indices[obj_index];
@@ -528,8 +526,7 @@ namespace internal
     DoFLevel::set_future_fe_index(const unsigned int obj_index,
                                   const unsigned int fe_index)
     {
-      Assert(obj_index < future_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, future_fe_indices.size()));
+      AssertIndexRange(obj_index, future_fe_indices.size());
 
       // check whether the given fe_index is within the range of
       // values that we interpret as "not compressed". if not, then
@@ -555,8 +552,7 @@ namespace internal
     inline bool
     DoFLevel::future_fe_index_set(const unsigned int obj_index) const
     {
-      Assert(obj_index < future_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, future_fe_indices.size()));
+      AssertIndexRange(obj_index, future_fe_indices.size());
 
       return (future_fe_indices[obj_index] != invalid_active_fe_index);
     }
@@ -566,8 +562,7 @@ namespace internal
     inline void
     DoFLevel::clear_future_fe_index(const unsigned int obj_index)
     {
-      Assert(obj_index < future_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, future_fe_indices.size()));
+      AssertIndexRange(obj_index, future_fe_indices.size());
 
       future_fe_indices[obj_index] = invalid_active_fe_index;
     }

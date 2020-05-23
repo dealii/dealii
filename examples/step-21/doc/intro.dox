@@ -76,8 +76,34 @@ can solve right away with the techniques of the first few tutorial programs
 similar). However, we have not said anything yet about the saturation, which
 of course is going to change as the fluids move around.
 
-The second part of the equations is a therefore description of the
-dynamics of the saturation. We model this as an advected quantity:
+The second part of the equations is the description of the
+dynamics of the saturation, i.e., how the relative concentration of the
+two fluids changes with time. The saturation equation for the displacing
+fluid (water) is given by the following conservation law:
+@f{eqnarray*}
+  S_{t} + \nabla \cdot (F(S) \mathbf{u}) = q_{w},
+@f}
+which can be rewritten by using the product rule of the divergence operator
+in the previous equation:
+@f{eqnarray*}
+  S_{t} + F(S) \left[\nabla \cdot \mathbf{u}\right]
+        + \mathbf{u} \cdot \left[ \nabla F(S)\right]
+  = S_{t} + F(S) q + \mathbf{u} \cdot \nabla F(S) = q_{w}.
+@f}
+Here, $q=\nabla\cdot \mathbf{u}$ is the total influx introduced
+above, and $q_{w}$ is the flow rate of the displacing fluid (water).
+These two are related to the fractional flow $F(S)$ in the following way:
+@f[
+  q_{w} = F(S) q,
+@f]
+where the fractional flow is often parameterized via the (heuristic) expression
+@f[
+  F(S)
+  =
+  \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}.
+@f]
+Putting it all together yields the saturation equation in the following,
+advected form:
 @f{eqnarray*}
   S_{t} + \mathbf{u} \cdot \nabla F(S) = 0,
 @f}
@@ -85,12 +111,6 @@ where $\mathbf u$ is the total velocity
 @f[
   \mathbf{u} =
   \mathbf{u}_{o} + \mathbf{u}_{w} = -\lambda(S) \mathbf{K}\cdot\nabla p.
-@f]
-In addition,
-@f[
-  F(S)
-  =
-  \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}
 @f]
 Note that the advection equation contains the term $\mathbf{u} \cdot \nabla
 F(S)$ rather than $\mathbf{u} \cdot \nabla S$ to indicate that the saturation
@@ -184,7 +204,9 @@ implicit pressure-velocity system that only depends on the previously computed
 saturation $S^n$, and then do an explicit time step for $S^{n+1}$ that only
 depends on the previously known $S^n$ and the just computed
 $\mathbf{u}^{n+1}$. This way, we never have to iterate for the nonlinearities
-of the system as we would have if we used a fully implicit method.
+of the system as we would have if we used a fully implicit method. (In
+a more modern perspective, this should be seen as an "operator
+splitting" method. step-58 has a long description of the idea behind this.)
 
 We can then state the problem in weak form as follows, by multiplying each
 equation with test functions $\mathbf v$, $\phi$, and $\sigma$ and integrating
@@ -230,6 +252,10 @@ cell term to get an equation as follows:
   (S^n,\sigma)_\Omega +
   \triangle t \sum_K  \left(F(S^n) q^{n+1}, \sigma\right)_K.
 @f}
+We introduce an object of type DiscreteTime in order to keep track of the
+current value of time and time step in the code. This class encapsulates many
+complexities regarding adjusting time step size and stopping at a specified
+final time.
 
 
 
@@ -261,7 +287,7 @@ The quantities $S_+,\mathbf{u}_+$ then correspond to the values of these
 variables on the present cell, whereas $S_-,\mathbf{u}_-$ (needed on the
 inflow part of the boundary of $K$) are quantities taken from the neighboring
 cell. Some more context on discontinuous element techniques and evaluation of
-fluxes can also be found in step-12.
+fluxes can also be found in step-12 and step-12b.
 
 
 <h3>Linear solvers</h3>
@@ -393,8 +419,8 @@ useful since the functions $\lambda(S)$ and $F(S)$ do not represent anything
 physical outside this range, and we should not expect the program to do
 anything useful once we have negative saturations or ones larger than one.
 
-Note that we will have similar restrictions on the time step also in @ref
-step_23 "step-23" and step-24 where we solve the time dependent
+Note that we will have similar restrictions on the time step also in
+step-23 and step-24 where we solve the time dependent
 wave equation, another hyperbolic problem. We will also come back to the issue
 of time step choice below in the section on <a href="#extensions">possible
 extensions to this program</a>.

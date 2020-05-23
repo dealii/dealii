@@ -19,12 +19,12 @@ estimation and adaptivity for general functional output for the Laplace
 equation, while the second gives many examples of applications of these
 concepts to a large number of other, more complicated equations. For
 applications to individual types of equations, see also the publications by
-Becker @cite Bec95, @cite Bec98, Kanschat @cite Kan96, @cite FK97, Suttmeier 
-@cite Sut96, @cite RS97, @cite RS98c, @cite RS99, Bangerth @cite BR99b, 
+Becker @cite Bec95, @cite Bec98, Kanschat @cite Kan96, @cite FK97, Suttmeier
+@cite Sut96, @cite RS97, @cite RS98c, @cite RS99, Bangerth @cite BR99b,
 @cite Ban00w, @cite BR01a, @cite Ban02, and Hartmann @cite Har02, @cite HH01,
-@cite HH01b. All of these works, from the original introduction by Becker and 
-Rannacher to individual contributions to particular equations, have later been 
-summarized in a book by Bangerth and Rannacher that covers all of these topics, 
+@cite HH01b. All of these works, from the original introduction by Becker and
+Rannacher to individual contributions to particular equations, have later been
+summarized in a book by Bangerth and Rannacher that covers all of these topics,
 see @cite BR03.
 
 

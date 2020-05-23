@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,11 @@
 #ifndef dealii_particles_particle_handler_h
 #define dealii_particles_particle_handler_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/bounding_box.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
@@ -24,6 +28,8 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/mapping.h>
+
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/particle_iterator.h>
@@ -33,8 +39,6 @@
 #include <boost/serialization/map.hpp>
 
 DEAL_II_NAMESPACE_OPEN
-
-#ifdef DEAL_II_WITH_P4EST
 
 namespace Particles
 {
@@ -47,6 +51,8 @@ namespace Particles
    * we call particles in the domain of the local process local particles,
    * and particles that belong to neighbor processes and live in the ghost cells
    * around the locally owned domain "ghost particles".
+   *
+   * This class is used in step-70.
    *
    * @ingroup Particle
    */
@@ -77,10 +83,9 @@ namespace Particles
      * This constructor is equivalent to calling the default constructor and
      * the initialize function.
      */
-    ParticleHandler(
-      const parallel::distributed::Triangulation<dim, spacedim> &tria,
-      const Mapping<dim, spacedim> &                             mapping,
-      const unsigned int n_properties = 0);
+    ParticleHandler(const Triangulation<dim, spacedim> &tria,
+                    const Mapping<dim, spacedim> &      mapping,
+                    const unsigned int                  n_properties = 0);
 
     /**
      * Destructor.
@@ -89,13 +94,13 @@ namespace Particles
 
     /**
      * Initialize the particle handler. This function does not clear the
-     * internal data structures, it just sets the connections to the
-     * MPI communicator and the triangulation.
+     * internal data structures, it just sets the triangulation and the
+     * mapping to be used.
      */
     void
-    initialize(const parallel::distributed::Triangulation<dim, spacedim> &tria,
-               const Mapping<dim, spacedim> &mapping,
-               const unsigned int            n_properties = 0);
+    initialize(const Triangulation<dim, spacedim> &tria,
+               const Mapping<dim, spacedim> &      mapping,
+               const unsigned int                  n_properties = 0);
 
     /**
      * Clear all particle related data.
@@ -224,12 +229,225 @@ namespace Particles
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then added to the local particle
      * collection. Note that this function currently uses
-     * GridTools::compute_point_locations, which assumes all positions are
+     * GridTools::compute_point_locations(), which assumes all positions are
      * within the local part of the triangulation. If one of them is not in the
      * local domain this function will throw an exception.
      */
     void
     insert_particles(const std::vector<Point<spacedim>> &positions);
+
+    /**
+     * Create and insert a number of particles into the collection of particles.
+     * This function takes a list of positions and creates a set of particles
+     * at these positions, which are then distributed and added to the local
+     * particle collection of a procesor. Note that this function uses
+     * GridTools::distributed_compute_point_locations(). Consequently, it can
+     * require intense communications between the processors. This function
+     * is used in step-70.
+     *
+     * This function figures out what mpi process owns the points that do not
+     * fall within the locally owned part of the triangulation, it sends
+     * to that process the points passed to this function on this process,
+     * and receives the points that fall within the locally owned cells of
+     * the triangulation from whoever received them as input.
+     *
+     * In order to keep track of what mpi process received what points, a map
+     * from mpi process to IndexSet is returned by the function. This IndexSet
+     * contains the local indices of the points that were passed to this
+     * function on the calling mpi process, and that falls within the part of
+     * triangulation owned by this mpi process.
+     *
+     * @param[in] positions A vector of points that do not need to be on the
+     * local processor, but have to be in the triangulation that is associated
+     * with this ParticleHandler object.
+     *
+     * @param[in] global_bounding_boxes A vector of vectors of bounding boxes.
+     * The bounding boxes `global_bboxes[rk]` describe which part of the mesh is
+     * locally owned by the mpi process with rank `rk`. The local description
+     * can be obtained from GridTools::compute_mesh_predicate_bounding_box(),
+     * and the global one can be obtained by passing the local ones to
+     * Utilities::MPI::all_gather().
+     *
+     * @param[in] properties (Optional) A vector of vector of properties
+     * associated with each local point. The size of the vector should be either
+     * zero (no properties will be transfered nor attached to the generated
+     * particles) or it should be a vector of `positions.size()` vectors of size
+     * `n_properties_per_particle()`. Notice that this function call will
+     * transfer the properties from the local mpi process to the final mpi
+     * process that will own each of the particles, and it may therefore be
+     * communication intensive.
+     *
+     * @return A map from owner to IndexSet, that contains the local indices
+     * of the points that were passed to this function on the calling mpi
+     * process, and that falls within the part of triangulation owned by this
+     * mpi process.
+     *
+     * @author Bruno Blais, Luca Heltai 2019
+     */
+    std::map<unsigned int, IndexSet>
+    insert_global_particles(
+      const std::vector<Point<spacedim>> &positions,
+      const std::vector<std::vector<BoundingBox<spacedim>>>
+        &                                     global_bounding_boxes,
+      const std::vector<std::vector<double>> &properties = {});
+
+    /**
+     * Set the position of the particles by using the values contained in the
+     * vector @p input_vector.
+     *
+     * @tparam VectorType Any of the parallel distributed vectors supported by
+     * the library.
+     *
+     * The vector @p input_vector should have read access to the indices
+     * created by extracting the locally relevant ids with
+     * locally_relevant_ids(), and taking its tensor
+     * product with the index set representing the range `[0, spacedim)`, i.e.:
+     * @code
+     * IndexSet ids = particle_handler.locally_relevant_ids().
+     *  tensor_product(complete_index_set(spacedim));
+     * @endcode
+     *
+     * The position of the particle with global index `id` is read from
+     * spacedim consecutive entries starting from
+     * `input_vector[id*spacedim]`.
+     *
+     * Notice that it is not necessary that the @p input_vector *owns* those
+     * indices, however it has to have read access to them (i.e., it can be a
+     * distributed vector with ghost entries).
+     *
+     * If the argument @p displace_particles is set to false, then the new
+     * position taken from the values contained in
+     * @p input_vector, replacing the previously stored particle position.
+     * By default, the particles are displaced by the amount contained in the
+     * @p input_vector, i.e., the contents of the vector are considered
+     * *offsets* that are added to the previous position.
+     *
+     * After setting the new position, this function calls internally the method
+     * sort_particles_into_subdomains_and_cells(). You should
+     * make sure you satisfy the requirements of that function.
+     *
+     * @param[in] input_vector A parallel distributed vector containing
+     * the displacement to apply to each particle, or their new absolute
+     * position.
+     *
+     * @param[in] displace_particles Control if the @p input_vector should
+     * be interpreted as a displacement vector, or a vector of absolute
+     * positions.
+     *
+     * @authors Luca Heltai, Bruno Blais, 2019.
+     */
+    template <class VectorType>
+    typename std::enable_if<
+      std::is_convertible<VectorType *, Function<spacedim> *>::value ==
+      false>::type
+    set_particle_positions(const VectorType &input_vector,
+                           const bool        displace_particles = true);
+
+    /**
+     * Set the position of the particles within the particle handler using a
+     * vector of points. The new set of point defined by the
+     * vector has to be sufficiently close to the original one to ensure that
+     * the sort_particles_into_subdomains_and_cells() function manages to find
+     * the new cells in which the particles belong.
+     *
+     * Points are numbered in the same way they are traversed locally by the
+     * ParticleHandler. A typical way to use this method, is to first call the
+     * get_particle_positions() function, and then modify the resulting vector.
+     *
+     * @param [in] new_positions A vector of points of dimension
+     * particle_handler.n_locally_owned_particles()
+     *
+     * @param [in] displace_particles When true, this function adds the value
+     * of the vector of points to the
+     * current position of the particle, thus displacing them by the
+     * amount given by the function. When false, the position of the
+     * particle is replaced by the value in the vector.
+     *
+     * @authors Bruno Blais, Luca Heltai (2019)
+     */
+    void
+    set_particle_positions(const std::vector<Point<spacedim>> &new_positions,
+                           const bool displace_particles = true);
+
+
+    /**
+     * Set the position of the particles within the particle handler using a
+     * function with spacedim components. The new set of point defined by the
+     * fuction has to be sufficiently close to the original one to ensure that
+     * the sort_particles_into_subdomains_and_cells algorithm manages to find
+     * the new cells in which the particles belong.
+     *
+     * The function is evaluated at the current location of the particles.
+     *
+     * @param [in] function A function that has n_components==spacedim that
+     * describes either the displacement or the new position of the particles as
+     * a function of the current location of the particle.
+     *
+     * @param [in] displace_particles When true, this function adds the results
+     * of the function to the current position of the particle, thus displacing
+     * them by the amount given by the function. When false, the position of the
+     * particle is replaced by the value of the function.
+     *
+     * @authors Bruno Blais, Luca Heltai (2019)
+     */
+    void
+    set_particle_positions(const Function<spacedim> &function,
+                           const bool                displace_particles = true);
+
+    /**
+     * Read the position of the particles and store them into the distributed
+     * vector @p output_vector. By default the
+     * @p output_vector is overwritten by this operation, but you can add to
+     * its entries by setting @p add_to_output_vector to `true`.
+     *
+     * @tparam VectorType Any of the parallel distributed vectors supported by
+     * the library.
+     *
+     * This is the reverse operation of the set_particle_positions() function.
+     * The position of the particle with global index `id` is written to
+     * spacedim consecutive entries starting from
+     * `output_vector[id*spacedim]`.
+     *
+     * Notice that, if you use a distributed vector type, it is not necessary
+     * for the @p output_vector to own the entries corresponding to the indices
+     * that will be written. However you should keep in mind that this requires
+     * a global communication to distribute the entries above to their
+     * respective owners.
+     *
+     * @param[in, out] output_vector A parallel distributed vector containing
+     * the positions of the particles, or updated with the positions of the
+     * particles.
+     *
+     * @param[in] add_to_output_vector Control if the function should set the
+     * entries of the @p output_vector or if should add to them.
+     *
+     * @author Luca Heltai, Bruno Blais, 2019.
+     */
+    template <class VectorType>
+    void
+    get_particle_positions(VectorType &output_vector,
+                           const bool  add_to_output_vector = false);
+
+    /**
+     * Gather the position of the particles within the particle handler in
+     * a vector of points. The order of the points is the same on would obtain
+     * by iterating over all (local) particles, and querying their locations.
+     *
+     * @param [in,out] positions A vector preallocated at size
+     * `particle_handler.n_locally_owned_articles` and whose points will become
+     * the positions of the locally owned particles
+     *
+     * @param [in] add_to_output_vector When true, the value of the point of
+     * the particles is added to the positions vector. When false,
+     * the value of the points in the positions vector are replaced by the
+     * position of the particles.
+     *
+     * @authors Bruno Blais, Luca Heltai (2019)
+     *
+     */
+    void
+    get_particle_positions(std::vector<Point<spacedim>> &positions,
+                           const bool add_to_output_vector = false);
 
     /**
      * This function allows to register three additional functions that are
@@ -301,6 +519,27 @@ namespace Particles
     get_next_free_particle_index() const;
 
     /**
+     * Extract an IndexSet with global dimensions equal to
+     * get_next_free_particle_index(), containing the locally owned
+     * particle indices.
+     *
+     * This function can be used to construct distributed vectors and matrices
+     * to manipulate particles using linear algebra operations.
+     *
+     * Notice that it is the user's responsibility to guarantee that particle
+     * indices are unique, and no check is performed to verify that this is the
+     * case, nor that the union of all IndexSet objects on each mpi process is
+     * complete.
+     *
+     * @return An IndexSet of size get_next_free_particle_index(), containing
+     * n_locally_owned_particle() indices.
+     *
+     * @author Luca Heltai, Bruno Blais, 2019.
+     */
+    IndexSet
+    locally_relevant_ids() const;
+
+    /**
      * Return the number of properties each particle has.
      */
     unsigned int
@@ -343,7 +582,8 @@ namespace Particles
     /**
      * Callback function that should be called before every refinement
      * and when writing checkpoints. This function is used to
-     * register store_particles() with the triangulation.
+     * register store_particles() with the triangulation. This function
+     * is used in step-70.
      */
     void
     register_store_callback_function();
@@ -351,7 +591,8 @@ namespace Particles
     /**
      * Callback function that should be called after every refinement
      * and after resuming from a checkpoint.  This function is used to
-     * register load_particles() with the triangulation.
+     * register load_particles() with the triangulation. This function
+     * is used in step-70.
      */
     void
     register_load_callback_function(const bool serialization);
@@ -367,7 +608,7 @@ namespace Particles
     /**
      * Address of the triangulation to work on.
      */
-    SmartPointer<const parallel::distributed::Triangulation<dim, spacedim>,
+    SmartPointer<const Triangulation<dim, spacedim>,
                  ParticleHandler<dim, spacedim>>
       triangulation;
 
@@ -464,7 +705,18 @@ namespace Particles
      */
     unsigned int handle;
 
-#  ifdef DEAL_II_WITH_MPI
+    /**
+     * The GridTools::Cache is used to store the information about the
+     * vertex_to_cells set and the vertex_to_cell_centers vectors to prevent
+     * recomputing them every time we sort_into_subdomain_and_cells().
+     * This cache is automatically updated when the triangulation has
+     * changed. This cache is stored within a unique pointer because the
+     * particle handler has a constructor that enables it to be constructed
+     * without a triangulation. The cache does not have such a constructor.
+     */
+    std::unique_ptr<GridTools::Cache<dim, spacedim>> triangulation_cache;
+
+#ifdef DEAL_II_WITH_MPI
     /**
      * Transfer particles that have crossed subdomain boundaries to other
      * processors.
@@ -500,7 +752,7 @@ namespace Particles
           types::subdomain_id,
           std::vector<
             typename Triangulation<dim, spacedim>::active_cell_iterator>>());
-#  endif
+#endif
 
     /**
      * Called by listener functions from Triangulation for every cell
@@ -524,7 +776,12 @@ namespace Particles
         &data_range);
   };
 
-  /* ---------------------- inline and template functions ------------------ */
+
+
+  /* ---------------------- inline and template functions ------------------
+   */
+
+
 
   template <int dim, int spacedim>
   template <class Archive>
@@ -539,9 +796,61 @@ namespace Particles
       &global_number_of_particles &global_max_particles_per_cell
         &                          next_free_particle_index;
   }
-} // namespace Particles
 
-#endif // DEAL_II_WITH_P4EST
+
+
+  template <int dim, int spacedim>
+  template <class VectorType>
+  typename std::enable_if<
+    std::is_convertible<VectorType *, Function<spacedim> *>::value ==
+    false>::type
+  ParticleHandler<dim, spacedim>::set_particle_positions(
+    const VectorType &input_vector,
+    const bool        displace_particles)
+  {
+    AssertDimension(input_vector.size(),
+                    get_next_free_particle_index() * spacedim);
+    for (auto &p : *this)
+      {
+        auto       new_point(displace_particles ? p.get_location() :
+                                            Point<spacedim>());
+        const auto id = p.get_id();
+        for (unsigned int i = 0; i < spacedim; ++i)
+          new_point[i] += input_vector[id * spacedim + i];
+        p.set_location(new_point);
+      }
+    sort_particles_into_subdomains_and_cells();
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class VectorType>
+  void
+  ParticleHandler<dim, spacedim>::get_particle_positions(
+    VectorType &output_vector,
+    const bool  add_to_output_vector)
+  {
+    AssertDimension(output_vector.size(),
+                    get_next_free_particle_index() * spacedim);
+    for (const auto &p : *this)
+      {
+        auto       point = p.get_location();
+        const auto id    = p.get_id();
+        if (add_to_output_vector)
+          for (unsigned int i = 0; i < spacedim; ++i)
+            output_vector[id * spacedim + i] += point[i];
+        else
+          for (unsigned int i = 0; i < spacedim; ++i)
+            output_vector[id * spacedim + i] = point[i];
+      }
+    if (add_to_output_vector)
+      output_vector.compress(VectorOperation::add);
+    else
+      output_vector.compress(VectorOperation::insert);
+  }
+
+} // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE
 

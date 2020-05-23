@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -38,6 +38,16 @@ MACRO(SETUP_THREADING)
 
     RESET_CMAKE_REQUIRED()
 
+    #
+    # The FindThreads macro returned a linker option instead of the actual
+    # library name in earlier versions. We still require the linker option,
+    # so we fix the corresponding variable.
+    #  - See: https://gitlab.kitware.com/cmake/cmake/issues/19747
+    #
+    IF(CMAKE_THREAD_LIBS_INIT AND NOT "${CMAKE_THREAD_LIBS_INIT}" MATCHES "^-l")
+      STRING(PREPEND CMAKE_THREAD_LIBS_INIT "-l")
+    ENDIF()
+
   ELSE()
 
     #
@@ -65,7 +75,7 @@ MACRO(SETUP_THREADING)
   MARK_AS_ADVANCED(pthread_LIBRARY)
 
   #
-  # Change -lphtread to -pthread for better compatibility on non linux
+  # Change -lpthread to -pthread for better compatibility on non linux
   # platforms:
   #
   IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
@@ -139,6 +149,18 @@ MACRO(FEATURE_THREADS_FIND_EXTERNAL var)
     SET(${var} TRUE)
   ENDIF()
 
+  #
+  # TBB currently uses the version numbering scheme
+  #
+  #     YYYY.X
+  #
+  # (e.g., 2018.0) where YYYY is the year of the release and X is the yearly
+  # release number. Older versions use
+  #
+  #     X.Y.Z
+  #
+  # (e.g., 4.2.1). Since we are compatible with all versions that use the new
+  # numbering scheme we only check for very old versions here.
   #
   # TBB versions before 4.2 are missing some explicit calls to std::atomic::load
   # in ternary expressions; these cause compilation errors in some compilers

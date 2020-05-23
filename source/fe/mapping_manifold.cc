@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,67 +117,23 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
                      std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
           // Compute tangentials to the unit cell.
-          for (unsigned int i = 0; i < unit_tangentials.size(); ++i)
-            unit_tangentials[i].resize(n_original_q_points);
-          switch (dim)
+          for (const unsigned int i : GeometryInfo<dim>::face_indices())
             {
-              case 2:
+              unit_tangentials[i].resize(n_original_q_points);
+              std::fill(unit_tangentials[i].begin(),
+                        unit_tangentials[i].end(),
+                        GeometryInfo<dim>::unit_tangential_vectors[i][0]);
+              if (dim > 2)
                 {
-                  // ensure a counterclockwise
-                  // orientation of tangentials
-                  static const int tangential_orientation[4] = {-1, 1, 1, -1};
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::faces_per_cell;
-                       ++i)
-                    {
-                      Tensor<1, dim> tang;
-                      tang[1 - i / 2] = tangential_orientation[i];
-                      std::fill(unit_tangentials[i].begin(),
-                                unit_tangentials[i].end(),
-                                tang);
-                    }
-                  break;
+                  unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                    .resize(n_original_q_points);
+                  std::fill(
+                    unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                      .begin(),
+                    unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
+                      .end(),
+                    GeometryInfo<dim>::unit_tangential_vectors[i][1]);
                 }
-              case 3:
-                {
-                  for (unsigned int i = 0;
-                       i < GeometryInfo<dim>::faces_per_cell;
-                       ++i)
-                    {
-                      Tensor<1, dim> tang1, tang2;
-
-                      const unsigned int nd =
-                        GeometryInfo<dim>::unit_normal_direction[i];
-
-                      // first tangential
-                      // vector in direction
-                      // of the (nd+1)%3 axis
-                      // and inverted in case
-                      // of unit inward normal
-                      tang1[(nd + 1) % dim] =
-                        GeometryInfo<dim>::unit_normal_orientation[i];
-                      // second tangential
-                      // vector in direction
-                      // of the (nd+2)%3 axis
-                      tang2[(nd + 2) % dim] = 1.;
-
-                      // same unit tangents
-                      // for all quadrature
-                      // points on this face
-                      std::fill(unit_tangentials[i].begin(),
-                                unit_tangentials[i].end(),
-                                tang1);
-                      std::fill(
-                        unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                          .begin(),
-                        unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
-                          .end(),
-                        tang2);
-                    }
-                  break;
-                }
-              default:
-                Assert(false, ExcNotImplemented());
             }
         }
     }
@@ -222,7 +178,7 @@ MappingManifold<dim, spacedim>::transform_unit_to_real_cell(
   std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
   std::array<double, GeometryInfo<dim>::vertices_per_cell>          weights;
 
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
     {
       vertices[v] = cell->vertex(v);
       weights[v]  = GeometryInfo<dim>::d_linear_shape_function(p, v);
@@ -460,9 +416,8 @@ namespace internal
                     const Point<dim> np(p + L * ei);
 
                     // Get the weights to compute the np point in real space
-                    for (unsigned int j = 0;
-                         j < GeometryInfo<dim>::vertices_per_cell;
-                         ++j)
+                    for (const unsigned int j :
+                         GeometryInfo<dim>::vertex_indices())
                       data.vertex_weights[j] =
                         GeometryInfo<dim>::d_linear_shape_function(np, j);
 
@@ -507,9 +462,9 @@ template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingManifold<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const CellSimilarity::Similarity,
+  const Quadrature<dim> &                                  quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -585,39 +540,30 @@ MappingManifold<dim, spacedim>::fill_fe_values(
               output_data.JxW_values[point] =
                 std::sqrt(determinant(G)) * weights[point];
 
-              if (cell_similarity == CellSimilarity::inverted_translation)
+              if (update_flags & update_normal_vectors)
                 {
-                  // we only need to flip the normal
-                  if (update_flags & update_normal_vectors)
+                  Assert(spacedim == dim + 1,
+                         ExcMessage(
+                           "There is no (unique) cell normal for " +
+                           Utilities::int_to_string(dim) +
+                           "-dimensional cells in " +
+                           Utilities::int_to_string(spacedim) +
+                           "-dimensional space. This only works if the "
+                           "space dimension is one greater than the "
+                           "dimensionality of the mesh cells."));
+
+                  if (dim == 1)
+                    output_data.normal_vectors[point] =
+                      cross_product_2d(-DX_t[0]);
+                  else // dim == 2
+                    output_data.normal_vectors[point] =
+                      cross_product_3d(DX_t[0], DX_t[1]);
+
+                  output_data.normal_vectors[point] /=
+                    output_data.normal_vectors[point].norm();
+
+                  if (cell->direction_flag() == false)
                     output_data.normal_vectors[point] *= -1.;
-                }
-              else
-                {
-                  if (update_flags & update_normal_vectors)
-                    {
-                      Assert(spacedim == dim + 1,
-                             ExcMessage(
-                               "There is no (unique) cell normal for " +
-                               Utilities::int_to_string(dim) +
-                               "-dimensional cells in " +
-                               Utilities::int_to_string(spacedim) +
-                               "-dimensional space. This only works if the "
-                               "space dimension is one greater than the "
-                               "dimensionality of the mesh cells."));
-
-                      if (dim == 1)
-                        output_data.normal_vectors[point] =
-                          cross_product_2d(-DX_t[0]);
-                      else // dim == 2
-                        output_data.normal_vectors[point] =
-                          cross_product_3d(DX_t[0], DX_t[1]);
-
-                      output_data.normal_vectors[point] /=
-                        output_data.normal_vectors[point].norm();
-
-                      if (cell->direction_flag() == false)
-                        output_data.normal_vectors[point] *= -1.;
-                    }
                 }
             } // codim>0 case
         }
@@ -629,22 +575,20 @@ MappingManifold<dim, spacedim>::fill_fe_values(
   if (update_flags & update_jacobians)
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          output_data.jacobians[point] = data.contravariant[point];
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        output_data.jacobians[point] = data.contravariant[point];
     }
 
   // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
-      if (cell_similarity != CellSimilarity::translation)
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          output_data.inverse_jacobians[point] =
-            data.covariant[point].transpose();
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        output_data.inverse_jacobians[point] =
+          data.covariant[point].transpose();
     }
 
-  return cell_similarity;
+  return CellSimilarity::invalid_next_cell;
 }
 
 

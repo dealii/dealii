@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,8 +29,11 @@
 #include "../tests.h"
 
 
+template <int dim, int spacedim>
 std::vector<int>
-get_data_of_first_child(const std::vector<std::vector<int>> &children_values)
+get_data_of_first_child(
+  const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+  const std::vector<std::vector<int>> &children_values)
 {
   return children_values[0];
 }
@@ -86,9 +89,13 @@ test()
   // ----- transfer -----
   parallel::distributed::
     CellDataTransfer<dim, spacedim, std::vector<std::vector<int>>>
-      cell_data_transfer(tria,
-                         /*transfer_variable_size_data=*/true,
-                         /*coarsening_strategy=*/&get_data_of_first_child);
+    cell_data_transfer(
+      tria,
+      /*transfer_variable_size_data=*/true,
+      /*refinement_strategy=*/
+      &dealii::AdaptationStrategies::Refinement::
+        preserve<dim, spacedim, std::vector<int>>,
+      /*coarsening_strategy=*/&get_data_of_first_child<dim, spacedim>);
 
   cell_data_transfer.prepare_for_coarsening_and_refinement(cell_data);
   tria.execute_coarsening_and_refinement();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 // Check that boost adaptors for bounding boxes work
 
 #include <deal.II/boost_adaptors/bounding_box.h>
+
+#include <boost/geometry/algorithms/equals.hpp>
 
 #include "../tests.h"
 

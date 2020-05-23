@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,24 +17,28 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
   cell_id.cc
-  grid_generator.cc
-  grid_in.cc
-  grid_out.cc
   grid_refinement.cc
-  grid_tools_cache.cc
+  grid_reordering.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
   persistent_tria.cc
   tria_accessor.cc
+  tria_description.cc
   tria_faces.cc
   tria_levels.cc
   tria_objects.cc
   )
 
 SET(_separate_src
-  grid_reordering.cc
+  grid_generator_from_name.cc
+  grid_in.cc
+  grid_out.cc
+  grid_generator.cc
   grid_tools.cc
+  grid_tools_2.cc
+  grid_tools_cache.cc
+  grid_tools_nontemplates.cc
   grid_tools_dof_handlers.cc
   tria.cc
   )
@@ -51,6 +55,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
 SET(_inst
   cell_id.inst.in
   grid_generator.inst.in
+  grid_generator_from_name.inst.in
   grid_in.inst.in
   grid_out.inst.in
   grid_refinement.inst.in
@@ -61,6 +66,7 @@ SET(_inst
   manifold.inst.in
   manifold_lib.inst.in
   tria_accessor.inst.in
+  tria_description.inst.in
   tria.inst.in
   tria_objects.inst.in
   )

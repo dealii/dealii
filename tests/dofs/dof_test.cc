@@ -157,7 +157,7 @@ CurvedLine<dim>::get_new_point_on_quad(
   // z-value of the midpoint is either
   // 0 or 1, then the z-values of all
   // vertices of the quad is like that
-  if ((middle(2) == 0) || (middle(2) == 1))
+  if (dim == 3 && (middle(dim - 1) == 0) || (middle(dim - 1) == 1))
     return middle;
 
   double x = middle(0), y = middle(1);

@@ -23,20 +23,20 @@ All entries are signed with the names of the author.
 
 
 <ol>
-  <li> <p> 
+  <li> <p>
        Fixed: In 3d, the function <code
-       class="member">DoFTools::make_hanging_node_constraints</code> 
+       class="member">DoFTools::make_hanging_node_constraints</code>
        contained an assertion that failed erroneously for finite
        elements that do not have degrees of freedom on vertices. This
        is now fixed.
-       <br> 
+       <br>
        (WB 2002/02/21)
        </p>
 
   <li> <p>
        Fixed: <code>TriaAccessor<3,3>::measure</code>
        sometimes computed a negative value. This is now fixed.
-       <br> 
+       <br>
        (WB 2002/02/21)
        </p>
 </ol>

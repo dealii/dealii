@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 - 2017 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,5 +25,8 @@ SET(src_boost_iostreams
     mapped_file.cpp
     zlib.cpp
     )
+
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-deprecated-copy)
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-c11-extensions)
 
 DEAL_II_ADD_LIBRARY(obj_boost_iostreams OBJECT ${src_boost_iostreams})

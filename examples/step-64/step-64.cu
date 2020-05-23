@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -17,7 +17,7 @@
  * Authors: Bruno Turcksin, Daniel Arndt, Oak Ridge National Laboratory, 2019
  */
 
-// First include the necessary files from the deal.II libary known from the
+// First include the necessary files from the deal.II library known from the
 // previous tutorials.
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -120,7 +120,9 @@ namespace Step64
   // The class `HelmholtzOperatorQuad` implements the evaluation of
   // the Helmholtz operator at each quadrature point. It uses a
   // similar mechanism as the MatrixFree framework introduced in
-  // step-37. As before, the functions of this class need to run on
+  // step-37. In contrast to there, the actual quadrature point
+  // index is treated implicitly by converting the current thread
+  // index. As before, the functions of this class need to run on
   // the device, so need to be marked as `__device__` for the
   // compiler.
   template <int dim, int fe_degree>
@@ -132,8 +134,7 @@ namespace Step64
     {}
 
     __device__ void
-    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
-               const unsigned int                          q) const;
+    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const;
 
   private:
     double coef;
@@ -149,11 +150,10 @@ namespace Step64
   // here:
   template <int dim, int fe_degree>
   __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
-                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
-             const unsigned int                          q) const
+                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
   {
-    fe_eval->submit_value(coef * fe_eval->get_value(q), q);
-    fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
+    fe_eval->submit_value(coef * fe_eval->get_value());
+    fe_eval->submit_gradient(fe_eval->get_gradient());
   }
 
 
@@ -209,7 +209,7 @@ namespace Step64
       fe_eval(cell, gpu_data, shared_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(true, true);
-    fe_eval.apply_quad_point_operations(
+    fe_eval.apply_for_each_quad_point(
       HelmholtzOperatorQuad<dim, fe_degree>(coef[pos]));
     fe_eval.integrate(true, true);
     fe_eval.distribute_local_to_global(dst);
@@ -235,6 +235,9 @@ namespace Step64
     vmult(LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &dst,
           const LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
             &src) const;
+
+    void initialize_dof_vector(
+      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const;
 
   private:
     CUDAWrappers::MatrixFree<dim, double>       mf_data;
@@ -301,6 +304,15 @@ namespace Step64
       coef.get_values());
     mf_data.cell_loop(helmholtz_operator, src, dst);
     mf_data.copy_constrained_values(src, dst);
+  }
+
+
+
+  template <int dim, int fe_degree>
+  void HelmholtzOperator<dim, fe_degree>::initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const
+  {
+    mf_data.initialize_dof_vector(vec);
   }
 
 
@@ -401,8 +413,8 @@ namespace Step64
     ghost_solution_host.reinit(locally_owned_dofs,
                                locally_relevant_dofs,
                                mpi_communicator);
-    solution_dev.reinit(locally_owned_dofs, mpi_communicator);
-    system_rhs_dev.reinit(locally_owned_dofs, mpi_communicator);
+    system_matrix_dev->initialize_dof_vector(solution_dev);
+    system_rhs_dev.reinit(solution_dev);
   }
 
 
@@ -474,7 +486,7 @@ namespace Step64
 
 
   // This solve() function finally contains the calls to the new classes
-  // previously dicussed. Here we don't use any preconditioner, i.e.
+  // previously discussed. Here we don't use any preconditioner, i.e.,
   // precondition by the identity matrix, to focus just on the peculiarities of
   // the CUDAWrappers::MatrixFree framework. Of course, in a real application
   // the choice of a suitable preconditioner is crucial but we have at least the
@@ -532,29 +544,11 @@ namespace Step64
     data_out.add_data_vector(ghost_solution_host, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(mpi_communicator)) +
-      ".vtu");
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
-
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream master_output(master_name);
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", cycle, mpi_communicator, 2);
 
     Vector<float> cellwise_norm(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,
@@ -612,7 +606,7 @@ namespace Step64
 // the machine, there is nothing we can do about it: All MPI ranks on
 // that machine need to share it. But if there are more than one GPU,
 // then it is better to address different graphic cards for different
-// processes. The choice below is based on the MPI proccess id by
+// processes. The choice below is based on the MPI process id by
 // assigning GPUs round robin to GPU ranks. (To work correctly, this
 // scheme assumes that the MPI ranks on one machine are
 // consecutive. If that were not the case, then the rank-GPU

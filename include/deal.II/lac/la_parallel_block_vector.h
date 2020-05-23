@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_PETSC
+// Forward declarations
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   namespace MPI
@@ -41,9 +43,9 @@ namespace PETScWrappers
     class BlockVector;
   }
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -51,6 +53,7 @@ namespace TrilinosWrappers
     class BlockVector;
   }
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 namespace LinearAlgebra
@@ -372,31 +375,6 @@ namespace LinearAlgebra
        */
       void
       sadd(const Number s, const BlockVector<Number> &V);
-
-      /**
-       * Assignment <tt>*this = a*u + b*v</tt>.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      void
-      equ(const Number               a,
-          const BlockVector<Number> &u,
-          const Number               b,
-          const BlockVector<Number> &v);
-
-      /**
-       * Scaling and multiple addition.
-       *
-       * This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      void
-      sadd(const Number               s,
-           const Number               a,
-           const BlockVector<Number> &V,
-           const Number               b,
-           const BlockVector<Number> &W);
 
       /**
        * Return whether the vector contains only elements with value zero.
@@ -743,7 +721,8 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
 
 
 /**
- * Declare dealii::LinearAlgebra::BlockVector< Number > as distributed vector.
+ * Declare dealii::LinearAlgebra::distributed::BlockVector as distributed
+ * vector.
  *
  * @author Uwe Koecher, 2017
  */

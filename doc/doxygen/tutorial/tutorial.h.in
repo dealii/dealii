@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,10 @@
  * </ol>
  * You can browse the available tutorial programs
  * <ol>
- *   <li> as <b><a href="#graph">a graph</a></b> that shows how tutorial programs build upon each other.
+ *   <li> as <b><a href="#graph">a graph</a></b> that shows how the major
+ *      concepts of each tutorial programs builds on previous ones (though each
+ *      program may also use minor pieces from other programs not specifically
+*       connected in the graph).
  *   <li> as <b><a href="#list">a list</a></b> that provides a short
  *     synopsis of each program.
  *   <li> or <b><a href="#topic">grouped by topic</a></b>.
@@ -51,7 +54,7 @@
  * <code>make run</code>. The latter command also compiles the program if
  * that has not already been done. The CMakeLists.txt files in the
  * different directories are based on the
- * <a href="../../users/cmakelists.html#cmakeauto" target="_top">autopilot
+ * <a href="../../users/cmake_user.html#cmakeauto" target="_top">autopilot
  * style CMakeLists.txt example</a>.
  *
  * @note Some of the tutorial programs also jointly form
@@ -66,7 +69,7 @@
  * <h3>Connections between tutorial programs</h3>
  *
  * The following graph shows the connections between tutorial programs and
- * how they build on each other.
+ * how their major components build on each other.
  * Click on any of the boxes to go to one of the programs. If you hover
  * your mouse pointer over a box, a brief description of the program
  * should appear.
@@ -86,9 +89,9 @@
  *   <tr valign="top">
  *       <td width="100px">step-1</td>
  *       <td> Creating a grid. A simple way to write it to a file.
- *       <br/> Keywords: Triangulation, GridGenerator::hyper_cube,
- *       GridGenerator::hyper_shell, GridOut,
- *       Triangulation::execute_coarsening_and_refinement
+ *       <br/> Keywords: Triangulation, GridGenerator::hyper_cube(),
+ *       GridGenerator::hyper_shell(), GridOut,
+ *       Triangulation::execute_coarsening_and_refinement()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -99,7 +102,7 @@
  *       matrices significantly, i.e. clusters nonzero entries around the
  *       diagonal.
  *       <br/> Keywords: FE_Q, DynamicSparsityPattern,
- *       DoFTools::make_sparsity_pattern, DoFHandler::distribute_dofs,
+ *       DoFTools::make_sparsity_pattern(), DoFHandler::distribute_dofs(),
  *       DoFRenumbering, SparsityPattern
  *       </td></tr>
  *
@@ -108,9 +111,9 @@
  *       <td> Actually solve Laplace's
  *       problem. Object-orientation. Assembling matrices and
  *       vectors. Boundary values.
- *       <br/> Keywords: FEValues, VectorTools::interpolate_boundary_values,
- *       MatrixTools::apply_boundary_values, SolverCG, Vector<double>,
- *       SparseMatrix<double>, DataOut
+ *       <br/> Keywords: FEValues, VectorTools::interpolate_boundary_values(),
+ *       MatrixTools::apply_boundary_values(), SolverCG, Vector,
+ *       SparseMatrix, DataOut
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -120,8 +123,8 @@
  *       solve Laplace's equation; we will solve the equation in 2D and
  *       3D, although the program is exactly the same. Non-constant right
  *       hand side function. Non-homogeneous boundary values.
- *       <br/> Keywords: VectorTools::point_value,
- *       VectorTools::compute_mean_value
+ *       <br/> Keywords: VectorTools::point_value(),
+ *       VectorTools::compute_mean_value()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -139,10 +142,10 @@
  *       <td>step-6</td>
  *       <td> Adaptive local
  *       refinement. Handling of hanging nodes. Higher order elements.
- *       Catching exceptions in the <code>main</code>; function.
- *       <br/> Keywords: DoFTools::make_hanging_node_constraints,
- *       AffineConstraints::distribute_local_to_global, KellyErrorEstimator,
- *       GridRefinement::refine_and_coarsen_fixed_number
+ *       Catching exceptions in the <code>main</code> function.
+ *       <br/> Keywords: DoFTools::make_hanging_node_constraints(),
+ *       AffineConstraints::distribute_local_to_global(), KellyErrorEstimator,
+ *       GridRefinement::refine_and_coarsen_fixed_number()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -152,8 +155,8 @@
  *       boundary integrals. Verification of correctness of computed
  *       solutions. Computing the error between exact and numerical
  *       solution and output of the data in tables. Using counted pointers.
- *       <br/> Keywords: FEFaceValues, VectorTools::integrate_difference,
- *       VectorTools::compute_global_error, TableHandler
+ *       <br/> Keywords: FEFaceValues, VectorTools::integrate_difference(),
+ *       VectorTools::compute_global_error(), TableHandler
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -171,7 +174,7 @@
  *       the system of equations in parallel using multi-threading,
  *       implementing a refinement criterion based on a finite difference
  *       approximation of the gradient.
- *       <br/> Keywords: TensorFunction, WorkStream::run, SolverGMRES
+ *       <br/> Keywords: TensorFunction, WorkStream::run(), SolverGMRES
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -179,6 +182,7 @@
  *       <td> Higher order mappings. Do not
  *       solve equations, but rather compute the value of pi to high
  *       accuracy.
+ *       <br/> Keywords: MappingQ, FE_Nothing, ConvergenceTable, GridOut, FEFaceValues
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -186,11 +190,15 @@
  *       <td> Solving a Laplace problem with
  *       higher order mappings. Using mean value constraints and
  *       intermediate representations of sparsity patterns.
+ *       <br/> Keywords: AffineConstraints, DoFTools::extract_boundary_dofs(),
+ *       TableHandler
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-12</td>
  *       <td> Discontinuous Galerkin methods for linear advection problems.
+ *       <br/> Keywords: FEInterfaceValues, MeshWorker::mesh_loop(),
+ *       DoFTools::make_flux_sparsity_pattern()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -204,18 +212,23 @@
  *       <td> Duality based error estimators,
  *       more strategies to write a modular, extensible finite element
  *       program.
+ *       <br/> Keywords: KellyErrorEstimator
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-15</td>
  *       <td> A nonlinear elliptic problem: The minimal surface equation.
  *       Newton's method. Transferring a solution across mesh refinement.
+ *       <br/> Keywords: SolutionTransfer
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-16</td>
  *       <td> Multigrid preconditioning of the Laplace equation on adaptive
  *       meshes.
+ *       <br/> Keywords: Multigrid, PreconditionMG, mg::Matrix,
+ *       MGTransferPrebuilt, MeshWorker::mesh_loop(), MGLevelObject,
+ *       MGConstrainedDoFs
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -228,19 +241,18 @@
  *       <td>step-17</td>
  *       <td> Using PETSc for linear algebra; running
  *       in parallel on clusters of computers linked together by MPI.
+ *       <br/> Keywords: PETScWrappers::MPI::SparseMatrix, ConditionalOStream,
+ *       PETScWrappers::PreconditionBlockJacobi
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-18</td>
  *       <td> A time dependent problem; using a much
  *       simplified version of implementing elasticity; moving meshes; handling
- *       large scale output of parallel programs.
- *       </td></tr>
- *
- *   <tr valign="top">
- *       <td>step-19</td>
- *       <td> Input parameter file handling. Merging
- *       output of a parallel program.
+ *       large scale output of parallel programs. Simple implicit (backward
+ *       Euler) time stepping.
+ *       <br/> Keywords: parallel::shared::Triangulation,
+ *       DataOutInterface::write_vtu_with_pvtu_record()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -248,13 +260,18 @@
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
  *       preconditioners working on the Schur complement.
+ *       <br/> Keywords: FEValuesExtractors, LinearOperator, TensorFunction,
+ *       FE_RaviartThomas
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-21</td>
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
- *       complicated block solvers. Simple time stepping.
+ *       complicated block solvers. Simple explicit (forward Euler) time 
+ *       stepping.
+ *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
+ *       VectorTools::project(), DiscreteTime
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -262,17 +279,25 @@
  *       <td> Solving the Stokes equations of slow fluid flow on adaptive
  *       meshes. More on Schur complement solvers. Advanced use of the
  *       AffineConstraints class.
+ *       <br/> Keywords: AffineConstraints,
+ *       VectorTools::compute_no_normal_flux_constraints(), SparseILU,
+ *       SparseDirectUMFPACK, BlockDynamicSparsityPattern
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
+ *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson 
+ *       method).
+ *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-24</td>
  *       <td> A variant of step-23 with absorbing
  *       boundary conditions, and extracting practically useful data.
+ *       Implicit time stepping.
+ *       <br/> Keywords: VectorTools::point_value()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -280,17 +305,23 @@
  *       <td> The sine-Gordon
  *       soliton equation, which is a nonlinear variant of the time
  *       dependent wave equation covered in step-23 and step-24.
+ *       Fractional time stepping.
+ *       <br/> Keywords: FunctionTime, VectorTools::integrate_difference()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-26</td>
  *       <td> The heat equation, solved on a mesh that is adapted
- *       every few time steps.
+ *       every few time steps. Fractional time stepping.
+ *       <br/> Keywords: KellyErrorEstimator, SolutionTransfer,
+ *       VectorTools::interpolate(), VectorTools::create_right_hand_side()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-27</td>
  *       <td> The hp finite element method.
+ *       <br/> Keywords: hp::DoFHandler, hp::FECollection, hp::QCollection,
+ *       FESeries::Fourier, Triangulation::create_triangulation()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -313,20 +344,20 @@
  *       <td>step-31</td>
  *       <td> Time-dependent Stokes flow driven by temperature
  *       differences in a fluid. Adaptive meshes that change between time
- *       steps.
+ *       steps. Implicit/explicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-32</td>
  *       <td> A massively parallel solver for time-dependent Stokes flow driven
  *       by temperature differences in a fluid. Adapting methods for real-world
- *       equations.
+ *       equations. Implicit/explicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-33</td>
  *       <td> A nonlinear hyperbolic conservation law: The Euler equations of
- *       compressible gas dynamics.
+ *       compressible gas dynamics. Fractional time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -388,28 +419,37 @@
  *   <tr valign="top">
  *       <td>step-43</td>
  *       <td> Advanced techniques for the simulation of porous media flow.
+ *       Explicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-44</td>
  *       <td> Finite strain hyperelasticity based on a three-field formulation.
+ *       Implicit time stepping.
  *       <br/> Keywords: CellDataStorage, FEValuesExtractors, WorkStream::run,
  *       BlockSparseMatrix, BlockVector, ComponentSelectFunction,
- *       Physics::Elasticity, FullMatrix::extract_submatrix_from,
- *       FullMatrix::scatter_matrix_to, LinearOperator, SolverSelector,
+ *       Physics::Elasticity, FullMatrix::extract_submatrix_from(),
+ *       FullMatrix::scatter_matrix_to(), LinearOperator, SolverSelector,
  *       PreconditionSelector, ReductionControl, MappingQEulerian
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-45</td>
  *       <td> Periodic boundary conditions.
- *       <br/> Keywords: GridTools::collect_periodic_faces,
- *       GridTools::PeriodicFacePair, Triangulation::add_periodicity
+ *       <br/> Keywords: GridTools::collect_periodic_faces(),
+ *       GridTools::PeriodicFacePair, Triangulation::add_periodicity()
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-46</td>
  *       <td> Coupling different kinds of equations in different parts of the domain.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-47</td>
+ *        <td> Solving the fourth-order biharmonic equation using the $C^0$
+ *        Interior Penalty (C0IP) method.
+ *        <br/> Keywords: FEInterfaceValues
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -425,6 +465,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-50</td>
+ *       <td> Geometric multigrid on adaptive meshes distributed in parallel.
+ *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-51</td>
  *       <td> Solving the convection-diffusion equation with a hybridizable
  *       discontinuous Galerkin method using face elements.
@@ -433,7 +479,7 @@
  *   <tr valign="top">
  *       <td>step-52</td>
  *       <td> Solving the time dependent neutron diffusion equation using
- *       Runge-Kutta methods.
+ *       Runge-Kutta methods. Explicit and implicit time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -444,7 +490,7 @@
  *   <tr valign="top">
  *       <td>step-54</td>
  *       <td> Using CAD files to describe the boundary of your domain.
- *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES,
+ *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES(),
  *       OpenCASCADE::NormalProjectionBoundary
  *       </td></tr>
  *
@@ -461,6 +507,11 @@
  *   <tr valign="top">
  *       <td>step-57</td>
  *       <td> Incompressible, stationary Navier Stokes equations.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-58</td>
+ *       <td> The nonlinear Schr&ouml;dinger equation.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -495,8 +546,8 @@
  *       <td>Block smoothers for geometric multigrid. A scalar convection
  *       diffusion equation is solved with different additive or
  *       multiplicative multigrid smoothers.
- *       <br/> Keywords: Multigrid, MeshWorker::mesh_loop,
- *       MGSmootherPrecondition, RelaxationBlock, DoFRenumbering::downstream
+ *       <br/> Keywords: Multigrid, MeshWorker::mesh_loop(),
+ *       MGSmootherPrecondition, RelaxationBlock, DoFRenumbering::downstream()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -511,7 +562,29 @@
  *        advanced manifold operations.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-67</td>
+ *        <td> Solving the Euler equations of compressible gas dynamics with an
+ *        explicit time integrator and high-order discontinuous Galerkin
+ *        methods based on matrix-free implementations.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-69</td>
+ *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
+ *        wavespeed method for the compressible Euler equations. Explicit time 
+ *        stepping.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-70</td>
+ *       <td> A fluid structure interaction problem on fully distributed
+ *       non-matching grids, using penalty methods, and a coupling constructed
+ *       through a ParticleHandler object.
+ *       </td></tr>
+ *
  * </table>
+ *
  *
  * <a name="topic"></a>
  * <h3>Tutorial programs grouped by topics</h3>
@@ -532,7 +605,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Solve the Laplace equation
+ *     <td> Solving the Laplace equation
  *     <td>step-3</td>
  *     </td>
  *   </tr>
@@ -579,7 +652,8 @@
  *       step-32,
  *       step-44,
  *       step-48,
- *       step-51
+ *       step-51,
+ *       step-69
  *     </td>
  *   </tr>
  *
@@ -596,7 +670,9 @@
  *       step-44,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -607,9 +683,11 @@
  *       step-31,
  *       step-32,
  *       step-33,
+ *       step-40,
  *       step-41,
  *       step-42,
  *       step-43,
+ *       step-50,
  *       step-55
  *     </td>
  *   </tr>
@@ -620,8 +698,8 @@
  *     <td>
  *       step-17,
  *       step-18,
- *       step-19,
  *       step-40,
+ *       step-50,
  *       step-55
  *     </td>
  *   </tr>
@@ -631,8 +709,11 @@
  *     </td>
  *     <td>
  *       step-32,
+ *       step-40,
  *       step-42,
- *       step-55
+ *       step-50,
+ *       step-55,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -660,8 +741,12 @@
  *       step-37,
  *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55,
- *       step-59
+ *       step-59,
+ *       step-67,
+ *       step-69,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -669,7 +754,6 @@
  *     <td> Input parameter handling
  *     </td>
  *     <td>
- *       step-19,
  *       step-28,
  *       step-29,
  *       step-32,
@@ -680,7 +764,9 @@
  *       step-42,
  *       step-44,
  *       step-60,
- *       step-62
+ *       step-62,
+ *       step-69,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -692,7 +778,8 @@
  *       step-11,
  *       step-32,
  *       step-60,
- *       step-65
+ *       step-65,
+ *       step-67
  *     </td>
  *   </tr>
  *
@@ -703,7 +790,8 @@
  *       step-6,
  *       step-9,
  *       step-14,
- *       step-39
+ *       step-39,
+ *       step-50
  *     </td>
  *   </tr>
  *
@@ -718,7 +806,8 @@
  *       step-33,
  *       step-42,
  *       step-43,
- *       step-57
+ *       step-57,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -730,9 +819,11 @@
  *       step-21,
  *       step-39,
  *       step-46,
+ *       step-47,
  *       step-51,
  *       step-59,
- *       step-61
+ *       step-61,
+ *       step-67
  *     </td>
  *   </tr>
  *
@@ -755,6 +846,12 @@
  *     <td> Computing Jacobians from residuals, automatic differentiation
  *     </td>
  *     <td>step-33</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Operator splitting
+ *     </td>
+ *     <td>step-21, step-31, step-32, step-58</td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -786,7 +883,8 @@
  *       step-37,
  *       step-48,
  *       step-59,
- *       step-64
+ *       step-64,
+ *       step-67
  *     </td>
  *   </tr>
  *
@@ -805,7 +903,8 @@
  *     <td> Non matching algorithms
  *     </td>
  *     <td>
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -840,6 +939,19 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> Direct solvers
+ *     </td>
+ *     <td>
+ *       step-29,
+ *       step-44,
+ *       step-47,
+ *       step-46,
+ *       step-58,
+ *       step-62
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Multilevel preconditioners
  *     </td>
  *     <td>
@@ -852,6 +964,7 @@
  *       step-41,
  *       step-42,
  *       step-43,
+ *       step-50,
  *       step-56,
  *       step-59,
  *       step-63
@@ -868,6 +981,7 @@
  *       step-37,
  *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55,
  *       step-59
  *     </td>
@@ -886,7 +1000,8 @@
  *       step-55,
  *       step-56,
  *       step-57,
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -919,11 +1034,14 @@
  *     </td>
  *     <td>
  *       step-44,
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Other equations</b></h4>
  * <table align="center" width="90%">
  *
@@ -950,7 +1068,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> The heat equation
+ *     <td> Heat equation
  *     </td>
  *     <td>
  *       step-26
@@ -989,7 +1107,11 @@
  *   <tr valign="top">
  *     <td> The nonlinear hyperbolic Euler system of compressible gas dynamics
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-67,
+ *       step-69
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -1013,7 +1135,8 @@
  *       step-46,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -1024,7 +1147,8 @@
  *       step-23,
  *       step-24,
  *       step-25,
- *       step-48
+ *       step-48,
+ *       step-58
  *     </td>
  *   </tr>
  *
@@ -1047,6 +1171,12 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> Fourth-order biharmonic equation
+ *     </td>
+ *     <td>step-47</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> The obstacle problem, a variational inequality
  *     </td>
  *     <td>
@@ -1056,12 +1186,21 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> The nonlinear Schr&ouml;dinger equation
+ *     </td>
+ *     <td>step-58</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     </td>
  *     <td>step-46</td>
  *   </tr>
  *
  * </table>
+ *
+ *
+ *
  * <h4><b>%Vector problems</b></h4>
  * <table align="center" width="90%">
  *
@@ -1097,7 +1236,8 @@
  *         step-35,
  *         step-55,
  *         step-56,
- *         step-57
+ *         step-57,
+ *         step-70
  *    </td>
  *   </tr>
  *
@@ -1110,7 +1250,11 @@
  *   <tr valign="top">
  *     <td> The Euler equations of compressible gas dynamics
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-67,
+ *       step-69
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -1119,6 +1263,7 @@
  *   </tr>
  *
  * </table>
+ *
  *
  *
  * <h4><b>Time dependent problems</b></h4>
@@ -1154,7 +1299,8 @@
  *     <td>step-23,
  *         step-24,
  *         step-25,
- *         step-48
+ *         step-48,
+ *         step-58
  *     </td>
  *   </tr>
  *
@@ -1169,13 +1315,29 @@
  *   <tr valign="top">
  *     <td> The Euler equations of compressible gas dynamics
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-67,
+ *       step-69
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> The nonlinear Schr&ouml;dinger equation
+ *     </td>
+ *     <td>step-58</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Time dependent neutron diffusion equation
  *     </td>
  *     <td>step-52</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Time dependent fluid structure interaction problems
+ *     </td>
+ *     <td>step-70</td>
  *   </tr>
  * </table>
  */

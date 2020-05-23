@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,11 +34,11 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>ConstantFunction</tt> etc also work for time dependent problems.
  *
  * Access to the time goes through the following functions:
- *  @verbatim
+ * <ul>
  *  <li> <tt>get_time</tt>: return the present value of the time variable.
  *  <li> <tt>set_time</tt>: set the time value to a specific value.
  *  <li> <tt>advance_time</tt>: increase the time by a certain time step.
- *  @endverbatim
+ * </ul>
  * The latter two functions are virtual, so that derived classes can perform
  * computations which need only be done once for every new time. For example,
  * if a time dependent function had a factor <tt>sin(t)</tt>, then it may be a

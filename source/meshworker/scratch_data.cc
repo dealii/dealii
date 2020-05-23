@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,8 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
+
+#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/meshworker/scratch_data.h>
 

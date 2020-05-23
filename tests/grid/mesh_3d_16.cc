@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,6 +34,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include "../tests.h"
+
 #include "mesh_3d.h"
 
 
@@ -62,7 +63,7 @@ void check(Triangulation<3> &tria)
       // and make sure that the
       // result of the integration is
       // close to zero
-      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
         {
           fe_face_values.reinit(cell, f);
           for (unsigned int q = 0; q < q_face.size(); ++q)
@@ -74,7 +75,7 @@ void check(Triangulation<3> &tria)
 
       // now same for subface
       // integration
-      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
         for (unsigned int sf = 0; sf < GeometryInfo<3>::max_children_per_face;
              ++sf)
           {

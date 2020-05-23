@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -330,10 +330,10 @@ namespace hp
   FECollection<dim, spacedim>::next_in_hierarchy(
     const unsigned int fe_index) const
   {
-    Assert(fe_index < size(), ExcIndexRange(fe_index, 0, size()));
+    AssertIndexRange(fe_index, size());
 
     const unsigned int new_fe_index = hierarchy_next(*this, fe_index);
-    Assert(new_fe_index < size(), ExcIndexRange(new_fe_index, 0, size()));
+    AssertIndexRange(new_fe_index, size());
 
     return new_fe_index;
   }
@@ -345,10 +345,10 @@ namespace hp
   FECollection<dim, spacedim>::previous_in_hierarchy(
     const unsigned int fe_index) const
   {
-    Assert(fe_index < size(), ExcIndexRange(fe_index, 0, size()));
+    AssertIndexRange(fe_index, size());
 
     const unsigned int new_fe_index = hierarchy_prev(*this, fe_index);
-    Assert(new_fe_index < size(), ExcIndexRange(new_fe_index, 0, size()));
+    AssertIndexRange(new_fe_index, size());
 
     return new_fe_index;
   }

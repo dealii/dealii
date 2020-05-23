@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 // (2) the case that all entries of the local matrix
 //     are zero while a dof is constrained.
 
-using namespace dealii;
 
 int
 main()

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,7 @@ check()
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
-  dof.distribute_mg_dofs(fe);
+  dof.distribute_mg_dofs();
 
   std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
   std::vector<types::global_dof_index> mg_dof_indices(fe.dofs_per_cell);

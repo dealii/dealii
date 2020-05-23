@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,10 +25,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class MappingQ;
 template <int dim>
 class Quadrature;
+#endif
 
 /*!@addtogroup fe */
 /*@{*/
@@ -106,7 +109,7 @@ class Quadrature;
  * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
 template <int dim, int spacedim = dim>
-class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
+class FE_DGQ : public FE_Poly<dim, spacedim>
 {
 public:
   /**
@@ -316,17 +319,6 @@ public:
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const override;
-
-  /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object.
-   *
-   * This function is made virtual, since finite element objects are usually
-   * accessed through pointers to their base class, rather than the class
-   * itself.
-   */
-  virtual std::size_t
-  memory_consumption() const override;
 
   virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;

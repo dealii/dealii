@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018-2014 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,8 +32,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 
 

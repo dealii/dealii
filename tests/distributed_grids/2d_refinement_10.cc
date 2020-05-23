@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Purpose of this test:
 // Demonstrate that mesh smoothing option limit_level_difference_at_vertices

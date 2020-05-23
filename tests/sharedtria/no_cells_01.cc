@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,7 +74,8 @@ test()
 
   deallog << "n_locally_owned_dofs_per_processor: ";
   const std::vector<types::global_dof_index> v =
-    dof_handler.compute_n_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.n_locally_owned_dofs());
   unsigned int sum = 0;
   for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -86,10 +87,13 @@ test()
   dof_handler.locally_owned_dofs().write(deallog.get_file_stream());
   deallog << std::endl;
 
-  Assert(dof_handler.n_locally_owned_dofs() ==
-           dof_handler.compute_n_locally_owned_dofs_per_processor()
-             [triangulation.locally_owned_subdomain()],
-         ExcInternalError());
+  Assert(
+    dof_handler.n_locally_owned_dofs() ==
+      Utilities::MPI::all_gather(
+        MPI_COMM_WORLD,
+        dof_handler
+          .n_locally_owned_dofs())[triangulation.locally_owned_subdomain()],
+    ExcInternalError());
   Assert(dof_handler.n_locally_owned_dofs() ==
            dof_handler.locally_owned_dofs().n_elements(),
          ExcInternalError());
@@ -98,12 +102,14 @@ test()
 
   Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
   const std::vector<types::global_dof_index> n_owned_dofs =
-    dof_handler.compute_n_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.n_locally_owned_dofs());
   Assert(std::accumulate(n_owned_dofs.begin(), n_owned_dofs.end(), 0U) == N,
          ExcInternalError());
 
   const std::vector<IndexSet> owned_dofs =
-    dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet all(N);
   for (unsigned int i = 0; i < owned_dofs.size(); ++i)
     {

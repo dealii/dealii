@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,9 +53,5 @@ check()
 int
 main()
 {
-  std::string   logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-
   check<1>();
 }

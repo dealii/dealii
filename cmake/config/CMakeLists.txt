@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -150,10 +150,20 @@ CONFIGURE_FILE(
 # For installation:
 #
 
+# Make sure that we only ever record the bundled subdirectory if it is in
+# fact created:
+IF("${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
+  SET(_installed_bundled "")
+ELSE()
+  SET(_installed_bundled
+    "\${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled"
+    )
+ENDIF()
+
 SET(CONFIG_BUILD_DIR FALSE)
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
-  \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+  ${_installed_bundled}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 

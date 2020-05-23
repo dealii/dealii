@@ -60,7 +60,10 @@ to be specified for a unique solution:
 In above formulation, $\varepsilon(\mathbf{u})= \frac 12 (\nabla \mathbf{u} + \nabla
 \mathbf{u}^T)$ is the symmetric gradient of the displacement, also called the
 <em>strain</em>. $C$ is a tensor of rank 4, called the <em>stress-strain
-  tensor</em> that contains knowledge of the elastic strength of the material; its
+  tensor</em> (the inverse of the <a
+  href="https://en.wikipedia.org/wiki/Hooke%27s_law#Hooke's_law_for_continuous_media"><em>compliance
+  tensor</em></a>)
+that contains knowledge of the elastic strength of the material; its
 symmetry properties make sure that it maps symmetric tensors of rank 2
 (&ldquo;matrices&rdquo; of dimension $d$, where $d$ is the spatial dimensionality) onto
 symmetric tensors of the same rank. We will comment on the roles of the strain
@@ -193,7 +196,23 @@ such that
   (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
   -(\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}
   \\
-  &\qquad +(\mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1}), \varphi)_{\Gamma_N}
+  &\qquad
+  +(\mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1}), \varphi)_{\Gamma_N}
+  +(\sigma^{n-1} \mathbf{n}, \varphi)_{\Gamma_N}
+  \\
+  &\qquad\qquad
+  \forall \varphi \in \{\mathbf{v}\in H^1(\Omega(t_{n-1}))^d: \mathbf{v}|_{\Gamma_D}=0\}.
+@f}
+Using that $\sigma^{n-1} \mathbf{n}
+            = [C \varepsilon(\mathbf{u}^{n-1})] \mathbf{n}
+            = \mathbf{b}(\mathbf x, t_{n-1})$,
+these equations can be simplified to
+@f{align*}
+  (C \varepsilon(\Delta\mathbf{u}^n), \varepsilon(\varphi) )_{\Omega(t_{n-1})}
+  &=
+  (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
+  -(\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}
+  +(\mathbf{b}(\mathbf{x},t_n),t_{n-1}), \varphi)_{\Gamma_N}
   \\
   &\qquad\qquad
   \forall \varphi \in \{\mathbf{v}\in H^1(\Omega(t_{n-1}))^d: \mathbf{v}|_{\Gamma_D}=0\}.
@@ -201,16 +220,17 @@ such that
   \qquad
   \textrm{[linear-system]}
 @f}
+
 We note that, for simplicity, in the program we will always assume that there
 are no boundary forces, i.e. $\mathbf{b} = 0$, and that the deformation of the
 body is driven by body forces $\mathbf{f}$ and prescribed boundary displacements
 $\mathbf{d}$ alone. It is also worth noting that when integrating by parts, we
 would get terms of the form $(C \varepsilon(\Delta\mathbf{u}^n), \nabla \varphi
-)_{\Omega(t_{n-1})}$, but that we replace it with the term involving the
+)_{\Omega(t_{n-1})}$, but that we replace them with the term involving the
 symmetric gradient $\varepsilon(\varphi)$ instead of $\nabla\varphi$. Due to
-the symmetry of $C$, the two terms are equivalent, but the symmetric version
-avoids a potential for round-off to render the resulting matrix slightly
-non-symmetric.
+the symmetry of $C$, the two terms are mathematically equivalent, but
+the symmetric version avoids the potential for round-off errors making
+the resulting matrix slightly non-symmetric.
 
 The system at time step $n$, to be solved on the old domain
 $\Omega(t_{n-1})$, has exactly the form of a stationary elastic
@@ -347,13 +367,13 @@ the correct files and allow moving around in time, both support record files
 that reference all files for a given timestep. Sadly, the record files have a
 different format between VisIt and Paraview, so we write out both formats.
 
-The code will generate the files <code>solution-TTTT.NNN.vtu</code>, 
-where <code>TTTT</code> is the timestep number (starting from 1) and 
+The code will generate the files <code>solution-TTTT.NNN.vtu</code>,
+where <code>TTTT</code> is the timestep number (starting from 1) and
 <code>NNN</code> is the process rank (starting from
 0). These files contain the locally owned cells for the timestep and
 processor. The files <code>solution-TTTT.visit</code> is the visit record
 for timestep <code>TTTT</code>, while <code>solution-TTTT.pvtu</code> is
-the same for ParaView. (More recent versions of Visit can actually read
+the same for ParaView. (More recent versions of VisIt can actually read
 <code>.pvtu</code> files as well, but it doesn't hurt to output both
 kinds of record files.) Finally, the file
 <code>solution.pvd</code> is a special record only supported by ParaView that references
@@ -381,14 +401,14 @@ partitions itself among all involved processes (which it knows about because
 you have to tell it about the @ref GlossMPICommunicator "MPI communicator"
 that connects these processes upon construction of the triangulation).
 Otherwise, the parallel::shared::Triangulation looks, for all practical
-purposes, like a regular Triangulation object. 
+purposes, like a regular Triangulation object.
 
 The convenience of using this class does not only result from being able
 to avoid the manual call to GridTools::partition(). Rather, the DoFHandler
 class now also knows that you want to use it in a parallel context, and
 by default automatically enumerates degrees of freedom in such a way
 that all DoFs owned by process zero come before all DoFs owned by process 1,
-etc. In other words, you can also avoid the call to 
+etc. In other words, you can also avoid the call to
 DoFRenumbering::subdomain_wise().
 
 There are other benefits. For example, because the triangulation knows that
@@ -404,7 +424,7 @@ using the syntax
 @endcode
 This knowledge extends to the DoFHandler object built on such triangulations,
 which can then identify which degrees of freedom are locally owned
-(see @ref GlossLocallyOwnedDofs) via calls such as 
+(see @ref GlossLocallyOwnedDof) via calls such as
 DoFHandler::compute_n_locally_owned_dofs_per_processor() and
 DoFTools::extract_locally_relevant_dofs(). Finally, the DataOut class
 also knows how to deal with such triangulations and will simply skip

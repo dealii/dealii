@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ check(const FiniteElement<dim> &fe)
 
       DoFHandler<dim> mgdof(tr);
       mgdof.distribute_dofs(fe);
-      mgdof.distribute_mg_dofs(fe);
+      mgdof.distribute_mg_dofs();
 
       Tensor<1, dim> exponents_monomial;
       for (unsigned int d = 0; d < dim; ++d)

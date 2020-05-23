@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -77,6 +77,6 @@ main(int argc, char **argv)
   VectorType v(N);
   v          = 1.0;
   auto niter = kinsol.solve(v);
-  deallog << v << std::endl;
+  v.print(deallog.get_file_stream());
   deallog << "Converged in " << niter << " iterations." << std::endl;
 }

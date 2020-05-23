@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,10 @@
 #ifndef dealii_polynomials_rannacher_turek_h
 #define dealii_polynomials_rannacher_turek_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/point.h>
+#include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/tensor.h>
 
 #include <vector>
@@ -38,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2015
  */
 template <int dim>
-class PolynomialsRannacherTurek
+class PolynomialsRannacherTurek : public ScalarPolynomialsBase<dim>
 {
 public:
   /**
@@ -55,28 +58,56 @@ public:
    * Value of basis function @p i at @p p.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * <tt>order</tt>-th of basis function @p i at @p p.
    *
-   * Consider using compute() instead.
+   * Consider using evaluate() instead.
    */
   template <int order>
   Tensor<order, dim>
   compute_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
+   * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   */
+  virtual Tensor<1, dim>
+  compute_1st_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   */
+  virtual Tensor<2, dim>
+  compute_2nd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   */
+  virtual Tensor<3, dim>
+  compute_3rd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   */
+  virtual Tensor<4, dim>
+  compute_4th_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
    * Gradient of basis function @p i at @p p.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Gradient of gradient of basis function @p i at @p p.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute values and derivatives of all basis functions at @p unit_point.
@@ -85,12 +116,24 @@ public:
    * zero. A size of zero means that we are not computing the vector entries.
    */
   void
-  compute(const Point<dim> &           unit_point,
-          std::vector<double> &        values,
-          std::vector<Tensor<1, dim>> &grads,
-          std::vector<Tensor<2, dim>> &grad_grads,
-          std::vector<Tensor<3, dim>> &third_derivatives,
-          std::vector<Tensor<4, dim>> &fourth_derivatives) const;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<double> &        values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
+
+  /**
+   * Return the name of the space, which is <tt>RannacherTurek</tt>.
+   */
+  std::string
+  name() const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::clone()
+   */
+  virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override;
 };
 
 
@@ -201,6 +244,59 @@ PolynomialsRannacherTurek<dim>::compute_derivative(const unsigned int i,
 {
   return internal::PolynomialsRannacherTurekImplementation::compute_derivative<
     order>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<1, dim>
+PolynomialsRannacherTurek<dim>::compute_1st_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<1>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<2, dim>
+PolynomialsRannacherTurek<dim>::compute_2nd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<2>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<3, dim>
+PolynomialsRannacherTurek<dim>::compute_3rd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<3>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<4, dim>
+PolynomialsRannacherTurek<dim>::compute_4th_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<4>(i, p);
+}
+
+
+
+template <int dim>
+inline std::string
+PolynomialsRannacherTurek<dim>::name() const
+{
+  return "RannacherTurek";
 }
 
 

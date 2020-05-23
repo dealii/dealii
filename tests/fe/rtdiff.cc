@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ initialize_node_matrix(const FiniteElement<dim> &other,
   // the normal component of the
   // shape function, possibly
   // pointing in negative direction.
-  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     for (unsigned int k = 0; k < other.dofs_per_face; ++k)
       {
         for (unsigned int i = 0; i < n_dofs; ++i)
@@ -154,8 +154,7 @@ test(unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   test<2>(0);
   test<2>(1);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -235,6 +235,7 @@ std::ostream &
 operator<<(std::ostream &out, const BlockMask &mask);
 
 
+#ifndef DOXYGEN
 // -------------------- inline functions ---------------------
 
 inline BlockMask::BlockMask(const std::vector<bool> &block_mask)
@@ -264,8 +265,7 @@ inline bool BlockMask::operator[](const unsigned int block_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      Assert(block_index < block_mask.size(),
-             ExcIndexRange(block_index, 0, block_mask.size()));
+      AssertIndexRange(block_index, block_mask.size());
       return block_mask[block_index];
     }
 }
@@ -383,7 +383,7 @@ BlockMask::operator!=(const BlockMask &mask) const
 {
   return block_mask != mask.block_mask;
 }
-
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

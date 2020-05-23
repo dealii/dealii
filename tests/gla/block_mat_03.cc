@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,6 +49,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "gla.h"
 
 template <class LA, int dim>
@@ -70,10 +71,10 @@ test()
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::block_wise(dof_handler);
 
-  std::vector<types::global_dof_index> dofs_per_block(fe.n_blocks());
-  std::vector<unsigned int>            sub_blocks(fe.n_blocks(), 0);
+  std::vector<unsigned int> sub_blocks(fe.n_blocks(), 0);
   sub_blocks[1] = 1;
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
   deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
           << std::endl;
@@ -108,11 +109,10 @@ test()
 
   BlockDynamicSparsityPattern bcsp(locally_relevant_partitioning);
   DoFTools::make_sparsity_pattern(dof_handler, bcsp, constraints, false);
-  SparsityTools::distribute_sparsity_pattern(
-    bcsp,
-    dof_handler.compute_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    locally_relevant_dofs);
+  SparsityTools::distribute_sparsity_pattern(bcsp,
+                                             locally_owned_dofs,
+                                             MPI_COMM_WORLD,
+                                             locally_relevant_dofs);
 
   typename LA::MPI::BlockSparseMatrix A;
   A.reinit(locally_owned_partitioning, bcsp, MPI_COMM_WORLD);
@@ -176,10 +176,10 @@ test_alt()
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::block_wise(dof_handler);
 
-  std::vector<types::global_dof_index> dofs_per_block(fe.n_blocks());
-  std::vector<unsigned int>            sub_blocks(fe.n_blocks(), 0);
+  std::vector<unsigned int> sub_blocks(fe.n_blocks(), 0);
   sub_blocks[1] = 1;
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
   deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
           << std::endl;

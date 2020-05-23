@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,6 @@ DEAL_II_NAMESPACE_CLOSE
 #  include <adolc/internal/adubfunc.h> // Taped double math functions
 
 #  include <complex>
-#  include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 

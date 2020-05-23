@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -102,7 +102,7 @@ check()
     DoFHandler<dim> dof(tr);
 
     dof.distribute_dofs(fe);
-    dof.distribute_mg_dofs(fe);
+    dof.distribute_mg_dofs();
     check_renumbering(dof);
   }
 
@@ -111,7 +111,7 @@ check()
     DoFHandler<dim> dof(tr);
 
     dof.distribute_dofs(fe);
-    dof.distribute_mg_dofs(fe);
+    dof.distribute_mg_dofs();
     check_renumbering(dof);
   }
 }
@@ -120,10 +120,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   deallog.push("1d");
   check<1>();

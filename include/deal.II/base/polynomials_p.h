@@ -23,6 +23,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor.h>
 
 #include <vector>
@@ -66,8 +67,8 @@ public:
    * Note, that this number is <tt>PolynomialSpace::degree()-1</tt>, compare
    * definition in PolynomialSpace.
    */
-  unsigned int
-  degree() const;
+  virtual unsigned int
+  degree() const override;
 
   /**
    * For the <tt>n</tt>th polynomial $p_n(x,y,z)=x^i y^j z^k$ this function
@@ -77,6 +78,12 @@ public:
    */
   std::array<unsigned int, dim>
   directional_degrees(unsigned int n) const;
+
+  std::unique_ptr<ScalarPolynomialsBase<dim>>
+  clone() const override
+  {
+    return std_cxx14::make_unique<PolynomialsP<dim>>(*this);
+  }
 
 private:
   /**

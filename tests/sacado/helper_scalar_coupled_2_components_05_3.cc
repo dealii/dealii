@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,8 +19,9 @@
 //
 // AD number type: Sacado Rad
 
-#include "../ad_common_tests/helper_scalar_coupled_2_components_05.h"
 #include "../tests.h"
+
+#include "../ad_common_tests/helper_scalar_coupled_2_components_05.h"
 
 int
 main()

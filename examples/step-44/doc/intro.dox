@@ -3,7 +3,7 @@
 <i>This program was contributed by Jean-Paul Pelteret and Andrew McBride.
 <br>
 This material is based upon work supported by  the German Science Foundation (Deutsche
-Forschungsgemeinschaft, DFG), grant STE 544/39-1,  and the National Research Foundation of South Africa. 
+Forschungsgemeinschaft, DFG), grant STE 544/39-1,  and the National Research Foundation of South Africa.
 </i>
 
 @dealiiTutorialDOI{10.5281/zenodo.439772,https://zenodo.org/badge/DOI/10.5281/zenodo.439772.svg}
@@ -11,10 +11,10 @@ Forschungsgemeinschaft, DFG), grant STE 544/39-1,  and the National Research Fou
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-The subject of this tutorial is nonlinear solid mechanics. 
-Classical single-field approaches (see e.g. step-18) can not correctly describe the response of quasi-incompressible materials. 
+The subject of this tutorial is nonlinear solid mechanics.
+Classical single-field approaches (see e.g. step-18) can not correctly describe the response of quasi-incompressible materials.
 The response is overly stiff; a phenomenon known as locking.
-Locking problems can be circumvented using a variety of alternative strategies. 
+Locking problems can be circumvented using a variety of alternative strategies.
 One such strategy is the  three-field formulation.
 It is used here  to model the three-dimensional, fully-nonlinear (geometrical and material) response of an isotropic continuum body.
 The material response is approximated as hyperelastic.
@@ -29,21 +29,21 @@ Step-18 does, however, describe many of the key concepts to implement elasticity
 We begin with a crash-course in nonlinear kinematics.
 For the sake of simplicity, we restrict our attention to the quasi-static problem.
 Thereafter, various key stress measures are introduced and the constitutive model described.
-We then describe the three-field formulation in detail prior to explaining the structure of the class used to manage the material. 
+We then describe the three-field formulation in detail prior to explaining the structure of the class used to manage the material.
 The setup of the example problem is then presented.
 
 @note This tutorial has been developed (and is described in the introduction) for the problem of elasticity in three dimensions.
  While the space dimension could be changed in the main() routine, care needs to be taken.
  Two-dimensional elasticity problems, in general, exist only as idealizations of three-dimensional ones.
- That is, they are either plane strain or plane stress. 
- The assumptions that follow either of these choices needs to be consistently imposed. 
+ That is, they are either plane strain or plane stress.
+ The assumptions that follow either of these choices needs to be consistently imposed.
  For more information see the note in step-8.
 
 <h3>List of references</h3>
 
 The three-field formulation implemented here was pioneered by Simo et al. (1985) and is known as the mixed Jacobian-pressure formulation.
 Important related contributions include those by Simo and Taylor (1991), and Miehe (1994).
-The notation adopted here draws heavily on the excellent overview of the theoretical aspects of nonlinear solid mechanics by Holzapfel (2001). 
+The notation adopted here draws heavily on the excellent overview of the theoretical aspects of nonlinear solid mechanics by Holzapfel (2001).
 A nice overview of issues pertaining to incompressible elasticity (at small strains) is given in Hughes (2000).
 
 <ol>
@@ -116,7 +116,7 @@ The fourth-order <code>SymmetricTensor</code> returned by identity_tensor() is $
 
 Let the time domain be denoted $\mathbb{T} = [0,T_{\textrm{end}}]$, where $t \in \mathbb{T}$ and $T_{\textrm{end}}$ is the total problem duration.
 Consider a continuum body that occupies the reference configuration $\Omega_0$ at time $t=0$.
-Particles in the reference configuration are identified by the position vector $\mathbf{X}$.
+%Particles in the reference configuration are identified by the position vector $\mathbf{X}$.
 The configuration of the body at a later time $t>0$ is termed the current configuration, denoted $\Omega$, with particles identified by the vector $\mathbf{x}$.
 The nonlinear map between the reference and current configurations, denoted $\boldsymbol{\varphi}$, acts as follows:
 @f[
@@ -276,7 +276,7 @@ The fictitious Kirchhoff stress tensor $\overline{\boldsymbol{\tau}}$ is defined
 pressure in solid mechanics as
 $p = - 1/3 \textrm{tr} \boldsymbol{\sigma} = - 1/3 J^{-1} \textrm{tr} \boldsymbol{\tau}$.
 Here $p$ is the hydrostatic pressure.
-We make use of the pressure response throughout this tut (although we refer to it as the pressure). 
+We make use of the pressure response throughout this tutorial (although we refer to it as the pressure).
 
 <h4> Neo-Hookean materials </h4>
 
@@ -286,7 +286,7 @@ The Helmholtz free energy corresponding to a compressible <a href="http://en.wik
         \underbrace{\kappa [ \mathcal{G}(J) ] }_{\Psi_{\textrm{vol}}(J)}
         + \underbrace{\bigl[c_1 [ \overline{I}_1 - 3] \bigr]}_{\Psi_{\text{iso}}(\overline{\mathbf{b}})} \, ,
 @f]
-where $\kappa \dealcoloneq \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lame parameters)
+where $\kappa \dealcoloneq \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lam&eacute; parameters)
 and $\overline{I}_1 \dealcoloneq \textrm{tr}\ \overline{\mathbf{b}}$.
 The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$,
 among others, see Holzapfel (2001) for further details.
@@ -408,14 +408,14 @@ for all virtual displacements $\delta \mathbf{u} \in H^1(\Omega)$ subject to the
 
 One should note that the definitions of the volumetric Kirchhoff stress in the three field formulation
 $\boldsymbol{\tau}_{\textrm{vol}} \equiv \widetilde{p} J \mathbf{I}$
- and the subsequent volumetric tangent differs slightly from the general form given in the section on hyperelastic materials where 
+ and the subsequent volumetric tangent differs slightly from the general form given in the section on hyperelastic materials where
 $\boldsymbol{\tau}_{\textrm{vol}} \equiv p J\mathbf{I}$.
 This is because the pressure $\widetilde{p}$ is now a primary field as opposed to a constitutively derived quantity.
-One needs to carefully distinguish between the primary fields and those obtained from the constitutive relations. 
+One needs to carefully distinguish between the primary fields and those obtained from the constitutive relations.
 
 @note Although the variables are all expressed in terms of spatial quantities, the domain of integration is the initial configuration.
 This approach is called a <em> total-Lagrangian formulation </em>.
-The approach given in step-18, where the domain of integration is the current configuration, could be called an <em> updated Lagrangian formulation </em>. 
+The approach given in step-18, where the domain of integration is the current configuration, could be called an <em> updated Lagrangian formulation </em>.
 The various merits of these two approaches are discussed widely in the literature.
 It should be noted however that they are equivalent.
 
@@ -439,28 +439,28 @@ The third is the definition of the pressure $\widetilde{p}$.
 \int_{\Omega} [-\mathrm{grad}\delta \mathbf{u}:\boldsymbol{\sigma} + \delta \mathbf{u} \cdot\mathbf{b}^\text{p}]~\mathrm{d}v
   + \int_{\partial \Omega} \delta \mathbf{u} \cdot \mathbf{t}^\text{p}~\mathrm{d}a \\
 &=
-- \int_{\Omega_0} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V 
+- \int_{\Omega_0} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V
 + \int_{\Omega_0} \delta \mathbf{u} \cdot J\mathbf{b}^\text{p}~\mathrm{d}V
  + \int_{\partial \Omega_0} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \\
 &=
-- \int_{\Omega_0} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V 
+- \int_{\Omega_0} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V
 + \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\mathrm{d}V
  + \int_{\partial \Omega_{0,\sigma}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \\
 &=
-- \int_{\Omega_0} [\mathrm{grad}\delta\mathbf{u}]^{\text{sym}} :\boldsymbol{\tau}~\mathrm{d}V 
+- \int_{\Omega_0} [\mathrm{grad}\delta\mathbf{u}]^{\text{sym}} :\boldsymbol{\tau}~\mathrm{d}V
 + \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\mathrm{d}V
  + \int_{\partial \Omega_{0,\sigma}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \, ,
 @f}
-where 
+where
 $[\mathrm{grad}\delta\mathbf{u}]^{\text{sym}} = 1/2[ \mathrm{grad}\delta\mathbf{u} + [\mathrm{grad}\delta\mathbf{u}]^T] $.
 
 We will use an iterative Newton-Raphson method to solve the nonlinear residual equation $R$.
 For the sake of simplicity we assume dead loading, i.e. the loading does not change due to the deformation.
 
 The change in a quantity between the known state at $t_{\textrm{n}-1}$
-and the currently unknown state at $t_{\textrm{n}}$ is denoted 
+and the currently unknown state at $t_{\textrm{n}}$ is denoted
 $\varDelta \{ \bullet \} = { \{ \bullet \} }^{\textrm{n}} - { \{ \bullet \} }^{\textrm{n-1}}$.
-The value of a quantity at the current iteration $\textrm{i}$ is denoted 
+The value of a quantity at the current iteration $\textrm{i}$ is denoted
 ${ \{ \bullet \} }^{\textrm{n}}_{\textrm{i}} = { \{ \bullet \} }_{\textrm{i}}$.
 The incremental change between iterations $\textrm{i}$ and $\textrm{i}+1$ is denoted
 $d \{ \bullet \} \dealcoloneq \{ \bullet \}_{\textrm{i}+1} - \{ \bullet \}_{\textrm{i}}$.
@@ -537,7 +537,7 @@ The three-field formulation used here is effective for quasi-incompressible mate
 that is where $\nu \rightarrow 0.5$ (where $\nu$ is <a
 href="http://en.wikipedia.org/wiki/Poisson's_ratio">Poisson's ratio</a>), subject to a good choice of the interpolation fields
 for $\mathbf{u},~\widetilde{p}$ and $\widetilde{J}$.
-Typically a choice of $Q_n \times DGPM_{n-1} \times DGPM_{n-1}$ is made. 
+Typically a choice of $Q_n \times DGPM_{n-1} \times DGPM_{n-1}$ is made.
 Here $DGPM$ is the FE_DGPMonomial class.
 A popular choice is $Q_1 \times DGPM_0 \times DGPM_0$ which is known as the mean dilatation method (see Hughes (2000) for an intuitive discussion).
 This code can accommodate a $Q_n \times DGPM_{n-1} \times DGPM_{n-1}$ formulation.
@@ -586,11 +586,11 @@ where
 		\end{bmatrix}}_{ \mathbf{\mathsf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
 @f}
 
-There are no derivatives of the pressure and dilatation (primary) variables present in the formulation. 
+There are no derivatives of the pressure and dilatation (primary) variables present in the formulation.
 Thus the discontinuous finite element interpolation of the pressure and dilatation yields a block
 diagonal matrix for
 $\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$,
-$\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}$ and 
+$\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}$ and
 $\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}$.
 Therefore we can easily express the fields $\widetilde{p}$ and $\widetilde{J}$ on each cell simply
 by inverting a local matrix and multiplying it by the local right hand
@@ -635,10 +635,10 @@ where
 Note that due to the choice of $\widetilde{p}$ and $\widetilde{J}$ as discontinuous at the element level, all matrices that need to be inverted are defined at the element level.
 
 The procedure to construct the various contributions is as follows:
-- Construct $\mathbf{\mathsf{K}}$. 
+- Construct $\mathbf{\mathsf{K}}$.
 - Form $\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}$ for element and store where $\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$ was stored in $\mathbf{\mathsf{K}}$.
 - Form $\overline{\overline{\mathbf{\mathsf{K}}}}$ and add to $\mathbf{\mathsf{K}}_{uu}$ to get $\mathbf{\mathsf{K}}_{\textrm{con}}$
-- The modified system matrix is called ${\mathbf{\mathsf{K}}}_{\textrm{store}}$. 
+- The modified system matrix is called ${\mathbf{\mathsf{K}}}_{\textrm{store}}$.
   That is
   @f[
         \mathbf{\mathsf{K}}_{\textrm{store}}
@@ -655,10 +655,10 @@ The procedure to construct the various contributions is as follows:
 
 <h3> The material class </h3>
 
-A good object-oriented design of a Material class would facilitate the extension of this tutorial to a wide range of material types. 
+A good object-oriented design of a Material class would facilitate the extension of this tutorial to a wide range of material types.
 In this tutorial we simply have one Material class named Material_Compressible_Neo_Hook_Three_Field.
 Ideally this class would derive from a class HyperelasticMaterial which would derive from the base class Material.
-The three-field nature of the formulation used here also complicates the matter. 
+The three-field nature of the formulation used here also complicates the matter.
 
 The Helmholtz free energy function for the three field formulation is $\Psi = \Psi_\text{vol}(\widetilde{J}) + \Psi_\text{iso}(\overline{\mathbf{b}})$.
 The isochoric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{iso}}(\overline{\mathbf{b}})$ is identical to that obtained using a one-field formulation for a hyperelastic material.
@@ -666,10 +666,10 @@ However, the volumetric part of the free energy is now a function of the primary
 Thus, for a three field formulation the constitutive response for the volumetric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{vol}}$ (and the tangent) is not given by the hyperelastic constitutive law as in a one-field formulation.
 One can label the term
 $\boldsymbol{\tau}_{\textrm{vol}} \equiv \widetilde{p} J \mathbf{I}$
-as the volumetric Kirchhoff stress, but the pressure $\widetilde{p}$ is not derived from the free energy; it is a primary field.  
+as the volumetric Kirchhoff stress, but the pressure $\widetilde{p}$ is not derived from the free energy; it is a primary field.
 
-In order to have a flexible approach, it was decided that the Material_Compressible_Neo_Hook_Three_Field would still be able to calculate and return a volumetric Kirchhoff stress and tangent. 
-In order to do this, we choose to store the interpolated primary fields $\widetilde{p}$ and $\widetilde{J}$ in the Material_Compressible_Neo_Hook_Three_Field class associated with the quadrature point. 
+In order to have a flexible approach, it was decided that the Material_Compressible_Neo_Hook_Three_Field would still be able to calculate and return a volumetric Kirchhoff stress and tangent.
+In order to do this, we choose to store the interpolated primary fields $\widetilde{p}$ and $\widetilde{J}$ in the Material_Compressible_Neo_Hook_Three_Field class associated with the quadrature point.
 This decision should be revisited at a later stage when the tutorial is extended to account for other materials.
 
 
@@ -691,6 +691,6 @@ For such a choice of material properties a conventional single-field $Q_1$ appro
 That is, the response would be overly stiff.
 The initial and final configurations are shown in the image above.
 Using symmetry, we solve for only one quarter of the geometry (i.e. a cube with dimension $0.001$).
-The inner-quarter of the upper surface of the domain is subject to a load of $p_0$. 
- 
- 
+The inner-quarter of the upper surface of the domain is subject to a load of $p_0$.
+
+

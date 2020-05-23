@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,10 +31,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
 class FullMatrix;
+#  endif
 
 /*! @addtogroup Matrix1
  *@{
@@ -2006,7 +2009,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::const_iterator
 ChunkSparseMatrix<number>::begin(const unsigned int r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return const_iterator(this, r);
 }
 
@@ -2016,7 +2019,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::const_iterator
 ChunkSparseMatrix<number>::end(const unsigned int r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return const_iterator(this, r + 1);
 }
 
@@ -2026,7 +2029,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::iterator
 ChunkSparseMatrix<number>::begin(const unsigned int r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return iterator(this, r);
 }
 
@@ -2036,7 +2039,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::iterator
 ChunkSparseMatrix<number>::end(const unsigned int r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  AssertIndexRange(r, m());
   return iterator(this, r + 1);
 }
 

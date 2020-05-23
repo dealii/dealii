@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -149,10 +149,8 @@ public:
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(3) << std::fixed;
 
   DynamicSparsityPattern dsp(2);
   dsp.add(0, 1);

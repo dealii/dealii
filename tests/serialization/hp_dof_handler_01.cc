@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ namespace dealii
                                                           c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (c1->vertex(v) != c2->vertex(v))
               return false;
@@ -52,7 +52,7 @@ namespace dealii
               return false;
           }
 
-        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
@@ -71,7 +71,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
@@ -84,15 +84,15 @@ namespace dealii
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->get_fe().get_name() != c2->get_fe().get_name())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->active_fe_index() != c2->active_fe_index())
           return false;
 
-        if (c1->active() && c2->active() &&
+        if (c1->is_active() && c2->is_active() &&
             c1->future_fe_index() != c2->future_fe_index())
           return false;
 
@@ -109,7 +109,7 @@ namespace dealii
             if (local_dofs_1 != local_dofs_2)
               return false;
 
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (const unsigned int f : GeometryInfo<dim>::face_indices())
               {
                 std::vector<types::global_dof_index> local_dofs_1(
                   c1->get_fe().dofs_per_face);
@@ -148,7 +148,7 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 {
   typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (c1->at_boundary(f))
         c1->face(f)->set_boundary_id(42);
 }

@@ -1,0 +1,15 @@
+
+DEAL:0::main partitioner: size=2506 local_size=1492 n_ghosts=273
+DEAL:0::partitioner: size=2506 local_size=1492 n_ghosts=0
+DEAL:0::partitioner: size=2506 local_size=1492 n_ghosts=273
+DEAL:0::partitioner: size=2506 local_size=1492 n_ghosts=273
+DEAL:0::partitioner: size=2506 local_size=1492 n_ghosts=0
+DEAL:0::partitioner: size=2506 local_size=1492 n_ghosts=0
+
+DEAL:1::main partitioner: size=2506 local_size=1014 n_ghosts=442
+DEAL:1::partitioner: size=2506 local_size=1014 n_ghosts=169
+DEAL:1::partitioner: size=2506 local_size=1014 n_ghosts=442
+DEAL:1::partitioner: size=2506 local_size=1014 n_ghosts=442
+DEAL:1::partitioner: size=2506 local_size=1014 n_ghosts=0
+DEAL:1::partitioner: size=2506 local_size=1014 n_ghosts=0
+

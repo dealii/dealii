@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,9 +22,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int spacedim, typename RangeNumberType>
 class Function;
-
+#endif
 
 
 /**
@@ -77,7 +79,9 @@ struct DEAL_II_DEPRECATED FunctionMap
    * (as that would ambiguate a possible constructor of this class), name it
    * in the fashion of the standard container local alias.
    *
-   * @deprecated Use the alias type directly.
+   * @deprecated Directly use the type
+   * <tt>std::map<types::boundary_id, const Function<dim, Number> *></tt>
+   * in your code instead of this alias.
    */
   using type DEAL_II_DEPRECATED =
     std::map<types::boundary_id, const Function<dim, Number> *>;

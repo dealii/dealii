@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ satisfies_level1_at_vertex_rule(const Triangulation<dim> &tr)
          tr.begin_active();
        cell != tr.end();
        ++cell)
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         min_adjacent_cell_level[cell->vertex_index(v)] =
           std::min<unsigned int>(min_adjacent_cell_level[cell->vertex_index(v)],

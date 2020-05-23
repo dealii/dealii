@@ -72,7 +72,7 @@ test()
                  ((dim == 2) ? "3_0:" : "7_0:"))
           cell->set_coarsen_flag();
 
-        deallog << "myid=" << myid << " cellid=" << cell->id()
+        deallog << "cellid=" << cell->id()
                 << " fe_index=" << cell->active_fe_index()
                 << " feq_degree=" << max_degree - cell->active_fe_index();
         if (cell->coarsen_flag_set())
@@ -89,11 +89,14 @@ test()
   // ------ verify ------
   // check if all children adopted the correct id
   for (auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << "myid=" << myid << " cellid=" << cell->id()
-              << " fe_index=" << cell->active_fe_index()
-              << " feq_degree=" << max_degree - cell->active_fe_index()
-              << std::endl;
+    if (!cell->is_artificial())
+      {
+        deallog << "cellid=" << cell->id()
+                << " fe_index=" << cell->active_fe_index();
+        if (cell->is_ghost())
+          deallog << " ghost";
+        deallog << std::endl;
+      }
 
   // for further calculations, distribute dofs, i.e.
   // dh.distribute_dofs(fe_collection);

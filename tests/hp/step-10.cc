@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -193,9 +193,7 @@ compute_pi_by_perimeter()
             endc                = dof_handler.end();
           long double perimeter = 0;
           for (; cell != endc; ++cell)
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               if (cell->face(face_no)->at_boundary())
                 {
                   x_fe_face_values.reinit(cell, face_no);

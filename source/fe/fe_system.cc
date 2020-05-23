@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,8 +69,7 @@ typename FiniteElement<dim, spacedim>::InternalDataBase &
 FESystem<dim, spacedim>::InternalData::get_fe_data(
   const unsigned int base_no) const
 {
-  Assert(base_no < base_fe_datas.size(),
-         ExcIndexRange(base_no, 0, base_fe_datas.size()));
+  AssertIndexRange(base_no, base_fe_datas.size());
   return *base_fe_datas[base_no];
 }
 
@@ -82,8 +81,7 @@ FESystem<dim, spacedim>::InternalData::set_fe_data(
   const unsigned int base_no,
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase> ptr)
 {
-  Assert(base_no < base_fe_datas.size(),
-         ExcIndexRange(base_no, 0, base_fe_datas.size()));
+  AssertIndexRange(base_no, base_fe_datas.size());
   base_fe_datas[base_no] = std::move(ptr);
 }
 
@@ -94,8 +92,7 @@ internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &
 FESystem<dim, spacedim>::InternalData::get_fe_output_object(
   const unsigned int base_no) const
 {
-  Assert(base_no < base_fe_output_objects.size(),
-         ExcIndexRange(base_no, 0, base_fe_output_objects.size()));
+  AssertIndexRange(base_no, base_fe_output_objects.size());
   return base_fe_output_objects[base_no];
 }
 
@@ -389,7 +386,7 @@ double
 FESystem<dim, spacedim>::shape_value(const unsigned int i,
                                      const Point<dim> & p) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   Assert(this->is_primitive(i),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            i)));
@@ -407,9 +404,8 @@ FESystem<dim, spacedim>::shape_value_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < this->n_components(),
-         ExcIndexRange(component, 0, this->n_components()));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be
   // zero, then return right away...
@@ -442,7 +438,7 @@ Tensor<1, dim>
 FESystem<dim, spacedim>::shape_grad(const unsigned int i,
                                     const Point<dim> & p) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   Assert(this->is_primitive(i),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            i)));
@@ -460,9 +456,8 @@ FESystem<dim, spacedim>::shape_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < this->n_components(),
-         ExcIndexRange(component, 0, this->n_components()));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
   if (this->nonzero_components[i][component] == false)
@@ -488,7 +483,7 @@ Tensor<2, dim>
 FESystem<dim, spacedim>::shape_grad_grad(const unsigned int i,
                                          const Point<dim> & p) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   Assert(this->is_primitive(i),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            i)));
@@ -506,9 +501,8 @@ FESystem<dim, spacedim>::shape_grad_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < this->n_components(),
-         ExcIndexRange(component, 0, this->n_components()));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
   if (this->nonzero_components[i][component] == false)
@@ -534,7 +528,7 @@ Tensor<3, dim>
 FESystem<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                               const Point<dim> & p) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   Assert(this->is_primitive(i),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            i)));
@@ -552,9 +546,8 @@ FESystem<dim, spacedim>::shape_3rd_derivative_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < this->n_components(),
-         ExcIndexRange(component, 0, this->n_components()));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
   if (this->nonzero_components[i][component] == false)
@@ -580,7 +573,7 @@ Tensor<4, dim>
 FESystem<dim, spacedim>::shape_4th_derivative(const unsigned int i,
                                               const Point<dim> & p) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  AssertIndexRange(i, this->dofs_per_cell);
   Assert(this->is_primitive(i),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            i)));
@@ -598,9 +591,8 @@ FESystem<dim, spacedim>::shape_4th_derivative_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < this->n_components(),
-         ExcIndexRange(component, 0, this->n_components()));
+  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(component, this->n_components());
 
   // if this value is supposed to be zero, then return right away...
   if (this->nonzero_components[i][component] == false)
@@ -703,17 +695,12 @@ FESystem<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -799,17 +786,12 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request, construction completely analogous to
   // restriction matrix
@@ -2303,8 +2285,7 @@ template <int dim, int spacedim>
 const FiniteElement<dim, spacedim> &
 FESystem<dim, spacedim>::base_element(const unsigned int index) const
 {
-  Assert(index < base_elements.size(),
-         ExcIndexRange(index, 0, base_elements.size()));
+  AssertIndexRange(index, base_elements.size());
   return *base_elements[index].first;
 }
 
@@ -2327,8 +2308,7 @@ template <int dim, int spacedim>
 Point<dim>
 FESystem<dim, spacedim>::unit_support_point(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  AssertIndexRange(index, this->dofs_per_cell);
   Assert((this->unit_support_points.size() == this->dofs_per_cell) ||
            (this->unit_support_points.size() == 0),
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
@@ -2349,8 +2329,7 @@ template <int dim, int spacedim>
 Point<dim - 1>
 FESystem<dim, spacedim>::unit_face_support_point(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_face,
-         ExcIndexRange(index, 0, this->dofs_per_face));
+  AssertIndexRange(index, this->dofs_per_face);
   Assert((this->unit_face_support_points.size() == this->dofs_per_face) ||
            (this->unit_face_support_points.size() == 0),
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));

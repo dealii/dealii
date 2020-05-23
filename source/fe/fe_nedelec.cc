@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,14 +69,14 @@ namespace internal
 
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
-  : FE_PolyTensor<PolynomialsNedelec<dim>, dim>(
-      order,
+  : FE_PolyTensor<dim>(
+      PolynomialsNedelec<dim>(order),
       FiniteElementData<dim>(get_dpo_vector(order),
                              dim,
                              order + 1,
                              FiniteElementData<dim>::Hcurl),
-      std::vector<bool>(PolynomialsNedelec<dim>::compute_n_pols(order), true),
-      std::vector<ComponentMask>(PolynomialsNedelec<dim>::compute_n_pols(order),
+      std::vector<bool>(PolynomialsNedelec<dim>::n_polynomials(order), true),
+      std::vector<ComponentMask>(PolynomialsNedelec<dim>::n_polynomials(order),
                                  std::vector<bool>(dim, true)))
 {
 #ifdef DEBUG_NEDELEC
@@ -442,8 +442,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
       const Quadrature<dim> &face_quadrature =
         QProjector<dim>::project_to_all_faces(reference_face_quadrature);
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int q_point = 0; q_point < n_face_points; ++q_point)
           {
             this->generalized_support_points[face * n_face_points + q_point +
@@ -2003,7 +2002,7 @@ FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree, bool dg)
 
   if (dg)
     {
-      dpo[dim] = PolynomialsNedelec<dim>::compute_n_pols(degree);
+      dpo[dim] = PolynomialsNedelec<dim>::n_polynomials(degree);
     }
   else
     {
@@ -2036,10 +2035,8 @@ bool
 FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
                                      const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   const unsigned int deg = this->degree - 1;
   switch (dim)
@@ -2959,17 +2956,12 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -3019,19 +3011,13 @@ FE_Nedelec<dim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child <
-           GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(
-                         RefinementCase<dim>(refinement_case))));
+  AssertIndexRange(
+    child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -3542,9 +3528,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                                                 {2, 3, 0, 1},
                                                 {6, 7, 4, 5}};
 
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   // Set up the right hand side
                   // for the horizontal shape

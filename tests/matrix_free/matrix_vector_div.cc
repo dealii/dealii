@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,10 +20,6 @@
 // matrix. The mesh uses a hyperball mesh with hanging nodes for a
 // vector-valued problem (div-div operator which does not really make a lot
 // of sense from a problem point of view, though).
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -51,6 +47,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 #include "create_mesh.h"
 
@@ -286,7 +284,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(3);
 

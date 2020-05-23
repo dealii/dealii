@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2018 by the deal.II authors
+## Copyright (C) 2014 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -156,7 +156,7 @@ ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   _detailed("#        DEAL_II_LIBRARIES_DEBUG:      ${BASE_LIBRARIES_DEBUG}\n")
 ENDIF()
-_detailed("#        DEAL_II_COMPILER_VECTORIZATION_LEVEL: ${DEAL_II_COMPILER_VECTORIZATION_LEVEL}\n")
+_detailed("#        DEAL_II_VECTORIZATION_WIDTH_IN_BITS: ${DEAL_II_VECTORIZATION_WIDTH_IN_BITS}\n")
 
 _detailed("#\n")
 

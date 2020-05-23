@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,6 +50,8 @@
 
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
+
+#  include <boost/serialization/split_member.hpp>
 
 #  include <symengine/derivative.h>
 
@@ -194,7 +196,7 @@ namespace Differentiation
        * potential ambiguities related to implicit conversions in either user
        * code or math functions that are loaded into the standard namespace.
        */
-      explicit Expression(const bool &value);
+      explicit Expression(const bool value);
 
       /**
        * Constructor for arithmetic number types.
@@ -451,10 +453,38 @@ namespace Differentiation
       load(std::istream &stream);
 
       /**
+       * Write the data of this object to a stream for the purpose
+       * of serialization.
+       *
+       * This effectively saves the value stored in this object to the
+       * @p archive with the given @p version number.
+       */
+      template <class Archive>
+      void
+      save(Archive &archive, const unsigned int version) const;
+
+      /**
+       * Read the data of this object from a stream for the purpose
+       * of serialization.
+       *
+       * This effectively loads into this object the value stored in of the
+       * @p archive with the given @p version number.
+       * In doing so, the previous contents of this object are thrown away.
+       *
+       * @note When deserializing a symbolic expression, it is imperative that
+       * you first create or deserialize all of the symbolic variables used in
+       * the serialized expression.
+       */
+      template <class Archive>
+      void
+      load(Archive &archive, const unsigned int version);
+
+#  ifdef DOXYGEN
+      /**
        * Write and read the data of this object from a stream for the purpose
        * of serialization.
        *
-       * This effecively saves or loads the value stored into/out of the
+       * This effectively saves or loads the value stored into/out of the
        * @p archive with the given @p version number into this object.
        * If deserializing data, then the previous contents of this object
        * are thrown away.
@@ -466,6 +496,11 @@ namespace Differentiation
       template <class Archive>
       void
       serialize(Archive &archive, const unsigned int version);
+#  else
+      // This macro defines the serialize() method that is compatible with
+      // the templated save() and load() method that have been implemented.
+      BOOST_SERIALIZATION_SPLIT_MEMBER()
+#  endif
 
       //@}
 
@@ -517,7 +552,7 @@ namespace Differentiation
        * to that of the @p rhs object.
        */
       Expression &
-      operator=(Expression &&rhs);
+      operator=(Expression &&rhs) noexcept;
 
       /**
        * Addition assignment.
@@ -676,6 +711,25 @@ namespace Differentiation
 
       /**
        * Perform substitution of all symbols found in this object's @p expression
+       * that match a key in the @p substitution_values map.
+       *
+       * This function is like the one above, but takes in a SymEngine map
+       * (one that maps a `SymEngine::RCP<const SymEngine::Basic>` to another
+       * `SymEngine::RCP<const SymEngine::Basic>`) as an argument.
+       *
+       * @note The replacement value (the entry in the @p substitution_values
+       * that is paired with a key) need not necessarily be numerical, but may
+       * also be another symbolic type.
+       *
+       * @note With dictionary substitution, partial substitution is allowed
+       * (i.e. an incomplete substitution map can be used and the return type
+       * can be symbolic).
+       */
+      Expression
+      substitute(const SymEngine::map_basic_basic &substitution_values) const;
+
+      /**
+       * Perform substitution of all symbols found in this object's @p expression
        * that match the @p symbol. Each @p symbol will be substituted with
        * the given @p value.
        *
@@ -710,6 +764,22 @@ namespace Differentiation
       ReturnType
       substitute_and_evaluate(
         const types::substitution_map &substitution_values) const;
+
+      /**
+       * Full substitution and evaluation. This creates a Expression by
+       * symbol substitution and then immediately computes its numerical value.
+       *
+       * This function is like the one above, but takes in a SymEngine map
+       * (one that maps a `SymEngine::RCP<const SymEngine::Basic>` to another
+       * `SymEngine::RCP<const SymEngine::Basic>`) as an argument.
+       *
+       * @note All symbols must be resolved by the substitution map in order
+       * for this function to return successfully.
+       */
+      template <typename ReturnType>
+      ReturnType
+      substitute_and_evaluate(
+        const SymEngine::map_basic_basic &substitution_values) const;
 
       //@}
 
@@ -1178,41 +1248,22 @@ namespace Differentiation
 
     template <class Archive>
     void
-    Expression::serialize(Archive &ar, const unsigned int /*version*/)
+    Expression::save(Archive &ar, const unsigned int /*version*/) const
     {
-      // This is a bit tricky... The SymEngine expression class is not
-      // serializable, and we're not sure if we're writing out or
-      // reading in here. So what we'll do is try to synchronise the
-      // current data with the stream, predicting if we're likely trying
-      // to write out data. We do this by checking if we're currently working
-      // with an object that has a trivial state. If not, then we're likely
-      // to output this object's contents.
-      const Expression default_constructed;
-      const bool       likely_writing_out =
-        (get_RCP()->__eq__(*default_constructed.get_RCP()) == false);
-
       std::stringstream sstream;
-      std::string       expr = default_constructed.get_RCP()->__str__();
+      sstream << *this;
+      const std::string expr = sstream.str();
+      ar &              expr;
+    }
 
-      // Output
-      if (likely_writing_out)
-        {
-          sstream << *this;
-          expr = sstream.str();
-        }
 
-      // Serialise
-      ar &expr;
-
-      // Input
-      if (!likely_writing_out)
-        {
-          sstream.clear();
-          sstream << expr;
-          sstream >> *this;
-
-          parse(expr);
-        }
+    template <class Archive>
+    void
+    Expression::load(Archive &ar, const unsigned int /*version*/)
+    {
+      std::string expr;
+      ar &        expr;
+      parse(expr);
     }
 
 
@@ -1235,6 +1286,15 @@ namespace Differentiation
     ReturnType
     Expression::substitute_and_evaluate(
       const types::substitution_map &substitution_values) const
+    {
+      return static_cast<ReturnType>(substitute(substitution_values));
+    }
+
+
+    template <typename ReturnType>
+    ReturnType
+    Expression::substitute_and_evaluate(
+      const SymEngine::map_basic_basic &substitution_values) const
     {
       return static_cast<ReturnType>(substitute(substitution_values));
     }

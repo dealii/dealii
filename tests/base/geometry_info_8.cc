@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 //
 // Test GeometryInfo<dim>::face_to_cell_vertices
@@ -33,7 +32,7 @@ test_vertices()
 {
   deallog << dim << "D:" << std::endl;
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "face " << i << ":" << std::endl;
 
@@ -66,7 +65,7 @@ test_lines()
 {
   deallog << dim << "D:" << std::endl;
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "face " << i << ":" << std::endl;
 

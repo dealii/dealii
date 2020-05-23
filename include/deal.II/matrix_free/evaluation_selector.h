@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 #ifndef dealii_matrix_free_evaluation_selector_h
 #define dealii_matrix_free_evaluation_selector_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/matrix_free/evaluation_kernels.h>
 
@@ -172,7 +174,7 @@ namespace internal
         const bool evaluate_gradients,
         const bool evaluate_hessians)
       {
-        const unsigned int     runtime_degree   = shape_info.fe_degree;
+        const unsigned int runtime_degree = shape_info.data.front().fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
         if (runtime_degree == degree)
           Factory<dim, n_components, Number, 1, degree, start_n_q_points>::
@@ -209,7 +211,7 @@ namespace internal
         const bool integrate_gradients,
         const bool sum_into_values_array = false)
       {
-        const int              runtime_degree   = shape_info.fe_degree;
+        const int runtime_degree = shape_info.data.front().fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
         if (runtime_degree == degree)
           Factory<dim, n_components, Number, 1, degree, start_n_q_points>::
@@ -274,7 +276,7 @@ namespace internal
         const bool evaluate_gradients,
         const bool evaluate_hessians)
       {
-        const int runtime_n_q_points_1d = shape_info.n_q_points_1d;
+        const int runtime_n_q_points_1d = shape_info.data.front().n_q_points_1d;
         if (runtime_n_q_points_1d == n_q_points_1d)
           {
             if (n_q_points_1d == degree + 1 &&
@@ -347,7 +349,7 @@ namespace internal
         const bool integrate_gradients,
         const bool sum_into_values_array)
       {
-        const int runtime_n_q_points_1d = shape_info.n_q_points_1d;
+        const int runtime_n_q_points_1d = shape_info.data.front().n_q_points_1d;
         if (runtime_n_q_points_1d == n_q_points_1d)
           {
             if (n_q_points_1d == degree + 1 &&

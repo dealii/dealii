@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,7 @@
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
+
 #include "coarse_grid_common.h"
 
 
@@ -80,7 +81,7 @@ create_disconnected_mesh(Triangulation<dim> &tria)
       }
 
     // Prepare cell data
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       cells[0].vertices[i] = i;
     cells[0].material_id = 0;
   }
@@ -132,7 +133,7 @@ create_disconnected_mesh(Triangulation<dim> &tria)
       }
 
     // Prepare cell data
-    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
       cells[1].vertices[i] = GeometryInfo<dim>::vertices_per_cell + i;
     cells[1].material_id = 0;
   }

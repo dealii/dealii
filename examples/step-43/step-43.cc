@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2019 by the deal.II authors
+ * Copyright (C) 2010 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -693,10 +693,9 @@ namespace Step43
     }
 
 
-    std::vector<types::global_dof_index> darcy_dofs_per_block(2);
-    DoFTools::count_dofs_per_block(darcy_dof_handler,
-                                   darcy_dofs_per_block,
-                                   darcy_block_component);
+    const std::vector<types::global_dof_index> darcy_dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(darcy_dof_handler,
+                                        darcy_block_component);
     const unsigned int n_u = darcy_dofs_per_block[0],
                        n_p = darcy_dofs_per_block[1],
                        n_s = saturation_dof_handler.n_dofs();
@@ -1125,12 +1124,10 @@ namespace Step43
               }
           }
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          if (cell->at_boundary(face_no))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              darcy_fe_face_values.reinit(cell, face_no);
+              darcy_fe_face_values.reinit(cell, face);
 
               pressure_boundary_values.value_list(
                 darcy_fe_face_values.get_quadrature_points(), boundary_values);
@@ -1310,13 +1307,11 @@ namespace Step43
                                           global_S_variation,
                                           local_dof_indices);
 
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          if (cell->at_boundary(face_no))
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
             {
-              darcy_fe_face_values.reinit(darcy_cell, face_no);
-              saturation_fe_face_values.reinit(cell, face_no);
+              darcy_fe_face_values.reinit(darcy_cell, face);
+              saturation_fe_face_values.reinit(cell, face);
               assemble_saturation_rhs_boundary_term(saturation_fe_face_values,
                                                     darcy_fe_face_values,
                                                     local_dof_indices);

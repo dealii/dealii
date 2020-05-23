@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,7 +130,7 @@ problems. In particular, they are aimed at the following goals:
   correctness. Existing tutorial programs typically employ simpler rather than
   more complicated solver schemes for exposition but frequently suggest more
   complicated schemes including hints on how they might be implemented in an
-  appendix. 
+  appendix.
 
 <li> <i>Try algorithms:</i> The rapid prototyping abilities of deal.II may
   also help in determining best algorithms on the scale of programs to which

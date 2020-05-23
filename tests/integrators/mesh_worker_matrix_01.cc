@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 // Define a class that fills all available entries in the info objects

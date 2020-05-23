@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ void generate_grid(Triangulation<2> &triangulation)
   /* cell 1 */
   int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {4, 5, 6, 7};
 
-  for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];
@@ -72,7 +72,7 @@ void generate_grid(Triangulation<2> &triangulation)
   Triangulation<2>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (unsigned int j = 0; j < GeometryInfo<2>::faces_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<2>::face_indices())
     {
       if (cell_1->face(j)->center()(1) > 2.9)
         face_1 = cell_1->face(j);
@@ -117,7 +117,7 @@ void generate_grid(Triangulation<3> &triangulation)
   int cell_vertices_1[GeometryInfo<3>::vertices_per_cell] = {
     8, 9, 10, 11, 12, 13, 14, 15};
 
-  for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];
@@ -134,7 +134,7 @@ void generate_grid(Triangulation<3> &triangulation)
   Triangulation<3>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (unsigned int j = 0; j < GeometryInfo<3>::faces_per_cell; ++j)
+  for (const unsigned int j : GeometryInfo<3>::face_indices())
     {
       if (cell_1->face(j)->center()(2) > 2.9)
         face_1 = cell_1->face(j);

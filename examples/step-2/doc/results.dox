@@ -73,3 +73,33 @@ Terminal type set to 'x11'
 gnuplot> set style data points
 gnuplot> plot "sparsity_pattern.1"
 @endcode
+
+Another practice based on
+<a href="http://www.gnuplot.info/">GNUPLOT</a> is trying to
+print out the mesh with locations and numbering of the support
+points. For that, you need to include header files for GridOut and MappingQ1.
+The code for this is:
+@code
+  std::ofstream out("gnuplot.gpl");
+  out << "plot '-' using 1:2 with lines, "
+      << "'-' with labels point pt 2 offset 1,1"
+      << std::endl;
+  GridOut().write_gnuplot (triangulation, out);
+  out << "e" << std::endl;
+  const int dim = 2;
+  std::map<types::global_dof_index, Point<dim> > support_points;
+  DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
+                                        dof_handler,
+                                        support_points);
+  DoFTools::write_gnuplot_dof_support_point_info(out,
+                                                 support_points);
+  out << "e" << std::endl;
+@endcode
+After we run the code, we get a file called gnuplot.gpl. To view this
+file, we can run the following code in the command line:
+@code
+gnuplot -p gnuplot.gpl
+@endcode.
+With that, you will get a picture similar to
+@image html support_point_dofs1.png
+depending on the mesh you are looking at. For more information, see DoFTools::write_gnuplot_dof_support_point_info.

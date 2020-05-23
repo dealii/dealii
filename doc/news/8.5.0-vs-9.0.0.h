@@ -966,8 +966,8 @@ inconvenience this causes.
 <ol>
 
  <li>
-  New: A new tutorial program, step-60, shows how to deal with non-matching discretizations using 
-  Distributed Lagrange Multipliers. 
+  New: A new tutorial program, step-60, shows how to deal with non-matching discretizations using
+  Distributed Lagrange Multipliers.
   <br>
   (Luca Heltai, Giovanni Alzetta, 2018/05/07)
  </li>

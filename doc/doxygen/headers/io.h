@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,9 +60,9 @@
  * itself), and it can create output used for visualization of data. Finally,
  * it can output matrices in a graphical format.
  *
- * 
+ *
  * <h3>Visualization of data</h3>
- * 
+ *
  * deal.II supports, through the DataOutBase class, a large number of popular
  * visualization formats, such as those used by the OpenDX, gmv, or gnuplot
  * programs. A complete list of supported formats is listed in the
@@ -100,8 +100,8 @@
  * dependent simulations in the space-time domain: it collects the results
  * from each time step and at the end outputs all of this information at once
  * as a space-time file.
- * 
- * 
+ *
+ *
  * <h3>Grid output</h3>
  *
  * Meshes, without any data vectors associated with it, can be written in a
@@ -109,7 +109,7 @@
  * documentation of that class lists the supported formats.
  *
  * Several of the tutorial programs, notably step-1, step-6, step-9, step-10,
- * step-12, and step-14 demonstrate the use of the GridOut class.
+ * step-12b, and step-14 demonstrate the use of the GridOut class.
  *
  *
  * <h3>Matrix output</h3>

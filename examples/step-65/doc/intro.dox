@@ -86,10 +86,10 @@ describe how exactly this should work. Here are a couple of examples:
   would not produce reasonable new points. In fact, defining a
   manifold description for things that are supposed "to look round"
   but might have points at or close to the origin is surprisingly very
-  difficult. 
+  difficult.
 - A similar thing happens at the origin
   of the three-dimensional ball when one tries to attach a spherical manifold to
-  the whole volume &endash; in this case, the computation of new manifold points
+  the whole volume &ndash; in this case, the computation of new manifold points
   would abort with an exception.
 - CAD geometries often only describe the boundary of the domain, in a
   similar way to how we only attached a manifold to the boundary in
@@ -125,7 +125,7 @@ inverts in some regions
 because the new points placed along interior cells intersect with the boundary
 as they are not following the circular shape along the toroidal direction. The
 simple case of a torus can still be fixed because we know that the toroidal
-direction follows a cylindrical coordindate system, so attaching a
+direction follows a cylindrical coordinate system, so attaching a
 TorusManifold to the surface combined with CylindricalManifold with
 appropriate periodicity in toroidal direction applied to all interior entities
 would produce a high-quality mesh as follows, now shown with two top cells
@@ -157,7 +157,8 @@ upon four global refinements:
 
 @image html circular_mesh_only_boundary_manifold.png ""
 
-If you know that the original coarse mesh consisted of a single square
+That's not a terrible mesh. At the same time,
+if you know that the original coarse mesh consisted of a single square
 in the middle, with four caps around it, then it's not hard to see
 every refinement step that happened to this mesh to get the picture
 above.
@@ -181,7 +182,7 @@ well as the interior cell layers can only add points according to a flat
 manifold description.
 
 At this point, we realize what would be needed to create a better mesh: For
-<i>all</i> new points in any child cell that is created within the red shaded
+<i>all</i> new points in <i>any</i> child cell that is created within the red shaded
 layer on the leftmost picture, we want to compute the interpolation with
 respect to the curvature in the area covered by the respective coarse
 cell. This is achieved by adding the class TransfiniteInterpolationManifold to
@@ -193,7 +194,8 @@ minute). These weighted averages are used whenever the mesh is refined, or
 when a higher order mapping (such as MappingQGeneric or MappingC1)
 is evaluated on a given cell
 subject to this manifold. Using this manifold on the shaded cells of the
-coarse grid with of the disk produces the following mesh upon four global
+coarse grid of the disk (i.e., not only in the outer-most layer of
+cells) produces the following mesh upon four global
 steps of refinement:
 
 @image html circular_mesh_transfinite_interpolation.png ""
@@ -308,7 +310,7 @@ far away.
 <h3>Transfinite interpolation is expensive and how to deal with it</h3>
 
 A mesh with a transfinite manifold description is typically set up in two
-steps. The first step is to create a mesh (or read it in from a file) and to
+steps. The first step is to create a coarse mesh (or read it in from a file) and to
 attach a curved manifold to some of the mesh entities. For the above example
 of the disk, we attach a polar manifold to the faces along the outer circle
 (this is done automatically by GridGenerator::hyper_ball()). Before we start
@@ -317,9 +319,9 @@ interior cells and edges of the mesh, which of course needs to be based on
 some manifold id that we have assigned to those entities (everything except
 the circle on the boundary). It does not matter whether we also assign a
 TransfiniteInterpolationManifold to the inner square of the disk or not
-because the transfinite interpolation becomes a flat representation to cells
-where all surrounding objects are also flat (or a transfinite interpolation
-with flat sub-entities).
+because the transfinite interpolation on a coarse cell with straight
+edges (or flat faces in 3d) simply yields subdivided children with
+straight edges (flat faces).
 
 Later, when the mesh is refined or when a higher-order mapping is set up based
 on this mesh, the cells will query the underlying manifold object for new
@@ -373,8 +375,8 @@ numerical solution. If the degree of the geometry is higher or lower than the
 solution, one calls that a super- or sub-parametric geometry representation,
 respectively. In deal.II, the standard class for polynomial representation is
 MappingQGeneric. If, for example, this class is used with polynomial degree $4$ in 3D, a
-total of 125 ($=(4+1)^3$) points are needed for the
-interpolation. Among these points, 8 are the mesh vertices and already
+total of 125 (i.e., $(4+1)^3$) points are needed for the
+interpolation. Among these points, 8 are the cell's vertices and already
 available from the mesh, but the other 117 need to be provided by the
 manifold. In case the transfinite interpolation manifold is used, we can
 imagine that going through the pull-back into reference coordinates of some
@@ -413,7 +415,8 @@ Jacobians of the map between the reference and physical coordinates).
 
 As a final note, we mention that the TransfiniteInterpolationManifold also
 makes the refinement of the mesh more expensive. In this case, the
-MappingQCache does not help and there currently does not exist a more
+MappingQCache does not help because it would compute points that can
+subsequently not be re-used; there currently does not exist a more
 efficient mechanism in deal.II. However, the mesh refinement contains many
 other expensive steps as well, so it is not as big as an issue compared to the
 rest of the computation. It also only happens at most once per time
@@ -426,9 +429,10 @@ exemplified in combination with MappingQCache. The test case is relatively
 simple and takes up the solution stages involved in many typical programs,
 e.g., the step-6 tutorial program. As a geometry, we select one prototype use
 of TransfiniteInterpolationManifold, namely a setup involving a spherical ball
-that is in turn surrounded by a cube. Such a setup is used for example in case
-that a material interface is located at the boundary of the ball within the
-computational domain that should be tracked by an element interface. A
+that is in turn surrounded by a cube. Such a setup would be used, for example,
+for a spherical inclusion embedded in a background medium, and if that
+inclusion has different material properties that require that the
+interface between the two materials needs to be tracked by element interfaces. A
 visualization of the grid is given here:
 
 <img src="https://www.dealii.org/images/steps/developer/step-65-mesh.png" alt="">

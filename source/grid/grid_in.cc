@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,11 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
+#include <boost/archive/binary_iarchive.hpp>
 #include <boost/io/ios_state.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/serialization/serialization.hpp>
 
 #include <algorithm>
 #include <cctype>
@@ -63,11 +67,8 @@ namespace
     Triangulation<1, spacedim> &                      triangulation)
   {
     if (boundary_ids.size() > 0)
-      for (typename Triangulation<1, spacedim>::active_cell_iterator cell =
-             triangulation.begin_active();
-           cell != triangulation.end();
-           ++cell)
-        for (unsigned int f = 0; f < GeometryInfo<1>::faces_per_cell; ++f)
+      for (const auto &cell : triangulation.active_cell_iterators())
+        for (unsigned int f : GeometryInfo<1>::face_indices())
           if (boundary_ids.find(cell->vertex_index(f)) != boundary_ids.end())
             {
               AssertThrow(
@@ -533,6 +534,34 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 }
 
 
+
+template <int dim, int spacedim>
+void
+GridIn<dim, spacedim>::read_vtu(std::istream &in)
+{
+  namespace pt = boost::property_tree;
+  pt::ptree tree;
+  pt::read_xml(in, tree);
+  auto section = tree.get_optional<std::string>("VTKFile.dealiiData");
+
+  AssertThrow(section,
+              ExcMessage(
+                "While reading a VTU file, failed to find dealiiData section. "
+                "Notice that we can only read grid files in .vtu format that "
+                "were created by the deal.II library, using a call to "
+                "GridOut::write_vtu(), where the flag "
+                "GridOutFlags::Vtu::serialize_triangulation is set to true."));
+
+  const auto decoded =
+    Utilities::decode_base64({section->begin(), section->end() - 1});
+  const auto string_archive =
+    Utilities::decompress({decoded.begin(), decoded.end()});
+  std::istringstream              in_stream(string_archive);
+  boost::archive::binary_iarchive ia(in_stream);
+  tria->load(ia, 0);
+}
+
+
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_unv(std::istream &in)
@@ -635,14 +664,12 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           cells.emplace_back();
 
           AssertThrow(in, ExcIO());
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               v++)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             in >> cells.back().vertices[v];
 
           cells.back().material_id = 0;
 
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               v++)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             cells.back().vertices[v] = vertex_indices[cells.back().vertices[v]];
 
           cell_indices[no] = no_cell;
@@ -860,8 +887,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
         {
           // allocate and read indices
           cells.emplace_back();
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
             in >> cells.back().vertices[i];
 
           // to make sure that the cast won't fail
@@ -871,19 +897,16 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::material_id>::max()));
           // we use only material_ids in the range from 0 to
           // numbers::invalid_material_id-1
-          Assert(material_id < numbers::invalid_material_id,
-                 ExcIndexRange(material_id, 0, numbers::invalid_material_id));
+          AssertIndexRange(material_id, numbers::invalid_material_id);
 
           if (apply_all_indicators_to_manifolds)
             cells.back().manifold_id =
               static_cast<types::manifold_id>(material_id);
-          cells.back().material_id =
-            static_cast<types::material_id>(material_id);
+          cells.back().material_id = material_id;
 
           // transform from ucd to
           // consecutive numbering
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
+          for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
             if (vertex_indices.find(cells.back().vertices[i]) !=
                 vertex_indices.end())
               // vertex with this index exists
@@ -913,10 +936,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          AssertIndexRange(material_id, numbers::internal_face_boundary_id);
 
           // Make sure to set both manifold id and boundary id appropriately in
           // both cases:
@@ -967,10 +987,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          AssertIndexRange(material_id, numbers::internal_face_boundary_id);
 
           // Make sure to set both manifold id and boundary id appropriately in
           // both cases:
@@ -1235,7 +1252,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       // read in vertex numbers. they
       // are 1-based, so subtract one
       cells.emplace_back();
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           in >> cells.back().vertices[i];
 
@@ -1879,9 +1896,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 // allocate and read indices
                 cells.emplace_back();
-                for (unsigned int i = 0;
-                     i < GeometryInfo<dim>::vertices_per_cell;
-                     ++i)
+                for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
                   in >> cells.back().vertices[i];
 
                 // to make sure that the cast won't fail
@@ -1893,19 +1908,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                          std::numeric_limits<types::material_id>::max()));
                 // we use only material_ids in the range from 0 to
                 // numbers::invalid_material_id-1
-                Assert(material_id < numbers::invalid_material_id,
-                       ExcIndexRange(material_id,
-                                     0,
-                                     numbers::invalid_material_id));
+                AssertIndexRange(material_id, numbers::invalid_material_id);
 
-                cells.back().material_id =
-                  static_cast<types::material_id>(material_id);
+                cells.back().material_id = material_id;
 
                 // transform from ucd to
                 // consecutive numbering
-                for (unsigned int i = 0;
-                     i < GeometryInfo<dim>::vertices_per_cell;
-                     ++i)
+                for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
                   {
                     AssertThrow(
                       vertex_indices.find(cells.back().vertices[i]) !=
@@ -1935,10 +1944,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                          std::numeric_limits<types::boundary_id>::max()));
                 // we use only boundary_ids in the range from 0 to
                 // numbers::internal_face_boundary_id-1
-                Assert(material_id < numbers::internal_face_boundary_id,
-                       ExcIndexRange(material_id,
-                                     0,
-                                     numbers::internal_face_boundary_id));
+                AssertIndexRange(material_id,
+                                 numbers::internal_face_boundary_id);
 
                 subcelldata.boundary_lines.back().boundary_id =
                   static_cast<types::boundary_id>(material_id);
@@ -1977,10 +1984,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                          std::numeric_limits<types::boundary_id>::max()));
                 // we use only boundary_ids in the range from 0 to
                 // numbers::internal_face_boundary_id-1
-                Assert(material_id < numbers::internal_face_boundary_id,
-                       ExcIndexRange(material_id,
-                                     0,
-                                     numbers::internal_face_boundary_id));
+                AssertIndexRange(material_id,
+                                 numbers::internal_face_boundary_id);
 
                 subcelldata.boundary_quads.back().boundary_id =
                   static_cast<types::boundary_id>(material_id);
@@ -3047,10 +3052,10 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
                         aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
 
   // If the import failed, report it
-  AssertThrow(scene, ExcMessage(importer.GetErrorString()))
+  AssertThrow(scene != nullptr, ExcMessage(importer.GetErrorString()));
 
-    AssertThrow(scene->mNumMeshes,
-                ExcMessage("Input file contains no meshes."));
+  AssertThrow(scene->mNumMeshes != 0,
+              ExcMessage("Input file contains no meshes."));
 
   AssertThrow((mesh_index == numbers::invalid_unsigned_int) ||
                 (mesh_index < scene->mNumMeshes),
@@ -3112,8 +3117,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
         {
           if (mFaces[i].mNumIndices == GeometryInfo<dim>::vertices_per_cell)
             {
-              for (unsigned int f = 0; f < GeometryInfo<dim>::vertices_per_cell;
-                   ++f)
+              for (const unsigned int f : GeometryInfo<dim>::vertex_indices())
                 {
                   cells[valid_cell].vertices[f] =
                     mFaces[i].mIndices[f] + v_offset;
@@ -3176,7 +3180,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   (void)remove_duplicates;
   (void)tol;
   (void)ignore_unsupported_types;
-  Assert(false, ExcNeedsAssimp());
+  AssertThrow(false, ExcNeedsAssimp());
 #endif
 }
 
@@ -3195,11 +3199,9 @@ GridIn<dim, spacedim>::skip_empty_lines(std::istream &in)
       // consists only of spaces, and
       // if not put the whole thing
       // back and return
-      if (std::find_if(line.begin(),
-                       line.end(),
-                       std::bind(std::not_equal_to<char>(),
-                                 std::placeholders::_1,
-                                 ' ')) != line.end())
+      if (std::find_if(line.begin(), line.end(), [](const char c) {
+            return c != ' ';
+          }) != line.end())
         {
           in.putback('\n');
           for (int i = line.length() - 1; i >= 0; --i)
@@ -3439,6 +3441,10 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
         read_vtk(in);
         return;
 
+      case vtu:
+        read_vtu(in);
+        return;
+
       case unv:
         read_unv(in);
         return;
@@ -3493,6 +3499,8 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
         return ".msh";
       case vtk:
         return ".vtk";
+      case vtu:
+        return ".vtu";
       case unv:
         return ".unv";
       case ucd:
@@ -3529,6 +3537,9 @@ GridIn<dim, spacedim>::parse_format(const std::string &format_name)
 
   if (format_name == "vtk")
     return vtk;
+
+  if (format_name == "vtu")
+    return vtu;
 
   // This is also the typical extension of Abaqus input files.
   if (format_name == "inp")
@@ -3575,7 +3586,7 @@ template <int dim, int spacedim>
 std::string
 GridIn<dim, spacedim>::get_format_names()
 {
-  return "dbmesh|msh|unv|vtk|ucd|abaqus|xda|netcdf|tecplot|assimp";
+  return "dbmesh|msh|unv|vtk|vtu|ucd|abaqus|xda|netcdf|tecplot|assimp";
 }
 
 
@@ -4100,18 +4111,18 @@ namespace
 
     // Write out node numbers
     // Loop over all nodes
-    for (unsigned int ii = 0; ii < node_list.size(); ++ii)
+    for (const auto &node : node_list)
       {
         // Node number
-        output << node_list[ii][0] << "\t";
+        output << node[0] << "\t";
 
         // Node coordinates
         output.setf(std::ios::scientific, std::ios::floatfield);
         for (unsigned int jj = 1; jj < spacedim + 1; ++jj)
           {
             // invoke tolerance -> set points close to zero equal to zero
-            if (std::abs(node_list[ii][jj]) > tolerance)
-              output << static_cast<double>(node_list[ii][jj]) << "\t";
+            if (std::abs(node[jj]) > tolerance)
+              output << static_cast<double>(node[jj]) << "\t";
             else
               output << 0.0 << "\t";
           }

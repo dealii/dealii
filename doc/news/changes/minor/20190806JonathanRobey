@@ -1,2 +1,0 @@
-New: Added frobenius_norm method to BlockMatrixBase.
-(Jonathan Robey, 2019/08/06)

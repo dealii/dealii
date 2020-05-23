@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,10 +72,8 @@ check_vmult()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(0);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(0) << std::fixed;
 
   check_vmult<double>();
   check_vmult<float>();

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2018 by the deal.II authors
+ * Copyright (C) 2001 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -30,10 +30,14 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
 
-// This is the only new one: in it, we declare the MappingQ class
+// This include file is new. Even if we are not solving a PDE in this tutorial,
+// we want to use a dummy finite element with zero degrees of freedoms provided
+// by the FE_Nothing class.
+#include <deal.II/fe/fe_nothing.h>
+
+// The following header file is also new: in it, we declare the MappingQ class
 // which we will use for polynomial mappings of arbitrary order:
 #include <deal.II/fe/mapping_q.h>
 
@@ -90,7 +94,7 @@ namespace Step10
       {
         std::cout << "Refinement level: " << refinement << std::endl;
 
-        std::string filename_base = "ball_" + Utilities::to_string(refinement);
+        std::string filename_base = "ball_" + std::to_string(refinement);
 
         for (unsigned int degree = 1; degree < 4; ++degree)
           {
@@ -130,8 +134,8 @@ namespace Step10
             grid_out.set_flags(gnuplot_flags);
 
             // Finally, generate a filename and a file for output:
-            std::string filename = filename_base + "_mapping_q_" +
-                                   Utilities::to_string(degree) + ".dat";
+            std::string filename =
+              filename_base + "_mapping_q_" + std::to_string(degree) + ".dat";
             std::ofstream gnuplot_file(filename);
 
             // Then write out the triangulation to this file. The last
@@ -329,8 +333,8 @@ namespace Step10
         Triangulation<dim> triangulation;
         GridGenerator::hyper_ball(triangulation);
 
-        const MappingQ<dim> mapping(degree);
-        const FE_Q<dim>     fe(1);
+        const MappingQ<dim>   mapping(degree);
+        const FE_Nothing<dim> fe;
 
         DoFHandler<dim> dof_handler(triangulation);
 
@@ -355,14 +359,12 @@ namespace Step10
             // added to the long double variable `perimeter'.
             long double perimeter = 0;
             for (const auto &cell : dof_handler.active_cell_iterators())
-              for (unsigned int face_no = 0;
-                   face_no < GeometryInfo<dim>::faces_per_cell;
-                   ++face_no)
-                if (cell->face(face_no)->at_boundary())
+              for (const auto &face : cell->face_iterators())
+                if (face->at_boundary())
                   {
                     // We reinit the FEFaceValues object with the cell
                     // iterator and the number of the face.
-                    fe_face_values.reinit(cell, face_no);
+                    fe_face_values.reinit(cell, face);
                     for (unsigned int i = 0;
                          i < fe_face_values.n_quadrature_points;
                          ++i)

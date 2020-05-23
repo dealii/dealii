@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -126,7 +126,7 @@ namespace Step35
 
     // In the constructor of this class we declare all the parameters. The
     // details of how this works have been discussed elsewhere, for example in
-    // step-19 and step-29.
+    // step-29.
     Data_Storage::Data_Storage()
       : form(Method::rotational)
       , dt(5e-4)
@@ -796,12 +796,10 @@ namespace Step35
         vel_exact.set_time(t_0);
         vel_exact.set_component(d);
         VectorTools::interpolate(dof_handler_velocity,
-                                 Functions::ZeroFunction<dim>(),
+                                 vel_exact,
                                  u_n_minus_1[d]);
         vel_exact.advance_time(dt);
-        VectorTools::interpolate(dof_handler_velocity,
-                                 Functions::ZeroFunction<dim>(),
-                                 u_n[d]);
+        VectorTools::interpolate(dof_handler_velocity, vel_exact, u_n[d]);
       }
   }
 
@@ -1117,8 +1115,9 @@ namespace Step35
   NavierStokesProjection<dim>::diffusion_component_solve(const unsigned int d)
   {
     SolverControl solver_control(vel_max_its, vel_eps * force[d].l2_norm());
-    SolverGMRES<> gmres(solver_control,
-                        SolverGMRES<>::AdditionalData(vel_Krylov_size));
+    SolverGMRES<Vector<double>> gmres(
+      solver_control,
+      SolverGMRES<Vector<double>>::AdditionalData(vel_Krylov_size));
     gmres.solve(vel_it_matrix[d], u_n[d], force[d], prec_velocity[d]);
   }
 
@@ -1236,7 +1235,7 @@ namespace Step35
                                      vel_diag_strength, vel_off_diagonals));
 
     SolverControl solvercontrol(vel_max_its, vel_eps * pres_tmp.l2_norm());
-    SolverCG<>    cg(solvercontrol);
+    SolverCG<Vector<double>> cg(solvercontrol);
     cg.solve(pres_iterative, phi_n, pres_tmp, prec_pres_Laplace);
 
     phi_n *= 1.5 / dt;
@@ -1429,7 +1428,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step35;
 
       RunTimeParameters::Data_Storage data;

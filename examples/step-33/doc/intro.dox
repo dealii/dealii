@@ -6,7 +6,7 @@ at Sandia (on the Wyoming Express bus to and from Corrales each day).
 The main purpose was to better understand Euler flow.
 The code solves the basic Euler equations of gas dynamics, by using a
 fully implicit Newton iteration (inspired by Sandia's Aria code).  The
-code may be configured by an input deck to run different simulations
+code may be configured by an input file to run different simulations
 on different meshes, with differing boundary conditions.
 <br>
 The original code and documentation was later slightly modified by Wolfgang
@@ -15,13 +15,19 @@ specific to the Euler equations by other hyperbolic conservation laws without
 too much trouble.
 </i>
 
-<b>Note:</b>The program uses the <a
-href="http://trilinos.org">Trilinos</a> linear solvers (which
-are part of the Aztec/Amesos package of Trilinos) and an automatic
+@note The program uses the <a
+href="http://trilinos.org">Trilinos</a> linear solvers (these can be found
+in Trilinos in the Aztec/Amesos packages) and an automatic
 differentiation package, Sacado, also part of Trilinos. deal.II must
-be configured to use this package. Refer to the <a
+be configured to use Trilinos. Refer to the <a
 href="../../readme.html#trilinos">ReadMe</a> file for instructions how to
 do this.
+
+@note While this program demonstrates the use of automatic differentiation
+well, it does not express the state of the art in Euler equation solvers.
+There are much faster and more accurate method for this equation, and
+you should take a look at step-67 and step-69 to see how this equation
+can be solved more efficiently.
 
 
 

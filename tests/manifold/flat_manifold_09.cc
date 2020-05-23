@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,8 +105,7 @@ check(Triangulation<dim> &tria)
   Tensor<1, dim> n;
   for (const auto &cell : tria.active_cell_iterators())
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary())
           {
             fe_face_values.reinit(cell, face);
@@ -136,8 +135,7 @@ test()
       std::cout << "step " << step << std::endl;
       for (auto &cell : tria.active_cell_iterators())
         {
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             {
               if (p.distance(cell->vertex(v)) < 0.03 / (1 << step))
                 {

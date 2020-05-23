@@ -1,0 +1,32 @@
+
+DEAL:Start to end::Start time = 0.00000
+DEAL:Start to end::End time = 1.50000
+DEAL:Start to end::Simulation started
+DEAL:Start to end::Current time = 0.00000, next = 0.123000, previous = 0.00000, step number = 0, next step size = 0.123000, previous step size = 0.00000
+DEAL:Start to end::Current time = 0.123000, next = 0.246000, previous = 0.00000, step number = 1, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.246000, next = 0.369000, previous = 0.123000, step number = 2, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.369000, next = 0.492000, previous = 0.246000, step number = 3, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.492000, next = 0.615000, previous = 0.369000, step number = 4, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.615000, next = 0.738000, previous = 0.492000, step number = 5, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.738000, next = 0.861000, previous = 0.615000, step number = 6, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.861000, next = 0.984000, previous = 0.738000, step number = 7, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 0.984000, next = 1.10700, previous = 0.861000, step number = 8, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 1.10700, next = 1.23000, previous = 0.984000, step number = 9, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 1.23000, next = 1.35300, previous = 1.10700, step number = 10, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 1.35300, next = 1.47600, previous = 1.23000, step number = 11, next step size = 0.123000, previous step size = 0.123000
+DEAL:Start to end::Current time = 1.47600, next = 1.50000, previous = 1.35300, step number = 12, next step size = 0.0240000, previous step size = 0.123000
+DEAL:Start to end::Current time = 1.50000, next = 1.50000, previous = 1.47600, step number = 13, next step size = 0.00000, previous step size = 0.0240000
+DEAL:Start to end::Simulation ended
+DEAL:Start to end::Restarted
+DEAL:Start to end::Simulation started
+DEAL:Start to end::Current time = 0.00000, next = 0.123000, previous = 0.00000, step number = 0, next step size = 0.123000, previous step size = 0.00000
+DEAL:Start to end::OK
+DEAL:Adjust time step size::Simulation started
+DEAL:Adjust time step size::Current time = 0.400000, next = 0.550000, previous = 0.400000, step number = 0, next step size = 0.150000, previous step size = 0.00000
+DEAL:Adjust time step size::Current time = 0.550000, next = 0.700000, previous = 0.400000, step number = 1, next step size = 0.150000, previous step size = 0.150000
+DEAL:Adjust time step size::Current time = 0.910000, next = 1.27000, previous = 0.550000, step number = 2, next step size = 0.360000, previous step size = 0.360000
+DEAL:Adjust time step size::Current time = 1.27000, next = 1.63000, previous = 0.910000, step number = 3, next step size = 0.360000, previous step size = 0.360000
+DEAL:Adjust time step size::Current time = 1.88000, next = 2.10000, previous = 1.27000, step number = 4, next step size = 0.220000, previous step size = 0.610000
+DEAL:Adjust time step size::Current time = 2.10000, next = 2.10000, previous = 1.88000, step number = 5, next step size = 0.00000, previous step size = 0.220000
+DEAL:Adjust time step size::Simulation ended
+DEAL:Adjust time step size::OK

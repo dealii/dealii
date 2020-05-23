@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_elasticity_standard_tensors_h
 #define dealii_elasticity_standard_tensors_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -68,7 +70,7 @@ namespace Physics
        * matrix, then this simply corresponds to the identity matrix.
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<2, dim> I
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = unit_symmetric_tensor<dim>()
 #endif
         ;
@@ -101,7 +103,7 @@ namespace Physics
        * operator.
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<4, dim> S
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = identity_tensor<dim>()
 #endif
         ;
@@ -117,7 +119,7 @@ namespace Physics
        * @f]
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<4, dim> IxI
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = outer_product(unit_symmetric_tensor<dim>(),
                         unit_symmetric_tensor<dim>())
 #endif
@@ -167,7 +169,7 @@ namespace Physics
        * @dealiiHolzapfelA{232,6.105}
        */
       static DEAL_II_CONSTEXPR const SymmetricTensor<4, dim> dev_P
-#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#ifdef DEAL_II_HAVE_CXX14_CONSTEXPR
         = deviator_tensor<dim>()
 #endif
         ;
@@ -273,8 +275,8 @@ namespace Physics
        * @dealiiHolzapfelA{228,6.82}
        */
       template <typename Number>
-      static constexpr SymmetricTensor<2, dim, Number>
-      ddet_F_dC(const Tensor<2, dim, Number> &F);
+      static DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
+                               ddet_F_dC(const Tensor<2, dim, Number> &F);
 
       //@}
 
@@ -368,8 +370,8 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
 
 template <int dim>
 template <typename Number>
-constexpr SymmetricTensor<2, dim, Number>
-Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
+DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
+                  Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
   const Tensor<2, dim, Number> &F)
 {
   return Number(0.5) * determinant(F) * symmetrize(invert(transpose(F) * F));

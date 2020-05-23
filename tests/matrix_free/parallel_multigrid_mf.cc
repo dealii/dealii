@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,7 +70,7 @@ public:
     typename MatrixFree<dim, number>::AdditionalData addit_data;
     addit_data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::none;
-    addit_data.level_mg_handler = level;
+    addit_data.mg_level = level;
 
     // extract the constraints due to Dirichlet boundary conditions
     AffineConstraints<double>                           constraints;
@@ -99,9 +99,7 @@ public:
             const FiniteElement<dim> &fe = cell->get_fe();
             local_dofs.resize(fe.dofs_per_face);
 
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<dim>::faces_per_cell;
-                 ++face_no)
+            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
               if (cell->at_boundary(face_no) == true)
                 {
                   const typename DoFHandler<dim>::face_iterator face =
@@ -418,7 +416,7 @@ do_test(const DoFHandler<dim> &dof)
   mg::Matrix<LinearAlgebra::distributed::Vector<number>> mg_matrix(mg_matrices);
 
   Multigrid<LinearAlgebra::distributed::Vector<number>> mg(
-    dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<number>,
                  MGTransferPrebuiltMF<dim, LevelMatrixType>>
@@ -452,7 +450,7 @@ test()
       FE_Q<dim>       fe(fe_degree);
       DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
-      dof.distribute_mg_dofs(fe);
+      dof.distribute_mg_dofs();
 
       do_test<dim, fe_degree, fe_degree + 1, number>(dof);
     }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 // Define a class that fills all available entries in the info objects
@@ -215,7 +214,7 @@ test(const FiniteElement<dim> &fe)
 
   DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
-  dofs.distribute_mg_dofs(fe);
+  dofs.distribute_mg_dofs();
   deallog << "DoFHandler " << dofs.n_dofs() << " levels";
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     deallog << ' ' << l << ':' << dofs.n_dofs(l);

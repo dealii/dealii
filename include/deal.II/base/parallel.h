@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -373,7 +373,8 @@ namespace parallel
 
   /**
    * This function applies the given function argument @p f to all elements in
-   * the range <code>[begin,end)</code> and may do so in parallel.
+   * the range <code>[begin,end)</code> and may do so in parallel. An example
+   * of its use is given in step-69.
    *
    * However, in many cases it is not efficient to call a function on each
    * element, so this function calls the given function object on sub-ranges.
@@ -398,11 +399,11 @@ namespace parallel
    *   {
    *     parallel::apply_to_subranges
    *        (0, A.n_rows(),
-   *         std::bind (&mat_vec_on_subranges,
-   *                    std::placeholders::_1, std::placeholders::_2,
-   *                    std::cref(A),
-   *                    std::cref(x),
-   *                    std::ref(y)),
+   *         [&](const unsigned int begin_row,
+   *             const unsigned int end_row)
+   *         {
+   *           mat_vec_on_subranges(begin_row, end_row, A, x, y);
+   *         },
    *         50);
    *   }
    *
@@ -418,14 +419,11 @@ namespace parallel
    *   }
    * @endcode
    *
-   * Note how we use the <code>std::bind</code> function to convert
+   * Note how we use the lambda function to convert
    * <code>mat_vec_on_subranges</code> from a function that takes 5 arguments
-   * to one taking 2 by binding the remaining arguments (the modifiers
-   * <code>std::ref</code> and <code>std::cref</code> make sure
-   * that the enclosed variables are actually passed by reference and constant
-   * reference, rather than by value). The resulting function object requires
-   * only two arguments, begin_row and end_row, with all other arguments
-   * fixed.
+   * to one taking 2 by binding the remaining arguments. The resulting function
+   * object requires only two arguments, `begin_row` and `end_row`, with all
+   * other arguments fixed.
    *
    * The code, if in single-thread mode, will call
    * <code>mat_vec_on_subranges</code> on the entire range
@@ -463,13 +461,13 @@ namespace parallel
     ff(begin, end);
 #  endif
 #else
-    internal::parallel_for(
-      begin,
-      end,
-      std::bind(&internal::apply_to_subranges<RangeType, Function>,
-                std::placeholders::_1,
-                std::cref(f)),
-      grainsize);
+    internal::parallel_for(begin,
+                           end,
+                           [&f](const tbb::blocked_range<RangeType> &range) {
+                             internal::apply_to_subranges<RangeType, Function>(
+                               range, f);
+                           },
+                           grainsize);
 #endif
   }
 
@@ -641,10 +639,11 @@ namespace parallel
    *      std::sqrt
    *       (parallel::accumulate_from_subranges<double>
    *        (0, A.n_rows(),
-   *         std::bind (&mat_norm_sqr_on_subranges,
-   *                     std::placeholders::_1, std::placeholders::_2,
-   *                     std::cref(A),
-   *                     std::cref(x)),
+   *         [&](const unsigned int begin_row,
+   *             const unsigned int end_row)
+   *         {
+   *           mat_vec_on_subranges(begin_row, end_row, A, x, y);
+   *         },
    *         50);
    *   }
    *
@@ -775,7 +774,7 @@ namespace parallel
       /**
        * A mutex to guard the access to the in_use flag.
        */
-      dealii::Threads::Mutex mutex;
+      std::mutex mutex;
 #endif
     };
   } // namespace internal

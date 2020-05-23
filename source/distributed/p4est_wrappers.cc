@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -473,58 +473,6 @@ namespace internal
     std::size_t (&functions<2>::connectivity_memory_used)(
       types<2>::connectivity *p4est) = p4est_connectivity_memory_used;
 
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors(
-      const typename dealii::parallel::distributed::Triangulation<dim, spacedim>
-        &                                                   tria,
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-      typename dealii::internal::p4est::types<dim>::ghost * parallel_ghost)
-    {
-      std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-        vertices_with_ghost_neighbors;
-
-      dealii::internal::p4est::FindGhosts<dim, spacedim> fg;
-      fg.subids        = sc_array_new(sizeof(dealii::types::subdomain_id));
-      fg.triangulation = &tria;
-      fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
-
-      switch (dim)
-        {
-          case 2:
-            p4est_iterate(
-              reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(
-                parallel_forest),
-              reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(
-                parallel_ghost),
-              static_cast<void *>(&fg),
-              nullptr,
-              find_ghosts_face<2, spacedim>,
-              find_ghosts_corner<2, spacedim>);
-            break;
-
-          case 3:
-            p8est_iterate(
-              reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(
-                parallel_forest),
-              reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(
-                parallel_ghost),
-              static_cast<void *>(&fg),
-              nullptr,
-              find_ghosts_face<3, 3>,
-              find_ghosts_edge<3, 3>,
-              find_ghosts_corner<3, 3>);
-            break;
-
-          default:
-            Assert(false, ExcNotImplemented());
-        }
-
-      sc_array_destroy(fg.subids);
-
-      return vertices_with_ghost_neighbors;
-    }
-
     constexpr unsigned int functions<2>::max_level;
 
     void (&functions<2>::transfer_fixed)(const types<2>::gloidx *dest_gfq,
@@ -834,6 +782,73 @@ namespace internal
       return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
               (coarse_grid_cell <= parallel_forest->last_local_tree));
     }
+
+
+
+    template <>
+    bool
+    quadrant_is_equal<1>(const typename types<1>::quadrant &q1,
+                         const typename types<1>::quadrant &q2)
+    {
+      return q1 == q2;
+    }
+
+
+
+    template <>
+    bool quadrant_is_ancestor<1>(types<1>::quadrant const &q1,
+                                 types<1>::quadrant const &q2)
+    {
+      // determine level of quadrants
+      const int level_1 = (q1 << types<1>::max_n_child_indices_bits) >>
+                          types<1>::max_n_child_indices_bits;
+      const int level_2 = (q2 << types<1>::max_n_child_indices_bits) >>
+                          types<1>::max_n_child_indices_bits;
+
+      // q1 can be an ancestor of q2 if q1's level is smaller
+      if (level_1 >= level_2)
+        return false;
+
+      // extract path of quadrants up to level of possible ancestor q1
+      const int truncated_id_1 = (q1 >> (types<1>::n_bits - 1 - level_1))
+                                 << (types<1>::n_bits - 1 - level_1);
+      const int truncated_id_2 = (q2 >> (types<1>::n_bits - 1 - level_1))
+                                 << (types<1>::n_bits - 1 - level_1);
+
+      // compare paths
+      return truncated_id_1 == truncated_id_2;
+    }
+
+
+
+    template <>
+    void
+    init_quadrant_children<1>(
+      const typename types<1>::quadrant &q,
+      typename types<1>::quadrant (
+        &p4est_children)[dealii::GeometryInfo<1>::max_children_per_cell])
+    {
+      // determine the current level of quadrant
+      const int level_parent = (q << types<1>::max_n_child_indices_bits) >>
+                               types<1>::max_n_child_indices_bits;
+      const int level_child = level_parent + 1;
+
+      // left child: only n_child_indices has to be incremented
+      p4est_children[0] = (q + 1);
+
+      // right child: increment and set a bit to 1 indicating that it is a right
+      // child
+      p4est_children[1] = (q + 1) | (1 << (types<1>::n_bits - 1 - level_child));
+    }
+
+
+
+    template <>
+    void init_coarse_quadrant<1>(typename types<1>::quadrant &quad)
+    {
+      quad = 0;
+    }
+
   } // namespace p4est
 } // namespace internal
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 class Deal2PeriodicBug
 {

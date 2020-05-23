@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 #define dealii_symmetric_tensor_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
@@ -28,8 +30,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int rank, int dim, typename Number = double>
 class SymmetricTensor;
+#endif
 
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
@@ -67,6 +72,50 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 
 namespace internal
 {
+  // Workaround: The following 4 overloads are necessary to be able to
+  // compile the library with Apple Clang 8 and older. We should remove
+  // these overloads again when we bump the minimal required version to
+  // something later than clang-3.6 / Apple Clang 6.3.
+  // - Jean-Paul Pelteret, Matthias Maier, Daniel Arndt 2020
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<SymmetricTensor<rank, dim, T>, std::complex<U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<SymmetricTensor<rank, dim, std::complex<T>>,
+                         std::complex<U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <typename T, int rank, int dim, typename U>
+  struct ProductTypeImpl<std::complex<T>, SymmetricTensor<rank, dim, U>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>,
+                         SymmetricTensor<rank, dim, std::complex<U>>>
+  {
+    using type =
+      SymmetricTensor<rank,
+                      dim,
+                      std::complex<typename ProductType<T, U>::type>>;
+  };
+  // end workaround
+
   /**
    * A namespace for functions and classes that are internal to how the
    * SymmetricTensor class (and its associate functions) works.
@@ -98,7 +147,7 @@ namespace internal
                                                          const unsigned int     new_index,
                                                          const unsigned int     position)
     {
-      Assert(position < 2, ExcIndexRange(position, 0, 2));
+      AssertIndexRange(position, 2);
 
       if (position == 0)
         return {new_index, numbers::invalid_unsigned_int};
@@ -119,7 +168,7 @@ namespace internal
                                                          const unsigned int     new_index,
                                                          const unsigned int     position)
     {
-      Assert(position < 4, ExcIndexRange(position, 0, 4));
+      AssertIndexRange(position, 4);
 
       switch (position)
         {
@@ -488,8 +537,14 @@ namespace internal
 /**
  * Provide a class that stores symmetric tensors of rank 2,4,... efficiently,
  * i.e. only store those off-diagonal elements of the full tensor that are not
- * redundant. For example, for symmetric 2x2 tensors, this would be the
+ * redundant. For example, for symmetric $2\times 2$ tensors, this would be the
  * elements 11, 22, and 12, while the element 21 is equal to the 12 element.
+ * Within this documentation, second order symmetric tensors are denoted as
+ * bold-faced upper-case Latin letters such as $\mathbf A, \mathbf B, \dots$
+ * or bold-faced Greek letters such as $\boldsymbol{\varepsilon}$,
+ * $\boldsymbol{\sigma}$. The Cartesian coordinates of a second-order tensor
+ * such as $\mathbf A$ are represented as $A_{ij}$ where $i,j$ are indices
+ * ranging from 0 to <tt>dim-1</tt>.
  *
  * Using this class for symmetric tensors of rank 2 has advantages over
  * matrices in many cases since the dimension is known to the compiler as well
@@ -500,22 +555,26 @@ namespace internal
  * the tensor represents a symmetric object.
  *
  * For tensors of higher rank, the savings in storage are even higher. For
- * example for the 3x3x3x3 tensors of rank 4, only 36 instead of the full 81
- * entries have to be stored.
+ * example for the $3 \times 3 \times 3 \times 3$ tensors of rank 4, only 36
+ * instead of the full 81 entries have to be stored. These rank 4 tensors are
+ * denoted by blackboard-style upper-case Latin letters such as $\mathbb A$
+ * with components $\mathcal{A}_{ijkl}$.
  *
  * While the definition of a symmetric rank-2 tensor is obvious, tensors of
  * rank 4 are considered symmetric if they are operators mapping symmetric
- * rank-2 tensors onto symmetric rank-2 tensors. This entails certain symmetry
- * properties on the elements in their 4-dimensional index space, in
- * particular that
- * <tt>C<sub>ijkl</sub>=C<sub>jikl</sub>=C<sub>ijlk</sub></tt>. However, it
- * does not imply the relation <tt>C<sub>ijkl</sub>=C<sub>klij</sub></tt>.
+ * rank-2 tensors onto symmetric rank-2 tensors. This so-called minor symmetry
+ * of the rank 4 tensor requires that for every set of four indices
+ * $i, j, k, l$, the identity $\mathcal{C}_{ijkl} = \mathcal{C}_{jikl} =
+ * \mathcal{C}_{ijlk}$ holds. However, it does not imply the relation
+ * $\mathcal{C}_{ijkl} = \mathcal{C}_{klij}$.
  * Consequently, symmetric tensors of rank 4 as understood here are only
  * tensors that map symmetric tensors onto symmetric tensors, but they do not
- * necessarily induce a symmetric scalar product <tt>a:C:b=b:C:a</tt> or even
- * a positive (semi-)definite form <tt>a:C:a</tt>, where <tt>a,b</tt> are
- * symmetric rank-2 tensors and the colon indicates the common double-index
- * contraction that acts as a product for symmetric tensors.
+ * necessarily induce a symmetric scalar product $\mathbf A : \mathbb C :
+ * \mathbf B = \mathbf B : \mathbb C : \mathbf A$ or even
+ * a positive (semi-)definite form $\mathbf A : \mathbb C : \mathbf A$, where
+ * $\mathbf A, \mathbf B$ are symmetric rank-2 tensors and the colon indicates
+ * the common double-index contraction that acts as a scalar product for
+ * symmetric tensors.
  *
  * Symmetric tensors are most often used in structural and fluid
  * mechanics, where strains and stresses are usually symmetric
@@ -531,14 +590,14 @@ namespace internal
  *
  * <h3>Accessing elements</h3>
  *
- * The elements of a tensor <tt>t</tt> can be accessed using the bracket
- * operator, i.e. for a tensor of rank 4, <tt>t[0][1][0][1]</tt> accesses the
- * element <tt>t<sub>0101</sub></tt>. This access can be used for both reading
+ * The elements of a tensor $\mathbb C$ can be accessed using the bracket
+ * operator, i.e. for a tensor of rank 4, <tt>C[0][1][0][1]</tt> accesses the
+ * element $\mathcal{C}_{0101}$. This access can be used for both reading
  * and writing (if the tensor is non-constant at least). You may also perform
  * other operations on it, although that may lead to confusing situations
  * because several elements of the tensor are stored at the same location. For
  * example, for a rank-2 tensor that is assumed to be zero at the beginning,
- * writing <tt>t[0][1]+=1; t[1][0]+=1;</tt> will lead to the same element
+ * writing <tt>A[0][1]+=1; A[1][0]+=1;</tt> will lead to the same element
  * being increased by one <em>twice</em>, because even though the accesses use
  * different indices, the elements that are accessed are symmetric and
  * therefore stored at the same location. It may therefore be useful in
@@ -591,12 +650,14 @@ public:
    * only up to round-off error: if the incoming tensor is not exactly
    * symmetric, then an exception is thrown. If you know that incoming tensor
    * is symmetric only up to round-off, then you may want to call the
-   * <tt>symmetrize</tt> function first. If you aren't sure, it is good
-   * practice to check before calling <tt>symmetrize</tt>.
+   * <tt>symmetrize()</tt> function first. If you aren't sure, it is good
+   * practice to check before calling <tt>symmetrize()</tt>.
+   *
+   * Because we check for symmetry via a non-constexpr function call, you will
+   * have to use the symmetrize() function in constexpr contexts instead.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR explicit SymmetricTensor(
-    const Tensor<2, dim, OtherNumber> &t);
+  explicit SymmetricTensor(const Tensor<2, dim, OtherNumber> &t);
 
   /**
    * A constructor that creates a symmetric tensor from an array holding its
@@ -609,7 +670,7 @@ public:
    * rank 2.
    *
    * The size of the array passed is equal to
-   * SymmetricTensor<rank_,dim>::n_independent_component; the reason for using
+   * SymmetricTensor<rank_,dim>::n_independent_components; the reason for using
    * the object from the internal namespace is to work around bugs in some
    * older compilers.
    */
@@ -628,26 +689,26 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    begin_raw();
+  Number *
+  begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
-  constexpr const Number *
+  const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    end_raw();
+  Number *
+  end_raw();
 
   /**
    * Return a const pointer to the element past the end of the underlying
    * storage.
    */
-  constexpr const Number *
+  const Number *
   end_raw() const;
 
   /**
@@ -664,7 +725,7 @@ public:
    * This operator assigns a scalar to a tensor. To avoid confusion with what
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
-   * <tt>t=0</tt> to reset all elements of the tensor to zero.
+   * $\mathbf A = 0$ to reset all elements of the tensor to zero.
    */
   DEAL_II_CONSTEXPR SymmetricTensor &
                     operator=(const Number &d);
@@ -723,18 +784,20 @@ public:
                     operator-() const;
 
   /**
-   * Product between the present symmetric tensor and a tensor of rank 2. For
-   * example, if the present object is also a rank-2 tensor, then this is the
-   * scalar-product double contraction <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
-   * over all indices <tt>i,j</tt>. In this case, the return value evaluates
-   * to a single scalar. While it is possible to define other scalar product
-   * (and associated induced norms), this one seems to be the most appropriate
-   * one.
+   * Double contraction product between the present symmetric tensor and a
+   * tensor of rank 2. For example, if the present object is the symmetric
+   * rank-2 tensor $\mathbf{A}$ and it is multiplied by another symmetric
+   * rank-2 tensor $\mathbf{B}$, then the result is the scalar-product double
+   * contraction $\mathbf A : \mathbf B = \sum_{i,j} A_{ij} B_{ij}$.
+   * In this case, the return value evaluates to a single
+   * scalar. While it is possible to define other scalar products (and
+   * associated induced norms), this one seems to be the most appropriate one.
    *
-   * If the present object is a rank-4 tensor, then the result is a rank-2
-   * tensor, i.e., the operation contracts over the last two indices of the
-   * present object and the indices of the argument, and the result is a
-   * tensor of rank 2.
+   * If the present object is a rank-4 tensor such as $\mathbb A$, then the
+   * result is a rank-2 tensor $\mathbf C = \mathbb A : \mathbf B$, i.e.,
+   * the operation contracts over the last two indices of the present object
+   * and the indices of the argument, and the result is a tensor of rank 2
+   * ($C_{ij} = \sum_{k,l} \mathcal{A}_{ijkl} B_{kl}$).
    *
    * Note that the multiplication operator for symmetric tensors is defined to
    * be a double contraction over two indices, while it is defined as a single
@@ -805,7 +868,8 @@ public:
   /**
    * Access to an element according to unrolled index. The function
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
-   * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
+   * <tt>s[s.unrolled_to_component_indices(unrolled_index)]</tt>, but more
+   * efficiently.
    */
   DEAL_II_CONSTEXPR const Number &
                           access_raw_entry(const unsigned int unrolled_index) const;
@@ -813,7 +877,8 @@ public:
   /**
    * Access to an element according to unrolled index. The function
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
-   * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
+   * <tt>s[s.unrolled_to_component_indices(unrolled_index)]</tt>, but more
+   * efficiently.
    */
   DEAL_II_CONSTEXPR Number &
                     access_raw_entry(const unsigned int unrolled_index);
@@ -1022,14 +1087,15 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Tensor<2, dim, OtherNumber> &t)
 {
   static_assert(rank == 2, "This function is only implemented for rank==2");
   for (unsigned int d = 0; d < dim; ++d)
     for (unsigned int e = 0; e < d; ++e)
-      Assert(t[d][e] == t[e][d], ExcInternalError());
+      Assert(t[d][e] == t[e][d],
+             ExcMessage("The incoming Tensor must be exactly symmetric."));
 
   for (unsigned int d = 0; d < dim; ++d)
     data[d] = t[d][d];
@@ -1950,7 +2016,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
                                                operator()(const TableIndices<rank_> &indices)
 {
   for (unsigned int r = 0; r < rank; ++r)
-    Assert(indices[r] < dimension, ExcIndexRange(indices[r], 0, dimension));
+    AssertIndexRange(indices[r], dimension);
   return internal::symmetric_tensor_access<dim, Number>(indices, data);
 }
 
@@ -1962,7 +2028,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const Number &
                                                      operator()(const TableIndices<rank_> &indices) const
 {
   for (unsigned int r = 0; r < rank; ++r)
-    Assert(indices[r] < dimension, ExcIndexRange(indices[r], 0, dimension));
+    AssertIndexRange(indices[r], dimension);
   return internal::symmetric_tensor_access<dim, Number>(indices, data);
 }
 
@@ -2045,7 +2111,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 SymmetricTensor<rank_, dim, Number>::begin_raw()
 {
   return std::addressof(this->access_raw_entry(0));
@@ -2054,7 +2120,7 @@ SymmetricTensor<rank_, dim, Number>::begin_raw()
 
 
 template <int rank_, int dim, typename Number>
-constexpr const Number *
+inline const Number *
 SymmetricTensor<rank_, dim, Number>::begin_raw() const
 {
   return std::addressof(this->access_raw_entry(0));
@@ -2063,7 +2129,7 @@ SymmetricTensor<rank_, dim, Number>::begin_raw() const
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 SymmetricTensor<rank_, dim, Number>::end_raw()
 {
   return begin_raw() + n_independent_components;
@@ -2072,7 +2138,7 @@ SymmetricTensor<rank_, dim, Number>::end_raw()
 
 
 template <int rank_, int dim, typename Number>
-constexpr const Number *
+inline const Number *
 SymmetricTensor<rank_, dim, Number>::end_raw() const
 {
   return begin_raw() + n_independent_components;
@@ -2241,8 +2307,8 @@ namespace internal
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE unsigned int
     component_to_unrolled_index(const TableIndices<2> &indices)
     {
-      Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
-      Assert(indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+      AssertIndexRange(indices[0], dim);
+      AssertIndexRange(indices[1], dim);
 
       switch (dim)
         {
@@ -2376,7 +2442,7 @@ namespace internal
             if (i < dim)
               return {i, i};
 
-            for (unsigned int d = 0, c = 0; d < dim; ++d)
+            for (unsigned int d = 0, c = dim; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if (c == i)
                   return {d, e};
@@ -2396,9 +2462,10 @@ namespace internal
     // this function is for tensors of a rank not already handled
     // above
     template <int dim, int rank_>
-    DEAL_II_CONSTEXPR inline TableIndices<rank_>
-    unrolled_to_component_indices(const unsigned int i,
-                                  const std::integral_constant<int, rank_> &)
+    DEAL_II_CONSTEXPR inline
+      typename std::enable_if<rank_ != 2, TableIndices<rank_>>::type
+      unrolled_to_component_indices(const unsigned int i,
+                                    const std::integral_constant<int, rank_> &)
     {
       (void)i;
       Assert(
@@ -2447,7 +2514,7 @@ SymmetricTensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
  *
  * If possible (e.g. when @p Number and @p OtherNumber are of the same type,
  * or if the result of <code>Number() + OtherNumber()</code> is another @p Number),
- * you should use <tt>operator +=</tt> instead since this does not require the
+ * you should use <tt>operator+=</tt> instead since this does not require the
  * creation of a temporary variable.
  *
  * @relatesalso SymmetricTensor
@@ -2471,8 +2538,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * operation.
  *
  * If possible (e.g. when @p Number and @p OtherNumber are of the same type,
- * or if the result of <code>Number() + OtherNumber()</code> is another @p Number),
- * you should use <tt>operator +=</tt> instead since this does not require the
+ * or if the result of <code>Number() - OtherNumber()</code> is another @p Number),
+ * you should use <tt>operator-=</tt> instead since this does not require the
  * creation of a temporary variable.
  *
  * @relatesalso SymmetricTensor
@@ -2560,13 +2627,14 @@ constexpr DEAL_II_ALWAYS_INLINE
 
 
 /**
- * Compute the determinant of a tensor or rank 2. The determinant is also
- * commonly referred to as the third invariant of rank-2 tensors.
+ * Compute the determinant of a rank 2 symmetric tensor. The determinant is
+ * also commonly referred to as the third invariant of rank-2 tensors.
  *
  * For a one-dimensional tensor, the determinant equals the only element and
  * is therefore equivalent to the trace.
  *
- * For greater notational simplicity, there is also a <tt>third_invariant</tt>
+ * For greater notational simplicity, there is also a
+ * <tt>third_invariant()</tt>
  * function that returns the determinant of a tensor.
  *
  * @relatesalso SymmetricTensor
@@ -2602,10 +2670,13 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 
 
 /**
- * Compute the determinant of a tensor or rank 2. This function therefore
- * computes the same value as the <tt>determinant()</tt> functions and is only
- * provided for greater notational simplicity (since there are also functions
- * first_invariant() and second_invariant()).
+ * Compute the determinant of a rank 2 symmetric tensor. This function
+ * therefore computes the same value as the <tt>determinant()</tt> functions
+ * and is only provided for greater notational simplicity (since there are
+ * also functions first_invariant() and second_invariant()).
+ * \f[
+ *   I_3 (\mathbf A) = III (\mathbf A) = \det (\mathbf A)
+ * \f]
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2622,6 +2693,9 @@ constexpr DEAL_II_ALWAYS_INLINE Number
 /**
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
  * diagonal entries. The trace is the first invariant of a rank-2 tensor.
+ * \f[
+ *   \text{tr} \mathbf A = \sum_i A_{ii}
+ * \f]
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2638,10 +2712,13 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 
 
 /**
- * Compute the trace of a tensor or rank 2. This function therefore computes
- * the same value as the <tt>trace()</tt> functions and is only provided for
- * greater notational simplicity (since there are also functions
+ * Compute the trace of a rank 2 symmetric tensor. This function therefore
+ * computes the same value as the <tt>trace()</tt> functions and is only
+ * provided for greater notational simplicity (since there are also functions
  * second_invariant() and third_invariant()).
+ * \f[
+ *   I_1 (\mathbf A) = I (\mathbf A) = \text{tr} \mathbf A = \sum_i A_{ii}
+ * \f]
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2656,9 +2733,9 @@ first_invariant(const SymmetricTensor<2, dim, Number> &t)
 
 /**
  * Compute the second invariant of a tensor of rank 2. The second invariant of
- * a tensor $\sigma$ is defined as
- * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
- *                               -\text{trace}\ (\sigma^2) \right]$.
+ * a tensor $\mathbf A$ is defined as
+ * $I_2 (\mathbf A) = II(\mathbf A) = \frac 12
+ * \left[ (\text{tr} \mathbf A)^2 - \text{tr} (\mathbf{A}^2) \right]$.
  *
  * For the kind of arguments to this function, i.e., a rank-2 tensor of
  * size 1, the result is simply zero.
@@ -2677,15 +2754,15 @@ constexpr DEAL_II_ALWAYS_INLINE Number
 
 /**
  * Compute the second invariant of a tensor of rank 2. The second invariant of
- * a tensor $\sigma$ is defined as
- * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
- *                               -\text{trace}\ (\sigma^2) \right]$.
+ * a tensor $\mathbf A$ is defined as
+ * $I_2 (\mathbf A) = II(\mathbf A) = \frac 12
+ * \left[ (\text{tr} \mathbf A)^2 - \text{tr} (\mathbf{A}^2) \right]$.
  *
- * For the kind of arguments to this function, i.e., a rank-2 tensor of
- * size 2, the result is (counting indices starting at one)
- * $II(\sigma) = \frac 12 \left[ (\sigma_{11} + \sigma_{22})^2
- *                               -(\sigma_{11}^2+2\sigma_{12}^2+\sigma_{22}^2)
- * \right] = \sigma_{11}\sigma_{22} - \sigma_{12}^2$. As expected, for the
+ * For the kind of arguments to this function, i.e., a symmetric rank-2 tensor
+ * of size 2, the result is (counting indices starting at one)
+ * $I_2(\mathbf A) = II(\mathbf A) = \frac 12
+ *   \left[ (A_{11} + A_{22})^2 - (A_{11}^2+2 A_{12}^2+ A_{22}^2) \right]
+ *   = A_{11} A_{22} - A_{12}^2$. As expected, for the
  * $2\times 2$ symmetric tensors this function handles, this equals the
  * determinant of the tensor. (This is so because for $2\times 2$ symmetric
  * tensors, there really are only two invariants, so the second and third
@@ -2705,9 +2782,9 @@ constexpr DEAL_II_ALWAYS_INLINE Number
 
 /**
  * Compute the second invariant of a tensor of rank 2. The second invariant of
- * a tensor $\sigma$ is defined as
- * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
- *                               -\text{trace}\ (\sigma^2) \right]$.
+ * a tensor $\mathbf A$ is defined as
+ * $I_2 (\mathbf A) = II(\mathbf A) = \frac 12
+ * \left[ (\text{tr} \mathbf A)^2 - \text{tr} (\mathbf{A}^2) \right]$.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
@@ -2723,7 +2800,7 @@ constexpr DEAL_II_ALWAYS_INLINE Number
 
 
 /**
- * Return the eigenvalues of a symmetric 1x1 tensor of rank 2.
+ * Return the eigenvalues of a symmetric $1 \times 1$ tensor.
  * The (single) entry of the tensor is, of course, equal to the (single)
  * eigenvalue.
  *
@@ -2737,16 +2814,16 @@ eigenvalues(const SymmetricTensor<2, 1, Number> &T);
 
 
 /**
- * Return the eigenvalues of a symmetric 2x2 tensor of rank 2.
+ * Return the eigenvalues of a symmetric $2\times 2$ tensor.
  * The array of eigenvalues is sorted in descending order.
  *
- * For 2x2 tensors, the eigenvalues of tensor $T$ are the roots of
- * <a
+ * For $2\times 2$ tensors, the eigenvalues of tensor $\mathbf T$ are the
+ * roots of <a
  * href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#2.C3.972_matrices">the
- * characteristic polynomial</a> $0 = \lambda^{2} - \lambda\textrm{tr}(T) +
- * \textrm{det}(T)$ as given by
- * $\lambda = \frac{\textrm{tr}(T) \pm \sqrt{[\textrm{tr}(T)]^{2} -
- * 4\textrm{det}(T)}}{2}$.
+ * characteristic polynomial</a> $0 = \lambda^2
+ * - \lambda\;\text{tr}\mathbf{T} + \det \mathbf{T}$ as given by
+ * $\lambda_1, \lambda_2 = \frac{1}{2} \left[ \text{tr} \mathbf{T} \pm
+ * \sqrt{(\text{tr} \mathbf{T})^2 - 4 \det \mathbf{T}} \right]$.
  *
  * @warning The algorithm employed here determines the eigenvalues by
  * computing the roots of the characteristic polynomial. In the case that there
@@ -2766,15 +2843,16 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T);
 
 
 /**
- * Return the eigenvalues of a symmetric 3x3 tensor of rank 2.
+ * Return the eigenvalues of a symmetric $3\times 3$ tensor.
  * The array of eigenvalues is sorted in descending order.
  *
- * For 3x3 tensors, the eigenvalues of tensor $T$ are the roots of
- * <a
+ * For $3\times 3$ tensors, the eigenvalues of tensor $\mathbf T$ are the
+ * roots of <a
  * href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#3.C3.973_matrices">the
- * characteristic polynomial</a> $0 = \lambda^{3} - \lambda^{2}\textrm{tr}(T) -
- * \frac{1}{2} \lambda (\textrm{tr}(T^{2}) - [\textrm{tr}(T)]^{2}) -
- * \textrm{det}(T)$.
+ * characteristic polynomial</a> $0 = \lambda^3 - \lambda^2\;\text{tr}\mathbf T
+ * - \frac{1}{2} \lambda
+ * \left[\text{tr}(\mathbf{T}^2) - (\text{tr}\mathbf T)^2\right] -
+ * \det \mathbf T$.
  *
  * @warning The algorithm employed here determines the eigenvalues by
  * computing the roots of the characteristic polynomial. In the case that there
@@ -3086,8 +3164,8 @@ enum struct SymmetricTensorEigenvectorMethod
 
 /**
  * Return the eigenvalues and eigenvectors of a real-valued rank-2 symmetric
- * tensor $T$. The array of matched eigenvalue and eigenvector pairs is sorted
- * in descending order (determined by the eigenvalues).
+ * tensor $\mathbf T$. The array of matched eigenvalue and eigenvector pairs
+ * is sorted in descending order (determined by the eigenvalues).
  *
  * The specialized algorithms utilized in computing the eigenvectors are
  * presented in
@@ -3141,8 +3219,10 @@ constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>
 
 
 /**
- * Compute the deviator of a symmetric tensor, which is defined as <tt>dev[s]
- * = s - 1/dim*tr[s]*I</tt>, where <tt>I</tt> is the identity operator. This
+ * Compute the deviator of a symmetric tensor, which is defined as
+ * $\text{dev} \mathbf T = \mathbf T -
+ * \frac{1}{\text{dim}} \text{tr}\mathbf T \; \mathbf I$, where $\mathbf I$
+ * is the identity operator. This
  * quantity equals the original tensor minus its contractive or dilative
  * component and refers to the shear in, for example, elasticity.
  *
@@ -3166,8 +3246,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 
 
 /**
- * Return a unit symmetric tensor of rank 2, i.e., the dim-by-dim identity
- * matrix.
+ * Return a unit symmetric tensor of rank 2, i.e., the
+ * $\text{dim}\times\text{dim}$ identity matrix $\mathbf I$.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3182,17 +3262,18 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
   switch (dim)
     {
       case 1:
-        tmp.data[0] = Number(1);
+        tmp.data[0] = internal::NumberType<Number>::value(1.);
         break;
       case 2:
-        tmp.data[0] = tmp.data[1] = Number(1);
+        tmp.data[0] = tmp.data[1] = internal::NumberType<Number>::value(1.);
         break;
       case 3:
-        tmp.data[0] = tmp.data[1] = tmp.data[2] = Number(1);
+        tmp.data[0] = tmp.data[1] = tmp.data[2] =
+          internal::NumberType<Number>::value(1.);
         break;
       default:
         for (unsigned int d = 0; d < dim; ++d)
-          tmp.data[d] = Number(1);
+          tmp.data[d] = internal::NumberType<Number>::value(1.);
     }
   return tmp;
 }
@@ -3200,9 +3281,9 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 
 
 /**
- * Return a unit symmetric tensor of rank 2, i.e., the dim-by-dim identity
- * matrix. This specialization of the function uses <code>double</code> as the
- * data type for the elements.
+ * unit_symmetric_tensor<dim>() is the specialization of the function
+ * unit_symmetric_tensor<dim,Number>() which
+ * uses <code>double</code> as the data type for the elements.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3218,14 +3299,29 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim>
 
 /**
  * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
- * tensor <tt>t</tt> returns the deviator $\textrm{dev}\ t$. It is the
- * operator representation of the linear deviator operator.
+ * tensor $\mathbf T$ returns the deviator $\text{dev}\ \mathbf T$. It is the
+ * operator representation of the linear deviator operator $\mathbb P$, also
+ * known as the volumetric projection tensor, calculated as:
+ * \f{align*}{
+ *   \mathbb{P} &=\mathbb{I} -\frac{1}{\text{dim}} \mathbf I \otimes \mathbf I
+ *   \\
+ *   \mathcal{P}_{ijkl} &= \frac 12 \left(\delta_{ik} \delta_{jl} +
+ *                                        \delta_{il} \delta_{jk} \right)
+ *                         - \frac{1}{\text{dim}} \delta_{ij} \delta_{kl}
+ * \f}
  *
- * For every tensor <tt>t</tt>, there holds the identity
- * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
- * round-off. The reason this operator representation is provided is that one
- * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
- * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
+ * For every tensor <tt>T</tt>, there holds the identity
+ * <tt>deviator<dim,Number>(T) == deviator_tensor<dim,Number>() * T</tt>,
+ * up to numerical round-off.
+ * \f[
+ *   \text{dev}\mathbf T = \mathbb P : \mathbf T
+ * \f]
+ *
+ * @note The reason this operator representation is provided is to simplify
+ * taking derivatives of the deviatoric part of tensors:
+ * \f[
+ *   \frac{\partial \text{dev}\mathbf{T}}{\partial \mathbf T} = \mathbb P.
+ * \f]
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3239,7 +3335,8 @@ deviator_tensor()
   // fill the elements treating the diagonal
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      tmp.data[i][j] = Number((i == j ? 1 : 0) - 1. / dim);
+      tmp.data[i][j] =
+        internal::NumberType<Number>::value((i == j ? 1. : 0.) - 1. / dim);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during
@@ -3250,7 +3347,7 @@ deviator_tensor()
        i < internal::SymmetricTensorAccessors::StorageType<4, dim, Number>::
              n_rank2_components;
        ++i)
-    tmp.data[i][i] = Number(0.5);
+    tmp.data[i][i] = internal::NumberType<Number>::value(0.5);
 
   return tmp;
 }
@@ -3258,15 +3355,9 @@ deviator_tensor()
 
 
 /**
- * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
- * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
- * representation of the linear deviator operator.
- *
- * For every tensor <tt>t</tt>, there holds the identity
- * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
- * round-off. The reason this operator representation is provided is that one
- * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
- * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
+ * This version of the deviator_tensor<dim>() function is a specialization of
+ * deviator_tensor<dim,Number>() that uses <tt>double</tt> as the
+ * data type for the elements of the tensor.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3281,21 +3372,37 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
 
 
 /**
- * Return the fourth-order symmetric identity tensor which maps symmetric
- * second-order tensors to themselves.
+ * Return the fourth-order symmetric identity tensor $\mathbb I$ which maps
+ * symmetric second-order tensors, such as  $\mathbf A$, to themselves.
+ * \f[
+ *   \mathbb I : \mathbf A = \mathbf A
+ * \f]
  *
  * Note that this tensor, even though it is the identity, has a somewhat funny
  * form, and in particular does not only consist of zeros and ones. For
  * example, for <tt>dim=2</tt>, the identity tensor has all zero entries
- * except for <tt>id[0][0][0][0]=id[1][1][1][1]=1</tt> and
- * <tt>id[0][1][0][1]=id[0][1][1][0]=id[1][0][0][1]=id[1][0][1][0]=1/2</tt>.
- * To see why this factor of 1/2 is necessary, consider computing <tt>A=Id :
- * B</tt>. For the element <tt>a_01</tt> we have <tt>a_01=id_0100 b_00 +
- * id_0111 b_11 + id_0101 b_01 + id_0110 b_10</tt>. On the other hand, we need
- * to have <tt>a_01=b_01</tt>, and symmetry implies <tt>b_01=b_10</tt>,
- * leading to <tt>a_01=(id_0101+id_0110) b_01</tt>, or, again by symmetry,
- * <tt>id_0101=id_0110=1/2</tt>. Similar considerations hold for the three-
- * dimensional case.
+ * except for
+ * \f[
+ *   \mathcal{I}_{0000} = \mathcal{I}_{1111} = 1
+ * \f]
+ * \f[
+ *   \mathcal{I}_{0101} = \mathcal{I}_{0110} = \mathcal{I}_{1001}
+ *                      = \mathcal{I}_{1010} = \frac 12.
+ * \f]
+ * In index notation, we can write the general form
+ * \f[
+ *   \mathcal{I}_{ijkl} = \frac 12 \left( \delta_{ik} \delta_{jl} +
+ *                                        \delta_{il} \delta_{jl} \right).
+ * \f]
+ * To see why this factor of $1 / 2$ is necessary, consider computing
+ * $\mathbf A= \mathbb I : \mathbf B$.
+ * For the element $A_{01}$ we have $A_{01} = \mathcal{I}_{0100} B_{00} +
+ * \mathcal{I}_{0111} B_{11} + \mathcal{I}_{0101} B_{01} +
+ * \mathcal{I}_{0110} B_{10}$. On the other hand, we need
+ * to have $A_{01} = B_{01}$, and symmetry implies $B_{01}=B_{10}$,
+ * leading to $A_{01} = (\mathcal{I}_{0101} + \mathcal{I}_{0110}) B_{01}$, or,
+ * again by symmetry, $\mathcal{I}_{0101} = \mathcal{I}_{0110} = \frac 12$.
+ * Similar considerations hold for the three-dimensional case.
  *
  * This issue is also explained in the introduction to step-44.
  *
@@ -3310,7 +3417,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
 
   // fill the elements treating the diagonal
   for (unsigned int i = 0; i < dim; ++i)
-    tmp.data[i][i] = Number(1);
+    tmp.data[i][i] = internal::NumberType<Number>::value(1.);
 
   // then fill the ones that copy over the
   // non-diagonal elements. note that during
@@ -3321,7 +3428,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
        i < internal::SymmetricTensorAccessors::StorageType<4, dim, Number>::
              n_rank2_components;
        ++i)
-    tmp.data[i][i] = Number(0.5);
+    tmp.data[i][i] = internal::NumberType<Number>::value(0.5);
 
   return tmp;
 }
@@ -3329,22 +3436,9 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
 
 
 /**
- * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
- * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
- * representation of the linear deviator operator.
- *
- * Note that this tensor, even though it is the identity, has a somewhat funny
- * form, and in particular does not only consist of zeros and ones. For
- * example, for <tt>dim=2</tt>, the identity tensor has all zero entries
- * except for <tt>id[0][0][0][0]=id[1][1][1][1]=1</tt> and
- * <tt>id[0][1][0][1]=id[0][1][1][0]=id[1][0][0][1]=id[1][0][1][0]=1/2</tt>.
- * To see why this factor of 1/2 is necessary, consider computing <tt>A=Id .
- * B</tt>. For the element <tt>a_01</tt> we have <tt>a_01=id_0100 b_00 +
- * id_0111 b_11 + id_0101 b_01 + id_0110 b_10</tt>. On the other hand, we need
- * to have <tt>a_01=b_01</tt>, and symmetry implies <tt>b_01=b_10</tt>,
- * leading to <tt>a_01=(id_0101+id_0110) b_01</tt>, or, again by symmetry,
- * <tt>id_0101=id_0110=1/2</tt>. Similar considerations hold for the three-
- * dimensional case.
+ * This version of the identity_tensor<dim>() function is the specialization of
+ * identity_tensor<dim,Number>() which uses <tt>double</tt> as the
+ * data type for the elements of the tensor.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3401,14 +3495,22 @@ invert(const SymmetricTensor<4, dim, Number> &t)
 
 /**
  * Return the tensor of rank 4 that is the outer product of the two tensors
- * given as arguments, i.e. the result $T=t1 \otimes t2$ satisfies <tt>T phi =
- * t1 (t2 : phi)</tt> for all symmetric tensors <tt>phi</tt>.
+ * given as arguments, i.e. the result
+ * $\mathbb A = \mathbf{T}_1 \otimes \mathbf{T}_2$ satisfies
+ * $\mathbb A : \mathbf B = (\mathbf{T}_2 : \mathbf B) \mathbf{T}_1$
+ * for all symmetric tensors $\mathbf B$. In index notation
+ * \f[
+ *   \mathcal{A}_{ijkl} = (T_1)_{ij} (T_2)_{kl}
+ * \f]
  *
- * For example, the deviator tensor can be computed as
- * <tt>identity_tensor<dim,Number>() -
- * 1/d*outer_product(unit_symmetric_tensor<dim,Number>(),
- * unit_symmetric_tensor<dim,Number>())</tt>, since the (double) contraction
- * with the unit tensor yields the trace of a symmetric tensor.
+ * For example, the deviator tensor
+ * $\mathbb P = \mathbb I - \frac{1}{\text{dim}} \mathbf I \otimes \mathbf I$
+ * can be computed as
+ * <tt>identity_tensor<dim>() - 1/d *
+ * outer_product (unit_symmetric_tensor<dim>(),
+ * unit_symmetric_tensor<dim>())</tt>,
+ * since the (double) contraction with the unit tensor yields the trace
+ * of a symmetric tensor ($\mathbf I : \mathbf B = \text{tr} \mathbf B$).
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3434,8 +3536,8 @@ outer_product(const SymmetricTensor<2, dim, Number> &t1,
 
 /**
  * Return the symmetrized version of a full rank-2 tensor, i.e.
- * (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version for
- * general dimensions.
+ * $\text{sym}\mathbf A = \frac 12 \left(\mathbf A + \mathbf{A}^T\right)$,
+ * as a symmetric rank-2 tensor. This is the version for general dimensions.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3447,7 +3549,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
   SymmetricTensor<2, dim, Number> result;
   for (unsigned int d = 0; d < dim; ++d)
     result[d][d] = t[d][d];
-  Number half = 0.5;
+
+  const Number half = internal::NumberType<Number>::value(0.5);
   for (unsigned int d = 0; d < dim; ++d)
     for (unsigned int e = d + 1; e < dim; ++e)
       result[d][e] = (t[d][e] + t[e][d]) * half;
@@ -3533,7 +3636,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
   // (as well as with switched arguments and double<->float).
   using product_type = typename ProductType<Number, OtherNumber>::type;
   SymmetricTensor<rank_, dim, product_type> tt(t);
-  tt *= product_type(factor);
+  tt *= internal::NumberType<product_type>::value(factor);
   return tt;
 }
 
@@ -3576,9 +3679,9 @@ DEAL_II_CONSTEXPR inline SymmetricTensor<
 operator/(const SymmetricTensor<rank_, dim, Number> &t,
           const OtherNumber &                        factor)
 {
-  SymmetricTensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-    tt = t;
-  tt /= factor;
+  using product_type = typename ProductType<Number, OtherNumber>::type;
+  SymmetricTensor<rank_, dim, product_type> tt(t);
+  tt /= internal::NumberType<product_type>::value(factor);
   return tt;
 }
 
@@ -3594,7 +3697,7 @@ template <int rank_, int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim>
                                                operator*(const SymmetricTensor<rank_, dim> &t, const double factor)
 {
-  SymmetricTensor<rank_, dim> tt = t;
+  SymmetricTensor<rank_, dim> tt(t);
   tt *= factor;
   return tt;
 }
@@ -3611,7 +3714,7 @@ template <int rank_, int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim>
                                                operator*(const double factor, const SymmetricTensor<rank_, dim> &t)
 {
-  SymmetricTensor<rank_, dim> tt = t;
+  SymmetricTensor<rank_, dim> tt(t);
   tt *= factor;
   return tt;
 }
@@ -3627,17 +3730,17 @@ template <int rank_, int dim>
 DEAL_II_CONSTEXPR inline SymmetricTensor<rank_, dim>
 operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
 {
-  SymmetricTensor<rank_, dim> tt = t;
+  SymmetricTensor<rank_, dim> tt(t);
   tt /= factor;
   return tt;
 }
 
 /**
- * Compute the scalar product $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two
- * tensors $a,b$ of rank 2. In the current case where both arguments are
- * symmetric tensors, this is equivalent to calling the expression
- * <code>t1*t2</code> which uses the overloaded <code>operator*</code> between
- * two symmetric tensors of rank 2.
+ * Compute the scalar product $\mathbf A: \mathbf B=\sum_{i,j} A_{ij}B_{ij}$
+ * between two tensors $\mathbf A, \mathbf B$ of rank 2. In the current case
+ * where both arguments are symmetric tensors, this is equivalent to calling
+ * the expression <code>A*B</code> which uses
+ * <code>SymmetricTensor::operator*()</code>.
  *
  * @relatesalso SymmetricTensor
  */
@@ -3651,13 +3754,17 @@ scalar_product(const SymmetricTensor<2, dim, Number> &     t1,
 
 
 /**
- * Compute the scalar product $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two
- * tensors $a,b$ of rank 2. We don't use <code>operator*</code> for this
+ * Compute the scalar product $\mathbf A: \mathbf B=\sum_{i,j} A_{ij}B_{ij}$
+ * between two tensors $\mathbf A, \mathbf B$ of rank 2. We don't use
+ * <code>operator*</code> for this
  * operation since the product between two tensors is usually assumed to be
  * the contraction over the last index of the first tensor and the first index
- * of the second tensor, for example $(a\cdot b)_{ij}=\sum_k a_{ik}b_{kj}$.
+ * of the second tensor. For example, if <tt>B</tt> is a Tensor, calling
+ * <tt>A*B</tt> (instead of <tt>scalar_product(A,B)</tt>) provides
+ * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
- * @relatesalso Tensor @relatesalso SymmetricTensor
+ * @relatesalso Tensor
+ * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -3675,13 +3782,17 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
 
 /**
- * Compute the scalar product $a:b=\sum_{i,j} a_{ij}b_{ij}$ between two
- * tensors $a,b$ of rank 2. We don't use <code>operator*</code> for this
+ * Compute the scalar product $\mathbf A:\mathbf B=\sum_{i,j} A_{ij}B_{ij}$
+ * between two tensors $\mathbf A, \mathbf B$ of rank 2.
+ * We don't use <code>operator*</code> for this
  * operation since the product between two tensors is usually assumed to be
  * the contraction over the last index of the first tensor and the first index
- * of the second tensor, for example $(a\cdot b)_{ij}=\sum_k a_{ik}b_{kj}$.
+ * of the second tensor. For example, if <tt>A</tt> is a Tensor, calling
+ * <tt>A*B</tt> (instead of <tt>scalar_product(A,B)</tt>) provides
+ * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
- * @relatesalso Tensor @relatesalso SymmetricTensor
+ * @relatesalso Tensor
+ * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
@@ -3698,11 +3809,11 @@ scalar_product(const Tensor<2, dim, Number> &              t1,
  * to this function. This operation is the symmetric tensor analogon of a
  * matrix-vector multiplication.
  *
- * This function does the same as the member operator* of the SymmetricTensor
- * class. It should not be used, however, since the member operator has
+ * This function does the same as SymmetricTensor::operator*().
+ * It should not be used, however, since the member operator has
  * knowledge of the actual data storage format and is at least 2 orders of
  * magnitude faster. This function mostly exists for compatibility purposes
- * with the general tensor class.
+ * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3724,11 +3835,11 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE void double_contract(
  * to this function. This operation is the symmetric tensor analogon of a
  * matrix-vector multiplication.
  *
- * This function does the same as the member operator* of the SymmetricTensor
- * class. It should not be used, however, since the member operator has
+ * This function does the same as SymmetricTensor::operator*().
+ * It should not be used, however, since the member operator has
  * knowledge of the actual data storage format and is at least 2 orders of
  * magnitude faster. This function mostly exists for compatibility purposes
- * with the general tensor class.
+ * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3750,13 +3861,14 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * to this function. This operation is the symmetric tensor analogon of a
  * matrix-vector multiplication.
  *
- * This function does the same as the member operator* of the SymmetricTensor
- * class. It should not be used, however, since the member operator has
+ * This function does the same as SymmetricTensor::operator*().
+ * It should not be used, however, since the member operator has
  * knowledge of the actual data storage format and is at least 2 orders of
  * magnitude faster. This function mostly exists for compatibility purposes
- * with the general tensor class.
+ * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor @author Wolfgang Bangerth, 2005
+ * @relatesalso SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline void double_contract(
@@ -3780,11 +3892,11 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * to this function. This operation is the symmetric tensor analogon of a
  * matrix-vector multiplication.
  *
- * This function does the same as the member operator* of the SymmetricTensor
- * class. It should not be used, however, since the member operator has
+ * This function does the same as SymmetricTensor::operator*().
+ * It should not be used, however, since the member operator has
  * knowledge of the actual data storage format and is at least 2 orders of
  * magnitude faster. This function mostly exists for compatibility purposes
- * with the general tensor class.
+ * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3811,11 +3923,11 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * to this function. This operation is the symmetric tensor analogon of a
  * matrix-vector multiplication.
  *
- * This function does the same as the member operator* of the SymmetricTensor
- * class. It should not be used, however, since the member operator has
+ * This function does the same as SymmetricTensor::operator*().
+ * It should not be used, however, since the member operator has
  * knowledge of the actual data storage format and is at least 2 orders of
  * magnitude faster. This function mostly exists for compatibility purposes
- * with the general tensor class.
+ * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -3843,11 +3955,11 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * to this function. This operation is the symmetric tensor analogon of a
  * matrix-vector multiplication.
  *
- * This function does the same as the member operator* of the SymmetricTensor
- * class. It should not be used, however, since the member operator has
+ * This function does the same as SymmetricTensor::operator*().
+ * It should not be used, however, since the member operator has
  * knowledge of the actual data storage format and is at least 2 orders of
  * magnitude faster. This function mostly exists for compatibility purposes
- * with the general tensor class.
+ * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005

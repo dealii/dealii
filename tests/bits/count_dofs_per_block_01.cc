@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,14 +75,14 @@ check()
 
   // no grouping
   {
-    std::vector<types::global_dof_index> dpc(dim + 1);
-    DoFTools::count_dofs_per_component(dof_handler, dpc);
+    const std::vector<types::global_dof_index> dpc =
+      DoFTools::count_dofs_per_fe_component(dof_handler);
     print(dpc);
   }
 
   {
-    std::vector<types::global_dof_index> dpc(dim + 1);
-    DoFTools::count_dofs_per_block(dof_handler, dpc);
+    const std::vector<types::global_dof_index> dpc =
+      DoFTools::count_dofs_per_fe_block(dof_handler);
     print(dpc);
   }
 
@@ -92,8 +92,8 @@ check()
   {
     std::vector<unsigned int> group(dim + 1, 0);
     group[dim] = 1;
-    std::vector<types::global_dof_index> dpc(2);
-    DoFTools::count_dofs_per_component(dof_handler, dpc, false, group);
+    const std::vector<types::global_dof_index> dpc =
+      DoFTools::count_dofs_per_fe_component(dof_handler, false, group);
     Assert(dpc.size() == 2, ExcInternalError());
     print(dpc);
   }
@@ -101,8 +101,8 @@ check()
   {
     std::vector<unsigned int> group(dim + 1, 0);
     group[dim] = 1;
-    std::vector<types::global_dof_index> dpc(2);
-    DoFTools::count_dofs_per_block(dof_handler, dpc, group);
+    const std::vector<types::global_dof_index> dpc =
+      DoFTools::count_dofs_per_fe_block(dof_handler, group);
     Assert(dpc.size() == 2, ExcInternalError());
     print(dpc);
   }
@@ -112,8 +112,8 @@ check()
   {
     std::vector<unsigned int> group(dim + 1, 2 * dim);
     group[dim] = 0;
-    std::vector<types::global_dof_index> dpc(2 * dim + 1);
-    DoFTools::count_dofs_per_component(dof_handler, dpc, false, group);
+    const std::vector<types::global_dof_index> dpc =
+      DoFTools::count_dofs_per_fe_component(dof_handler, false, group);
     Assert(dpc.size() == 2 * dim + 1, ExcInternalError());
     print(dpc);
   }
@@ -121,8 +121,8 @@ check()
   {
     std::vector<unsigned int> group(dim + 1, 2 * dim);
     group[dim] = 0;
-    std::vector<types::global_dof_index> dpc(2 * dim + 1);
-    DoFTools::count_dofs_per_block(dof_handler, dpc, group);
+    const std::vector<types::global_dof_index> dpc =
+      DoFTools::count_dofs_per_fe_block(dof_handler, group);
     Assert(dpc.size() == 2 * dim + 1, ExcInternalError());
     print(dpc);
   }
@@ -133,10 +133,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile << std::setprecision(2);
+  initlog();
   deallog << std::setprecision(2);
-  deallog.attach(logfile);
 
   check<1>();
   check<2>();

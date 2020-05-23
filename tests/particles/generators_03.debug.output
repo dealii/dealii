@@ -1,0 +1,509 @@
+
+DEAL:2d/2d::Particle number: 90
+DEAL:2d/2d::Particle location: 0.941285 0.0667651
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: 0.897464 0.291604
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: 0.800759 0.499259
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: 0.748121 0.0530641
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: 0.713292 0.231763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: 0.636433 0.396805
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: 0.554957 0.0393630
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: 0.529121 0.171922
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: 0.472106 0.294350
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: 0.722272 0.607287
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: 0.554663 0.763428
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: 0.354370 0.874583
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: 0.574052 0.482664
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: 0.440839 0.606763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: 0.281649 0.695107
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: 0.425832 0.358041
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: 0.327015 0.450097
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: 0.208927 0.515631
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: 0.227376 0.915846
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: -1.25642e-16 0.943649
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: -0.227376 0.915846
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: 0.180715 0.727903
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: 4.59243e-17 0.750000
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: -0.180715 0.727903
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: 0.134055 0.539959
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: 1.86737e-17 0.556351
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: -0.134055 0.539959
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: -0.354370 0.874583
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: -0.554663 0.763428
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: -0.722272 0.607287
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: -0.281649 0.695107
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: -0.440839 0.606763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: -0.574052 0.482664
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: -0.208927 0.515631
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: -0.327015 0.450097
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: -0.425832 0.358041
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: -0.800759 0.499259
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: -0.897464 0.291604
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: -0.941285 0.0667651
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: -0.636433 0.396805
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: -0.713292 0.231763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: -0.748121 0.0530641
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: -0.472106 0.294350
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: -0.529121 0.171922
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: -0.554957 0.0393630
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: -0.941285 -0.0667651
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: -0.897464 -0.291604
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: -0.800759 -0.499259
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: -0.748121 -0.0530641
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: -0.713292 -0.231763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: -0.636433 -0.396805
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: -0.554957 -0.0393630
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: -0.529121 -0.171922
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: -0.472106 -0.294350
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: -0.722272 -0.607287
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: -0.554663 -0.763428
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: -0.354370 -0.874583
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: -0.574052 -0.482664
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: -0.440839 -0.606763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: -0.281649 -0.695107
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: -0.425832 -0.358041
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: -0.327015 -0.450097
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: -0.208927 -0.515631
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: -0.227376 -0.915846
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: -1.73346e-16 -0.943649
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: 0.227376 -0.915846
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: -0.180715 -0.727903
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: -1.37773e-16 -0.750000
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: 0.180715 -0.727903
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: -0.134055 -0.539959
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: -1.02200e-16 -0.556351
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: 0.134055 -0.539959
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: 0.354370 -0.874583
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: 0.554663 -0.763428
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: 0.722272 -0.607287
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: 0.281649 -0.695107
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: 0.440839 -0.606763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: 0.574052 -0.482664
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: 0.208927 -0.515631
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: 0.327015 -0.450097
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: 0.425832 -0.358041
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::Particle location: 0.800759 -0.499259
+DEAL:2d/2d::Particle reference location: 0.112702 0.112702
+DEAL:2d/2d::Particle location: 0.897464 -0.291604
+DEAL:2d/2d::Particle reference location: 0.500000 0.112702
+DEAL:2d/2d::Particle location: 0.941285 -0.0667651
+DEAL:2d/2d::Particle reference location: 0.887298 0.112702
+DEAL:2d/2d::Particle location: 0.636433 -0.396805
+DEAL:2d/2d::Particle reference location: 0.112702 0.500000
+DEAL:2d/2d::Particle location: 0.713292 -0.231763
+DEAL:2d/2d::Particle reference location: 0.500000 0.500000
+DEAL:2d/2d::Particle location: 0.748121 -0.0530641
+DEAL:2d/2d::Particle reference location: 0.887298 0.500000
+DEAL:2d/2d::Particle location: 0.472106 -0.294350
+DEAL:2d/2d::Particle reference location: 0.112702 0.887298
+DEAL:2d/2d::Particle location: 0.529121 -0.171922
+DEAL:2d/2d::Particle reference location: 0.500000 0.887298
+DEAL:2d/2d::Particle location: 0.554957 -0.0393630
+DEAL:2d/2d::Particle reference location: 0.887298 0.887298
+DEAL:2d/2d::OK
+DEAL:3d/3d::Particle number: 162
+DEAL:3d/3d::Particle location: -0.476419 -0.476419 -0.660871
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.112702
+DEAL:3d/3d::Particle location: 1.32857e-17 -0.545131 -0.770491
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.112702
+DEAL:3d/3d::Particle location: 0.476419 -0.476419 -0.660871
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.545131 -1.42692e-17 -0.770491
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.00000 0.00000 -0.943649
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.545131 2.23611e-17 -0.770491
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.112702
+DEAL:3d/3d::Particle location: -0.476419 0.476419 -0.660871
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.112702
+DEAL:3d/3d::Particle location: 6.92696e-18 0.545131 -0.770491
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.476419 0.476419 -0.660871
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.378651 -0.378651 -0.525252
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.500000
+DEAL:3d/3d::Particle location: 1.05593e-17 -0.433263 -0.612376
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.378651 -0.378651 -0.525252
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.433263 -1.13410e-17 -0.612376
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.00000 0.00000 -0.750000
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.433263 1.77723e-17 -0.612376
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.500000
+DEAL:3d/3d::Particle location: -0.378651 0.378651 -0.525252
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.500000
+DEAL:3d/3d::Particle location: 5.50545e-18 0.433263 -0.612376
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.378651 0.378651 -0.525252
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.280884 -0.280884 -0.389632
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.887298
+DEAL:3d/3d::Particle location: 7.83289e-18 -0.321395 -0.454261
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.887298
+DEAL:3d/3d::Particle location: 0.280884 -0.280884 -0.389632
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.321395 -8.41273e-18 -0.454261
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.00000 0.00000 -0.556351
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.321395 1.31835e-17 -0.454261
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.887298
+DEAL:3d/3d::Particle location: -0.280884 0.280884 -0.389632
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.887298
+DEAL:3d/3d::Particle location: 4.08395e-18 0.321395 -0.454261
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.280884 0.280884 -0.389632
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.660871 -0.476419 -0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.112702
+DEAL:3d/3d::Particle location: 0.770491 -6.65359e-17 -0.545131
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.112702
+DEAL:3d/3d::Particle location: 0.660871 0.476419 -0.476419
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.112702
+DEAL:3d/3d::Particle location: 0.525252 -0.378651 -0.378651
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.612376 2.34892e-17 -0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.525252 0.378651 -0.378651
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.389632 -0.280884 -0.280884
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.454261 1.77330e-17 -0.321395
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.389632 0.280884 -0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.770491 -0.545131 1.15648e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.943649 0.00000 5.32706e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.770491 0.545131 4.81933e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.612376 -0.433263 3.46004e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.750000 0.00000 -3.60556e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.612376 0.433263 -3.32973e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.454261 -0.321395 1.09309e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.556351 0.00000 -1.55504e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.454261 0.321395 -3.65316e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.660871 -0.476419 0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.887298
+DEAL:3d/3d::Particle location: 0.770491 -6.03480e-17 0.545131
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.887298
+DEAL:3d/3d::Particle location: 0.660871 0.476419 0.476419
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.887298
+DEAL:3d/3d::Particle location: 0.525252 -0.378651 0.378651
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.612376 -3.60214e-17 0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.525252 0.378651 0.378651
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.389632 -0.280884 0.280884
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.454261 -3.15407e-17 0.321395
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.389632 0.280884 0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.887298
+DEAL:3d/3d::Particle location: -0.476419 -0.476419 0.660871
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.112702
+DEAL:3d/3d::Particle location: -6.73286e-18 -0.545131 0.770491
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.112702
+DEAL:3d/3d::Particle location: 0.476419 -0.476419 0.660871
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.378651 -0.378651 0.525252
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.112702
+DEAL:3d/3d::Particle location: 2.36821e-17 -0.433263 0.612376
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.378651 -0.378651 0.525252
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.112702
+DEAL:3d/3d::Particle location: -0.280884 -0.280884 0.389632
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.112702
+DEAL:3d/3d::Particle location: -3.09508e-17 -0.321395 0.454261
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.280884 -0.280884 0.389632
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.545131 1.69368e-18 0.770491
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.00000 5.32706e-17 0.943649
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.545131 -8.87336e-18 0.770491
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.433263 8.37197e-18 0.612376
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.00000 -3.60556e-17 0.750000
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.433263 -2.01818e-17 0.612376
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.500000
+DEAL:3d/3d::Particle location: -0.321395 -5.86515e-18 0.454261
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.00000 -1.55504e-17 0.556351
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.321395 3.11385e-18 0.454261
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.476419 0.476419 0.660871
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.887298
+DEAL:3d/3d::Particle location: 3.93763e-17 0.545131 0.770491
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.887298
+DEAL:3d/3d::Particle location: 0.476419 0.476419 0.660871
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.378651 0.378651 0.525252
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.887298
+DEAL:3d/3d::Particle location: -2.23785e-18 0.433263 0.612376
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.378651 0.378651 0.525252
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.887298
+DEAL:3d/3d::Particle location: -0.280884 0.280884 0.389632
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.887298
+DEAL:3d/3d::Particle location: -1.84612e-19 0.321395 0.454261
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.280884 0.280884 0.389632
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.887298
+DEAL:3d/3d::Particle location: -0.660871 -0.476419 -0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.525252 -0.378651 -0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.389632 -0.280884 -0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.770491 6.00978e-17 -0.545131
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.112702
+DEAL:3d/3d::Particle location: -0.612376 4.61544e-17 -0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.112702
+DEAL:3d/3d::Particle location: -0.454261 1.71230e-17 -0.321395
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.112702
+DEAL:3d/3d::Particle location: -0.660871 0.476419 -0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.525252 0.378651 -0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.389632 0.280884 -0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.770491 -0.545131 2.39508e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.612376 -0.433263 -1.36696e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.454261 -0.321395 5.67762e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.943649 -1.48921e-17 6.81628e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.500000
+DEAL:3d/3d::Particle location: -0.750000 0.00000 -3.60556e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.500000
+DEAL:3d/3d::Particle location: -0.556351 -1.24975e-18 -1.43006e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.500000
+DEAL:3d/3d::Particle location: -0.770491 0.545131 -4.47525e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.612376 0.433263 2.80840e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.454261 0.321395 -1.56218e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.660871 -0.476419 0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.525252 -0.378651 0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.389632 -0.280884 0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.770491 -4.86211e-17 0.545131
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.887298
+DEAL:3d/3d::Particle location: -0.612376 -4.29685e-17 0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.887298
+DEAL:3d/3d::Particle location: -0.454261 -1.86629e-17 0.321395
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.887298
+DEAL:3d/3d::Particle location: -0.660871 0.476419 0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.887298
+DEAL:3d/3d::Particle location: -0.525252 0.378651 0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.887298
+DEAL:3d/3d::Particle location: -0.389632 0.280884 0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.887298
+DEAL:3d/3d::Particle location: -0.476419 -0.660871 -0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.112702
+DEAL:3d/3d::Particle location: -6.65359e-17 -0.770491 -0.545131
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.112702
+DEAL:3d/3d::Particle location: 0.476419 -0.660871 -0.476419
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.378651 -0.525252 -0.378651
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.112702
+DEAL:3d/3d::Particle location: 2.34892e-17 -0.612376 -0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.378651 -0.525252 -0.378651
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.112702
+DEAL:3d/3d::Particle location: -0.280884 -0.389632 -0.280884
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.112702
+DEAL:3d/3d::Particle location: 1.77330e-17 -0.454261 -0.321395
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.280884 -0.389632 -0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.545131 -0.770491 1.15648e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.00000 -0.943649 5.32706e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.500000
+DEAL:3d/3d::Particle location: 0.545131 -0.770491 4.81933e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.433263 -0.612376 3.46004e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.00000 -0.750000 -3.60556e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.433263 -0.612376 -3.32973e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.500000
+DEAL:3d/3d::Particle location: -0.321395 -0.454261 1.09309e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.00000 -0.556351 -1.55504e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.321395 -0.454261 -3.65316e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.476419 -0.660871 0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.887298
+DEAL:3d/3d::Particle location: -6.03480e-17 -0.770491 0.545131
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.887298
+DEAL:3d/3d::Particle location: 0.476419 -0.660871 0.476419
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.378651 -0.525252 0.378651
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.887298
+DEAL:3d/3d::Particle location: -3.60214e-17 -0.612376 0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.378651 -0.525252 0.378651
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.887298
+DEAL:3d/3d::Particle location: -0.280884 -0.389632 0.280884
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.887298
+DEAL:3d/3d::Particle location: -3.15407e-17 -0.454261 0.321395
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.280884 -0.389632 0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.887298
+DEAL:3d/3d::Particle location: -0.476419 0.660871 -0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.378651 0.525252 -0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.112702
+DEAL:3d/3d::Particle location: -0.280884 0.389632 -0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.112702
+DEAL:3d/3d::Particle location: 6.00978e-17 0.770491 -0.545131
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.112702
+DEAL:3d/3d::Particle location: 4.61544e-17 0.612376 -0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.112702
+DEAL:3d/3d::Particle location: 1.71230e-17 0.454261 -0.321395
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.112702
+DEAL:3d/3d::Particle location: 0.476419 0.660871 -0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.378651 0.525252 -0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.112702
+DEAL:3d/3d::Particle location: 0.280884 0.389632 -0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.112702
+DEAL:3d/3d::Particle location: -0.545131 0.770491 2.39508e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.433263 0.612376 -1.36696e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.500000
+DEAL:3d/3d::Particle location: -0.321395 0.454261 5.67762e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.500000
+DEAL:3d/3d::Particle location: -1.48921e-17 0.943649 6.81628e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.00000 0.750000 -3.60556e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.500000
+DEAL:3d/3d::Particle location: -1.24975e-18 0.556351 -1.43006e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.500000
+DEAL:3d/3d::Particle location: 0.545131 0.770491 -4.47525e-17
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.433263 0.612376 2.80840e-17
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.500000
+DEAL:3d/3d::Particle location: 0.321395 0.454261 -1.56218e-17
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.500000
+DEAL:3d/3d::Particle location: -0.476419 0.660871 0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.378651 0.525252 0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.112702 0.887298
+DEAL:3d/3d::Particle location: -0.280884 0.389632 0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.112702 0.887298
+DEAL:3d/3d::Particle location: -4.86211e-17 0.770491 0.545131
+DEAL:3d/3d::Particle reference location: 0.112702 0.500000 0.887298
+DEAL:3d/3d::Particle location: -4.29685e-17 0.612376 0.433263
+DEAL:3d/3d::Particle reference location: 0.500000 0.500000 0.887298
+DEAL:3d/3d::Particle location: -1.86629e-17 0.454261 0.321395
+DEAL:3d/3d::Particle reference location: 0.887298 0.500000 0.887298
+DEAL:3d/3d::Particle location: 0.476419 0.660871 0.476419
+DEAL:3d/3d::Particle reference location: 0.112702 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.378651 0.525252 0.378651
+DEAL:3d/3d::Particle reference location: 0.500000 0.887298 0.887298
+DEAL:3d/3d::Particle location: 0.280884 0.389632 0.280884
+DEAL:3d/3d::Particle reference location: 0.887298 0.887298 0.887298
+DEAL:3d/3d::OK

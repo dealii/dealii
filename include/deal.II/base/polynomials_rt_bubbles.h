@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_polynomials_base.h>
 
 #include <vector>
 
@@ -84,7 +85,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 template <int dim>
-class PolynomialsRT_Bubbles
+class PolynomialsRT_Bubbles : public TensorPolynomialsBase<dim>
 {
 public:
   /**
@@ -106,31 +107,18 @@ public:
    * in a loop over all tensor product polynomials.
    */
   void
-  compute(const Point<dim> &           unit_point,
-          std::vector<Tensor<1, dim>> &values,
-          std::vector<Tensor<2, dim>> &grads,
-          std::vector<Tensor<3, dim>> &grad_grads,
-          std::vector<Tensor<4, dim>> &third_derivatives,
-          std::vector<Tensor<5, dim>> &fourth_derivatives) const;
-
-  /**
-   * Returns the number of enhanced Raviart-Thomas polynomials.
-   */
-  unsigned int
-  n() const;
-
-  /**
-   * Returns the degree of the RT_bubble space, which is one less than the
-   * highest polynomial degree.
-   */
-  unsigned int
-  degree() const;
+  evaluate(const Point<dim> &           unit_point,
+           std::vector<Tensor<1, dim>> &values,
+           std::vector<Tensor<2, dim>> &grads,
+           std::vector<Tensor<3, dim>> &grad_grads,
+           std::vector<Tensor<4, dim>> &third_derivatives,
+           std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
    * Return the name of the space, which is <tt>RT_Bubbles</tt>.
    */
   std::string
-  name() const;
+  name() const override;
 
   /**
    * Return the number of polynomials in the space <tt>RT_Bubbles(degree)</tt>
@@ -138,14 +126,15 @@ public:
    * required by the FiniteElement classes.
    */
   static unsigned int
-  compute_n_pols(const unsigned int degree);
+  n_polynomials(const unsigned int degree);
+
+  /**
+   * @copydoc TensorPolynomialsBase::clone()
+   */
+  virtual std::unique_ptr<TensorPolynomialsBase<dim>>
+  clone() const override;
 
 private:
-  /**
-   * The degree of this object as given to the constructor.
-   */
-  const unsigned int my_degree;
-
   /**
    * An object representing the Raviart-Thomas part of the space
    */
@@ -156,31 +145,7 @@ private:
    * to <i>k+1</i>.
    */
   std::vector<Polynomials::Polynomial<double>> monomials;
-
-  /**
-   * Number of RT_Bubbles polynomials.
-   */
-  unsigned int n_pols;
 };
-
-
-
-template <int dim>
-inline unsigned int
-PolynomialsRT_Bubbles<dim>::n() const
-{
-  return n_pols;
-}
-
-
-
-template <int dim>
-inline unsigned int
-PolynomialsRT_Bubbles<dim>::degree() const
-{
-  return my_degree;
-}
-
 
 
 template <int dim>

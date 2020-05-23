@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,11 +126,11 @@ check_fe(FiniteElement<dim> &fe)
 
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
   typedef PETScWrappers::MPI::Vector vector_t;
   {}
   MGTransferPrebuilt<vector_t> transfer;
-  transfer.build_matrices(dofh);
+  transfer.build(dofh);
   transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels() - 1);

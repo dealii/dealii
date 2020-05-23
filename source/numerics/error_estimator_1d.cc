@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/distributed/tria.h>
@@ -436,10 +435,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
   // contributions from the two vertices of each cell.
-  for (typename DoFHandlerType::active_cell_iterator cell =
-         dof_handler.begin_active();
-       cell != dof_handler.end();
-       ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     if (((subdomain_id == numbers::invalid_subdomain_id) ||
          (cell->subdomain_id() == subdomain_id)) &&
         ((material_id == numbers::invalid_material_id) ||
@@ -464,8 +460,8 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 neighbor = neighbor->child(n == 0 ? 1 : 0);
 
             fe_face_values.reinit(cell, n);
-            Tensor<1, spacedim> normal = fe_face_values.get_present_fe_values()
-                                           .get_all_normal_vectors()[0];
+            Tensor<1, spacedim> normal =
+              fe_face_values.get_present_fe_values().get_normal_vectors()[0];
 
             if (neighbor.state() == IteratorState::valid)
               {
@@ -478,7 +474,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 fe_face_values.reinit(neighbor, n == 0 ? 1 : 0);
                 Tensor<1, spacedim> neighbor_normal =
                   fe_face_values.get_present_fe_values()
-                    .get_all_normal_vectors()[0];
+                    .get_normal_vectors()[0];
 
                 // extract the gradient in normal direction of all the
                 // components.

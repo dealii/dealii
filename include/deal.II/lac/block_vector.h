@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+// Forward declaration
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -40,6 +42,7 @@ namespace TrilinosWrappers
     class BlockVector;
   }
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 
@@ -530,7 +533,7 @@ namespace internal
 
 
 /**
- * Declare dealii::BlockVector< Number > as serial vector.
+ * Declare dealii::BlockVector as serial vector.
  *
  * @author Uwe Koecher, 2017
  */

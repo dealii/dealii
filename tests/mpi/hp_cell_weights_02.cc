@@ -81,8 +81,8 @@ test()
   }
 
 
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
+  const parallel::CellWeights<dim> cell_weights(
+    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
 
   tria.repartition();
 
@@ -96,6 +96,25 @@ test()
         dof_counter += cell->get_fe().dofs_per_cell;
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
+
+#ifdef DEBUG
+  parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
+  GridGenerator::hyper_cube(other_tria);
+  other_tria.refine_global(3);
+
+  dh.initialize(other_tria, fe_collection);
+
+  try
+    {
+      tria.repartition();
+    }
+  catch (ExcMessage &)
+    {
+      deallog << "Triangulation changed" << std::endl;
+    }
+#else
+  deallog << "Triangulation changed" << std::endl;
+#endif
 
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);

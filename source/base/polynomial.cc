@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -38,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 // more fine-grained solution
 namespace
 {
-  Threads::Mutex coefficients_lock;
+  std::mutex coefficients_lock;
 }
 
 
@@ -660,6 +661,17 @@ namespace Polynomials
   }
 
 
+  template <typename number>
+  std::size_t
+  Polynomial<number>::memory_consumption() const
+  {
+    return (MemoryConsumption::memory_consumption(coefficients) +
+            MemoryConsumption::memory_consumption(in_lagrange_product_form) +
+            MemoryConsumption::memory_consumption(lagrange_support_points) +
+            MemoryConsumption::memory_consumption(lagrange_weight));
+  }
+
+
 
   // ------------------ class Monomial -------------------------- //
 
@@ -742,11 +754,10 @@ namespace Polynomials
                                             const unsigned int   support_point,
                                             std::vector<double> &a)
   {
-    Assert(support_point < n + 1, ExcIndexRange(support_point, 0, n + 1));
+    AssertIndexRange(support_point, n + 1);
 
     unsigned int n_functions = n + 1;
-    Assert(support_point < n_functions,
-           ExcIndexRange(support_point, 0, n_functions));
+    AssertIndexRange(support_point, n_functions);
     double const *x = nullptr;
 
     switch (n)
@@ -1537,6 +1548,7 @@ namespace Polynomials
 
 // ------------------ explicit instantiations --------------- //
 
+#ifndef DOXYGEN
 namespace Polynomials
 {
   template class Polynomial<float>;
@@ -1560,5 +1572,6 @@ namespace Polynomials
   template class Monomial<double>;
   template class Monomial<long double>;
 } // namespace Polynomials
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

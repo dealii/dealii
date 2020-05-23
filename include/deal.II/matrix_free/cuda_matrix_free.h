@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
+#  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/quadrature.h>
 #  include <deal.II/base/tensor.h>
@@ -41,11 +42,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace CUDAWrappers
 {
   // forward declaration
+#  ifndef DOXYGEN
   namespace internal
   {
     template <int dim, typename Number>
     class ReinitHelper;
   }
+#  endif
 
   /**
    * This class collects all the data that is stored for the matrix free
@@ -59,7 +62,7 @@ namespace CUDAWrappers
    * this class.
    *
    * This class implements a loop over all cells (cell_loop()). This loop is
-   * scheduled in such a way that cells that cells that share degrees of freedom
+   * scheduled in such a way that cells that share degrees of freedom
    * are not worked on simultaneously, which implies that it is possible to
    * write to vectors in parallel without having to explicitly synchronize
    * access to these vectors and matrices. This class does not implement any
@@ -96,20 +99,33 @@ namespace CUDAWrappers
      */
     struct AdditionalData
     {
+      /**
+       * Constructor.
+       */
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values,
-        const bool use_coloring = false)
+                                                 update_JxW_values |
+                                                 update_quadrature_points,
+        const bool use_coloring                      = false,
+        const bool overlap_communication_computation = false)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
-      {}
-
-      /**
-       * Number of colors created by the graph coloring algorithm.
-       */
-      unsigned int n_colors;
+        , overlap_communication_computation(overlap_communication_computation)
+      {
+#  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
+        AssertThrow(
+          overlap_communication_computation == false,
+          ExcMessage(
+            "Overlapping communication and computation requires CUDA-aware MPI."));
+#  endif
+        if (overlap_communication_computation == true)
+          AssertThrow(
+            use_coloring == false || overlap_communication_computation == false,
+            ExcMessage(
+              "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
+      }
       /**
        * Parallelization scheme used, parallelization over degrees of freedom or
        * over cells.
@@ -132,6 +148,12 @@ namespace CUDAWrappers
        * newer architectures.
        */
       bool use_coloring;
+
+      /**
+       *  Overlap MPI communications with computation. This requires CUDA-aware
+       *  MPI and use_coloring must be false.
+       */
+      bool overlap_communication_computation;
     };
 
     /**
@@ -140,15 +162,52 @@ namespace CUDAWrappers
      */
     struct Data
     {
-      point_type *             q_points;
+      /**
+       * Pointer to the quadrature points.
+       */
+      point_type *q_points;
+
+      /**
+       * Map the position in the local vector to the position in the global
+       * vector.
+       */
       types::global_dof_index *local_to_global;
-      Number *                 inv_jacobian;
-      Number *                 JxW;
-      unsigned int             n_cells;
-      unsigned int             padding_length;
-      unsigned int             row_start;
-      unsigned int *           constraint_mask;
-      bool                     use_coloring;
+
+      /**
+       * Pointer to the inverse Jacobian.
+       */
+      Number *inv_jacobian;
+
+      /**
+       * Pointer to the Jacobian times the weights.
+       */
+      Number *JxW;
+
+      /**
+       * Number of cells.
+       */
+      unsigned int n_cells;
+
+      /**
+       * Length of the padding.
+       */
+      unsigned int padding_length;
+
+      /**
+       * Row start (including padding).
+       */
+      unsigned int row_start;
+
+      /**
+       * Mask deciding where constraints are set on a given cell.
+       */
+      unsigned int *constraint_mask;
+
+      /**
+       * If true, use graph coloring has been used and we can simply add into
+       * the destingation vector. Otherwise, use atomic operations.
+       */
+      bool use_coloring;
     };
 
     /**
@@ -175,7 +234,7 @@ namespace CUDAWrappers
            const DoFHandler<dim> &          dof_handler,
            const AffineConstraints<Number> &constraints,
            const Quadrature<1> &            quad,
-           const AdditionalData             additional_data = AdditionalData());
+           const AdditionalData &           additional_data = AdditionalData());
 
     /**
      * Initializes the data structures. Same as above but using a Q1 mapping.
@@ -184,7 +243,7 @@ namespace CUDAWrappers
     reinit(const DoFHandler<dim> &          dof_handler,
            const AffineConstraints<Number> &constraints,
            const Quadrature<1> &            quad,
-           const AdditionalData             AdditionalData = AdditionalData());
+           const AdditionalData &           AdditionalData = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
@@ -398,6 +457,12 @@ namespace CUDAWrappers
     bool use_coloring;
 
     /**
+     *  Overlap MPI communications with computation. This requires CUDA-aware
+     *  MPI and use_coloring must be false.
+     */
+    bool overlap_communication_computation;
+
+    /**
      * Total number of degrees of freedom.
      */
     types::global_dof_index n_dofs;
@@ -451,15 +516,19 @@ namespace CUDAWrappers
     std::vector<Number *> inv_jacobian;
 
     /**
-     * Vector of pointer to the Jacobian time the weights associated to the
+     * Vector of pointer to the Jacobian times the weights associated to the
      * cells of each color.
      */
     std::vector<Number *> JxW;
 
-    // Pointer to the constrained degrees of freedom.
+    /**
+     * Pointer to the constrained degrees of freedom.
+     */
     types::global_dof_index *constrained_dofs;
 
-    // Mask deciding where constraints are set on a given cell.
+    /**
+     * Mask deciding where constraints are set on a given cell.
+     */
     std::vector<unsigned int *> constraint_mask;
 
     /**
@@ -480,12 +549,32 @@ namespace CUDAWrappers
      */
     std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
-    // Parallelization parameters
+    /**
+     * Cells per block (determined by the function cells_per_block_shmem() ).
+     */
     unsigned int cells_per_block;
-    dim3         constraint_grid_dim;
-    dim3         constraint_block_dim;
 
-    unsigned int              padding_length;
+    /**
+     * Grid dimensions used to launch the CUDA kernels
+     * in *_constrained_values-operations.
+     */
+    dim3 constraint_grid_dim;
+
+    /**
+     * Block dimensions used to launch the CUDA kernels
+     * in *_constrained_values-operations.
+     */
+    dim3 constraint_block_dim;
+
+    /**
+     * Length of the padding (closest power of two larger than or equal to
+     * the number of thread).
+     */
+    unsigned int padding_length;
+
+    /**
+     * Row start of each color.
+     */
     std::vector<unsigned int> row_start;
 
     friend class internal::ReinitHelper<dim, Number>;
@@ -494,10 +583,16 @@ namespace CUDAWrappers
 
 
   // TODO find a better place to put these things
-  // Structure to pass the shared memory into a general user function.
+
+  /**
+   * Structure to pass the shared memory into a general user function.
+   */
   template <int dim, typename Number>
   struct SharedData
   {
+    /**
+     * Constructor.
+     */
     __device__
     SharedData(Number *vd, Number *gq[dim])
       : values(vd)
@@ -506,7 +601,16 @@ namespace CUDAWrappers
         gradients[d] = gq[d];
     }
 
+    /**
+     * Shared memory for dof and quad values.
+     */
     Number *values;
+
+    /**
+     * Shared memory for computed gradients in reference coordinate system.
+     * The gradient in each direction is saved in a struct-of-array
+     * format, i.e. first, all gradients in the x-direction come...
+     */
     Number *gradients[dim];
   };
 
@@ -519,13 +623,17 @@ namespace CUDAWrappers
            cells_per_block_shmem(int dim, int fe_degree)
   {
     /* clang-format off */
-    return dim==2 ? (fe_degree==1 ? 32 :
-                     fe_degree==2 ? 8 :
-                     fe_degree==3 ? 4 :
-                     fe_degree==4 ? 4 :
+    // We are limiting the number of threads according to the
+    // following formulas:
+    //  - in 2D: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
+    //  - in 3D: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
+    return dim==2 ? (fe_degree==1 ? CUDAWrappers::warp_size :    // 128
+                     fe_degree==2 ? CUDAWrappers::warp_size/4 :  //  72
+                     fe_degree==3 ? CUDAWrappers::warp_size/8 :  //  64
+                     fe_degree==4 ? CUDAWrappers::warp_size/8 :  // 100
                      1) :
-           dim==3 ? (fe_degree==1 ? 8 :
-                     fe_degree==2 ? 2 :
+           dim==3 ? (fe_degree==1 ? CUDAWrappers::warp_size/4 :  //  64
+                     fe_degree==2 ? CUDAWrappers::warp_size/16 : //  54
                      1) : 1;
     /* clang-format on */
   }
@@ -535,7 +643,7 @@ namespace CUDAWrappers
   /**
    * Compute the quadrature point index in the local cell of a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim>
   __device__ inline unsigned int
@@ -555,7 +663,7 @@ namespace CUDAWrappers
    * Return the quadrature point index local of a given thread. The index is
    * only unique for a given MPI process.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline unsigned int
@@ -574,7 +682,7 @@ namespace CUDAWrappers
   /**
    * Return the quadrature point associated with a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &

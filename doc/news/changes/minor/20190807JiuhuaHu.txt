@@ -1,5 +1,0 @@
-Changed: 
-1. Add the HDG overview article in the references.bib file.The overview article is by N.C. Nguygen and J. Peraire: Hybridzable discontinuous Galerkin methods for partial differential equations in continuum mechanics, Journal of Computational Physics, 2012.  
-2. In the introduction part of step-51, I replace the above article by its referenced name.
-<br>
-(Jiuhua Hu, 2019/08/07)

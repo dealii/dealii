@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-        Amesos Epetra Ifpack AztecOO Teuchos ML MueLu
+        Amesos Epetra Ifpack AztecOO Teuchos ML
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
@@ -104,6 +104,25 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
+    # deal.II has to be configured with MPI if both Trilinos and PETSc are
+    # enabled.
+    #
+    IF(DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI)
+      MESSAGE(STATUS "Incompatible configuration settings: "
+        "MPI must be enabled to use both Trilinos and PETSc, as both libraries "
+        "provide mutually incompatible MPI stubs."
+        )
+      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "Incompatible Trilinos and PETSc libraries found. Both libraries were "
+        "configured without MPI support and cannot be used at the same time due "
+        "to incompatible MPI stub files. Either reconfigure deal.II, Trilinos, "
+        "and PETSc with MPI support, or disable one of the libraries.\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    #
     # Trilinos has to be configured with 32bit indices if deal.II uses
     # unsigned int.
     #
@@ -145,34 +164,58 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
     CHECK_MPI_INTERFACE(TRILINOS ${var})
 
+    #
+    # Check which optional features of trilinos are installed.
+    #
     IF (${var})
-      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra Zoltan)
-      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
-      IF(_module_found)
+      #
+      # Check for modules.
+      #
+      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra MueLu Zoltan)
+        ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
+        IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
           STRING(TOUPPER "${_optional_module}" _optional_module_upper)
           SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
-      ELSE()
+        ELSE()
           MESSAGE(STATUS "Module ${_optional_module} not found!")
-      ENDIF()
+        ENDIF()
+      ENDFOREACH()
+
+      #
+      # Check for third-party libraries (tpl).
+      #
+      FOREACH(_optional_tpl MUMPS)
+        ITEM_MATCHES(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
+        IF(_tpl_found)
+          MESSAGE(STATUS "Found ${_optional_tpl}")
+          STRING(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
+          SET(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
+        ELSE()
+          MESSAGE(STATUS "Module ${_optional_tpl} not found!")
+        ENDIF()
       ENDFOREACH()
     ENDIF()
 
-    IF(${DEAL_II_TRILINOS_WITH_TPETRA})
+    IF(DEAL_II_TRILINOS_WITH_TPETRA)
       #
       # Check if Tpetra is usable in fact.
       #
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
       ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
       CHECK_SYMBOL_EXISTS(
         "KOKKOS_ENABLE_CUDA_LAMBDA"
         "Kokkos_Macros.hpp"
-        DEAL_II_KOKKOS_LAMBDA_EXISTS)
-      IF(${DEAL_II_KOKKOS_LAMBDA_EXISTS})
+        DEAL_II_KOKKOS_LAMBDA_EXISTS
+        )
+      IF(DEAL_II_KOKKOS_LAMBDA_EXISTS)
         ADD_FLAGS(CMAKE_REQUIRED_FLAGS "--expt-extended-lambda")
       ENDIF()
-      LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${Trilinos_LIBRARIES}")
+
+      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+
       CHECK_CXX_SOURCE_COMPILES(
         "
         #include <Tpetra_Vector.hpp>
@@ -191,13 +234,52 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "
         TRILINOS_TPETRA_IS_FUNCTIONAL
         )
+
       RESET_CMAKE_REQUIRED()
+
       IF(NOT TRILINOS_TPETRA_IS_FUNCTIONAL)
         MESSAGE(
           STATUS
           "Tpetra was found but is not usable! Disabling Tpetra support."
           )
         SET(DEAL_II_TRILINOS_WITH_TPETRA OFF)
+      ENDIF()
+    ENDIF()
+
+    IF(DEAL_II_TRILINOS_WITH_MUELU)
+      #
+      # Check if MueLu is actually usable.
+      #
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
+      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <MueLu_CreateEpetraPreconditioner.hpp>
+        int
+        main()
+        {
+          Epetra_CrsMatrix *matrix;
+          const auto teuchos_wrapped_matrix = Teuchos::rcp(matrix, false);	
+          Teuchos::ParameterList parameters;
+          MueLu::CreateEpetraPreconditioner(teuchos_wrapped_matrix, parameters);
+          return 0;
+        }
+        "
+        TRILINOS_MUELU_IS_FUNCTIONAL
+        )
+
+      RESET_CMAKE_REQUIRED()
+
+      IF(NOT TRILINOS_MUELU_IS_FUNCTIONAL)
+        MESSAGE(
+          STATUS
+          "MueLu was found but is not usable through Epetra! Disabling MueLu support."
+          )
+        SET(DEAL_II_TRILINOS_WITH_MUELU OFF)
       ENDIF()
     ENDIF()
 
@@ -210,7 +292,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
         )
-      
+
       IF(EXISTS ${SACADO_CONFIG_H})
         #
         # Determine whether Trilinos was configured with C++11 support and
@@ -243,6 +325,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         CHECK_CXX_SOURCE_COMPILES(
           "
           #include <Sacado_trad.hpp>
+          #include <complex>
           int main ()
           {
             Sacado::Rad::ADvar<double> sacado_rad_double; // Works

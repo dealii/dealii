@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,6 @@
 #include "../tests.h"
 namespace Step44
 {
-  using namespace dealii;
   namespace Parameters
   {
     struct FESystem
@@ -838,8 +837,7 @@ namespace Step44
             cell = dof_handler_ref.begin_active(),
             endc = dof_handler_ref.end();
           for (; cell != endc; ++cell)
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6 * parameters.scale)
                 {
                   Tensor<1, dim> soln;
@@ -1081,8 +1079,7 @@ namespace Step44
                                                       endc =
                                                         triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->center()[1] == 1.0 * parameters.scale)
@@ -1113,9 +1110,8 @@ namespace Step44
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
-    DoFTools::count_dofs_per_block(dof_handler_ref,
-                                   dofs_per_block,
-                                   block_component);
+    dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler_ref, block_component);
     pcout << "Triangulation:"
           << "\n\t Number of active cells: " << triangulation.n_active_cells()
           << "\n\t Number of degrees of freedom: " << dof_handler_ref.n_dofs()
@@ -1243,7 +1239,8 @@ namespace Step44
       scratch.solution_total, scratch.solution_values_p_total);
     scratch.fe_values_ref[J_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_J_total);
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       lqph[q_point]->update_values(scratch.solution_grads_u_total[q_point],
                                    scratch.solution_values_p_total[q_point],
                                    scratch.solution_values_J_total[q_point]);
@@ -1352,7 +1349,8 @@ namespace Step44
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point :
+             fe_values_ref.quadrature_point_indices())
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
             const double JxW      = fe_values_ref.JxW(q_point);
@@ -1377,7 +1375,8 @@ namespace Step44
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point :
+             fe_values_ref.quadrature_point_indices())
           {
             const double det_F_qp   = lqph[q_point]->get_det_F();
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
@@ -1475,10 +1474,11 @@ namespace Step44
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
             if (k_group == u_dof)
@@ -1498,7 +1498,8 @@ namespace Step44
               Assert(k_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim>          tau = lqph[q_point]->get_tau();
         const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
@@ -1509,12 +1510,13 @@ namespace Step44
           scratch.symm_grad_Nx[q_point];
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
-            for (unsigned int j = 0; j <= i; ++j)
+            for (const unsigned int j :
+                 scratch.fe_values_ref.dof_indices_ending_at(i))
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
@@ -1546,8 +1548,9 @@ namespace Step44
               }
           }
       }
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
+    for (const unsigned int i : scratch.fe_values_ref.dof_indices())
+      for (const unsigned int j :
+           scratch.fe_values_ref.dof_indices_starting_at(i + 1))
         data.cell_matrix(i, j) = data.cell_matrix(j, i);
   }
   template <int dim>
@@ -1598,10 +1601,11 @@ namespace Step44
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
             if (k_group == u_dof)
@@ -1617,7 +1621,8 @@ namespace Step44
               Assert(k_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
         const double                  det_F   = lqph[q_point]->get_det_F();
@@ -1628,7 +1633,7 @@ namespace Step44
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
             if (i_group == u_dof)
@@ -1641,14 +1646,13 @@ namespace Step44
               Assert(i_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       if (cell->face(face)->at_boundary() == true &&
           cell->face(face)->boundary_id() == 6)
         {
           scratch.fe_face_values_ref.reinit(cell, face);
-          for (unsigned int f_q_point = 0; f_q_point < n_q_points_f;
-               ++f_q_point)
+          for (const unsigned int f_q_point :
+               scratch.fe_face_values_ref.quadrature_point_indices())
             {
               const Tensor<1, dim> &N =
                 scratch.fe_face_values_ref.normal_vector(f_q_point);
@@ -1657,7 +1661,7 @@ namespace Step44
               const double         time_ramp = (time.current() / time.end());
               const double         pressure  = p0 * parameters.p_p0 * time_ramp;
               const Tensor<1, dim> traction  = pressure * N;
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (const unsigned int i : scratch.fe_values_ref.dof_indices())
                 {
                   const unsigned int i_group =
                     fe.system_to_base_index(i).first.first;
@@ -2083,14 +2087,12 @@ namespace Step44
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
 
-  using namespace dealii;
   using namespace Step44;
   try
     {

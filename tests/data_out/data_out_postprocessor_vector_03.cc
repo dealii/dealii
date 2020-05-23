@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2018 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -55,8 +55,6 @@
 #include <iostream>
 
 #include "../tests.h"
-
-using namespace dealii;
 
 
 

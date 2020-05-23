@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,7 @@ test(bool second_case = false)
       vertices[7](0) = 1;
     }
   std::vector<CellData<dim>> cells(1);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     cells[0].vertices[i] = i;
 
   if (dim == 3 && second_case)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,9 +44,6 @@
 #include <deal.II/numerics/point_value_history.h>
 
 #include "../tests.h"
-
-
-using namespace dealii;
 
 
 

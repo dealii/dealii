@@ -118,8 +118,19 @@ over the domain $\Omega$, yielding the following set of equations:
 which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
 \\ q\end{pmatrix}$.
 
-In practice, one wants to impose as little regularity on the pressure
-variable as possible; consequently, we integrate by parts the second term:
+A generally good rule of thumb is that if one <i>can</i> reduce how
+many derivatives are taken on any variable in the formulation, then
+one <i>should</i> in fact do that using integration by parts. (This is
+motivated by the theory of <a
+href="https://en.wikipedia.org/wiki/Partial_differential_equation">partial
+differential equations</a>, and in particular the difference between
+strong and <a href="https://en.wikipedia.org/wiki/Weak_solution">weak
+solutions</a>.) We have already done that for the Laplace equation,
+where we have integrated the second derivative by parts to obtain the
+weak formulation that has only one derivative on both test and trial
+function.
+
+In the current context, we integrate by parts the second term:
 @f{eqnarray*}
   (\textbf{v}, -2\; \textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
@@ -149,6 +160,10 @@ defined as
   2 \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
   \varepsilon(\textbf{u})_{ij} \ dx.
 @f}
+Using this, we have now reduced the requirements on our variables to
+first derivatives for $\mathbf u,\mathbf v$ and no derivatives at all
+for $p,q$.
+
 Because the scalar product between a general tensor like
 $\nabla\textbf{v}$ and a symmetric tensor like
 $\varepsilon(\textbf{u})$ equals the scalar product between the
@@ -351,11 +366,13 @@ for all test functions
 $\textbf{v}\in \textbf V_0 = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=0\},q\in
 Q$.
 
-These equations represent a symmetric saddle point problem. It is well known
+These equations represent a symmetric <a
+href="https://en.wikipedia.org/wiki/Ladyzhenskaya%E2%80%93Babu%C5%A1ka%E2%80%93Brezzi_condition">saddle
+point problem</a>. It is well known
 that then a solution only exists if the function spaces in which we search for
 a solution have to satisfy certain conditions, typically referred to as the
 Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions. The continuous
-function spaces above satisfy them. However, when we discretize the equations by
+function spaces above satisfy these. However, when we discretize the equations by
 replacing the continuous variables and test functions by finite element
 functions in finite dimensional spaces $\textbf V_{g,h}\subset \textbf V_g,
 Q_h\subset Q$, we have to make sure that $\textbf V_h,Q_h$ also satisfy the LBB
@@ -571,6 +588,120 @@ classes, we will be able to use them interchangeably using the same syntax in
 all places.
 
 
+<h4> A note on the structure of the linear system </h4>
+
+Above, we have claimed that the linear system has the form
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{cc}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{cc}
+    F \\ G
+  \end{array}\right),
+@f}
+i.e., in particular that there is a zero block at the bottom right of the
+matrix. This then allowed us to write the Schur complement as
+$S=B A^{-1} B^T$. But this is not quite correct.
+
+Think of what would happen if there are constraints on some
+pressure variables (see the
+@ref constraints "Constraints on degrees of freedom" documentation
+module), for example because we use adaptively
+refined meshes and continuous pressure finite elements so that there
+are hanging nodes. Another cause for such constraints are Dirichlet
+boundary conditions on the pressure. Then the AffineConstraints
+class, upon copying the local contributions to the matrix into the
+global linear system will zero out rows and columns corresponding
+to constrained degrees of freedom and put a positive entry on
+the diagonal. (You can think of this entry as being one for
+simplicity, though in reality it is a value of the same order
+of magnitude as the other matrix entries.) In other words,
+the bottom right block is really not empty at all: It has
+a few entries on the diagonal, one for each constrained
+pressure degree of freedom, and a correct description
+of the linear system we have to solve is that it has the
+form
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    A & B^T \\ B & D_c
+  \end{array}\right)
+  \left(\begin{array}{cc}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{cc}
+    F \\ G
+  \end{array}\right),
+@f}
+where $D_c$ is the zero matrix with the exception of the
+positive diagonal entries for the constrained degrees of
+freedom. The correct Schur complement would then in fact
+be the matrix $S = B A^{-1} B^T - D_c $ instead of the one
+stated above.
+
+Thinking about this makes us, first, realize that the
+resulting Schur complement is now indefinite because
+$B A^{-1} B^T$ is symmetric and positive definite whereas
+$D_c$ is a positive semidefinite, and subtracting the latter
+from the former may no longer be positive definite. This
+is annoying because we could no longer employ the Conjugate
+Gradient method on this true Schur complement. That said, we could
+fix the issue in AffineConstraints::distribute_local_to_global() by
+simply putting *negative* values onto the diagonal for the constrained
+pressure variables -- because we really only put something nonzero
+to ensure that the resulting matrix is not singular; we really didn't
+care whether that entry is positive or negative. So if the entries
+on the diagonal of $D_c$ were negative, then $S$ would again be a
+symmetric and positive definite matrix.
+
+But, secondly, the code below doesn't actually do any of that: It
+happily solves the linear system with the wrong Schur complement
+$S = B A^{-1} B^T$ that just ignores the issue altogether. Why
+does this even work? To understand why this is so, recall that
+when writing local contributions into the global matrix,
+AffineConstraints::distribute_local_to_global() zeros out the
+rows and columns that correspond to constrained degrees of freedom.
+This means that $B$ has some zero rows, and $B^T$ zero columns.
+As a consequence, if one were to multiply out what the entries
+of $S$ are, one would realize that it has zero rows and columns
+for all constrained pressure degrees of freedom, including a
+zero on the diagonal. The nonzero entries of $D_c$ would fit
+into exactly those zero diagonal locations, and ensure that $S$
+is invertible. Not doing so, strictly speaking, means that $S$
+remains singular: It is symmetric and positive definite on the
+subset of non-constrained pressure degrees of freedom, and
+simply the zero matrix on the constrained pressures. Why
+does the Conjugate Gradient method work for this matrix?
+Because AffineConstraints::distribute_local_to_global()
+also makes sure that the right hand side entries that
+correspond to these zero rows of the matrix are *also*
+zero, i.e., the right hand side is compatible.
+
+What this means is that whatever the values of the solution
+vector for these constrained pressure degrees of freedom,
+these rows will always have a zero residual and, if one
+were to consider what the CG algorithm does internally, just
+never produce any updates to the solution vector. In other
+words, the CG algorithm just *ignores* these rows, despite the
+fact that the matrix is singular. This only works because these
+degrees of freedom are entirely decoupled from the rest of the
+linear system (because the entire row and corresponding column
+are zero). At the end of the solution process, the constrained
+pressure values in the solution vector therefore remain exactly
+as they were when we started the call to the solver; they are
+finally overwritten with their correct values when we call
+AffineConstraints::distribute() after the CG solver is done.
+
+The upshot of this discussion is that the assumption that the
+bottom right block of the big matrix is zero is a bit
+simplified, but that just going with it does not actually lead
+to any practical problems worth addressing.
+
+
 <h3>The testcase</h3>
 
 The domain, right hand side and boundary conditions we implement below relate
@@ -740,10 +871,10 @@ comparison of their results.
 
 Apart from this, many other algorithms have been tested and improved during
 the creation of this program. For example, in building the sparsity pattern,
-we originally used a (now no longer existing) BlockCompressedSparsityPattern 
+we originally used a (now no longer existing) BlockCompressedSparsityPattern
 object that added one element at a time; however, its data structures were poorly
-adapted for the large numbers of nonzero entries per row created by our 
-discretization in 3d, leading to a quadratic behavior. Replacing the internal 
+adapted for the large numbers of nonzero entries per row created by our
+discretization in 3d, leading to a quadratic behavior. Replacing the internal
 algorithms in deal.II to set many elements at a time, and using a
 BlockCompressedSimpleSparsityPattern (which has, as of early 2015, been in turn
 replaced by BlockDynamicSparsityPattern) as a better adapted data structure,

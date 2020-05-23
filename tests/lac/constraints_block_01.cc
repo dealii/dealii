@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -147,12 +147,8 @@ main()
         block_component[comp] = 2;
     } // comp
 
-  std::vector<types::global_dof_index> dofs_per_block(
-    3, 0); // 3 blocks, count dofs:
-  DoFTools::count_dofs_per_component(dh,
-                                     dofs_per_block,
-                                     false,
-                                     block_component);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dh, false, block_component);
 
   DoFRenumbering::component_wise(dh, block_component);
 
@@ -248,7 +244,7 @@ main()
       if (int(cell->material_id()) == 1)
         {
           // Only loop over cells in the fluid region
-          for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
             {
               if (!cell->at_boundary(f))
                 {

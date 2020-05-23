@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2017 - 2018 by the deal.II authors
+ * Copyright (C) 2017 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -66,7 +66,6 @@
 #include "../tests.h"
 namespace Step18
 {
-  using namespace dealii;
   template <int dim>
   struct PointHistory
   {
@@ -206,10 +205,8 @@ namespace Step18
     const unsigned int                   n_mpi_processes;
     const unsigned int                   this_mpi_process;
     ConditionalOStream                   pcout;
-    std::vector<types::global_dof_index> local_dofs_per_process;
     IndexSet                             locally_owned_dofs;
     IndexSet                             locally_relevant_dofs;
-    unsigned int                         n_local_cells;
     static const SymmetricTensor<4, dim> stress_strain_tensor;
     int                                  monitored_vertex_first_dof;
   };
@@ -344,7 +341,7 @@ namespace Step18
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->at_boundary())
           {
             const Point<dim> face_center = cell->face(f)->center();
@@ -372,10 +369,6 @@ namespace Step18
     dof_handler.distribute_dofs(fe);
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-    n_local_cells = GridTools::count_cells_with_subdomain_association(
-      triangulation, triangulation.locally_owned_subdomain());
-    local_dofs_per_process =
-      dof_handler.compute_n_locally_owned_dofs_per_processor();
     hanging_node_constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler,
                                             hanging_node_constraints);
@@ -386,7 +379,7 @@ namespace Step18
                                     hanging_node_constraints,
                                     /*keep constrained dofs*/ false);
     SparsityTools::distribute_sparsity_pattern(sparsity_pattern,
-                                               local_dofs_per_process,
+                                               locally_owned_dofs,
                                                mpi_communicator,
                                                locally_relevant_dofs);
     system_matrix.reinit(locally_owned_dofs,
@@ -423,9 +416,10 @@ namespace Step18
           cell_matrix = 0;
           cell_rhs    = 0;
           fe_values.reinit(cell);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
+              for (const unsigned int q_point :
+                   fe_values.quadrature_point_indices())
                 {
                   const SymmetricTensor<2, dim>
                     eps_phi_i = get_strain(fe_values, i, q_point),
@@ -437,11 +431,12 @@ namespace Step18
             reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
           body_force.vector_value_list(fe_values.get_quadrature_points(),
                                        body_force_values);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             {
               const unsigned int component_i =
                 fe.system_to_component_index(i).first;
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const unsigned int q_point :
+                   fe_values.quadrature_point_indices())
                 {
                   const SymmetricTensor<2, dim> &old_stress =
                     local_quadrature_points_data[q_point].old_stress;
@@ -631,8 +626,7 @@ namespace Step18
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6)
                 {
                   monitored_vertex_first_dof = cell->vertex_dof_index(v, 0);
@@ -710,7 +704,7 @@ namespace Step18
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
             vertex_touched[cell->vertex_index(v)] = true;
@@ -797,13 +791,11 @@ namespace Step18
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   try
     {
-      using namespace dealii;
       using namespace Step18;
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       TopLevel<3>                      elastic_problem;

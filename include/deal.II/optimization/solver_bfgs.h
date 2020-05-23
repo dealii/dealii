@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2018 - 2019 by the deal.II authors
+//    Copyright (C) 2018 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_solver_bfgs_h
 #define dealii_solver_bfgs_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/solver.h>
 
@@ -59,7 +61,7 @@ public:
   /**
    * Number type.
    */
-  typedef typename VectorType::value_type Number;
+  using Number = typename VectorType::value_type;
 
 
   /**

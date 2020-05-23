@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,6 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria_iterator.h>
@@ -364,7 +363,7 @@ public:
     fourth_derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;
@@ -411,8 +410,8 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
-     * This array has (dim-1)*GeometryInfo::faces_per_cell entries. The first
-     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * This array has (dim-1)*GeometryInfo%<dim%>::%faces_per_cell entries. The
+     * first GeometryInfo::faces_per_cell contain the vectors in the first
      * tangential direction for each face; the second set of
      * GeometryInfo::faces_per_cell entries contain the vectors in the second
      * tangential direction (only in 3d, since there we have 2 tangential
@@ -611,13 +610,6 @@ protected:
   QGaussLobatto<1> line_support_points;
 
   /**
-   * An FE_Q object which is only needed in 3D, since it knows how to reorder
-   * shape functions/DoFs on non-standard faces. This is used to reorder
-   * support points in the same way.
-   */
-  const std::unique_ptr<FE_Q<dim>> fe_q;
-
-  /**
    * A vector of tables of weights by which we multiply the locations of the
    * support points on the perimeter of an object (line, quad, hex) to get the
    * location of interior support points.
@@ -757,10 +749,7 @@ MappingQGeneric<dim, spacedim>::InternalData::shape(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr, shape_values.size());
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -771,10 +760,7 @@ inline double &
 MappingQGeneric<dim, spacedim>::InternalData::shape(const unsigned int qpoint,
                                                     const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr, shape_values.size());
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -785,10 +771,8 @@ MappingQGeneric<dim, spacedim>::InternalData::derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_derivatives.size());
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -800,10 +784,8 @@ MappingQGeneric<dim, spacedim>::InternalData::derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_derivatives.size());
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -814,11 +796,8 @@ MappingQGeneric<dim, spacedim>::InternalData::second_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_second_derivatives.size());
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -829,11 +808,8 @@ MappingQGeneric<dim, spacedim>::InternalData::second_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_second_derivatives.size());
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -843,10 +819,8 @@ MappingQGeneric<dim, spacedim>::InternalData::third_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_third_derivatives.size());
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -857,10 +831,8 @@ MappingQGeneric<dim, spacedim>::InternalData::third_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_third_derivatives.size());
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -871,11 +843,8 @@ MappingQGeneric<dim, spacedim>::InternalData::fourth_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_fourth_derivatives.size());
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -886,11 +855,8 @@ MappingQGeneric<dim, spacedim>::InternalData::fourth_derivative(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  AssertIndexRange(qpoint * n_shape_functions + shape_nr,
+                   shape_fourth_derivatives.size());
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,9 +29,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int, int>
 class FiniteElement;
-
+#endif
 
 /*!@addtogroup feaccess */
 /*@{*/
@@ -113,6 +115,9 @@ enum UpdateFlags
    * locations $\mathbf x_q$ on the real cell, you need to pass this
    * flag to the FEValues constructor to make sure you can later
    * access them.
+   *
+   * In the context of DataPostprocessor,
+   * DataPostprocessorInputs::CommonInputs::evaluation_points will be updated.
    */
   update_quadrature_points = 0x0020,
   //! Transformed quadrature weights

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2019 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
+#ifndef DOXYGEN
 template <int N, typename T>
 class TableBase;
 template <int N, typename T>
@@ -49,6 +50,7 @@ template <typename T>
 class Table<5, T>;
 template <typename T>
 class Table<6, T>;
+#endif
 
 
 
@@ -1252,7 +1254,6 @@ public:
   typename AlignedVector<T>::const_reference
   operator()(const size_type i, const size_type j) const;
 
-
   /**
    * Direct access to one element of the table by specifying all indices at
    * the same time. Range checks are performed.
@@ -2188,7 +2189,7 @@ namespace internal
     inline Accessor<N, T, C, P - 1> Accessor<N, T, C, P>::
                                     operator[](const size_type i) const
     {
-      Assert(i < table.size()[N - P], ExcIndexRange(i, 0, table.size()[N - P]));
+      AssertIndexRange(i, table.size()[N - P]);
 
       // access i-th
       // subobject. optimize on the
@@ -2299,7 +2300,7 @@ template <int N, typename T>
 inline TableBase<N, T> &
 TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
 {
-  static_cast<Subscriptor &>(*this) = std::move(m);
+  static_cast<Subscriptor &>(*this) = std::move(static_cast<Subscriptor &>(m));
   values                            = std::move(m.values);
   table_size                        = m.table_size;
   m.table_size                      = TableIndices<N>();
@@ -2396,7 +2397,7 @@ template <int N, typename T>
 inline typename TableBase<N, T>::size_type
 TableBase<N, T>::size(const unsigned int i) const
 {
-  Assert(i < N, ExcIndexRange(i, 0, N));
+  AssertIndexRange(i, N);
   return table_size[i];
 }
 

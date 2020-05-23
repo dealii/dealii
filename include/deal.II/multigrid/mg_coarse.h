@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,10 +17,11 @@
 #define dealii_mg_coarse_h
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/linear_operator.h>
-#include <deal.II/lac/matrix_lib.h>
 
 #include <deal.II/multigrid/mg_base.h>
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,7 @@ test_fe(const char *name)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   // These names are all correct.
   test_fe<1>("FE_Q(1)");
@@ -83,7 +82,7 @@ main()
         }
       catch (ExceptionBase &e)
         {
-          logfile << e.what();
+          deallog << e.what();
         }
     }
 }

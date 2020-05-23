@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_particles_property_pool_h
 #define dealii_particles_property_pool_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
 

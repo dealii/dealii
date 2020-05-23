@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_fe_tools_templates_H
 #define dealii_fe_tools_templates_H
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/qprojector.h>
@@ -225,9 +227,8 @@ namespace FETools
       // for each shape function, copy the flags from the base element to this
       // one, taking into account multiplicities, and other complications
       unsigned int total_index = 0;
-      for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_number)
+      for (const unsigned int vertex_number :
+           GeometryInfo<dim>::vertex_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -417,9 +418,8 @@ namespace FETools
       // to this one, taking into account multiplicities, multiple components in
       // base elements, and other complications
       unsigned int total_index = 0;
-      for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_number)
+      for (const unsigned int vertex_number :
+           GeometryInfo<dim>::vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -661,9 +661,8 @@ namespace FETools
       // the first vertex in the order of the base elements, then of the second
       // vertex, etc
       total_index = 0;
-      for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_number)
+      for (const unsigned int vertex_number :
+           GeometryInfo<dim>::vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -1278,11 +1277,11 @@ namespace FETools
       // and accessing the fe_name_map variable. make this lock local to
       // this file.
       //
-      // this and the next variable are declared static (even though
-      // they're in an anonymous namespace) in order to make icc happy
+      // This variable is declared static (even though
+      // it belongs to an internal namespace) in order to make icc happy
       // (which otherwise reports a multiply defined symbol when linking
-      // libraries for more than one space dimension together
-      static Threads::Mutex fe_name_map_lock;
+      // libraries for more than one space dimension together)
+      static std::mutex fe_name_map_lock;
 
       // This is the map used by FETools::get_fe_by_name and
       // FETools::add_fe_name. It is only accessed by functions in this
@@ -1460,23 +1459,18 @@ namespace FETools
                                       fe2.dofs_per_cell,
                                       fe1.dofs_per_cell));
 
-    // first try the easy way: maybe
-    // the FE wants to implement things
-    // itself:
-    bool fe_implements_interpolation = true;
+    // first try the easy way: maybe the FE wants to implement things itself:
     try
       {
         internal::FEToolsGetInterpolationMatrixHelper::gim_forwarder(
           fe1, fe2, interpolation_matrix);
+        return;
       }
     catch (
       typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented &)
       {
         // too bad....
-        fe_implements_interpolation = false;
       }
-    if (fe_implements_interpolation == true)
-      return;
 
     // uh, so this was not the
     // case. hm. then do it the hard
@@ -1818,14 +1812,10 @@ namespace FETools
               A(k * nd + d, j) = fine.shape_value_component(j, k, d);
 
         Householder<double> H(A);
-        unsigned int        cell_number = 0;
 
         Threads::TaskGroup<void> task_group;
 
-        for (typename Triangulation<dim, spacedim>::active_cell_iterator
-               fine_cell = tria.begin_active();
-             fine_cell != tria.end();
-             ++fine_cell, ++cell_number)
+        for (const auto &fine_cell : tria.active_cell_iterators())
           {
             fine.reinit(fine_cell);
 
@@ -1845,7 +1835,8 @@ namespace FETools
 
             coarse.reinit(tria.begin(0));
 
-            FullMatrix<double> &this_matrix = matrices[cell_number];
+            FullMatrix<double> &this_matrix =
+              matrices[fine_cell->active_cell_index()];
 
             // Compute this once for each
             // coarse grid basis function. can
@@ -1888,10 +1879,6 @@ namespace FETools
                 if (std::fabs(this_matrix(i, j)) < 1e-12)
                   this_matrix(i, j) = 0.;
           }
-
-        Assert(cell_number ==
-                 GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)),
-               ExcInternalError());
       }
     } // namespace FEToolsComputeEmbeddingMatricesHelper
   }   // namespace internal
@@ -3131,17 +3118,15 @@ namespace FETools
 
 
   template <int dim>
-  void
-  hierarchic_to_lexicographic_numbering(const unsigned int         degree,
-                                        std::vector<unsigned int> &h2l)
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering(const unsigned int degree)
   {
     // number of support points in each direction
     const unsigned int n = degree + 1;
 
     const unsigned int dofs_per_cell = Utilities::fixed_power<dim>(n);
 
-    // Assert size matches degree
-    AssertDimension(h2l.size(), dofs_per_cell);
+    std::vector<unsigned int> h2l(dofs_per_cell);
 
     // polynomial degree
     const unsigned int dofs_per_line = degree - 1;
@@ -3154,6 +3139,11 @@ namespace FETools
     // order
     switch (dim)
       {
+        case 0:
+          {
+            h2l[0] = 0;
+            break;
+          }
         case 1:
           {
             h2l[0] = 0;
@@ -3292,6 +3282,19 @@ namespace FETools
         default:
           Assert(false, ExcNotImplemented());
       }
+
+    return h2l;
+  }
+
+
+
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering(const unsigned int         degree,
+                                        std::vector<unsigned int> &h2l)
+  {
+    AssertDimension(h2l.size(), Utilities::fixed_power<dim>(degree + 1));
+    h2l = hierarchic_to_lexicographic_numbering<dim>(degree);
   }
 
 
@@ -3313,9 +3316,17 @@ namespace FETools
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe)
   {
     Assert(fe.n_components() == 1, ExcInvalidFE());
-    std::vector<unsigned int> h2l(fe.dofs_per_cell);
-    hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1, h2l);
-    return h2l;
+    return hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1);
+  }
+
+
+
+  template <int dim>
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering(const unsigned int degree)
+  {
+    return Utilities::invert_permutation(
+      hierarchic_to_lexicographic_numbering<dim>(degree));
   }
 
 

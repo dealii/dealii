@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,17 +20,16 @@
 #include <list>
 #include <set>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(3) << std::fixed;
 
   // generate usual sparsity pattern
   const unsigned int N = 15;

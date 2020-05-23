@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -772,14 +772,9 @@ namespace Step60
         for (auto &cell : cells)
           {
             cell->set_refine_flag();
-            for (unsigned int face_no = 0;
-                 face_no < GeometryInfo<spacedim>::faces_per_cell;
-                 ++face_no)
+            for (unsigned int face_no : GeometryInfo<spacedim>::face_indices())
               if (!cell->at_boundary(face_no))
-                {
-                  auto neighbor = cell->neighbor(face_no);
-                  neighbor->set_refine_flag();
-                }
+                cell->neighbor(face_no)->set_refine_flag();
           }
         space_grid->execute_coarsening_and_refinement();
       }

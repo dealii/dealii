@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,9 +47,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 class ParameterHandler;
 class XDMFEntry;
+#endif
 
 /**
  * This is a base class for output of data on meshes of very general form.
@@ -267,10 +269,9 @@ namespace DataOutBase
     /**
      * Patch indices of neighbors of the current patch. This is made available
      * for the OpenDX format that requires neighbor
-     * information for advanced output. For dim==0 we still allow one
-     * neighbor, to avoid compiler warnings about zero-sized arrays.
+     * information for advanced output.
      */
-    unsigned int neighbors[dim > 0 ? GeometryInfo<dim>::faces_per_cell : 1];
+    std::array<unsigned int, GeometryInfo<dim>::faces_per_cell> neighbors;
 
     /**
      * Number of this patch. Since we are not sure patches are always
@@ -1165,14 +1166,14 @@ namespace DataOutBase
      *
      * @note The ability to write data that corresponds to higher order
      * polynomials rather than simply linear or bilinear is a feature that was
-     * only introduced in VTK sometime in 2017 or 2018. You will need at least
-     * Paraview version 5.5 (released in the spring of 2018) or a similarly
-     * recent version of Visit for this feature to work (for example,
-     * Visit 2.13.2, released in May 2018, does not yet support this feature).
-     * Older versions of these programs are likely going to result in errors
-     * when trying to read files generated with this flag set to @p true.
-     * Experience with these programs shows that these error messages are likely
-     * going to be rather less descriptive and more obscure.
+     * only introduced in VTK 8.1.0 in December 2017. You will need at least
+     * Paraview version 5.5.0 released in April 2018 or a similarly recent
+     * version of VisIt for this feature to work (for example, VisIt 3.1.1,
+     * released in February 2020, does not yet support this feature). Older
+     * versions of these programs are likely going to result in errors when
+     * trying to read files generated with this flag set to true. Experience
+     * with these programs shows that these error messages are likely going to
+     * be rather less descriptive and more obscure.
      */
     bool write_higher_order_cells;
 
@@ -1624,20 +1625,6 @@ namespace DataOutBase
     hdf5
   };
 
-  /**
-   * Write the given list of patches to the output stream in OpenDX format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_dx(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            nonscalar_data_ranges,
-    const DXFlags &flags,
-    std::ostream & out);
 
   /**
    * Write the given list of patches to the output stream in OpenDX format.
@@ -1655,38 +1642,6 @@ namespace DataOutBase
       &            nonscalar_data_ranges,
     const DXFlags &flags,
     std::ostream & out);
-
-  /**
-   * Write the given list of patches to the output stream in eps format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int spacedim>
-  DEAL_II_DEPRECATED void
-  write_eps(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * This is the same function as above except for domains that are not two-
-   * dimensional. This function is not implemented (and will throw an error if
-   * called) but is declared to allow for dimension-independent programs.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_eps(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
 
   /**
    * Write the given list of patches to the output stream in eps format.
@@ -1750,23 +1705,6 @@ namespace DataOutBase
    * This is the same function as above except for domains that are not two-
    * dimensional. This function is not implemented (and will throw an error if
    * called) but is declared to allow for dimension-independent programs.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_eps(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * This is the same function as above except for domains that are not two-
-   * dimensional. This function is not implemented (and will throw an error if
-   * called) but is declared to allow for dimension-independent programs.
    */
   template <int dim, int spacedim>
   void
@@ -1782,20 +1720,6 @@ namespace DataOutBase
     const EpsFlags &flags,
     std::ostream &  out);
 
-  /**
-   * Write the given list of patches to the output stream in GMV format.
-   *
-   *@deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_gmv(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const GmvFlags &flags,
-    std::ostream &  out);
 
   /**
    * Write the given list of patches to the output stream in GMV format.
@@ -1819,21 +1743,6 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const GmvFlags &flags,
     std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in gnuplot format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_gnuplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 nonscalar_data_ranges,
-    const GnuplotFlags &flags,
-    std::ostream &      out);
 
   /**
    * Write the given list of patches to the output stream in gnuplot format.
@@ -1909,22 +1818,6 @@ namespace DataOutBase
    * Write the given list of patches to the output stream for the Povray
    * raytracer.
    *
-   *@deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_povray(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                nonscalar_data_ranges,
-    const PovrayFlags &flags,
-    std::ostream &     out);
-
-  /**
-   * Write the given list of patches to the output stream for the Povray
-   * raytracer.
-   *
    * Output in this format creates a povray source file, include standard
    * camera and light source definition for rendering with povray 3.1 At
    * present, this format only supports output for two-dimensional data, with
@@ -1985,24 +1878,6 @@ namespace DataOutBase
    * format (FEBLOCK).
    *
    * For more information consult the Tecplot Users and Reference manuals.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_tecplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
-
-  /**
-   * Write the given list of patches to the output stream in Tecplot ASCII
-   * format (FEBLOCK).
-   *
-   * For more information consult the Tecplot Users and Reference manuals.
    */
   template <int dim, int spacedim>
   void
@@ -2014,22 +1889,6 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
-
-  /**
-   * Write the given list of patches to the output stream in Tecplot binary
-   * format.
-   *
-   * @deprecated Using Tecplot binary output is deprecated.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_tecplot_binary(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
       &                 nonscalar_data_ranges,
     const TecplotFlags &flags,
     std::ostream &      out);
@@ -2071,22 +1930,6 @@ namespace DataOutBase
 
   /**
    * Write the given list of patches to the output stream in UCD format
-   * described in the AVS developer's guide (now AVS).
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_ucd(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const UcdFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in UCD format
    * described in the AVS developer's guide (now AVS). Due to limitations in
    * the present format, only node based data can be output, which in one
    * reason why we invented the patch concept. In order to write higher order
@@ -2111,23 +1954,6 @@ namespace DataOutBase
                  DataComponentInterpretation::DataComponentInterpretation>>
       &             nonscalar_data_ranges,
     const UcdFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in VTK format. The
-   * data is written in the traditional VTK format as opposed to the XML-based
-   * format that write_vtu() produces.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_vtk(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
     std::ostream &  out);
 
   /**
@@ -2163,22 +1989,6 @@ namespace DataOutBase
     const VtkFlags &flags,
     std::ostream &  out);
 
-  /**
-   * Write the given list of patches to the output stream in VTU format. The
-   * data is written in the XML-based VTK format as opposed to the traditional
-   * format that write_vtk() produces.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_vtu(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
 
   /**
    * Write the given list of patches to the output stream in VTU format. The
@@ -2239,24 +2049,6 @@ namespace DataOutBase
    * routine is used internally together with
    * DataOutInterface::write_vtu_header() and
    * DataOutInterface::write_vtu_footer() by DataOutBase::write_vtu().
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_vtu_main(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * This function writes the main part for the xml based vtu file format. This
-   * routine is used internally together with
-   * DataOutInterface::write_vtu_header() and
-   * DataOutInterface::write_vtu_footer() by DataOutBase::write_vtu().
    */
   template <int dim, int spacedim>
   void
@@ -2271,25 +2063,6 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const VtkFlags &flags,
     std::ostream &  out);
-
-  /**
-   * Some visualization programs, such as ParaView, can read several separate
-   * VTU files that all form part of the same simulation, in order to
-   * parallelize visualization. In that case, you need a
-   * <code>.pvtu</code> file that describes which VTU files (written, for
-   * example, through the DataOutInterface::write_vtu() function) form a group.
-   * The current function can generate such a master record.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  write_pvtu_record(
-    std::ostream &                  out,
-    const std::vector<std::string> &piece_names,
-    const std::vector<std::string> &data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &nonscalar_data_ranges);
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
@@ -2486,21 +2259,6 @@ namespace DataOutBase
   /**
    * Write the given list of patches to the output stream in SVG format.
    *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int spacedim>
-  DEAL_II_DEPRECATED void
-  write_svg(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             nonscalar_data_ranges,
-    const SvgFlags &flags,
-    std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in SVG format.
-   *
    * SVG (Scalable Vector Graphics) is an XML-based vector image format
    * developed and maintained by the World Wide Web Consortium (W3C). This
    * function conforms to the latest specification SVG 1.1, released on August
@@ -2531,27 +2289,6 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const SvgFlags &flags,
     std::ostream &  out);
-
-  /**
-   * Write the given list of patches to the output stream in deal.II
-   * intermediate format. This is not a format understood by any other
-   * graphics program, but is rather a direct dump of the intermediate
-   * internal format used by deal.II. This internal format is generated by the
-   * various classes that can generate output using the DataOutBase class, for
-   * example from a finite element solution, and is then converted in the
-   * present class to the final graphics format.
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_deal_II_intermediate(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                              nonscalar_data_ranges,
-    const Deal_II_IntermediateFlags &flags,
-    std::ostream &                   out);
 
   /**
    * Write the given list of patches to the output stream in deal.II
@@ -2630,23 +2367,6 @@ namespace DataOutBase
                       const std::string &                      mesh_filename,
                       const std::string &solution_filename,
                       MPI_Comm           comm);
-
-  /**
-   * DataOutFilter is an intermediate data format that reduces the amount of
-   * data that will be written to files. The object filled by this function
-   * can then later be used again to write data in a concrete file format;
-   * see, for example, DataOutBase::write_hdf5_parallel().
-   *
-   * @deprecated Use the version using DataComponentInterpretation instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_filtered_data(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            nonscalar_data_ranges,
-    DataOutFilter &filtered_data);
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -3029,6 +2749,74 @@ public:
                     const std::vector<std::string> &piece_names) const;
 
   /**
+   * This function writes several .vtu files and a .pvtu record in parallel
+   * and constructs the filenames automatically. It is a combination of
+   * DataOutInterface::write_vtu() or
+   * DataOutInterface::write_vtu_in_parallel(), and
+   * DataOutInterface::write_pvtu_record().
+   *
+   * For example, running
+   * <code> write_vtu_with_pvtu_record("output/", "solution", 3, comm, 4, 2)
+   * </code> on 10 processes generates the files
+   * @code
+   * output/solution_0003.0.vtu
+   * output/solution_0003.1.vtu
+   * output/solution_0003.pvtu
+   * @endcode
+   * where the `.0.vtu` file contains the output of the first half of the
+   * processes grouped together, and the `.1.vtu` the data from the remaining
+   * half.
+   *
+   * A specified @p directory and a @p filename_without_extension
+   * form the first part of the filename. The filename is then extended with
+   * a @p counter labeling the current timestep/iteration/etc., the processor ID,
+   * and finally the .vtu/.pvtu ending. Since the number of timesteps to be
+   * written depends on the application, the number of digits to be reserved in
+   * the filename can be specified as parameter @p n_digits_for_counter, and the number
+   * is not padded with leading zeros if this parameter is left at its default
+   * value numbers::invalid_unsigned_int. If more than one file identifier
+   * is needed (e.g. time step number and iteration counter of solver), the
+   * last identifier is used as @p counter, while all other identifiers have to be
+   * added to @p filename_without_extension when calling this function.
+   *
+   * In a
+   * parallel setting, several files are typically written per time step. The
+   * number of files written in parallel depends on the number of MPI processes
+   * (see parameter @p mpi_communicator), and a
+   * specified number of @p n_groups with default value 0. The background is that
+   * VTU file output supports grouping files from several CPUs into a given
+   * number of files using MPI I/O when writing on a parallel filesystem. The
+   * default value of @p n_groups is 0, meaning that every MPI rank will write one
+   * file. A value of 1 will generate one big file containing the solution over
+   * the whole domain, while a larger value will create @p n_groups files (but not
+   * more than there are MPI ranks).
+   *
+   * Note that only one processor needs to
+   * generate the .pvtu file, where processor zero is chosen to take over this
+   * job.
+   *
+   * The return value is the filename of the master file for the pvtu record.
+   *
+   * @note The code simply combines the strings @p directory and
+   * @p filename_without_extension, i.e., the user has to make sure that
+   * @p directory contains a trailing character, e.g. "/", that separates the
+   * directory from the filename.
+   *
+   * @note Use an empty string "" for the first argument if output is to be
+   * written in the current working directory.
+   *
+   * @author Niklas Fehn, Martin Kronbichler, 2019
+   */
+  std::string
+  write_vtu_with_pvtu_record(
+    const std::string &directory,
+    const std::string &filename_without_extension,
+    const unsigned int counter,
+    const MPI_Comm &   mpi_communicator,
+    const unsigned int n_digits_for_counter = numbers::invalid_unsigned_int,
+    const unsigned int n_groups             = 0) const;
+
+  /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
    * format. See DataOutBase::write_svg.
    */
@@ -3242,17 +3030,6 @@ protected:
    * output files that consist of more than one data set are to be
    * interpreted.
    *
-   * @deprecated Use get_nonscalar_data_ranges instead.
-   */
-  DEAL_II_DEPRECATED
-  virtual std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-  get_vector_data_ranges() const;
-
-  /**
-   * This functions returns information about how the individual components of
-   * output files that consist of more than one data set are to be
-   * interpreted.
-   *
    * It returns a list of index pairs and corresponding name and type indicating
    * which components of the output are to be considered vector- or
    * tensor-valued rather than just a collection of scalar data. The index pairs
@@ -3390,15 +3167,13 @@ private:
  * This second use scenario is explained in some detail in the step-18 example
  * program.
  *
- * Both these applications are implemented in the step-19 example program.
- * There, a slight complication is also explained: in order to read data back
- * into this object, you have to know the template parameters for the space
- * dimension which were used when writing the data. If this knowledge is
- * available at compile time, then this is no problem. However, if it is not
- * (such as in a simple format converter), then it needs to be figured out at
- * run time, even though the compiler already needs it at compile time. A way
- * around using the DataOutBase::determine_intermediate_format_dimensions()
- * function is explained in step-19.
+ * In order to read data back into this object, you have to know the template
+ * parameters for the space dimension which were used when writing the
+ * data. If this knowledge is available at compile time, then this is no
+ * problem. However, if it is not (such as in a simple format converter), then
+ * it needs to be figured out at run time, even though the compiler already
+ * needs it at compile time. A way around using the
+ * DataOutBase::determine_intermediate_format_dimensions() function.
  *
  * Note that the intermediate format is what its name suggests: a direct
  * representation of internal data. It isn't standardized and will change
@@ -3441,8 +3216,6 @@ public:
    *
    * This function will fail if either this or the other object did not yet
    * set up any patches.
-   *
-   * The use of this function is demonstrated in step-19.
    */
   void
   merge(const DataOutReader<dim, spacedim> &other);

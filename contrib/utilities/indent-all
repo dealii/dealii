@@ -60,15 +60,22 @@ checks
 # Process all source and header files:
 #
 
-process "tests include source examples" ".*\.(cc|h|cu|cuh)" format_file
+process "tests include source examples contrib/python-bindings" ".*\.(cc|h|cu|cuh)" format_file
 process "source" ".*\.inst.in" format_inst
 
 #
 # Fix permissions and convert to unix line ending if necessary:
 #
 
-process "tests include source examples" \
+process "tests include source examples contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-process "tests include source examples" \
+process "tests include source examples contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix
+
+#
+# Removing trailing whitespace
+#
+
+process "include source examples contrib/python-bindings doc" \
+  ".*\.(cc|h|cu|cuh|html|dox|txt)" remove_trailing_whitespace

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -232,7 +232,7 @@ DGTransportEquation<dim>::assemble_boundary_term(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -279,7 +279,7 @@ DGTransportEquation<dim>::assemble_face_term1(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -328,7 +328,7 @@ DGTransportEquation<dim>::assemble_face_term2(
   const std::vector<double> &JxW =
     fe_v.get_present_fe_values().get_JxW_values();
   const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_all_normal_vectors();
+    fe_v.get_present_fe_values().get_normal_vectors();
 
   std::vector<Point<dim>> beta(
     fe_v.get_present_fe_values().n_quadrature_points);
@@ -484,7 +484,7 @@ template <int dim>
 void
 DGMethod<dim>::assemble_system1()
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe(0).dofs_per_cell;
   std::vector<types::global_dof_index> dofs(dofs_per_cell);
   std::vector<types::global_dof_index> dofs_neighbor(dofs_per_cell);
 
@@ -536,9 +536,7 @@ DGMethod<dim>::assemble_system1()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           typename hp::DoFHandler<dim>::face_iterator face =
             cell->face(face_no);
@@ -665,7 +663,7 @@ template <int dim>
 void
 DGMethod<dim>::assemble_system2()
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe(0).dofs_per_cell;
   std::vector<types::global_dof_index> dofs(dofs_per_cell);
   std::vector<types::global_dof_index> dofs_neighbor(dofs_per_cell);
 
@@ -715,9 +713,7 @@ DGMethod<dim>::assemble_system2()
 
       cell->get_dof_indices(dofs);
 
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           typename hp::DoFHandler<dim>::face_iterator face =
             cell->face(face_no);

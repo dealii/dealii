@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,6 @@
 
 // Finally, this is as in previous
 // programs:
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -615,7 +614,7 @@ LaplaceProblem<2>::create_coarse_grid()
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -672,8 +671,8 @@ int
 main()
 {
   initlog();
-  deallog.get_file_stream().precision(4);
-  deallog << std::setprecision(4);
+  deallog.get_file_stream().precision(5);
+  deallog << std::setprecision(5);
 
   try
     {

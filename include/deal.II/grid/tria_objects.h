@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,12 +39,15 @@ DEAL_II_NAMESPACE_OPEN
 // bool and then an integer and then a double, etc. Verify that this is
 // actually the case.
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <class Accessor>
 class TriaRawIterator;
 template <int, int, int>
 class TriaAccessor;
+#endif
 
 namespace internal
 {
@@ -114,7 +117,7 @@ namespace internal
        * processed.
        *
        * You can clear all used flags using
-       * dealii::Triangulation::clear_user_flags().
+       * Triangulation::clear_user_flags().
        */
       std::vector<bool> user_flags;
 
@@ -190,7 +193,7 @@ namespace internal
 
       /**
        * Return an iterator to the next free slot for a single object. This
-       * function is only used by dealii::Triangulation::execute_refinement()
+       * function is only used by Triangulation::execute_refinement()
        * in 3D.
        *
        * @warning Interestingly, this function is not used for 1D or 2D
@@ -201,11 +204,11 @@ namespace internal
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
-      next_free_single_object(const dealii::Triangulation<dim, spacedim> &tria);
+      next_free_single_object(const Triangulation<dim, spacedim> &tria);
 
       /**
        * Return an iterator to the next free slot for a pair of objects. This
-       * function is only used by dealii::Triangulation::execute_refinement()
+       * function is only used by Triangulation::execute_refinement()
        * in 3D.
        *
        * @warning Interestingly, this function is not used for 1D or 2D
@@ -216,16 +219,16 @@ namespace internal
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
-      next_free_pair_object(const dealii::Triangulation<dim, spacedim> &tria);
+      next_free_pair_object(const Triangulation<dim, spacedim> &tria);
 
       /**
        * Return an iterator to the next free slot for a pair of hexes. Only
        * implemented for <code>G=Hexahedron</code>.
        */
       template <int dim, int spacedim>
-      typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator
-      next_free_hex(const dealii::Triangulation<dim, spacedim> &tria,
-                    const unsigned int                          level);
+      typename Triangulation<dim, spacedim>::raw_hex_iterator
+      next_free_hex(const Triangulation<dim, spacedim> &tria,
+                    const unsigned int                  level);
 
       /**
        * Clear all the data contained in this object.
@@ -328,7 +331,7 @@ namespace internal
                      << ", which is not as expected.");
 
       /**
-       * dealii::Triangulation objects can either access a user pointer or a
+       * Triangulation objects can either access a user pointer or a
        * user index. What you tried to do is trying to access one of those
        * after using the other.
        *
@@ -632,7 +635,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].p;
     }
 
@@ -645,7 +648,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].p;
     }
 
@@ -658,7 +661,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].i;
     }
 
@@ -667,7 +670,7 @@ namespace internal
     inline void
     TriaObjects<G>::clear_user_data(const unsigned int i)
     {
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       user_data[i].i = 0;
     }
 
@@ -689,7 +692,7 @@ namespace internal
              ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      AssertIndexRange(i, user_data.size());
       return user_data[i].i;
     }
 
@@ -765,13 +768,10 @@ namespace internal
     TriaObjectsHex::face_orientation(const unsigned int cell,
                                      const unsigned int face) const
     {
-      Assert(cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
-             ExcIndexRange(0,
-                           cell,
-                           face_orientations.size() /
-                             GeometryInfo<3>::faces_per_cell));
-      Assert(face < GeometryInfo<3>::faces_per_cell,
-             ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
+      AssertIndexRange(cell,
+                       face_orientations.size() /
+                         GeometryInfo<3>::faces_per_cell);
+      AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
 
       return face_orientations[cell * GeometryInfo<3>::faces_per_cell + face];
     }
@@ -792,7 +792,7 @@ namespace internal
     template <int dim, int spacedim>
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
     TriaObjects<G>::next_free_single_object(
-      const dealii::Triangulation<dim, spacedim> &tria)
+      const Triangulation<dim, spacedim> &tria)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.
@@ -845,7 +845,7 @@ namespace internal
     template <int dim, int spacedim>
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
     TriaObjects<G>::next_free_pair_object(
-      const dealii::Triangulation<dim, spacedim> &tria)
+      const Triangulation<dim, spacedim> &tria)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.

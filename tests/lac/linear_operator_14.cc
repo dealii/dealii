@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -97,7 +96,8 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   // Setup system
   dof_handler.distribute_dofs(fe);
   DoFRenumbering::component_wise(dof_handler, block_component);
-  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
+  dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
   locally_owned_dofs = dof_handler.locally_owned_dofs();
   locally_owned_partitioning.push_back(

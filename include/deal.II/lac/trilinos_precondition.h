@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,22 +40,25 @@
 #    include <Teuchos_ParameterList.hpp>
 
 // forward declarations
+#    ifndef DOXYGEN
 class Ifpack_Preconditioner;
 class Ifpack_Chebyshev;
 namespace ML_Epetra
 {
   class MultiLevelPreconditioner;
 }
-
+#    endif
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#    ifndef DOXYGEN
 template <typename number>
 class SparseMatrix;
 template <typename number>
 class Vector;
 class SparsityPattern;
+#    endif
 
 /*! @addtogroup TrilinosWrappers
  *@{
@@ -1297,7 +1300,7 @@ namespace TrilinosWrappers
        * smoothing), but not the way the solver classes expect a
        * preconditioner to work (where one ignores the content in <tt>dst</tt>
        * for the preconditioner application). The user should really know what
-       * she is doing when touching this flag.
+       * they are doing when touching this flag.
        */
       bool nonzero_starting;
     };
@@ -1327,7 +1330,7 @@ namespace TrilinosWrappers
    * Since the Trilinos objects we want to use are heavily dependent on Epetra
    * objects, we recommend using this class in conjunction with Trilinos
    * (Epetra) sparse matrices and vectors. There is support for use with
-   * matrices of the deal.II::SparseMatrix class and corresponding vectors,
+   * matrices of the dealii::SparseMatrix class and corresponding vectors,
    * too, but this requires generating a copy of the matrix, which is slower
    * and takes (much) more memory. When doing such a copy operation, we can
    * still profit from the fact that some of the entries in the preconditioner
@@ -1665,7 +1668,7 @@ namespace TrilinosWrappers
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
-     * linear system with the given matrix. This function takes a deal.ii
+     * linear system with the given matrix. This function takes a deal.II
      * matrix and copies the content into a Trilinos matrix, so the function
      * can be considered rather inefficient.
      */
@@ -1713,7 +1716,7 @@ namespace TrilinosWrappers
 
 
 
-#    if defined(DOXYGEN) || DEAL_II_TRILINOS_VERSION_GTE(11, 14, 0)
+#    if defined(DOXYGEN) || defined(DEAL_II_TRILINOS_WITH_MUELU)
   /**
    * This class implements an algebraic multigrid (AMG) preconditioner based
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
@@ -1722,8 +1725,10 @@ namespace TrilinosWrappers
    * except for the higher_order_elements parameter which does not exist in
    * PreconditionerAMGMueLu.
    *
-   * @note This class requires Trilinos 11.14 or higher. At the moment 64bit-indices
-   * are not supported.
+   * @note You need to configure Trilinos with MueLU support for this
+   * preconditioner to work.
+   *
+   * @note At the moment 64bit-indices are not supported.
    *
    * @warning This interface should not be considered as stable.
    *

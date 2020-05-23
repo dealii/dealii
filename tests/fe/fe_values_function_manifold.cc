@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,6 @@
 // error causes the Laplace solver to converge at order 2 instead of order 5,
 // resulting in much higher L2 errors when the grid is refined.
 
-using namespace dealii;
 
 static const unsigned int               fe_order          = 4;
 static const dealii::types::boundary_id boundary_id       = 0;
@@ -321,9 +320,7 @@ JxWError<dim>::setup_matrices()
       cell_rhs    = 0.0;
       fe_values.reinit(cell);
 
-      for (unsigned int q_point_n = 0;
-           q_point_n < fe_values.n_quadrature_points;
-           ++q_point_n)
+      for (const auto q_point_n : fe_values.quadrature_point_indices())
         {
           const double point_forcing =
             manufactured_forcing->value(fe_values.quadrature_point(q_point_n));
@@ -411,9 +408,8 @@ main(int argc, char **argv)
 
   static const int dim = 2;
 
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(10);
-  deallog.attach(logfile);
   for (unsigned int n_global_refines = 3; n_global_refines < 6;
        ++n_global_refines)
     {

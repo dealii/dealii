@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,8 +77,6 @@
 
 namespace Maxwell
 {
-  using namespace dealii;
-
   // Dirichlet BCs / exact solution:.
   template <int dim>
   class ExactSolution : public Function<dim>
@@ -256,7 +254,7 @@ namespace Maxwell
         // Calc values of curlE from fe solution:
         cell->get_dof_indices(local_dof_indices);
         // Loop over quad points to calculate solution:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // Split exact solution into real/imaginary parts:
             for (unsigned int component = 0; component < dim; component++)
@@ -353,7 +351,7 @@ namespace Maxwell
     std::vector<Vector<double>> neumann_value_list(
       n_face_q_points, Vector<double>(fe.n_components()));
     std::vector<Tensor<1, dim>> normal_vector_list(
-      fe_face_values.get_all_normal_vectors());
+      fe_face_values.get_normal_vectors());
     Tensor<1, dim> neumann_value_vector;
     Tensor<1, dim> neumann_value;
     Tensor<1, dim> normal_vector;
@@ -373,7 +371,7 @@ namespace Maxwell
                                          rhs_value_list);
 
         // Loop over all element quad points:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // store rhs value at this q point & turn into tensor
             for (unsigned int component = 0; component < dim; component++)

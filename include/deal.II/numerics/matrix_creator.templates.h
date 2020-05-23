@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_matrix_creator_templates_h
 #define dealii_matrix_creator_templates_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/geometry_info.h>
@@ -663,8 +665,6 @@ namespace MatrixCreator
       {
         CopyData();
 
-        CopyData(CopyData const &data);
-
         unsigned int                                  dofs_per_cell;
         std::vector<types::global_dof_index>          dofs;
         std::vector<std::vector<bool>>                dof_is_on_face;
@@ -680,15 +680,6 @@ namespace MatrixCreator
       {}
 
 
-      template <typename DoFHandlerType, typename number>
-      CopyData<DoFHandlerType, number>::CopyData(CopyData const &data)
-        : dofs_per_cell(data.dofs_per_cell)
-        , dofs(data.dofs)
-        , dof_is_on_face(data.dof_is_on_face)
-        , cell(data.cell)
-        , cell_matrix(data.cell_matrix)
-        , cell_vector(data.cell_vector)
-      {}
     } // namespace AssemblerBoundary
   }   // namespace internal
 } // namespace MatrixCreator
@@ -741,12 +732,10 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         number>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<number, SparseMatrix<number>, Vector<number>>,
-        std::placeholders::_1,
-        &matrix,
-        static_cast<Vector<number> *>(nullptr)),
+      [&matrix](const internal::AssemblerData::CopyData<number> &data) {
+        MatrixCreator::internal::copy_local_to_global(
+          data, &matrix, static_cast<Vector<number> *>(nullptr));
+      },
       assembler_data,
       copy_data);
   }
@@ -816,12 +805,12 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         number>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<number, SparseMatrix<number>, Vector<number>>,
-        std::placeholders::_1,
-        &matrix,
-        &rhs_vector),
+      [&matrix,
+       &rhs_vector](const internal::AssemblerData::CopyData<number> &data) {
+        MatrixCreator::internal::copy_local_to_global(data,
+                                                      &matrix,
+                                                      &rhs_vector);
+      },
       assembler_data,
       copy_data);
   }
@@ -891,12 +880,10 @@ namespace MatrixCreator
         spacedim,
         typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
         number>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<number, SparseMatrix<number>, Vector<number>>,
-        std::placeholders::_1,
-        &matrix,
-        static_cast<Vector<number> *>(nullptr)),
+      [&matrix](const internal::AssemblerData::CopyData<number> &data) {
+        MatrixCreator::internal::copy_local_to_global(
+          data, &matrix, static_cast<Vector<number> *>(nullptr));
+      },
       assembler_data,
       copy_data);
   }
@@ -963,12 +950,12 @@ namespace MatrixCreator
         spacedim,
         typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
         number>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<number, SparseMatrix<number>, Vector<number>>,
-        std::placeholders::_1,
-        &matrix,
-        &rhs_vector),
+      [&matrix,
+       &rhs_vector](const internal::AssemblerData::CopyData<number> &data) {
+        MatrixCreator::internal::copy_local_to_global(data,
+                                                      &matrix,
+                                                      &rhs_vector);
+      },
       assembler_data,
       copy_data);
   }
@@ -1056,8 +1043,7 @@ namespace MatrixCreator
       copy_data.cell_matrix.clear();
       copy_data.cell_vector.clear();
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         // check if this face is on that part of the boundary we are
         // interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
@@ -1274,8 +1260,7 @@ namespace MatrixCreator
       // inefficient, so we copy the dofs into a set, which enables binary
       // searches.
       unsigned int pos(0);
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           // check if this face is on that part of
           // the boundary we are interested in
@@ -1405,31 +1390,30 @@ namespace MatrixCreator
     WorkStream::run(
       dof.begin_active(),
       dof.end(),
-      static_cast<std::function<
-        void(typename DoFHandler<dim, spacedim>::active_cell_iterator const &,
-             MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-             MatrixCreator::internal::AssemblerBoundary::
-               CopyData<DoFHandler<dim, spacedim>, number> &)>>(
-        std::bind(
-          &internal::create_boundary_mass_matrix_1<dim, spacedim, number>,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3,
-          std::cref(mapping),
-          std::cref(fe),
-          std::cref(q),
-          std::cref(boundary_functions),
-          coefficient,
-          std::cref(component_mapping))),
-      static_cast<std::function<void(
-        MatrixCreator::internal::AssemblerBoundary ::
-          CopyData<DoFHandler<dim, spacedim>, number> const &)>>(
-        std::bind(&internal::copy_boundary_mass_matrix_1<dim, spacedim, number>,
-                  std::placeholders::_1,
-                  std::cref(boundary_functions),
-                  std::cref(dof_to_boundary_mapping),
-                  std::ref(matrix),
-                  std::ref(rhs_vector))),
+      [&mapping, &fe, &q, &boundary_functions, coefficient, &component_mapping](
+        typename DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
+        MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch_data,
+        MatrixCreator::internal::AssemblerBoundary::
+          CopyData<DoFHandler<dim, spacedim>, number> &copy_data) {
+        internal::create_boundary_mass_matrix_1(cell,
+                                                scratch_data,
+                                                copy_data,
+                                                mapping,
+                                                fe,
+                                                q,
+                                                boundary_functions,
+                                                coefficient,
+                                                component_mapping);
+      },
+      [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
+        MatrixCreator::internal::AssemblerBoundary::
+          CopyData<DoFHandler<dim, spacedim>, number> const &copy_data) {
+        internal::copy_boundary_mass_matrix_1(copy_data,
+                                              boundary_functions,
+                                              dof_to_boundary_mapping,
+                                              matrix,
+                                              rhs_vector);
+      },
       scratch,
       copy_data);
   }
@@ -1443,7 +1427,7 @@ namespace MatrixCreator
     create_hp_boundary_mass_matrix_1(
       typename hp::DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
       MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-      MatrixCreator::internal::AssemblerBoundary ::
+      MatrixCreator::internal::AssemblerBoundary::
         CopyData<hp::DoFHandler<dim, spacedim>, number> &copy_data,
       hp::MappingCollection<dim, spacedim> const &       mapping,
       hp::FECollection<dim, spacedim> const &            fe_collection,
@@ -1500,8 +1484,7 @@ namespace MatrixCreator
       copy_data.cell_vector.clear();
 
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         // check if this face is on that part of
         // the boundary we are interested in
         if (boundary_functions.find(cell->face(face)->boundary_id()) !=
@@ -1699,7 +1682,7 @@ namespace MatrixCreator
     template <int dim, int spacedim, typename number>
     void
     copy_hp_boundary_mass_matrix_1(
-      MatrixCreator::internal::AssemblerBoundary ::
+      MatrixCreator::internal::AssemblerBoundary::
         CopyData<hp::DoFHandler<dim, spacedim>, number> const &copy_data,
       std::map<types::boundary_id, const Function<spacedim, number> *> const
         &                                         boundary_functions,
@@ -1734,8 +1717,7 @@ namespace MatrixCreator
       // inefficient, so we copy the dofs into a set, which enables binary
       // searches.
       unsigned int pos(0);
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           // check if this face is on that part of
           // the boundary we are interested in
@@ -1879,32 +1861,36 @@ namespace MatrixCreator
     WorkStream::run(
       dof.begin_active(),
       dof.end(),
-      static_cast<std::function<void(
-        typename hp::DoFHandler<dim, spacedim>::active_cell_iterator const &,
-        MatrixCreator::internal::AssemblerBoundary::Scratch const &,
+      [&mapping,
+       &fe_collection,
+       &q,
+       &boundary_functions,
+       coefficient,
+       &component_mapping](
+        typename hp::DoFHandler<dim, spacedim>::active_cell_iterator const
+          &                                                        cell,
+        MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch_data,
         MatrixCreator::internal::AssemblerBoundary::
-          CopyData<hp::DoFHandler<dim, spacedim>, number> &)>>(
-        std::bind(
-          &internal::create_hp_boundary_mass_matrix_1<dim, spacedim, number>,
-          std::placeholders::_1,
-          std::placeholders::_2,
-          std::placeholders::_3,
-          std::cref(mapping),
-          std::cref(fe_collection),
-          std::cref(q),
-          std::cref(boundary_functions),
-          coefficient,
-          std::cref(component_mapping))),
-      static_cast<std::function<void(
-        MatrixCreator::internal::AssemblerBoundary ::
-          CopyData<hp::DoFHandler<dim, spacedim>, number> const &)>>(
-        std::bind(
-          &internal::copy_hp_boundary_mass_matrix_1<dim, spacedim, number>,
-          std::placeholders::_1,
-          std::cref(boundary_functions),
-          std::cref(dof_to_boundary_mapping),
-          std::ref(matrix),
-          std::ref(rhs_vector))),
+          CopyData<hp::DoFHandler<dim, spacedim>, number> &copy_data) {
+        internal::create_hp_boundary_mass_matrix_1(cell,
+                                                   scratch_data,
+                                                   copy_data,
+                                                   mapping,
+                                                   fe_collection,
+                                                   q,
+                                                   boundary_functions,
+                                                   coefficient,
+                                                   component_mapping);
+      },
+      [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
+        MatrixCreator::internal::AssemblerBoundary::
+          CopyData<hp::DoFHandler<dim, spacedim>, number> const &copy_data) {
+        internal::copy_hp_boundary_mass_matrix_1(copy_data,
+                                                 boundary_functions,
+                                                 dof_to_boundary_mapping,
+                                                 matrix,
+                                                 rhs_vector);
+      },
       scratch,
       copy_data);
   }
@@ -1980,12 +1966,10 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<double, SparseMatrix<double>, Vector<double>>,
-        std::placeholders::_1,
-        &matrix,
-        static_cast<Vector<double> *>(nullptr)),
+      [&matrix](const internal::AssemblerData::CopyData<double> &data) {
+        MatrixCreator::internal::copy_local_to_global(
+          data, &matrix, static_cast<Vector<double> *>(nullptr));
+      },
       assembler_data,
       copy_data);
   }
@@ -2054,12 +2038,12 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<double, SparseMatrix<double>, Vector<double>>,
-        std::placeholders::_1,
-        &matrix,
-        &rhs_vector),
+      [&matrix,
+       &rhs_vector](const internal::AssemblerData::CopyData<double> &data) {
+        MatrixCreator::internal::copy_local_to_global(data,
+                                                      &matrix,
+                                                      &rhs_vector);
+      },
       assembler_data,
       copy_data);
   }
@@ -2128,12 +2112,10 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename hp::DoFHandler<dim, spacedim>::active_cell_iterator>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<double, SparseMatrix<double>, Vector<double>>,
-        std::placeholders::_1,
-        &matrix,
-        static_cast<Vector<double> *>(nullptr)),
+      [&matrix](const internal::AssemblerData::CopyData<double> &data) {
+        MatrixCreator::internal::copy_local_to_global(
+          data, &matrix, static_cast<Vector<double> *>(nullptr));
+      },
       assembler_data,
       copy_data);
   }
@@ -2200,12 +2182,12 @@ namespace MatrixCreator
         dim,
         spacedim,
         typename hp::DoFHandler<dim, spacedim>::active_cell_iterator>,
-      std::bind(
-        &MatrixCreator::internal::
-          copy_local_to_global<double, SparseMatrix<double>, Vector<double>>,
-        std::placeholders::_1,
-        &matrix,
-        &rhs_vector),
+      [&matrix,
+       &rhs_vector](const internal::AssemblerData::CopyData<double> &data) {
+        MatrixCreator::internal::copy_local_to_global(data,
+                                                      &matrix,
+                                                      &rhs_vector);
+      },
       assembler_data,
       copy_data);
   }

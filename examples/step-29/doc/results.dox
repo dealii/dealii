@@ -36,9 +36,9 @@ $d=0.3$, which amounts to a focus of the transducer lens
 at $x=0.5$, $y=0.3$. The coarse mesh is refined 5 times,
 resulting in 160x160 cells, and the output is written in vtu
 format. The parameter reader understands many more parameters
-pertaining in particular to the generation of output, see the
-explanation in step-19, but we need none of these
-parameters here and therefore stick with their default values.
+pertaining in particular to the generation of output, but we
+need none of these parameters here and therefore stick with
+their default values.
 
 Here's the console output of the program in debug mode:
 

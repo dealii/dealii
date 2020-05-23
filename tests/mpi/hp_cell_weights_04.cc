@@ -83,8 +83,8 @@ test()
   }
 
 
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
+  const parallel::CellWeights<dim> cell_weights(
+    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
 
   // we didn't mark any cells, but we want to repartition our domain
   tria.execute_coarsening_and_refinement();
@@ -99,6 +99,29 @@ test()
         dof_counter += cell->get_fe().dofs_per_cell;
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
+
+#ifdef DEBUG
+  parallel::shared::Triangulation<dim> other_tria(
+    MPI_COMM_WORLD,
+    ::Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::Settings::partition_metis);
+  GridGenerator::hyper_cube(other_tria);
+  other_tria.refine_global(3);
+
+  dh.initialize(other_tria, fe_collection);
+
+  try
+    {
+      tria.execute_coarsening_and_refinement();
+    }
+  catch (ExcMessage &)
+    {
+      deallog << "Triangulation changed" << std::endl;
+    }
+#else
+  deallog << "Triangulation changed" << std::endl;
+#endif
 
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);

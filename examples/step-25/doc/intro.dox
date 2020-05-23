@@ -30,6 +30,9 @@ references on the subject: G. L. Lamb's <i>Elements of Soliton
 Theory</i> (Chapter 5, Section 2) and G. B. Whitham's <i>Linear and
 Nonlinear Waves</i> (Chapter 17, Sections 10-13).
 
+@note We will cover a separate nonlinear equation from quantum
+  mechanics, the Nonlinear Schr&ouml;dinger Equation, in step-58.
+
 <h3>Statement of the problem</h3>
 The sine-Gordon initial-boundary-value problem (IBVP) we wish to solve
 consists of the following equations:

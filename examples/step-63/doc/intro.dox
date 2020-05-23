@@ -9,6 +9,8 @@ Award EAR-0949446 and EAR-1550901 and The University of California -
 Davis.
 </i>
 
+@dealiiTutorialDOI{10.5281/zenodo.3382899,https://zenodo.org/badge/DOI/10.5281/zenodo.3382899.svg}
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
@@ -106,10 +108,8 @@ a(u_h,\,v_h) + \sum_K (-\varepsilon \Delta u_h +
 @f}
 where the sum is done over all cells $K$ with the inner product taken
 for each cell, and $\delta_K$ is a cell-wise constant
-stabilization parameter defined in <a
-href="https://link.springer.com/chapter/10.1007/978-3-540-34288-5_27">
-On Discontinuity-Capturing Methods for Convection-Diffusion Equations
-by Volker John and Petr Knobloch</a>.
+stabilization parameter defined in
+@cite john2006discontinuity.
 
 Essentially, adding in the
 discrete strong form residual enhances the coercivity of the bilinear
@@ -164,7 +164,10 @@ accordingly so that the ones further upstream are treated earlier
 (have larger indices). The influence of the ordering will be visible
 in the results section.
 
-Let us now briefly define the smoothers used in this tutorial. A Schwarz
+Let us now briefly define the smoothers used in this tutorial.
+For a more detailed introduction, we refer to
+@cite KanschatNotesIterative and the books @cite smith2004domain and @cite toselli2006domain.
+A Schwarz
 preconditioner requires a decomposition
 @f{align*}{
 V = \sum_{j=1}^J V_j
@@ -246,7 +249,7 @@ with a circle of radius 0.3 centered at the
 origin removed. In addition, we use $\varepsilon=0.005$, $\boldsymbol{\beta} =
 [-\sin(\pi/6),\,\cos(\pi/6)]$, $f=0$, and Dirichlet boundary values
 @f{align*}{
-g = \left\{\begin{array}{ll} 1 & \text{if } x=-1 \text{ or } y=-1,\,x\geq 0.5 \\ 
+g = \left\{\begin{array}{ll} 1 & \text{if } x=-1 \text{ or } y=-1,\,x\geq 0.5 \\
 0 & \text{otherwise} \end{array}\right.
 @f}
 

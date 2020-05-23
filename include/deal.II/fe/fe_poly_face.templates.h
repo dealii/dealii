@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_fe_poly_face_templates_h
 #define dealii_fe_poly_face_templates_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/qprojector.h>

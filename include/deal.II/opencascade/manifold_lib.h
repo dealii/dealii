@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -360,8 +360,8 @@ namespace OpenCASCADE
   public:
     /**
      * The constructor takes an OpenCASCADE TopoDS_Face @p face and an optional
-     * @p tolerance. This class uses the interval OpenCASCADE variables @var u,
-     * @var v to describe the manifold.
+     * @p tolerance. This class uses the interval OpenCASCADE variables u, v
+     * to describe the manifold.
      */
     NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
 

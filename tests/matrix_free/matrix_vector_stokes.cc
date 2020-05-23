@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,10 +19,6 @@
 // matrix-vector products by comparing with the result of deal.II sparse
 // matrix. No hanging nodes and no other
 // constraints for a vector-valued problem (stokes equations).
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -50,6 +46,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 #include "create_mesh.h"
 
@@ -161,8 +159,8 @@ test()
 
   constraints.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(dim + 1);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_block);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   // std::cout << "   Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -317,8 +315,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

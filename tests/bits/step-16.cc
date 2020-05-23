@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,10 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-16
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -107,7 +103,7 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   deallog << "   Number of degrees of freedom: " << mg_dof_handler.n_dofs()
           << std::endl;
@@ -255,7 +251,7 @@ void
 LaplaceProblem<dim>::solve()
 {
   MGTransferPrebuilt<Vector<double>> mg_transfer;
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
 
   FullMatrix<float> coarse_matrix;
   coarse_matrix.copy_from(mg_matrices[0]);
@@ -273,12 +269,8 @@ LaplaceProblem<dim>::solve()
   mg_smoother.set_symmetric(true);
 
   mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
-  Multigrid<Vector<double>>  mg(mg_dof_handler,
-                               mg_matrix,
-                               mg_coarse,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>>  mg(
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
     preconditioner(mg_dof_handler, mg, mg_transfer);
 
@@ -345,6 +337,7 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
 

@@ -1,6 +1,6 @@
-﻿// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,8 @@
 
 
 
-// validate algorithms that will flag cells for p adaptivity
+// validate algorithms that will flag cells for p-adaptivity:
+// - hp::Refinement::p_adaptivity_from_flags
 
 
 #include <deal.II/base/geometry_info.h>
@@ -37,7 +38,7 @@
 
 template <int dim>
 void
-validate(const Triangulation<dim> &tria, const hp::DoFHandler<dim> &dh)
+validate(const hp::DoFHandler<dim> &dh)
 {
   deallog << " fe_indices:";
   for (const auto &cell : dh.active_cell_iterators())
@@ -64,12 +65,12 @@ setup(Triangulation<dim> &         tria,
                                               endc = dh.end(1);
   for (unsigned int counter = 0; cell != endc; ++counter, ++cell)
     {
-      Assert(!cell->active(), ExcInternalError());
+      Assert(!cell->is_active(), ExcInternalError());
       for (unsigned int child_index = 0; child_index < cell->n_children();
            ++child_index)
         {
           const auto &child = cell->child(child_index);
-          Assert(child->active(), ExcInternalError());
+          Assert(child->is_active(), ExcInternalError());
 
           child->set_active_fe_index(1);
 
@@ -91,125 +92,29 @@ test()
   for (unsigned int d = 1; d <= 3; ++d)
     fes.push_back(FE_Q<dim>(d));
 
-  deallog << "starting situation: ";
-  {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
+  Triangulation<dim>  tria;
+  hp::DoFHandler<dim> dh;
+  setup(tria, dh, fes);
 
-    deallog << "ncells: " << tria.n_active_cells() << std::endl;
-    validate(tria, dh);
-  }
+  deallog << "starting situation" << std::endl;
+  validate(dh);
 
-  deallog << "full p adaptivity" << std::endl;
-  {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
 
-    hp::Refinement::full_p_adaptivity(dh);
+  // We flag the first half of all cells to be refined and the last half of all
+  // cells to be coarsened for p adapativity. Ultimately, the first quarter of
+  // all cells will be flagged for p refinement, and the last quarter for p
+  // coarsening.
 
-    validate(tria, dh);
-  }
+  const unsigned int n_active = tria.n_active_cells();
+  std::vector<bool>  p_flags(n_active, false);
+  std::fill(p_flags.begin(), p_flags.begin() + n_active / 4, true);
+  std::fill(p_flags.end() - n_active / 4, p_flags.end(), true);
 
-  // In the following cases, we flag the first half of all cells to be refined
-  // and the last half of all cells to be coarsened for p adapativity.
-  // Ultimately, the first quarter of all cells will be flagged for
-  // p refinement, and the last quarter for p coarsening.
+  hp::Refinement::p_adaptivity_from_flags(dh, p_flags);
 
-  deallog << "p adaptivity from flags" << std::endl;
-  {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
+  deallog << "p-adaptivity from flags" << std::endl;
+  validate(dh);
 
-    unsigned int      n_active = tria.n_active_cells();
-    std::vector<bool> p_flags(n_active, false);
-
-    std::fill(p_flags.begin(), p_flags.begin() + .25 * n_active, true);
-    std::fill(p_flags.end() - .25 * n_active, p_flags.end(), true);
-
-    hp::Refinement::p_adaptivity_from_flags(dh, p_flags);
-
-    validate(tria, dh);
-  }
-
-  deallog << "p adaptivity from threshold" << std::endl;
-  {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
-
-    unsigned int   n_active = tria.n_active_cells();
-    Vector<double> smoothness_indicators(n_active);
-    for (unsigned int i = 0; i < n_active; ++i)
-      {
-        if (i < .25 * n_active)
-          smoothness_indicators[i] = 2.;
-        else if (i < .75 * n_active)
-          smoothness_indicators[i] = 1.;
-        else
-          smoothness_indicators[i] = 0.;
-      }
-    hp::Refinement::p_adaptivity_from_threshold(dh, smoothness_indicators);
-
-    validate(tria, dh);
-  }
-
-  deallog << "p adaptivity from regularity" << std::endl;
-  {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
-
-    unsigned int   n_active = tria.n_active_cells();
-    Vector<double> sobolev_indices(n_active);
-    for (unsigned int i = 0; i < n_active; ++i)
-      {
-        if (i < .25 * n_active)
-          sobolev_indices[i] = 3. + 1e-4;
-        else if (i < .75 * n_active)
-          sobolev_indices[i] = 2.;
-        else
-          sobolev_indices[i] = 1. - 1e-4;
-      }
-    hp::Refinement::p_adaptivity_from_regularity(dh, sobolev_indices);
-
-    validate(tria, dh);
-  }
-
-  deallog << "p adaptivity from prediction" << std::endl;
-  {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
-
-    unsigned int   n_active = tria.n_active_cells();
-    Vector<double> predicted_errors(n_active), error_estimates(n_active);
-    for (unsigned int i = 0; i < n_active; ++i)
-      {
-        if (i < .25 * n_active)
-          {
-            predicted_errors[i] = 1. + 1e-4;
-            error_estimates[i]  = 1.;
-          }
-        else if (i < .75 * n_active)
-          {
-            predicted_errors[i] = 1.;
-            error_estimates[i]  = 1.;
-          }
-        else
-          {
-            predicted_errors[i] = 1. + 1e-4;
-            error_estimates[i]  = 1.;
-          }
-      }
-    hp::Refinement::p_adaptivity_from_prediction(dh,
-                                                 error_estimates,
-                                                 predicted_errors);
-
-    validate(tria, dh);
-  }
 
   deallog << "OK" << std::endl;
 }

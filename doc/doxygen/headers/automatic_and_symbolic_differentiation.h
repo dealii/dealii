@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -119,7 +119,7 @@
  *    truncation of the Taylor scheme; dual numbers do not contain any higher-order terms in their first derivative,
  *    while for the complex-step method these existent higher-order terms are neglected. It can be shown that
  *    both of these methods are not subject to subtractive cancellation errors and that, within their
- *    finite-difference scheme, they are not numerically sensitive to the internal step-size chosen for the
+ *    finite-difference scheme, they are not numerically sensitive to the internal \step-size chosen for the
  *    numerical perturbation. The dual number approach thus produces exact first derivatives, while the
  *    complex-step approximation does not. The standard implementation of the dual numbers, however, cannot yield
  *    exact values for second derivatives. Hyper-dual numbers take a different view of this idea, with numbers
@@ -443,7 +443,7 @@
  * A summary of the files that implement the interface to the supported auto-differentiable
  * numbers is as follows:
  *
- * - ad_drivers.h: Provides classes that act as drivers to the interface of internally supported 
+ * - ad_drivers.h: Provides classes that act as drivers to the interface of internally supported
  *   automatic differentiation libraries. These are used internally as an intermediary to the
  *   helper classes that we provide.
  * - ad_helpers.h: Provides a set of classes to help perform automatic differentiation in a
@@ -485,7 +485,7 @@
  *
  * @subsubsection auto_diff_1_3 User interface to the automatic differentiation libraries
  *
- * The deal.II library offers a unified interface to the automatic differentiation libraries that 
+ * The deal.II library offers a unified interface to the automatic differentiation libraries that
  * we support. To date, the helper classes have been developed for the following contexts:
  *
  * - Classes designed to operate at the quadrature point level (or any general continuum point):
@@ -500,7 +500,7 @@
  *   - ResidualLinearization: Differentiation of a vector-valued finite element residual, leading to
  *                            its consistent linearization.
  *
- * Naturally, it is also possible for users to manage the initialization and derivative 
+ * Naturally, it is also possible for users to manage the initialization and derivative
  * computations themselves.
  *
  * The most up-to-date examples of how this is done using ADOL-C can be found in
@@ -576,23 +576,24 @@
  * Being focused on numerical simulation of PDEs, the functionality of the CAS that is exposed
  * within deal.II focuses on symbolic expression creation, manipulation, and differentiation.
  *
- * As a final note, it is important to recognize a major deficiency in deal.II's current implementation
- * of the interface to the supported symbolic library.
- * To date, convenience wrappers to SymEngine functionality is focused on manipulations that solely
- * involve dictionary-based (i.e., something reminiscent of "string-based") operations.
+ * The convenience wrappers to SymEngine functionality are primarily focused on manipulations that
+ * solely involve dictionary-based (i.e., something reminiscent of "string-based") operations.
  * Although SymEngine performs these operations in an efficient manner, they are still known to be
  * computationally expensive, especially when the operations are performed on large expressions.
  * It should therefore be expected that the performance of the parts of code that perform
  * differentiation, symbolic substitution, etc., @b may be a limiting factor when using this in
  * production code.
- * In the future, deal.II will provide an interface to accelerate the evaluation of lengthy symbolic
- * expression through the @p BatchOptimizer class (which is already referenced in several places in
- * the documentation).
- * In particular, the @p BatchOptimizer will simultaneously optimize a collection of symbolic
+ * deal.II therefore provides an interface to accelerate the evaluation of lengthy symbolic
+ * expression through the @p BatchOptimizer class (itself often leveraging functionality provided
+ * by SymEngine).
+ * In particular, the @p BatchOptimizer simultaneously optimizes a collection of symbolic
  * expressions using methods such as common subexpression elimination (CSE), as well as by generating
  * high performance code-paths to evaluate these expressions through the use of a custom-generated
  * `std::function` or by compiling the expression using the LLVM JIT compiler.
- * Additionally, the level of functionality currently implemented effectively limits the use of
+ *
+ * As a final note, it is important to recognize the remaining major deficiencies in deal.II's current
+ * implementation of the interface to the supported symbolic library.
+ * The level of functionality currently implemented effectively limits the use of
  * symbolic algebra to the traditional use case (i.e. scalar and tensor algebra, as might be useful to
  * define constitutive relations or complex functions for application as boundary conditions or
  * source terms).
@@ -612,6 +613,9 @@
  *   This Expression class has been given a full set of operators overloaded for all mathematical
  *   and logical operations that are supported by the SymEngine library and are considered useful
  *   within the context of numerical modeling.
+ * - symengine_optimizer.h: Implementation of the Differentiation::SD::BatchOptimizer class that
+ *   can be used to accelerate (in some cases, significantly) evaluation of the symbolic
+ *   expressions using an assortment of techniques.
  * - symengine_product_types.h: Defines some product and scalar types that allow the use of symbolic
  *   expressions in conjunction with the Tensor and SymmetricTensor classes.
  * - symengine_scalar_operations.h: Defines numerous operations that can be performed either on or

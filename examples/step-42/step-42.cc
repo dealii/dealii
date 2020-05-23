@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2019 by the deal.II authors
+ * Copyright (C) 2012 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -137,7 +137,8 @@ namespace Step42
   // The constructor of the ConstitutiveLaw class sets the required material
   // parameter for our deformable body. Material parameters for elastic
   // isotropic media can be defined in a variety of ways, such as the pair $E,
-  // \nu$ (elastic modulus and Poisson's number), using the Lame parameters
+  // \nu$ (elastic modulus and Poisson's number), using the Lam&eacute;
+  // parameters
   // $\lambda,mu$ or several other commonly used conventions. Here, the
   // constructor takes a description of material parameters in the form of
   // $E,\nu$, but since this turns out to these are not the coefficients that
@@ -623,7 +624,8 @@ namespace Step42
     void solve_newton();
     void refine_grid();
     void move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const;
-    void output_results(const std::string &filename_base);
+    void output_results(const unsigned int current_refinement_cycle);
+
     void output_contact_force() const;
 
     // As far as member variables are concerned, we start with ones that we use
@@ -934,23 +936,18 @@ namespace Step42
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
         for (const auto &cell : triangulation.active_cell_iterators())
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
-            if (cell->face(face_no)->at_boundary())
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary())
               {
-                if (std::fabs(cell->face(face_no)->center()[2] - p2[2]) < 1e-12)
-                  cell->face(face_no)->set_boundary_id(1);
-                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[0] - p2[0]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[1] - p1[1]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[1] - p2[1]) < 1e-12)
-                  cell->face(face_no)->set_boundary_id(8);
-                if (std::fabs(cell->face(face_no)->center()[2] - p1[2]) < 1e-12)
-                  cell->face(face_no)->set_boundary_id(6);
+                if (std::fabs(face->center()[2] - p2[2]) < 1e-12)
+                  face->set_boundary_id(1);
+                if (std::fabs(face->center()[0] - p1[0]) < 1e-12 ||
+                    std::fabs(face->center()[0] - p2[0]) < 1e-12 ||
+                    std::fabs(face->center()[1] - p1[1]) < 1e-12 ||
+                    std::fabs(face->center()[1] - p2[1]) < 1e-12)
+                  face->set_boundary_id(8);
+                if (std::fabs(face->center()[2] - p1[2]) < 1e-12)
+                  face->set_boundary_id(6);
               }
       }
 
@@ -1145,10 +1142,8 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && face->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell_matrix = 0;
@@ -1236,13 +1231,11 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (!cell->is_artificial())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && face->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
-              cell->face(face)->get_dof_indices(dof_indices);
+              face->get_dof_indices(dof_indices);
 
               for (unsigned int q_point = 0; q_point < n_face_q_points;
                    ++q_point)
@@ -1425,10 +1418,8 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            if (cell->face(face)->at_boundary() &&
-                cell->face(face)->boundary_id() == 1)
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary() && face->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -1557,10 +1548,8 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            if (cell->face(face)->at_boundary() &&
-                cell->face(face)->boundary_id() == 1)
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary() && face->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -1972,7 +1961,7 @@ namespace Step42
   // ghost entries for all locally relevant degrees of freedom.
   template <int dim>
   void PlasticityContactProblem<dim>::output_results(
-    const std::string &filename_base)
+    const unsigned int current_refinement_cycle)
   {
     TimerOutput::Scope t(computing_timer, "Graphical output");
 
@@ -2044,33 +2033,11 @@ namespace Step42
     // set of output files can be read at once. These <code>.pvtu</code>
     // are used by Paraview to describe an entire parallel computation's
     // output files. We then do the same again for the competitor of
-    // Paraview, the Visit visualization program, by creating a matching
+    // Paraview, the VisIt visualization program, by creating a matching
     // <code>.visit</code> file.
-    const std::string filename =
-      (output_dir + filename_base + "-" +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
-
-    std::ofstream output_vtu((filename + ".vtu"));
-    data_out.write_vtu(output_vtu);
-    pcout << output_dir + filename_base << ".pvtu" << std::endl;
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.push_back(filename_base + "-" +
-                              Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream pvtu_master_output(
-          (output_dir + filename_base + ".pvtu"));
-        data_out.write_pvtu_record(pvtu_master_output, filenames);
-
-        std::ofstream visit_master_output(
-          (output_dir + filename_base + ".visit"));
-        DataOutBase::write_visit_record(visit_master_output, filenames);
-      }
+    const std::string master_name = data_out.write_vtu_with_pvtu_record(
+      output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);
+    pcout << master_name << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;
@@ -2125,10 +2092,8 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary() && face->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
 
@@ -2184,8 +2149,7 @@ namespace Step42
 
         solve_newton();
 
-        output_results(std::string("solution-") +
-                       Utilities::int_to_string(current_refinement_cycle, 2));
+        output_results(current_refinement_cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,9 +59,7 @@ void make_grid(Triangulation<2> &triangulation)
                                              endc = triangulation.end();
 
       for (; cell != endc; ++cell)
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<2>::vertices_per_cell;
-             ++vertex)
+        for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
           {
             const double distance_from_center =
               center.distance(cell->vertex(vertex));

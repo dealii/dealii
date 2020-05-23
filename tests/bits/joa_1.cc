@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,7 +108,6 @@
 
 // Finally, this is as in previous
 // programs:
-using namespace dealii;
 
 
 // @sect3{The <code>LaplaceProblem</code> class template}
@@ -1140,10 +1139,8 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(3);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(3) << std::fixed;
 
   // The general idea behind the
   // layout of this function is as

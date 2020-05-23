@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 // We want to use the matrix-vector product provided by this function (which
@@ -97,7 +96,7 @@ test()
   solver.solve(mf, sol, rhs, PreconditionIdentity());
 
   const std::vector<IndexSet> locally_owned_dofs_per_processor =
-    dof.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD, dof.locally_owned_dofs());
   // gather all data at root
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {

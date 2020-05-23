@@ -57,7 +57,15 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # CUDA Toolkit 8 is incompatible with C++14,
+    # disable CUDA support older than 9.0:
+    #
+    IF(CUDA_VERSION_MAJOR VERSION_LESS 9.0)
+      MESSAGE(FATAL_ERROR "\n"
+        "deal.II requires CUDA version 9 or newer."
+      )
+    ENDIF()
+
+    #
     # CUDA Toolkit 9 and CUDA Toolkit 10 are incompatible with C++17.
     # Make sure that deal.II is configured appropriately
     #
@@ -71,12 +79,11 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
             "CUDA ${_version} is not compatible with the C++ standard\n"
             "enabled by ${_feature}.\n"
             "Please disable ${_feature}, e.g. by reconfiguring with\n"
-            "  cmake -D${_feature}=OFF ."
+            "  cmake -D${_feature}=OFF .\n"
             )
         ENDIF()
       ENDIF()
     ENDMACRO()
-    _cuda_ensure_feature_off(8 DEAL_II_WITH_CXX14)
     _cuda_ensure_feature_off(9 DEAL_II_WITH_CXX17)
     _cuda_ensure_feature_off(10 DEAL_II_WITH_CXX17)
 

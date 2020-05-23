@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,6 +33,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <typename Accessor>
@@ -44,7 +46,7 @@ class TriaActiveIterator;
 
 template <int dim, int spacedim>
 class Manifold;
-
+#endif
 
 namespace internal
 {
@@ -979,6 +981,14 @@ public:
    */
   TriaIterator<TriaAccessor<structdim, dim, spacedim>>
   child(const unsigned int i) const;
+
+  /**
+   * Return the child number of @p child on the current cell. This is the
+   * inverse function of TriaAccessor::child().
+   */
+  unsigned int
+  child_iterator_to_index(
+    const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &child) const;
 
   /**
    * Return an iterator to that object that is identical to the ith child for
@@ -2043,6 +2053,12 @@ public:
   max_refinement_depth();
 
   /**
+   * @brief Return an invalid unsigned integer.
+   */
+  static unsigned int
+  child_iterator_to_index(const TriaIterator<TriaAccessor<0, dim, spacedim>> &);
+
+  /**
    * @brief Return an invalid object.
    */
   static TriaIterator<TriaAccessor<0, dim, spacedim>>
@@ -2496,6 +2512,12 @@ public:
   max_refinement_depth();
 
   /**
+   * @brief Return an invalid unsigned integer.
+   */
+  static unsigned int
+  child_iterator_to_index(const TriaIterator<TriaAccessor<0, 1, spacedim>> &);
+
+  /**
    * @brief Return an invalid object
    */
   static TriaIterator<TriaAccessor<0, 1, spacedim>>
@@ -2732,6 +2754,21 @@ public:
    */
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
   face(const unsigned int i) const;
+
+  /**
+   * Return the face number of @p face on the current cell. This is the
+   * inverse function of TriaAccessor::face().
+   */
+  unsigned int
+  face_iterator_to_index(
+    const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> &face) const;
+
+  /**
+   * Return an array of iterators to all faces of this cell.
+   */
+  std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+             GeometryInfo<dim>::faces_per_cell>
+  face_iterators() const;
 
   /**
    * Return the (global) index of the @p ith face of this cell.
@@ -3374,15 +3411,32 @@ public:
    */
 
   /**
-   * Test whether the cell has children (this is the criterion for activity of
-   * a cell).
+   * Test that the cell has no children (this is the criterion for whether a
+   * cell is called "active").
+   *
+   * See the
+   * @ref GlossActive "glossary"
+   * for more information.
+   *
+   * @deprecated This function is deprecated. Use the is_active()
+   *   function instead, which satisfies the naming scheme of other
+   *   functions inquiring about yes/no properties of cells (e.g.,
+   *   is_ghost(), is_locally_owned(), etc.).
+   */
+  DEAL_II_DEPRECATED
+  bool
+  active() const;
+
+  /**
+   * Test that the cell has no children (this is the criterion for whether a
+   * cell is called "active").
    *
    * See the
    * @ref GlossActive "glossary"
    * for more information.
    */
   bool
-  active() const;
+  is_active() const;
 
   /**
    * Return whether this cell is owned by the current processor or is owned by

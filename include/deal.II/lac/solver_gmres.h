@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,7 +95,7 @@ namespace internal
 
     private:
       /**
-       * Pool were vectors are obtained from.
+       * Pool where vectors are obtained from.
        */
       VectorMemory<VectorType> &mem;
 
@@ -440,19 +440,23 @@ protected:
 
 /**
  * Implementation of the Generalized minimal residual method with flexible
- * preconditioning method.
+ * preconditioning (flexible GMRES or FGMRES).
  *
- * This version of the GMRES method allows for the use of a different
+ * This flexible version of the GMRES method allows for the use of a different
  * preconditioner in each iteration step. Therefore, it is also more robust
  * with respect to inaccurate evaluation of the preconditioner. An important
- * application is also the use of a Krylov space method inside the
+ * application is the use of a Krylov space method inside the
  * preconditioner. As opposed to SolverGMRES which allows one to choose
  * between left and right preconditioning, this solver always applies the
  * preconditioner from the right.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary
- * vectors.
+ * <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * vectors. Otherwise, FGMRES requires roughly the same number of operations
+ * per iteration compared to GMRES, except one application of the
+ * preconditioner less at each restart and at the end of solve().
+ *
+ * For more details see @cite Saad1991.
  *
  * @author Guido Kanschat, 2003
  */
@@ -553,7 +557,7 @@ namespace internal
     inline VectorType &TmpVectors<VectorType>::
                        operator[](const unsigned int i) const
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
 
       Assert(data[i] != nullptr, ExcNotInitialized());
       return *data[i];
@@ -566,7 +570,7 @@ namespace internal
     TmpVectors<VectorType>::operator()(const unsigned int i,
                                        const VectorType & temp)
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      AssertIndexRange(i, data.size());
       if (data[i] == nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));

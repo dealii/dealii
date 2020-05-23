@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim>

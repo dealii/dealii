@@ -27,10 +27,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// Forward declarations
+// Forward declaration
+#ifndef DOXYGEN
 template <typename Iterator>
 class IteratorOverIterators;
-
+#endif
 
 
 /**

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,10 +17,11 @@
 #ifndef dealii_vector_operations_internal_h
 #define dealii_vector_operations_internal_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/vectorization.h>
 
@@ -56,28 +57,6 @@ namespace internal
       return false;
     }
 
-
-    template <typename T>
-    void
-    print(const T &t, const char *format)
-    {
-      if (format != nullptr)
-        std::printf(format, t);
-      else
-        std::printf(" %5.2f", double(t));
-    }
-
-
-
-    template <typename T>
-    void
-    print(const std::complex<T> &t, const char *format)
-    {
-      if (format != nullptr)
-        std::printf(format, t.real(), t.imag());
-      else
-        std::printf(" %5.2f+%5.2fi", double(t.real()), double(t.imag()));
-    }
 
     // call std::copy, except for in
     // the case where we want to copy
@@ -168,10 +147,11 @@ namespace internal
     template <typename Functor>
     void
     parallel_for(
-      Functor &                                                  functor,
-      const size_type                                            start,
-      const size_type                                            end,
-      const std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+      Functor &       functor,
+      const size_type start,
+      const size_type end,
+      const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       const size_type vec_size = end - start;
@@ -196,12 +176,12 @@ namespace internal
           // vector entries). The number of chunks here is calculated inside
           // TBBForFunctor. See also GitHub issue #2496 for further discussion
           // of this strategy.
-          parallel::internal::parallel_for(static_cast<size_type>(0),
-                                           static_cast<size_type>(
-                                             generic_functor.n_chunks),
-                                           generic_functor,
-                                           1,
-                                           tbb_partitioner);
+          ::dealii::parallel::internal::parallel_for(
+            static_cast<size_type>(0),
+            static_cast<size_type>(generic_functor.n_chunks),
+            generic_functor,
+            1,
+            tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
         }
       else if (vec_size > 0)
@@ -302,7 +282,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -333,7 +313,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -367,7 +347,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -397,7 +377,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -425,7 +405,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -453,7 +433,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -488,7 +468,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -522,7 +502,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -560,7 +540,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -592,7 +572,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -623,7 +603,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -659,7 +639,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -701,7 +681,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -735,7 +715,7 @@ namespace internal
       void
       operator()(const size_type begin, const size_type end) const
       {
-        if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
+        if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (size_type i = begin; i < end; ++i)
@@ -763,9 +743,8 @@ namespace internal
     template <typename Number, typename Number2>
     struct Dot
     {
-      static const bool vectorizes =
-        std::is_same<Number, Number2>::value &&
-        (VectorizedArray<Number>::n_array_elements > 1);
+      static constexpr bool vectorizes = std::is_same<Number, Number2>::value &&
+                                         (VectorizedArray<Number>::size() > 1);
 
       Dot(const Number *const X, const Number2 *const Y)
         : X(X)
@@ -805,8 +784,7 @@ namespace internal
     template <typename Number, typename RealType>
     struct Norm2
     {
-      static const bool vectorizes =
-        VectorizedArray<Number>::n_array_elements > 1;
+      static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
       Norm2(const Number *const X)
         : X(X)
@@ -832,8 +810,7 @@ namespace internal
     template <typename Number, typename RealType>
     struct Norm1
     {
-      static const bool vectorizes =
-        VectorizedArray<Number>::n_array_elements > 1;
+      static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
       Norm1(const Number *X)
         : X(X)
@@ -859,8 +836,7 @@ namespace internal
     template <typename Number, typename RealType>
     struct NormP
     {
-      static const bool vectorizes =
-        VectorizedArray<Number>::n_array_elements > 1;
+      static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
       NormP(const Number *X, RealType p)
         : X(X)
@@ -888,8 +864,7 @@ namespace internal
     template <typename Number>
     struct MeanValue
     {
-      static const bool vectorizes =
-        VectorizedArray<Number>::n_array_elements > 1;
+      static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
       MeanValue(const Number *X)
         : X(X)
@@ -915,8 +890,7 @@ namespace internal
     template <typename Number>
     struct AddAndDot
     {
-      static const bool vectorizes =
-        VectorizedArray<Number>::n_array_elements > 1;
+      static const bool vectorizes = VectorizedArray<Number>::size() > 1;
 
       AddAndDot(Number *const       X,
                 const Number *const V,
@@ -1201,8 +1175,8 @@ namespace internal
       // First we work on (n_chunks/nvecs) chunks, where each chunk processes
       // nvecs*(4*8) elements.
 
-      const unsigned int nvecs = VectorizedArray<Number>::n_array_elements;
-      const size_type    regular_chunks = n_chunks / nvecs;
+      constexpr unsigned int nvecs          = VectorizedArray<Number>::size();
+      const size_type        regular_chunks = n_chunks / nvecs;
       for (size_type i = 0; i < regular_chunks; ++i)
         {
           VectorizedArray<Number> r0 = op.do_vectorized(index);
@@ -1220,8 +1194,7 @@ namespace internal
           r0 += r1;
           r2 += r3;
           r0 += r2;
-          r0.store(
-            &outer_results[i * VectorizedArray<Number>::n_array_elements]);
+          r0.store(&outer_results[i * nvecs]);
         }
 
       // If we are treating a case where the vector length is not divisible by
@@ -1230,9 +1203,12 @@ namespace internal
       // regular_chunks * nvecs; We do as much as possible with 2 SIMD
       // operations within each chunk. Here we assume that nvecs < 32/2 = 16 as
       // well as 16%nvecs==0.
-      AssertIndexRange(VectorizedArray<Number>::n_array_elements, 17);
+      static_assert(
+        VectorizedArray<Number>::size() <= 16 &&
+          16 % VectorizedArray<Number>::size() == 0,
+        "VectorizedArray::size() must be a power of 2 and not more than 16");
       Assert(16 % nvecs == 0, ExcInternalError());
-      if (n_chunks % VectorizedArray<Number>::n_array_elements != 0)
+      if (n_chunks % nvecs != 0)
         {
           VectorizedArray<Number> r0  = VectorizedArray<Number>(),
                                   r1  = VectorizedArray<Number>();
@@ -1247,7 +1223,7 @@ namespace internal
           r0.store(&outer_results[start_irreg]);
           // update n_chunks to denote unused element in outer_results[] from
           // which we can keep writing.
-          n_chunks = start_irreg + VectorizedArray<Number>::n_array_elements;
+          n_chunks = start_irreg + VectorizedArray<Number>::size();
         }
     }
 
@@ -1375,11 +1351,12 @@ namespace internal
     template <typename Operation, typename ResultType>
     void
     parallel_reduce(
-      const Operation &                                          op,
-      const size_type                                            start,
-      const size_type                                            end,
-      ResultType &                                               result,
-      const std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+      const Operation &op,
+      const size_type  start,
+      const size_type  end,
+      ResultType &     result,
+      const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       const size_type vec_size = end - start;
@@ -1406,12 +1383,12 @@ namespace internal
           // vector entries). The number of chunks here is calculated inside
           // TBBForFunctor. See also GitHub issue #2496 for further discussion
           // of this strategy.
-          parallel::internal::parallel_for(static_cast<size_type>(0),
-                                           static_cast<size_type>(
-                                             generic_functor.n_chunks),
-                                           generic_functor,
-                                           1,
-                                           tbb_partitioner);
+          ::dealii::parallel::internal::parallel_for(
+            static_cast<size_type>(0),
+            static_cast<size_type>(generic_functor.n_chunks),
+            generic_functor,
+            1,
+            tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
           result = generic_functor.do_sum();
         }
@@ -2116,13 +2093,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2141,13 +2112,7 @@ namespace internal
                                      1.,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2166,13 +2131,7 @@ namespace internal
                                      -1.,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2187,13 +2146,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2213,13 +2166,7 @@ namespace internal
                                      a,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2244,13 +2191,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2268,13 +2209,7 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2293,13 +2228,7 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), a, v_data.values_dev.get(), size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2326,13 +2255,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2347,13 +2270,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2371,13 +2288,7 @@ namespace internal
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     v_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2397,13 +2308,7 @@ namespace internal
                                                     a,
                                                     v_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2428,13 +2333,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static Number
@@ -2461,13 +2360,7 @@ namespace internal
                                                     v_data.values_dev.get(),
                                                     static_cast<unsigned int>(
                                                       size));
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
 
         // Copy the result back to the host
         Number result;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_mesh_worker_vector_selector_h
 #define dealii_mesh_worker_vector_selector_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/named_selection.h>
 
@@ -25,8 +27,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int, int>
 class FEValuesBase;
+#endif
 
 namespace MeshWorker
 {

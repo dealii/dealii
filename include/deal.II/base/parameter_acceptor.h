@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * file.
  *
  * Such registry is traversed upon invocation of the single function
- * ParameterAcceptor::initialize(file.prm) which in turn calls the method
+ * ParameterAcceptor::initialize("file.prm") which in turn calls the method
  * ParameterAcceptor::declare_parameters() for each of the registered classes,
  * reads the file `file.prm` and subsequently calls the method
  * ParameterAcceptor::parse_parameters(), again for each of the registered
@@ -72,7 +72,7 @@ DEAL_II_NAMESPACE_OPEN
  * attach a signal to ParameterAcceptor::declare_parameters_call_back and
  * ParameterAcceptor::parse_parameters_call_back, that are called just after
  * the declare_parameters() and parse_parameters() functions of each derived
- * class.
+ * class. step-69 has an example of doing this.
  *
  * A typical usage of this class is the following:
  *
@@ -373,29 +373,40 @@ public:
    * default values, and don't want to read external files to use a class
    * derived from ParameterAcceptor.
    *
-   * If outfilename is not the empty string, then write the content that was
-   * read in to the outfilename. The format of both input and output files are
-   * selected using the extensions of the files themselves. This can be either
-   * `prm` or `xml` for input, and `prm`, `xml`, or `tex/latex` for output. If
-   * the output format is `prm`, then `output_style_for_prm_format` is used to
-   * decide whether we write the full documentation as well, or only the
-   * parameters.
+   * If @p output_filename is not the empty string, then we write the content
+   * that was read into the @p output_filename file, using the style specified
+   * in @p output_style_for_output_filename. The format of both input and output
+   * files are selected using the extensions of the files themselves. This can
+   * be either `prm`, `xml`, or `json` for the @p filename, and any of the
+   * supported formats for the @p output_filename.
    *
    * If the input file does not exist, a default one with the same name is
-   * created for you, and an exception is thrown.
+   * created for you following the style specified in
+   * @p output_style_for_filename, and an exception is thrown.
+   *
+   * By default, the file format used to write the files is deduced from
+   * the extension of the file names. If the corresponding
+   * ParameterHandler::OutputStyle specifies a format specification, this must
+   * be compatible with the file extension, or an exception will be thrown.
+   *
+   * If the extension is not recognized, and you do not specify a format in the
+   * corresponding ParameterHandler::OutputStyle, an assertion is thrown.
    *
    * @param filename Input file name
    * @param output_filename Output file name
-   * @param output_style_for_prm_format How to write the output file if format
-   * is `prm`
+   * @param output_style_for_output_filename How to write the output file
    * @param prm The ParameterHandler to use
+   * @param output_style_for_filename How to write the default input file if it
+   * does not exist
    */
   static void
-  initialize(const std::string &                 filename        = "",
-             const std::string &                 output_filename = "",
-             const ParameterHandler::OutputStyle output_style_for_prm_format =
-               ParameterHandler::ShortText,
-             ParameterHandler &prm = ParameterAcceptor::prm);
+  initialize(const std::string &filename        = "",
+             const std::string &output_filename = "",
+             const ParameterHandler::OutputStyle
+                                                 output_style_for_output_filename = ParameterHandler::Short,
+             ParameterHandler &                  prm = ParameterAcceptor::prm,
+             const ParameterHandler::OutputStyle output_style_for_filename =
+               ParameterHandler::DefaultStyle);
 
   /**
    * Call declare_all_parameters(), read the parameters from the `input_stream`
@@ -603,7 +614,7 @@ public:
    * are passed to the SourceClass constructor.
    */
   template <typename... Args>
-  ParameterAcceptorProxy(const std::string section_name, Args... args);
+  ParameterAcceptorProxy(const std::string &section_name, Args... args);
 
   /**
    * Overloads the ParameterAcceptor::declare_parameters function, by calling
@@ -641,7 +652,7 @@ ParameterAcceptor::add_parameter(const std::string &          entry,
 template <class SourceClass>
 template <typename... Args>
 ParameterAcceptorProxy<SourceClass>::ParameterAcceptorProxy(
-  const std::string section_name,
+  const std::string &section_name,
   Args... args)
   : SourceClass(args...)
   , ParameterAcceptor(section_name)

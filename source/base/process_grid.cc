@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -181,9 +181,12 @@ namespace Utilities
       // Note that on all the active MPI processes (except for the one with
       // rank 0) the resulting MPI_Comm mpi_communicator_inactive_with_root
       // will be MPI_COMM_NULL.
+      const int mpi_tag =
+        Utilities::MPI::internal::Tags::process_grid_constructor;
+
       ierr = Utilities::MPI::create_group(mpi_communicator,
                                           inactive_with_root_group,
-                                          55,
+                                          mpi_tag,
                                           &mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
 

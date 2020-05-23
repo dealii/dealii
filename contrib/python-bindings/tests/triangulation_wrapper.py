@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------
 #
-# Copyright (C) 2016 - 2017 by the deal.II authors
+# Copyright (C) 2016 - 2020 by the deal.II authors
 #
 # This file is part of the deal.II library.
 #
@@ -15,7 +15,6 @@
 
 import unittest
 from PyDealII.Debug import *
-
 
 class TestTriangulationWrapper(unittest.TestCase):
 
@@ -62,6 +61,22 @@ class TestTriangulationWrapper(unittest.TestCase):
             triangulation.generate_simplex(vertices)
             n_cells = triangulation.n_active_cells()
             self.assertEqual(n_cells, len(vertices))
+
+    def test_create_triangulation(self):
+        for dim in self.dim:
+            triangulation = Triangulation(dim[0])
+            if (dim[0] == '2D'):
+                vertices = [[0., 0.], [1., 0.], [0., 1.], [1., 1.]]
+                cell_vertices = [[0, 1, 2, 3]]
+            else:
+                vertices = [[0., 0., 0.], [1., 0., 0.],\
+                            [0., 1., 0.], [1., 1., 0.],\
+                            [0., 0., 1.], [1., 0., 1.],\
+                            [0., 1., 1.], [1., 1., 1.]]
+                cell_vertices = [[0, 1, 2, 3, 4, 5, 6, 7]]
+            triangulation.create_triangulation(vertices, cell_vertices)
+            n_cells = triangulation.n_active_cells()
+            self.assertEqual(n_cells, len(cell_vertices))
 
     def test_subdivided_hyper_cube(self):
         for dim in self.dim:
@@ -141,7 +156,15 @@ class TestTriangulationWrapper(unittest.TestCase):
                 n_cells = triangulation.n_active_cells()
                 self.assertEqual(n_cells, 17)
 
-    def test_generate_chees(self):
+    def test_hyper_cube_with_cylindrical_hole(self):
+        for dim in self.restricted_dim:
+            triangulation = Triangulation(dim[0])
+            triangulation.generate_hyper_cube_with_cylindrical_hole(inner_radius = .25,
+				outer_radius = .5, L = .5, repetitions = 1, colorize = False)
+            n_cells = triangulation.n_active_cells()
+            self.assertEqual(n_cells, 8)
+
+    def test_generate_cheese(self):
         for dim in self.dim:
             triangulation = Triangulation(dim[0], dim[1])
             if (dim[0] == '2D'):
@@ -374,6 +397,35 @@ class TestTriangulationWrapper(unittest.TestCase):
                 self.assertEqual(n_cells, 16)
             else:
                 self.assertEqual(n_cells, 64)
+
+
+    def test_transform(self):
+        for dim in self.dim:
+            triangulation_1 = self.build_hyper_cube_triangulation(dim)
+            triangulation_1.refine_global(1)
+            triangulation_2 = self.build_hyper_cube_triangulation(dim)
+            triangulation_2.refine_global(1)
+
+            triangulation_1.transform(lambda p: [v + 1. for v in p])
+
+            if dim[1] == '3D':
+                offset = Point([1., 1., 1.])
+            else:
+                offset = Point([1., 1.])
+
+            for (cell_1, cell_2) in zip(triangulation_1.active_cells(), triangulation_2.active_cells()):
+                self.assertTrue(cell_1.center().distance(cell_2.center() + offset) < 1e-8)
+
+
+    def test_find_active_cell_around_point(self):
+        for dim in self.dim:
+            triangulation = self.build_hyper_cube_triangulation(dim)
+            triangulation.refine_global(2)
+
+            for cell in triangulation.active_cells():
+                cell_ret = triangulation.find_active_cell_around_point(cell.center())
+                self.assertTrue(cell.center().distance(cell_ret.center()) < 1e-8)
+
 
     def test_save_load(self):
         for dim in self.dim:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,10 +26,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <typename Number>
 class Vector;
+#endif
 
 /**
  * This namespace provides a collection of functions that aid in refinement
@@ -85,10 +87,10 @@ namespace GridRefinement
   template <int dim>
   std::pair<double, double>
   adjust_refine_and_coarsen_number_fraction(
-    const unsigned int current_n_cells,
-    const unsigned int max_n_cells,
-    const double       top_fraction_of_cells,
-    const double       bottom_fraction_of_cells);
+    const types::global_cell_index current_n_cells,
+    const types::global_cell_index max_n_cells,
+    const double                   top_fraction_of_cells,
+    const double                   bottom_fraction_of_cells);
 
   /**
    * This function provides a strategy to mark cells for refinement and

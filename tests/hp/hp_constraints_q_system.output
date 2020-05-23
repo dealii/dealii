@@ -20,95 +20,95 @@ DEAL::
 DEAL::
 DEAL::Interpolation test
 DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.19131e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.19131e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.75611e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.75611e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 7.91056e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 7.91056e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.17688e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.17688e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 5.97019e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 5.97019e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.34247e-16
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.34247e-16
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.54830e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.54830e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 5.83856e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 5.83856e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.33132e-16
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.33132e-16
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.46514e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.46514e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.46821e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.46821e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 4.89000e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.89000e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.47532e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.47532e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 8.14885e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 8.14885e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 9.93093e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 9.93093e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.78970e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.78970e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 8.08266e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 8.08266e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 8.56312e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 8.56312e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::
 DEAL::
 DEAL::Random hanging nodes
@@ -668,131 +668,131 @@ DEAL::
 DEAL::
 DEAL::Interpolation test
 DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.87362e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.61725e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.11768e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 4.50677e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.58740e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.05076e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 4.66041e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.65622e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.84477e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.95294e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.58740e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.13883e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 6.04534e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 5.67509e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 7.50065e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 7.61491e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.78540e-17
+DEAL::  Relative difference after constraints: 3.11829e-18
+DEAL::  Relative interpolation error before constraints: 5.18110e-17
+DEAL::  Relative difference after constraints: 1.46883e-18
 DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.76390e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.65622e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.71506e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 5.96732e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.78540e-17
+DEAL::  Relative difference after constraints: 3.11829e-18
+DEAL::  Relative interpolation error before constraints: 7.44029e-17
+DEAL::  Relative difference after constraints: 1.75253e-18
 DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 8.31175e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.42735e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 6.87631e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.61682e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.83871e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.98857e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.35604e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.93771e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.73617e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.20742e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.07227e-17
+DEAL::  Relative difference after constraints: 1.46711e-17
+DEAL::  Relative interpolation error before constraints: 2.56786e-17
+DEAL::  Relative difference after constraints: 9.92580e-18
 DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.65956e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.97122e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.05462e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.45787e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.90047e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.36639e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.45267e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.19092e-17
+DEAL::  Relative difference after constraints: 1.71641e-17
+DEAL::  Relative interpolation error before constraints: 4.17866e-17
+DEAL::  Relative difference after constraints: 7.38745e-18
 DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.06376e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.15602e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.49342e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.44832e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.44628e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 4.35517e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 4.22847e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.89847e-17
+DEAL::  Relative difference after constraints: 2.69671e-17
+DEAL::  Relative interpolation error before constraints: 4.44466e-17
+DEAL::  Relative difference after constraints: 7.02338e-18
 DEAL::
 DEAL::
 DEAL::Random hanging nodes
@@ -24486,10 +24486,10 @@ DEAL::n_dofs=12455
     2788 2786:  1.000000
     2788 4444:  0.2222222
     2788 4445:  0.1111111
-    2789 472:  -5.551115e-17
+    2789 472:  -2.775558e-17
     2789 2463:  -0.3333333
     2789 2786:  1.000000
-    2789 4444:  0.000000
+    2789 4444:  2.775558e-17
     2789 4445:  0.3333333
     2929 2464:  0.6666667
     2929 2466:  0.3333333
@@ -29607,7 +29607,7 @@ DEAL::n_dofs=12455
     12155 2463:  -0.07407407
     12155 2786:  0.2500000
     12155 4444:  -0.01851852
-    12155 4445:  -2.775558e-17
+    12155 4445:  -1.387779e-17
     12155 11956:  -0.07407407
     12155 12303:  0.1975309
     12155 12386:  0.7901235
@@ -29632,7 +29632,7 @@ DEAL::n_dofs=12455
     12157 12303:  -0.09876543
     12157 12386:  0.7901235
     12158 472:  0.4166667
-    12158 2463:  -5.551115e-17
+    12158 2463:  0.000000
     12158 2786:  0.6250000
     12158 4444:  -0.08333333
     12158 4445:  0.04166667
@@ -29734,8 +29734,8 @@ DEAL::n_dofs=12455
     12388 4444:  0.06250000
     12388 4445:  0.2500000
     12388 11956:  0.2500000
-    12389 472:  0.02929688
-    12389 2463:  -0.2539062
+    12389 472:  0.02929687
+    12389 2463:  -0.2539063
     12389 2786:  0.7119141
     12389 4444:  0.02929688
     12389 4445:  0.4833984
@@ -29845,12 +29845,12 @@ DEAL::n_dofs=1269
     120 555:  0.2222222
     120 557:  0.1111111
     120 619:  0.4444444
-    121 266:  0.1111111
-    121 555:  0.4444444
+    121 266:  0.4444444
+    121 555:  0.1111111
     121 557:  0.2222222
     121 619:  0.2222222
-    122 266:  0.4444444
-    122 555:  0.1111111
+    122 266:  0.1111111
+    122 555:  0.4444444
     122 557:  0.2222222
     122 619:  0.2222222
     123 266:  0.2222222
@@ -29984,12 +29984,12 @@ DEAL::n_dofs=1269
     401 354:  0.2222222
     401 355:  0.1111111
     402 350:  0.2222222
-    402 351:  0.1111111
-    402 354:  0.4444444
+    402 351:  0.4444444
+    402 354:  0.1111111
     402 355:  0.2222222
     403 350:  0.2222222
-    403 351:  0.4444444
-    403 354:  0.1111111
+    403 351:  0.1111111
+    403 354:  0.4444444
     403 355:  0.2222222
     404 350:  0.1111111
     404 351:  0.2222222
@@ -30018,20 +30018,20 @@ DEAL::n_dofs=1269
     413 350:  0.1481481
     413 351:  0.02469136
     413 619:  -0.03703704
-    414 0:  0.01234568
-    414 3:  -0.09876543
-    414 10:  -0.09876543
+    414 0:  0.04938272
+    414 3:  0.1975309
+    414 10:  0.1975309
     414 15:  0.7901235
-    414 350:  0.07407407
-    414 351:  0.2469136
-    414 619:  0.07407407
-    415 0:  0.04938272
-    415 3:  0.1975309
-    415 10:  0.1975309
+    414 350:  -0.07407407
+    414 351:  -0.08641975
+    414 619:  -0.07407407
+    415 0:  0.01234568
+    415 3:  -0.09876543
+    415 10:  -0.09876543
     415 15:  0.7901235
-    415 350:  -0.07407407
-    415 351:  -0.08641975
-    415 619:  -0.07407407
+    415 350:  0.07407407
+    415 351:  0.2469136
+    415 619:  0.07407407
     416 0:  -0.02469136
     416 3:  -0.09876543
     416 10:  0.1975309
@@ -30824,14 +30824,14 @@ DEAL::n_dofs=1321
     235 383:  0.2222222
     235 384:  0.4444444
     241 0:  0.1111111
-    241 199:  0.2222222
+    241 200:  -0.3333333
     241 240:  1.000000
-    241 381:  -0.2222222
-    241 382:  -0.1111111
+    241 382:  0.2222222
     242 0:  0.1111111
-    242 200:  -0.3333333
+    242 199:  0.2222222
     242 240:  1.000000
-    242 382:  0.2222222
+    242 381:  -0.2222222
+    242 382:  -0.1111111
     243 0:  0.3333333
     243 199:  0.1111111
     243 200:  -0.3333333
@@ -30913,20 +30913,20 @@ DEAL::n_dofs=1321
     432 17:  0.7901235
     432 88:  0.02469136
     432 92:  -0.03703704
-    433 0:  -0.07407407
-    433 1:  0.04938272
-    433 9:  0.1975309
-    433 12:  0.1975309
+    433 0:  0.07407407
+    433 1:  0.01234568
+    433 9:  -0.09876543
+    433 12:  -0.09876543
     433 17:  0.7901235
-    433 88:  -0.08641975
-    433 92:  -0.07407407
-    434 0:  0.07407407
-    434 1:  0.01234568
-    434 9:  -0.09876543
-    434 12:  -0.09876543
+    433 88:  0.2469136
+    433 92:  0.07407407
+    434 0:  -0.07407407
+    434 1:  0.04938272
+    434 9:  0.1975309
+    434 12:  0.1975309
     434 17:  0.7901235
-    434 88:  0.2469136
-    434 92:  0.07407407
+    434 88:  -0.08641975
+    434 92:  -0.07407407
     435 0:  -0.03703704
     435 1:  -0.02469136
     435 9:  0.1975309
@@ -30939,12 +30939,12 @@ DEAL::n_dofs=1321
     436 90:  0.2222222
     436 92:  0.1111111
     437 86:  0.2222222
-    437 88:  0.4444444
-    437 90:  0.1111111
+    437 88:  0.1111111
+    437 90:  0.4444444
     437 92:  0.2222222
     438 86:  0.2222222
-    438 88:  0.1111111
-    438 90:  0.4444444
+    438 88:  0.4444444
+    438 90:  0.1111111
     438 92:  0.2222222
     439 86:  0.1111111
     439 88:  0.2222222
@@ -30974,21 +30974,21 @@ DEAL::n_dofs=1321
     444 124:  0.1975309
     444 126:  0.1975309
     444 133:  0.7901235
-    445 1:  0.01234568
-    445 9:  -0.09876543
-    445 90:  0.1481481
-    445 92:  0.07407407
+    445 1:  0.04938272
+    445 9:  0.1975309
+    445 90:  -0.03703704
+    445 92:  -0.07407407
     445 120:  -0.02469136
-    445 124:  -0.09876543
-    445 126:  0.1975309
+    445 124:  0.1975309
+    445 126:  -0.09876543
     445 133:  0.7901235
-    446 1:  0.04938272
-    446 9:  0.1975309
-    446 90:  -0.03703704
-    446 92:  -0.07407407
+    446 1:  0.01234568
+    446 9:  -0.09876543
+    446 90:  0.1481481
+    446 92:  0.07407407
     446 120:  -0.02469136
-    446 124:  0.1975309
-    446 126:  -0.09876543
+    446 124:  -0.09876543
+    446 126:  0.1975309
     446 133:  0.7901235
     447 1:  -0.02469136
     447 9:  0.1975309
@@ -31540,7 +31540,7 @@ DEAL::n_dofs=1321
     1145 199:  0.05555556
     1145 382:  0.05555556
     1145 1090:  0.1111111
-    1146 0:  0.000000
+    1146 0:  1.387779e-17
     1146 87:  -0.02160494
     1146 88:  -0.02160494
     1146 199:  0.009259259
@@ -31705,12 +31705,12 @@ DEAL::n_dofs=1605
     200 1399:  0.2222222
     201 6:  0.2222222
     201 523:  0.2222222
-    201 1365:  0.4444444
-    201 1399:  0.1111111
+    201 1365:  0.1111111
+    201 1399:  0.4444444
     202 6:  0.2222222
     202 523:  0.2222222
-    202 1365:  0.1111111
-    202 1399:  0.4444444
+    202 1365:  0.4444444
+    202 1399:  0.1111111
     203 6:  0.4444444
     203 523:  0.1111111
     203 1365:  0.2222222
@@ -31724,21 +31724,21 @@ DEAL::n_dofs=1605
     208 24:  0.7901235
     208 1399:  -0.07407407
     209 4:  -0.02469136
-    209 5:  0.01234568
-    209 6:  0.07407407
-    209 11:  -0.09876543
-    209 13:  0.1975309
-    209 14:  -0.09876543
+    209 5:  0.04938272
+    209 6:  -0.07407407
+    209 11:  0.1975309
+    209 13:  -0.09876543
+    209 14:  0.1975309
     209 24:  0.7901235
-    209 1399:  0.1481481
+    209 1399:  -0.03703704
     210 4:  -0.02469136
-    210 5:  0.04938272
-    210 6:  -0.07407407
-    210 11:  0.1975309
-    210 13:  -0.09876543
-    210 14:  0.1975309
+    210 5:  0.01234568
+    210 6:  0.07407407
+    210 11:  -0.09876543
+    210 13:  0.1975309
+    210 14:  -0.09876543
     210 24:  0.7901235
-    210 1399:  -0.03703704
+    210 1399:  0.1481481
     211 4:  0.01234568
     211 5:  -0.02469136
     211 6:  0.1481481
@@ -31976,23 +31976,23 @@ DEAL::n_dofs=1605
     385 98:  0.1975309
     385 100:  -0.09876543
     385 102:  0.7901235
-    386 0:  0.01234568
+    386 0:  0.04938272
     386 2:  -0.02469136
-    386 7:  -0.09876543
+    386 7:  0.1975309
     386 90:  -0.02469136
-    386 92:  0.04938272
-    386 94:  0.1975309
-    386 98:  -0.09876543
-    386 100:  0.1975309
+    386 92:  0.01234568
+    386 94:  -0.09876543
+    386 98:  0.1975309
+    386 100:  -0.09876543
     386 102:  0.7901235
-    387 0:  0.04938272
+    387 0:  0.01234568
     387 2:  -0.02469136
-    387 7:  0.1975309
+    387 7:  -0.09876543
     387 90:  -0.02469136
-    387 92:  0.01234568
-    387 94:  -0.09876543
-    387 98:  0.1975309
-    387 100:  -0.09876543
+    387 92:  0.04938272
+    387 94:  0.1975309
+    387 98:  -0.09876543
+    387 100:  0.1975309
     387 102:  0.7901235
     388 0:  -0.02469136
     388 2:  0.04938272
@@ -32344,13 +32344,13 @@ DEAL::n_dofs=1605
     966 6:  0.02777778
     966 1399:  0.1388889
     967 1:  0.5555556
-    967 3:  0.2777778
+    967 3:  0.1111111
     967 6:  0.05555556
-    967 1399:  0.1111111
+    967 1399:  0.2777778
     968 1:  0.5555556
-    968 3:  0.1111111
+    968 3:  0.2777778
     968 6:  0.05555556
-    968 1399:  0.2777778
+    968 1399:  0.1111111
     969 1:  0.4444444
     969 3:  0.2222222
     969 6:  0.1111111
@@ -32758,13 +32758,13 @@ DEAL::n_dofs=1605
     1460 6:  0.4444444
     1460 1399:  0.2222222
     1461 1:  0.05555556
-    1461 3:  0.2777778
+    1461 3:  0.1111111
     1461 6:  0.5555556
-    1461 1399:  0.1111111
+    1461 1399:  0.2777778
     1462 1:  0.05555556
-    1462 3:  0.1111111
+    1462 3:  0.2777778
     1462 6:  0.5555556
-    1462 1399:  0.2777778
+    1462 1399:  0.1111111
     1463 1:  0.02777778
     1463 3:  0.1388889
     1463 6:  0.6944444
@@ -33288,14 +33288,14 @@ DEAL::n_dofs=1026
     700 471:  0.5555556
     700 499:  0.1111111
     700 884:  0.05555556
-    701 469:  0.2222222
-    701 471:  0.4444444
-    701 499:  0.2222222
-    701 884:  0.1111111
-    702 469:  0.1388889
-    702 471:  0.6944444
-    702 499:  0.1388889
-    702 884:  0.02777778
+    701 469:  0.1388889
+    701 471:  0.6944444
+    701 499:  0.1388889
+    701 884:  0.02777778
+    702 469:  0.2222222
+    702 471:  0.4444444
+    702 499:  0.2222222
+    702 884:  0.1111111
     703 469:  0.1111111
     703 471:  0.5555556
     703 499:  0.2777778
@@ -33332,14 +33332,14 @@ DEAL::n_dofs=1026
     708 471:  0.5555556
     708 499:  0.1111111
     708 913:  0.05555556
-    709 470:  0.1388889
-    709 471:  0.6944444
-    709 499:  0.1388889
-    709 913:  0.02777778
-    710 470:  0.2222222
-    710 471:  0.4444444
-    710 499:  0.2222222
-    710 913:  0.1111111
+    709 470:  0.2222222
+    709 471:  0.4444444
+    709 499:  0.2222222
+    709 913:  0.1111111
+    710 470:  0.1388889
+    710 471:  0.6944444
+    710 499:  0.1388889
+    710 913:  0.02777778
     711 470:  0.1111111
     711 471:  0.5555556
     711 499:  0.2777778
@@ -33569,14 +33569,14 @@ DEAL::n_dofs=1315
     202 120:  0.3333333
     203 88:  0.3333333
     203 120:  0.6666667
-    205 83:  -0.2222222
-    205 87:  -0.1111111
-    205 149:  0.2222222
+    205 87:  0.2222222
     205 150:  0.1111111
+    205 196:  -0.3333333
     205 204:  1.000000
-    206 87:  0.2222222
+    206 83:  -0.2222222
+    206 87:  -0.1111111
+    206 149:  0.2222222
     206 150:  0.1111111
-    206 196:  -0.3333333
     206 204:  1.000000
     207 83:  -0.1111111
     207 87:  0.000000
@@ -33625,12 +33625,12 @@ DEAL::n_dofs=1315
     220 87:  0.2222222
     220 88:  0.1111111
     221 83:  0.2222222
-    221 84:  0.1111111
-    221 87:  0.4444444
+    221 84:  0.4444444
+    221 87:  0.1111111
     221 88:  0.2222222
     222 83:  0.2222222
-    222 84:  0.4444444
-    222 87:  0.1111111
+    222 84:  0.1111111
+    222 87:  0.4444444
     222 88:  0.2222222
     223 83:  0.1111111
     223 84:  0.2222222
@@ -33764,7 +33764,7 @@ DEAL::n_dofs=1315
     420 85:  -0.02160494
     420 87:  -0.02777778
     420 89:  -0.02160494
-    420 149:  -8.673617e-19
+    420 149:  0.000000
     420 150:  0.009259259
     420 196:  -0.05555556
     420 204:  0.2500000
@@ -33775,7 +33775,7 @@ DEAL::n_dofs=1315
     421 85:  0.006172840
     421 87:  -0.02777778
     421 89:  0.006172840
-    421 149:  8.673617e-19
+    421 149:  4.336809e-19
     421 150:  -0.004629630
     421 196:  0.02777778
     421 204:  -0.1250000
@@ -33803,12 +33803,12 @@ DEAL::n_dofs=1315
     430 87:  0.1388889
     430 89:  0.02777778
     431 83:  0.5555556
-    431 85:  0.2777778
-    431 87:  0.1111111
+    431 85:  0.1111111
+    431 87:  0.2777778
     431 89:  0.05555556
     432 83:  0.5555556
-    432 85:  0.1111111
-    432 87:  0.2777778
+    432 85:  0.2777778
+    432 87:  0.1111111
     432 89:  0.05555556
     433 83:  0.4444444
     433 85:  0.2222222
@@ -33991,14 +33991,14 @@ DEAL::n_dofs=1315
     685 85:  0.5555556
     685 87:  0.05555556
     685 89:  0.1111111
-    686 83:  0.1388889
-    686 85:  0.6944444
-    686 87:  0.02777778
-    686 89:  0.1388889
-    687 83:  0.2222222
-    687 85:  0.4444444
-    687 87:  0.1111111
-    687 89:  0.2222222
+    686 83:  0.2222222
+    686 85:  0.4444444
+    686 87:  0.1111111
+    686 89:  0.2222222
+    687 83:  0.1388889
+    687 85:  0.6944444
+    687 87:  0.02777778
+    687 89:  0.1388889
     688 83:  0.1111111
     688 85:  0.5555556
     688 87:  0.05555556
@@ -34323,7 +34323,7 @@ DEAL::n_dofs=1315
     1058 87:  -0.02777778
     1058 89:  -0.02160494
     1058 149:  0.009259259
-    1058 150:  0.000000
+    1058 150:  1.387779e-17
     1058 152:  -0.02160494
     1058 196:  -0.08333333
     1058 204:  0.2500000
@@ -34823,14 +34823,14 @@ DEAL::n_dofs=1568
     1267 963:  0.2777778
     1267 1084:  0.05555556
     1267 1508:  0.1111111
-    1268 516:  0.6944444
-    1268 963:  0.1388889
-    1268 1084:  0.02777778
-    1268 1508:  0.1388889
-    1269 516:  0.4444444
-    1269 963:  0.2222222
-    1269 1084:  0.1111111
-    1269 1508:  0.2222222
+    1268 516:  0.4444444
+    1268 963:  0.2222222
+    1268 1084:  0.1111111
+    1268 1508:  0.2222222
+    1269 516:  0.6944444
+    1269 963:  0.1388889
+    1269 1084:  0.02777778
+    1269 1508:  0.1388889
     1270 516:  0.5555556
     1270 963:  0.1111111
     1270 1084:  0.05555556
@@ -35154,14 +35154,14 @@ DEAL::n_dofs=1461
     276 7:  0.1111111
     276 219:  0.4444444
     276 220:  0.2222222
-    277 5:  0.1111111
+    277 5:  0.4444444
     277 7:  0.2222222
     277 219:  0.2222222
-    277 220:  0.4444444
-    278 5:  0.4444444
+    277 220:  0.1111111
+    278 5:  0.1111111
     278 7:  0.2222222
     278 219:  0.2222222
-    278 220:  0.1111111
+    278 220:  0.4444444
     279 5:  0.2222222
     279 7:  0.4444444
     279 219:  0.1111111
@@ -35171,12 +35171,12 @@ DEAL::n_dofs=1461
     284 6:  0.2222222
     284 7:  0.1111111
     285 4:  0.2222222
-    285 5:  0.4444444
-    285 6:  0.1111111
+    285 5:  0.1111111
+    285 6:  0.4444444
     285 7:  0.2222222
     286 4:  0.2222222
-    286 5:  0.1111111
-    286 6:  0.4444444
+    286 5:  0.4444444
+    286 6:  0.1111111
     286 7:  0.2222222
     287 4:  0.1111111
     287 5:  0.2222222
@@ -35513,12 +35513,12 @@ DEAL::n_dofs=1461
     813 6:  0.1388889
     813 7:  0.02777778
     814 2:  0.5555556
-    814 3:  0.1111111
-    814 6:  0.2777778
+    814 3:  0.2777778
+    814 6:  0.1111111
     814 7:  0.05555556
     815 2:  0.5555556
-    815 3:  0.2777778
-    815 6:  0.1111111
+    815 3:  0.1111111
+    815 6:  0.2777778
     815 7:  0.05555556
     816 2:  0.4444444
     816 3:  0.2222222
@@ -35917,14 +35917,14 @@ DEAL::n_dofs=1461
     1238 7:  0.1111111
     1238 218:  0.2777778
     1238 220:  0.5555556
-    1239 3:  0.1111111
-    1239 7:  0.2222222
-    1239 218:  0.2222222
-    1239 220:  0.4444444
-    1240 3:  0.02777778
-    1240 7:  0.1388889
-    1240 218:  0.1388889
-    1240 220:  0.6944444
+    1239 3:  0.02777778
+    1239 7:  0.1388889
+    1239 218:  0.1388889
+    1239 220:  0.6944444
+    1240 3:  0.1111111
+    1240 7:  0.2222222
+    1240 218:  0.2222222
+    1240 220:  0.4444444
     1241 3:  0.05555556
     1241 7:  0.2777778
     1241 218:  0.1111111
@@ -35957,14 +35957,14 @@ DEAL::n_dofs=1461
     1246 7:  0.1111111
     1246 220:  0.5555556
     1246 1086:  0.2777778
-    1247 6:  0.02777778
-    1247 7:  0.1388889
-    1247 220:  0.6944444
-    1247 1086:  0.1388889
-    1248 6:  0.1111111
-    1248 7:  0.2222222
-    1248 220:  0.4444444
-    1248 1086:  0.2222222
+    1247 6:  0.1111111
+    1247 7:  0.2222222
+    1247 220:  0.4444444
+    1247 1086:  0.2222222
+    1248 6:  0.02777778
+    1248 7:  0.1388889
+    1248 220:  0.6944444
+    1248 1086:  0.1388889
     1249 6:  0.05555556
     1249 7:  0.2777778
     1249 220:  0.5555556
@@ -36022,167 +36022,167 @@ DEAL::
 DEAL::
 DEAL::Interpolation test
 DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.03048e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.89728e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.77616e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.55384e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.83352e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.57125e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.16493e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.91082e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.38046e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.42069e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.83885e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.85284e-17
+DEAL::  Relative difference after constraints: 5.69579e-18
 DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.50185e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.57125e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.16493e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.77190e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.94953e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.35761e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.51705e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 5.35390e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 5.17699e-17
+DEAL::  Relative difference after constraints: 6.04407e-18
+DEAL::  Relative interpolation error before constraints: 2.99355e-17
+DEAL::  Relative difference after constraints: 1.29827e-17
+DEAL::  Relative interpolation error before constraints: 3.30115e-17
+DEAL::  Relative difference after constraints: 1.33244e-17
+DEAL::  Relative interpolation error before constraints: 3.77699e-17
+DEAL::  Relative difference after constraints: 3.19257e-18
 DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 2.45907e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.42069e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.83885e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.65518e-17
+DEAL::  Relative difference after constraints: 9.30871e-18
 DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 3.90233e-17
+DEAL::  Relative difference after constraints: 8.34555e-18
+DEAL::  Relative interpolation error before constraints: 2.99355e-17
+DEAL::  Relative difference after constraints: 1.29827e-17
+DEAL::  Relative interpolation error before constraints: 3.30115e-17
+DEAL::  Relative difference after constraints: 1.33244e-17
+DEAL::  Relative interpolation error before constraints: 5.27465e-17
+DEAL::  Relative difference after constraints: 4.10399e-18
 DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 4.91413e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.14496e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.32355e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 3.87797e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 9.72809e-18
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 9.54126e-18
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 9.41987e-18
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.24006e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.48583e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.35341e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.55734e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.77427e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.20921e-17
+DEAL::  Relative difference after constraints: 3.41576e-18
+DEAL::  Relative interpolation error before constraints: 1.13316e-17
+DEAL::  Relative difference after constraints: 1.80389e-17
+DEAL::  Relative interpolation error before constraints: 1.25120e-17
+DEAL::  Relative difference after constraints: 1.93958e-17
+DEAL::  Relative interpolation error before constraints: 1.37721e-17
+DEAL::  Relative difference after constraints: 2.09355e-17
 DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.21466e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.61705e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.38309e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.32854e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.90185e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.96820e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.95424e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.19124e-17
+DEAL::  Relative difference after constraints: 0.00000
 DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.60698e-17
+DEAL::  Relative difference after constraints: 3.57251e-18
+DEAL::  Relative interpolation error before constraints: 1.97625e-17
+DEAL::  Relative difference after constraints: 2.71072e-17
+DEAL::  Relative interpolation error before constraints: 1.80186e-17
+DEAL::  Relative difference after constraints: 2.23224e-17
+DEAL::  Relative interpolation error before constraints: 2.03558e-17
+DEAL::  Relative difference after constraints: 1.60194e-17
 DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.30394e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.77023e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 2.09755e-17
+DEAL::  Relative difference after constraints: 0.00000
+DEAL::  Relative interpolation error before constraints: 1.75232e-17
+DEAL::  Relative difference after constraints: 5.20048e-18
 DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.91101e-17
+DEAL::  Relative difference after constraints: 1.71430e-18
+DEAL::  Relative interpolation error before constraints: 1.99181e-17
+DEAL::  Relative difference after constraints: 1.17885e-17
+DEAL::  Relative interpolation error before constraints: 2.10111e-17
+DEAL::  Relative difference after constraints: 1.12697e-17
+DEAL::  Relative interpolation error before constraints: 2.18116e-17
+DEAL::  Relative difference after constraints: 9.61888e-19
 DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
-DEAL::  Relative interpolation error before constraints: 0
-DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 1.62973e-17
+DEAL::  Relative difference after constraints: 3.04434e-18
+DEAL::  Relative interpolation error before constraints: 1.93547e-17
+DEAL::  Relative difference after constraints: 3.84563e-17
+DEAL::  Relative interpolation error before constraints: 1.92699e-17
+DEAL::  Relative difference after constraints: 4.15089e-17
+DEAL::  Relative interpolation error before constraints: 1.99615e-17
+DEAL::  Relative difference after constraints: 1.43370e-17
 DEAL::
 DEAL::
 DEAL::Random hanging nodes
@@ -37795,7 +37795,7 @@ DEAL::n_dofs=67854
     3305 3447:  -0.1481481
     3305 3456:  0.2962963
     3305 13250:  -0.3333333
-    3305 13253:  -2.775558e-17
+    3305 13253:  0.000000
     3306 1916:  0.1111111
     3306 3531:  0.2222222
     3306 20528:  0.4444444
@@ -39465,7 +39465,7 @@ DEAL::n_dofs=67854
     6610 7395:  0.1111111
     6610 16188:  -0.2222222
     6610 43779:  0.2222222
-    6611 3199:  -5.551115e-17
+    6611 3199:  -2.775558e-17
     6611 6491:  -0.2962963
     6611 6608:  1.000000
     6611 7395:  0.3333333
@@ -59307,7 +59307,7 @@ DEAL::n_dofs=67854
     41688 3840:  0.01736111
     41688 3850:  0.1562500
     41688 4598:  -0.01157407
-    41688 4599:  -1.084202e-19
+    41688 4599:  0.000000
     41688 4605:  -0.009259259
     41688 31485:  -0.01234568
     41688 39773:  0.06018519
@@ -59352,7 +59352,7 @@ DEAL::n_dofs=67854
     41691 4599:  5.421011e-20
     41691 4605:  4.336809e-19
     41691 31485:  0.006172840
-    41691 39773:  1.387779e-17
+    41691 39773:  1.040834e-17
     41691 40358:  -0.01851852
     41691 40970:  0.006172840
     41691 41845:  0.04938272
@@ -59449,7 +59449,7 @@ DEAL::n_dofs=67854
     41861 4598:  -0.08398438
     41861 4599:  -0.01171875
     41861 4605:  -0.02343750
-    41861 39773:  -0.1289062
+    41861 39773:  -0.1289063
     41861 40358:  0.1406250
     41863 3569:  0.2812500
     41863 3581:  0.5625000
@@ -59625,7 +59625,7 @@ DEAL::n_dofs=67854
     42171 3840:  0.1250000
     42171 3850:  1.125000
     42171 4598:  -0.08333333
-    42171 4599:  0.000000
+    42171 4599:  -6.938894e-18
     42171 4605:  0.3333333
     42171 39773:  -0.3333333
     42171 40358:  -0.1666667
@@ -60481,7 +60481,7 @@ DEAL::n_dofs=67854
     43181 7395:  0.3750000
     43181 29597:  0.2500000
     43181 29598:  0.2500000
-    43183 3199:  0.02929688
+    43183 3199:  0.02929687
     43183 6491:  -0.2343750
     43183 6608:  0.7119141
     43183 7395:  0.4833984
@@ -60509,7 +60509,7 @@ DEAL::n_dofs=67854
     43256 43423:  -0.1111111
     43256 44312:  0.8888889
     43257 3533:  3.469447e-18
-    43257 4346:  -8.673617e-19
+    43257 4346:  0.000000
     43257 4348:  -0.1111111
     43257 43423:  0.2222222
     43257 44312:  0.8888889
@@ -62749,7 +62749,7 @@ DEAL::n_dofs=67854
     46595 46732:  -0.09876543
     46595 46982:  0.07407407
     46595 47030:  0.7901235
-    46596 1917:  1.040834e-17
+    46596 1917:  6.938894e-18
     46596 1921:  -0.02160494
     46596 2326:  0.006172840
     46596 3536:  0.006172840
@@ -62794,7 +62794,7 @@ DEAL::n_dofs=67854
     46738 46982:  0.5000000
     46739 46980:  0.5000000
     46739 46983:  0.5000000
-    46742 1917:  -0.1289062
+    46742 1917:  -0.1289063
     46742 1921:  -0.08398438
     46742 4455:  0.7119141
     46742 4598:  0.2285156
@@ -62971,7 +62971,7 @@ DEAL::n_dofs=67854
     47026 1921:  0.5625000
     47026 2326:  0.1875000
     47026 3536:  0.06250000
-    47028 1917:  -0.1289062
+    47028 1917:  -0.1289063
     47028 1921:  0.2285156
     47028 4455:  0.7119141
     47028 4598:  -0.08398438
@@ -64693,7 +64693,7 @@ DEAL::n_dofs=67854
     49216 49569:  0.03125000
     49217 47309:  0.7500000
     49217 49569:  0.2500000
-    49218 4601:  -0.1289062
+    49218 4601:  -0.1289063
     49218 4686:  -0.07812500
     49218 4778:  -0.02636719
     49218 4794:  0.7119141
@@ -64951,7 +64951,7 @@ DEAL::n_dofs=67854
     49577 49537:  0.2500000
     49577 49539:  0.2500000
     49577 49540:  0.2500000
-    49578 4601:  -0.2539062
+    49578 4601:  -0.2539063
     49578 4686:  -0.2343750
     49578 4778:  0.3955078
     49578 4794:  0.7119141
@@ -66693,11 +66693,11 @@ DEAL::n_dofs=67854
     52531 48145:  0.2500000
     52531 48146:  0.2500000
     52531 48150:  0.3750000
-    52534 5238:  -0.09570312
+    52534 5238:  -0.09570313
     52534 5324:  -0.02343750
     52534 5407:  0.3955078
     52534 5433:  0.7119141
-    52534 47309:  -0.1289062
+    52534 47309:  -0.1289063
     52534 48150:  0.1406250
     52600 5238:  0.1666667
     52600 30433:  0.1666667
@@ -66985,11 +66985,11 @@ DEAL::n_dofs=67854
     52789 5322:  0.1875000
     52789 5324:  0.5625000
     52789 30433:  0.06250000
-    52790 5238:  0.02929688
+    52790 5238:  0.02929687
     52790 5324:  0.3515625
     52790 5407:  0.3955078
     52790 5433:  0.7119141
-    52790 47309:  -0.2539062
+    52790 47309:  -0.2539063
     52790 48150:  -0.2343750
     52856 49537:  0.6666667
     52856 53024:  0.3333333
@@ -72138,7 +72138,7 @@ DEAL::n_dofs=67854
     59202 3302:  0.6250000
     59202 3447:  -0.06481481
     59202 3456:  -0.03703704
-    59202 13250:  -5.551115e-17
+    59202 13250:  0.000000
     59202 13253:  0.4166667
     59203 1914:  0.1070602
     59203 3302:  0.3906250
@@ -72241,7 +72241,7 @@ DEAL::n_dofs=67854
     59360 3302:  0.7119141
     59360 3447:  -0.1464844
     59360 3456:  0.3515625
-    59360 13250:  -0.2539062
+    59360 13250:  -0.2539063
     59360 13253:  0.02929688
     59362 1914:  0.5625000
     59362 7596:  0.06250000

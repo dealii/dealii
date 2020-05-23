@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,8 +63,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   Functions::SlitSingularityFunction<2> exact_solution;
 
 
@@ -463,7 +461,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
     solution.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -631,7 +629,7 @@ namespace Step39
     SolverCG<TrilinosWrappers::MPI::Vector> solver(control);
 
     MGTransferPrebuilt<TrilinosWrappers::MPI::Vector> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     SolverControl coarse_solver_control(1000, 1e-10, false, false);
     SolverCG<TrilinosWrappers::MPI::Vector> coarse_solver(
@@ -654,12 +652,8 @@ namespace Step39
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgdown(mg_matrix_dg_down);
     mg::Matrix<TrilinosWrappers::MPI::Vector> mgup(mg_matrix_dg_up);
 
-    Multigrid<TrilinosWrappers::MPI::Vector> mg(dof_handler,
-                                                mgmatrix,
-                                                coarse_grid_solver,
-                                                mg_transfer,
-                                                mg_smoother,
-                                                mg_smoother);
+    Multigrid<TrilinosWrappers::MPI::Vector> mg(
+      mgmatrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim,
@@ -787,7 +781,6 @@ namespace Step39
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
   using namespace Step39;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(

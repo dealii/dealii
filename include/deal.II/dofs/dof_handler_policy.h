@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,9 +32,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#  ifndef DOXYGEN
 template <int, int>
 class DoFHandler;
-
+#  endif
 
 namespace internal
 {
@@ -213,7 +215,7 @@ namespace internal
 
       /**
        * This class implements the policy for operations when we use a
-       * parallel::distributed::Triangulation object.
+       * parallel::DistributedTriangulationBase object.
        */
       template <class DoFHandlerType>
       class ParallelDistributed

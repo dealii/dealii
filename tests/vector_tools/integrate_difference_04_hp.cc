@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 // x+y+z, x^2+y^2, z+xy
@@ -101,8 +100,7 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   solution = interpolated;
 
   Vector<double>       cellwise_errors(tria.n_active_cells());
-  hp::QCollection<dim> quadrature;
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 5));
+  hp::QCollection<dim> quadrature(QIterated<dim>(QTrapez<1>(), 5));
 
   const dealii::Function<dim, double> *w = nullptr;
   VectorTools::integrate_difference(dofh,

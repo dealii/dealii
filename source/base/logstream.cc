@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  Threads::Mutex log_lock;
-  Threads::Mutex write_lock;
+  std::mutex log_lock;
+  std::mutex write_lock;
 } // namespace
 
 

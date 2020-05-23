@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 template <int dim, typename number, int spacedim>
@@ -209,9 +208,9 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   mg_dof_handler_renumbered.distribute_dofs(fe);
-  mg_dof_handler_renumbered.distribute_mg_dofs(fe);
+  mg_dof_handler_renumbered.distribute_mg_dofs();
 
   std::vector<unsigned int> block_component(2 * dim, 0);
   for (unsigned int c = dim; c < 2 * dim; ++c)
@@ -359,10 +358,10 @@ LaplaceProblem<dim>::test()
                                             dirichlet_boundary);
 
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
   MGTransferPrebuilt<Vector<double>> mg_transfer_renumbered(
     mg_constrained_dofs_renumbered);
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered);
+  mg_transfer_renumbered.build(mg_dof_handler_renumbered);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from(mg_matrices[0]);
@@ -392,15 +391,10 @@ LaplaceProblem<dim>::test()
 
   mg::Matrix<Vector<double>> mg_matrix_renumbered(mg_matrices_renumbered);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
-                               mg_coarse,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>> mg(
+    mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
 
-  Multigrid<Vector<double>> mg_renumbered(mg_dof_handler_renumbered,
-                                          mg_matrix_renumbered,
+  Multigrid<Vector<double>> mg_renumbered(mg_matrix_renumbered,
                                           mg_coarse_renumbered,
                                           mg_transfer_renumbered,
                                           mg_smoother_renumbered,
@@ -444,9 +438,7 @@ LaplaceProblem<dim>::refine_local()
        cell != triangulation.end();
        ++cell)
     {
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2018 by the deal.II authors
+## Copyright (C) 2016 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -12,64 +12,6 @@
 ## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
-
-#
-# Find Python:
-#
-
-INCLUDE(FindPythonInterp)
-INCLUDE(FindPythonLibs)
-
-IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
-  MESSAGE(FATAL_ERROR
-    "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
-    "Python bindings require an external boost library, but deal.II was "
-    "configured with bundled boost."
-    )
-ENDIF()
-
-#
-# Unset Boost_Found and run the low level FindBOOST.cmake module again to
-# pick up libboost_python.so
-#
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-SET(Boost_FOUND)
-# Use the low level _FIND_PACKAGE function instead of our wrapper
-_FIND_PACKAGE(Boost 1.54 COMPONENTS python)
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-
-IF(NOT Boost_FOUND)
-  MESSAGE(FATAL_ERROR
-    "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
-    "The external boost library does not provide Boost.Python"
-    )
-ENDIF()
-
-#
-# FIXME: Once finalized, reconsider moving this definitions into
-# cmake/setup_dealii.cmake
-#
-# General information about deal.II:
-#
-#     PYTHON_BINDINGS_BASE_NAME       *)
-#     PYTHON_BINDINGS_DEBUG_NAME      *)
-#     PYTHON_BINDINGS_RELEASE_NAME    *)
-#
-# Information about paths, install locations and names:
-#
-#     DEAL_II_PYTHON_RELDIR           *) **)
-#
-# *)  Can be overwritten by the command line via -D<...>
-# **) We do a best effort guess on site-packages location...
-#
-
-SET_IF_EMPTY(PYTHON_BINDINGS_BASE_NAME "PyDealII")
-SET_IF_EMPTY(PYTHON_BINDINGS_DEBUG_NAME "Debug")
-SET_IF_EMPTY(PYTHON_BINDINGS_RELEASE_NAME "Release")
-
-SET_IF_EMPTY(DEAL_II_PYTHON_RELDIR
-  "${DEAL_II_LIBRARY_RELDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/${PYTHON_BINDINGS_BASE_NAME}"
-  )
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/include/
@@ -89,12 +31,20 @@ INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(_src
   wrappers.cc
+  export_tria_accessor.cc
   export_cell_accessor.cc
   export_point.cc
   export_triangulation.cc
+  export_mapping.cc
+  export_manifold.cc
+  export_quadrature.cc
   cell_accessor_wrapper.cc
+  tria_accessor_wrapper.cc
   point_wrapper.cc
   triangulation_wrapper.cc
+  mapping_wrapper.cc
+  manifold_wrapper.cc
+  quadrature_wrapper.cc
   )
 
 FOREACH(_build ${DEAL_II_BUILD_TYPES})

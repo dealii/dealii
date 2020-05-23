@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,6 +87,33 @@ public:
              const MappingQGeneric<dim, spacedim> &mapping);
 
   /**
+   * Initialize the data cache by letting the function given as an argument
+   * provide the mapping support points for all cells (on all levels) of the
+   * given triangulation. The function must return a vector of
+   * `Point<spacedim>` whose length is the same as the size of the polynomial
+   * space, $(p+1)^\text{dim}$, where $p$ is the polynomial degree of the
+   * mapping, and it must be in the order the mapping or FE_Q sort their
+   * points, i.e., all $2^\text{dim}$ vertex points first, then the points on
+   * the lines, quads, and hexes according to the usual hierarchical
+   * numbering. No attempt is made to validate these points internally, except
+   * for the number of given points.
+   *
+   * @note If multiple threads are enabled, this function will run in
+   * parallel, invoking the function passed in several times. Thus, in case
+   * MultithreadInfo::n_threads()>1, the user code must make sure that the
+   * function, typically a lambda, does not write into data shared with other
+   * threads.
+   *
+   * @note The cache is invalidated upon the signal
+   * Triangulation::Signals::any_change of the underlying triangulation.
+   */
+  void
+  initialize(const Triangulation<dim, spacedim> &triangulation,
+             const std::function<std::vector<Point<spacedim>>(
+               const typename Triangulation<dim, spacedim>::cell_iterator &)>
+               &compute_points_on_cell);
+
+  /**
    * Return the memory consumption (in bytes) of the cache.
    */
   std::size_t
@@ -94,7 +121,7 @@ public:
 
 protected:
   /**
-   * This is the main function overriden from the base class MappingQGeneric.
+   * This is the main function overridden from the base class MappingQGeneric.
    */
   virtual std::vector<Point<spacedim>>
   compute_mapping_support_points(
@@ -116,6 +143,8 @@ private:
    */
   boost::signals2::connection clear_signal;
 };
+
+/*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 

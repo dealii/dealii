@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2019 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,9 @@
 #include <deal.II/integrators/advection.h>
 #include <deal.II/integrators/laplace.h>
 
-#include "../test_grids.h"
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 using namespace LocalIntegrators::Advection;
 
@@ -276,7 +277,7 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
                          face_quadrature,
                          update_values | update_gradients |
                            update_normal_vectors | update_JxW_values);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       deallog << "boundary_matrix " << i << std::endl;
       fef1.reinit(cell1, i);

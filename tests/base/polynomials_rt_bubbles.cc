@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,8 @@ plot(const PolynomialsRT_Bubbles<dim> &poly)
 
       deallog << "RT_Bubbles" << poly.degree() << '<' << dim << '>' << '\t'
               << quadrature.point(k);
-      poly.compute(quadrature.point(k), values, grads, grads2, thirds, fourths);
+      poly.evaluate(
+        quadrature.point(k), values, grads, grads2, thirds, fourths);
 
       for (unsigned int i = 0; i < poly.n(); ++i)
         for (unsigned int d = 0; d < dim; ++d)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,6 @@
 #include <deal.II/base/function.h>
 
 #include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 

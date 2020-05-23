@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,11 +17,12 @@
 #define dealii_fe_tools_interpolate_templates_H
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/std_cxx14/memory.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -163,25 +164,20 @@ namespace FETools
                  ExcDimensionMismatch(cell1->get_fe().n_components(),
                                       cell2->get_fe().n_components()));
 
-          // for continuous elements on
-          // grids with hanging nodes we
-          // need hanging node
-          // constraints. Consequently,
-          // if there are no constraints
-          // then hanging nodes are not
-          // allowed.
+#ifdef DEBUG
+          // For continuous elements on grids with hanging nodes we need
+          // hanging node constraints. Consequently, when the elements are
+          // continuous no hanging node constraints are allowed.
           const bool hanging_nodes_not_allowed =
             ((cell2->get_fe().dofs_per_vertex != 0) &&
              (constraints.n_constraints() == 0));
 
           if (hanging_nodes_not_allowed)
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               Assert(cell1->at_boundary(face) ||
                        cell1->neighbor(face)->level() == cell1->level(),
                      ExcHangingNodesNotAllowed());
-
+#endif
 
           const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
           const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
@@ -326,6 +322,7 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
+#ifdef DEBUG
           // For continuous elements on grids with hanging nodes we need
           // hanging node constraints. Consequently, when the elements are
           // continuous no hanging node constraints are allowed.
@@ -333,12 +330,11 @@ namespace FETools
             (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
 
           if (hanging_nodes_not_allowed)
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
                      ExcHangingNodesNotAllowed());
+#endif
 
           const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
 
@@ -640,16 +636,6 @@ namespace FETools
                       " index sets."));
 #endif
 
-    // For continuous elements on grids
-    // with hanging nodes we need
-    // hanging node
-    // constraints. Consequently, when
-    // the elements are continuous no
-    // hanging node constraints are
-    // allowed.
-    const bool hanging_nodes_not_allowed =
-      (dof1.get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
-
     const unsigned int dofs_per_cell = dof1.get_fe().dofs_per_cell;
 
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
@@ -669,13 +655,19 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
+#ifdef DEBUG
+          // For continuous elements on grids with hanging nodes we need
+          // hanging node constraints. Consequently, when the elements are
+          // continuous no hanging node constraints are allowed.
+          const bool hanging_nodes_not_allowed =
+            (dof1.get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+
           if (hanging_nodes_not_allowed)
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
-                 ++face)
+            for (const unsigned int face : GeometryInfo<dim>::face_indices())
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
                      ExcHangingNodesNotAllowed());
+#endif
 
           cell->get_dof_values(u1, u1_local);
           difference_matrix.vmult(u1_diff_local, u1_local);

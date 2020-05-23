@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -355,7 +355,7 @@ public:
     fourth_derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;
@@ -402,8 +402,8 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
-     * This array has (dim-1)*GeometryInfo::faces_per_cell entries. The first
-     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * This array has `(dim-1)*GeometryInfo<dim>::%faces_per_cell` entries. The
+     * first GeometryInfo::faces_per_cell contain the vectors in the first
      * tangential direction for each face; the second set of
      * GeometryInfo::faces_per_cell entries contain the vectors in the second
      * tangential direction (only in 3d, since there we have 2 tangential
@@ -634,7 +634,7 @@ private:
   /**
    * A variable to guard access to the fe_values variable.
    */
-  mutable Threads::Mutex fe_values_mutex;
+  mutable std::mutex fe_values_mutex;
 
   void
   compute_data(const UpdateFlags      update_flags,

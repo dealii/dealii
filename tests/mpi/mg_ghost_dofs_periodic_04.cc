@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,7 @@ test()
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(face))
         {
           if (face >= 2)
@@ -86,7 +85,7 @@ test()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
-  dof_handler.distribute_mg_dofs(fe);
+  dof_handler.distribute_mg_dofs();
 
   std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
@@ -113,8 +112,6 @@ test()
 int
 main(int argc, char *argv[])
 {
-  using namespace dealii;
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
   MPILogInitAll log;

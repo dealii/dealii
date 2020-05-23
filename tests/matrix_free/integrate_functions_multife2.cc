@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,9 +44,9 @@
 #include <iostream>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
@@ -344,7 +344,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << std::setprecision(3);
 
   {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,6 +107,13 @@ namespace hp
     const Quadrature<dim> &operator[](const unsigned int index) const;
 
     /**
+     * Equality comparison operator. All stored Quadrature objects are compared
+     * in order.
+     */
+    bool
+    operator==(const QCollection<dim> &q_collection) const;
+
+    /**
      * Return the number of quadrature pointers stored in this object.
      */
     unsigned int
@@ -156,7 +163,8 @@ namespace hp
     // loop over all of the given arguments and add the quadrature objects to
     // this collection. Inlining the definition of q_pointers causes internal
     // compiler errors on GCC 7.1.1 so we define it separately:
-    const auto q_pointers = {&quadrature_objects...};
+    const auto q_pointers = {
+      (static_cast<const Quadrature<dim> *>(&quadrature_objects))...};
     for (const auto p : q_pointers)
       push_back(*p);
   }
@@ -193,9 +201,25 @@ namespace hp
   inline const Quadrature<dim> &QCollection<dim>::
                                 operator[](const unsigned int index) const
   {
-    Assert(index < quadratures.size(),
-           ExcIndexRange(index, 0, quadratures.size()));
+    AssertIndexRange(index, quadratures.size());
     return *quadratures[index];
+  }
+
+
+
+  template <int dim>
+  inline bool
+  QCollection<dim>::operator==(const QCollection<dim> &q_collection) const
+  {
+    const unsigned int n_quadratures = size();
+    if (n_quadratures != q_collection.size())
+      return false;
+
+    for (unsigned int i = 0; i < n_quadratures; ++i)
+      if (!(*quadratures[i] == q_collection[i]))
+        return false;
+
+    return true;
   }
 
 

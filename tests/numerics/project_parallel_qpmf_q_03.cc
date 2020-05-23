@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 // FE_Q on a mesh with hanging nodes and specified fe_component
 
 #include "../tests.h"
+
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>

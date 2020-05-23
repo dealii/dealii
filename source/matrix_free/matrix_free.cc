@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,13 +24,17 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#define SPLIT_INSTANTIATIONS_COUNT 3
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#  define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
 #include "matrix_free.inst"
+
+#if SPLIT_INSTANTIATIONS_INDEX == 0
 
 template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
 template struct internal::MatrixFreeFunctions::ShapeInfo<float>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<
-  VectorizedArray<double>>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<
-  VectorizedArray<float>>;
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

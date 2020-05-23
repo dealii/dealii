@@ -1,98 +1,270 @@
 <h1>Results</h1>
 
-The output that this program generates is, of course, the same as that
-of step-6, so you may see there for more results. On the
-other hand, since no tutorial program is a good one unless it has at
-least one colorful picture, here is, again, the solution:
-
-
-When run, the output of this program is
-<pre>
+When you run the program, the screen output should look like the following:
+@code
 Cycle 0:
-   Number of active cells:       20
-   Number of degrees of freedom: 25 (by level: 8, 25)
-   7 CG iterations needed to obtain convergence.
-Cycle 1:
-   Number of active cells:       44
-   Number of degrees of freedom: 57 (by level: 8, 25, 48)
-   8 CG iterations needed to obtain convergence.
-Cycle 2:
-   Number of active cells:       92
-   Number of degrees of freedom: 117 (by level: 8, 25, 80, 60)
-   9 CG iterations needed to obtain convergence.
-Cycle 3:
-   Number of active cells:       188
-   Number of degrees of freedom: 221 (by level: 8, 25, 80, 200)
-   12 CG iterations needed to obtain convergence.
-Cycle 4:
-   Number of active cells:       416
-   Number of degrees of freedom: 485 (by level: 8, 25, 89, 288, 280)
-   13 CG iterations needed to obtain convergence.
-Cycle 5:
-   Number of active cells:       800
-   Number of degrees of freedom: 925 (by level: 8, 25, 89, 288, 784, 132)
-   14 CG iterations needed to obtain convergence.
-Cycle 6:
-   Number of active cells:       1628
-   Number of degrees of freedom: 1865 (by level: 8, 25, 89, 304, 1000, 1164, 72)
-   14 CG iterations needed to obtain convergence.
-Cycle 7:
-   Number of active cells:       3194
-   Number of degrees of freedom: 3603 (by level: 8, 25, 89, 328, 1032, 2200, 1392)
-   16 CG iterations needed to obtain convergence.
-</pre>
-That's not perfect &mdash; we would have hoped for a constant number
-of iterations rather than one that increases as we get more and more
-degrees of freedom &mdash; but it is also not far away. The reason for
-this is easy enough to understand, however: since we have a strongly
-varying coefficient, the operators that we assembly by quadrature on
-the lower levels become worse and worse approximations of the operator
-on the finest level. Consequently, even if we had perfect solvers on
-the coarser levels, they would not be good preconditioners on the
-finest level. This theory is easily tested by comparing results when
-we use a constant coefficient: in that case, the number of iterations
-remains constant at 9 after the first three or four refinement steps.
+   Number of active cells:       56 (2 global levels)
+   Workload imbalance:           1.14286
+   Number of degrees of freedom: 665 (by level: 117, 665)
+   Number of CG iterations:      10
+   Wrote solution_00.pvtu
 
-We can also compare what this program produces with how @ref step_5
-"step-5" performed. To solve the same problem as in step-5, the only
-two changes that are necessary are (i) to replace the body of the
-function <code>LaplaceProblem::refine_grid</code> by a call to
-<code>triangulation.refine_global(1)</code>, and (ii) to use the same
-SolverControl object and tolerance as in step-5 &mdash; the rest of the
-program remains unchanged. In that case, here is how the solvers used
-in step-5 and the multigrid solver used in the current program
-compare:
-<table align="center">
-<tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
-<tr><td>20</td>   <td>13</td> <td>6</td> </tr>
-<tr><td>80</td>   <td>17</td> <td>7</td> </tr>
-<tr><td>320</td>  <td>29</td> <td>9</td> </tr>
-<tr><td>1280</td> <td>51</td> <td>10</td> </tr>
-<tr><td>5120</td> <td>94</td> <td>11</td> </tr>
-<tr><td>20480</td><td>180</td><td>13</td></tr>
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0457s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble right hand side        |         1 |  0.000241s |      0.53% |
+| Estimate                        |         1 |    0.0288s |        63% |
+| Output results                  |         1 |   0.00219s |       4.8% |
+| Setup                           |         1 |   0.00264s |       5.8% |
+| Setup multigrid                 |         1 |   0.00261s |       5.7% |
+| Solve                           |         1 |   0.00355s |       7.8% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000315s |      0.69% |
+| Solve: CG                       |         1 |   0.00186s |       4.1% |
+| Solve: Preconditioner setup     |         1 |  0.000968s |       2.1% |
++---------------------------------+-----------+------------+------------+
+
+Cycle 1:
+   Number of active cells:       126 (3 global levels)
+   Workload imbalance:           1.17483
+   Number of degrees of freedom: 1672 (by level: 117, 665, 1100)
+   Number of CG iterations:      11
+   Wrote solution_01.pvtu
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0433s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble right hand side        |         1 |  0.000286s |      0.66% |
+| Estimate                        |         1 |    0.0272s |        63% |
+| Output results                  |         1 |   0.00333s |       7.7% |
+| Refine grid                     |         1 |   0.00196s |       4.5% |
+| Setup                           |         1 |    0.0023s |       5.3% |
+| Setup multigrid                 |         1 |   0.00262s |         6% |
+| Solve                           |         1 |   0.00549s |        13% |
+| Solve: 1 multigrid V-cycle      |         1 |  0.000343s |      0.79% |
+| Solve: CG                       |         1 |   0.00293s |       6.8% |
+| Solve: Preconditioner setup     |         1 |   0.00174s |         4% |
++---------------------------------+-----------+------------+------------+
+
+Cycle 2:
+.
+.
+.
+@endcode
+Here, the timing of the `solve()` function is split up in 3 parts: setting
+up the multigrid preconditioner, execution of a single multigrid V-cycle, and
+the CG solver. The V-cycle that is timed is unnecessary for the overall solve
+and only meant to give an insight at the different costs for AMG and GMG.
+Also it should be noted that when using the AMG solver, "Workload imbalance"
+is not included in the output since the hierarchy of coarse meshes is not
+required.
+
+All results in this section are gathered on Intel Xeon Platinum 8280 (Cascade
+Lake) nodes which have 56 cores and 192GB per node and support AVX-512 instructions,
+allowing for vectorization over 8 doubles (vectorization used only in the matrix-free
+computations). The code is compiled using gcc 7.1.0 with intel-mpi 17.0.3. Trilinos
+12.10.1 is used for the matrix-based GMG/AMG computations.
+
+We can then gather a variety of information by calling the program
+with the input files that are provided in the directory in which
+step-50 is located. Using these, and adjusting the number of mesh
+refinement steps, we can produce information about how well the
+program scales.
+
+The following table gives weak scaling timings for this program on up to 256M DoFs
+and 7,168 processors. (Recall that weak scaling keeps the number of
+degrees of freedom per processor constant while increasing the number of
+processors; i.e., it considers larger and larger problems.)
+Here, $\mathbb{E}$ is the partition efficiency from the
+ introduction (also equal to 1.0/workload imbalance), "Setup" is a combination
+of setup, setup multigrid, assemble, and assemble multigrid from the timing blocks,
+and "Prec" is the preconditioner setup. Ideally all times would stay constant
+over each problem size for the individual solvers, but since the partition
+efficiency decreases from 0.371 to 0.161 from largest to smallest problem size,
+we expect to see an approximately $0.371/0.161=2.3$ times increase in timings
+for GMG. This is, in fact, pretty close to what we really get:
+
+<table align="center" class="doxtable">
+<tr>
+  <th colspan="4"></th>
+  <th></th>
+  <th colspan="4">MF-GMG</th>
+  <th></th>
+  <th colspan="4">MB-GMG</th>
+  <th></th>
+  <th colspan="4">AMG</th>
+</tr>
+<tr>
+  <th align="right">Procs</th>
+  <th align="right">Cycle</th>
+  <th align="right">DoFs</th>
+  <th align="right">$\mathbb{E}$</th>
+  <th></th>
+  <th align="right">Setup</th>
+  <th align="right">Prec</th>
+  <th align="right">Solve</th>
+  <th align="right">Total</th>
+  <th></th>
+  <th align="right">Setup</th>
+  <th align="right">Prec</th>
+  <th align="right">Solve</th>
+  <th align="right">Total</th>
+  <th></th>
+  <th align="right">Setup</th>
+  <th align="right">Prec</th>
+  <th align="right">Solve</th>
+  <th align="right">Total</th>
+</tr>
+<tr>
+  <td align="right">112</th>
+  <td align="right">13</th>
+  <td align="right">4M</th>
+  <td align="right">0.37</th>
+  <td></td>
+  <td align="right">0.742</th>
+  <td align="right">0.393</th>
+  <td align="right">0.200</th>
+  <td align="right">1.335</th>
+  <td></td>
+  <td align="right">1.714</th>
+  <td align="right">2.934</th>
+  <td align="right">0.716</th>
+  <td align="right">5.364</th>
+  <td></td>
+  <td align="right">1.544</th>
+  <td align="right">0.456</th>
+  <td align="right">1.150</th>
+  <td align="right">3.150</th>
+</tr>
+<tr>
+  <td align="right">448</th>
+  <td align="right">15</th>
+  <td align="right">16M</th>
+  <td align="right">0.29</th>
+  <td></td>
+  <td align="right">0.884</th>
+  <td align="right">0.535</th>
+  <td align="right">0.253</th>
+  <td align="right">1.672</th>
+  <td></td>
+  <td align="right">1.927</th>
+  <td align="right">3.776</th>
+  <td align="right">1.190</th>
+  <td align="right">6.893</th>
+  <td></td>
+  <td align="right">1.544</th>
+  <td align="right">0.456</th>
+  <td align="right">1.150</th>
+  <td align="right">3.150</th>
+</tr>
+<tr>
+  <td align="right">1,792</th>
+  <td align="right">17</th>
+  <td align="right">65M</th>
+  <td align="right">0.22</th>
+  <td></td>
+  <td align="right">1.122</th>
+  <td align="right">0.686</th>
+  <td align="right">0.309</th>
+  <td align="right">2.117</th>
+  <td></td>
+  <td align="right">2.171</th>
+  <td align="right">4.862</th>
+  <td align="right">1.660</th>
+  <td align="right">8.693</th>
+  <td></td>
+  <td align="right">1.654</th>
+  <td align="right">0.546</th>
+  <td align="right">1.460</th>
+  <td align="right">3.660</th>
+</tr>
+<tr>
+  <td align="right">7,168</th>
+  <td align="right">19</th>
+  <td align="right">256M</th>
+  <td align="right">0.16</th>
+  <td></td>
+  <td align="right">1.214</th>
+  <td align="right">0.893</th>
+  <td align="right">0.521</th>
+  <td align="right">2.628</th>
+  <td></td>
+  <td align="right">2.386</th>
+  <td align="right">7.260</th>
+  <td align="right">2.560</th>
+  <td align="right">12.206</th>
+  <td></td>
+  <td align="right">1.844</th>
+  <td align="right">1.010</th>
+  <td align="right">1.890</th>
+  <td align="right">4.744</th>
+</tr>
 </table>
-This isn't only fewer iterations than in step-5 (each of which
-is, however, much more expensive) but more importantly, the number of
-iterations also grows much more slowly under mesh refinement (again,
-it would be almost constant if the coefficient was constant rather
-than strongly varying as chosen here). This justifies the common
-observation that, whenever possible, multigrid methods should be used
-for second order problems.
+
+On the other hand, the algebraic multigrid in the last set of columns
+is relatively unaffected by the increasing imbalance of the mesh
+hierarchy (because it doesn't use the mesh hierarchy) and the growth
+in time is rather driven by other factors that are well documented in
+the literature (most notably that the algorithmic complexity of
+some parts of algebraic multigrid methods appears to be ${\cal O}(N
+\log N)$ instead of ${\cal O}(N)$ for geometric multigrid).
+
+The upshort of the table above is that the matrix-free geometric multigrid
+method appears to be the fastest approach to solving this equation if
+not by a huge margin. Matrix-based methods, on the other hand, are
+consistently the worst.
+
+The following figure provides strong scaling results for each method, i.e.,
+we solve the same problem on more and more processors. Specifically,
+we consider the problems after 16 mesh refinement cycles
+(32M DoFs) and 19 cycles (256M DoFs), on between 56 to 28,672 processors:
+
+<img width="600px" src="https://www.dealii.org/images/steps/developer/step-50-strong-scaling.png" alt="">
+
+While the matrix-based GMG solver and AMG scale similarly and have a
+similar time to solution (at least as long as there is a substantial
+number of unknowns per processor -- say, several 10,000), the
+matrix-free GMG solver scales much better and solves the finer problem
+in roughly the same time as the AMG solver for the coarser mesh with
+only an eighth of the number of processors. Conversely, it can solve the
+same problem on the same number of processors in about one eighth the
+time.
 
 
 <h3> Possible extensions </h3>
 
-A close inspection of this program's performance shows that it is mostly
-dominated by matrix-vector operations. step-37 shows one way
-how this can be avoided by working with matrix-free methods.
+<h4> Testing convergence and higher order elements </h4>
 
-Another avenue would be to use algebraic multigrid methods. The
-geometric multigrid method used here can at times be a bit awkward to
-implement because it needs all those additional data structures, and
-it becomes even more difficult if the program is to run in %parallel on
-machines coupled through MPI, for example. In that case, it would be
-simpler if one could use a black-box preconditioner that uses some
-sort of multigrid hierarchy for good performance but can figure out
-level matrices and similar things out by itself. Algebraic multigrid
-methods do exactly this, and we will use them in
-step-31 for the solution of a Stokes problem.
+The finite element degree is currently hard-coded as 2, see the template
+arguments of the main class. It is easy to change. To test, it would be
+interesting to switch to a test problem with a reference solution. This way,
+you can compare error rates.
+
+<h4> Coarse solver </h4>
+
+A more interesting example would involve a more complicated coarse mesh (see
+step-49 for inspiration). The issue in that case is that the coarsest
+level of the mesh hierarchy is actually quite large, and one would
+have to think about ways to solve the coarse level problem
+efficiently. (This is not an issue for algebraic multigrid methods
+because they would just continue to build coarser and coarser levels
+of the matrix, regardless of their geometric origin.)
+
+In the program here, we simply solve the coarse level problem with a
+Conjugate Gradient method without any preconditioner. That is acceptable
+if the coarse problem is really small -- for example, if the coarse
+mesh had a single cell, then the coarse mesh problems has a $9\times 9$
+matrix in 2d, and a $27\times 27$ matrix in 3d; for the coarse mesh we
+use on the $L$-shaped domain of the current program, these sizes are
+$21\times 21$ in 2d and $117\times 117$ in 3d. But if the coarse mesh
+consists of hundreds or thousands of cells, this approach will no
+longer work and might start to dominate the overall run-time of each V-cyle.
+A common approach is then to solve the coarse mesh problem using an
+algebraic multigrid preconditioner; this would then, however, require
+assembling the coarse matrix (even for the matrix-free version) as
+input to the AMG implementation.

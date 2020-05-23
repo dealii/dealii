@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -21,6 +21,8 @@
 #include <deal.II/base/iterator_range.h>
 
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -75,7 +77,6 @@ test()
   auto cell_worker = [](const Iterator &cell, ScratchData &s, CopyData &c) {
     const auto &fev = s.reinit(cell);
     const auto &JxW = s.get_JxW_values();
-    c               = 0;
     for (auto w : JxW)
       c.vectors[0][0] += w;
   };

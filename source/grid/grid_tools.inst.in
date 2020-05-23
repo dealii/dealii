@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const typename Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::active_cell_iterator &,
-        const Point<deal_II_space_dimension> &);
+        const Point<deal_II_space_dimension> &,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
 
       template std::map<unsigned int, types::global_vertex_index>
       compute_local_to_global_vertex_index_map(
@@ -175,6 +176,16 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
       std::pair<BoundingBox<deal_II_space_dimension>, unsigned int>>
     GridTools::build_global_description_tree(
       const std::vector<BoundingBox<deal_II_space_dimension>> &, MPI_Comm);
+
+    template Vector<double> GridTools::compute_aspect_ratio_of_cells(
+      const Mapping<deal_II_space_dimension> &,
+      const Triangulation<deal_II_space_dimension> &,
+      const Quadrature<deal_II_space_dimension> &);
+
+    template double GridTools::compute_maximum_aspect_ratio(
+      const Mapping<deal_II_space_dimension> &,
+      const Triangulation<deal_II_space_dimension> &,
+      const Quadrature<deal_II_space_dimension> &);
   }
 
 
@@ -287,7 +298,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       partition_triangulation_zorder(
         const unsigned int,
-        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const bool);
 
       template void
       partition_multigrid_levels(
@@ -346,8 +358,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Function<deal_II_dimension> *                     coefficient,
         const bool);
 
-#    endif
-
       template Triangulation<deal_II_dimension,
                              deal_II_space_dimension>::DistortedCellList
       fix_up_distorted_child_cells(
@@ -356,6 +366,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &distorted_cells,
         Triangulation<deal_II_dimension, deal_II_space_dimension>
           &triangulation);
+#    endif
 #  endif
     \}
 #endif
@@ -394,6 +405,16 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       regularize_corner_cells(
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         double);
+
+      template void
+      collect_coinciding_vertices(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        std::map<unsigned int, std::vector<unsigned int>> &,
+        std::map<unsigned int, unsigned int> &);
+
+      template std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+      compute_vertices_with_ghost_neighbors(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
     \}
 #endif
   }

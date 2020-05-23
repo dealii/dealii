@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/derivative_form.h>
 
 #include <deal.II/fe/fe_update_flags.h>
@@ -458,7 +459,8 @@ public:
 
   /**
    * Transform the point @p p on the real @p cell to the corresponding point
-   * on the unit cell, and then projects it to a dim-1  point on the face with
+   * on the reference cell, and then project this point to a (dim-1)-dimensional
+   * point in the coordinate system of the face with
    * the given face number @p face_no. Ideally the point @p p is near the face
    * @p face_no, but any point in the cell can technically be projected.
    *
@@ -628,7 +630,7 @@ public:
     UpdateFlags update_each;
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const;

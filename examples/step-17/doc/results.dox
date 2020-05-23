@@ -104,7 +104,7 @@ relevant to when the code was initially written, in 2004.) I lost the timing
 information for the last step, though, but you get the idea. All this is after
 release mode has been enabled by running <code>make release</code>, and
 with the generation of graphical output switched off for the reasons stated in
-the program comments above. 
+the program comments above.
 (@dealiiVideoLectureSeeAlso{18})
 The biggest 2d computations I did had roughly 7.1
 million unknowns, and were done on 32 processes. It took about 40 minutes.
@@ -237,7 +237,7 @@ the right one shows the x-displacement along two cutplanes through the cube.
 The program keeps a complete copy of the Triangulation and DoFHandler objects
 on every processor. It also creates complete copies of the solution vector,
 and it creates output on only one processor. All of this is obviously
-the bottleneck as far as parallelization is concerned. 
+the bottleneck as far as parallelization is concerned.
 
 Internally, within deal.II, parallelizing the data
 structures used in hierarchic and unstructured triangulations is a hard

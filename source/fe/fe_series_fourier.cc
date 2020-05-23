@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,8 @@
 
 
 
-#include <deal.II/base/config.h>
-
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe_series.h>
 
@@ -87,6 +86,7 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
+    const std::vector<unsigned int> &              n_coefficients_per_direction,
     const hp::FECollection<1, spacedim> &          fe_collection,
     const hp::QCollection<1> &                     q_collection,
     const Table<1, Tensor<1, 1>> &                 k_vectors,
@@ -97,10 +97,10 @@ namespace
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
-        fourier_transform_matrices[fe].reinit(k_vectors.n_elements(),
+        fourier_transform_matrices[fe].reinit(n_coefficients_per_direction[fe],
                                               fe_collection[fe].dofs_per_cell);
 
-        for (unsigned int k = 0; k < k_vectors.size(0); ++k)
+        for (unsigned int k = 0; k < n_coefficients_per_direction[fe]; ++k)
           for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
             fourier_transform_matrices[fe](k, j) =
               integrate(fe_collection[fe], q_collection[fe], k_vectors(k), j);
@@ -110,6 +110,7 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
+    const std::vector<unsigned int> &              n_coefficients_per_direction,
     const hp::FECollection<2, spacedim> &          fe_collection,
     const hp::QCollection<2> &                     q_collection,
     const Table<2, Tensor<1, 2>> &                 k_vectors,
@@ -120,12 +121,14 @@ namespace
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
-        fourier_transform_matrices[fe].reinit(k_vectors.n_elements(),
-                                              fe_collection[fe].dofs_per_cell);
+        fourier_transform_matrices[fe].reinit(
+          Utilities::fixed_power<2>(n_coefficients_per_direction[fe]),
+          fe_collection[fe].dofs_per_cell);
 
         unsigned int k = 0;
-        for (unsigned int k1 = 0; k1 < k_vectors.size(0); ++k1)
-          for (unsigned int k2 = 0; k2 < k_vectors.size(1); ++k2, k++)
+        for (unsigned int k1 = 0; k1 < n_coefficients_per_direction[fe]; ++k1)
+          for (unsigned int k2 = 0; k2 < n_coefficients_per_direction[fe];
+               ++k2, ++k)
             for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
               fourier_transform_matrices[fe](k, j) = integrate(
                 fe_collection[fe], q_collection[fe], k_vectors(k1, k2), j);
@@ -135,6 +138,7 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
+    const std::vector<unsigned int> &              n_coefficients_per_direction,
     const hp::FECollection<3, spacedim> &          fe_collection,
     const hp::QCollection<3> &                     q_collection,
     const Table<3, Tensor<1, 3>> &                 k_vectors,
@@ -145,13 +149,15 @@ namespace
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
-        fourier_transform_matrices[fe].reinit(k_vectors.n_elements(),
-                                              fe_collection[fe].dofs_per_cell);
+        fourier_transform_matrices[fe].reinit(
+          Utilities::fixed_power<3>(n_coefficients_per_direction[fe]),
+          fe_collection[fe].dofs_per_cell);
 
         unsigned int k = 0;
-        for (unsigned int k1 = 0; k1 < k_vectors.size(0); ++k1)
-          for (unsigned int k2 = 0; k2 < k_vectors.size(1); ++k2)
-            for (unsigned int k3 = 0; k3 < k_vectors.size(2); ++k3, k++)
+        for (unsigned int k1 = 0; k1 < n_coefficients_per_direction[fe]; ++k1)
+          for (unsigned int k2 = 0; k2 < n_coefficients_per_direction[fe]; ++k2)
+            for (unsigned int k3 = 0; k3 < n_coefficients_per_direction[fe];
+                 ++k3, ++k)
               for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
                 fourier_transform_matrices[fe](k, j) =
                   integrate(fe_collection[fe],
@@ -168,15 +174,84 @@ namespace FESeries
 {
   template <int dim, int spacedim>
   Fourier<dim, spacedim>::Fourier(
-    const unsigned int                     N,
+    const std::vector<unsigned int> &      n_coefficients_per_direction,
     const hp::FECollection<dim, spacedim> &fe_collection,
     const hp::QCollection<dim> &           q_collection)
-    : fe_collection(&fe_collection)
-    , q_collection(&q_collection)
+    : n_coefficients_per_direction(n_coefficients_per_direction)
+    , fe_collection(&fe_collection)
+    , q_collection(q_collection)
     , fourier_transform_matrices(fe_collection.size())
   {
-    set_k_vectors(k_vectors, N);
-    unrolled_coefficients.resize(k_vectors.n_elements());
+    Assert(n_coefficients_per_direction.size() == fe_collection.size() &&
+             n_coefficients_per_direction.size() == q_collection.size(),
+           ExcMessage("All parameters are supposed to have the same size."));
+
+    const unsigned int max_n_coefficients_per_direction =
+      *std::max_element(n_coefficients_per_direction.cbegin(),
+                        n_coefficients_per_direction.cend());
+    set_k_vectors(k_vectors, max_n_coefficients_per_direction);
+
+    // reserve sufficient memory
+    unrolled_coefficients.reserve(k_vectors.n_elements());
+  }
+
+
+
+  template <int dim, int spacedim>
+  Fourier<dim, spacedim>::Fourier(
+    const unsigned int                     n_coefficients_per_direction,
+    const hp::FECollection<dim, spacedim> &fe_collection,
+    const hp::QCollection<dim> &           q_collection)
+    : Fourier<dim, spacedim>(
+        std::vector<unsigned int>(fe_collection.size(),
+                                  n_coefficients_per_direction),
+        fe_collection,
+        q_collection)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  inline bool
+  Fourier<dim, spacedim>::
+  operator==(const Fourier<dim, spacedim> &fourier) const
+  {
+    return (
+      (n_coefficients_per_direction == fourier.n_coefficients_per_direction) &&
+      (*fe_collection == *(fourier.fe_collection)) &&
+      (q_collection == fourier.q_collection) &&
+      (k_vectors == fourier.k_vectors) &&
+      (fourier_transform_matrices == fourier.fourier_transform_matrices));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  Fourier<dim, spacedim>::precalculate_all_transformation_matrices()
+  {
+    Threads::TaskGroup<> task_group;
+    for (unsigned int fe = 0; fe < fe_collection->size(); ++fe)
+      task_group += Threads::new_task([&, fe]() {
+        ensure_existence(n_coefficients_per_direction,
+                         *fe_collection,
+                         q_collection,
+                         k_vectors,
+                         fe,
+                         fourier_transform_matrices);
+      });
+
+    task_group.join_all();
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  Fourier<dim, spacedim>::get_n_coefficients_per_direction(
+    const unsigned int index) const
+  {
+    return n_coefficients_per_direction[index];
   }
 
 
@@ -189,8 +264,13 @@ namespace FESeries
     const unsigned int           cell_active_fe_index,
     Table<dim, CoefficientType> &fourier_coefficients)
   {
-    ensure_existence(*fe_collection,
-                     *q_collection,
+    for (unsigned int d = 0; d < dim; ++d)
+      AssertDimension(fourier_coefficients.size(d),
+                      n_coefficients_per_direction[cell_active_fe_index]);
+
+    ensure_existence(n_coefficients_per_direction,
+                     *fe_collection,
+                     q_collection,
                      k_vectors,
                      cell_active_fe_index,
                      fourier_transform_matrices);
@@ -198,6 +278,8 @@ namespace FESeries
     const FullMatrix<CoefficientType> &matrix =
       fourier_transform_matrices[cell_active_fe_index];
 
+    unrolled_coefficients.resize(Utilities::fixed_power<dim>(
+      n_coefficients_per_direction[cell_active_fe_index]));
     std::fill(unrolled_coefficients.begin(),
               unrolled_coefficients.end(),
               CoefficientType(0.));

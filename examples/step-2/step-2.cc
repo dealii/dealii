@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -24,7 +24,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
 // However, the next file is new. We need this include file for the
 // association of degrees of freedom ("DoF"s) to vertices, lines, and cells:

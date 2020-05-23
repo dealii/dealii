@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,11 +21,13 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "full_matrix.inst"
 
-#ifndef DEAL_II_WITH_COMPLEX_VALUES
+#ifndef DOXYGEN
+
+#  ifndef DEAL_II_WITH_COMPLEX_VALUES
 // instantiate for std::complex<double> because we use it internally in
 // FESeries.
 template class FullMatrix<std::complex<double>>;
-#endif
+#  endif
 
 // instantiate for long double manually because we use it in a few places
 // inside the library
@@ -66,19 +68,21 @@ FullMatrix<long double>::add<long double>(const long double,
 // arguments is covered by the default copy constructor and copy operator that
 // is declared separately)
 
-#define TEMPL_OP_EQ(S1, S2) \
-  template FullMatrix<S1> &FullMatrix<S1>::operator=(const FullMatrix<S2> &)
+#  define TEMPL_OP_EQ(S1, S2) \
+    template FullMatrix<S1> &FullMatrix<S1>::operator=(const FullMatrix<S2> &)
 
 TEMPL_OP_EQ(double, float);
 TEMPL_OP_EQ(float, double);
 
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
 TEMPL_OP_EQ(std::complex<double>, std::complex<float>);
 TEMPL_OP_EQ(std::complex<float>, std::complex<double>);
 TEMPL_OP_EQ(std::complex<double>, double);
 TEMPL_OP_EQ(std::complex<float>, float);
-#endif
+#  endif
 
-#undef TEMPL_OP_EQ
+#  undef TEMPL_OP_EQ
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

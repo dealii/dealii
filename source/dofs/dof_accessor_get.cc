@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,8 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
   Vector<number> &   interpolated_values,
   const unsigned int fe_index) const
 {
-  if (!this->has_children())
-    // if this cell has no children: simply return the exact values on this
+  if (this->is_active())
+    // If this cell is active: simply return the exact values on this
     // cell unless the finite element we need to interpolate to is different
     // than the one we have on the current cell
     {
@@ -69,19 +69,28 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
           // well, here we need to first get the values from the current
           // cell and then interpolate it to the element requested. this
           // can clearly only happen for hp::DoFHandler objects
-          Vector<number> tmp(this->get_fe().dofs_per_cell);
-          this->get_dof_values(values, tmp);
+          const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
+          if (dofs_per_cell == 0)
+            {
+              interpolated_values = 0;
+            }
+          else
+            {
+              Vector<number> tmp(dofs_per_cell);
+              this->get_dof_values(values, tmp);
 
-          FullMatrix<double> interpolation(
-            this->dof_handler->get_fe(fe_index).dofs_per_cell,
-            this->get_fe().dofs_per_cell);
-          this->dof_handler->get_fe(fe_index).get_interpolation_matrix(
-            this->get_fe(), interpolation);
-          interpolation.vmult(interpolated_values, tmp);
+              FullMatrix<double> interpolation(
+                this->dof_handler->get_fe(fe_index).dofs_per_cell,
+                this->get_fe().dofs_per_cell);
+              this->dof_handler->get_fe(fe_index).get_interpolation_matrix(
+                this->get_fe(), interpolation);
+              interpolation.vmult(interpolated_values, tmp);
+            }
         }
     }
   else
-    // otherwise obtain them from the children
+    // The cell is not active; we need to obtain data them from
+    // children recursively.
     {
       // we are on a non-active cell. these do not have any finite
       // element associated with them in the hp context (in the non-hp

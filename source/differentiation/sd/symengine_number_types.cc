@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,17 +50,17 @@ namespace Differentiation
     {}
 
 
-    Expression::Expression(const bool &value)
+    Expression::Expression(const bool value)
       : expression(SE::boolean(value))
     {}
 
 
-    Expression::Expression(const SE::integer_class &value)
+    Expression::Expression(const SymEngine::integer_class &value)
       : expression(value)
     {}
 
 
-    Expression::Expression(const SE::rational_class &value)
+    Expression::Expression(const SymEngine::rational_class &value)
       : expression(value)
     {}
 
@@ -150,17 +150,17 @@ namespace Differentiation
     {}
 
 
-    Expression::Expression(const SE::Expression &rhs)
+    Expression::Expression(const SymEngine::Expression &rhs)
       : expression(rhs)
     {}
 
 
-    Expression::Expression(const SE::RCP<const SE::Basic> &rhs)
+    Expression::Expression(const SymEngine::RCP<const SymEngine::Basic> &rhs)
       : expression(rhs)
     {}
 
 
-    Expression::Expression(SE::RCP<const SE::Basic> &&rhs)
+    Expression::Expression(SymEngine::RCP<const SymEngine::Basic> &&rhs)
       : expression(rhs)
     {}
 
@@ -241,14 +241,16 @@ namespace Differentiation
 
 
     Expression
-    Expression::differentiate(const SE::RCP<const SE::Symbol> &symbol) const
+    Expression::differentiate(
+      const SymEngine::RCP<const SymEngine::Symbol> &symbol) const
     {
       return Expression(SE::diff(get_RCP(), symbol));
     }
 
 
     Expression
-    Expression::differentiate(const SE::RCP<const SE::Basic> &symbol) const
+    Expression::differentiate(
+      const SymEngine::RCP<const SymEngine::Basic> &symbol) const
     {
       // Potential symbol
       return Expression(SE::sdiff(get_RCP(), symbol));
@@ -265,13 +267,13 @@ namespace Differentiation
     /* ------------- Conversion operators ------------------------- */
 
 
-    Expression::operator const SE::Expression &() const
+    Expression::operator const SymEngine::Expression &() const
     {
       return get_expression();
     }
 
 
-    Expression::operator const SE::RCP<const SE::Basic> &() const
+    Expression::operator const SymEngine::RCP<const SymEngine::Basic> &() const
     {
       return get_expression().get_basic();
     }
@@ -282,10 +284,18 @@ namespace Differentiation
 
     Expression
     Expression::substitute(
+      const SymEngine::map_basic_basic &substitution_values) const
+    {
+      return Expression(get_expression().subs(substitution_values));
+    }
+
+
+    Expression
+    Expression::substitute(
       const types::substitution_map &substitution_values) const
     {
-      return Expression(get_expression().subs(
-        Utilities::convert_expression_map_to_basic_map(substitution_values)));
+      return substitute(
+        Utilities::convert_expression_map_to_basic_map(substitution_values));
     }
 
 
@@ -317,7 +327,7 @@ namespace Differentiation
 
 
     Expression &
-    Expression::operator=(Expression &&rhs)
+    Expression::operator=(Expression &&rhs) noexcept
     {
       if (this != &rhs)
         this->expression = std::move(rhs.expression);

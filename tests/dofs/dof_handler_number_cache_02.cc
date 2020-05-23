@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,17 +95,21 @@ test()
 
       Assert(dof_handler.n_locally_owned_dofs() == N, ExcInternalError());
       Assert(dof_handler.locally_owned_dofs() == all, ExcInternalError());
-      Assert(dof_handler.compute_n_locally_owned_dofs_per_processor() ==
+      Assert(Utilities::MPI::all_gather(MPI_COMM_SELF,
+                                        dof_handler.n_locally_owned_dofs()) ==
                std::vector<types::global_dof_index>(1, N),
              ExcInternalError());
-      Assert(dof_handler.compute_locally_owned_dofs_per_processor() ==
+      Assert(Utilities::MPI::all_gather(MPI_COMM_SELF,
+                                        dof_handler.locally_owned_dofs()) ==
                std::vector<IndexSet>(1, all),
              ExcInternalError());
 
       dof_handler.clear();
       deallog << "those should be zero: " << dof_handler.n_locally_owned_dofs()
               << " "
-              << dof_handler.compute_n_locally_owned_dofs_per_processor().size()
+              << Utilities::MPI::all_gather(MPI_COMM_SELF,
+                                            dof_handler.n_locally_owned_dofs())
+                   .size()
               << " " << dof_handler.n_dofs() << std::endl;
     }
 }

@@ -1,0 +1,16 @@
+
+DEAL:2d::Testing FE_DGQHermite<2>(1)
+DEAL:2d::Norm of difference: 2.18e-13
+DEAL:2d::
+DEAL:2d::Testing FE_DGQHermite<2>(2)
+DEAL:2d::Norm of difference: 7.94e-14
+DEAL:2d::
+DEAL:2d::Testing FE_DGQHermite<2>(4)
+DEAL:2d::Norm of difference: 5.69e-14
+DEAL:2d::
+DEAL:3d::Testing FE_DGQHermite<3>(1)
+DEAL:3d::Norm of difference: 3.16e-14
+DEAL:3d::
+DEAL:3d::Testing FE_DGQHermite<3>(3)
+DEAL:3d::Norm of difference: 1.06e-14
+DEAL:3d::

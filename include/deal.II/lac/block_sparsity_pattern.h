@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,10 +31,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+// Forward declarations
+#ifndef DOXYGEN
 template <typename number>
 class BlockSparseMatrix;
 class BlockDynamicSparsityPattern;
+#endif
 
 /*! @addtogroup Sparsity
  *@{
@@ -131,7 +133,7 @@ public:
    * sizes may be varying, the maximum number of elements per row may be
    * varying, etc. It is simpler not to reproduce the interface of the
    * SparsityPattern class here but rather let the user call whatever function
-   * she desires.
+   * they desire.
    */
   void
   reinit(const size_type n_block_rows, const size_type n_block_columns);
@@ -480,26 +482,38 @@ public:
  * the use of block indices causes some additional complications, we give a
  * short example.
  *
- * @dontinclude block_dynamic_sparsity_pattern.cc
- *
  * After the DoFHandler <tt>dof</tt> and the AffineConstraints
  * <tt>constraints</tt> have been set up with a system element, we must count
  * the degrees of freedom in each matrix block:
  *
- * @skipline dofs_per_block
- * @until count
+ * @code
+ * const std::vector<unsigned int> dofs_per_block =
+ *   DoFTools::count_dofs_per_fe_block(dof);
+ * @endcode
  *
  * Now, we are ready to set up the BlockDynamicSparsityPattern.
  *
- * @until collect
+ * @code
+ * BlockDynamicSparsityPattern dsp(fe.n_blocks(), fe.n_blocks());
+ * for (unsigned int i = 0; i < fe.n_blocks(); ++i)
+ *   for (unsigned int j = 0; j < fe.n_blocks(); ++j)
+ *     dsp.block(i, j).reinit(dofs_per_block[i], dofs_per_block[j]);
+ * dsp.collect_sizes();
+ * @endcode
  *
  * It is filled as if it were a normal pattern
  *
- * @until condense
+ * @code
+ * DoFTools::make_sparsity_pattern(dof, dsp);
+ * constraints.condense(dsp);
+ * @endcode
  *
  * In the end, it is copied to a normal BlockSparsityPattern for later use.
  *
- * @until copy
+ * @code
+ * BlockSparsityPattern sparsity;
+ * sparsity.copy_from(dsp);
+ * @endcode
  *
  * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
  */
@@ -649,19 +663,6 @@ namespace TrilinosWrappers
                          const std::vector<size_type> &col_block_sizes);
 
     /**
-     * Initialize the pattern with an array Epetra_Map that specifies both
-     * rows and columns of the matrix (so the final matrix will be a square
-     * matrix), where the Epetra_Map specifies the parallel distribution of
-     * the degrees of freedom on the individual block.  This function is
-     * equivalent to calling the second constructor with the length of the
-     * mapping vector and then entering the index values.
-     *
-     * @deprecated Use the respective method with IndexSet arguments instead.
-     */
-    DEAL_II_DEPRECATED
-    BlockSparsityPattern(const std::vector<Epetra_Map> &parallel_partitioning);
-
-    /**
      * Initialize the pattern with an array of index sets that specifies both
      * rows and columns of the matrix (so the final matrix will be a square
      * matrix), where the size() of the IndexSets specifies the size of the
@@ -700,17 +701,6 @@ namespace TrilinosWrappers
     void
     reinit(const std::vector<size_type> &row_block_sizes,
            const std::vector<size_type> &col_block_sizes);
-
-    /**
-     * Resize the matrix to a square tensor product of matrices with parallel
-     * distribution according to the specifications in the array of
-     * Epetra_Maps.
-     *
-     * @deprecated Use the respective method with IndexSet arguments instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    reinit(const std::vector<Epetra_Map> &parallel_partitioning);
 
     /**
      * Resize the matrix to a square tensor product of matrices. See the
@@ -765,8 +755,8 @@ inline SparsityPatternType &
 BlockSparsityPatternBase<SparsityPatternType>::block(const size_type row,
                                                      const size_type column)
 {
-  Assert(row < rows, ExcIndexRange(row, 0, rows));
-  Assert(column < columns, ExcIndexRange(column, 0, columns));
+  AssertIndexRange(row, rows);
+  AssertIndexRange(column, columns);
   return *sub_objects[row][column];
 }
 
@@ -778,8 +768,8 @@ BlockSparsityPatternBase<SparsityPatternType>::block(
   const size_type row,
   const size_type column) const
 {
-  Assert(row < rows, ExcIndexRange(row, 0, rows));
-  Assert(column < columns, ExcIndexRange(column, 0, columns));
+  AssertIndexRange(row, rows);
+  AssertIndexRange(column, columns);
   return *sub_objects[row][column];
 }
 
@@ -971,7 +961,7 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
   const std::pair<size_type, size_type> row_index =
     row_indices.global_to_local(row);
 
-  Assert(index < row_length(row), ExcIndexRange(index, 0, row_length(row)));
+  AssertIndexRange(index, row_length(row));
 
   size_type c             = 0;
   size_type block_columns = 0; // sum of n_cols for all blocks to the left

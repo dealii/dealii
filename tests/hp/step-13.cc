@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -136,9 +136,7 @@ namespace Evaluation
                                                        endc = dof_handler.end();
     bool evaluation_point_found                             = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex)
+      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
           {
             point_value = solution(

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ void
 test()
 {
   Triangulation<dim> triangulation;
-  GridGenerator ::hyper_cube(triangulation, 0, 1);
+  GridGenerator::hyper_cube(triangulation, 0, 1);
   triangulation.refine_global(1);
 
   hp::FECollection<dim> fe_collection;

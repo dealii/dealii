@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -34,7 +34,6 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "*.inp"
     PATTERN "*.ipynb"
     PATTERN "step*/CMakeLists.txt"
-    PATTERN "doxygen/CMakeLists.txt"
     #
     # Special files:
     #
@@ -52,7 +51,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     # Set up all executables:
     #
-    FILE(GLOB _steps 
+    FILE(GLOB _steps
       ${CMAKE_CURRENT_SOURCE_DIR}/step-*/step-*.cc
       ${CMAKE_CURRENT_SOURCE_DIR}/step-*/step-*.cu)
     FOREACH(_step ${_steps})

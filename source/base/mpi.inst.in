@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,12 +51,21 @@ for (S : MPI_SCALARS)
                                       const MPI_Comm &,
                                       std::vector<S> &);
 
+    template void max<S>(const ArrayView<const S> &,
+                         const MPI_Comm &,
+                         const ArrayView<S> &);
+
     template S min<S>(const S &, const MPI_Comm &);
 
     template void min<std::vector<S>>(const std::vector<S> &,
                                       const MPI_Comm &,
                                       std::vector<S> &);
 
+    template void min<S>(const ArrayView<const S> &,
+                         const MPI_Comm &,
+                         const ArrayView<S> &);
+
+#ifndef DOXYGEN
     // The fixed-length array (i.e., things declared like T(&values)[N])
     // versions of the functions above live in the header file mpi.h since the
     // length (N) is a compile-time constant. Those functions all call
@@ -76,6 +85,7 @@ for (S : MPI_SCALARS)
       const ArrayView<const S> &,
       const MPI_Comm &,
       const ArrayView<S> &);
+#endif
   }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 // x+y(+z), x^2+y^2 (, z+xy) times (1+i)/sqrt(2)
@@ -87,12 +86,13 @@ test(VectorTools::NormType norm, double value)
   VectorTools::interpolate(dofh, Ref<dim>(), solution);
 
   Vector<double> cellwise_errors(tria.n_active_cells());
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    Functions::ZeroFunction<dim>(dim),
-                                    cellwise_errors,
-                                    QGauss<dim>(5),
-                                    norm);
+  VectorTools::integrate_difference(
+    dofh,
+    solution,
+    Functions::ZeroFunction<dim, std::complex<double>>(dim),
+    cellwise_errors,
+    QGauss<dim>(5),
+    norm);
 
   const double error = cellwise_errors.l2_norm();
 

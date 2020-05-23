@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,8 @@
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/lac/lapack_full_matrix.h>
+
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
 #endif
@@ -38,25 +40,23 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
-
+#ifndef DOXYGEN
 template <int dim, typename Number>
 class Point;
 template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>
 class Vector;
-
-#ifndef DOXYGEN
-// Overload invalid tensor types of negative rank that come up during
-// overload resolution of operator* and related contraction variants.
-template <int dim, typename Number>
-class Tensor<-2, dim, Number>
-{};
-
-template <int dim, typename Number>
-class Tensor<-1, dim, Number>
-{};
-#endif /* DOXYGEN */
+template <typename number>
+class FullMatrix;
+namespace Differentiation
+{
+  namespace SD
+  {
+    class Expression;
+  }
+} // namespace Differentiation
+#endif
 
 
 /**
@@ -93,6 +93,9 @@ template <int dim, typename Number>
 class Tensor<0, dim, Number>
 {
 public:
+  static_assert(dim >= 0,
+                "Tensors must have a dimension greater than or equal to one.");
+
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -167,26 +170,26 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    begin_raw();
+  Number *
+  begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
-  constexpr const Number *
+  const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    end_raw();
+  Number *
+  end_raw();
 
   /**
    * Return a const pointer to the element past the end of the underlying
    * storage.
    */
-  constexpr const Number *
+  const Number *
   end_raw() const;
 
   /**
@@ -322,8 +325,8 @@ public:
    * the absolute squares of all entries. For the present case of rank-1
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    */
-  DEAL_II_CONSTEXPR real_type
-                    norm() const;
+  real_type
+  norm() const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
@@ -331,8 +334,8 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV real_type
-                        norm_square() const;
+  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV real_type
+                                          norm_square() const;
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
@@ -358,7 +361,7 @@ private:
    * Internal helper function for unroll.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR void
+  void
   unroll_recursion(Vector<OtherNumber> &result,
                    unsigned int &       start_index) const;
 
@@ -376,6 +379,43 @@ private:
  * tensors of rank 1 or put into external templated functions, e.g. the
  * <tt>contract</tt> family.
  *
+ * The rank of a tensor specifies which types of physical quantities it can
+ * represent:
+ * <ul>
+ *   <li> A rank-0 tensor is a scalar that can store quantities such as
+ *     temperature or pressure. These scalar quantities are shown in this
+ *     documentation as simple lower-case Latin letters e.g. $a, b, c, \dots$.
+ *   </li>
+ *   <li> A rank-1 tensor is a vector with @p dim components and it can
+ *     represent vector quantities such as velocity, displacement, electric
+ *     field, etc. They can also describe the gradient of a scalar field.
+ *     The notation used for rank-1 tensors is bold-faced lower-case Latin
+ *     letters e.g. $\mathbf a, \mathbf b, \mathbf c, \dots$.
+ *     The components of a rank-1 tensor such as $\mathbf a$ are represented
+ *     as $a_i$ where $i$ is an index between 0 and <tt>dim-1</tt>.
+ *   </li>
+ *   <li> A rank-2 tensor is a linear operator that can transform a vector
+ *     into another vector. These tensors are similar to matrices with
+ *     $\text{dim} \times \text{dim}$ components. There is a related class
+ *     SymmetricTensor<2,dim> for tensors of rank 2 whose elements are
+ *     symmetric. Rank-2 tensors are usually denoted by bold-faced upper-case
+ *     Latin letters such as $\mathbf A, \mathbf B, \dots$ or bold-faced Greek
+ *     letters for example $\boldsymbol{\varepsilon}, \boldsymbol{\sigma}$.
+ *     The components of a rank 2 tensor such as $\mathbf A$ are shown with
+ *     two indices $(i,j)$ as $A_{ij}$. These tensors usually describe the
+ *     gradients of vector fields (deformation gradient, velocity gradient,
+ *     etc.) or Hessians of scalar fields. Additionally, mechanical stress
+ *     tensors are rank-2 tensors that map the unit normal vectors of internal
+ *     surfaces into local traction (force per unit area) vectors.
+ *   </li>
+ *   <li> Tensors with ranks higher than 2 are similarly defined in a
+ *     consistent manner. They have $\text{dim}^{\text{rank}}$ components and
+ *     the number of indices required to identify a component equals
+ *     <tt>rank</tt>. For rank-4 tensors, a symmetric variant called
+ *     SymmetricTensor<4,dim> exists.
+ *   </li>
+ * </ul>
+ *
  * Using this tensor class for objects of rank 2 has advantages over matrices
  * in many cases since the dimension is known to the compiler as well as the
  * location of the data. It is therefore possible to produce far more
@@ -386,12 +426,8 @@ private:
  * transforms) and matrices (which we consider as operators on arbitrary
  * vector spaces related to linear algebra things).
  *
- * @tparam rank_ An integer that denotes the rank of this tensor. A rank-0
- * tensor is a scalar, a rank-1 tensor is a vector with @p dim components, a
- * rank-2 tensor is a matrix with dim-by-dim components, etc. There are
- * specializations of this class for rank-0 and rank-1 tensors. There is also
- * a related class SymmetricTensor for tensors of even rank whose elements are
- * symmetric.
+ * @tparam rank_ An integer that denotes the rank of this tensor. A
+ * specialization of this class exists for rank-0 tensors.
  *
  * @tparam dim An integer that denotes the dimension of the space in which
  * this tensor operates. This of course equals the number of coordinates that
@@ -414,6 +450,10 @@ template <int rank_, int dim, typename Number>
 class Tensor
 {
 public:
+  static_assert(rank_ >= 0,
+                "Tensors must have a rank greater than or equal to one.");
+  static_assert(dim >= 0,
+                "Tensors must have a dimension greater than or equal to one.");
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -456,7 +496,13 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
-                                  Tensor() = default;
+                                  Tensor()
+#ifdef DEAL_II_MSVC
+    : values{}
+  {}
+#else
+    = default;
+#endif
 
   /**
    * Constructor, where the data is copied from a C-style array.
@@ -521,25 +567,25 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    begin_raw();
+  Number *
+  begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
-  constexpr const Number *
+  const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  DEAL_II_CONSTEXPR Number *
-                    end_raw();
+  Number *
+  end_raw();
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  constexpr const Number *
+  const Number *
   end_raw() const;
 
   /**
@@ -643,10 +689,9 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-
-  DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV
-    typename numbers::NumberTraits<Number>::real_type
-    norm() const;
+  DEAL_II_CUDA_HOST_DEV
+  typename numbers::NumberTraits<Number>::real_type
+  norm() const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
@@ -666,19 +711,20 @@ public:
    * fastest.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR void
+  void
   unroll(Vector<OtherNumber> &result) const;
 
   /**
-   * Return an unrolled index in the range [0,dim^rank-1] for the element of
-   * the tensor indexed by the argument to the function.
+   * Return an unrolled index in the range $[0,\text{dim}^{\text{rank}}-1]$
+   * for the element of the tensor indexed by the argument to the function.
    */
   static DEAL_II_CONSTEXPR unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
 
   /**
    * Opposite of  component_to_unrolled_index: For an index in the range
-   * [0,dim^rank-1], return which set of indices it would correspond to.
+   * $[0, \text{dim}^{\text{rank}}-1]$, return which set of indices it would
+   * correspond to.
    */
   static DEAL_II_CONSTEXPR TableIndices<rank_>
                            unrolled_to_component_indices(const unsigned int i);
@@ -716,7 +762,7 @@ private:
    * Internal helper function for unroll.
    */
   template <typename OtherNumber>
-  DEAL_II_CONSTEXPR void
+  void
   unroll_recursion(Vector<OtherNumber> &result,
                    unsigned int &       start_index) const;
 
@@ -740,8 +786,43 @@ private:
 };
 
 
+#ifndef DOXYGEN
 namespace internal
 {
+  // Workaround: The following 4 overloads are necessary to be able to
+  // compile the library with Apple Clang 8 and older. We should remove
+  // these overloads again when we bump the minimal required version to
+  // something later than clang-3.6 / Apple Clang 6.3.
+  // - Jean-Paul Pelteret, Matthias Maier, Daniel Arndt 2020
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<Tensor<rank, dim, T>, std::complex<U>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<Tensor<rank, dim, std::complex<T>>, std::complex<U>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <typename T, int rank, int dim, typename U>
+  struct ProductTypeImpl<std::complex<T>, Tensor<rank, dim, U>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+
+  template <int rank, int dim, typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>, Tensor<rank, dim, std::complex<U>>>
+  {
+    using type =
+      Tensor<rank, dim, std::complex<typename ProductType<T, U>::type>>;
+  };
+  // end workaround
+
   /**
    * The structs below are needed to initialize nested Tensor objects.
    * Also see numbers.h for another specialization.
@@ -798,7 +879,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 Tensor<0, dim, Number>::begin_raw()
 {
   return std::addressof(value);
@@ -807,7 +888,7 @@ Tensor<0, dim, Number>::begin_raw()
 
 
 template <int dim, typename Number>
-constexpr const Number *
+inline const Number *
 Tensor<0, dim, Number>::begin_raw() const
 {
   return std::addressof(value);
@@ -816,7 +897,7 @@ Tensor<0, dim, Number>::begin_raw() const
 
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 Tensor<0, dim, Number>::end_raw()
 {
   return begin_raw() + n_independent_components;
@@ -825,7 +906,7 @@ Tensor<0, dim, Number>::end_raw()
 
 
 template <int dim, typename Number>
-constexpr const Number *
+const Number *
 Tensor<0, dim, Number>::end_raw() const
 {
   return begin_raw() + n_independent_components;
@@ -838,10 +919,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator Number &()
 {
   // We cannot use Assert inside a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
+#  endif
   return value;
 }
 
@@ -851,10 +932,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator const Number &() const
 {
   // We cannot use Assert inside a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
+#  endif
   return value;
 }
 
@@ -870,7 +951,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 }
 
 
-#ifdef __INTEL_COMPILER
+#  ifdef __INTEL_COMPILER
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
@@ -879,7 +960,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   value = p.value;
   return *this;
 }
-#endif
+#  endif
 
 
 template <int dim, typename Number>
@@ -898,13 +979,13 @@ template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
-#if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
+#  if defined(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING)
   Assert(!(std::is_same<Number, adouble>::value ||
            std::is_same<OtherNumber, adouble>::value),
          ExcMessage(
            "The Tensor equality operator for ADOL-C taped numbers has not yet "
            "been extended to support advanced branching."));
-#endif
+#  endif
 
   return numbers::values_are_equal(value, p.value);
 }
@@ -953,7 +1034,7 @@ namespace internal
       val *= s;
     }
 
-#ifdef __CUDA_ARCH__
+#  ifdef __CUDA_ARCH__
     template <typename Number, typename OtherNumber>
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV void
                                                    multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
@@ -961,7 +1042,7 @@ namespace internal
       printf("This function is not implemented for std::complex<Number>!\n");
       assert(false);
     }
-#endif
+#  endif
   } // namespace ComplexWorkaround
 } // namespace internal
 
@@ -997,9 +1078,8 @@ Tensor<0, dim, Number>::operator-() const
 
 
 template <int dim, typename Number>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
-  typename Tensor<0, dim, Number>::real_type
-  Tensor<0, dim, Number>::norm() const
+inline DEAL_II_ALWAYS_INLINE typename Tensor<0, dim, Number>::real_type
+Tensor<0, dim, Number>::norm() const
 {
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
@@ -1008,22 +1088,22 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
 
 template <int dim, typename Number>
-DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   typename Tensor<0, dim, Number>::real_type
   Tensor<0, dim, Number>::norm_square() const
 {
   // We cannot use Assert inside a CUDA kernel
-#ifndef __CUDA_ARCH__
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#endif
+#  endif
   return numbers::NumberTraits<Number>::abs_square(value);
 }
 
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline void
+inline void
 Tensor<0, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
                                          unsigned int &       index) const
 {
@@ -1052,6 +1132,9 @@ Tensor<0, dim, Number>::serialize(Archive &ar, const unsigned int)
   ar &value;
 }
 
+
+template <int dim, typename Number>
+constexpr unsigned int Tensor<0, dim, Number>::n_independent_components;
 
 
 /*-------------------- Inline functions: Tensor<rank,dim> --------------------*/
@@ -1115,9 +1198,9 @@ namespace internal
                                       std::integral_constant<int, dim>)
     {
       // We cannot use Assert in a CUDA kernel
-#ifndef __CUDA_ARCH__
-      Assert(i < dim, ExcIndexRange(i, 0, dim));
-#endif
+#  ifndef __CUDA_ARCH__
+      AssertIndexRange(i, dim);
+#  endif
       return values[i];
     }
 
@@ -1132,16 +1215,23 @@ namespace internal
       static ArrayElementType value;
     };
 
+    template <typename Type>
+    Type Uninitialized<Type>::value;
+
     template <typename ArrayElementType>
-    DEAL_II_CONSTEXPR inline ArrayElementType &
-    subscript(ArrayElementType *,
-              const unsigned int,
-              std::integral_constant<int, 0>)
+    DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+      DEAL_II_CUDA_HOST_DEV ArrayElementType &
+                            subscript(ArrayElementType *,
+                                      const unsigned int,
+                                      std::integral_constant<int, 0>)
     {
+      // We cannot use Assert in a CUDA kernel
+#  ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
+#  endif
       return Uninitialized<ArrayElementType>::value;
     }
   } // namespace TensorSubscriptor
@@ -1149,7 +1239,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV //
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE     DEAL_II_CUDA_HOST_DEV
   typename Tensor<rank_, dim, Number>::value_type &Tensor<rank_, dim, Number>::
                                                    operator[](const unsigned int i)
 {
@@ -1193,7 +1283,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 Tensor<rank_, dim, Number>::begin_raw()
 {
   return std::addressof(
@@ -1203,7 +1293,7 @@ Tensor<rank_, dim, Number>::begin_raw()
 
 
 template <int rank_, int dim, typename Number>
-constexpr const Number *
+inline const Number *
 Tensor<rank_, dim, Number>::begin_raw() const
 {
   return std::addressof(
@@ -1213,7 +1303,7 @@ Tensor<rank_, dim, Number>::begin_raw() const
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline Number *
+inline Number *
 Tensor<rank_, dim, Number>::end_raw()
 {
   return begin_raw() + n_independent_components;
@@ -1222,7 +1312,7 @@ Tensor<rank_, dim, Number>::end_raw()
 
 
 template <int rank_, int dim, typename Number>
-constexpr const Number *
+inline const Number *
 Tensor<rank_, dim, Number>::end_raw() const
 {
   return begin_raw() + n_independent_components;
@@ -1235,8 +1325,10 @@ template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, OtherNumber> &t)
 {
-  if (dim > 0)
-    std::copy(&t.values[0], &t.values[0] + dim, &values[0]);
+  // The following loop could be written more concisely using std::copy, but
+  // that function is only constexpr from C++20 on.
+  for (unsigned int i = 0; i < dim; ++i)
+    values[i] = t.values[i];
   return *this;
 }
 
@@ -1330,14 +1422,58 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 }
 
 
+namespace internal
+{
+  namespace TensorImplementation
+  {
+    template <int rank,
+              int dim,
+              typename Number,
+              typename OtherNumber,
+              typename std::enable_if<
+                !std::is_integral<
+                  typename ProductType<Number, OtherNumber>::type>::value &&
+                  !std::is_same<Number, Differentiation::SD::Expression>::value,
+                int>::type = 0>
+    DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
+                      division_operator(Tensor<rank, dim, Number> (&t)[dim],
+                                        const OtherNumber &factor)
+    {
+      const Number inverse_factor = Number(1.) / factor;
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        t[d] *= inverse_factor;
+    }
+
+
+    template <int rank,
+              int dim,
+              typename Number,
+              typename OtherNumber,
+              typename std::enable_if<
+                std::is_integral<
+                  typename ProductType<Number, OtherNumber>::type>::value ||
+                  std::is_same<Number, Differentiation::SD::Expression>::value,
+                int>::type = 0>
+    DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
+                      division_operator(Tensor<rank, dim, Number> (&t)[dim],
+                                        const OtherNumber &factor)
+    {
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        t[d] /= factor;
+    }
+  } // namespace TensorImplementation
+} // namespace internal
+
+
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<rank_, dim, Number> &
   Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] /= s;
+  internal::TensorImplementation::division_operator(values, s);
   return *this;
 }
 
@@ -1357,7 +1493,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
 
 template <int rank_, int dim, typename Number>
-DEAL_II_CONSTEXPR inline typename numbers::NumberTraits<Number>::real_type
+inline typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_, dim, Number>::norm() const
 {
   return std::sqrt(norm_square());
@@ -1380,7 +1516,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline void
+inline void
 Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
 {
   AssertDimension(result.size(),
@@ -1393,7 +1529,7 @@ Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-DEAL_II_CONSTEXPR inline void
+inline void
 Tensor<rank_, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
                                              unsigned int &       index) const
 {
@@ -1422,7 +1558,7 @@ namespace internal
   // and rank=2. Make sure we don't have compiler warnings.
 
   template <int dim>
-  inline unsigned int
+  inline DEAL_II_CONSTEXPR unsigned int
   mod(const unsigned int x)
   {
     return x % dim;
@@ -1437,7 +1573,7 @@ namespace internal
   }
 
   template <int dim>
-  inline unsigned int
+  inline DEAL_II_CONSTEXPR unsigned int
   div(const unsigned int x)
   {
     return x / dim;
@@ -1459,8 +1595,7 @@ template <int rank_, int dim, typename Number>
 DEAL_II_CONSTEXPR inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  Assert(i < n_independent_components,
-         ExcIndexRange(i, 0, n_independent_components));
+  AssertIndexRange(i, n_independent_components);
 
   TableIndices<rank_> indices;
 
@@ -1502,6 +1637,11 @@ Tensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 }
 
 
+template <int rank_, int dim, typename Number>
+constexpr unsigned int Tensor<rank_, dim, Number>::n_independent_components;
+
+#endif // DOXYGEN
+
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
 /**
@@ -1535,7 +1675,7 @@ operator<<(std::ostream &out, const Tensor<rank_, dim, Number> &p)
  * Output operator for tensors of rank 0. Since such tensors are scalars, we
  * simply print this one value.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 inline std::ostream &
@@ -1561,10 +1701,10 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  *
  * @note This function can also be used in CUDA device code.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename Other>
-constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   typename ProductType<Other, Number>::type
   operator*(const Other &object, const Tensor<0, dim, Number> &t)
 {
@@ -1581,10 +1721,10 @@ constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
  *
  * @note This function can also be used in CUDA device code.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename Other>
-constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
+DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
   typename ProductType<Number, Other>::type
   operator*(const Tensor<0, dim, Number> &t, const Other &object)
 {
@@ -1601,7 +1741,7 @@ constexpr DEAL_II_CUDA_HOST_DEV DEAL_II_ALWAYS_INLINE
  *
  * @note This function can also be used in CUDA device code.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
@@ -1619,7 +1759,7 @@ DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
  *
  * @note This function can also be used in CUDA device code.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
@@ -1638,7 +1778,7 @@ DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
  *
  * @note This function can also be used in CUDA device code.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
@@ -1655,7 +1795,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
  *
  * @note This function can also be used in CUDA device code.
  *
- * @relatesalso Tensor<0,dim,Number>
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
@@ -1708,16 +1848,65 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-DEAL_II_CUDA_HOST_DEV constexpr DEAL_II_ALWAYS_INLINE
-  Tensor<rank,
+DEAL_II_CUDA_HOST_DEV DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
+                      Tensor<rank,
          dim,
          typename ProductType<typename EnableIfScalar<Number>::type,
                               OtherNumber>::type>
-  operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
+                      operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
 {
   // simply forward to the operator above
   return t * factor;
 }
+
+
+namespace internal
+{
+  namespace TensorImplementation
+  {
+    template <int rank,
+              int dim,
+              typename Number,
+              typename OtherNumber,
+              typename std::enable_if<
+                !std::is_integral<
+                  typename ProductType<Number, OtherNumber>::type>::value,
+                int>::type = 0>
+    DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+                      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                      division_operator(const Tensor<rank, dim, Number> &t,
+                                        const OtherNumber &              factor)
+    {
+      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
+      const Number inverse_factor = Number(1.) / factor;
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        tt[d] = t[d] * inverse_factor;
+      return tt;
+    }
+
+
+    template <int rank,
+              int dim,
+              typename Number,
+              typename OtherNumber,
+              typename std::enable_if<
+                std::is_integral<
+                  typename ProductType<Number, OtherNumber>::type>::value,
+                int>::type = 0>
+    DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
+                      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                      division_operator(const Tensor<rank, dim, Number> &t,
+                                        const OtherNumber &              factor)
+    {
+      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        tt[d] = t[d] / factor;
+      return tt;
+    }
+  } // namespace TensorImplementation
+} // namespace internal
 
 
 /**
@@ -1737,11 +1926,7 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
                               typename EnableIfScalar<OtherNumber>::type>::type>
                   operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
-  // recurse over the base objects
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-  for (unsigned int d = 0; d < dim; ++d)
-    tt[d] = t[d] / factor;
-  return tt;
+  return internal::TensorImplementation::division_operator(t, factor);
 }
 
 
@@ -1799,33 +1984,14 @@ DEAL_II_CONSTEXPR DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-  schur_product(const Tensor<0, dim, Number> &     src1,
-                const Tensor<0, dim, OtherNumber> &src2)
+inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
+                         Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+                         schur_product(const Tensor<0, dim, Number> &     src1,
+                                       const Tensor<0, dim, OtherNumber> &src2)
 {
   Tensor<0, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
 
   tmp *= src2;
-
-  return tmp;
-}
-
-/**
- * Entrywise multiplication of two tensor objects of rank 1.
- *
- * @relatesalso Tensor
- */
-template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
-  schur_product(const Tensor<1, dim, Number> &     src1,
-                const Tensor<1, dim, OtherNumber> &src2)
-{
-  Tensor<1, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
-
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] *= src2[i];
 
   return tmp;
 }
@@ -1838,7 +2004,7 @@ inline DEAL_II_ALWAYS_INLINE
  * new tensor of size <rank, dim>:
  * @f[
  *   \text{result}_{i, j}
- *   = \text{left}_{i, j}\cdot
+ *   = \text{left}_{i, j}\circ
  *     \text{right}_{i, j}
  * @f]
  *
@@ -1847,15 +2013,16 @@ inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-  schur_product(const Tensor<rank, dim, Number> &     src1,
-                const Tensor<rank, dim, OtherNumber> &src2)
+inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
+                         Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                         schur_product(const Tensor<rank, dim, Number> &     src1,
+                                       const Tensor<rank, dim, OtherNumber> &src2)
 {
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(src1);
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp;
 
   for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] = schur_product(src1[i], src2[i]);
+    tmp[i] = schur_product(Tensor<rank - 1, dim, Number>(src1[i]),
+                           Tensor<rank - 1, dim, OtherNumber>(src2[i]));
 
   return tmp;
 }
@@ -1894,7 +2061,8 @@ template <int rank_1,
           int rank_2,
           int dim,
           typename Number,
-          typename OtherNumber>
+          typename OtherNumber,
+          typename = typename std::enable_if<rank_1 >= 1 && rank_2 >= 1>::type>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
@@ -1905,7 +2073,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+    result{};
 
   TensorAccessors::internal::
     ReorderedIndexView<0, rank_2, const Tensor<rank_2, dim, OtherNumber>>
@@ -1930,8 +2098,8 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  *
  * If for example the first index (<code>index_1==0</code>) of a tensor
  * <code>t1</code> shall be contracted with the third index
- * (<code>index_2==2</code>) of a tensor <code>t2</code>, the invocation of
- * this function is
+ * (<code>index_2==2</code>) of a tensor <code>t2</code>, this function should
+ * be invoked as
  * @code
  *   contract<0, 2>(t1, t2);
  * @endcode
@@ -1980,7 +2148,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+    result{};
   TensorAccessors::contract<1, rank_1, rank_2, dim>(result, reord_01, reord_02);
   return result;
 }
@@ -2002,10 +2170,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * If for example the first index (<code>index_1==0</code>) shall be
  * contracted with the third index (<code>index_2==2</code>), and the second
  * index (<code>index_3==1</code>) with the first index
- * (<code>index_4==0</code>) the invocation of this function is this function
- * is
+ * (<code>index_4==0</code>) of a tensor <code>t2</code>, this function should
+ * be invoked as
  * @code
- *   contract<0, 2, 1, 0>(t1, t2);
+ *   double_contract<0, 2, 1, 0>(t1, t2);
  * @endcode
  *
  * @note The position of the index is counted from 0, i.e.,
@@ -2088,7 +2256,7 @@ DEAL_II_CONSTEXPR inline
   typename Tensor<rank_1 + rank_2 - 4,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+    result{};
   TensorAccessors::contract<2, rank_1, rank_2, dim>(result, reord_3, reord_4);
   return result;
 }
@@ -2113,7 +2281,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   scalar_product(const Tensor<rank, dim, Number> &     left,
                  const Tensor<rank, dim, OtherNumber> &right)
 {
-  typename ProductType<Number, OtherNumber>::type result;
+  typename ProductType<Number, OtherNumber>::type result{};
   TensorAccessors::contract<rank, rank, rank, dim>(result, left, right);
   return result;
 }
@@ -2146,7 +2314,7 @@ template <template <int, int, typename> class TensorT1,
           typename T1,
           typename T2,
           typename T3>
-DEAL_II_CONSTEXPR
+DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename ProductType<T1, typename ProductType<T2, T3>::type>::type
   contract3(const TensorT1<rank_1, dim, T1> &         left,
             const TensorT2<rank_1 + rank_2, dim, T2> &middle,
@@ -2184,7 +2352,7 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+    result{};
   TensorAccessors::contract<0, rank_1, rank_2, dim>(result, src1, src2);
   return result;
 }
@@ -2243,9 +2411,14 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
   Tensor<1, dim, typename ProductType<Number1, Number2>::type> result;
 
-  result[0] = src1[1] * src2[2] - src1[2] * src2[1];
-  result[1] = src1[2] * src2[0] - src1[0] * src2[2];
-  result[2] = src1[0] * src2[1] - src1[1] * src2[0];
+  // avoid compiler warnings
+  constexpr int s0 = 0 % dim;
+  constexpr int s1 = 1 % dim;
+  constexpr int s2 = 2 % dim;
+
+  result[s0] = src1[s1] * src2[s2] - src1[s2] * src2[s1];
+  result[s1] = src1[s2] * src2[s0] - src1[s0] * src2[s2];
+  result[s2] = src1[s0] * src2[s1] - src1[s1] * src2[s0];
 
   return result;
 }
@@ -2441,10 +2614,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
 
 /**
  * Return the adjugate of the given tensor of rank 2.
- * The adjugate of a tensor $\left(\bullet\right)$ is defined as
+ * The adjugate of a tensor $\mathbf A$ is defined as
  * @f[
- *  \textrm{adj}\left(\bullet\right)
- *   \dealcoloneq \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-1}
+ *  \textrm{adj}\mathbf A
+ *   \dealcoloneq \textrm{det}\mathbf A \; \mathbf{A}^{-1}
  * \; .
  * @f]
  *
@@ -2463,11 +2636,11 @@ adjugate(const Tensor<2, dim, Number> &t)
 
 /**
  * Return the cofactor of the given tensor of rank 2.
- * The cofactor of a tensor $\left(\bullet\right)$ is defined as
+ * The cofactor of a tensor $\mathbf A$ is defined as
  * @f[
- *  \textrm{cof}\left(\bullet\right)
- *   \dealcoloneq \textrm{det}\left(\bullet\right) \; \left(\bullet\right)^{-T}
- *    = \left[ \textrm{adj}\left(\bullet\right) \right]^{T} \; .
+ *  \textrm{cof}\mathbf A
+ *   \dealcoloneq \textrm{det}\mathbf A \; \mathbf{A}^{-T}
+ *    = \left[ \textrm{adj}\mathbf A \right]^{T} \; .
  * @f]
  *
  * @note This requires that the tensor is invertible.
@@ -2484,8 +2657,45 @@ cofactor(const Tensor<2, dim, Number> &t)
 
 
 /**
- * Return the $l_1$ norm of the given rank-2 tensor, where $||t||_1 = \max_j
- * \sum_i |t_{ij}|$ (maximum of the sums over columns).
+ * Return the nearest orthogonal matrix by
+ * combining the products of the SVD decomposition: $\mathbf U \mathbf{V}^T$,
+ * where $\mathbf U$ and $\mathbf V$ are computed from the SVD decomposition:
+ * $\mathbf U  \mathbf S \mathbf V^T$,
+ * effectively replacing $\mathbf S$ with the identity matrix.
+ * @param tensor The tensor which to find the closest orthogonal
+ * tensor to.
+ * @relatesalso Tensor
+ */
+template <int dim, typename Number>
+Tensor<2, dim, Number>
+project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor)
+{
+  Tensor<2, dim, Number>   output_tensor;
+  FullMatrix<Number>       matrix(dim);
+  LAPACKFullMatrix<Number> lapack_matrix(dim);
+  LAPACKFullMatrix<Number> result(dim);
+
+  // todo: find or add dealii functionality to copy in one step.
+  matrix.copy_from(tensor);
+  lapack_matrix.copy_from(matrix);
+
+  // now compute the svd of the matrices
+  lapack_matrix.compute_svd();
+
+  // Use the SVD results to orthogonalize: $U V^T$
+  lapack_matrix.get_svd_u().mmult(result, lapack_matrix.get_svd_vt());
+
+  // todo: find or add dealii functionality to copy in one step.
+  matrix = result;
+  matrix.copy_to(output_tensor);
+  return output_tensor;
+}
+
+
+/**
+ * Return the $l_1$ norm of the given rank-2 tensor, where
+ * $\|\mathbf T\|_1 = \max_j \sum_i |T_{ij}|$
+ * (maximum of the sums over columns).
  *
  * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2012
@@ -2510,8 +2720,9 @@ l1_norm(const Tensor<2, dim, Number> &t)
 
 
 /**
- * Return the $l_\infty$ norm of the given rank-2 tensor, where $||t||_\infty
- * = \max_i \sum_j |t_{ij}|$ (maximum of the sums over rows).
+ * Return the $l_\infty$ norm of the given rank-2 tensor, where
+ * $\|\mathbf T\|_\infty = \max_i \sum_j |T_{ij}|$
+ * (maximum of the sums over rows).
  *
  * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2012
@@ -2585,8 +2796,5 @@ linfty_norm(const Tensor<2, dim, adouble> &t)
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
-
-// include deprecated non-member functions operating on Tensor
-#include <deal.II/base/tensor_deprecated.h>
 
 #endif

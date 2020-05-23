@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2018 by the deal.II authors
+ * Copyright (C) 2010 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -327,7 +327,7 @@ namespace Step39
   // them are equivalent to each other uniformly with mesh size (some not
   // uniformly with polynomial degree). Here, we choose @f[ \|u\|_{1,h} =
   // \sum_{K\in \mathbb T_h} \|\nabla u\|_K^2 + \sum_{F \in F_h^i}
-  // 4\sigma_F\|\{\!\{ u \mathbf n\}\!\}\|^2_F + \sum_{F \in F_h^b}
+  // 4\sigma_F\|\average{ u \mathbf n}\|^2_F + \sum_{F \in F_h^b}
   // 2\sigma_F\|u\|^2_F @f]
 
   template <int dim>
@@ -722,7 +722,7 @@ namespace Step39
     // preconditioner. First, we need transfer between grid levels. The object
     // we are using here generates sparse matrices for these transfers.
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     // Then, we need an exact solver for the matrix on the coarsest level.
     FullMatrix<double> coarse_matrix;

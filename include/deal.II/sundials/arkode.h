@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2019 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -25,7 +25,6 @@
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/logstream.h>
-#  include <deal.II/base/mpi.h>
 #  include <deal.II/base/parameter_handler.h>
 #  ifdef DEAL_II_WITH_PETSC
 #    include <deal.II/lac/petsc_block_vector.h>
@@ -139,19 +138,19 @@ namespace SUNDIALS
    *
    * For both DIRK and ARK methods, an implicit system of the form
    * \f[
-   *  G(z_i) \dealcoloneq M z_i − h_n A^I_{i,i} f_I (t^I_{n,i}, z_i) − a_i = 0
+   *  G(z_i) \dealcoloneq M z_i - h_n A^I_{i,i} f_I (t^I_{n,i}, z_i) - a_i = 0
    * \f]
    * must be solved for each stage $z_i , i = 1, \ldots, s$, where
    * we have the data
    * \f[
    *  a_i \dealcoloneq
-   *  M y_{n−1} + h_n \sum_{j=1}^{i−1} [ A^E_{i,j} f_E(t^E_{n,j}, z_j)
+   *  M y_{n-1} + h_n \sum_{j=1}^{i-1} [ A^E_{i,j} f_E(t^E_{n,j}, z_j)
    *  + A^I_{i,j} f_I (t^I_{n,j}, z_j)]
    * \f]
    * for the ARK methods, or
    * \f[
    *  a_i \dealcoloneq
-   *  M y_{n−1} + h_n \sum_{j=1}^{i−1} A^I_{i,j} f_I (t^I_{n,j}, z_j)
+   *  M y_{n-1} + h_n \sum_{j=1}^{i-1} A^I_{i,j} f_I (t^I_{n,j}, z_j)
    * \f]
    * for the DIRK methods. Here $A^I_{i,j}$ and $A^E_{i,j}$ are the Butcher's
    * tables for the chosen solver.
@@ -163,7 +162,7 @@ namespace SUNDIALS
    * faster solution process.
    *
    * For systems of either type, ARKode allows a choice of solution strategy.
-   * The default solver choice is a variant of Newton’s method,
+   * The default solver choice is a variant of Newton's method,
    * \f[
    *  z_i^{m+1} = z_i^m +\delta^{m+1},
    * \f]
@@ -179,13 +178,13 @@ namespace SUNDIALS
    * \qquad \gamma\dealcoloneq h_n A^I_{i,i}.
    * \f]
    *
-   * As an alternate to Newton’s method, ARKode may solve for each stage $z_i ,i
+   * As an alternate to Newton's method, ARKode may solve for each stage $z_i ,i
    * = 1, \ldots , s$ using an Anderson-accelerated fixed point iteration
    * \f[
    * z_i^{m+1} = g(z_i^{m}), m=0,1,\ldots.
    * \f]
    *
-   * Unlike with Newton’s method, this option does not require the solution of
+   * Unlike with Newton's method, this option does not require the solution of
    * a linear system at each iteration, instead opting for solution of a
    * low-dimensional least-squares solution to construct the nonlinear update.
    *
@@ -218,7 +217,7 @@ namespace SUNDIALS
    * the efficiency and robustness of the algorithm intimately depends on the
    * choice of a good initial guess. In ARKode, the initial guess for either
    * nonlinear solution method is a predicted value $z_i(0)$ that is computed
-   * explicitly from the previously-computed data (e.g. $y_{n−2}, y_{n−1}$, and
+   * explicitly from the previously-computed data (e.g. $y_{n-2}, y_{n-1}$, and
    * $z_j$ where $j < i$). Additional information on the specific predictor
    * algorithms implemented in ARKode is provided in ARKode documentation.
    *
@@ -595,7 +594,7 @@ namespace SUNDIALS
      *
      * Make sure that after a call to this function, we know how to compute
      * solutions of systems $A x = b$, where $A$ is some approximation to the
-     * Newton matrix, $M − \gamma \partial f_I/\partial y$. This function is
+     * Newton matrix, $M - \gamma \partial f_I/\partial y$. This function is
      * optional. If the user does not provide it, then solve_jacobian_system()
      * is assumed to also perform the setup internally.
      *
@@ -635,7 +634,7 @@ namespace SUNDIALS
      * @param[in] fpred  is the value of the implicit right-hand side at ypred,
      *        $f_I (t_n, ypred)$.
      *
-     * @param[in] convfail – an input flag used to indicate any problem that
+     * @param[in] convfail Input flag used to indicate any problem that
      * occurred during the solution of the nonlinear equation on the current
      * time step for which the linear solver is being used. This flag can be
      * used to help decide whether the Jacobian data kept by a linear solver

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 template <int dim>
 class MaxwellProblem
 {
@@ -349,7 +348,7 @@ MaxwellProblem<dim>::assemble_system()
       fe_values.reinit(cell);
       right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                         rhs_values);
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {

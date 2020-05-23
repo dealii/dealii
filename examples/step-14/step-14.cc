@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2002 - 2019 by the deal.II authors
+ * Copyright (C) 2002 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -325,8 +325,8 @@ namespace Step14
                                      const Vector<double> & /*solution*/) const
     {
       std::ofstream out(output_name_base + "-" +
-                        std::to_string(this->refinement_cycle) + ".eps");
-      GridOut().write_eps(dof_handler.get_triangulation(), out);
+                        std::to_string(this->refinement_cycle) + ".svg");
+      GridOut().write_svg(dof_handler.get_triangulation(), out);
     }
   } // namespace Evaluation
 
@@ -519,20 +519,24 @@ namespace Step14
     template <int dim>
     void Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
     {
-      Threads::Task<> rhs_task =
+      Threads::Task<void> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
+
+      auto worker =
+        [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+               AssemblyScratchData &scratch_data,
+               AssemblyCopyData &   copy_data) {
+          this->local_assemble_matrix(cell, scratch_data, copy_data);
+        };
+
+      auto copier = [this, &linear_system](const AssemblyCopyData &copy_data) {
+        this->copy_local_to_global(copy_data, linear_system);
+      };
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
-                      std::bind(&Solver<dim>::local_assemble_matrix,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&Solver<dim>::copy_local_to_global,
-                                this,
-                                std::placeholders::_1,
-                                std::ref(linear_system)),
+                      worker,
+                      copier,
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
@@ -654,7 +658,7 @@ namespace Step14
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task =
+      Threads::Task<void> side_task =
         Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
 
       DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -678,10 +682,10 @@ namespace Step14
     template <int dim>
     void Solver<dim>::LinearSystem::solve(Vector<double> &solution) const
     {
-      SolverControl solver_control(5000, 1e-12);
-      SolverCG<>    cg(solver_control);
+      SolverControl            solver_control(5000, 1e-12);
+      SolverCG<Vector<double>> cg(solver_control);
 
-      PreconditionSSOR<> preconditioner;
+      PreconditionSSOR<SparseMatrix<double>> preconditioner;
       preconditioner.initialize(matrix, 1.2);
 
       cg.solve(matrix, solution, rhs, preconditioner);
@@ -746,8 +750,8 @@ namespace Step14
       data_out.build_patches();
 
       std::ofstream out("solution-" + std::to_string(this->refinement_cycle) +
-                        ".gnuplot");
-      data_out.write(out, DataOutBase::gnuplot);
+                        ".vtu");
+      data_out.write(out, DataOutBase::vtu);
     }
 
 
@@ -1132,10 +1136,6 @@ namespace Step14
       class BoundaryValues : public Function<dim>
       {
       public:
-        BoundaryValues()
-          : Function<dim>()
-        {}
-
         virtual double value(const Point<dim> & p,
                              const unsigned int component) const;
       };
@@ -1144,10 +1144,6 @@ namespace Step14
       class RightHandSide : public Function<dim>
       {
       public:
-        RightHandSide()
-          : Function<dim>()
-        {}
-
         virtual double value(const Point<dim> & p,
                              const unsigned int component) const;
       };
@@ -1392,7 +1388,7 @@ namespace Step14
     };
 
 
-    // @sect4{The PointValueEvaluation class}
+    // @sect4{The dual functional PointValueEvaluation class}
 
     // As a first application, we consider the functional corresponding to the
     // evaluation of the solution's value at a given point which again we
@@ -1469,7 +1465,7 @@ namespace Step14
     }
 
 
-    // @sect4{The PointXDerivativeEvaluation class}
+    // @sect4{The dual functional PointXDerivativeEvaluation class}
 
     // As second application, we again consider the evaluation of the
     // x-derivative of the solution at one point. Again, the declaration of
@@ -2000,7 +1996,7 @@ namespace Step14
     template <int dim>
     void WeightedResidual<dim>::solve_problem()
     {
-      Threads::TaskGroup<> tasks;
+      Threads::TaskGroup<void> tasks;
       tasks +=
         Threads::new_task(&WeightedResidual<dim>::solve_primal_problem, *this);
       tasks +=
@@ -2104,8 +2100,8 @@ namespace Step14
       data_out.build_patches();
 
       std::ofstream out("solution-" + std::to_string(this->refinement_cycle) +
-                        ".gnuplot");
-      data_out.write(out, DataOutBase::gnuplot);
+                        ".vtu");
+      data_out.write(out, DataOutBase::vtu);
     }
 
 
@@ -2191,24 +2187,28 @@ namespace Step14
       FaceIntegrals face_integrals;
       for (const auto &cell :
            DualSolver<dim>::dof_handler.active_cell_iterators())
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<dim>::faces_per_cell;
-             ++face_no)
-          face_integrals[cell->face(face_no)] = -1e20;
+        for (const auto &face : cell->face_iterators())
+          face_integrals[face] = -1e20;
+
+      auto worker = [this,
+                     &error_indicators,
+                     &face_integrals](const active_cell_iterator & cell,
+                                      WeightedResidualScratchData &scratch_data,
+                                      WeightedResidualCopyData &   copy_data) {
+        this->estimate_on_one_cell(
+          cell, scratch_data, copy_data, error_indicators, face_integrals);
+      };
+
+      auto do_nothing_copier =
+        std::function<void(const WeightedResidualCopyData &)>();
 
       // Then hand it all off to WorkStream::run() to compute the
       // estimators for all cells in parallel:
       WorkStream::run(
         DualSolver<dim>::dof_handler.begin_active(),
         DualSolver<dim>::dof_handler.end(),
-        std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3,
-                  std::ref(error_indicators),
-                  std::ref(face_integrals)),
-        std::function<void(const WeightedResidualCopyData &)>(),
+        worker,
+        do_nothing_copier,
         WeightedResidualScratchData(*DualSolver<dim>::fe,
                                     *DualSolver<dim>::quadrature,
                                     *DualSolver<dim>::face_quadrature,
@@ -2227,15 +2227,11 @@ namespace Step14
       for (const auto &cell :
            DualSolver<dim>::dof_handler.active_cell_iterators())
         {
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (const auto &face : cell->face_iterators())
             {
-              Assert(face_integrals.find(cell->face(face_no)) !=
-                       face_integrals.end(),
+              Assert(face_integrals.find(face) != face_integrals.end(),
                      ExcInternalError());
-              error_indicators(present_cell) -=
-                0.5 * face_integrals[cell->face(face_no)];
+              error_indicators(present_cell) -= 0.5 * face_integrals[face];
             }
           ++present_cell;
         }
@@ -2277,9 +2273,7 @@ namespace Step14
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
       // something needs to be computed on it:
-      for (unsigned int face_no = 0;
-           face_no < GeometryInfo<dim>::faces_per_cell;
-           ++face_no)
+      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
         {
           // First, if this face is part of the boundary, then there is
           // nothing to do. However, to make things easier when summing up
@@ -2818,7 +2812,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step14;
 
       // Describe the problem we want to solve here by passing a descriptor

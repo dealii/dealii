@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -159,9 +159,8 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
 
           case 2:
             {
-              for (unsigned int vertex = 0;
-                   vertex < GeometryInfo<dimension>::vertices_per_cell;
-                   ++vertex)
+              for (const unsigned int vertex :
+                   GeometryInfo<dimension>::vertex_indices())
                 {
                   const Point<dimension> v = (*cell)->vertex(vertex);
 
@@ -413,7 +412,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
               // we need to get at the number of the cell to which this face
               // belongs in order to access the cell data. this is not readily
               // available, so choose the following rather inefficient way:
-              Assert((*cell)->active(),
+              Assert((*cell)->is_active(),
                      ExcMessage("Cell must be active for cell data"));
               const unsigned int cell_number = std::distance(
                 this->triangulation->begin_active(),
@@ -535,15 +534,18 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
   WorkStream::run(
     all_cells.data(),
     all_cells.data() + all_cells.size(),
-    std::bind(&DataOutRotation<dim, DoFHandlerType>::build_one_patch,
-              this,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::placeholders::_3),
-    std::bind(&internal::DataOutRotationImplementation ::
-                append_patch_to_list<dim, space_dimension>,
-              std::placeholders::_1,
-              std::ref(this->patches)),
+    [this](const cell_iterator *cell,
+           internal::DataOutRotationImplementation::
+             ParallelData<dimension, space_dimension> &data,
+           std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
+             &my_patches) { this->build_one_patch(cell, data, my_patches); },
+    [this](
+      const std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
+        &new_patches) {
+      internal::DataOutRotationImplementation::
+        append_patch_to_list<dimension, space_dimension>(new_patches,
+                                                         this->patches);
+    },
     thread_data,
     new_patches);
 }

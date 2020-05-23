@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ test()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
+  dofh.distribute_mg_dofs();
 
 
   ScratchData scratch;

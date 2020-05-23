@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 #include <sstream>
 
 #include "../tests.h"
+
 #include "dof_tools_periodic.h"
 
 // A simple test for

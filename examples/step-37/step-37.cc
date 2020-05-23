@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -86,10 +86,6 @@ namespace Step37
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
@@ -870,7 +866,7 @@ namespace Step37
           MatrixFree<dim, float>::AdditionalData::none;
         additional_data.mapping_update_flags =
           (update_gradients | update_JxW_values | update_quadrature_points);
-        additional_data.level_mg_handler = level;
+        additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
         mg_mf_storage_level->reinit(dof_handler,
@@ -1132,29 +1128,11 @@ namespace Step37
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
-      ".vtu");
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
-
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream master_output(master_name);
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", cycle, MPI_COMM_WORLD, 3);
 
     time_details << "Time write output          (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << "s\n";
@@ -1174,14 +1152,12 @@ namespace Step37
   void LaplaceProblem<dim>::run()
   {
     {
-      const unsigned int n_vect_doubles =
-        VectorizedArray<double>::n_array_elements;
-      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+      const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
 
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
+            << Utilities::System::get_current_vectorization_level() << ")"
             << std::endl;
     }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <cstddef>
+#include <cstdint>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -45,55 +45,73 @@ namespace types
   /**
    * The type used for global indices of vertices.
    */
-  using global_vertex_index = unsigned long long int;
+  using global_vertex_index = uint64_t;
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_vertex_index.
    */
-#define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
-#ifdef DEAL_II_WITH_64BIT_INDICES
   /**
-   * The type used for global indices of degrees of freedom. While in
-   * sequential computations the 4 billion indices of 32-bit unsigned integers
-   * is plenty, parallel computations using the
-   * parallel::distributed::Triangulation class can overflow this number and
-   * we need a bigger index space.
+   * The type used to denote the global index of degrees of freedom. This
+   * type is then also used for querying the global *number* of degrees
+   * of freedom, since the number is simply the largest index plus one.
    *
-   * The data type always indicates an unsigned integer type.
+   * While in sequential computations the 4 billion indices of 32-bit unsigned
+   * integers is plenty, parallel computations using (for example) the
+   * parallel::distributed::Triangulation class can overflow this number and
+   * consequently, deal.II chooses a larger integer type when
+   * configured to use 64-bit indices.
+   *
+   * The data type always corresponds to an unsigned integer type.
    *
    * See the
    * @ref GlobalDoFIndex
    * page for guidance on when this type should or should not be used.
    */
-  // TODO: we should check that unsigned long long int
-  // has the same size as uint64_t
-  using global_dof_index = unsigned long long int;
-
-  /**
-   * An identifier that denotes the MPI type associated with
-   * types::global_dof_index.
-   */
-#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  using global_dof_index = uint64_t;
 #else
-  /**
-   * The type used for global indices of degrees of freedom. While in
-   * sequential computations the 4 billion indices of 32-bit unsigned integers
-   * is plenty, parallel computations using the
-   * parallel::distributed::Triangulation class can overflow this number and
-   * we need a bigger index space.
-   *
-   * The data type always indicates an unsigned integer type.
-   */
-  using global_dof_index = unsigned int;
+  using global_dof_index  = unsigned int;
+#endif
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
+#ifdef DEAL_II_WITH_64BIT_INDICES
+#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
+#else
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
+
+  /**
+   * The type used to denote the global index of a cell. This type
+   * is then also used for querying the global *number* of cells in
+   * a triangulation since the number is simply the largest index plus one.
+   *
+   * While in sequential computations the 4 billion indices of 32-bit unsigned
+   * integers is plenty, parallel computations using (for example) the
+   * parallel::distributed::Triangulation class can overflow this number and
+   * consequently, deal.II chooses a larger integer type when
+   * configured to use 64-bit indices.
+   *
+   * The data type always corresponds to an unsigned integer type.
+   */
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  using global_cell_index = uint64_t;
+#else
+  using global_cell_index = unsigned int;
+#endif
+
+  /**
+   * The type used for coarse-cell ids. See the glossary
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
+   */
+  using coarse_cell_id = global_cell_index;
 
   /**
    * The type used to denote boundary indicators associated with every piece
@@ -148,7 +166,7 @@ namespace TrilinosWrappers
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    using int_type = long long;
+    using int_type = long long int;
 #else
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
@@ -187,6 +205,15 @@ namespace numbers
    */
   const types::global_dof_index invalid_dof_index =
     static_cast<types::global_dof_index>(-1);
+
+  /**
+   * An invalid value for coarse cell ids. See the glossary
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
+   */
+  const types::coarse_cell_id invalid_coarse_cell_id =
+    static_cast<types::coarse_cell_id>(-1);
 
   /**
    * Invalid material_id which we need in several places as a default value.

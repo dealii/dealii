@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
@@ -53,8 +54,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#ifndef DOXYGEN
 template <int dim, int spacedim = dim>
 class FEValuesBase;
+#endif
 
 namespace internal
 {
@@ -2017,9 +2021,7 @@ namespace FEValuesViews
  *
  * @code
  * FEValues values (mapping, finite_element, quadrature, flags);
- * for (cell = dof_handler.begin_active();
- *      cell != dof_handler.end();
- *      ++cell)
+ * for (const auto &cell : dof_handler.active_cell_iterators())
  *   {
  *     values.reinit(cell);
  *     for (unsigned int q=0; q<quadrature.size(); ++q)
@@ -2908,8 +2910,130 @@ public:
     bool quadrature_points_fastest = false) const;
   //@}
 
+  /// @name Cell degrees of freedom
+  //@{
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero (inclusive) to `dofs_per_cell` (exclusive). This allows
+   * one to write code using range-based `for` loops of the following kind:
+   * @code
+   *   FEValues<dim>      fe_values (...);
+   *   FullMatrix<double> cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       fe_values.reinit(cell);
+   *       for (const auto q : fe_values.quadrature_point_indices())
+   *         for (const auto i : fe_values.dof_indices())
+   *           for (const auto j : fe_values.dof_indices())
+   *             cell_matrix(i,j) += ...; // Do something for DoF indices (i,j)
+   *                                      // at quadrature point q
+   *     }
+   * @endcode
+   * Here, we are looping over all degrees of freedom on all cells, with
+   * `i` and `j` taking on all valid indices for cell degrees of freedom, as
+   * defined by the finite element passed to `fe_values`.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  dof_indices() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from @p start_dof_index (inclusive) to `dofs_per_cell` (exclusive).
+   * This allows one to write code using range-based `for` loops of the
+   * following kind:
+   * @code
+   *   FEValues<dim>      fe_values (...);
+   *   FullMatrix<double> cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       fe_values.reinit(cell);
+   *       for (const auto q : fe_values.quadrature_point_indices())
+   *         for (const auto i : fe_values.dof_indices())
+   *           for (const auto j : fe_values.dof_indices_starting_at(i))
+   *             cell_matrix(i,j) += ...; // Do something for DoF indices (i,j)
+   *                                      // at quadrature point q
+   *     }
+   * @endcode
+   * Here, we are looping over all local degrees of freedom on all cells, with
+   * `i` taking on all valid indices for cell degrees of freedom, as
+   * defined by the finite element passed to `fe_values`, and `j` taking
+   * on a specified subset of `i`'s range, starting at `i` itself and ending at
+   * the number of cell degrees of freedom. In this way, we can construct the
+   * upper half and the diagonal of a stiffness matrix contribution (assuming it
+   * is symmetric, and that only one half of it needs to be computed), for
+   * example.
+   *
+   * @note If the @p start_dof_index is equal to the number of DoFs in the cell,
+   * then the returned index range is empty.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  dof_indices_starting_at(const unsigned int start_dof_index) const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero (inclusive) to @p end_dof_index (inclusive). This allows
+   * one to write code using range-based `for` loops of the following kind:
+   * @code
+   *   FEValues<dim>      fe_values (...);
+   *   FullMatrix<double> cell_matrix (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       cell_matrix = 0;
+   *       fe_values.reinit(cell);
+   *       for (const auto q : fe_values.quadrature_point_indices())
+   *         for (const auto i : fe_values.dof_indices())
+   *           for (const auto j : fe_values.dof_indices_ending_at(i))
+   *             cell_matrix(i,j) += ...; // Do something for DoF indices (i,j)
+   *                                      // at quadrature point q
+   *     }
+   * @endcode
+   * Here, we are looping over all local degrees of freedom on all cells, with
+   * `i` taking on all valid indices for cell degrees of freedom, as
+   * defined by the finite element passed to `fe_values`, and `j` taking
+   * on a specified subset of `i`'s range, starting at zero and ending at
+   * `i` itself. In this way, we can construct the lower half and the
+   * diagonal of a stiffness matrix contribution (assuming it is symmetric, and
+   * that only one half of it needs to be computed), for example.
+   *
+   * @note If the @p end_dof_index is equal to zero, then the returned index
+   * range is empty.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  dof_indices_ending_at(const unsigned int end_dof_index) const;
+
+  //@}
+
   /// @name Geometry of the cell
   //@{
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to `n_quadrature_points`. This allows to write code
+   * using range-based `for` loops of the following kind:
+   * @code
+   *   FEValues<dim> fe_values (...);
+   *
+   *   for (auto &cell : dof_handler.active_cell_iterators())
+   *     {
+   *       fe_values.reinit(cell);
+   *       for (const auto q_point : fe_values.quadrature_point_indices())
+   *         ... do something at the quadrature point ...
+   *     }
+   * @endcode
+   * Here, we are looping over all quadrature points on all cells, with
+   * `q_point` taking on all valid indices for quadrature points, as defined
+   * by the quadrature rule passed to `fe_values`.
+   *
+   * @see CPP11
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  quadrature_point_indices() const;
 
   /**
    * Position of the <tt>q</tt>th quadrature point in real space.
@@ -3110,10 +3234,16 @@ public:
   get_inverse_jacobians() const;
 
   /**
-   * For a face, return the outward normal vector to the cell at the
-   * <tt>i</tt>th quadrature point.
+   * Return the normal vector at a quadrature point. If you call this
+   * function for a face (i.e., when using a FEFaceValues or FESubfaceValues
+   * object), then this function returns the outward normal vector to
+   * the cell at the <tt>i</tt>th quadrature point of the face.
    *
-   * For a cell of codimension one, return the normal vector. There are of
+   * In contrast, if you call this function for a cell of codimension one
+   * (i.e., when using a `FEValues<dim,spacedim>` object with
+   * `spacedim>dim`), then this function returns the normal vector to the
+   * cell -- in other words, an approximation to the normal vector to the
+   * manifold in which the triangulation is embedded. There are of
    * course two normal directions to a manifold in that case, and this
    * function returns the "up" direction as induced by the numbering of the
    * vertices.
@@ -3126,23 +3256,9 @@ public:
   normal_vector(const unsigned int i) const;
 
   /**
-   * Return the normal vectors at the quadrature points. For a face, these are
-   * the outward normal vectors to the cell. For a cell of codimension one,
-   * the orientation is given by the numbering of vertices.
-   *
-   * @dealiiRequiresUpdateFlags{update_normal_vectors}
-   *
-   * @deprecated Use get_normal_vectors() instead, which returns the exact
-   * same thing.
-   */
-  DEAL_II_DEPRECATED
-  const std::vector<Tensor<1, spacedim>> &
-  get_all_normal_vectors() const;
-
-  /**
-   * Return the normal vectors at the quadrature points. For a face, these are
-   * the outward normal vectors to the cell. For a cell of codimension one,
-   * the orientation is given by the numbering of vertices.
+   * Return the normal vectors at all quadrature points represented by
+   * this object. See the normal_vector() function for what the normal
+   * vectors represent.
    *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
@@ -3300,7 +3416,7 @@ public:
 
 protected:
   /**
-   * Objects of the FEValues class need to store a pointer (i.e. an iterator)
+   * Objects of the FEValues class need to store an iterator
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
    * functions. On the other hand, this class should also work for different
@@ -3324,6 +3440,10 @@ protected:
    *
    * This way, the use of virtual functions is restricted to only this class,
    * and other users of iterators do not have to bear the negative effects.
+   *
+   * @note This class is an example of the
+   * <a href="https://www.artima.com/cppsource/type_erasure.html">type
+   * erasure</a> design pattern.
    *
    * @author Wolfgang Bangerth, 2003
    */
@@ -3755,9 +3875,21 @@ public:
          const unsigned int                                     face_no);
 
   /**
+   * Reinitialize the gradients, Jacobi determinants, etc for face @p face
+   * and cell @p cell.
+   *
+   * @note @p face must be one of @p cell's face iterators.
+   */
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void
+  reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>,
+                                            level_dof_access>> &     cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face);
+
+  /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given face
-   * on given cell of type "iterator into a Triangulation object", and the
-   * given finite element. Since iterators into triangulation alone only
+   * on a given cell of type "iterator into a Triangulation object", and the
+   * given finite element. Since iterators into a triangulation alone only
    * convey information about the geometry of a cell, but not about degrees of
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
@@ -3770,6 +3902,25 @@ public:
   void
   reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
          const unsigned int                                          face_no);
+
+  /*
+   * Reinitialize the gradients, Jacobi determinants, etc for the given face
+   * on a given cell of type "iterator into a Triangulation object", and the
+   * given finite element. Since iterators into a triangulation alone only
+   * convey information about the geometry of a cell, but not about degrees of
+   * freedom possibly associated with this cell, you will not be able to call
+   * some functions of this class if they need information about degrees of
+   * freedom. These functions are, above all, the
+   * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
+   *
+   * @note @p face must be one of @p cell's face iterators.
+   */
+  void
+  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face);
 
   /**
    * Return a reference to this very object.
@@ -3875,9 +4026,20 @@ public:
          const unsigned int                                     subface_no);
 
   /**
+   * Alternative reinitialization function that takes, as arguments, iterators
+   * to the face and subface instead of their numbers.
+   */
+  template <template <int, int> class DoFHandlerType, bool level_dof_access>
+  void
+  reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType<dim, spacedim>,
+                                            level_dof_access>> &     cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face,
+         const typename Triangulation<dim, spacedim>::face_iterator &subface);
+
+  /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given
-   * subface on given cell of type "iterator into a Triangulation object", and
-   * the given finite element. Since iterators into triangulation alone only
+   * subface on a given cell of type "iterator into a Triangulation object", and
+   * the given finite element. Since iterators into a triangulation alone only
    * convey information about the geometry of a cell, but not about degrees of
    * freedom possibly associated with this cell, you will not be able to call
    * some functions of this class if they need information about degrees of
@@ -3891,6 +4053,30 @@ public:
   reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
          const unsigned int                                          face_no,
          const unsigned int subface_no);
+
+  /**
+   * Reinitialize the gradients, Jacobi determinants, etc for the given
+   * subface on a given cell of type "iterator into a Triangulation object", and
+   * the given finite element. Since iterators into a triangulation alone only
+   * convey information about the geometry of a cell, but not about degrees of
+   * freedom possibly associated with this cell, you will not be able to call
+   * some functions of this class if they need information about degrees of
+   * freedom. These functions are, above all, the
+   * <tt>get_function_value/gradients/hessians/third_derivatives</tt>
+   * functions. If you want to call these functions, you have to call the @p
+   * reinit variants that take iterators into DoFHandler or other DoF handler
+   * type objects.
+   *
+   * This does the same thing as the previous function but takes iterators
+   * instead of numbers as arguments.
+   *
+   * @note @p face and @p subface must correspond to a face (and a subface of
+   * that face) of @p cell.
+   */
+  void
+  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+         const typename Triangulation<dim, spacedim>::face_iterator &face,
+         const typename Triangulation<dim, spacedim>::face_iterator &subface);
 
   /**
    * Return a reference to this very object.
@@ -3953,8 +4139,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::value(const unsigned int shape_function,
                                const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(
       fe_values->update_flags & update_values,
       ((typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -3977,8 +4162,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::gradient(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4001,8 +4185,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::hessian(const unsigned int shape_function,
                                  const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
@@ -4024,8 +4207,7 @@ namespace FEValuesViews
   Scalar<dim, spacedim>::third_derivative(const unsigned int shape_function,
                                           const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
@@ -4048,8 +4230,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::value(const unsigned int shape_function,
                                const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4087,8 +4268,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::gradient(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4128,8 +4308,7 @@ namespace FEValuesViews
                                     const unsigned int q_point) const
   {
     // this function works like in the case above
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4166,8 +4345,7 @@ namespace FEValuesViews
   {
     // this function works like in the case above
 
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4339,8 +4517,7 @@ namespace FEValuesViews
                                  const unsigned int q_point) const
   {
     // this function works like in the case above
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
@@ -4380,8 +4557,7 @@ namespace FEValuesViews
                                           const unsigned int q_point) const
   {
     // this function works like in the case above
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
@@ -4424,7 +4600,7 @@ namespace FEValuesViews
     inline dealii::SymmetricTensor<2, 1>
     symmetrize_single_row(const unsigned int n, const dealii::Tensor<1, 1> &t)
     {
-      Assert(n < 1, ExcIndexRange(n, 0, 1));
+      AssertIndexRange(n, 1);
       (void)n;
 
       return {{t[0]}};
@@ -4447,7 +4623,7 @@ namespace FEValuesViews
             }
           default:
             {
-              Assert(false, ExcIndexRange(n, 0, 2));
+              AssertIndexRange(n, 2);
               return {};
             }
         }
@@ -4474,7 +4650,7 @@ namespace FEValuesViews
             }
           default:
             {
-              Assert(false, ExcIndexRange(n, 0, 3));
+              AssertIndexRange(n, 3);
               return {};
             }
         }
@@ -4488,8 +4664,7 @@ namespace FEValuesViews
   Vector<dim, spacedim>::symmetric_gradient(const unsigned int shape_function,
                                             const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4524,8 +4699,7 @@ namespace FEValuesViews
   SymmetricTensor<2, dim, spacedim>::value(const unsigned int shape_function,
                                            const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4570,8 +4744,7 @@ namespace FEValuesViews
     const unsigned int shape_function,
     const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4649,8 +4822,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::value(const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
@@ -4700,8 +4872,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
                                        const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4757,8 +4928,7 @@ namespace FEValuesViews
   Tensor<2, dim, spacedim>::gradient(const unsigned int shape_function,
                                      const unsigned int q_point) const
   {
-    Assert(shape_function < fe_values->fe->dofs_per_cell,
-           ExcIndexRange(shape_function, 0, fe_values->fe->dofs_per_cell));
+    AssertIndexRange(shape_function, fe_values->fe->dofs_per_cell);
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
@@ -4818,10 +4988,7 @@ template <int dim, int spacedim>
 inline const FEValuesViews::Scalar<dim, spacedim> &FEValuesBase<dim, spacedim>::
                                                    operator[](const FEValuesExtractors::Scalar &scalar) const
 {
-  Assert(scalar.component < fe_values_views_cache.scalars.size(),
-         ExcIndexRange(scalar.component,
-                       0,
-                       fe_values_views_cache.scalars.size()));
+  AssertIndexRange(scalar.component, fe_values_views_cache.scalars.size());
 
   return fe_values_views_cache.scalars[scalar.component];
 }
@@ -4832,10 +4999,8 @@ template <int dim, int spacedim>
 inline const FEValuesViews::Vector<dim, spacedim> &FEValuesBase<dim, spacedim>::
                                                    operator[](const FEValuesExtractors::Vector &vector) const
 {
-  Assert(vector.first_vector_component < fe_values_views_cache.vectors.size(),
-         ExcIndexRange(vector.first_vector_component,
-                       0,
-                       fe_values_views_cache.vectors.size()));
+  AssertIndexRange(vector.first_vector_component,
+                   fe_values_views_cache.vectors.size());
 
   return fe_values_views_cache.vectors[vector.first_vector_component];
 }
@@ -4865,11 +5030,8 @@ inline const FEValuesViews::Tensor<2, dim, spacedim> &
   FEValuesBase<dim, spacedim>::
   operator[](const FEValuesExtractors::Tensor<2> &tensor) const
 {
-  Assert(tensor.first_tensor_component <
-           fe_values_views_cache.second_order_tensors.size(),
-         ExcIndexRange(tensor.first_tensor_component,
-                       0,
-                       fe_values_views_cache.second_order_tensors.size()));
+  AssertIndexRange(tensor.first_tensor_component,
+                   fe_values_views_cache.second_order_tensors.size());
 
   return fe_values_views_cache
     .second_order_tensors[tensor.first_tensor_component];
@@ -4882,7 +5044,7 @@ inline const double &
 FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
                                          const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -4919,11 +5081,10 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -4949,7 +5110,7 @@ inline const Tensor<1, spacedim> &
 FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
                                         const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -4986,11 +5147,10 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   // check whether the shape function
@@ -5015,7 +5175,7 @@ inline const Tensor<2, spacedim> &
 FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
                                            const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
@@ -5052,11 +5212,10 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
+  AssertIndexRange(i, fe->dofs_per_cell);
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   // check whether the shape function
@@ -5081,8 +5240,8 @@ inline const Tensor<3, spacedim> &
 FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
                                                   const unsigned int j) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
-  Assert(this->update_flags & update_hessians,
+  AssertIndexRange(i, fe->dofs_per_cell);
+  Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(fe->is_primitive(i), ExcShapeFunctionNotPrimitive(i));
   Assert(present_cell.get() != nullptr,
@@ -5118,11 +5277,10 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int j,
   const unsigned int component) const
 {
-  Assert(i < fe->dofs_per_cell, ExcIndexRange(i, 0, fe->dofs_per_cell));
-  Assert(this->update_flags & update_hessians,
+  AssertIndexRange(i, fe->dofs_per_cell);
+  Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
-  Assert(component < fe->n_components(),
-         ExcIndexRange(component, 0, fe->n_components()));
+  AssertIndexRange(component, fe->n_components());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
   // check whether the shape function
@@ -5372,13 +5530,54 @@ FEValuesBase<dim, spacedim>::get_inverse_jacobians() const
 
 
 template <int dim, int spacedim>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEValuesBase<dim, spacedim>::dof_indices() const
+{
+  return {0U, dofs_per_cell};
+}
+
+
+
+template <int dim, int spacedim>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEValuesBase<dim, spacedim>::dof_indices_starting_at(
+  const unsigned int start_dof_index) const
+{
+  Assert(start_dof_index <= dofs_per_cell,
+         ExcIndexRange(start_dof_index, 0, dofs_per_cell + 1));
+  return {start_dof_index, dofs_per_cell};
+}
+
+
+
+template <int dim, int spacedim>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEValuesBase<dim, spacedim>::dof_indices_ending_at(
+  const unsigned int end_dof_index) const
+{
+  Assert(end_dof_index < dofs_per_cell,
+         ExcIndexRange(end_dof_index, 0, dofs_per_cell));
+  return {0U, end_dof_index + 1};
+}
+
+
+
+template <int dim, int spacedim>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEValuesBase<dim, spacedim>::quadrature_point_indices() const
+{
+  return {0U, n_quadrature_points};
+}
+
+
+
+template <int dim, int spacedim>
 inline const Point<spacedim> &
 FEValuesBase<dim, spacedim>::quadrature_point(const unsigned int i) const
 {
   Assert(this->update_flags & update_quadrature_points,
          ExcAccessToUninitializedField("update_quadrature_points"));
-  Assert(i < this->mapping_output.quadrature_points.size(),
-         ExcIndexRange(i, 0, this->mapping_output.quadrature_points.size()));
+  AssertIndexRange(i, this->mapping_output.quadrature_points.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5393,8 +5592,7 @@ FEValuesBase<dim, spacedim>::JxW(const unsigned int i) const
 {
   Assert(this->update_flags & update_JxW_values,
          ExcAccessToUninitializedField("update_JxW_values"));
-  Assert(i < this->mapping_output.JxW_values.size(),
-         ExcIndexRange(i, 0, this->mapping_output.JxW_values.size()));
+  AssertIndexRange(i, this->mapping_output.JxW_values.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5409,8 +5607,7 @@ FEValuesBase<dim, spacedim>::jacobian(const unsigned int i) const
 {
   Assert(this->update_flags & update_jacobians,
          ExcAccessToUninitializedField("update_jacobians"));
-  Assert(i < this->mapping_output.jacobians.size(),
-         ExcIndexRange(i, 0, this->mapping_output.jacobians.size()));
+  AssertIndexRange(i, this->mapping_output.jacobians.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5425,8 +5622,7 @@ FEValuesBase<dim, spacedim>::jacobian_grad(const unsigned int i) const
 {
   Assert(this->update_flags & update_jacobian_grads,
          ExcAccessToUninitializedField("update_jacobians_grads"));
-  Assert(i < this->mapping_output.jacobian_grads.size(),
-         ExcIndexRange(i, 0, this->mapping_output.jacobian_grads.size()));
+  AssertIndexRange(i, this->mapping_output.jacobian_grads.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5441,8 +5637,7 @@ FEValuesBase<dim, spacedim>::inverse_jacobian(const unsigned int i) const
 {
   Assert(this->update_flags & update_inverse_jacobians,
          ExcAccessToUninitializedField("update_inverse_jacobians"));
-  Assert(i < this->mapping_output.inverse_jacobians.size(),
-         ExcIndexRange(i, 0, this->mapping_output.inverse_jacobians.size()));
+  AssertIndexRange(i, this->mapping_output.inverse_jacobians.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5458,8 +5653,7 @@ FEValuesBase<dim, spacedim>::normal_vector(const unsigned int i) const
   Assert(this->update_flags & update_normal_vectors,
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_normal_vectors")));
-  Assert(i < this->mapping_output.normal_vectors.size(),
-         ExcIndexRange(i, 0, this->mapping_output.normal_vectors.size()));
+  AssertIndexRange(i, this->mapping_output.normal_vectors.size());
   Assert(present_cell.get() != nullptr,
          ExcMessage("FEValues object is not reinit'ed to any cell"));
 
@@ -5532,8 +5726,7 @@ template <int dim, int spacedim>
 inline const Tensor<1, spacedim> &
 FEFaceValuesBase<dim, spacedim>::boundary_form(const unsigned int i) const
 {
-  Assert(i < this->mapping_output.boundary_forms.size(),
-         ExcIndexRange(i, 0, this->mapping_output.boundary_forms.size()));
+  AssertIndexRange(i, this->mapping_output.boundary_forms.size());
   Assert(this->update_flags & update_boundary_forms,
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_boundary_forms")));

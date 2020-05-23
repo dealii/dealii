@@ -21,29 +21,29 @@ Refinement cycle 1
    Writing output...
 
 Refinement cycle 2
-   Number of active cells: 412
-   Number of degrees of freedom: 3667
+   Number of active cells: 436
+   Number of degrees of freedom: 3723
    Assembling...
    Solving...
    Writing output...
 
 Refinement cycle 3
-   Number of active cells: 1216
-   Number of degrees of freedom: 9999
+   Number of active cells: 1072
+   Number of degrees of freedom: 7493
    Assembling...
    Solving...
    Writing output...
 
 Refinement cycle 4
-   Number of active cells: 2788
-   Number of degrees of freedom: 18537
+   Number of active cells: 2632
+   Number of degrees of freedom: 15005
    Assembling...
    Solving...
    Writing output...
 
 Refinement cycle 5
-   Number of active cells: 6496
-   Number of degrees of freedom: 35985
+   Number of active cells: 5944
+   Number of degrees of freedom: 29437
    Assembling...
    Solving...
    Writing output...
@@ -51,16 +51,16 @@ Refinement cycle 5
 
 The results are easily visualized:
 
-<table width="60%" align="center">
+<table width="80%" align="center">
   <tr valign="top">
     <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.velocity-magnitude.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.velocity-2d.png" alt="">
       <p align="center">
-        Magnitude of the fluid velocity.
+        Magnitude and vectors for the fluid velocity.
       </p>
     </td>
     <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.pressure.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.pressure-2d.png" alt="">
       <p align="center">
         Fluid pressure. The dynamic range has been truncated to cut off the
         pressure singularities at the top left and right corners of the domain
@@ -68,35 +68,19 @@ The results are easily visualized:
         into the fluid domain.
       </p>
     </td>
-  </tr>
-  <tr valign="top">
     <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.velocity.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.displacement-2d.png" alt="">
       <p align="center">
-        Fluid velocity.
-      </p>
-    </td>
-    <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.displacement.png" alt="">
-      <p align="center">
-        Solid displacement.
+        Magnitude and vectors for the solid displacement.
       </p>
     </td>
   </tr>
 </table>
 
-In all figures, we have applied a mask to only show the original field, not
-the one extended by zero: for example, to plot the pressure, we have selected
-that part of the domain where the magnitude of the velocity is greater than
-$10^{-7}$.
-
 The plots are easily interpreted: as the flow drives down on the left side and
-up on the right side of the upright part of the solid, it produces a shear
-force that pulls the left side down and the right side up. An additional part
-force comes from the pressure, which bears down on the left side of the top
-and pulls up on the right side. Both forces yield a net torque on the solid
-that bends it to the left, as confirmed by the plot of the displacement
-vectors.
+up on the right side of the upright part of the solid, it produces a
+pressure that is high on the left and low on the right, and these
+forces bend the vertical part of the solid to the right.
 
 
 <h3>3d results</h3>
@@ -117,45 +101,26 @@ Refinement cycle 1
    Number of degrees of freedom: 48984
    Assembling...
    Solving...
+   Writing output...
 
 Refinement cycle 2
-   Number of active cells: 8534
-   Number of degrees of freedom: 245647
+   Number of active cells: 8548
+   Number of degrees of freedom: 245746
    Assembling...
    Solving...
 @endcode
 You'll notice that the big bottleneck is the solver: SparseDirectUmfpack needs
-approximately 8 hours and some 42 GB of memory to solve the last iteration of
-this problem on a 2010 workstation (the second to last iteration took only 6
+nearly 5 hours and some 80 GB of memory to solve the last iteration of
+this problem on a 2016 workstation (the second to last iteration took only 16
 minutes). Clearly a better solver is needed here, a topic discussed below.
 
-The results can also be visualized and yield some good pictures:
+The results can also be visualized and yield good pictures as
+well. Here is one, showing both a vector plot for the velocity (in
+oranges), the solid displacement (in blues), and shading the solid region:
 
-<table width="60%" align="center">
-  <tr valign="top">
-    <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.velocity.png" alt="">
-      <p align="center">
-        Vectors of the fluid velocity and magnitude of the
-        displacement of the solid part.
-      </p>
-    </td>
-    <td valign="top" align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.streamlines.png" alt="">
-      <p align="center">
-        Streamlines of the velocity, with the mesh superimposed.
-      </p>
-    </td>
-  </tr>
-  <tr valign="top">
-    <td valign="top" align="center" colspan="2">
-      <img src="https://www.dealii.org/images/steps/developer/step-46.3d.displacement.png" alt="">
-      <p align="center">
-        Solid displacement.
-      </p>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-46.9.2.3d.png" alt="">
+</p>
 
 In addition to the lack of a good solver, the mesh is a bit
 unbalanced: mesh refinement heavily favors the fluid subdomain (in 2d,

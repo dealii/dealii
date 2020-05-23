@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ test(unsigned int ref = 1)
     if (dim < spacedim && cell->center().distance(center) < radius)
       cell->set_all_manifold_ids(1);
     else
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->face(f)->center().distance(center) < radius)
           cell->face(f)->set_all_manifold_ids(1);
 

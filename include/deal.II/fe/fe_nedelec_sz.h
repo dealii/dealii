@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_fe_nedelec_sz_h
 #define dealii_fe_nedelec_sz_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
@@ -34,7 +36,8 @@ DEAL_II_NAMESPACE_OPEN
  * H<sup>curl</sup>-conforming N&eacute;d&eacute;lec element described in the
  * PhD thesis of S. Zaglmayr, <b>High Order Finite Element Methods for
  * Electromagnetic Field Computation</b>, Johannes Kepler Universit&auml;t Linz,
- * 2006.
+ * 2006. It its used in the same context as described at the top of the
+ * description for the FE_Nedelec class.
  *
  * This element overcomes the sign conflict issues present in
  * traditional N&eacute;d&eacute;lec elements that arise from the edge
@@ -77,9 +80,18 @@ public:
                 "FE_NedelecSZ is only implemented for dim==spacedim!");
 
   /**
-   * Constructor for an element of given @p degree.
+   * Constructor for the NedelecSZ element of given @p order. The maximal
+   * polynomial degree of the shape functions is `order+1` (in each variable;
+   * the total polynomial degree may be higher). If `order = 0`, the element is
+   * linear and has degrees of freedom only on the edges. If `order >= 1` the
+   * element has degrees of freedom on the edges, faces and volume. For example
+   * the 3D version of FE_NedelecSZ has 12 degrees of freedom for `order = 0`
+   * and 54 for `degree = 1`. It is important to have enough quadrature points
+   * in order to perform the quadrature with sufficient accuracy.
+   * For example [QGauss<dim>(order + 2)](@ref QGauss) can be used for the
+   * quadrature formula, where `order` is the order of FE_NedelecSZ.
    */
-  FE_NedelecSZ(const unsigned int degree);
+  FE_NedelecSZ(const unsigned int order);
 
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
@@ -134,22 +146,6 @@ public:
   shape_grad_grad_component(const unsigned int i,
                             const Point<dim> & p,
                             const unsigned int component) const override;
-
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed only
-   * for the reference cell. Make sure, that #mapping_kind is set by the
-   * derived class, such that this function can operate correctly.
-   */
-  UpdateFlags
-  update_once(const UpdateFlags flags) const;
-
-  /**
-   * Given <tt>flags</tt>, determines the values which must be computed in
-   * each cell cell. Make sure, that #mapping_kind is set by the derived
-   * class, such that this function can operate correctly.
-   */
-  UpdateFlags
-  update_each(const UpdateFlags flags) const;
 
 protected:
   /**

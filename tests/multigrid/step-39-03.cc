@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,8 +64,6 @@
 
 namespace Step39
 {
-  using namespace dealii;
-
   Functions::SlitSingularityFunction<2> exact_solution;
 
 
@@ -458,7 +456,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
     types::global_dof_index n_dofs = dof_handler.n_dofs();
     solution.reinit(n_dofs);
     right_hand_side.reinit(n_dofs);
@@ -597,7 +595,7 @@ namespace Step39
     SolverGMRES<Vector<double>> solver(control);
 
     MGTransferPrebuilt<Vector<double>> mg_transfer;
-    mg_transfer.build_matrices(dof_handler);
+    mg_transfer.build(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from(mg_matrix[0]);
@@ -620,7 +618,7 @@ namespace Step39
     mg::Matrix<Vector<double>> mgedge(mg_matrix_in_out);
 
     Multigrid<Vector<double>> mg(
-      dof_handler, mgmatrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
+      mgmatrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
     mg.set_edge_matrices(mgedge, mgedge);
 
@@ -808,7 +806,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step39;
       initlog(__FILE__);
 

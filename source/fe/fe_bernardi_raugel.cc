@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,15 +38,14 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
-  : FE_PolyTensor<PolynomialsBernardiRaugel<dim>, dim>(
-      p,
+  : FE_PolyTensor<dim>(
+      PolynomialsBernardiRaugel<dim>(p),
       FiniteElementData<dim>(get_dpo_vector(),
                              dim,
                              2,
                              FiniteElementData<dim>::Hdiv),
-      std::vector<bool>(PolynomialsBernardiRaugel<dim>::compute_n_pols(p),
-                        true),
-      std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::compute_n_pols(
+      std::vector<bool>(PolynomialsBernardiRaugel<dim>::n_polynomials(p), true),
+      std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::n_polynomials(
                                    p),
                                  std::vector<bool>(dim, true)))
 {
@@ -102,7 +101,7 @@ FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
 
   std::vector<Tensor<1, dim>> normals;
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (unsigned int i : GeometryInfo<dim>::face_indices())
     {
       Tensor<1, dim> normal;
       normal[i / 2] = 1;
@@ -178,7 +177,6 @@ FE_BernardiRaugel<dim>::initialize_support_points()
     }
 }
 
-template class FE_BernardiRaugel<1>;
 template class FE_BernardiRaugel<2>;
 template class FE_BernardiRaugel<3>;
 

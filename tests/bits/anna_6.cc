@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -154,8 +154,8 @@ void
 ImposeBC<dim>::get_ready()
 {
   dof_handler.distribute_dofs(fe);
-  std::vector<types::global_dof_index> dofs_per_comp(fe.n_components());
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_comp);
+  const std::vector<types::global_dof_index> dofs_per_comp =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   // For an FESystem with Nedelec-elements as
   // first component and bilinear elements as
@@ -279,9 +279,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
+      initlog();
       deallog << std::setprecision(2);
-      deallog.attach(logfile);
 
       ImposeBC<2>().run();
       ImposeBC<3>().run();

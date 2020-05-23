@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,6 @@
 
 #include "../tests.h"
 
-
-std::ofstream logfile("output");
 
 
 template <int dim,
@@ -291,11 +289,8 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
-  // need to set quite a loose tolerance because
-  // FEValues approximates Hessians with finite
-  // differences, which are not so accurate
-  deallog << std::setprecision(3);
+  initlog();
+  deallog << std::setprecision(7);
 
   {
     deallog.push("2d");

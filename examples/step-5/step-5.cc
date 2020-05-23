@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -63,7 +63,7 @@ using namespace dealii;
 // @sect3{The <code>Step5</code> class template}
 
 // The main class is mostly as in the previous example. The most visible
-// change is that the function <code>make_grid_and_dofs</code> has been
+// change is that the function <code>make_grid</code> has been
 // removed, since creating the grid is now done in the <code>run</code>
 // function and the rest of its functionality is now in
 // <code>setup_system</code>. Apart from this, everything is as before.
@@ -127,7 +127,7 @@ Step5<dim>::Step5()
 
 // @sect4{Step5::setup_system}
 
-// This is the function <code>make_grid_and_dofs</code> from the previous
+// This is the function <code>make_grid</code> from the previous
 // example, minus the generation of the grid. Everything else is unchanged:
 template <int dim>
 void Step5<dim>::setup_system()
@@ -170,7 +170,6 @@ void Step5<dim>::assemble_system()
                             update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -189,13 +188,13 @@ void Step5<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           const double current_coefficient =
             coefficient<dim>(fe_values.quadrature_point(q_index));
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             {
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              for (const unsigned int j : fe_values.dof_indices())
                 cell_matrix(i, j) +=
                   (current_coefficient *              // a(x_q)
                    fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
@@ -210,9 +209,9 @@ void Step5<dim>::assemble_system()
 
 
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int j : fe_values.dof_indices())
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i, j));
@@ -264,10 +263,10 @@ void Step5<dim>::assemble_system()
 template <int dim>
 void Step5<dim>::solve()
 {
-  SolverControl solver_control(1000, 1e-12);
-  SolverCG<>    solver(solver_control);
+  SolverControl            solver_control(1000, 1e-12);
+  SolverCG<Vector<double>> solver(solver_control);
 
-  PreconditionSSOR<> preconditioner;
+  PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
   solver.solve(system_matrix, solution, system_rhs, preconditioner);

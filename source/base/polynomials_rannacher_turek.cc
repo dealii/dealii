@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,12 +16,14 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomials_rannacher_turek.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 PolynomialsRannacherTurek<dim>::PolynomialsRannacherTurek()
+  : ScalarPolynomialsBase<dim>(2, dealii::GeometryInfo<dim>::faces_per_cell)
 {
   Assert(dim == 2, ExcNotImplemented());
 }
@@ -141,7 +143,7 @@ PolynomialsRannacherTurek<dim>::compute_grad_grad(
 
 template <int dim>
 void
-PolynomialsRannacherTurek<dim>::compute(
+PolynomialsRannacherTurek<dim>::evaluate(
   const Point<dim> &           unit_point,
   std::vector<double> &        values,
   std::vector<Tensor<1, dim>> &grads,
@@ -149,7 +151,7 @@ PolynomialsRannacherTurek<dim>::compute(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  const unsigned int n_pols = dealii::GeometryInfo<dim>::faces_per_cell;
+  const unsigned int n_pols = this->n();
   Assert(values.size() == n_pols || values.size() == 0,
          ExcDimensionMismatch(values.size(), n_pols));
   Assert(grads.size() == n_pols || grads.size() == 0,
@@ -184,6 +186,15 @@ PolynomialsRannacherTurek<dim>::compute(
           fourth_derivatives[i] = compute_derivative<4>(i, unit_point);
         }
     }
+}
+
+
+
+template <int dim>
+std::unique_ptr<ScalarPolynomialsBase<dim>>
+PolynomialsRannacherTurek<dim>::clone() const
+{
+  return std_cxx14::make_unique<PolynomialsRannacherTurek<dim>>(*this);
 }
 
 

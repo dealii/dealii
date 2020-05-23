@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2018 by the deal.II authors
+## Copyright (C) 2013 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -65,9 +65,8 @@
 #
 # The following variables must be set:
 #
-#   NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
-#     - pointing to valid diff executables. If NUMDIFF_EXECUTABLE is not
-#       "numdiff" it will be ignored and DIFF_EXECUTABLE is used instead.
+#   NUMDIFF_EXECUTABLE
+#     - Complete path to the numdiff binary.
 #
 #   TEST_TIME_LIMIT
 #     - specifying the maximal wall clock time in seconds a test is allowed
@@ -97,17 +96,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     SET(_configuration DEBUG)
   ELSEIF(_file MATCHES "\\.release\\.")
     SET(_configuration RELEASE)
-  ENDIF()
-
-  #
-  # A "binary" in the output file indicates binary output. In this case we
-  # have to switch to plain diff instead of (possibly) numdiff, which can
-  # only work on plain text files.
-  #
-  IF(_file MATCHES "\\.binary\\.")
-    SET(_test_diff ${DIFF_EXECUTABLE})
-  ELSE()
-    SET(_test_diff ${NUMDIFF_EXECUTABLE})
   ENDIF()
 
   #
@@ -314,8 +302,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          diff "${_test_full}" "${_test_diff}"
-          "${DIFF_EXECUTABLE}" "${_comparison_file}" ${_run_args}
+          diff "${_test_full}" "${NUMDIFF_EXECUTABLE}"
+          "${_comparison_file}" ${_run_args}
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS

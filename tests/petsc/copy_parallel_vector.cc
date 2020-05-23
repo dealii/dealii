@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,6 @@
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
-
   Utilities::MPI::MPI_InitFinalize mpi_context(argc, argv, 1);
   MPILogInitAll                    mpi_log;
 

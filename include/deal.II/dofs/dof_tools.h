@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,6 +39,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 class BlockMask;
 template <int dim, typename RangeNumberType>
 class Function;
@@ -67,6 +69,28 @@ namespace GridTools
   struct PeriodicFacePair;
 }
 
+namespace DoFTools
+{
+  namespace internal
+  {
+    /*
+     * Default value of the face_has_flux_coupling parameter of
+     * make_flux_sparsity_pattern. Defined here (instead of using a default
+     * lambda in the parameter list) to avoid a bug in gcc where the same lambda
+     * gets defined multiple times.
+     */
+    template <typename DoFHandlerType>
+    inline bool
+    always_couple_on_faces(
+      const typename DoFHandlerType::active_cell_iterator &,
+      const unsigned int)
+    {
+      return true;
+    }
+  } // namespace internal
+} // namespace DoFTools
+
+#endif
 
 /**
  * This is a collection of functions operating on, and manipulating the
@@ -773,18 +797,41 @@ namespace DoFTools
    * components of a finite element are continuous and some discontinuous,
    * allowing constraints to be imposed on the continuous part while also
    * building the flux terms needed for the discontinuous part.
+   *
+   * The optional @p face_has_flux_coupling can be used to specify on which
+   * faces flux couplings occur. This allows for creating a sparser pattern when
+   * using a bilinear form where flux terms only appear on a subset of the faces
+   * in the triangulation. By default flux couplings are added over all internal
+   * faces. @p face_has_flux_coupling should be a function that takes an
+   * active_cell_iterator and a face index and should return true if there is a
+   * flux coupling over the face. When using the ::dealii::DoFHandler we could,
+   * for example, use
+   *
+   * @code
+   *  auto face_has_flux_coupling =
+   *    [](const typename DoFHandler<dim>::active_cell_iterator &cell,
+   *       const unsigned int                                    face_index) {
+   *      const Point<dim> &face_center = cell->face(face_index)->center();
+   *      return 0 < face_center[0];
+   *    };
+   * @endcode
    */
   template <typename DoFHandlerType,
             typename SparsityPatternType,
             typename number>
   void
-  make_flux_sparsity_pattern(const DoFHandlerType &           dof,
-                             SparsityPatternType &            sparsity,
-                             const AffineConstraints<number> &constraints,
-                             const bool                keep_constrained_dofs,
-                             const Table<2, Coupling> &couplings,
-                             const Table<2, Coupling> &face_couplings,
-                             const types::subdomain_id subdomain_id);
+  make_flux_sparsity_pattern(
+    const DoFHandlerType &           dof,
+    SparsityPatternType &            sparsity,
+    const AffineConstraints<number> &constraints,
+    const bool                       keep_constrained_dofs,
+    const Table<2, Coupling> &       couplings,
+    const Table<2, Coupling> &       face_couplings,
+    const types::subdomain_id        subdomain_id,
+    const std::function<
+      bool(const typename DoFHandlerType::active_cell_iterator &,
+           const unsigned int)> &face_has_flux_coupling =
+      &internal::always_couple_on_faces<DoFHandlerType>);
 
   /**
    * Create the sparsity pattern for boundary matrices. See the general
@@ -1148,10 +1195,24 @@ namespace DoFTools
    * This function makes sure that identity constraints don't create cycles
    * in @p constraints.
    *
+   * @p periodicity_factor can be used to implement Bloch periodic conditions
+   * (a.k.a. phase shift periodic conditions) of the form
+   * $\psi(\mathbf{r})=e^{-i\mathbf{k}\cdot\mathbf{r}}u(\mathbf{r})$
+   * where $u$ is periodic with the same periodicity as the crystal lattice and
+   * $\mathbf{k}$ is the wavevector, see
+   * [https://en.wikipedia.org/wiki/Bloch_wave](https://en.wikipedia.org/wiki/Bloch_wave).
+   * The solution at @p face_2 is equal to the solution at @p face_1 times
+   * @p periodicity_factor. For example, if the solution at @p face_1 is
+   * $\psi(0)$ and $\mathbf{d}$ is the corresponding point on @p face_2, then
+   * the solution at @p face_2 should be
+   * $\psi(d) = \psi(0)e^{-i \mathbf{k}\cdot \mathbf{d}}$. This condition can be
+   * implemented using
+   * $\mathrm{periodicity\_factor}=e^{-i \mathbf{k}\cdot \mathbf{d}}$.
+   *
    * Detailed information can be found in the see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
    *
-   * @author Matthias Maier, 2012 - 2015
+   * @author Matthias Maier, Daniel Garcia-Sanchez 2012 - 2019
    */
   template <typename FaceIterator, typename number>
   void
@@ -1165,7 +1226,8 @@ namespace DoFTools
     const bool                       face_rotation    = false,
     const FullMatrix<double> &       matrix           = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
-      std::vector<unsigned int>());
+      std::vector<unsigned int>(),
+    const number periodicity_factor = 1.);
 
 
 
@@ -1199,7 +1261,8 @@ namespace DoFTools
     AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask = ComponentMask(),
     const std::vector<unsigned int> &first_vector_components =
-      std::vector<unsigned int>());
+      std::vector<unsigned int>(),
+    const number periodicity_factor = 1.);
 
 
 
@@ -1216,13 +1279,14 @@ namespace DoFTools
    *
    * This function tries to match all faces belonging to the first boundary
    * with faces belonging to the second boundary with the help of
-   * orthogonal_equality().
+   * orthogonal_equality(). More precisely, faces with coordinates only
+   * differing in the @p direction component are identified.
    *
    * If this matching is successful it constrains all DoFs associated with the
    * 'first' boundary to the respective DoFs of the 'second' boundary
    * respecting the relative orientation of the two faces.
    *
-   * @note: This function is a convenience wrapper. It internally calls
+   * @note This function is a convenience wrapper. It internally calls
    * GridTools::collect_periodic_faces() with the supplied parameters and
    * feeds the output to above make_periodicity_constraints() variant. If you
    * need more functionality use GridTools::collect_periodic_faces() directly.
@@ -1239,9 +1303,10 @@ namespace DoFTools
     const DoFHandlerType &     dof_handler,
     const types::boundary_id   b_id1,
     const types::boundary_id   b_id2,
-    const int                  direction,
+    const unsigned int         direction,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask     = ComponentMask(),
+    const number               periodicity_factor = 1.);
 
 
 
@@ -1254,13 +1319,14 @@ namespace DoFTools
    * boundary_ids this function defines a 'left' boundary as all faces with
    * local face index <code>2*dimension</code> and boundary indicator @p b_id
    * and, similarly, a 'right' boundary consisting of all face with local face
-   * index <code>2*dimension+1</code> and boundary indicator @p b_id.
+   * index <code>2*dimension+1</code> and boundary indicator @p b_id. Faces with
+   * coordinates only differing in the @p direction component are identified.
    *
    * @note This version of make_periodicity_constraints  will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
    *
-   * @note: This function is a convenience wrapper. It internally calls
+   * @note This function is a convenience wrapper. It internally calls
    * GridTools::collect_periodic_faces() with the supplied parameters and
    * feeds the output to above make_periodicity_constraints() variant. If you
    * need more functionality use GridTools::collect_periodic_faces() directly.
@@ -1274,9 +1340,10 @@ namespace DoFTools
   make_periodicity_constraints(
     const DoFHandlerType &     dof_handler,
     const types::boundary_id   b_id,
-    const int                  direction,
+    const unsigned int         direction,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask     = ComponentMask(),
+    const number               periodicity_factor = 1.);
 
   /**
    * @}
@@ -1301,15 +1368,18 @@ namespace DoFTools
    * for large parallel computations -- in fact, it may be too large to store on
    * each processor. In that case, you may want to choose the variant of this
    * function that returns an IndexSet object.
+   *
+   * @deprecated For the reason stated above, this function is deprecated in
+   *   favor of the following function.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   extract_hanging_node_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                             std::vector<bool> &              selected_dofs);
 
   /**
    * Same as above but return the selected DoFs as IndexSet. In particular,
-   * for parallel::Triangulation objects this function should be preferred.
+   * for parallel::TriangulationBase objects this function should be preferred.
    */
   template <int dim, int spacedim>
   IndexSet
@@ -1350,12 +1420,55 @@ namespace DoFTools
    *   vector just holds the locally owned extracted degrees of freedom, which
    *   first have to be mapped to the global degrees of freedom, to correspond
    *   with them.
+   *
+   * @deprecated This function is difficult to use in parallel contexts because
+   *   it returns a vector that needs to be indexed based on the position
+   *   of a degree of freedom within the set of locally owned degrees of
+   *   freedom. It is consequently deprecated in favor of the following
+   *   function.
    */
   template <typename DoFHandlerType>
-  void
+  DEAL_II_DEPRECATED void
   extract_dofs(const DoFHandlerType &dof_handler,
                const ComponentMask & component_mask,
                std::vector<bool> &   selected_dofs);
+
+  /**
+   * Extract the (locally owned) indices of the degrees of freedom belonging to
+   * certain vector components of a vector-valued finite element. The
+   * @p component_mask defines which components or blocks of an FESystem or
+   * vector-valued element are to be extracted
+   * from the DoFHandler @p dof. The entries in the output object then
+   * correspond to degrees of freedom belonging to these
+   * components.
+   *
+   * If the finite element under consideration is not primitive, i.e., some or
+   * all of its shape functions are non-zero in more than one vector component
+   * (which holds, for example, for FE_Nedelec or FE_RaviartThomas elements),
+   * then shape functions cannot be associated with a single vector component.
+   * In this case, if <em>one</em> shape vector component of this element is
+   * flagged in @p component_mask (see
+   * @ref GlossComponentMask),
+   * then this is equivalent to selecting <em>all</em> vector components
+   * corresponding to this non-primitive base element.
+   *
+   * @param[in] dof_handler The DoFHandler whose enumerated degrees of freedom
+   *   are to be filtered by this function.
+   * @param[in] component_mask A mask that states which components you want
+   *   to select. The size of this mask must be compatible with the number of
+   *   components in the FiniteElement used by the @p dof_handler. See
+   *   @ref GlossComponentMask "the glossary entry on component masks"
+   *   for more information.
+   * @return An IndexSet object that will contain exactly those entries that
+   *   (i) correspond to degrees of freedom selected by the mask above, and
+   *   (ii) are locally owned. The size of the index set is equal to the global
+   *   number of degrees of freedom. Note that the resulting object is always
+   *   a subset of what DoFHandler::locally_owned_dofs() returns.
+   */
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs(const DoFHandlerType &dof_handler,
+               const ComponentMask & component_mask);
 
   /**
    * This function is the equivalent to the DoFTools::extract_dofs() functions
@@ -1380,12 +1493,45 @@ namespace DoFTools
    *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
    *   sequential computations of course equals DoFHandler::n_dofs(). The
    *   previous contents of this array are overwritten.
+   *
+   * @deprecated This function is difficult to use in parallel contexts because
+   *   it returns a vector that needs to be indexed based on the position
+   *   of a degree of freedom within the set of locally owned degrees of
+   *   freedom. It is consequently deprecated in favor of the following
+   *   function.
    */
   template <typename DoFHandlerType>
-  void
+  DEAL_II_DEPRECATED void
   extract_dofs(const DoFHandlerType &dof_handler,
                const BlockMask &     block_mask,
                std::vector<bool> &   selected_dofs);
+
+  /**
+   * This function is the equivalent to the DoFTools::extract_dofs() functions
+   * above except that the selection of which degrees of freedom to extract is
+   * not done based on components (see
+   * @ref GlossComponent)
+   * but instead based on whether they are part of a particular block (see
+   * @ref GlossBlock).
+   * Consequently, the second argument is not a ComponentMask but a BlockMask
+   * object.
+   *
+   * @param[in] dof_handler The DoFHandler whose enumerated degrees of freedom
+   *   are to be filtered by this function.
+   * @param[in] block_mask A mask that states which blocks you want
+   *   to select. The size of this mask must be compatible with the number of
+   *   blocks in the FiniteElement used by the @p dof_handler. See
+   *   @ref GlossBlockMask "the glossary entry on block masks"
+   *   for more information.
+   * @return An IndexSet object that will contain exactly those entries that
+   *   (i) correspond to degrees of freedom selected by the mask above, and
+   *   (ii) are locally owned. The size of the index set is equal to the global
+   *   number of degrees of freedom. Note that the resulting object is always
+   *   a subset of what DoFHandler::locally_owned_dofs() returns.
+   */
+  template <typename DoFHandlerType>
+  IndexSet
+  extract_dofs(const DoFHandlerType &dof_handler, const BlockMask &block_mask);
 
   /**
    * Do the same thing as the corresponding extract_dofs() function for one
@@ -1425,7 +1571,7 @@ namespace DoFTools
    * @ref GlossComponentMask)
    * shall equal the number of components in the finite element used by @p
    * dof. The size of @p selected_dofs shall equal
-   * <tt>dof_handler.n_dofs()</tt>. Previous contents of this array or
+   * <tt>dof_handler.n_dofs()</tt>. Previous contents of this array are
    * overwritten.
    *
    * Using the usual convention, if a shape function is non-zero in more than
@@ -1442,7 +1588,7 @@ namespace DoFTools
    * DoFTools::extract_boundary_dofs function.
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
-   * live on which cell
+   * live on which cell.
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
    * @ref GlossComponentMask).
@@ -1482,7 +1628,7 @@ namespace DoFTools
    * @ref GlossLocallyRelevantDof "locally relevant DoFs").
    *
    * @param[in] dof_handler The object that describes which degrees of freedom
-   * live on which cell
+   * live on which cell.
    * @param[in] component_mask A mask denoting the vector components of the
    * finite element that should be considered (see also
    * @ref GlossComponentMask).
@@ -1675,8 +1821,25 @@ namespace DoFTools
   extract_locally_relevant_dofs(const DoFHandlerType &dof_handler,
                                 IndexSet &            dof_set);
 
+
   /**
+   * Extract the set of locally owned DoF indices for each component within the
+   * mask that are owned by the current  processor. For components disabled by
+   * the mask, an empty IndexSet is returned. For a scalar DoFHandler built on a
+   * sequential triangulation, the return vector contains a single complete
+   * IndexSet with all DoF indices. If the mask contains all components (which
+   * also corresponds to the default value), then the union of the returned
+   * index sets equlas what DoFHandler::locally_owned_dofs() returns.
    *
+   * @authors Bruno Blais, Luca Heltai, 2019
+   */
+  template <typename DoFHandlerType>
+  std::vector<IndexSet>
+  locally_owned_dofs_per_component(
+    const DoFHandlerType &dof_handler,
+    const ComponentMask & components = ComponentMask());
+
+  /**
    * For each processor, determine the set of locally owned degrees of freedom
    * as an IndexSet. This function then returns a vector of index sets, where
    * the vector has size equal to the number of MPI processes that participate
@@ -2139,12 +2302,23 @@ namespace DoFTools
    * The indices not targeted by target_components are left untouched.
    */
   template <typename DoFHandlerType>
-  void
+  std::vector<types::global_dof_index>
+  count_dofs_per_fe_component(
+    const DoFHandlerType &           dof_handler,
+    const bool                       vector_valued_once = false,
+    const std::vector<unsigned int> &target_component   = {});
+
+  /**
+   * @deprecated A version of the previous function that returns its
+   * information through the non-`const` second argument.
+   */
+  template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED void
   count_dofs_per_component(
     const DoFHandlerType &                dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
     const bool                            vector_valued_once = false,
-    std::vector<unsigned int>             target_component   = {});
+    const std::vector<unsigned int> &     target_component   = {});
 
   /**
    * Count the degrees of freedom in each block. This function is similar to
@@ -2156,14 +2330,24 @@ namespace DoFTools
    * assertion is thrown.
    *
    * This function is used in the step-22, step-31, and step-32 tutorial
-   * programs.
+   * programs, among others.
    *
    * @pre The dofs_per_block variable has as many components as the finite
    * element used by the dof_handler argument has blocks, or alternatively as
    * many blocks as are enumerated in the target_blocks argument if given.
    */
   template <typename DoFHandlerType>
-  void
+  std::vector<types::global_dof_index>
+  count_dofs_per_fe_block(const DoFHandlerType &           dof,
+                          const std::vector<unsigned int> &target_block =
+                            std::vector<unsigned int>());
+
+  /**
+   * @deprecated A version of the previous function that returns its
+   * information through the non-`const` second argument.
+   */
+  template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED void
   count_dofs_per_block(const DoFHandlerType &                dof,
                        std::vector<types::global_dof_index> &dofs_per_block,
                        const std::vector<unsigned int> &     target_block =
@@ -2280,25 +2464,37 @@ namespace DoFTools
    * @note The precondition to this function that the output argument needs to
    * have size equal to the total number of degrees of freedom makes this
    * function unsuitable for the case that the given DoFHandler object derives
-   * from a parallel::distributed::Triangulation object.  Consequently, this
-   * function will produce an error if called with such a DoFHandler.
+   * from a parallel::TriangulationBase object (or any of the classes derived
+   * from parallel::TriangulationBase). Consequently, this function will produce
+   * an error if called with such a DoFHandler.
+   *
+   * @param[in] mapping The mapping from the reference cell to the real cell on
+   * which DoFs are defined.
+   * @param[in] dof_handler The object that describes which DoF indices live on
+   * which cell of the triangulation.
+   * @param[in,out] support_points A vector that stores the corresponding
+   * location of the dofs in real space coordinates. Previous content of this
+   * object is deleted in this function.
+   * @param[in] mask An optional component mask that restricts the
+   * components from which the support points are extracted.
    */
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             std::vector<Point<spacedim>> &   support_points);
+                             std::vector<Point<spacedim>> &   support_points,
+                             const ComponentMask &mask = ComponentMask());
 
   /**
    * Same as the previous function but for the hp case.
    */
-
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
     const hp::DoFHandler<dim, spacedim> &               dof_handler,
-    std::vector<Point<spacedim>> &                      support_points);
+    std::vector<Point<spacedim>> &                      support_points,
+    const ComponentMask &                               mask = ComponentMask());
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2307,7 +2503,8 @@ namespace DoFTools
    * with one entry for each global degree of freedom, but instead a map that
    * maps from the DoFs index to its location. The point of this function is
    * that it is also usable in cases where the DoFHandler is based on a
-   * parallel::distributed::Triangulation object. In such cases, each
+   * parallel::TriangulationBase object (or any of the classes derived from
+   * parallel::TriangulationBase). In such cases, each
    * processor will not be able to determine the support point location of all
    * DoFs, and worse no processor may be able to hold a vector that would
    * contain the locations of all DoFs even if they were known. As a
@@ -2319,20 +2516,23 @@ namespace DoFTools
    * For non-distributed triangulations, the map returned as @p support_points
    * is of course dense, i.e., every DoF is to be found in it.
    *
-   * @param mapping The mapping from the reference cell to the real cell on
+   * @param[in] mapping The mapping from the reference cell to the real cell on
    * which DoFs are defined.
-   * @param dof_handler The object that describes which DoF indices live on
+   * @param[in] dof_handler The object that describes which DoF indices live on
    * which cell of the triangulation.
-   * @param support_points A map that for every locally relevant DoF index
-   * contains the corresponding location in real space coordinates. Previous
-   * content of this object is deleted in this function.
+   * @param[in,out] support_points A map that for every locally relevant DoF
+   * index contains the corresponding location in real space coordinates.
+   * Previous content of this object is deleted in this function.
+   * @param[in] mask An optional component mask that restricts the
+   * components from which the support points are extracted.
    */
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points);
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask = ComponentMask());
 
   /**
    * Same as the previous function but for the hp case.
@@ -2342,7 +2542,8 @@ namespace DoFTools
   map_dofs_to_support_points(
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
     const hp::DoFHandler<dim, spacedim> &               dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points);
+    std::map<types::global_dof_index, Point<spacedim>> &support_points,
+    const ComponentMask &                               mask = ComponentMask());
 
 
   /**

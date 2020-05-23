@@ -21,7 +21,8 @@ $\mbox{WG}(Q_2,Q_2;RT_{[2]})$.
 
 The following figures show interior pressures and face pressures using the
 $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ element. The mesh is refined 2 times (top)
-and 4 times (bottom), respectively. When the mesh is coarse, one can see
+and 4 times (bottom), respectively. (This number can be adjusted in the
+`make_grid()` function.) When the mesh is coarse, one can see
 the face pressures $p^\partial$ neatly between the values of the interior
 pressures $p^\circ$ on the two adjacent cells.
 
@@ -36,16 +37,17 @@ pressures $p^\circ$ on the two adjacent cells.
   </tr>
 </table>
 
-From the figures, we can see that with the mesh refinement, the maximum and 
-minimum pressure values are approaching the values we expect. 
-Since the mesh is a rectangular mesh and numbers of cells in each direction is even, we 
-have symmetric solutions. From the 3d figures on the right, 
+From the figures, we can see that with the mesh refinement, the maximum and
+minimum pressure values are approaching the values we expect.
+Since the mesh is a rectangular mesh and numbers of cells in each direction is even, we
+have symmetric solutions. From the 3d figures on the right,
 we can see that on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, the pressure is a constant
 in the interior of the cell, as expected.
 
-<h4>Convergence table</h4>
+<h4>Convergence table for <i>k=0</i></h4>
 
-We run the code with finer meshes and get the following convergence rates of pressure, 
+We run the code with differently refined meshes (chosen in the `make_grid()` function)
+and get the following convergence rates of pressure,
 velocity, and flux (as defined in the introduction).
 
 <table align="center" class="doxtable">
@@ -77,8 +79,8 @@ This, of course, matches our theoretical expectations.
 
 We can repeat the experiment from above using the next higher polynomial
 degree:
-The following figures are interior pressures and face pressures implemented using 
-$\mbox{WG}(Q_1,Q_1;RT_{[1]})$. The mesh is refined 4 times.  Compared to the 
+The following figures are interior pressures and face pressures implemented using
+$\mbox{WG}(Q_1,Q_1;RT_{[1]})$. The mesh is refined 4 times.  Compared to the
 previous figures using
 $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, on each cell, the solution is no longer constant
 on each cell, as we now use bilinear polynomials to do the approximation.
@@ -98,9 +100,9 @@ particular so close to being continuous at the interfaces that we can
 no longer distinguish the interface pressures $p^\partial$ from the
 interior pressures $p^\circ$ on the adjacent cells.
 
-<h4>Convergence table</h4>
+<h4>Convergence table for <i>k=1</i></h4>
 
-The following are the convergence rates of pressure, velocity, and flux 
+The following are the convergence rates of pressure, velocity, and flux
 we obtain from using the $\mbox{WG}(Q_1,Q_1;RT_{[1]})$ element combination:
 
 <table align="center" class="doxtable">
@@ -131,7 +133,7 @@ The convergence rates of $WG(Q_1,Q_1;RT_{[1]})$ are around 2, as expected.
 <h3>Test results on <i>WG(Q<sub>2</sub>,Q<sub>2</sub>;RT<sub>[2]</sub>)</i></h3>
 
 Let us go one polynomial degree higher.
-The following are interior pressures and face pressures implemented using 
+The following are interior pressures and face pressures implemented using
 $WG(Q_2,Q_2;RT_{[2]})$, with mesh size $h = 1/32$ (i.e., 5 global mesh
 refinement steps). In the program, we use
 `data_out_face.build_patches(fe.degree)` when generating graphical output
@@ -146,10 +148,10 @@ visualization of the quadratic polynomials.
 </table>
 
 
-<h4>Convergence table</h4>
+<h4>Convergence table for <i>k=2</i></h4>
 
 As before, we can generate convergence data for the
-$L_2$ errors of pressure, velocity, and flux 
+$L_2$ errors of pressure, velocity, and flux
 using the $\mbox{WG}(Q_2,Q_2;RT_{[2]})$ combination:
 
 <table align="center" class="doxtable">

@@ -17,16 +17,16 @@
 
 #include <deal.II/base/config.h>
 
-#ifndef DEAL_II_WITH_CXX17
-#  include <deal.II/base/std_cxx14/utility.h>
-#endif
+#include <tuple>
 
-#include <cmath>
+#ifndef __cpp_lib_apply
+#  include <deal.II/base/std_cxx14/utility.h>
+#endif // __cpp_lib_apply
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
-#ifndef DEAL_II_WITH_CXX17
+#ifndef __cpp_lib_apply
   template <typename F, typename Tuple, size_t... S>
   auto
   apply_impl(F &&fn, Tuple &&t, std_cxx14::index_sequence<S...>)
@@ -51,7 +51,7 @@ namespace std_cxx17
   }
 #else
   using std::apply;
-#endif // DEAL_II_WITH_CXX17
+#endif // __cpp_lib_apply
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 

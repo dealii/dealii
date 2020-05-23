@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,13 +25,16 @@
 #endif
 
 DEAL_II_NAMESPACE_OPEN
+
 namespace std_cxx14
 {
 #ifdef DEAL_II_WITH_CXX14
   using std::index_sequence;
   using std::index_sequence_for;
   using std::make_index_sequence;
+
 #else
+
   template <size_t... Ints>
   struct index_sequence
   {
@@ -74,6 +77,7 @@ namespace std_cxx14
   using index_sequence_for = make_index_sequence<sizeof...(T)>;
 #endif
 } // namespace std_cxx14
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_cxx14_memory_h

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2019 by the deal.II authors
+ * Copyright (C) 2016 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -362,12 +362,11 @@ namespace Step55
     stokes_sub_blocks[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   stokes_sub_blocks);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, stokes_sub_blocks);
 
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const unsigned int n_u = dofs_per_block[0];
+    const unsigned int n_p = dofs_per_block[1];
 
     pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " ("
           << n_u << '+' << n_p << ')' << std::endl;
@@ -430,7 +429,7 @@ namespace Step55
 
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        dof_handler.compute_locally_owned_dofs_per_processor(),
+        dof_handler.locally_owned_dofs(),
         mpi_communicator,
         locally_relevant_dofs);
 
@@ -457,7 +456,8 @@ namespace Step55
         dof_handler, coupling, dsp, constraints, false);
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        dof_handler.compute_locally_owned_dofs_per_processor(),
+        Utilities::MPI::all_gather(mpi_communicator,
+                                   dof_handler.locally_owned_dofs()),
         mpi_communicator,
         locally_relevant_dofs);
       preconditioner_matrix.reinit(owned_partitioning,
@@ -749,25 +749,8 @@ namespace Step55
 
     data_out.build_patches();
 
-    const std::string filename =
-      ("solution-" + Utilities::int_to_string(cycle, 2) + "." +
-       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
-    std::ofstream output((filename + ".vtu"));
-    data_out.write_vtu(output);
-
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      {
-        std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
-                              "." + Utilities::int_to_string(i, 4) + ".vtu");
-
-        std::ofstream master_output(
-          "solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu");
-        data_out.write_pvtu_record(master_output, filenames);
-      }
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", cycle, mpi_communicator, 2);
   }
 
 

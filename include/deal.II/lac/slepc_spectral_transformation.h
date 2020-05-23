@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,11 +33,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declaration
+#    ifndef DOXYGEN
 namespace PETScWrappers
 {
   // forward declarations
   class SolverBase;
 } // namespace PETScWrappers
+#    endif
 
 namespace SLEPcWrappers
 {

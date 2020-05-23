@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ check(const unsigned int fe_degree)
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  mgdof.distribute_mg_dofs(fe);
+  mgdof.distribute_mg_dofs();
 
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof);
@@ -63,7 +63,7 @@ check(const unsigned int fe_degree)
   // build reference
   MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>> transfer_ref(
     mg_constrained_dofs);
-  transfer_ref.build_matrices(mgdof);
+  transfer_ref.build(mgdof);
   deallog << "Transfer matrices: " << std::endl;
   transfer_ref.print_matrices(deallog.get_file_stream());
   deallog << std::endl;

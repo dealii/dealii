@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -211,7 +211,7 @@ public:
       const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
     /**
-     * Return an estimate (in bytes) or the memory consumption of this object.
+     * Return an estimate (in bytes) for the memory consumption of this object.
      */
     virtual std::size_t
     memory_consumption() const override;
@@ -279,11 +279,11 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
-     * This array has (dim-1)*GeometryInfo::faces_per_cell entries. The first
-     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * This array has (dim-1)*GeometryInfo%<dim%>::%faces_per_cell entries. The
+     * first GeometryInfo::faces_per_cell contain the vectors in the first
      * tangential direction for each face; the second set of
-     * GeometryInfo::faces_per_cell entries contain the vectors in the second
-     * tangential direction (only in 3d, since there we have 2 tangential
+     * GeometryInfo<dim>::faces_per_cell entries contain the vectors in the
+     * second tangential direction (only in 3d, since there we have 2 tangential
      * directions per face), etc.
      *
      * Filled once.
@@ -400,7 +400,7 @@ MappingManifold<dim, spacedim>::InternalData::store_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   vertices.resize(GeometryInfo<dim>::vertices_per_cell);
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     vertices[i] = cell->vertex(i);
   this->cell = cell;
 }
@@ -415,7 +415,7 @@ MappingManifold<dim, spacedim>::InternalData::
     quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
   for (unsigned int q = 0; q < quad.size(); ++q)
     {
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
           cell_manifold_quadrature_weights[q][i] =
             GeometryInfo<dim>::d_linear_shape_function(quad.point(q), i);

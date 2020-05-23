@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,16 +38,15 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int deg)
-  : FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>(
-      deg,
-      FiniteElementData<dim>(get_dpo_vector(deg),
-                             dim,
-                             deg + 1,
-                             FiniteElementData<dim>::Hdiv),
-      get_ria_vector(deg),
-      std::vector<ComponentMask>(PolynomialsRaviartThomas<dim>::compute_n_pols(
-                                   deg),
-                                 std::vector<bool>(dim, true)))
+  : FE_PolyTensor<dim>(PolynomialsRaviartThomas<dim>(deg),
+                       FiniteElementData<dim>(get_dpo_vector(deg),
+                                              dim,
+                                              deg + 1,
+                                              FiniteElementData<dim>::Hdiv),
+                       get_ria_vector(deg),
+                       std::vector<ComponentMask>(
+                         PolynomialsRaviartThomas<dim>::n_polynomials(deg),
+                         std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -254,7 +253,7 @@ std::vector<bool>
 FE_RaviartThomasNodal<dim>::get_ria_vector(const unsigned int deg)
 {
   const unsigned int dofs_per_cell =
-    PolynomialsRaviartThomas<dim>::compute_n_pols(deg);
+    PolynomialsRaviartThomas<dim>::n_polynomials(deg);
   unsigned int dofs_per_face = deg + 1;
   for (unsigned int d = 2; d < dim; ++d)
     dofs_per_face *= deg + 1;
@@ -279,10 +278,8 @@ FE_RaviartThomasNodal<dim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // The first degrees of freedom are
   // on the faces and each face has
@@ -610,7 +607,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   // which returns the support
   // points on the face.
   Quadrature<dim - 1> quad_face_support(
-    source_fe.get_generalized_face_support_points());
+    source_fe.generalized_face_support_points);
 
   // Rule of thumb for FP accuracy,
   // that can be expected for a
@@ -714,7 +711,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // which returns the support
   // points on the face.
   Quadrature<dim - 1> quad_face_support(
-    source_fe.get_generalized_face_support_points());
+    source_fe.generalized_face_support_points);
 
   // Rule of thumb for FP accuracy,
   // that can be expected for a

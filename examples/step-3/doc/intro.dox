@@ -144,8 +144,9 @@ Now we know what we need (namely: objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
 takes to make that happen:
 
-- The objects for $A,U,F$ are of type SparseMatrix and Vector, and we will see
-  in the program below what classes are used to solve linear systems.
+- The object for $A$ is of type SparseMatrix while those for $U$ and $F$ are of
+  type Vector. We will see in the program below what classes are used to solve
+  linear systems.
 - We need a way to form the integrals. In the finite element method, this is
   most commonly done using quadrature, i.e. the integrals are replaced by a
   weighted sum over a set of points on each cell. That is, we first split the
@@ -335,8 +336,13 @@ following tutorial programs.
 
 <h3> A note on types </h3>
 
-deal.II defines a number of integral %types via alias in namespace types. In
-particular, in this program you will see types::global_dof_index in a couple of
+deal.II defines a number of integral %types via alias in namespace dealii::types.
+(In the previous sentence, the word "integral" is used as the <i>adjective</i>
+that corresponds to the noun "integer". It shouldn't be confused with the
+<i>noun</i> "integral" that represents the area or volume under a curve
+or surface. The adjective "integral" is widely used in the C++ world in
+contexts such as "integral type", "integral constant", etc.)
+In particular, in this program you will see types::global_dof_index in a couple of
 places: an integer type that is used to denote the <i>global</i> index of a
 degree of freedom, i.e., the index of a particular degree of freedom within the
 DoFHandler object that is defined on top of a triangulation (as opposed to the

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,10 +20,14 @@
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/io/ios_state.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#undef BOOST_BIND_GLOBAL_PLACEHOLDERS
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cctype>
@@ -1278,17 +1282,14 @@ namespace Patterns
 
 
     // check the different possibilities
-    for (std::vector<std::string>::const_iterator test_string =
-           split_names.begin();
-         test_string != split_names.end();
-         ++test_string)
+    for (const auto &test_string : split_names)
       {
         bool string_found = false;
 
         tmp = sequence;
         while (tmp.find('|') != std::string::npos)
           {
-            if (*test_string == std::string(tmp, 0, tmp.find('|')))
+            if (test_string == std::string(tmp, 0, tmp.find('|')))
               {
                 // string found, quit
                 // loop. don't change
@@ -1302,7 +1303,7 @@ namespace Patterns
           }
         // check last choice, not finished by |
         if (!string_found)
-          if (*test_string == tmp)
+          if (test_string == tmp)
             string_found = true;
 
         if (!string_found)

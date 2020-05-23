@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 // Many usage cases lead to a combination of LinearOperator and
 // PackagedOperation. To ease the pain of reading compilation errors, just
 // include all headers we ever need to use LO and friends in one place:
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/lac/block_linear_operator.h>
 #include <deal.II/lac/constrained_linear_operator.h>

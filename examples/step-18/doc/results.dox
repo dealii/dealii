@@ -463,7 +463,7 @@ Incompressibility is characterized by Poisson's ratio
 @f[
   \nu = \frac{\lambda}{2(\lambda+\mu)},
 @f]
-where $\lambda,\mu$ are the Lam\'e constants of the material.
+where $\lambda,\mu$ are the Lam&eacute; constants of the material.
 Physical constraints indicate that $-1\le \nu\le \frac 12$ (the condition
 also follows from mathematical stability considerations). If $\nu$
 approaches $\frac 12$, then the material becomes incompressible. In that
@@ -472,7 +472,7 @@ solution of such problems, and stabilization techniques have to be employed
 for a stable and accurate solution. The book and paper cited above give
 indications as to how to do this, but there is also a large volume of
 literature on this subject; a good start to get an overview of the topic can
-be found in the references of the paper by H.-Y. Duan and Q. Lin; @cite DL05. 
+be found in the references of the paper by H.-Y. Duan and Q. Lin; @cite DL05.
 
 
 <h5>Refinement during timesteps</h5>

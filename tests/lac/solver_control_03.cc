@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,9 @@
 
 #include <iostream>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 template <typename MatrixType, typename VectorType, class PRECONDITION>
 void
@@ -67,9 +68,8 @@ check_solve(SolverControl &     solver_control,
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
-  logfile.precision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(4);
 
 
   {

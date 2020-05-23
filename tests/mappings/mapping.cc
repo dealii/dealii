@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,8 +104,7 @@ plot_faces(Mapping<dim> &                           mapping,
                                           update_JxW_values |
                                           update_normal_vectors));
 
-  for (unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
-       ++face_nr)
+  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
     {
       fe_values.reinit(cell, face_nr);
 
@@ -148,8 +147,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
                                  q,
                                  UpdateFlags(update_quadrature_points |
                                              update_normal_vectors));
-  for (unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
-       ++face_nr)
+  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
     for (unsigned int sub_nr = 0;
          sub_nr < GeometryInfo<dim>::max_children_per_face;
          ++sub_nr)
@@ -157,7 +155,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
         fe_values.reinit(cell, face_nr, sub_nr);
 
         const std::vector<Tensor<1, dim>> &normals =
-          fe_values.get_all_normal_vectors();
+          fe_values.get_normal_vectors();
 
         unsigned int k = 0;
         for (unsigned int ny = 0; ny < ((dim > 2) ? nq : 1); ++ny)

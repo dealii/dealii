@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ test()
              dim>::active_cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell)
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           {
             if (dim == 2)
               if (cell->vertex(v)[0] < 0.25 && cell->vertex(v)[1] < 0.25)

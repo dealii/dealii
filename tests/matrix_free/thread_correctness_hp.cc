@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018-2014 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,15 +19,13 @@
 // matrix free matrix-vector products for hp elements by comparing to the
 // serial version
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
+
+#include "../tests.h"
 
 #include "create_mesh.h"
 #include "matrix_vector_common.h"

@@ -1,125 +1,181 @@
 <h1>Results</h1>
 
 
-The output of this program consist of the console output, the eps
-files containing the grids, and the grids and solutions given in gnuplot format.
+The output of this program consist of the console output, the SVG
+files containing the grids, and the solutions given in VTU format.
 @code
 Performing a 2D run with isotropic refinement...
 ------------------------------------------------
 Cycle 0:
    Number of active cells:       128
    Number of degrees of freedom: 512
-Time of assemble_system: 0.040003
-Writing grid to <grid-0.iso.eps>...
-Writing grid to <grid-0.iso.gnuplot>...
-Writing solution to <sol-0.iso.gnuplot>...
+   Time of assemble_system: 0.092049
+   Writing grid to <grid-0.iso.svg>...
+   Writing solution to <sol-0.iso.vtu>...
+
 Cycle 1:
    Number of active cells:       239
    Number of degrees of freedom: 956
-Time of assemble_system: 0.072005
-Writing grid to <grid-1.iso.eps>...
-Writing grid to <grid-1.iso.gnuplot>...
-Writing solution to <sol-1.iso.gnuplot>...
+   Time of assemble_system: 0.109519
+   Writing grid to <grid-1.iso.svg>...
+   Writing solution to <sol-1.iso.vtu>...
+
 Cycle 2:
    Number of active cells:       491
    Number of degrees of freedom: 1964
-Time of assemble_system: 0.144009
-Writing grid to <grid-2.iso.eps>...
-Writing grid to <grid-2.iso.gnuplot>...
-Writing solution to <sol-2.iso.gnuplot>...
+   Time of assemble_system: 0.08303
+   Writing grid to <grid-2.iso.svg>...
+   Writing solution to <sol-2.iso.vtu>...
+
 Cycle 3:
    Number of active cells:       1031
    Number of degrees of freedom: 4124
-Time of assemble_system: 0.296019
-Writing grid to <grid-3.iso.eps>...
-Writing grid to <grid-3.iso.gnuplot>...
-Writing solution to <sol-3.iso.gnuplot>...
+   Time of assemble_system: 0.278987
+   Writing grid to <grid-3.iso.svg>...
+   Writing solution to <sol-3.iso.vtu>...
+
 Cycle 4:
    Number of active cells:       2027
    Number of degrees of freedom: 8108
-Time of assemble_system: 0.576036
-Writing grid to <grid-4.iso.eps>...
-Writing grid to <grid-4.iso.gnuplot>...
-Writing solution to <sol-4.iso.gnuplot>...
+   Time of assemble_system: 0.305869
+   Writing grid to <grid-4.iso.svg>...
+   Writing solution to <sol-4.iso.vtu>...
+
 Cycle 5:
    Number of active cells:       4019
    Number of degrees of freedom: 16076
-Time of assemble_system: 1.13607
-Writing grid to <grid-5.iso.eps>...
-Writing grid to <grid-5.iso.gnuplot>...
-Writing solution to <sol-5.iso.gnuplot>...
+   Time of assemble_system: 0.47616
+   Writing grid to <grid-5.iso.svg>...
+   Writing solution to <sol-5.iso.vtu>...
+
 
 Performing a 2D run with anisotropic refinement...
 --------------------------------------------------
 Cycle 0:
    Number of active cells:       128
    Number of degrees of freedom: 512
-Time of assemble_system: 0.040003
-Writing grid to <grid-0.aniso.eps>...
-Writing grid to <grid-0.aniso.gnuplot>...
-Writing solution to <sol-0.aniso.gnuplot>...
+   Time of assemble_system: 0.052866
+   Writing grid to <grid-0.aniso.svg>...
+   Writing solution to <sol-0.aniso.vtu>...
+
 Cycle 1:
    Number of active cells:       171
    Number of degrees of freedom: 684
-Time of assemble_system: 0.048003
-Writing grid to <grid-1.aniso.eps>...
-Writing grid to <grid-1.aniso.gnuplot>...
-Writing solution to <sol-1.aniso.gnuplot>...
+   Time of assemble_system: 0.050917
+   Writing grid to <grid-1.aniso.svg>...
+   Writing solution to <sol-1.aniso.vtu>...
+
 Cycle 2:
    Number of active cells:       255
    Number of degrees of freedom: 1020
-Time of assemble_system: 0.072005
-Writing grid to <grid-2.aniso.eps>...
-Writing grid to <grid-2.aniso.gnuplot>...
-Writing solution to <sol-2.aniso.gnuplot>...
+   Time of assemble_system: 0.064132
+   Writing grid to <grid-2.aniso.svg>...
+   Writing solution to <sol-2.aniso.vtu>...
+
 Cycle 3:
-   Number of active cells:       397
-   Number of degrees of freedom: 1588
-Time of assemble_system: 0.16401
-Writing grid to <grid-3.aniso.eps>...
-Writing grid to <grid-3.aniso.gnuplot>...
-Writing solution to <sol-3.aniso.gnuplot>...
+   Number of active cells:       394
+   Number of degrees of freedom: 1576
+   Time of assemble_system: 0.119849
+   Writing grid to <grid-3.aniso.svg>...
+   Writing solution to <sol-3.aniso.vtu>...
+
 Cycle 4:
-   Number of active cells:       658
-   Number of degrees of freedom: 2632
-Time of assemble_system: 0.192012
-Writing grid to <grid-4.aniso.eps>...
-Writing grid to <grid-4.aniso.gnuplot>...
-Writing solution to <sol-4.aniso.gnuplot>...
+   Number of active cells:       648
+   Number of degrees of freedom: 2592
+   Time of assemble_system: 0.218244
+   Writing grid to <grid-4.aniso.svg>...
+   Writing solution to <sol-4.aniso.vtu>...
+
 Cycle 5:
-   Number of active cells:       1056
-   Number of degrees of freedom: 4224
-Time of assemble_system: 0.304019
-Writing grid to <grid-5.aniso.eps>...
-Writing grid to <grid-5.aniso.gnuplot>...
-Writing solution to <sol-5.aniso.gnuplot>...
+   Number of active cells:       1030
+   Number of degrees of freedom: 4120
+   Time of assemble_system: 0.128121
+   Writing grid to <grid-5.aniso.svg>...
+   Writing solution to <sol-5.aniso.vtu>...
 @endcode
 
 This text output shows the reduction in the number of cells which results from
 the successive application of anisotropic refinement. After the last refinement
-step the savings have accumulated so much, that almost four times as many cells
-and thus dofs are needed in the isotropic case. The time needed for assembly
+step the savings have accumulated so much that almost four times as many cells
+and thus degrees of freedom are needed in the isotropic case. The time needed for assembly
 scales with a similar factor.
 
-Now we show the solutions on the mesh after one and after five adaptive
-refinement steps for both the isotropic (left) and anisotropic refinement
-algorithms (right).
+The first interesting part is of course to see how the meshes look like.
+On the left are the isotropically refined ones, on the right the
+anisotropic ones (colors indicate the refinement level of cells):
 
-<table width="60%" align="center">
+<table width="80%" align="center">
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.iso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-0.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.aniso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-0.aniso.9.2.png" alt="">
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-5.iso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-1.iso.9.2.png" alt="">
     </td>
     <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-5.aniso.png" alt="">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-1.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-2.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-2.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-4.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-4.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-5.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.grid-5.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+</table>
+
+
+The other interesting thing is, of course, to see the solution on these
+two sequences of meshes. Here they are, on the refinement cycles 1 and 4,
+clearly showing that the solution is indeed composed of <i>discontinuous</i> piecewise
+polynomials:
+
+<table width="60%" align="center">
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-1.aniso.9.2.png" alt="">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-4.iso.9.2.png" alt="">
+    </td>
+    <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-30.sol-4.aniso.9.2.png" alt="">
     </td>
   </tr>
 </table>
@@ -127,22 +183,27 @@ algorithms (right).
 We see, that the solution on the anisotropically refined mesh is very similar to
 the solution obtained on the isotropically refined mesh. Thus the anisotropic
 indicator seems to effectively select the appropriate cells for anisotropic
-refinement. This observation is strengthened by the plot of the an adapted
-anisotropic grid, e.g. the grid after three refinement steps.
+refinement.
 
-<img src="https://www.dealii.org/images/steps/developer/step-30.grid-3.aniso.png" alt="">
-
+The pictures also explain why the mesh is refined as it is.
 In the whole left part of the domain refinement is only performed along the
-y-axis of cells. In the right part of the domain the refinement is dominated by
+$y$-axis of cells. In the right part of the domain the refinement is dominated by
 isotropic refinement, as the anisotropic feature of the solution - the jump from
-one to zero - is not well aligned with the mesh. However, at the bottom and
-leftmost parts of the quarter circle this jumps becomes more and more aligned
+one to zero - is not well aligned with the mesh where the advection direction
+takes a turn. However, at the bottom and closest (to the observer) parts of the
+quarter circle this jumps again becomes more and more aligned
 with the mesh and the refinement algorithm reacts by creating anisotropic cells
 of increasing aspect ratio.
 
 It might seem that the necessary alignment of anisotropic features and the
 coarse mesh can decrease performance significantly for real world
-problems. However, that is not always the case. Considering boundary layers in
-compressible viscous flows, for example, the mesh is always aligned with the
-anisotropic features, thus anisotropic refinement will almost always increase the
-efficiency of computations on adapted grids for these cases.
+problems. That is not wrong in general: If one were, for example, to apply
+anisotropic refinement to problems in which shocks appear (e.g., the
+equations solved in step-69), then it many cases the shock is not aligned
+with the mesh and anisotropic refinement will help little unless one also
+introduces techniques to move the mesh in alignment with the shocks.
+On the other hand, many steep features of solutions are due to boundary layers.
+In those cases, the mesh is already aligned with the anisotropic features
+because it is of course aligned with the boundary itself, and anisotropic
+refinement will almost always increase the efficiency of computations on
+adapted grids for these cases.

@@ -16,6 +16,8 @@
 #ifndef dealii_trilinos_tpetra_vector_templates_h
 #define dealii_trilinos_tpetra_vector_templates_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/trilinos_tpetra_vector.h>

@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2016 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -59,5 +59,7 @@ SET(src_boost_serialization
   xml_wiarchive.cpp
   xml_woarchive.cpp
   )
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-deprecated-copy)
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-c11-extensions)
 
 DEAL_II_ADD_LIBRARY(obj_boost_serialization OBJECT ${src_boost_serialization})

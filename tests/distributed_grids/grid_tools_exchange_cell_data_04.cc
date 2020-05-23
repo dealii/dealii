@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 // test GridTools::exchange_cell_data_to_ghosts
 //
 // this test works just like the _01 test, but it skips those cells
-// where we have an odd 'counter' value via the boost::optional
+// where we have an odd 'counter' value via the std_cxx17::optional
 // framework
 
 #include <deal.II/base/logstream.h>
@@ -54,7 +54,7 @@ test()
   GridTools::
     exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
       tria,
-      [&](const cell_iterator &cell) -> boost::optional<DT> {
+      [&](const cell_iterator &cell) -> std_cxx17::optional<DT> {
         ++counter;
         if (counter % 2 == 0)
           {
@@ -66,7 +66,7 @@ test()
         else
           {
             deallog << "skipping " << cell->id() << ' ' << counter << std::endl;
-            return boost::optional<DT>();
+            return std_cxx17::optional<DT>();
           }
       },
       [&](const cell_iterator &cell, const DT &data) {

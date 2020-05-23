@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 template <>
 struct EnableIfScalar<Differentiation::SD::Expression>
 {
-  typedef Differentiation::SD::Expression type;
+  using type = Differentiation::SD::Expression;
 };
 
 
@@ -69,7 +69,7 @@ namespace internal
       Differentiation::SD::Expression,
       typename std::enable_if<std::is_arithmetic<T>::value>::type>
     {
-      typedef Differentiation::SD::Expression type;
+      using type = Differentiation::SD::Expression;
     };
 
     template <typename T>
@@ -80,7 +80,7 @@ namespace internal
         boost::is_complex<T>::value &&
         std::is_arithmetic<typename T::value_type>::value>::type>
     {
-      typedef Differentiation::SD::Expression type;
+      using type = Differentiation::SD::Expression;
     };
 
   } // namespace SD
@@ -90,26 +90,22 @@ namespace internal
   struct ProductTypeImpl<Differentiation::SD::Expression,
                          Differentiation::SD::Expression>
   {
-    typedef Differentiation::SD::Expression type;
+    using type = Differentiation::SD::Expression;
   };
 
 
   template <typename T>
   struct ProductTypeImpl<T, Differentiation::SD::Expression>
   {
-    typedef
-      typename SD::GeneralProductTypeImpl<T,
-                                          Differentiation::SD::Expression>::type
-        type;
+    using type = typename SD::
+      GeneralProductTypeImpl<T, Differentiation::SD::Expression>::type;
   };
 
   template <typename T>
   struct ProductTypeImpl<Differentiation::SD::Expression, T>
   {
-    typedef
-      typename SD::GeneralProductTypeImpl<T,
-                                          Differentiation::SD::Expression>::type
-        type;
+    using type = typename SD::
+      GeneralProductTypeImpl<T, Differentiation::SD::Expression>::type;
   };
 
 } // namespace internal

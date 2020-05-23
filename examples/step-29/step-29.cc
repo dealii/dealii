@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -333,9 +333,15 @@ namespace Step29
            ExcDimensionMismatch(computed_quantities.size(),
                                 inputs.solution_values.size()));
 
-    // The computation itself is straightforward: We iterate over each entry
-    // in the output vector and compute $|u|$ from the corresponding values of
-    // $v$ and $w$:
+    // The computation itself is straightforward: We iterate over each
+    // entry in the output vector and compute $|u|$ from the
+    // corresponding values of $v$ and $w$. We do this by creating a
+    // complex number $u$ and then calling `std::abs()` on the
+    // result. (One may be tempted to call `std::norm()`, but in a
+    // historical quirk, the C++ committee decided that `std::norm()`
+    // should return the <i>square</i> of the absolute value --
+    // thereby not satisfying the properties mathematicians require of
+    // something called a "norm".)
     for (unsigned int i = 0; i < computed_quantities.size(); i++)
       {
         Assert(computed_quantities[i].size() == 1,
@@ -343,9 +349,10 @@ namespace Step29
         Assert(inputs.solution_values[i].size() == 2,
                ExcDimensionMismatch(inputs.solution_values[i].size(), 2));
 
-        computed_quantities[i](0) = std::sqrt(
-          inputs.solution_values[i](0) * inputs.solution_values[i](0) +
-          inputs.solution_values[i](1) * inputs.solution_values[i](1));
+        const std::complex<double> u(inputs.solution_values[i](0),
+                                     inputs.solution_values[i](1));
+
+        computed_quantities[i](0) = std::abs(u);
       }
   }
 
@@ -447,13 +454,12 @@ namespace Step29
     GridGenerator::subdivided_hyper_cube(triangulation, 5, 0, 1);
 
     for (auto &cell : triangulation.cell_iterators())
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
-        if (cell->face(face)->at_boundary() &&
-            ((cell->face(face)->center() - transducer).norm_square() < 0.01))
+      for (const auto &face : cell->face_iterators())
+        if (face->at_boundary() &&
+            ((face->center() - transducer).norm_square() < 0.01))
           {
-            cell->face(face)->set_boundary_id(1);
-            cell->face(face)->set_manifold_id(1);
+            face->set_boundary_id(1);
+            face->set_manifold_id(1);
           }
     // For the circle part of the transducer lens, a SphericalManifold object
     // is used (which, of course, in 2D just represents a circle), with center
@@ -645,27 +651,26 @@ namespace Step29
         // is at the boundary, and second has the correct boundary indicator
         // associated with $\Gamma_2$, the part of the boundary where we have
         // absorbing boundary conditions:
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              (cell->face(face)->boundary_id() == 0))
+        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+          if (cell->face(face_no)->at_boundary() &&
+              (cell->face(face_no)->boundary_id() == 0))
             {
               // These faces will certainly contribute to the off-diagonal
               // blocks of the system matrix, so we ask the FEFaceValues
               // object to provide us with the shape function values on this
               // face:
-              fe_face_values.reinit(cell, face);
+              fe_face_values.reinit(cell, face_no);
 
 
               // Next, we loop through all DoFs of the current cell to find
               // pairs that belong to different components and both have
-              // support on the current face:
+              // support on the current face_no:
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   if ((fe.system_to_component_index(i).first !=
                        fe.system_to_component_index(j).first) &&
-                      fe.has_support_on_face(i, face) &&
-                      fe.has_support_on_face(j, face))
+                      fe.has_support_on_face(i, face_no) &&
+                      fe.has_support_on_face(j, face_no))
                     // The check whether shape functions have support on a
                     // face is not strictly necessary: if we don't check for
                     // it we would simply add up terms to the local cell

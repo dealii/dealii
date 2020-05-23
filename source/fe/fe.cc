@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,10 +83,9 @@ FiniteElement<dim, spacedim>::FiniteElement(
   , n_nonzero_components_table(compute_n_nonzero_components(nonzero_components))
   , cached_primitivity(std::find_if(n_nonzero_components_table.begin(),
                                     n_nonzero_components_table.end(),
-                                    std::bind(std::not_equal_to<unsigned int>(),
-                                              std::placeholders::_1,
-                                              1U)) ==
-                       n_nonzero_components_table.end())
+                                    [](const unsigned int n_components) {
+                                      return n_components != 1U;
+                                    }) == n_nonzero_components_table.end())
 {
   Assert(restriction_is_additive_flags.size() == this->dofs_per_cell,
          ExcDimensionMismatch(restriction_is_additive_flags.size(),
@@ -307,19 +306,13 @@ FiniteElement<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  Assert(child <
-           GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(
-                         RefinementCase<dim>(refinement_case))));
+  AssertIndexRange(
+    child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
   // we use refinement_case-1 here. the -1 takes care of the origin of the
   // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
   // available and so the vector indices are shifted
@@ -336,19 +329,13 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  Assert(child <
-           GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(
-                         RefinementCase<dim>(refinement_case))));
+  AssertIndexRange(
+    child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
   // we use refinement_case-1 here. the -1 takes care
   // of the origin of the vector, as for
   // RefinementCase::no_refinement (=0) there is no
@@ -366,8 +353,7 @@ unsigned int
 FiniteElement<dim, spacedim>::component_to_block_index(
   const unsigned int index) const
 {
-  Assert(index < this->n_components(),
-         ExcIndexRange(index, 0, this->n_components()));
+  AssertIndexRange(index, this->n_components());
 
   return first_block_of_base(component_to_base_table[index].first.first) +
          component_to_base_table[index].second;
@@ -554,10 +540,8 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                                                  const bool face_flip,
                                                  const bool face_rotation) const
 {
-  Assert(face_index < this->dofs_per_face,
-         ExcIndexRange(face_index, 0, this->dofs_per_face));
-  Assert(face < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
+  AssertIndexRange(face_index, this->dofs_per_face);
+  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
 
   // TODO: we could presumably solve the 3d case below using the
   // adjust_quad_dof_index_for_face_orientation_table field. for the
@@ -654,8 +638,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // in 3d), so we don't need the table, but
   // the function should also not have been
   // called
-  Assert(index < this->dofs_per_quad,
-         ExcIndexRange(index, 0, this->dofs_per_quad));
+  AssertIndexRange(index, this->dofs_per_quad);
   Assert(adjust_quad_dof_index_for_face_orientation_table.n_elements() ==
            8 * this->dofs_per_quad,
          ExcInternalError());
@@ -678,8 +661,7 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   if (dim < 3)
     return index;
 
-  Assert(index < this->dofs_per_line,
-         ExcIndexRange(index, 0, this->dofs_per_line));
+  AssertIndexRange(index, this->dofs_per_line);
   Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
            this->dofs_per_line,
          ExcInternalError());
@@ -1055,8 +1037,7 @@ template <int dim, int spacedim>
 Point<dim>
 FiniteElement<dim, spacedim>::unit_support_point(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  AssertIndexRange(index, this->dofs_per_cell);
   Assert(unit_support_points.size() == this->dofs_per_cell,
          ExcFEHasNoSupportPoints());
   return unit_support_points[index];
@@ -1090,36 +1071,11 @@ FiniteElement<dim, spacedim>::has_face_support_points() const
 
 
 template <int dim, int spacedim>
-const std::vector<Point<dim - 1>> &
-FiniteElement<dim, spacedim>::get_generalized_face_support_points() const
-{
-  // a finite element may define
-  // support points, but only if
-  // there are as many as there are
-  // degrees of freedom on a face
-  return ((generalized_face_support_points.size() == 0) ?
-            unit_face_support_points :
-            generalized_face_support_points);
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::has_generalized_face_support_points() const
-{
-  return (generalized_face_support_points.size() != 0);
-}
-
-
-
-template <int dim, int spacedim>
 Point<dim - 1>
 FiniteElement<dim, spacedim>::unit_face_support_point(
   const unsigned int index) const
 {
-  Assert(index < this->dofs_per_face,
-         ExcIndexRange(index, 0, this->dofs_per_face));
+  AssertIndexRange(index, this->dofs_per_face);
   Assert(unit_face_support_points.size() == this->dofs_per_face,
          ExcFEHasNoSupportPoints());
   return unit_face_support_points[index];
@@ -1296,7 +1252,7 @@ const FiniteElement<dim, spacedim> &
 FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
 {
   (void)index;
-  Assert(index == 0, ExcIndexRange(index, 0, 1));
+  AssertIndexRange(index, 1);
   // This function should not be
   // called for a system element
   Assert(base_to_block_indices.size() == 1, ExcInternalError());

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,11 +45,12 @@
 #include <iostream>
 
 #include "../tests.h"
+
 #include "matrix_vector_mf.h"
 
 
 // forward declare this function. will be implemented in .cu files
-template <int dim, int fe_degree>
+template <int dim, int fe_degree, typename Number>
 void
 test();
 
@@ -76,7 +77,7 @@ template <int dim,
           int n_q_points_1d>
 void
 do_test(const DoFHandler<dim> &          dof,
-        const AffineConstraints<double> &constraints,
+        const AffineConstraints<Number> &constraints,
         const unsigned int               n_locally_owned_cells,
         const bool                       constant_coefficient = true,
         const bool                       coloring             = false)
@@ -188,7 +189,7 @@ do_test(const DoFHandler<dim> &          dof,
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog.depth_console(0);
 
   deallog << std::setprecision(3);
@@ -196,15 +197,29 @@ main()
   init_cuda();
 
   {
+    deallog.push("double");
     deallog.push("2d");
-    test<2, 1>();
-    // test<2, 2>();
-    test<2, 3>();
+    test<2, 1, double>();
+    test<2, 2, double>();
+    test<2, 3, double>();
     deallog.pop();
     deallog.push("3d");
-    test<3, 1>();
-    test<3, 2>();
-    test<3, 3>();
+    test<3, 1, double>();
+    test<3, 2, double>();
+    test<3, 3, double>();
+    deallog.pop();
+    deallog.pop();
+    deallog.push("float");
+    deallog.push("2d");
+    test<2, 1, double>();
+    test<2, 2, double>();
+    test<2, 3, double>();
+    deallog.pop();
+    deallog.push("3d");
+    test<3, 1, double>();
+    test<3, 2, double>();
+    test<3, 3, double>();
+    deallog.pop();
     deallog.pop();
   }
 

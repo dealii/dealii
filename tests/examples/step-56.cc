@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2018 by the deal.II authors
+ * Copyright (C) 2016 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -76,8 +76,6 @@
 
 namespace Step56
 {
-  using namespace dealii;
-
   // In order to make it easy to switch between the different solvers that are
   // being used, we declare an enum that can be passed as an argument to the
   // constructor of the main class.
@@ -493,7 +491,7 @@ namespace Step56
     pressure_mass_matrix.clear();
 
     // The main DoFHandler only needs active DoFs, so we are not calling
-    // distribute_mg_dofs() here
+    // distribute_mg_dofs();
     dof_handler.distribute_dofs(fe);
 
     // This block structure separates the dim velocity components from
@@ -564,10 +562,8 @@ namespace Step56
           }
       }
 
-    std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+    const std::vector<types::global_dof_index> dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -900,7 +896,7 @@ namespace Step56
 
         // Transfer operators between levels
         MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-        mg_transfer.build_matrices(velocity_dof_handler);
+        mg_transfer.build(velocity_dof_handler);
 
         // Setup coarse grid solver
         FullMatrix<double> coarse_matrix;
@@ -1130,7 +1126,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step56;
 
       const int degree = 1;

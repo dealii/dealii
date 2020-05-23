@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -253,7 +253,7 @@ TridiagonalMatrix<number>::compute_eigenvalues()
 
   state = LAPACKSupport::eigenvalues;
 #else
-  Assert(false, ExcNeedsLAPACK());
+  AssertThrow(false, ExcNeedsLAPACK());
 #endif
 }
 
@@ -264,7 +264,7 @@ number
 TridiagonalMatrix<number>::eigenvalue(const size_type i) const
 {
   Assert(state == LAPACKSupport::eigenvalues, ExcState(state));
-  Assert(i < n(), ExcIndexRange(i, 0, n()));
+  AssertIndexRange(i, n());
   return diagonal[i];
 }
 

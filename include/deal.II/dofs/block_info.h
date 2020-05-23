@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #ifndef dealii_block_info_h
 #define dealii_block_info_h
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/subscriptor.h>
 
@@ -26,7 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class DoFHandler;
 namespace hp
@@ -34,6 +36,7 @@ namespace hp
   template <int dim, int spacedim>
   class DoFHandler;
 }
+#endif
 
 
 /**
@@ -116,12 +119,32 @@ public:
              bool active_only = false);
 
   /**
+   * The same as above but for hp::DoFHandler.
+   *
+   * @note Not implemented.
+   */
+  template <int dim, int spacedim>
+  void
+  initialize(const hp::DoFHandler<dim, spacedim> &,
+             bool levels_only = false,
+             bool active_only = false);
+
+  /**
    * @brief Initialize block structure on cells and compute renumbering
    * between cell dofs and block cell dofs.
    */
   template <int dim, int spacedim>
   void
   initialize_local(const DoFHandler<dim, spacedim> &);
+
+  /**
+   * The same as above but for hp::DoFHandler.
+   *
+   * @note Not implemented.
+   */
+  template <int dim, int spacedim>
+  void
+  initialize_local(const hp::DoFHandler<dim, spacedim> &);
 
   /**
    * Access the BlockIndices structure of the global system.

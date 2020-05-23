@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 void
@@ -50,8 +49,7 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
     std::vector<std::vector<double>>(
       dim + 1, std::vector<double>(fe.dofs_per_cell, 0.)));
 
-  for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell;
-       ++vertex)
+  for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
     {
       Point<dim> v;
       for (unsigned int d = 0; d < dim; ++d)

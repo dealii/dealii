@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,7 @@ template <typename Number>
 void
 test()
 {
-  constexpr unsigned int n = VectorizedArray<Number>::n_array_elements;
+  constexpr unsigned int n = VectorizedArray<Number>::size();
 
   VectorizedArray<Number> a;
   std::stringstream       test_stream;

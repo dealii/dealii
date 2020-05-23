@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,11 +25,14 @@
 #endif
 
 DEAL_II_NAMESPACE_OPEN
+
 namespace std_cxx14
 {
 #ifdef DEAL_II_WITH_CXX14
   using std::make_unique;
+
 #else
+
   namespace internal
   {
     template <typename T>
@@ -66,6 +69,7 @@ namespace std_cxx14
 
 #endif
 } // namespace std_cxx14
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_cxx14_memory_h

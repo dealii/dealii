@@ -1,0 +1,5 @@
+
+DEAL:2d::0 1 2 3 
+DEAL:2d-pdt::0 0 0 0 
+DEAL:3d::0 1 2 3 4 5 6 7 
+DEAL:3d-pdt::0 0 0 0 0 0 0 0 

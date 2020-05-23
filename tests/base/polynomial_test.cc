@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ check_poly(const Point<dim> &x, const PolynomialType &p)
   std::vector<Tensor<3, dim>> third(n);
   std::vector<Tensor<4, dim>> fourth(n);
 
-  p.compute(x, values, gradients, second, third, fourth);
+  p.evaluate(x, values, gradients, second, third, fourth);
 
   for (unsigned int k = 0; k < n; ++k)
     {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,6 +63,13 @@ struct DisableWindowsDebugRuntimeDialog
   }
 } deal_II_windows_crt_dialog;
 #endif
+
+// Redefine Assert as AssertThrow to make sure that the code is tested similarly
+// in Release mode and in Debug mode. clang-format makes sure that this file is
+// included after all regular header files but before all the other local header
+// files.
+#undef Assert
+#define Assert AssertThrow
 
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
@@ -750,35 +757,13 @@ struct SetGrainSizes
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*
- * Do not use a template here to work around an overload resolution issue with
- * clang and enabled  C++11 mode.
- *
- * - Maier 2013
- */
+template <class T>
 LogStream &
-operator<<(LogStream &out, const std::vector<unsigned int> &v)
+operator<<(LogStream &out, const std::vector<T> &v)
 {
-  for (unsigned int i = 0; i < v.size(); ++i)
+  for (std::size_t i = 0; i < v.size(); ++i)
     out << v[i] << (i == v.size() - 1 ? "" : " ");
   return out;
 }
-
-LogStream &
-operator<<(LogStream &out, const std::vector<long long unsigned int> &v)
-{
-  for (unsigned int i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
-
-LogStream &
-operator<<(LogStream &out, const std::vector<double> &v)
-{
-  for (unsigned int i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
-
 
 #endif // dealii_tests_h

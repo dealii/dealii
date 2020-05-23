@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// Test DoFTools::count_dofs_per_component
+// Test DoFTools::count_dofs_per_fe_component
 //
 // like the test without the hp_ prefix, but for hp::DoFHandler
 
@@ -63,8 +63,8 @@ test()
   triangulation.refine_global(2);
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_component(fe.n_components());
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   Assert(std::accumulate(dofs_per_component.begin(),
                          dofs_per_component.end(),

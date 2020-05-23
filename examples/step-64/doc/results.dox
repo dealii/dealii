@@ -40,7 +40,7 @@ like ${\cal O}(h^{-2})$.) This is of course rather inefficient, as an
 optimal solver would have a number of iterations that is independent
 of the size of the problem. But having such a solver would require
 using a better preconditioner than the identity matrix we have used here.
-   
+
 
 <a name="extensions"></a>
 <h3> Possible extensions </h3>

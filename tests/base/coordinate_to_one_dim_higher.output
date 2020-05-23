@@ -1,0 +1,17 @@
+
+DEAL::dim = 1
+DEAL::locked coordinate = 0
+DEAL::0 -> 1
+DEAL::locked coordinate = 1
+DEAL::0 -> 0
+DEAL::
+DEAL::dim = 2
+DEAL::locked coordinate = 0
+DEAL::0 -> 1
+DEAL::1 -> 2
+DEAL::locked coordinate = 1
+DEAL::0 -> 2
+DEAL::1 -> 0
+DEAL::locked coordinate = 2
+DEAL::0 -> 0
+DEAL::1 -> 1

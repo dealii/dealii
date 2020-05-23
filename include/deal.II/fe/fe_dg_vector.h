@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2010
  */
 template <class PolynomialType, int dim, int spacedim = dim>
-class FE_DGVector : public FE_PolyTensor<PolynomialType, dim, spacedim>
+class FE_DGVector : public FE_PolyTensor<dim, spacedim>
 {
 public:
   /**
@@ -62,7 +62,8 @@ public:
 
   /**
    * Return a string that uniquely identifies a finite element. This class
-   * returns <tt>FE_RaviartThomas<dim>(degree)</tt>, with @p dim and @p degree
+   * returns `FE_DGVector_` plus a piece of the name that is taken from what
+   * the polynomial object returns, plus `<dim>(degree)`, with @p dim and @p degree
    * replaced by appropriate values.
    */
   virtual std::string
@@ -134,7 +135,11 @@ private:
 
 /**
  * A vector-valued DG element based on the polynomials space of FE_Nedelec.
+ * This class implements a "broken" finite element
+ * space that is discontinuous between cells and on each cell has shape
+ * functions that equal those of the Nedelec element.
  *
+ * The related class FE_DGRT is used in step-61.
  * @ingroup fe
  * @author Guido Kanschat
  * @date 2011
@@ -162,7 +167,11 @@ public:
 
 /**
  * A vector-valued DG element based on the polynomials space of
- * FE_RaviartThomas.
+ * FE_RaviartThomas. This class implements a "broken" finite element
+ * space that is discontinuous between cells and on each cell has shape
+ * functions that equal those of the Raviart-Thomas element.
+ *
+ * The class is used in step-61.
  *
  * @ingroup fe
  * @author Guido Kanschat
@@ -191,6 +200,11 @@ public:
 
 /**
  * A vector-valued DG element based on the polynomials space of FE_BDM.
+ * This class implements a "broken" finite element
+ * space that is discontinuous between cells and on each cell has shape
+ * functions that equal those of the BDM element.
+ *
+ * The related class FE_DGRT is used in step-61.
  *
  * @ingroup fe
  * @author Guido Kanschat

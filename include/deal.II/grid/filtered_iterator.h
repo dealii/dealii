@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2019 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -341,7 +341,7 @@ namespace IteratorFilters
  * filter (called a <em>predicate</em>, following the notation of the C++
  * standard library). Once initialized with a predicate and a value for the
  * iterator, a filtered iterator hops to the next or previous element that
- * satisfies the predicate if operators ++ or -- are invoked. Intermediate
+ * satisfies the predicate if operators ++ or \-- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
  * objects without the need to explicitly write down the condition they have
@@ -349,7 +349,7 @@ namespace IteratorFilters
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.
  *
- * This class is used in step-18 and step-32.
+ * This class is used in step-32.
  *
  *
  * <h3>Predicates</h3>
@@ -387,11 +387,11 @@ namespace IteratorFilters
  * @endcode
  * then
  * @code
- *   std::bind (&level_equal_to<active_cell_iterator>, std::placeholders::_1, 3)
+ *   [](const BIterator& c){ return level_equal_to<active_cell_iterator>(c, 3);}
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;
- * this second argument is bound to a fixed value using the @p std::bind
+ * this second argument is taken considered fixed when creating the lambda
  * function).
  *
  * Finally, classes can be predicates. The following class is one:
@@ -402,7 +402,7 @@ namespace IteratorFilters
  *     template <class Iterator>
  *     bool operator () (const Iterator &i) const
  *     {
- *       return (i->active());
+ *       return i->is_active();
  *     }
  *   };
  * @endcode
@@ -786,7 +786,8 @@ private:
  * explicitly specify the type of the base iterator by hand -- it is deduced
  * automatically here.
  *
- * @author Wolfgang Bangerth @relatesalso FilteredIterator
+ * @author Wolfgang Bangerth
+ * @relatesalso FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
 FilteredIterator<BaseIterator>
@@ -1164,7 +1165,7 @@ namespace IteratorFilters
   inline bool
   Active::operator()(const Iterator &i) const
   {
-    return (i->active());
+    return i->is_active();
   }
 
 

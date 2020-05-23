@@ -1,4 +1,0 @@
-Improved: The function project_boundary_values_curl_conforming_l2() can now be
-used with std::complex<double> numbers.
-<br>
-(Daniel Garcia-Sanchez, 2019/06/22)

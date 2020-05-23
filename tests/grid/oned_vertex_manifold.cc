@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,9 +43,7 @@ main()
       deallog << "current cell manifold id: " << cell->manifold_id()
               << std::endl;
 
-      for (unsigned int vertex_n = 0;
-           vertex_n < GeometryInfo<1>::vertices_per_cell;
-           ++vertex_n)
+      for (const unsigned int vertex_n : GeometryInfo<1>::vertex_indices())
         {
           deallog << "current vertex: " << cell->vertex(vertex_n) << std::endl;
           deallog << "current vertex manifold id: "

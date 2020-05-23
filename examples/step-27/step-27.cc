@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2018 by the deal.II authors
+ * Copyright (C) 2006 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -111,7 +111,7 @@ namespace Step27
     hp::QCollection<dim - 1> face_quadrature_collection;
 
     hp::QCollection<dim>                    fourier_q_collection;
-    std::shared_ptr<FESeries::Fourier<dim>> fourier;
+    std::unique_ptr<FESeries::Fourier<dim>> fourier;
     std::vector<double>                     ln_k;
     Table<dim, std::complex<double>>        fourier_coefficients;
 
@@ -136,10 +136,6 @@ namespace Step27
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component) const override;
   };
@@ -159,7 +155,7 @@ namespace Step27
 
   // @sect3{Implementation of the main class}
 
-  // @sect4{LaplaceProblem::LaplaceProblem}
+  // @sect4{LaplaceProblem::LaplaceProblem constructor}
 
   // The constructor of this class is fairly straightforward. It associates
   // the hp::DoFHandler object with the triangulation, and then sets the
@@ -234,9 +230,10 @@ namespace Step27
       fourier_q_collection.push_back(quadrature);
 
     // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std::make_shared<FESeries::Fourier<dim>>(N,
-                                                       fe_collection,
-                                                       fourier_q_collection);
+    const std::vector<unsigned int> n_coefficients_per_direction(
+      fe_collection.size(), N);
+    fourier = std_cxx14::make_unique<FESeries::Fourier<dim>>(
+      n_coefficients_per_direction, fe_collection, fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.
@@ -244,7 +241,7 @@ namespace Step27
   }
 
 
-  // @sect4{LaplaceProblem::~LaplaceProblem}
+  // @sect4{LaplaceProblem::~LaplaceProblem destructor}
 
   // The destructor is unchanged from what we already did in step-6:
   template <int dim>
@@ -321,7 +318,7 @@ namespace Step27
                                      update_quadrature_points |
                                      update_JxW_values);
 
-    const RightHandSide<dim> rhs_function;
+    RightHandSide<dim> rhs_function;
 
     FullMatrix<double> cell_matrix;
     Vector<double>     cell_rhs;
@@ -378,11 +375,11 @@ namespace Step27
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
-    SolverControl solver_control(system_rhs.size(),
+    SolverControl            solver_control(system_rhs.size(),
                                  1e-12 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverCG<Vector<double>> cg(solver_control);
 
-    PreconditionSSOR<> preconditioner;
+    PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
@@ -695,9 +692,9 @@ namespace Step27
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
           FESeries::process_coefficients<dim>(
             fourier_coefficients,
-            std::bind(&LaplaceProblem<dim>::predicate,
-                      this,
-                      std::placeholders::_1),
+            [this](const TableIndices<dim> &indices) {
+              return this->predicate(indices);
+            },
             VectorTools::Linfty_norm);
 
         Assert(res.first.size() == res.second.size(), ExcInternalError());
@@ -742,7 +739,6 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step27;
 
       LaplaceProblem<2> laplace_problem;

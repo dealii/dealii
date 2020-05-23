@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2018 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,9 +16,15 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  dof_info.cc
   evaluation_selector.cc
   mapping_info.cc
+  mapping_info_inst2.cc
+  mapping_info_inst3.cc
   matrix_free.cc
+  matrix_free_inst2.cc
+  matrix_free_inst3.cc
+  shape_info.cc
   task_info.cc
   )
 
@@ -26,6 +32,7 @@ SET(_inst
   evaluation_selector.inst.in
   mapping_info.inst.in
   matrix_free.inst.in
+  shape_info.inst.in
   )
 
 FILE(GLOB _header

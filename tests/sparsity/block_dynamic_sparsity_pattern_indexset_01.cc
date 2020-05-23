@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,10 +26,8 @@
 int
 main()
 {
-  std::ofstream logfile("output");
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   IndexSet a(5);
   IndexSet b(3);
@@ -66,7 +64,7 @@ main()
         }
     }
 
-  csp.print(logfile);
+  csp.print(deallog.get_file_stream());
 
   return 0;
 }

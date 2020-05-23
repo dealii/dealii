@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,10 +19,6 @@
 // different polynomial degrees. The mesh uses a hypercube mesh with no
 // hanging nodes and no other constraints
 
-#include "../tests.h"
-
-std::ofstream logfile("output");
-
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -39,6 +35,8 @@ std::ofstream logfile("output");
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 void
@@ -121,7 +119,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
-    data.tasks_block_size = 8 / VectorizedArray<number>::n_array_elements;
+    data.tasks_block_size = 8 / VectorizedArray<number>::size();
     mf_data.reinit(dof, constraints, quad, data);
   }
 
@@ -156,7 +154,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   deallog << std::setprecision(2);
 

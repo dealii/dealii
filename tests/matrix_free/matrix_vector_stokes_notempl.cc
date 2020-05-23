@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,10 +17,6 @@
 
 // same as matrix_vector_stokes_noflux but no template parameter on the
 // polynomial degree
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -49,6 +45,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 
 
@@ -178,10 +176,8 @@ test(const unsigned int fe_degree)
   DoFTools::make_hanging_node_constraints(dof_handler_p, constraints_p);
   constraints_p.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(dof_handler,
-                                 dofs_per_block,
-                                 stokes_sub_blocks);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, stokes_sub_blocks);
 
   // std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -329,8 +325,7 @@ test(const unsigned int fe_degree)
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 #include <deal.II/base/bounding_box.h>
+#include <deal.II/base/geometry_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -171,6 +172,161 @@ BoundingBox<spacedim, Number>::volume() const
     vol *= (this->boundary_points.second[i] - this->boundary_points.first[i]);
   return vol;
 }
+
+
+
+template <int spacedim, typename Number>
+Number
+BoundingBox<spacedim, Number>::lower_bound(const unsigned int direction) const
+{
+  AssertIndexRange(direction, spacedim);
+
+  return boundary_points.first[direction];
+}
+
+
+
+template <int spacedim, typename Number>
+Number
+BoundingBox<spacedim, Number>::upper_bound(const unsigned int direction) const
+{
+  AssertIndexRange(direction, spacedim);
+
+  return boundary_points.second[direction];
+}
+
+
+
+template <int spacedim, typename Number>
+Point<spacedim, Number>
+BoundingBox<spacedim, Number>::center() const
+{
+  Point<spacedim, Number> point;
+  for (unsigned int i = 0; i < spacedim; ++i)
+    point[i] = .5 * (boundary_points.first[i] + boundary_points.second[i]);
+
+  return point;
+}
+
+
+
+template <int spacedim, typename Number>
+BoundingBox<1, Number>
+BoundingBox<spacedim, Number>::bounds(const unsigned int direction) const
+{
+  AssertIndexRange(direction, spacedim);
+
+  std::pair<Point<1, Number>, Point<1, Number>> lower_upper_bounds;
+  lower_upper_bounds.first[0]  = lower_bound(direction);
+  lower_upper_bounds.second[0] = upper_bound(direction);
+
+  return BoundingBox<1, Number>(lower_upper_bounds);
+}
+
+
+
+template <int spacedim, typename Number>
+Number
+BoundingBox<spacedim, Number>::side_length(const unsigned int direction) const
+{
+  AssertIndexRange(direction, spacedim);
+
+  return boundary_points.second[direction] - boundary_points.first[direction];
+}
+
+
+
+template <int spacedim, typename Number>
+Point<spacedim, Number>
+BoundingBox<spacedim, Number>::vertex(const unsigned int index) const
+{
+  AssertIndexRange(index, GeometryInfo<spacedim>::vertices_per_cell);
+
+  const Point<spacedim> unit_cell_vertex =
+    GeometryInfo<spacedim>::unit_cell_vertex(index);
+
+  Point<spacedim, Number> point;
+  for (unsigned int i = 0; i < spacedim; ++i)
+    point[i] = boundary_points.first[i] + side_length(i) * unit_cell_vertex[i];
+
+  return point;
+}
+
+
+
+template <int spacedim, typename Number>
+BoundingBox<spacedim, Number>
+BoundingBox<spacedim, Number>::child(const unsigned int index) const
+{
+  AssertIndexRange(index, GeometryInfo<spacedim>::max_children_per_cell);
+
+  // Vertex closest to child.
+  const Point<spacedim, Number> parent_vertex = vertex(index);
+  const Point<spacedim, Number> parent_center = center();
+
+  const Point<spacedim> upper_corner_unit_cell =
+    GeometryInfo<spacedim>::unit_cell_vertex(
+      GeometryInfo<spacedim>::vertices_per_cell - 1);
+
+  const Point<spacedim> lower_corner_unit_cell =
+    GeometryInfo<spacedim>::unit_cell_vertex(0);
+
+  std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
+    child_lower_upper_corner;
+  for (unsigned int i = 0; i < spacedim; ++i)
+    {
+      const double child_side_length = side_length(i) / 2;
+
+      const double child_center = (parent_center[i] + parent_vertex[i]) / 2;
+
+      child_lower_upper_corner.first[i] =
+        child_center + child_side_length * (lower_corner_unit_cell[i] - .5);
+      child_lower_upper_corner.second[i] =
+        child_center + child_side_length * (upper_corner_unit_cell[i] - .5);
+    }
+
+  return BoundingBox<spacedim, Number>(child_lower_upper_corner);
+}
+
+
+
+template <int spacedim, typename Number>
+BoundingBox<spacedim - 1, Number>
+BoundingBox<spacedim, Number>::cross_section(const unsigned int direction) const
+{
+  AssertIndexRange(direction, spacedim);
+
+  std::pair<Point<spacedim - 1, Number>, Point<spacedim - 1, Number>>
+    cross_section_lower_upper_corner;
+  for (unsigned int d = 0; d < spacedim - 1; ++d)
+    {
+      const int index_to_write_from =
+        internal::coordinate_to_one_dim_higher<spacedim - 1>(direction, d);
+
+      cross_section_lower_upper_corner.first[d] =
+        boundary_points.first[index_to_write_from];
+
+      cross_section_lower_upper_corner.second[d] =
+        boundary_points.second[index_to_write_from];
+    }
+
+  return BoundingBox<spacedim - 1, Number>(cross_section_lower_upper_corner);
+}
+
+
+
+template <int dim, typename Number>
+BoundingBox<dim, Number>
+create_unit_bounding_box()
+{
+  std::pair<Point<dim, Number>, Point<dim, Number>> lower_upper_corner;
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      lower_upper_corner.second[i] = 1;
+    }
+  return BoundingBox<dim, Number>(lower_upper_corner);
+}
+
 
 #include "bounding_box.inst"
 DEAL_II_NAMESPACE_CLOSE

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -172,13 +172,13 @@ check()
 
   FESystem<dim> e1(FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e1);
-  mgdof.distribute_mg_dofs(e1);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof, false);
   mgdof.clear();
 
   FESystem<dim> e2(FE_DGP<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e2);
-  mgdof.distribute_mg_dofs(e2);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof, true);
   mgdof.clear();
 }
@@ -187,10 +187,8 @@ check()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2) << std::fixed;
 
   deallog.push("1d");
   check<1>();

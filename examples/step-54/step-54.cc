@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -231,8 +231,8 @@ namespace Step54
     Triangulation<2, 3>::active_cell_iterator cell = tria.begin_active();
     cell->set_manifold_id(1);
 
-    for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
-      cell->face(f)->set_manifold_id(2);
+    for (const auto &face : cell->face_iterators())
+      face->set_manifold_id(2);
 
     // Once both the CAD geometry and the initial mesh have been
     // imported and digested, we use the CAD surfaces and curves to
@@ -386,33 +386,33 @@ int main()
 {
   try
     {
-      using namespace dealii;
       using namespace Step54;
 
       const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
       const std::string cad_file_name    = "input/DTMB-5415_bulbous_bow.iges";
 
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << "Testing projection in direction normal to CAD surface" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << "Testing projection in direction normal to CAD surface"
+                << std::endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
       std::string        out_mesh_filename = ("3d_mesh_normal_projection");
       TriangulationOnCAD tria_on_cad_norm(in_mesh_filename,
                                           cad_file_name,
                                           out_mesh_filename,
                                           TriangulationOnCAD::NormalProjection);
       tria_on_cad_norm.run();
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << endl;
-      cout << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << std::endl;
 
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << "Testing projection in y-axis direction" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << "Testing projection in y-axis direction" << std::endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
       out_mesh_filename = ("3d_mesh_directional_projection");
       TriangulationOnCAD tria_on_cad_dir(
         in_mesh_filename,
@@ -420,16 +420,17 @@ int main()
         out_mesh_filename,
         TriangulationOnCAD::DirectionalProjection);
       tria_on_cad_dir.run();
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << endl;
-      cout << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << std::endl;
 
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << "Testing projection in direction normal to mesh elements" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << "Testing projection in direction normal to mesh elements"
+                << std::endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
       out_mesh_filename = ("3d_mesh_normal_to_mesh_projection");
       TriangulationOnCAD tria_on_cad_norm_to_mesh(
         in_mesh_filename,
@@ -437,10 +438,10 @@ int main()
         out_mesh_filename,
         TriangulationOnCAD::NormalToMeshProjection);
       tria_on_cad_norm_to_mesh.run();
-      cout << "----------------------------------------------------------"
-           << endl;
-      cout << endl;
-      cout << endl;
+      std::cout << "----------------------------------------------------------"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << std::endl;
     }
   catch (std::exception &exc)
     {

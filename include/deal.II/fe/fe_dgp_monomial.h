@@ -283,7 +283,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 2004
  */
 template <int dim>
-class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>, dim>
+class FE_DGPMonomial : public FE_Poly<dim>
 {
 public:
   /**

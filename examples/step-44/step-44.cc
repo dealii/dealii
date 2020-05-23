@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2019 by the deal.II authors and
+ * Copyright (C) 2010 - 2020 by the deal.II authors and
  *                              & Jean-Paul Pelteret and Andrew McBride
  *
  * This file is part of the deal.II library.
@@ -504,8 +504,8 @@ namespace Step44
   // 1 - 2\textrm{ln}\; \widetilde{J} ]$, where $\kappa \dealcoloneq \lambda +
   // 2/3 \mu$ is the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk
   // modulus</a> and $\lambda$ is <a
-  // href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lame's first
-  // parameter</a>.
+  // href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lam&eacute;'s
+  // first parameter</a>.
   //
   // The following class will be used to characterize the material we work with,
   // and provides a central point that one would need to modify if one were to
@@ -1467,22 +1467,21 @@ namespace Step44
     // +y surface and will get boundary ID 6 (zero through five are already
     // used when creating the six faces of the cube domain):
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const auto &face : cell->face_iterators())
         {
-          if (cell->face(face)->at_boundary() == true &&
-              cell->face(face)->center()[1] == 1.0 * parameters.scale)
+          if (face->at_boundary() == true &&
+              face->center()[1] == 1.0 * parameters.scale)
             {
               if (dim == 3)
                 {
-                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale &&
-                      cell->face(face)->center()[2] < 0.5 * parameters.scale)
-                    cell->face(face)->set_boundary_id(6);
+                  if (face->center()[0] < 0.5 * parameters.scale &&
+                      face->center()[2] < 0.5 * parameters.scale)
+                    face->set_boundary_id(6);
                 }
               else
                 {
-                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale)
-                    cell->face(face)->set_boundary_id(6);
+                  if (face->center()[0] < 0.5 * parameters.scale)
+                    face->set_boundary_id(6);
                 }
             }
         }
@@ -1510,9 +1509,9 @@ namespace Step44
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler);
     DoFRenumbering::component_wise(dof_handler, block_component);
-    DoFTools::count_dofs_per_block(dof_handler,
-                                   dofs_per_block,
-                                   block_component);
+
+    dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
 
     std::cout << "Triangulation:"
               << "\n\t Number of active cells: "
@@ -1727,7 +1726,8 @@ namespace Step44
     scratch.fe_values[J_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_J_total);
 
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       lqph[q_point]->update_values(scratch.solution_grads_u_total[q_point],
                                    scratch.solution_values_p_total[q_point],
                                    scratch.solution_values_J_total[q_point]);
@@ -1915,7 +1915,7 @@ namespace Step44
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
             const double JxW      = fe_values.JxW(q_point);
@@ -1949,7 +1949,7 @@ namespace Step44
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
             const double det_F_qp   = lqph[q_point]->get_det_F();
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
@@ -2049,17 +2049,16 @@ namespace Step44
     // call to WorkStream because assemble_system_tangent_one_cell
     // is a constant function and copy_local_to_global_K is
     // non-constant.
-    WorkStream::run(dof_handler.active_cell_iterators(),
-                    std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
-                              this,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3),
-                    std::bind(&Solid<dim>::copy_local_to_global_K,
-                              this,
-                              std::placeholders::_1),
-                    scratch_data,
-                    per_task_data);
+    WorkStream::run(
+      dof_handler.active_cell_iterators(),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             ScratchData_K &                                       scratch,
+             PerTaskData_K &                                       data) {
+        this->assemble_system_tangent_one_cell(cell, scratch, data);
+      },
+      [this](const PerTaskData_K &data) { this->copy_local_to_global_K(data); },
+      scratch_data,
+      per_task_data);
 
     timer.leave_subsection();
   }
@@ -2101,10 +2100,11 @@ namespace Step44
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
 
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
 
@@ -2139,7 +2139,8 @@ namespace Step44
     //
     // In doing so, we first extract some configuration dependent variables
     // from our quadrature history objects for the current quadrature point.
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       {
         const Tensor<2, dim>          tau = lqph[q_point]->get_tau();
         const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
@@ -2156,13 +2157,14 @@ namespace Step44
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
         const double                       JxW = scratch.fe_values.JxW(q_point);
 
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
 
-            for (unsigned int j = 0; j <= i; ++j)
+            for (const unsigned int j :
+                 scratch.fe_values.dof_indices_ending_at(i))
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
@@ -2207,8 +2209,9 @@ namespace Step44
 
     // Finally, we need to copy the lower half of the local matrix into the
     // upper half:
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
+    for (const unsigned int i : scratch.fe_values.dof_indices())
+      for (const unsigned int j :
+           scratch.fe_values.dof_indices_starting_at(i + 1))
         data.cell_matrix(i, j) = data.cell_matrix(j, i);
   }
 
@@ -2234,17 +2237,18 @@ namespace Step44
     PerTaskData_RHS per_task_data(dofs_per_cell);
     ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
 
-    WorkStream::run(dof_handler.active_cell_iterators(),
-                    std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
-                              this,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3),
-                    std::bind(&Solid<dim>::copy_local_to_global_rhs,
-                              this,
-                              std::placeholders::_1),
-                    scratch_data,
-                    per_task_data);
+    WorkStream::run(
+      dof_handler.active_cell_iterators(),
+      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
+             ScratchData_RHS &                                     scratch,
+             PerTaskData_RHS &                                     data) {
+        this->assemble_system_rhs_one_cell(cell, scratch, data);
+      },
+      [this](const PerTaskData_RHS &data) {
+        this->copy_local_to_global_rhs(data);
+      },
+      scratch_data,
+      per_task_data);
 
     timer.leave_subsection();
   }
@@ -2275,11 +2279,12 @@ namespace Step44
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
 
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
 
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
 
@@ -2297,7 +2302,8 @@ namespace Step44
           }
       }
 
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       {
         const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
         const double                  det_F   = lqph[q_point]->get_det_F();
@@ -2315,7 +2321,7 @@ namespace Step44
         // definition of the rhs as the negative
         // of the residual, these contributions
         // are subtracted.
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values.dof_indices())
           {
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
 
@@ -2333,15 +2339,13 @@ namespace Step44
     // Next we assemble the Neumann contribution. We first check to see it the
     // cell face exists on a boundary on which a traction is applied and add
     // the contribution if this is the case.
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
-      if (cell->face(face)->at_boundary() == true &&
-          cell->face(face)->boundary_id() == 6)
+    for (const auto &face : cell->face_iterators())
+      if (face->at_boundary() && face->boundary_id() == 6)
         {
           scratch.fe_face_values.reinit(cell, face);
 
-          for (unsigned int f_q_point = 0; f_q_point < n_q_points_f;
-               ++f_q_point)
+          for (const unsigned int f_q_point :
+               scratch.fe_face_values.quadrature_point_indices())
             {
               const Tensor<1, dim> &N =
                 scratch.fe_face_values.normal_vector(f_q_point);
@@ -2365,7 +2369,7 @@ namespace Step44
               const double         pressure  = p0 * parameters.p_p0 * time_ramp;
               const Tensor<1, dim> traction  = pressure * N;
 
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (const unsigned int i : scratch.fe_values.dof_indices())
                 {
                   const unsigned int i_group =
                     fe.system_to_base_index(i).first.first;
@@ -3346,7 +3350,7 @@ namespace Step44
 
   // @sect4{Solid::output_results}
   // Here we present how the results are written to file to be viewed
-  // using ParaView or Visit. The method is similar to that shown in previous
+  // using ParaView or VisIt. The method is similar to that shown in previous
   // tutorials so will not be discussed in detail.
   template <int dim>
   void Solid<dim>::output_results() const
@@ -3401,7 +3405,6 @@ namespace Step44
 // no different to the other tutorials.
 int main()
 {
-  using namespace dealii;
   using namespace Step44;
 
   try

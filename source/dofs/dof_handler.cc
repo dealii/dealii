@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,6 +35,7 @@
 
 #include <algorithm>
 #include <set>
+#include <unordered_set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -44,9 +45,6 @@ const unsigned int DoFHandler<dim, spacedim>::dimension;
 
 template <int dim, int spacedim>
 const unsigned int DoFHandler<dim, spacedim>::space_dimension;
-
-template <int dim, int spacedim>
-const types::global_dof_index DoFHandler<dim, spacedim>::invalid_dof_index;
 
 template <int dim, int spacedim>
 const unsigned int DoFHandler<dim, spacedim>::default_fe_index;
@@ -426,9 +424,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<1>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -502,9 +498,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -579,9 +573,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -855,7 +847,7 @@ DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
                                ParallelShared<DoFHandler<dim, spacedim>>>(
         *this);
   else if (dynamic_cast<
-             const parallel::distributed::Triangulation<dim, spacedim> *>(
+             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
              &tria) == nullptr)
     policy =
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
@@ -907,8 +899,8 @@ DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &t,
                                ParallelShared<DoFHandler<dim, spacedim>>>(
         *this);
   else if (dynamic_cast<
-             const parallel::distributed::Triangulation<dim, spacedim> *>(&t) !=
-           nullptr)
+             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+             &t) != nullptr)
     policy =
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
                                ParallelDistributed<DoFHandler<dim, spacedim>>>(
@@ -1096,36 +1088,50 @@ template <int dim, int spacedim>
 types::global_dof_index
 DoFHandler<dim, spacedim>::n_boundary_dofs() const
 {
-  std::set<int> boundary_dofs;
+  const FiniteElement<dim, spacedim> &fe            = get_fe();
+  const unsigned int                  dofs_per_face = fe.n_dofs_per_face();
+  std::vector<dealii::types::global_dof_index> dofs_on_face(dofs_per_face);
 
-  const unsigned int                   dofs_per_face = get_fe().dofs_per_face;
-  std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
+  const IndexSet &owned_dofs = locally_owned_dofs();
 
-  // loop over all faces of all cells
-  // and see whether they are at a
-  // boundary. note (i) that we visit
-  // interior faces twice (which we
-  // don't care about) but exterior
-  // faces only once as is
-  // appropriate, and (ii) that we
-  // need not take special care of
-  // single lines (using
-  // @p{cell->has_boundary_lines}),
-  // since we do not support
-  // boundaries of dimension dim-2,
-  // and so every boundary line is
+  std::unordered_set<unsigned int> boundary_dof_indices;
+  // Loop over all faces of all cells and see whether they are at a boundary.
+  // note (i) that we visit interior faces twice (which we don't care about) but
+  // exterior faces only once as is appropriate, and (ii) that we need not take
+  // special care of single lines (using @p{cell->has_boundary_lines}), since we
+  // do not support boundaries of dimension dim-2, and so every boundary line is
   // also part of a boundary face.
-  active_cell_iterator cell = begin_active(), endc = end();
-  for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->at_boundary(f))
+  for (const auto &cell : this->active_cell_iterators())
+    {
+      if (cell->is_locally_owned() && cell->at_boundary())
         {
-          cell->face(f)->get_dof_indices(dofs_on_face);
-          for (unsigned int i = 0; i < dofs_per_face; ++i)
-            boundary_dofs.insert(dofs_on_face[i]);
-        }
+          for (const unsigned int iface :
+               dealii::GeometryInfo<dim>::face_indices())
+            {
+              const auto face = cell->face(iface);
+              if (face->at_boundary())
+                {
+                  cell->face(iface)->get_dof_indices(dofs_on_face);
+                  for (unsigned int idof_face = 0; idof_face < dofs_per_face;
+                       ++idof_face)
+                    {
+                      const unsigned int global_idof_index =
+                        dofs_on_face[idof_face];
 
-  return boundary_dofs.size();
+                      // If dof is not already in our hashmap, then insert it
+                      // into our set of surface indices. However, do not add if
+                      // it is not locally owned, it will get picked up by
+                      // another processor
+                      if (owned_dofs.is_element(global_idof_index))
+                        {
+                          boundary_dof_indices.insert(global_idof_index);
+                        }
+                    }
+                }
+            }
+        }
+    }
+  return boundary_dof_indices.size();
 }
 
 
@@ -1139,28 +1145,55 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
            boundary_ids.end(),
          ExcInvalidBoundaryIndicator());
 
-  std::set<types::global_dof_index> boundary_dofs;
+  const FiniteElement<dim, spacedim> &fe            = get_fe();
+  const unsigned int                  dofs_per_face = fe.n_dofs_per_face();
+  std::vector<dealii::types::global_dof_index> dofs_on_face(dofs_per_face);
 
-  const unsigned int                   dofs_per_face = get_fe().dofs_per_face;
-  std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
+  const IndexSet &owned_dofs = locally_owned_dofs();
 
-  // same as in the previous
-  // function, but with a different
-  // check for the boundary indicator
-  active_cell_iterator cell = begin_active(), endc = end();
-  for (; cell != endc; ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->at_boundary(f) &&
-          (std::find(boundary_ids.begin(),
-                     boundary_ids.end(),
-                     cell->face(f)->boundary_id()) != boundary_ids.end()))
+  std::unordered_set<unsigned int> boundary_dof_indices;
+  // Loop over all faces of all cells and see whether they are at a boundary.
+  // note (i) that we visit interior faces twice (which we don't care about) but
+  // exterior faces only once as is appropriate, and (ii) that we need not take
+  // special care of single lines (using @p{cell->has_boundary_lines}), since we
+  // do not support boundaries of dimension dim-2, and so every boundary line is
+  // also part of a boundary face.
+  for (const auto &cell : this->active_cell_iterators())
+    {
+      if (cell->is_locally_owned() && cell->at_boundary())
         {
-          cell->face(f)->get_dof_indices(dofs_on_face);
-          for (unsigned int i = 0; i < dofs_per_face; ++i)
-            boundary_dofs.insert(dofs_on_face[i]);
-        }
+          for (const unsigned int iface :
+               dealii::GeometryInfo<dim>::face_indices())
+            {
+              const auto         face        = cell->face(iface);
+              const unsigned int boundary_id = face->boundary_id();
 
-  return boundary_dofs.size();
+              if (face->at_boundary() &&
+                  std::find(boundary_ids.begin(),
+                            boundary_ids.end(),
+                            boundary_id) != boundary_ids.end())
+                {
+                  cell->face(iface)->get_dof_indices(dofs_on_face);
+                  for (unsigned int idof_face = 0; idof_face < dofs_per_face;
+                       ++idof_face)
+                    {
+                      const unsigned int global_idof_index =
+                        dofs_on_face[idof_face];
+
+                      // If dof is not already in our hashmap, then insert it
+                      // into our set of surface indices. However, do not add if
+                      // it is not locally owned, it will get picked up by
+                      // another processor
+                      if (owned_dofs.is_element(global_idof_index))
+                        {
+                          boundary_dof_indices.insert(global_idof_index);
+                        }
+                    }
+                }
+            }
+        }
+    }
+  return boundary_dof_indices.size();
 }
 
 
@@ -1251,19 +1284,9 @@ DoFHandler<dim, spacedim>::distribute_dofs(
   // only if this is a sequential
   // triangulation. it doesn't work
   // correctly yet if it is parallel
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
-        &*tria) == nullptr)
+  if (dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
+                     *>(&*tria) == nullptr)
     block_info_object.initialize(*this, false, true);
-}
-
-
-
-template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::distribute_mg_dofs(
-  const FiniteElement<dim, spacedim> &)
-{
-  this->distribute_mg_dofs();
 }
 
 
@@ -1293,7 +1316,7 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
   // only if this is a sequential
   // triangulation. it doesn't work
   // correctly yet if it is parallel
-  if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+  if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*tria) == nullptr)
     block_info_object.initialize(*this, true, false);
 }
@@ -1353,7 +1376,7 @@ DoFHandler<dim, spacedim>::renumber_dofs(
              ExcMessage("Incorrect size of the input array."));
     }
   else if (dynamic_cast<
-             const parallel::distributed::Triangulation<dim, spacedim> *>(
+             const parallel::DistributedTriangulationBase<dim, spacedim> *>(
              &*tria) != nullptr)
     {
       AssertDimension(new_numbers.size(), n_locally_owned_dofs());

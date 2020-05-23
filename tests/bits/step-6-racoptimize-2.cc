@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,11 +17,6 @@
 
 // like the step-6-racoptimize test but calling
 // GridRefinement::refine_and_coarsen_optimize with argument order=5
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>

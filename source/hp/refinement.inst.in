@@ -52,13 +52,37 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
       namespace Refinement
       \{
         template void
-        p_adaptivity_from_threshold<deal_II_dimension,
-                                    S,
-                                    deal_II_space_dimension>(
+        p_adaptivity_from_absolute_threshold<deal_II_dimension,
+                                             S,
+                                             deal_II_space_dimension>(
+          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const Vector<S> &,
+          const S,
+          const S,
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
+
+        template void
+        p_adaptivity_from_relative_threshold<deal_II_dimension,
+                                             S,
+                                             deal_II_space_dimension>(
           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
           const Vector<S> &,
           const double,
-          const double);
+          const double,
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
+
+        template void
+        p_adaptivity_fixed_number<deal_II_dimension,
+                                  S,
+                                  deal_II_space_dimension>(
+          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const Vector<S> &,
+          const double,
+          const double,
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
 
         template void
         p_adaptivity_from_regularity<deal_II_dimension,
@@ -68,12 +92,14 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
           const Vector<S> &);
 
         template void
-        p_adaptivity_from_prediction<deal_II_dimension,
-                                     S,
-                                     deal_II_space_dimension>(
+        p_adaptivity_from_reference<deal_II_dimension,
+                                    S,
+                                    deal_II_space_dimension>(
           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
           const Vector<S> &,
-          const Vector<S> &);
+          const Vector<S> &,
+          const ComparisonFunction<typename identity<S>::type> &,
+          const ComparisonFunction<typename identity<S>::type> &);
 
         template void
         predict_error<deal_II_dimension, S, deal_II_space_dimension>(

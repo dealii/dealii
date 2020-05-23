@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,7 @@ public:
    * This function returns an identifier for the running program. Currently,
    * the library provides a function returning "JobID".
    *
-   * The user may define a replacement of this function in his source code and
+   * The user may define a replacement of this function in their source code and
    * avoid linking the library version. Unfortunately, this mechanism does not
    * work with shared libraries.
    */

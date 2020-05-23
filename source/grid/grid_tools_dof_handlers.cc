@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -201,8 +202,7 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < mesh.get_triangulation().n_vertices(),
-           ExcIndexRange(0, mesh.get_triangulation().n_vertices(), vertex));
+    AssertIndexRange(vertex, mesh.get_triangulation().n_vertices());
     Assert(mesh.get_triangulation().get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 
@@ -253,7 +253,7 @@ namespace GridTools
     // list, but std::set throws out those cells already entered
     for (; cell != endc; ++cell)
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           if (cell->vertex_index(v) == vertex)
             {
               // OK, we found a cell that contains
@@ -272,7 +272,7 @@ namespace GridTools
                       GeometryInfo<dim>::vertex_to_face[v][vface];
 
                     if (!cell->at_boundary(face) &&
-                        cell->neighbor(face)->active())
+                        cell->neighbor(face)->is_active())
                       {
                         // there is a (possibly) coarser cell behind a
                         // face to which the vertex belongs. the
@@ -746,25 +746,19 @@ namespace GridTools
     // Find the cells for which the predicate is true
     // These are the cells around which we wish to construct
     // the halo layer
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
 
     // Find the cells that do not conform to the predicate
     // but share a vertex with the selected subdomain
     // These comprise the halo layer
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
               true)
             {
@@ -796,9 +790,8 @@ namespace GridTools
          cell != mesh.end(level);
          ++cell)
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] =
             true;
 
@@ -809,9 +802,8 @@ namespace GridTools
          cell != mesh.end(level);
          ++cell)
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (locally_active_vertices_on_level_subdomain[cell->vertex_index(
                 v)] == true)
             {
@@ -907,14 +899,11 @@ namespace GridTools
 
     // Find the cells for which the predicate is false
     // These are the cells which are around the predicate subdomain
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // Negation of predicate --> Not Part of subdomain
         {
-          for (unsigned int v = 0;
-               v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v :
+               GeometryInfo<MeshType::dimension>::vertex_indices())
             vertices_outside_subdomain[cell->vertex_index(v)] = true;
           n_non_predicate_cells++;
         }
@@ -929,14 +918,11 @@ namespace GridTools
 
     // Find the cells that conform to the predicate
     // but share a vertex with the cell not in the predicate subdomain
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Potential boundary cell of the
                            // subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (vertices_outside_subdomain[cell->vertex_index(v)] == true)
             {
               subdomain_boundary_cells.push_back(cell);
@@ -992,9 +978,7 @@ namespace GridTools
     // cells that are inside the extended bounding box but are not part of the
     // predicate subdomain are possible candidates to be within the distance to
     // the boundary cells of the predicate subdomain.
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       {
         // Ignore all the cells that are in the predicate subdomain
         if (predicate(cell))
@@ -1091,9 +1075,7 @@ namespace GridTools
     Point<MeshType::space_dimension> maxp, minp;
 
     // initialize minp and maxp with the first predicate cell center
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell))
         {
           minp = cell->center();
@@ -1103,13 +1085,10 @@ namespace GridTools
 
     // Run through all the cells to check if it belongs to predicate domain,
     // if it belongs to the predicate domain, extend the bounding box.
-    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
-         cell != mesh.end();
-         ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v = 0;
-             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<MeshType::dimension>::vertex_indices())
           if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
               false)
             {
@@ -1204,9 +1183,9 @@ namespace GridTools
           {
             // at least one cell is active
             if (remove_ghost_cells &&
-                ((cell_pair->first->active() &&
+                ((cell_pair->first->is_active() &&
                   !cell_pair->first->is_locally_owned()) ||
-                 (cell_pair->second->active() &&
+                 (cell_pair->second->is_active() &&
                   !cell_pair->second->is_locally_owned())))
               {
                 // we only exclude ghost cells for distributed Triangulations
@@ -1223,7 +1202,7 @@ namespace GridTools
     // least one active iterator or have different refinement_cases
     for (cell_pair = cell_list.begin(); cell_pair != cell_list.end();
          ++cell_pair)
-      Assert(cell_pair->first->active() || cell_pair->second->active() ||
+      Assert(cell_pair->first->is_active() || cell_pair->second->is_active() ||
                (cell_pair->first->refinement_case() !=
                 cell_pair->second->refinement_case()),
              ExcInternalError());
@@ -1252,7 +1231,7 @@ namespace GridTools
                                                            mesh_2.begin(0),
                                                          endc = mesh_1.end(0);
     for (; cell_1 != endc; ++cell_1, ++cell_2)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         if (cell_1->vertex(v) != cell_2->vertex(v))
           return false;
 
@@ -1417,9 +1396,8 @@ namespace GridTools
 
     std::vector<typename MeshType::active_cell_iterator> patch;
     patch.push_back(cell);
-    for (unsigned int face_number = 0;
-         face_number < GeometryInfo<MeshType::dimension>::faces_per_cell;
-         ++face_number)
+    for (const unsigned int face_number :
+         GeometryInfo<MeshType::dimension>::face_indices())
       if (cell->face(face_number)->at_boundary() == false)
         {
           if (cell->neighbor(face_number)->has_children() == false)
@@ -1465,7 +1443,7 @@ namespace GridTools
              "Vector containing patch cells should not be an empty vector!"));
     // In order to extract the set of cells with the coarsest common level from
     // the give vector of cells: First it finds the number associated with the
-    // minimum level of refinmenet, namely "min_level"
+    // minimum level of refinement, namely "min_level"
     int min_level = patch[0]->level();
 
     for (unsigned int i = 0; i < patch.size(); ++i)
@@ -1528,9 +1506,8 @@ namespace GridTools
          uniform_cell != uniform_cells.end();
          ++uniform_cell)
       {
-        for (unsigned int v = 0;
-             v < GeometryInfo<Container::dimension>::vertices_per_cell;
-             ++v)
+        for (const unsigned int v :
+             GeometryInfo<Container::dimension>::vertex_indices())
           {
             Point<Container::space_dimension> position =
               (*uniform_cell)->vertex(v);
@@ -1586,12 +1563,8 @@ namespace GridTools
     do
       {
         refinement_necessary = false;
-        for (typename Triangulation<Container::dimension,
-                                    Container::space_dimension>::
-               active_cell_iterator active_tria_cell =
-                 local_triangulation.begin_active();
-             active_tria_cell != local_triangulation.end();
-             ++active_tria_cell)
+        for (const auto &active_tria_cell :
+             local_triangulation.active_cell_iterators())
           {
             if (patch_to_global_tria_map_tmp[active_tria_cell]->has_children())
               {
@@ -1609,10 +1582,8 @@ namespace GridTools
                     {
                       // adjust the cell vertices of the local_triangulation to
                       // match cell vertices of the global triangulation
-                      for (unsigned int v = 0;
-                           v < GeometryInfo<
-                                 Container::dimension>::vertices_per_cell;
-                           ++v)
+                      for (const unsigned int v :
+                           GeometryInfo<Container::dimension>::vertex_indices())
                         active_tria_cell->vertex(v) = patch[i]->vertex(v);
 
                       Assert(active_tria_cell->center().distance(
@@ -1830,9 +1801,8 @@ namespace GridTools
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (unsigned int f = 0;
-                 f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
-                 ++f)
+            for (const unsigned int f :
+                 GeometryInfo<DoFHandlerType::dimension>::face_indices())
               {
                 if (cell->face(f)->has_children())
                   {
@@ -2060,11 +2030,28 @@ namespace GridTools
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+#ifdef DEBUG
+    {
+      constexpr int dim      = CellIterator::AccessorType::dimension;
+      constexpr int spacedim = CellIterator::AccessorType::space_dimension;
+      // For parallel::fullydistributed::Triangulation there might be unmatched
+      // faces on periodic boundaries on the coarse grid, which results that
+      // this assert is not fulfilled (not a bug!). See also the discussion in
+      // the method collect_periodic_faces.
+      if (!(((pairs1.size() > 0) &&
+             (dynamic_cast<const parallel::fullydistributed::
+                             Triangulation<dim, spacedim> *>(
+                &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+            ((pairs2.size() > 0) &&
+             (dynamic_cast<
+                const parallel::fullydistributed::Triangulation<dim, spacedim>
+                  *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
+        Assert(pairs1.size() == pairs2.size(),
+               ExcMessage("Unmatched faces on periodic boundaries"));
+    }
+#endif
 
     unsigned int n_matches = 0;
 
@@ -2100,9 +2087,25 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched
-    AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
-                ExcMessage("Unmatched faces on periodic boundaries"));
+    // Assure that all faces are matched if not
+    // parallel::fullydistributed::Triangulation is used. This is related to the
+    // fact that the faces might not be successfully matched on the coarse grid
+    // (not a bug!). See also the comment above and in the
+    // method collect_periodic_faces.
+    {
+      constexpr int dim      = CellIterator::AccessorType::dimension;
+      constexpr int spacedim = CellIterator::AccessorType::space_dimension;
+      if (!(((pairs1.size() > 0) &&
+             (dynamic_cast<const parallel::fullydistributed::
+                             Triangulation<dim, spacedim> *>(
+                &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+            ((pairs2.size() > 0) &&
+             (dynamic_cast<
+                const parallel::fullydistributed::Triangulation<dim, spacedim>
+                  *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
+        AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
+                    ExcMessage("Unmatched faces on periodic boundaries"));
+    }
   }
 
 
@@ -2122,8 +2125,7 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     Assert(dim == space_dim, ExcNotImplemented());
 
@@ -2205,8 +2207,7 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    AssertIndexRange(direction, space_dim);
 
     // Loop over all cells on the highest level and collect all boundary
     // faces belonging to b_id1 and b_id2:
@@ -2218,7 +2219,7 @@ namespace GridTools
          cell != mesh.end(0);
          ++cell)
       {
-        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        for (unsigned int i : GeometryInfo<dim>::face_indices())
           {
             const typename MeshType::face_iterator face = cell->face(i);
             if (face->at_boundary() && face->boundary_id() == b_id1)
@@ -2237,13 +2238,31 @@ namespace GridTools
           }
       }
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    // Assure that all faces are matched on the coare grid. This requirement
+    // can only fulfilled if a process owns the complete coarse grid. This is
+    // not the case for a parallel::fullydistributed::Triangulation, i.e. this
+    // requirement has not to be met neither (consider faces on the outside of a
+    // ghost cell that are periodic but for which the ghost neighbor doesn't
+    // exist).
+    if (!(((pairs1.size() > 0) &&
+           (dynamic_cast<
+              const parallel::fullydistributed::Triangulation<dim, space_dim>
+                *>(&pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+          ((pairs2.size() > 0) &&
+           (dynamic_cast<
+              const parallel::fullydistributed::Triangulation<dim, space_dim>
+                *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
+      Assert(pairs1.size() == pairs2.size(),
+             ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert(pairs1.size() > 0,
-           ExcMessage("No new periodic face pairs have been found. "
-                      "Are you sure that you've selected the correct boundary "
-                      "id's and that the coarsest level mesh is colorized?"));
+    Assert(
+      (pairs1.size() > 0 ||
+       (dynamic_cast<
+          const parallel::fullydistributed::Triangulation<dim, space_dim> *>(
+          &mesh.begin()->get_triangulation()) != nullptr)),
+      ExcMessage("No new periodic face pairs have been found. "
+                 "Are you sure that you've selected the correct boundary "
+                 "id's and that the coarsest level mesh is colorized?"));
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
@@ -2269,8 +2288,7 @@ namespace GridTools
                       const Tensor<1, spacedim> &offset,
                       const FullMatrix<double> & matrix)
   {
-    Assert(0 <= direction && direction < spacedim,
-           ExcIndexRange(direction, 0, spacedim));
+    AssertIndexRange(direction, spacedim);
 
     Assert(matrix.m() == matrix.n(), ExcInternalError());
 

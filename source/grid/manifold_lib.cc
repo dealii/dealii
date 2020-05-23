@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2019 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -274,6 +274,77 @@ PolarManifold<dim, spacedim>::push_forward_gradient(
 
 
 
+namespace
+{
+  template <int dim, int spacedim>
+  bool
+  spherical_face_is_horizontal(
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const Point<spacedim> &                                     manifold_center)
+  {
+    // We test whether a face is horizontal by checking that the vertices
+    // all have roughly the same distance from the center: If the
+    // maximum deviation for the distances from the vertices to the
+    // center is less than 1.e-5 of the distance between vertices (as
+    // measured by the minimum distance from any of the other vertices
+    // to the first vertex), then we call this a horizontal face.
+    constexpr unsigned int n_vertices =
+      GeometryInfo<spacedim>::vertices_per_face;
+    std::array<double, n_vertices>     sqr_distances_to_center;
+    std::array<double, n_vertices - 1> sqr_distances_to_first_vertex;
+    sqr_distances_to_center[0] =
+      (face->vertex(0) - manifold_center).norm_square();
+    for (unsigned int i = 1; i < n_vertices; ++i)
+      {
+        sqr_distances_to_center[i] =
+          (face->vertex(i) - manifold_center).norm_square();
+        sqr_distances_to_first_vertex[i - 1] =
+          (face->vertex(i) - face->vertex(0)).norm_square();
+      }
+    const auto minmax_sqr_distance =
+      std::minmax_element(sqr_distances_to_center.begin(),
+                          sqr_distances_to_center.end());
+    const auto min_sqr_distance_to_first_vertex =
+      std::min_element(sqr_distances_to_first_vertex.begin(),
+                       sqr_distances_to_first_vertex.end());
+
+    return (*minmax_sqr_distance.second - *minmax_sqr_distance.first <
+            1.e-10 * *min_sqr_distance_to_first_vertex);
+  }
+} // namespace
+
+
+
+template <int dim, int spacedim>
+Tensor<1, spacedim>
+PolarManifold<dim, spacedim>::normal_vector(
+  const typename Triangulation<dim, spacedim>::face_iterator &face,
+  const Point<spacedim> &                                     p) const
+{
+  // Let us first test whether we are on a "horizontal" face
+  // (tangential to the sphere).  In this case, the normal vector is
+  // easy to compute since it is proportional to the vector from the
+  // center to the point 'p'.
+  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
+    {
+      // So, if this is a "horizontal" face, then just compute the normal
+      // vector as the one from the center to the point 'p', adequately
+      // scaled.
+      const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
+      const Tensor<1, spacedim> normalized_spherical_normal =
+        unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
+      return normalized_spherical_normal;
+    }
+  else
+    // If it is not a horizontal face, just use the machinery of the
+    // base class.
+    return Manifold<dim, spacedim>::normal_vector(face, p);
+
+  return Tensor<1, spacedim>();
+}
+
+
+
 // ============================================================
 // SphericalManifold
 // ============================================================
@@ -419,35 +490,26 @@ SphericalManifold<dim, spacedim>::normal_vector(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   const Point<spacedim> &                                     p) const
 {
-  // if the maximum deviation for the distance from the vertices to the center
-  // is less than 1.e-5 of the minimum distance to the first vertex, assume we
-  // can simply return p-center. otherwise, we compute the normal using
-  // get_normal_vector
-  constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     distances_to_center;
-  std::array<double, n_vertices - 1> distances_to_first_vertex;
-  distances_to_center[0] = (face->vertex(0) - center).norm_square();
-  for (unsigned int i = 1; i < n_vertices; ++i)
+  // Let us first test whether we are on a "horizontal" face
+  // (tangential to the sphere).  In this case, the normal vector is
+  // easy to compute since it is proportional to the vector from the
+  // center to the point 'p'.
+  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
     {
-      distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      distances_to_first_vertex[i - 1] =
-        (face->vertex(i) - face->vertex(0)).norm_square();
-    }
-  const auto minmax_distance =
-    std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex =
-    std::min_element(distances_to_first_vertex.begin(),
-                     distances_to_first_vertex.end());
-
-  if (*minmax_distance.second - *minmax_distance.first <
-      1.e-10 * *min_distance_to_first_vertex)
-    {
+      // So, if this is a "horizontal" face, then just compute the normal
+      // vector as the one from the center to the point 'p', adequately
+      // scaled.
       const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
       return normalized_spherical_normal;
     }
-  return Manifold<dim, spacedim>::normal_vector(face, p);
+  else
+    // If it is not a horizontal face, just use the machinery of the
+    // base class.
+    return Manifold<dim, spacedim>::normal_vector(face, p);
+
+  return Tensor<1, spacedim>();
 }
 
 
@@ -481,30 +543,18 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
   typename Manifold<dim, spacedim>::FaceVertexNormals &face_vertex_normals)
   const
 {
-  // if the maximum deviation for the distance from the vertices to the center
-  // is less than 1.e-5 of the minimum distance to the first vertex, assume we
-  // can simply return vertex-center. otherwise, we compute the normal using
-  // get_normal_vector
-  constexpr unsigned int n_vertices = GeometryInfo<spacedim>::vertices_per_face;
-  std::array<double, n_vertices>     distances_to_center;
-  std::array<double, n_vertices - 1> distances_to_first_vertex;
-  distances_to_center[0] = (face->vertex(0) - center).norm_square();
-  for (unsigned int i = 1; i < n_vertices; ++i)
+  // Let us first test whether we are on a "horizontal" face
+  // (tangential to the sphere).  In this case, the normal vector is
+  // easy to compute since it is proportional to the vector from the
+  // center to the point 'p'.
+  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
     {
-      distances_to_center[i] = (face->vertex(i) - center).norm_square();
-      distances_to_first_vertex[i - 1] =
-        (face->vertex(i) - face->vertex(0)).norm_square();
-    }
-  const auto minmax_distance =
-    std::minmax_element(distances_to_center.begin(), distances_to_center.end());
-  const auto min_distance_to_first_vertex =
-    std::min_element(distances_to_first_vertex.begin(),
-                     distances_to_first_vertex.end());
-
-  if (*minmax_distance.second - *minmax_distance.first <
-      1.e-10 * *min_distance_to_first_vertex)
-    {
-      for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+      // So, if this is a "horizontal" face, then just compute the normal
+      // vector as the one from the center to the point 'p', adequately
+      // scaled.
+      for (unsigned int vertex = 0;
+           vertex < GeometryInfo<spacedim>::vertices_per_face;
+           ++vertex)
         face_vertex_normals[vertex] = face->vertex(vertex) - center;
     }
   else
@@ -1121,20 +1171,25 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
   const Tensor<1, spacedim> intermediate =
     normal_direction * cosine + dxn * sine;
 
+  // avoid compiler warnings
+  constexpr int s0 = 0 % spacedim;
+  constexpr int s1 = 1 % spacedim;
+  constexpr int s2 = 2 % spacedim;
+
   // derivative w.r.t the radius
-  derivatives[0][0] = intermediate[0];
-  derivatives[1][0] = intermediate[1];
-  derivatives[2][0] = intermediate[2];
+  derivatives[s0][s0] = intermediate[s0];
+  derivatives[s1][s0] = intermediate[s1];
+  derivatives[s2][s0] = intermediate[s2];
 
   // derivatives w.r.t the angle
-  derivatives[0][1] = -normal_direction[0] * sine + dxn[0] * cosine;
-  derivatives[1][1] = -normal_direction[1] * sine + dxn[1] * cosine;
-  derivatives[2][1] = -normal_direction[2] * sine + dxn[2] * cosine;
+  derivatives[s0][s1] = -normal_direction[s0] * sine + dxn[s0] * cosine;
+  derivatives[s1][s1] = -normal_direction[s1] * sine + dxn[s1] * cosine;
+  derivatives[s2][s1] = -normal_direction[s2] * sine + dxn[s2] * cosine;
 
   // derivatives w.r.t the direction of the axis
-  derivatives[0][2] = direction[0];
-  derivatives[1][2] = direction[1];
-  derivatives[2][2] = direction[2];
+  derivatives[s0][s2] = direction[s0];
+  derivatives[s1][s2] = direction[s1];
+  derivatives[s2][s2] = direction[s2];
 
   return derivatives;
 }
@@ -1308,6 +1363,7 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const Tensor<1, chartdim> &periodicity,
   const double               tolerance)
   : ChartManifold<dim, spacedim, chartdim>(periodicity)
+  , const_map()
   , push_forward_function(&push_forward_function)
   , pull_back_function(&pull_back_function)
   , tolerance(tolerance)
@@ -1316,6 +1372,26 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
 {
   AssertDimension(push_forward_function.n_components, spacedim);
   AssertDimension(pull_back_function.n_components, chartdim);
+}
+
+
+
+template <int dim, int spacedim, int chartdim>
+FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
+  std::unique_ptr<Function<chartdim>> push_forward,
+  std::unique_ptr<Function<spacedim>> pull_back,
+  const Tensor<1, chartdim> &         periodicity,
+  const double                        tolerance)
+  : ChartManifold<dim, spacedim, chartdim>(periodicity)
+  , const_map()
+  , push_forward_function(push_forward.release())
+  , pull_back_function(pull_back.release())
+  , tolerance(tolerance)
+  , owns_pointers(true)
+  , finite_difference_step(0)
+{
+  AssertDimension(push_forward_function->n_components, spacedim);
+  AssertDimension(pull_back_function->n_components, chartdim);
 }
 
 
@@ -1375,13 +1451,15 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
   // push forward and the pull back charts, or by providing two Function
   // objects. In the first case, the push_forward and pull_back functions are
   // created internally in FunctionManifold, and destroyed when this object is
-  // deleted. We need to make sure that our cloned object is constructed in the
+  // deleted. In the second case, the function objects are destroyed if they
+  // are passed as pointers upon construction.
+  // We need to make sure that our cloned object is constructed in the
   // same way this class was constructed, and that its internal Function
   // pointers point either to the same Function objects used to construct this
-  // function (owns_pointers == false) or that the newly generated manifold
-  // creates internally the push_forward and pull_back functions using the same
-  // expressions that were used to construct this class (own_pointers == true).
-  if (owns_pointers == true)
+  // function or that the newly generated manifold creates internally the
+  // push_forward and pull_back functions using the same expressions that were
+  // used to construct this class.
+  if (!(push_forward_expression.empty() && pull_back_expression.empty()))
     {
       return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
         push_forward_expression,
@@ -1394,11 +1472,13 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
         finite_difference_step);
     }
   else
-    return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
-      *push_forward_function,
-      *pull_back_function,
-      this->get_periodicity(),
-      tolerance);
+    {
+      return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
+        *push_forward_function,
+        *pull_back_function,
+        this->get_periodicity(),
+        tolerance);
+    }
 }
 
 
@@ -1663,7 +1743,7 @@ namespace
 
     Point<spacedim> new_point;
     if (cell_is_flat)
-      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
         new_point += weights_vertices[v] * vertices[v];
     else
       {
@@ -1721,7 +1801,7 @@ namespace
           }
 
         // subtract contribution from the vertices (second line in formula)
-        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<2>::vertex_indices())
           new_point -= weights_vertices[v] * vertices[v];
       }
 
@@ -1812,8 +1892,7 @@ namespace
           make_array_view(weights.begin(), weights.end());
         const auto points_view = make_array_view(points.begin(), points.end());
 
-        for (unsigned int face = 0; face < GeometryInfo<3>::faces_per_cell;
-             ++face)
+        for (const unsigned int face : GeometryInfo<3>::face_indices())
           {
             const double       my_weight = linear_shapes[face];
             const unsigned int face_even = face - face % 2;
@@ -1856,8 +1935,7 @@ namespace
               }
             else
               {
-                for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v : GeometryInfo<2>::vertex_indices())
                   points[v] = vertices[face_to_cell_vertices_3d[face][v]];
                 weights[0] =
                   linear_shapes[face_even + 2] * linear_shapes[face_even + 4];
@@ -1924,7 +2002,7 @@ namespace
           }
 
         // finally add the contribution of the
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
           new_point += weights_vertices[v] * vertices[v];
       }
     return new_point;
@@ -2145,7 +2223,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
   Assert(triangulation != nullptr, ExcNotInitialized());
   Assert(triangulation->begin_active()->level() >= level_coarse,
          ExcMessage("The manifold was initialized with level " +
-                    Utilities::to_string(level_coarse) + " but there are now" +
+                    std::to_string(level_coarse) + " but there are now" +
                     "active cells on a lower level. Coarsening the mesh is " +
                     "currently not supported"));
 
@@ -2167,9 +2245,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
 
       std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
         vertices;
-      for (unsigned int vertex_n = 0;
-           vertex_n < GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_n)
+      for (const unsigned int vertex_n : GeometryInfo<dim>::vertex_indices())
         {
           vertices[vertex_n] = cell->vertex(vertex_n);
         }
@@ -2178,11 +2254,11 @@ TransfiniteInterpolationManifold<dim, spacedim>::
       // center of the loop, we can skip the expensive part below (this assumes
       // that the manifold does not deform the grid too much)
       Point<spacedim> center;
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         center += vertices[v];
       center *= 1. / GeometryInfo<dim>::vertices_per_cell;
       double radius_square = 0.;
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         radius_square =
           std::max(radius_square, (center - vertices[v]).norm_square());
       bool inside_circle = true;
@@ -2455,8 +2531,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
                 triangulation, level_coarse, nearby_cells[b]);
               message << "Looking at cell " << cell->id()
                       << " with vertices: " << std::endl;
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                   ++v)
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
                 message << cell->vertex(v) << "    ";
               message << std::endl;
               message << "Transformation to chart coordinates: " << std::endl;

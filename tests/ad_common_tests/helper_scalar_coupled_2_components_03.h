@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace AD = dealii::Differentiation::AD;
 
 // Function and its derivatives
@@ -43,7 +42,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   psi(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return double_contract(t, t) * std::pow(s, 3);
+    return double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 3);
   };
 
   static Tensor<2, dim, NumberType>
@@ -55,7 +54,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   dpsi_ds(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 3.0 * double_contract(t, t) * std::pow(s, 2);
+    return 3.0 * double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 2);
   };
 
   static Tensor<4, dim, NumberType>
@@ -89,7 +88,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   d2psi_ds_ds(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 6.0 * double_contract(t, t) * std::pow(s, 1);
+    return 6.0 * double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 1);
   };
 };
 

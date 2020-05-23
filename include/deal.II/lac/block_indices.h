@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -330,7 +330,7 @@ BlockIndices::push_back(const size_type sz)
 inline std::pair<unsigned int, BlockIndices::size_type>
 BlockIndices::global_to_local(const size_type i) const
 {
-  Assert(i < total_size(), ExcIndexRangeType<size_type>(i, 0, total_size()));
+  AssertIndexRange(i, total_size());
   Assert(n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
   // start_indices[0] == 0 so we might as well start from the next one
@@ -345,10 +345,8 @@ inline BlockIndices::size_type
 BlockIndices::local_to_global(const unsigned int block,
                               const size_type    index) const
 {
-  Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
-  Assert(index < start_indices[block + 1] - start_indices[block],
-         ExcIndexRangeType<size_type>(
-           index, 0, start_indices[block + 1] - start_indices[block]));
+  AssertIndexRange(block, n_blocks);
+  AssertIndexRange(index, start_indices[block + 1] - start_indices[block]);
 
   return start_indices[block] + index;
 }
@@ -375,7 +373,7 @@ BlockIndices::total_size() const
 inline BlockIndices::size_type
 BlockIndices::block_size(const unsigned int block) const
 {
-  Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  AssertIndexRange(block, n_blocks);
   return start_indices[block + 1] - start_indices[block];
 }
 
@@ -389,9 +387,9 @@ BlockIndices::to_string() const
     {
       if (i > 0)
         result += ',';
-      result += Utilities::to_string(block_size(i));
+      result += std::to_string(block_size(i));
     }
-  result += "|" + Utilities::to_string(total_size()) + ']';
+  result += "|" + std::to_string(total_size()) + ']';
   return result;
 }
 
@@ -400,7 +398,7 @@ BlockIndices::to_string() const
 inline BlockIndices::size_type
 BlockIndices::block_start(const unsigned int block) const
 {
-  Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  AssertIndexRange(block, n_blocks);
   return start_indices[block];
 }
 

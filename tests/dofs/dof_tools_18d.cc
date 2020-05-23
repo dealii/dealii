@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 
 #include "../tests.h"
+
 #include "dof_tools_common.h"
 #include "dof_tools_common_fake_hp.h"
 
@@ -63,9 +64,9 @@ check_this(const DoFHandlerType &dof_handler)
 
   // create sparsity pattern
   const unsigned int n_components = dof_handler.get_fe().n_components();
-  BlockDynamicSparsityPattern          sp(n_components, n_components);
-  std::vector<types::global_dof_index> dofs_per_component(n_components);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  BlockDynamicSparsityPattern                sp(n_components, n_components);
+  const std::vector<types::global_dof_index> dofs_per_component =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
   for (unsigned int i = 0; i < n_components; ++i)
     for (unsigned int j = 0; j < n_components; ++j)
       sp.block(i, j).reinit(dofs_per_component[i], dofs_per_component[j]);

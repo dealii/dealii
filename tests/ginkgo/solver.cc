@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,9 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "../testmatrix.h"
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 int
 main(int argc, char **argv)
@@ -85,7 +86,7 @@ main(int argc, char **argv)
     u = 0.;
     check_solver_within_range(bicgstab_solver.solve(A, u, f),
                               control.last_step(),
-                              59,
+                              53,
                               65);
     u = 0.;
     check_solver_within_range(cgs_solver.solve(A, u, f),

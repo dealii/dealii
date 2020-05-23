@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_physics_notation_h
 #define dealii_physics_notation_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>
@@ -688,7 +690,7 @@ namespace Physics
         inline std::pair<unsigned int, unsigned int>
         indices_from_component<1>(const unsigned int component_n, const bool)
         {
-          Assert(component_n < 1, ExcIndexRange(component_n, 0, 1));
+          AssertIndexRange(component_n, 1);
 
           return std::make_pair(0u, 0u);
         }

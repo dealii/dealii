@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,8 @@ test()
 
   deallog << "n_locally_owned_dofs_per_processor: ";
   std::vector<types::global_dof_index> v =
-    dof_handler.compute_n_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.n_locally_owned_dofs());
   unsigned int sum = 0;
   for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -105,7 +106,8 @@ test()
   Assert(std::accumulate(v.begin(), v.end(), 0U) == N, ExcInternalError());
 
   std::vector<IndexSet> locally_owned_dofs_per_processor =
-    dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet all(N);
   for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
     {

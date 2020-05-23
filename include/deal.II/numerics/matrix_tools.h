@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/dofs/deprecated_function_map.h>
 
@@ -37,6 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
+#ifndef DOXYGEN
 template <int dim>
 class Quadrature;
 
@@ -69,7 +69,7 @@ namespace hp
 } // namespace hp
 
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class MatrixBase;
@@ -80,9 +80,9 @@ namespace PETScWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -93,6 +93,7 @@ namespace TrilinosWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace TrilinosWrappers
+#  endif
 #endif
 
 
@@ -652,7 +653,8 @@ namespace MatrixCreator
  * respect for fixed degrees of freedom, and in a second step eliminate them
  * again from the linear system. The inclusion into the assembly process is as
  * follows: when the matrix and vectors are set up, a list of nodes subject to
- * Dirichlet B.C. is made and matrix and vectors are modified accordingly. This
+ * Dirichlet boundary conditions is made and matrix and vectors are
+ * modified accordingly. This
  * is done by deleting all entries in the matrix in the line of this degree of
  * freedom, setting the main diagonal entry to a suitable positive value and
  * the right hand side element to a value so that the solution of the linear
@@ -733,8 +735,8 @@ namespace MatrixCreator
  * depends on the original matrix, this is not possible without storing the
  * original matrix somewhere and applying the @p apply_boundary_conditions
  * function to a copy of it each time we want to solve. In that case, you can
- * use the FilteredMatrix class in the @p LAC sublibrary. There you can also
- * find a formal (mathematical) description of the process of modifying the
+ * use the constrained_linear_operator() function. In its documentation you can
+ * also find a formal (mathematical) description of the process of modifying the
  * matrix and right hand side vectors for boundary values.
  *
  *

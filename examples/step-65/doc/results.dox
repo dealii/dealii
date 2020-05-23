@@ -1,21 +1,18 @@
 
 <h1>Results</h1>
 
-The mesh created by this program and the benefits of the
-TransfiniteInterpolationManifold are discussed in the introduction.
-
 <h3>Program output</h3>
 
 If we run the three-dimensional version of this program with polynomials of
 degree three, we get the following program output:
 
 @code
-$ make run
-Scanning dependencies of target step-65
-[ 33%] Building CXX object CMakeFiles/step-65.dir/step-65.cc.o
-[ 66%] Linking CXX executable step-65
-[ 66%] Built target step-65
-[100%] Run step-65 with Release configuration
+> make run
+Scanning dependencies of target \step-65
+[ 33%] Building CXX object CMakeFiles/\step-65.dir/\step-65.cc.o
+[ 66%] Linking CXX executable \step-65
+[ 66%] Built target \step-65
+[100%] Run \step-65 with Release configuration
 
 ====== Running with the basic MappingQGeneric class ======
 
@@ -69,10 +66,12 @@ Scanning dependencies of target step-65
 @endcode
 
 Before discussing the timings, we look at the memory consumption for the
-MappingQCache object: Our program prints that it utilizes 23.0 MB of
-memory. If we relate this number to the memory consumption of a single vector,
-which is 1.5 MB (181,609 * 8 [Byte/double]), or to the memory consumed by the
-system matrix and the sparsity pattern, which is 274 MB, we realize that it is
+MappingQCache object: Our program prints that it utilizes 23 MB of
+memory. If we relate this number to the memory consumption of a single
+(solution or right hand side) vector,
+which is 1.5 MB (namely, 181,609 elements times 8 bytes per entry in
+double precision), or to the memory consumed by the
+system matrix and the sparsity pattern (which is 274 MB), we realize that it is
 not an overly heavy data structure, given its benefits.
 
 With respect to the timers, we see a clear improvement in the overall run time

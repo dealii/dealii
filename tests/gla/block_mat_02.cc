@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,6 +46,7 @@
 #include <vector>
 
 #include "../tests.h"
+
 #include "gla.h"
 
 template <class LA, int dim>
@@ -77,10 +78,8 @@ test()
   stokes_dof_handler.distribute_dofs(stokes_fe);
   DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
-  std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-  DoFTools::count_dofs_per_block(stokes_dof_handler,
-                                 stokes_dofs_per_block,
-                                 stokes_sub_blocks);
+  const std::vector<types::global_dof_index> stokes_dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(stokes_dof_handler, stokes_sub_blocks);
 
   const unsigned int n_u = stokes_dofs_per_block[0],
                      n_p = stokes_dofs_per_block[1];
@@ -125,7 +124,7 @@ test()
 
   SparsityTools::distribute_sparsity_pattern(
     sp,
-    stokes_dof_handler.compute_locally_owned_dofs_per_processor(),
+    stokes_dof_handler.locally_owned_dofs(),
     MPI_COMM_WORLD,
     stokes_relevant_set);
 
@@ -174,10 +173,8 @@ test_LA_Trilinos()
   stokes_dof_handler.distribute_dofs(stokes_fe);
   DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
-  std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-  DoFTools::count_dofs_per_block(stokes_dof_handler,
-                                 stokes_dofs_per_block,
-                                 stokes_sub_blocks);
+  const std::vector<types::global_dof_index> stokes_dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(stokes_dof_handler, stokes_sub_blocks);
 
   const unsigned int n_u = stokes_dofs_per_block[0],
                      n_p = stokes_dofs_per_block[1];

@@ -1,8 +1,8 @@
 ##                                                                       ##
-#                      Example configuration file                         #
+#                       Example configuration file                        #
 #                                                                         #
-#        See doc/readme.html and doc/users/cmake.html for further         #
-#        details on how to use the cmake build system of deal.II.         #
+#     See doc/readme.html and doc/users/cmake_dealii.html for further     #
+#     details on how to use the cmake build system of deal.II.            #
 ##                                                                       ##
 
 

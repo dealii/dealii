@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -103,7 +103,15 @@ MACRO(DEAL_II_SETUP_TARGET _target)
     SET(_build "RELEASE")
   ENDIF()
 
-  TARGET_INCLUDE_DIRECTORIES(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    # Intel (at least up to 19.0.5) confuses an external TBB installation with
+    # our selected one if we use -Isystem includes. Work around this by using
+    # normal includes.
+    # See https://github.com/dealii/dealii/issues/8374 for details.
+    TARGET_INCLUDE_DIRECTORIES(${_target} PRIVATE ${DEAL_II_INCLUDE_DIRS})
+  ELSE()
+    TARGET_INCLUDE_DIRECTORIES(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})
+  ENDIF()
 
   SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
     LINK_FLAGS " ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"

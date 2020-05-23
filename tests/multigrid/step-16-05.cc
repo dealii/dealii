@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -163,7 +162,7 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
 
   sparsity_pattern.reinit(mg_dof_handler.n_dofs(),
                           mg_dof_handler.n_dofs(),
@@ -375,8 +374,8 @@ void
 LaplaceProblem<dim>::solve()
 {
   MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>> mg_transfer(
-    hanging_node_constraints, mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+    mg_constrained_dofs);
+  mg_transfer.build(mg_dof_handler);
 
   SolverControl coarse_solver_control(1000, 1e-10, false, false);
   SolverCG<LinearAlgebra::distributed::Vector<double>> coarse_solver(
@@ -483,9 +482,8 @@ LaplaceProblem<dim>::run()
 int
 main(int argc, char **argv)
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 

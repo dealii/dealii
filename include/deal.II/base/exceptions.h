@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -690,14 +690,18 @@ namespace StandardExceptions
   /**
    * Trying to allocate a new object failed due to lack of free memory.
    */
-  DeclExceptionMsg(ExcOutOfMemory,
-                   "Your program tried to allocate some memory but this "
-                   "allocation failed. Typically, this either means that "
-                   "you simply do not have enough memory in your system, "
-                   "or that you are (erroneously) trying to allocate "
-                   "a chunk of memory that is simply beyond all reasonable "
-                   "size, for example because the size of the object has "
-                   "been computed incorrectly.");
+  DeclException1(ExcOutOfMemory,
+                 std::size_t,
+                 "Your program tried to allocate some memory but this "
+                 "allocation failed. Typically, this either means that "
+                 "you simply do not have enough memory in your system, "
+                 "or that you are (erroneously) trying to allocate "
+                 "a chunk of memory that is simply beyond all reasonable "
+                 "size, for example because the size of the object has "
+                 "been computed incorrectly."
+                 "\n\n"
+                 "In the current case, the request was for "
+                   << arg1 << " bytes.");
 
   /**
    * A memory handler reached a point where all allocated objects should have
@@ -737,8 +741,8 @@ namespace StandardExceptions
   /**
    * An error occurred opening the named file.
    *
-   * The constructor takes a single argument of type <tt>char*</tt> naming the
-   * file.
+   * The constructor takes a single argument of type <tt>std::string</tt> naming
+   * the file.
    */
   DeclException1(ExcFileNotOpen,
                  std::string,
@@ -778,7 +782,7 @@ namespace StandardExceptions
    *
    * We usually leave in these assertions even after we are confident that the
    * implementation is correct, since if someone later changes or extends the
-   * algorithm, these exceptions will indicate to him if he violates
+   * algorithm, these exceptions will indicate to them if they violate
    * assumptions that are used later in the algorithm. Furthermore, it
    * sometimes happens that an algorithm does not work in very rare corner
    * cases. These cases will then be trapped sooner or later by the exception,
@@ -1081,6 +1085,14 @@ namespace StandardExceptions
     "You are attempting to use functionality that is only available "
     "if deal.II was configured to use LAPACK, but cmake did not "
     "find a valid LAPACK library.");
+
+  /**
+   * This function requires support for the MPI library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsMPI,
+    "You are attempting to use functionality that is only available "
+    "if deal.II was configured to use MPI.");
 
   /**
    * This function requires support for the NetCDF library.
@@ -1755,6 +1767,37 @@ namespace internal
       {                                   \
         (void)(error_code);               \
       }
+#  endif
+
+/**
+ * An assertion that checks that the kernel was launched and executed
+ * successfully.
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ * @author Bruno Turcksin, 2020
+ */
+#  ifdef DEBUG
+#    define AssertCudaKernel()                                \
+      {                                                       \
+        cudaError_t local_error_code = cudaPeekAtLastError(); \
+        AssertCuda(local_error_code);                         \
+        local_error_code = cudaDeviceSynchronize();           \
+        AssertCuda(local_error_code)                          \
+      }
+#  else
+#    define AssertCudaKernel() \
+      {}
 #  endif
 
 /**

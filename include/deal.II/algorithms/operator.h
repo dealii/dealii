@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,6 +88,7 @@ namespace Algorithms
      */
     virtual void
     notify(const Event &);
+
     /**
      * Clear all #notifications.
      */
@@ -134,11 +135,13 @@ namespace Algorithms
      */
     void
     initialize_stream(std::ostream &stream);
+
     /**
      * Set the current step.
      */
     void
     set_step(const unsigned int step);
+
     /**
      * Output all the vectors in AnyData.
      */

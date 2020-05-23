@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <int, int, int>
@@ -41,6 +43,7 @@ template <typename>
 class TriaIterator;
 template <typename>
 class TriaActiveIterator;
+#  endif
 
 
 
@@ -111,7 +114,7 @@ class TriaActiveIterator;
  * anyway. Most iterator and accessor functions are inlined.
  *
  * The main functionality of iterators, resides in the <tt>++</tt> and
- * <tt>--</tt> operators. These move the iterator forward or backward just as
+ * <tt>\--</tt> operators. These move the iterator forward or backward just as
  * if it were a pointer into an array. Here, this operation is not so easy,
  * since it may include skipping some elements and the transition between the
  * triangulation levels. This is completely hidden from the user, though you
@@ -148,7 +151,7 @@ class TriaActiveIterator;
  * member function <tt>bool used()</tt>, for the latter a member function
  * <tt>bool active()</tt>.
  *
- * <li> It must have void operators <tt>++</tt> and <tt>--</tt>.
+ * <li> It must have void operators <tt>++</tt> and <tt>\--</tt>.
  *
  * <li> It must declare a local alias <tt>AccessorData</tt> which states the
  * data type the accessor expects to get passed as fourth constructor
@@ -447,14 +450,14 @@ public:
   operator++(int);
 
   /**
-   * Prefix @p -- operator: @p --iterator. This operator moves the iterator to
+   * Prefix @p \-- operator: @p \--iterator. This operator moves the iterator to
    * the previous element and returns a reference to <tt>*this</tt>.
    */
   TriaRawIterator &
   operator--();
 
   /**
-   * Postfix @p -- operator: @p iterator--. This operator moves the iterator
+   * Postfix @p \-- operator: @p iterator\--. This operator moves the iterator
    * to the previous element, but returns an iterator to the element
    * previously pointed to.
    *
@@ -711,14 +714,14 @@ public:
   operator++(int);
 
   /**
-   * Prefix @p -- operator: @p --i. This operator advances the iterator to the
+   * Prefix @p \-- operator: @p \--i. This operator advances the iterator to the
    * previous used element and returns a reference to <tt>*this</tt>.
    */
   TriaIterator<Accessor> &
   operator--();
 
   /**
-   * Postfix @p -- operator: @p i--.
+   * Postfix @p \-- operator: @p i\--.
    */
   TriaIterator<Accessor>
   operator--(int);
@@ -912,14 +915,14 @@ public:
   operator++(int);
 
   /**
-   * Prefix @p -- operator: @p --i. This operator advances the iterator to the
+   * Prefix @p \-- operator: @p \--i. This operator advances the iterator to the
    * previous active element and returns a reference to <tt>*this</tt>.
    */
   TriaActiveIterator<Accessor> &
   operator--();
 
   /**
-   * Postfix @p -- operator: @p i--.
+   * Postfix @p \-- operator: @p i\--.
    */
   TriaActiveIterator<Accessor>
   operator--(int);

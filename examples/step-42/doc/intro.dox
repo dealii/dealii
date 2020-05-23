@@ -72,7 +72,7 @@ relationship between strain $\varepsilon(\mathbf u)=\frac{1}{2}\left(\nabla \mat
 the fourth-order compliance tensor $A$; $\varepsilon^p$ provides the plastic
 component of the strain to ensure that the stress does not exceed the yield
 stress. We will only consider isotropic
-materials for which $A$ can be expressed in terms of the Lam\'e moduli
+materials for which $A$ can be expressed in terms of the Lam&eacute; moduli
 $\lambda$ and $\mu$ or alternatively in terms of the bulk modulus
 $\kappa$ and $\mu$.
 The second equation is the force balance; we will here
@@ -413,7 +413,7 @@ Other than that, let us comment only on the following aspects:
 <li> The program allows you to select from two different coarse meshes
   through the parameter file. These are either a cube $[0,1]^3$ or
   a half sphere with the open side facing the positive $z$ direction.
-  
+
 <li>In either case, we will assume the convention that the part of the
   boundary that may be in contact with the obstacle has boundary
   indicator one. For both kinds of meshes, we assume that this is a free

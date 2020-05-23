@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 #ifndef dealii_parsed_function_h
 #define dealii_parsed_function_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/function_parser.h>

@@ -91,7 +91,7 @@ All entries are signed with the names of the author.
   <li> <a name="new_fe_mapping_design"></a>
        <i> New Design of <code>FiniteElements</code>
        and <code>Mappings</code></i>
-              
+
        <p>
        New: The finite element
        classes have been redesigned from scratch to allow also
@@ -102,7 +102,7 @@ All entries are signed with the names of the author.
        to higher degree.
        </p>
 
-       <p> 
+       <p>
        Furthermore we have totally reimplemented the mapping
        between unit and real cell.  In future we won't be restricted
        to Q<sub>1</sub> mapping any more, but we will have
@@ -141,8 +141,8 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: There is now some support to include and use routines from the 
-       <a href="http://www.cse.clrc.ac.uk/Activity/HSL" 
+       New: There is now some support to include and use routines from the
+       <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
        target="_top">Harwell Subroutine Library</a>.
        <br>
        (WB 2001/01/30)
@@ -165,14 +165,14 @@ All entries are signed with the names of the author.
 <h3>base</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
        New: Color function <code
        class="member">DataOutBase::EpsFlags::reverse_grey_scale_color_function</code>.
        <br>
        (WB 2001/08/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: Function <code>QProjector::project_to_child</code>
        generates quadrature formulae which act on the area which a
        child would occupy.
@@ -191,7 +191,7 @@ All entries are signed with the names of the author.
        (WB 2001/07/18)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: classes <code>FourierSineFunction</code>
        and <code>FourierCosineFunction</code>,
        resembling one mode of a Fourier decomposition. Classes <code
@@ -415,7 +415,7 @@ All entries are signed with the names of the author.
        New: Classes <code>Vector</code> and
        <code>BlockVector</code> now have member functions
        <code>operator*=</code> which scale the vectors
-       by a constant factor. These functions are aliases for the 
+       by a constant factor. These functions are aliases for the
        <code>scale</code> member functions except that
        they return a reference to themselves.
        <br>
@@ -423,8 +423,8 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: There is now a function 
-       <code>FullMatrix::precondition_Jacobi</code>. The 
+       New: There is now a function
+       <code>FullMatrix::precondition_Jacobi</code>. The
        <code>PreconditionJacobi</code> class is
        therefore now also applicable with the full matrix class.
        <br>
@@ -476,13 +476,13 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: There are now functions 
+       New: There are now functions
        <code>SparsityPattern::copy_from</code> and
        <code>SparseMatrix::copy_from</code>
        that can be used to construct sparsity patterns and matrix at
        once, i.e. without setting up a sparsity pattern element by
        element, possibly after using a way too large value for the
-       maximal row length, then calling 
+       maximal row length, then calling
        <code>SparsityPattern::compress</code> etc.
        <br>
        (WB 2001/05/07)
@@ -542,7 +542,7 @@ All entries are signed with the names of the author.
        (GK 2001/03/29)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The functions <code>FullMatrix</code>::<code
        class="member">mmult</code> and <code
        class="member">Tmmult</code> now have an additional
@@ -561,7 +561,7 @@ All entries are signed with the names of the author.
        New: class <code>SchurMatrix</code> implements
        a Schur complement for block matrices. It provides matrix-vector
        multiplication suitable for iterative methods as well as pre- and
-       post-processing of right hand side and slution, respectively. 
+       post-processing of right hand side and slution, respectively.
        <br>
        (GK 2001/03/22)
        </p>
@@ -572,14 +572,14 @@ All entries are signed with the names of the author.
        removed as a prerelease of gcc3.0 fails to compile it. A user
        of <code>SparseMatrix&lt;long double&gt;</code>
        needs now to include
-       <code>lac/include/lac/sparse_matrix.templates.h</code> into his
+       <code>lac/include/lac/sparse_matrix.templates.h</code> into their
        source file and to use an appropriate compiler, e.g. gcc2.95.2 or
        a future version of gcc3.0 (that will then hopefully be fixed).
        <br>
        (RH 2001/03/14)
        </p>
-  
-  <li> <p> 
+
+  <li> <p>
        New: class <code
        class="class">BlockMatrixArray&lt;MATRIX&gt;</code> implements
        a block matrix based on an array of matrix pointers. Since this
@@ -590,10 +590,10 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: There is now some support to include and use routines from the 
-       <a href="http://www.cse.clrc.ac.uk/Activity/HSL" 
+       New: There is now some support to include and use routines from the
+       <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
        target="_top">Harwell Subroutine Library</a>, and support
-       classes 
+       classes
        <code>SparseDirectMA27</code> and
        <code>SparseDirectMA47</code>
        for the sparse direct solvers MA27 and MA47.
@@ -608,28 +608,28 @@ All entries are signed with the names of the author.
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p> 
+  <li> <p>
        New: Class <code>MappingQ1Eulerian</code>
        implementing an Eulerian mapping.
        <br>
        (<a href="mailto:ms@biomech.tu-graz.ac.at">Michael Stadler</a> 2001/09/24)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>VectorTools::create_boundary_right_hand_side</code>
        integrates boundary forces for inhomogeneous Neumann boundary values.
        <br>
        (WB 2001/09/13)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>DoFTools::make_flux_sparsity_pattern</code>
        now exists also for 1d.
        <br>
        (WB 2001/09/03)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: There are now two functions
        <code
        class="member">FETools::hierarchic_to_lexicographic_numbering</code>
@@ -641,7 +641,7 @@ All entries are signed with the names of the author.
        (WB 2001/08/31)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: <code>ConstraintMatrix::close</code>
        now simply returns instead of throwing an exception, if the
        matrix was already closed.
@@ -694,7 +694,7 @@ All entries are signed with the names of the author.
        New: Implement
        <code>DoFTools::make_sparsity_pattern</code>,
        <code>DoFTools::make_boundary_sparsity_pattern</code>,
-       and 
+       and
        <code>ConstraintMatrix::condense</code> to work on
        the <code>CompressedSparsityPattern</code> and
        <code>CompressedBlockSparsityPattern</code> and
@@ -704,8 +704,9 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       New: <code>FE*Values::get_quadrature</code>
-       returns a reference to the quadrature formula used by a
+       New: <code>FEValues::get_quadrature()</code> and
+       <code>FEFaceValuesBase::get_quadrature()</code>
+       return a reference to the quadrature formula used by a
        FEValues object.
        <br>
        (WB 2001/06/21)
@@ -787,7 +788,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: There are now functions <code
        class="class">DoFTools</code>::<code
-       class="member">map_dofs_to_support_points</code> and 
+       class="member">map_dofs_to_support_points</code> and
        <code
        class="class">DoFTools</code>::<code
        class="member">map_support_points_to_dofs</code> that
@@ -826,7 +827,7 @@ All entries are signed with the names of the author.
        <br>
        (<a href="mailto:roger@kea.grace.cri.nz">Roger Young</a> 2001/04/12)
        </p>
-       
+
   <li> <p>
        Fixed: the <code
        class="class">DoFRenumbering</code>::<code
@@ -836,7 +837,7 @@ All entries are signed with the names of the author.
        <br>
        (<a href="mailto:or@winfos.com">Oliver Rheinbach</a> 2001/04/12)
        </p>
-       
+
   <li> <p>
        Changed: A <code>typedef FunctionMap</code> was
        declared in at least four places previously (in classes <code
@@ -853,9 +854,9 @@ All entries are signed with the names of the author.
        <br>
        (WB 2001/04/09)
        </p>
-       
+
   <li> <p>
-       Fixed: When using Neuman boundary functions in the 
+       Fixed: When using Neuman boundary functions in the
        <code>KellyErrorEstimator</code> class, it was
        assumed that the function object had <code
        class="class">Function</code>::<code
@@ -866,7 +867,7 @@ All entries are signed with the names of the author.
        <br>
        (WB 2001/04/09)
        </p>
-       
+
   <li> <p>
        New: The various <code
        class="class">MatrixCreator</code>::<code
@@ -876,7 +877,7 @@ All entries are signed with the names of the author.
        <br>
        (WB 2001/04/08)
        </p>
-       
+
   <li> <p>
        New: The following functions are extended to work
        on arbitrary mappings:
@@ -903,7 +904,7 @@ All entries are signed with the names of the author.
        <p>
        All these functions now take a <code
        class="class">Mapping</code> object as additional argument.
-       <br>      
+       <br>
        For backward compatibility there exist second versions of
        each of these functions that still don't have a <code
        class="class">Mapping</code> argument. These functions
@@ -932,7 +933,7 @@ All entries are signed with the names of the author.
        class="member">create_mass_matrix</code> function with two
        arguments is removed, as it relied on the <code
        class="member">get_local_mass_matrix</code> function. If in
-       future the user wants to create a mass matrix he needs to use
+       future the user wants to create a mass matrix they need to use
        one of the remaining <code
        class="class">MatrixCreator</code>::<code
        class="member">create_mass_matrix</code> functions that require
@@ -941,7 +942,7 @@ All entries are signed with the names of the author.
        <br>
        (RH 2001/04/04)
        </p>
-       
+
   <li> <p>
        New/Fixed: Now there exists a new <code
        class="class">Triangulation</code>::<code
@@ -956,7 +957,7 @@ All entries are signed with the names of the author.
        <br>
        (RH 2001/04/03)
        </p>
-       
+
   <li> <p>
        Fixed: Missing <code>ucd</code> is now added to the list of
        supported output formats returned by <code
@@ -981,7 +982,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        Removed: the <code>ProblemBase</code> class,
-       which has been deprecated since before the release of 
+       which has been deprecated since before the release of
        deal.II 3.0, has finally been removed. The
        same applies for the classes
        <code>Assembler</code>,
@@ -1011,7 +1012,7 @@ All entries are signed with the names of the author.
        the class <code>VectorTools</code> are extended
        to work on arbitrary mappings. All these functions now take a
        <code>Mapping</code> object as additional
-       argument. 
+       argument.
        <br>
        For backward compatibility there exist second versions of
        each of these functions that still don't have a <code
@@ -1077,7 +1078,7 @@ All entries are signed with the names of the author.
        (WB 2001/03/14)
        </p>
 
-  <li> <p> 
+  <li> <p>
        Removed: The function <code
        class="class">FiniteElement&lt;dim&gt;</code>::<code
        class="member">get_support_points</code>
@@ -1096,7 +1097,7 @@ All entries are signed with the names of the author.
        (RH 2001/03/14)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The class <code>Boundary</code> has two new
        functions <code
        class="member">get_intermediate_points_on_line</code> and <code
@@ -1150,12 +1151,12 @@ All entries are signed with the names of the author.
        <br>
        (RH 2001/03/14)
        </p>
-       
+
   <li> <p>
        Changed: We now unconditionally include
        <code>deal.II/include/grid/tria_accessor.templates.h</code>
        (which contains some inline functions for triangulation
-       accessor classes) into 
+       accessor classes) into
        <code>deal.II/include/grid/tria_accessor.h</code> to work
        around a problem with gcc3.0 which does not place a copy of
        these functions into the library. Previously we only included
@@ -1205,7 +1206,7 @@ All entries are signed with the names of the author.
        (WB 2001/02/26)
        </p>
 
-  <li> <p> 
+  <li> <p>
        New: The <code>DoFTools</code> class now has
        a function <code>count_dofs_per_component</code>
        that counts the number of degrees of freedom in each of the

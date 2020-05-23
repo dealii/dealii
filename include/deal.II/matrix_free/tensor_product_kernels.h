@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018-2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -675,47 +675,119 @@ namespace internal
                             Utilities::fixed_power<dim - direction - 1>(n_rows);
     Assert(n_rows <= 128, ExcNotImplemented());
 
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
+    // specialization for n_rows = 2 that manually unrolls the innermost loop
+    // to make the operation perform better (not completely as good as the
+    // templated one, but much better than the generic version down below,
+    // because the loop over col can be more effectively unrolled by the
+    // compiler)
+    if (contract_over_rows && n_rows == 2)
       {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
+        const Number2 *shape_data_1 = shape_data + n_columns;
+        for (int i2 = 0; i2 < n_blocks2; ++i2)
           {
-            Number x[129];
-            for (int i = 0; i < mm; ++i)
-              x[i] = in[stride * i];
-            for (int col = 0; col < nn; ++col)
+            for (int i1 = 0; i1 < n_blocks1; ++i1)
               {
-                Number2 val0;
-                if (contract_over_rows == true)
-                  val0 = shape_data[col];
-                else
-                  val0 = shape_data[col * n_columns];
-                Number res0 = val0 * x[0];
-                for (int i = 1; i < mm; ++i)
+                const Number x0 = in[0], x1 = in[stride];
+                for (int col = 0; col < nn; ++col)
                   {
-                    if (contract_over_rows == true)
-                      val0 = shape_data[i * n_columns + col];
+                    const Number result =
+                      shape_data[col] * x0 + shape_data_1[col] * x1;
+                    if (add == false)
+                      out[stride * col] = result;
                     else
-                      val0 = shape_data[col * n_columns + i];
-                    res0 += val0 * x[i];
+                      out[stride * col] += result;
                   }
-                if (add == false)
-                  out[stride * col] = res0;
-                else
-                  out[stride * col] += res0;
-              }
 
+                if (one_line == false)
+                  {
+                    ++in;
+                    ++out;
+                  }
+              }
             if (one_line == false)
               {
-                ++in;
-                ++out;
+                in += stride * (mm - 1);
+                out += stride * (nn - 1);
               }
           }
-        if (one_line == false)
+      }
+    // specialization for n = 3
+    else if (contract_over_rows && n_rows == 3)
+      {
+        const Number2 *shape_data_1 = shape_data + n_columns;
+        const Number2 *shape_data_2 = shape_data + 2 * n_columns;
+        for (int i2 = 0; i2 < n_blocks2; ++i2)
           {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
+            for (int i1 = 0; i1 < n_blocks1; ++i1)
+              {
+                const Number x0 = in[0], x1 = in[stride], x2 = in[2 * stride];
+                for (int col = 0; col < nn; ++col)
+                  {
+                    const Number result = shape_data[col] * x0 +
+                                          shape_data_1[col] * x1 +
+                                          shape_data_2[col] * x2;
+                    if (add == false)
+                      out[stride * col] = result;
+                    else
+                      out[stride * col] += result;
+                  }
+
+                if (one_line == false)
+                  {
+                    ++in;
+                    ++out;
+                  }
+              }
+            if (one_line == false)
+              {
+                in += stride * (mm - 1);
+                out += stride * (nn - 1);
+              }
           }
       }
+    // general loop for all other cases
+    else
+      for (int i2 = 0; i2 < n_blocks2; ++i2)
+        {
+          for (int i1 = 0; i1 < n_blocks1; ++i1)
+            {
+              Number x[129];
+              for (int i = 0; i < mm; ++i)
+                x[i] = in[stride * i];
+              for (int col = 0; col < nn; ++col)
+                {
+                  Number2 val0;
+                  if (contract_over_rows == true)
+                    val0 = shape_data[col];
+                  else
+                    val0 = shape_data[col * n_columns];
+                  Number res0 = val0 * x[0];
+                  for (int i = 1; i < mm; ++i)
+                    {
+                      if (contract_over_rows == true)
+                        val0 = shape_data[i * n_columns + col];
+                      else
+                        val0 = shape_data[col * n_columns + i];
+                      res0 += val0 * x[i];
+                    }
+                  if (add == false)
+                    out[stride * col] = res0;
+                  else
+                    out[stride * col] += res0;
+                }
+
+              if (one_line == false)
+                {
+                  ++in;
+                  ++out;
+                }
+            }
+          if (one_line == false)
+            {
+              in += stride * (mm - 1);
+              out += stride * (nn - 1);
+            }
+        }
   }
 
 
@@ -1716,7 +1788,7 @@ namespace internal
                     else
                       r0 += shapes[mid * offset + col] * xmid;
                   }
-                else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0))
+                else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0 || mm == 3))
                   r0 += shapes[col * offset + mid] * xmid;
 
                 if (add == false)
@@ -1737,7 +1809,7 @@ namespace internal
                   }
               }
             if (type == 0 && contract_over_rows == true && nn % 2 == 1 &&
-                mm % 2 == 1)
+                mm % 2 == 1 && mm > 3)
               {
                 if (add == false)
                   out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;

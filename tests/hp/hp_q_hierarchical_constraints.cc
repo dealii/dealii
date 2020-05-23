@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@
 
 //#define FEQH_DEBUG_OUTPUT
 
-using namespace dealii;
 
 template <int dim>
 void

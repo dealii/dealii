@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,7 +97,10 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
   {
-    template std::pair<double, double> GridRefinement::
-      adjust_refine_and_coarsen_number_fraction<deal_II_dimension>(
-        const unsigned int, const unsigned int, const double, const double);
+    template std::pair<double, double>
+    GridRefinement::adjust_refine_and_coarsen_number_fraction<
+      deal_II_dimension>(const types::global_cell_index,
+                         const types::global_cell_index,
+                         const double,
+                         const double);
   }

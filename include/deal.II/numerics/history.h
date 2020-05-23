@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -148,7 +148,7 @@ template <typename T>
 void
 FiniteSizeHistory<T>::remove(const std::size_t ind)
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  AssertIndexRange(ind, data.size());
   auto el = std::move(data[ind]);
   data.erase(data.begin() + ind);
 
@@ -207,7 +207,7 @@ FiniteSizeHistory<T>::add(const T &element)
 template <typename T>
 T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  AssertIndexRange(ind, data.size());
   return *data[ind];
 }
 
@@ -216,7 +216,7 @@ T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 template <typename T>
 const T &FiniteSizeHistory<T>::operator[](const std::size_t ind) const
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  AssertIndexRange(ind, data.size());
   return *data[ind];
 }
 

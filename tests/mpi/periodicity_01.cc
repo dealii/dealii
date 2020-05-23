@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,8 +65,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
-
   template <int dim>
   class LaplaceProblem
   {
@@ -168,7 +166,8 @@ namespace Step40
     constraints.close();
 
     const std::vector<IndexSet> &locally_owned_dofs =
-      dof_handler.compute_locally_owned_dofs_per_processor();
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.locally_owned_dofs());
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -181,16 +180,17 @@ namespace Step40
                                dof_handler.n_dofs(),
                                locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      mpi_communicator,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(csp,
+                                               dof_handler.locally_owned_dofs(),
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
     system_matrix.reinit(
       mpi_communicator,
       csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
       Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
@@ -569,7 +569,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

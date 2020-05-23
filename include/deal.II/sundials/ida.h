@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2019 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -24,7 +24,6 @@
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/logstream.h>
-#  include <deal.II/base/mpi.h>
 #  include <deal.II/base/parameter_handler.h>
 #  ifdef DEAL_II_WITH_PETSC
 #    include <deal.II/lac/petsc_block_vector.h>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_time_stepping_templates_h
 #define dealii_time_stepping_templates_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/time_stepping.h>
@@ -375,18 +377,16 @@ namespace TimeStepping
         // Solve the nonlinear system using Newton's method
         const double new_t       = t + this->c[i] * delta_t;
         const double new_delta_t = this->a[i][i] * delta_t;
+        VectorType & f_stage     = f_stages[i];
         newton_solve(
-          std::bind(&ImplicitRungeKutta<VectorType>::compute_residual,
-                    this,
-                    f,
-                    new_t,
-                    new_delta_t,
-                    std::cref(old_y),
-                    std::placeholders::_1,
-                    std::ref(f_stages[i]),
-                    std::placeholders::_2),
-          std::bind(
-            id_minus_tau_J_inverse, new_t, new_delta_t, std::placeholders::_1),
+          [this, &f, new_t, new_delta_t, &old_y, &f_stage](
+            const VectorType &y, VectorType &residual) {
+            this->compute_residual(
+              f, new_t, new_delta_t, old_y, y, f_stage, residual);
+          },
+          [&id_minus_tau_J_inverse, new_t, new_delta_t](const VectorType &y) {
+            return id_minus_tau_J_inverse(new_t, new_delta_t, y);
+          },
           y);
       }
   }

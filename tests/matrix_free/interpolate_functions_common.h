@@ -1,6 +1,6 @@
 //------------------  interpolate_functions_common.h  ------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,8 +130,7 @@ public:
         fe_evalp.read_dof_values(src);
         fe_evalp.evaluate(true, true);
 
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
           {
             // skip empty components in VectorizedArray
             if (data.get_face_info(face).cells_interior[j] ==
@@ -194,8 +193,7 @@ public:
         fe_evalm.read_dof_values(src);
         fe_evalm.evaluate(true, true);
 
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
           {
             // skip empty components in VectorizedArray
             if (data.get_face_info(face).cells_interior[j] ==

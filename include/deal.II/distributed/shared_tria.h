@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,8 @@ namespace parallel
      * "owns" a subset of cells. The use of this class is demonstrated in
      * step-18.
      *
-     * Different from the parallel::distributed::Triangulation, this implies
+     * Different from the parallel::distributed::Triangulation and
+     * parallel::fullydistributed::Triangulation classes, this implies
      * that the entire mesh is stored on each processor. While this is clearly
      * a memory bottleneck that limits the use of this class to a few dozen
      * or hundreds of MPI processes, the partitioning of the mesh can be used
@@ -99,7 +100,8 @@ namespace parallel
      *
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
+    class Triangulation
+      : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
     public:
       using active_cell_iterator =
@@ -247,6 +249,12 @@ namespace parallel
       virtual ~Triangulation() override = default;
 
       /**
+       * Return if multilevel hierarchy is supported and has been constructed.
+       */
+      virtual bool
+      is_multilevel_hierarchy_constructed() const override;
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -267,6 +275,16 @@ namespace parallel
       create_triangulation(const std::vector<Point<spacedim>> &vertices,
                            const std::vector<CellData<dim>> &  cells,
                            const SubCellData &subcelldata) override;
+
+      /*
+       * @copydoc Triangulation::create_triangulation()
+       *
+       * @note Not inmplemented yet.
+       */
+      virtual void
+      create_triangulation(
+        const TriangulationDescription::Description<dim, spacedim>
+          &construction_data) override;
 
       /**
        * Copy @p other_tria to this triangulation.
@@ -322,14 +340,6 @@ namespace parallel
        */
       bool
       with_artificial_cells() const;
-
-    protected:
-      /**
-       * Override the function to update the number cache so we can fill data
-       * like @p level_ghost_owners.
-       */
-      virtual void
-      update_number_cache() override;
 
     private:
       /**
@@ -401,7 +411,8 @@ namespace parallel
      * MPI is not available.
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
+    class Triangulation
+      : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
     public:
       /**
@@ -409,6 +420,12 @@ namespace parallel
        * constructed (see also the class documentation).
        */
       Triangulation() = delete;
+
+      /**
+       * Return if multilevel hierarchy is supported and has been constructed.
+       */
+      virtual bool
+      is_multilevel_hierarchy_constructed() const override;
 
       /**
        * A dummy function to return empty vector.

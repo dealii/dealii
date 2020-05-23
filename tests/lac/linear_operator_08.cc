@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@
 #  include <deal.II/lac/sparse_direct.h>
 #endif
 
-using namespace dealii;
 
 
 template <class PRECONDITIONER,

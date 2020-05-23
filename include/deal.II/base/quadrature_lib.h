@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -805,6 +805,7 @@ public:
 
 /* -------------- declaration of explicit specializations ------------- */
 
+#ifndef DOXYGEN
 template <>
 QGauss<1>::QGauss(const unsigned int n);
 template <>
@@ -841,9 +842,9 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 template <>
 QTelles<1>::QTelles(const Quadrature<1> &base_quad,
                     const Point<1> &     singularity);
+#endif // DOXYGEN
 
 
 
 DEAL_II_NAMESPACE_CLOSE
-
 #endif

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -120,8 +120,7 @@ main(int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
+      initlog();
       deallog << std::setprecision(4);
 
       test();

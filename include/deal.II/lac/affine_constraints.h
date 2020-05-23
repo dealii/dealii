@@ -35,6 +35,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename>
 class FullMatrix;
 class SparsityPattern;
@@ -46,15 +48,40 @@ class SparseMatrix;
 template <typename number>
 class BlockSparseMatrix;
 
-namespace internals
+namespace internal
 {
-  template <typename number>
-  class GlobalRowsFromLocal;
-}
+  namespace AffineConstraints
+  {
+    template <typename number>
+    class GlobalRowsFromLocal;
+  }
+} // namespace internal
+
+namespace internal
+{
+  namespace AffineConstraintsImplementation
+  {
+    template <class VectorType>
+    void
+    set_zero_all(const std::vector<types::global_dof_index> &cm,
+                 VectorType &                                vec);
+
+    template <class T>
+    void
+    set_zero_all(const std::vector<types::global_dof_index> &cm,
+                 dealii::Vector<T> &                         vec);
+
+    template <class T>
+    void
+    set_zero_all(const std::vector<types::global_dof_index> &cm,
+                 dealii::BlockVector<T> &                    vec);
+  } // namespace AffineConstraintsImplementation
+} // namespace internal
 
 
 template <typename number>
 class AffineConstraints;
+#endif
 
 /**
  * ConstraintMatrix has been renamed to AffineConstraints. Provide a
@@ -1536,9 +1563,9 @@ private:
    * the global row indices.
    */
   void
-  make_sorted_row_list(
-    const std::vector<size_type> &          local_dof_indices,
-    internals::GlobalRowsFromLocal<number> &global_rows) const;
+  make_sorted_row_list(const std::vector<size_type> &local_dof_indices,
+                       internal::AffineConstraints::GlobalRowsFromLocal<number>
+                         &global_rows) const;
 
   /**
    * Internal helper function for add_entries_local_to_global function.
@@ -1557,11 +1584,11 @@ private:
   template <typename MatrixScalar, typename VectorScalar>
   typename ProductType<VectorScalar, MatrixScalar>::type
   resolve_vector_entry(
-    const size_type                               i,
-    const internals::GlobalRowsFromLocal<number> &global_rows,
-    const Vector<VectorScalar> &                  local_vector,
-    const std::vector<size_type> &                local_dof_indices,
-    const FullMatrix<MatrixScalar> &              local_matrix) const;
+    const size_type                                                 i,
+    const internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows,
+    const Vector<VectorScalar> &    local_vector,
+    const std::vector<size_type> &  local_dof_indices,
+    const FullMatrix<MatrixScalar> &local_matrix) const;
 };
 
 /* ---------------- template and inline functions ----------------- */
@@ -1670,6 +1697,20 @@ AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
   Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
   line_ptr->inhomogeneity  = value;
+}
+
+template <typename number>
+template <class VectorType>
+inline void
+AffineConstraints<number>::set_zero(VectorType &vec) const
+{
+  // since lines is a private member, we cannot pass it to the functions
+  // above. therefore, copy the content which is cheap
+  std::vector<size_type> constrained_lines(lines.size());
+  for (unsigned int i = 0; i < lines.size(); ++i)
+    constrained_lines[i] = lines[i].index;
+  internal::AffineConstraintsImplementation::set_zero_all(constrained_lines,
+                                                          vec);
 }
 
 template <typename number>

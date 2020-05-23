@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 #ifndef dealii_matrix_free_task_info_h
 #define dealii_matrix_free_task_info_h
 
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
@@ -62,10 +64,16 @@ namespace internal
     virtual void
     vector_compress_finish() = 0;
 
-    /// Zeros part of the vector accroding to a given range as stored in
+    /// Zeros part of the vector according to a given range as stored in
     /// DoFInfo
     virtual void
     zero_dst_vector_range(const unsigned int range_index) = 0;
+
+    virtual void
+    cell_loop_pre_range(const unsigned int range_index) = 0;
+
+    virtual void
+    cell_loop_post_range(const unsigned int range_index) = 0;
 
     /// Runs the cell work specified by MatrixFree::loop or
     /// MatrixFree::cell_loop
@@ -87,10 +95,6 @@ namespace internal
 
   namespace MatrixFreeFunctions
   {
-    // forward declaration of internal data structure
-    template <typename Number>
-    struct ConstraintValues;
-
     /**
      * A struct that collects all information related to parallelization with
      * threads: The work is subdivided into tasks that can be done
@@ -131,30 +135,29 @@ namespace internal
       loop(MFWorkerInterface &worker) const;
 
       /**
-       * Determines the position of cells with ghosts for distributed-memory
-       * calculations.
+       * Make the number of cells which can only be treated in the
+       * communication overlap divisible by the vectorization length.
        */
       void
-      collect_boundary_cells(const unsigned int n_active_cells,
-                             const unsigned int n_active_and_ghost_cells,
-                             const unsigned int vectorization_length,
-                             std::vector<unsigned int> &boundary_cells);
+      make_boundary_cells_divisible(std::vector<unsigned int> &boundary_cells);
 
       /**
        * Sets up the blocks for running the cell loop based on the options
        * controlled by the input arguments.
        *
-       * @param boundary_cells A list of cells that need to exchange data prior
-       * to performing computations. These will be given a certain id in the
-       * partitioning.
-       *
-       * @param cells_close_to_boundary A list of cells that interact with
-       * boundaries between different subdomains and are involved in sending
-       * data to neighboring processes.
+       * @param cells_with_comm A list of cells that need to exchange data
+       * prior to performing computations. These will be given a certain id in
+       * the partitioning to make sure cell loops that overlap communication
+       * with communication have the ghost data ready.
        *
        * @param dofs_per_cell Gives an expected value for the number of degrees
        * of freedom on a cell, which is used to determine the block size for
        * interleaving cell and face integrals.
+       *
+       * @param categories_are_hp Defines whether
+       * `cell_vectorization_categories` is originating from a hp adaptive
+       * computation with variable polynomial degree or a user-defined
+       * variant.
        *
        * @param cell_vectorization_categories This set of categories defines
        * the cells that should be grouped together inside the lanes of a
@@ -165,6 +168,10 @@ namespace internal
        * categories defined by the previous variables should be separated
        * strictly or whether it is allowed to insert lower categories into the
        * next high one(s).
+       *
+       * @param parent_relation This data field is used to specify which cells
+       * have the same parent cell. Cells with the same ancestor are grouped
+       * together into the same batch(es) with vectorization across cells.
        *
        * @param renumbering When leaving this function, the vector contains a
        * new numbering of the cells that aligns with the grouping stored in
@@ -178,11 +185,12 @@ namespace internal
        */
       void
       create_blocks_serial(
-        const std::vector<unsigned int> &boundary_cells,
-        const std::vector<unsigned int> &cells_close_to_boundary,
+        const std::vector<unsigned int> &cells_with_comm,
         const unsigned int               dofs_per_cell,
+        const bool                       categories_are_hp,
         const std::vector<unsigned int> &cell_vectorization_categories,
         const bool                       cell_vectorization_categories_strict,
+        const std::vector<unsigned int> &parent_relation,
         std::vector<unsigned int> &      renumbering,
         std::vector<unsigned char> &     incompletely_filled_vectorization);
 

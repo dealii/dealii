@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,12 +35,12 @@ test()
   // that case
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
 
     Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         deallog << "Reference cell: " << determinants[v] << std::endl;
         AssertThrow(static_cast<double>(determinants[v]) == 1,
@@ -52,7 +52,7 @@ test()
   // in the x-direction by a factor of 10
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
         vertices[v][0] /= 10;
@@ -60,7 +60,7 @@ test()
 
     Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         deallog << "Squashed cell: " << determinants[v] << std::endl;
         AssertThrow(static_cast<double>(determinants[v]) == 0.1,
@@ -75,7 +75,7 @@ test()
   // 1d)
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
         vertices[v][0] /= 10;
@@ -89,7 +89,7 @@ test()
 
     Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       {
         deallog << "Squashed+rotated cell: " << determinants[v] << std::endl;
         AssertThrow(static_cast<double>(determinants[v]) == 0.1,
@@ -100,13 +100,13 @@ test()
   // pinched cell
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     vertices[1] /= 10;
 
     Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       deallog << "Pinched cell: " << determinants[v] << std::endl;
   }
 
@@ -114,13 +114,13 @@ test()
   // inverted cell
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     std::swap(vertices[0], vertices[1]);
 
     Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
       deallog << "Inverted cell: " << determinants[v] << std::endl;
   }
 }

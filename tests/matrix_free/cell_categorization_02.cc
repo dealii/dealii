@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -36,9 +36,9 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
 #include "../tests.h"
+
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
 
 template <int dim>
 void
@@ -135,7 +135,7 @@ test()
               .cell_vectorization_category[cell->index()] = cell->material_id();
           }
 
-      mg_additional_data[level].level_mg_handler = level;
+      mg_additional_data[level].mg_level = level;
     }
 
   std::vector<std::shared_ptr<MatrixFree<dim, float>>> mg_mf_data(max_level +

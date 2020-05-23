@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Eldar Khattatov, 2018
  */
 template <int dim>
-class FE_RT_Bubbles : public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
+class FE_RT_Bubbles : public FE_PolyTensor<dim>
 {
 public:
   /**

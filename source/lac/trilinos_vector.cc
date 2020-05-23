@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,11 +38,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+#  ifndef DOXYGEN
   namespace internal
   {
     VectorReference::operator TrilinosScalar() const
     {
-      Assert(index < vector.size(), ExcIndexRange(index, 0, vector.size()));
+      AssertIndexRange(index, vector.size());
 
       // Trilinos allows for vectors to be referenced by the [] or ()
       // operators but only () checks index bounds. We check these bounds by
@@ -62,6 +63,7 @@ namespace TrilinosWrappers
       return (*(vector.vector))[0][local_index];
     }
   } // namespace internal
+#  endif
 
   namespace MPI
   {
@@ -246,7 +248,7 @@ namespace TrilinosWrappers
       // Otherwise, we have to check that the two vectors are already of the
       // same size, create an object for the data exchange and then insert all
       // the data. The first assertion is only a check whether the user knows
-      // what she is doing.
+      // what they are doing.
       else
         {
           Assert(omit_zeroing_entries == false,
@@ -882,15 +884,12 @@ namespace TrilinosWrappers
              this->local_size() *
                (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
     }
-  } /* end of namespace MPI */
-} /* end of namespace TrilinosWrappers */
 
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-#  include "trilinos_vector.inst"
-  }
+    // explicit instantiations
+#  ifndef DOXYGEN
+#    include "trilinos_vector.inst"
+#  endif
+  } // namespace MPI
 } // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ namespace LocalIntegrators
     /**
      * The weak form of the grad-div operator penalizing volume changes
      * @f[
-     *  \int_Z \nabla\!\cdot\!u \nabla\!\cdot\!v \,dx
+     *  \int_Z \nabla\cdot u \nabla \cdot v \,dx
      * @f]
      *
      * @author Guido Kanschat

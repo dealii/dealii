@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,10 +20,6 @@
 // matrix. No hanging nodes and no other constraints for a vector-valued
 // problem (stokes equations). Same as matrix_vector_stokes_qdg0 but now
 // without the template on the degree of the element.
-
-#include "../tests.h"
-
-std::ofstream logfile("output");
 
 #include <deal.II/base/utilities.h>
 
@@ -52,6 +48,8 @@ std::ofstream logfile("output");
 
 #include <complex>
 #include <iostream>
+
+#include "../tests.h"
 
 #include "create_mesh.h"
 
@@ -160,8 +158,8 @@ test(const unsigned int fe_degree)
 
   constraints.close();
 
-  std::vector<types::global_dof_index> dofs_per_block(dim + 1);
-  DoFTools::count_dofs_per_component(dof_handler, dofs_per_block);
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_component(dof_handler);
 
   // std::cout << "   Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -316,8 +314,7 @@ test(const unsigned int fe_degree)
 int
 main()
 {
-  deallog.attach(logfile);
-
+  initlog();
   deallog << std::setprecision(3);
 
   {

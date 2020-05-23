@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,6 @@ char logname[] = "output";
 
 // Finally, this is as in previous
 // programs:
-using namespace dealii;
 
 template <int dim>
 class LaplaceProblem
@@ -618,7 +617,7 @@ LaplaceProblem<2>::create_coarse_grid()
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -784,7 +783,7 @@ LaplaceProblem<3>::create_coarse_grid()
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -795,7 +794,7 @@ LaplaceProblem<3>::create_coarse_grid()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if ((cell->face(f)->center()[2] != -4) &&
           (cell->face(f)->center()[2] != 7) && (cell->face(f)->at_boundary()))
         cell->face(f)->set_boundary_id(1);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #include <deal.II/base/exceptions.h>
 
 #include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -96,9 +98,7 @@ check()
       for (const auto level_cell : dof_handler.cell_iterators_on_level(level))
         {
           // Iterate over all faces
-          for (unsigned int i_face = 0;
-               i_face < GeometryInfo<dim>::faces_per_cell;
-               ++i_face)
+          for (const unsigned int i_face : GeometryInfo<dim>::face_indices())
             {
               if ((level_cell->at_boundary(i_face) &&
                    !level_cell->has_periodic_neighbor(i_face)) ||
@@ -131,9 +131,7 @@ check()
       for (const auto level_cell : dof_handler.cell_iterators_on_level(level))
         {
           // Iterate over all faces
-          for (unsigned int i_face = 0;
-               i_face < GeometryInfo<dim>::faces_per_cell;
-               ++i_face)
+          for (const unsigned int i_face : GeometryInfo<dim>::face_indices())
             {
               if (!level_cell->has_periodic_neighbor(i_face) ||
                   level_cell->periodic_neighbor(i_face)->level() !=

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
   OutputVector &        values,
   const unsigned int    fe_index) const
 {
-  if (!this->has_children() && !this->is_artificial())
+  if (this->is_active() && !this->is_artificial())
     {
       if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
                                    DoFHandlerType::space_dimension> *>(

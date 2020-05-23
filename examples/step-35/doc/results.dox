@@ -107,35 +107,27 @@ yields the following images at times $t=20,40$:
   </tr>
 </table>
 
-What does look right is that with the higher Reynolds number, the flow
-is much more unorganized, swaying between the bottom and top boundary
-of the domain. On the other hand, the vorticity can't be right: it
-oscillates rapidly, not something we would expect for a Reynolds
-number that is still only moderate and that would not produce
-small scale dynamics. The riddle is easily solved,
-however, by looking at a zoom at the region behind the obstacle, and
+For this larger Reynolds number, we observe unphysical oscillations, especially
+for the vorticity. The discretization scheme has now difficulties in correctly
+resolving the flow, which should still be laminar and well-organized.
+These phenomena are typical of discretization schemes that lack robustness
+in under-resolved scenarios, where under-resolved means that the Reynolds
+number computed with the mesh size instead of the physical dimensions of
+the geometry is large. We look at a zoom at the region behind the obstacle, and
 the mesh size we have there:
+
 
 <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom.png" alt="">
 
-It is clear here that the flow is still reasonably well resolved in
-the immediate wake of the obstacle, where the mesh is relatively fine,
-but that the problem appears where the mesh becomes too coarse. That
-shouldn't surprise us: if we increase the Reynolds number, the scales
-on which we expect flow variation decrease and we will have to have a
-finer mesh.
-
-A rerun with one more mesh refinement set in the parameter file
-confirms that results look much more sensible now:
+We can easily test our hypothesis by re-running the simulation with one more
+mesh refinement set in the parameter file:
 
 <img src="https://www.dealii.org/images/steps/developer/step-35.Re_500.zoom_2.png" alt="">
 
-Here, the zone where the mesh becomes coarser is immediately
-downstream of the big red blob at the bottom of the wake behind the
-obstacle. While there are still quite visible oscillations beyond that
-point, it is clear that mesh refinement has already significantly
-helped, and we can expect that further refining the mesh will suppress
-the remaining oscillations as well.
+Indeed, the vorticity field now looks much smoother. While we can expect that
+further refining the mesh will suppress the remaining oscillations as well,
+one should take measures to obtain a robust scheme in the limit of coarse
+resolutions, as described below.
 
 
 <a name="extensions"></a>
@@ -152,8 +144,10 @@ This program can be extended in the following directions:
   practice shows that they perform very well.
 
   <li> High Reynolds %numbers: As we can see from the results, increasing the Reynolds number changes significantly
-  the behavior of the flow. Using well-known stabilization techniques we could be able to
-  compute the flow in this, or many other problems, when the Reynolds number is very large.
+  the behavior of the discretization scheme. Using well-known stabilization techniques we could be able to
+  compute the flow in this, or many other problems, when the Reynolds number is very large and where computational
+  costs demand spatial resolutions for which the flow is only marginally resolved, especially for 3D turbulent
+  flows.
 
   <li> Variable density incompressible flows: There are projection-like methods for the case of incompressible
   flows with variable density. Such flows play a role if fluids of different

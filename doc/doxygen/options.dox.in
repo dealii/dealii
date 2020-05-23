@@ -25,8 +25,9 @@ CASE_SENSE_NAMES       = YES
 
 
 INLINE_INHERITED_MEMB  = NO
-STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@ @CMAKE_BINARY_DIR@
 STRIP_FROM_INC_PATH    = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+
 FULL_PATH_NAMES        = YES
 JAVADOC_AUTOBRIEF      = NO
 INHERIT_DOCS           = YES
@@ -39,17 +40,19 @@ BUILTIN_STL_SUPPORT    = YES
 # Build related configuration options
 #---------------------------------------------------------------------------
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
-HIDE_UNDOC_MEMBERS     = YES
-HIDE_UNDOC_CLASSES     = YES
+EXTRACT_PACKAGE        = NO
+
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
 SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO
 GENERATE_TODOLIST      = YES
-GENERATE_DEPRECATEDLIST= YES
+GENERATE_DEPRECATEDLIST= NO
 SHOW_USED_FILES        = YES
 
 #---------------------------------------------------------------------------
@@ -68,8 +71,7 @@ WARN_IF_DOC_ERROR      = YES
 INPUT                  =
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = *.templates.h
-EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial \
-                         @CMAKE_SOURCE_DIR@/examples/doxygen
+EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
 INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter
@@ -133,7 +135,7 @@ GENERATE_LATEX         = NO
 
 # but set a few flags for when processing formulas embedded
 # in the documentation.
-PAPER_TYPE             = a4wide
+PAPER_TYPE             = a4
 EXTRA_PACKAGES         = amsmath amsfonts mathtools @_extra_packages@
 LATEX_BATCHMODE        = YES
 
@@ -172,22 +174,37 @@ PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
                          DEAL_II_WARNING(x)= \
                          DEAL_II_USE_MT_POSIX=1 \
+                         DEAL_II_CONSTEXPR=constexpr \
+                         DEAL_II_NAMESPACE_OPEN= \
+                         DEAL_II_NAMESPACE_CLOSE= \
+                         DEAL_II_ENABLE_EXTRA_DIAGNOSTICS= \
+                         DEAL_II_DISABLE_EXTRA_DIAGNOSTICS= \
+                         DEAL_II_DEPRECATED= \
+                         DEAL_II_CUDA_HOST_DEV= \
+                         DEAL_II_ALWAYS_INLINE= \
+                         __device__= \
                          DEAL_II_WITH_ADOLC=1 \
+                         DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING=1 \
                          DEAL_II_ADOLC_WITH_ATRIG_ERF=1 \
+                         DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING=1 \
                          DEAL_II_WITH_ARPACK=1 \
                          DEAL_II_ARPACK_WITH_PARPACK=1 \
+                         DEAL_II_WITH_ASSIMP=1 \
                          DEAL_II_WITH_BOOST=1 \
-                         DEAL_II_WITH_CXX14=1 \
-                         DEAL_II_WITH_CXX17=1 \
+                         DEAL_II_WITH_COMPLEX_VALUES=1 \
                          DEAL_II_WITH_CUDA=1 \
                          DEAL_II_COMPILER_CUDA_AWARE=1 \
+                         DEAL_II_WITH_CXX14=1 \
+                         DEAL_II_WITH_CXX17=1 \
                          DEAL_II_WITH_GINKGO=1 \
-                         DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_GMSH=1 \
+                         DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_HDF5=1 \
                          DEAL_II_WITH_LAPACK=1 \
+                         DEAL_II_LAPACK_WITH_MKL=1 \
                          DEAL_II_WITH_METIS=1 \
                          DEAL_II_WITH_MPI=1 \
+                         DEAL_II_MPI_WITH_CUDA_SUPPORT=1 \
                          DEAL_II_MPI_VERSION_MAJOR=3 \
                          DEAL_II_MPI_VERSION_MINOR=0 \
                          DEAL_II_WITH_MUPARSER=1 \
@@ -199,29 +216,30 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_P4EST_VERSION_MINOR=0 \
                          DEAL_II_P4EST_VERSION_SUBMINOR=0 \
                          DEAL_II_P4EST_VERSION_PATCH=0 \
+                         DEAL_II_P4EST_VERSION_GTE=1 \
                          DEAL_II_WITH_PETSC=1 \
+                         DEAL_II_PETSC_WITH_COMPLEX=1 \
+                         DEAL_II_PETSC_WITH_HYPRE=1 \
+                         DEAL_II_PETSC_WITH_MUMPS=1 \
                          DEAL_II_WITH_SCALAPACK=1 \
                          DEAL_II_WITH_SLEPC=1 \
                          DEAL_II_WITH_SUNDIALS=1 \
-                         DEAL_II_WITH_SYMENGINE=1 \
-                         DEAL_II_SYMENGINE_WITH_LLVM=1 \
-                         DEAL_II_WITH_THREADS=1 \
-                         DEAL_II_WITH_TRILINOS=1 \
-                         DEAL_II_TRILINOS_WITH_ROL=1 \
-                         DEAL_II_WITH_UMFPACK=1 \
-                         DEAL_II_WITH_ZLIB=1 \
-                         DEAL_II_NAMESPACE_OPEN= \
-                         DEAL_II_NAMESPACE_CLOSE= \
-                         DEAL_II_ENABLE_EXTRA_DIAGNOSTICS= \
-                         DEAL_II_DISABLE_EXTRA_DIAGNOSTICS= \
-                         DEAL_II_DEPRECATED= \
-                         DEAL_II_CUDA_HOST_DEV= \
-                         DEAL_II_ALWAYS_INLINE= \
-                         __device__= \
-                         DEAL_II_P4EST_VERSION_GTE=1 \
+                         DEAL_II_SUNDIALS_WITH_IDAS=1 \
                          DEAL_II_SUNDIALS_VERSION_GTE=1 \
                          DEAL_II_SUNDIALS_VERSION_LT=0 \
-                         DEAL_II_TRILINOS_VERSION_GTE=1
+                         DEAL_II_WITH_SYMENGINE=1 \
+                         DEAL_II_SYMENGINE_WITH_LLVM=1 \
+                         DEAL_II_WITH_THREAD=1 \
+                         DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
+                         DEAL_II_TRILINOS_WITH_MUELU=1 \
+                         DEAL_II_TRILINOS_WITH_ROL=1 \
+                         DEAL_II_TRILINOS_WITH_SACADO=1 \
+                         DEAL_II_TRILINOS_WITH_TPETRA=1 \
+                         DEAL_II_TRILINOS_WITH_ZOLTAN=1 \
+                         DEAL_II_TRILINOS_VERSION_GTE=1 \
+                         DEAL_II_WITH_UMFPACK=1 \
+                         DEAL_II_WITH_ZLIB=1
 
 # do not expand exception declarations
 EXPAND_AS_DEFINED      = DeclExceptionMsg \
@@ -240,7 +258,6 @@ SKIP_FUNCTION_MACROS   = YES
 GENERATE_TAGFILE       = deal.tag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
-PERL_PATH              = /usr/bin/perl
 
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
@@ -254,8 +271,8 @@ COLLABORATION_GRAPH    = NO
 GROUP_GRAPHS           = YES
 UML_LOOK               = NO
 TEMPLATE_RELATIONS     = YES
-INCLUDE_GRAPH          = YES
-INCLUDED_BY_GRAPH      = YES
+INCLUDE_GRAPH          = NO
+INCLUDED_BY_GRAPH      = NO
 CALL_GRAPH             = NO
 CALLER_GRAPH           = NO
 GRAPHICAL_HIERARCHY    = NO

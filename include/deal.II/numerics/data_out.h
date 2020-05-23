@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/grid/filtered_iterator.h>
 
 #include <deal.II/numerics/data_out_dof_data.h>
 
@@ -75,9 +77,10 @@ namespace internal
  * which are the objects that are later output by the functions of the base
  * classes. You can give a parameter to the function which determines how many
  * subdivisions in each coordinate direction are to be performed, i.e. of how
- * many subcells each patch shall consist. Default is one, but you may want to
- * choose a higher number for higher order elements, for example two for
- * quadratic elements, three for cubic elements three, and so on. The purpose
+ * many subcells each patch shall consist. The default is one, but you may want
+ * to choose a higher number for higher order elements, for example two for
+ * quadratic elements, three for cubic elements, and so on. (See
+ * step-11 for an example.) The purpose
  * of this parameter is because most graphics programs do not allow to specify
  * higher order polynomial functions in the file formats: only data at
  * vertices can be plotted and is then shown as a bilinear interpolation
@@ -111,47 +114,32 @@ namespace internal
  * <h3>Extensions</h3>
  *
  * By default, this class produces patches for all active cells. Sometimes,
- * this is not what you want, maybe because they are simply too many (and too
+ * this is not what you want, maybe because there are simply too many (and too
  * small to be seen individually) or because you only want to see a certain
- * region of the domain (for example in parallel programs such as the step-18
- * example program), or for some other reason.
+ * region of the domain (for example only in the fluid part of the domain in
+ * step-46), or for some other reason.
  *
  * For this, internally build_patches() does not generate the sequence of
- * cells to be converted into patches itself, but relies on the two functions
- * first_cell() and next_cell(). By default, they return the first active
- * cell, and the next active cell, respectively. Since they are @p virtual
- * functions, you can write your own class derived from DataOut in which you
- * overload these two functions to select other cells for output. This may,
+ * cells to be converted into patches itself, but relies on the two function
+ * that we'll call first_cell() and next_cell(). By default, they return the
+ * first active cell, and the next active cell, respectively. But this can
+ * be changed using the set_cell_selection() function that allows you to
+ * replace this behavior. What set_cell_selection() wants to know is how
+ * you want to pick out the first cell on which output should be generated,
+ * and how given one cell on which output is generated you want to pick the
+ * next cell.
+ *
+ * This may,
  * for example, include only cells that are in parts of a domain (e.g., if you
  * don't care about the solution elsewhere, think for example a buffer region
  * in which you attenuate outgoing waves in the Perfectly Matched Layer
  * method) or if you don't want output to be generated at all levels of an
  * adaptively refined mesh because this creates too much data (in this case,
- * the set of cells returned by your implementations of first_cell() and
- * next_cell() will include non-active cells, and DataOut::build_patches()
+ * the set of cells returned by your implementations of the `first_cell` and
+ * `next_cell` arguments to set_cell_selection() will include
+ * non-active cells, and DataOut::build_patches()
  * will simply take interpolated values of the solution instead of the exact
- * values on these cells children for output). Once you derive your own class,
- * you would just create an object of this type instead of an object of type
- * DataOut, and everything else will remain the same.
- *
- * The two functions are not constant, so you may store information within
- * your derived class about the last accessed cell. This is useful if the
- * information of the last cell which was accessed is not sufficient to
- * determine the next one.
- *
- * There is one caveat, however: if you have cell data (in contrast to nodal,
- * or dof, data) such as error indicators, then you must make sure that
- * first_cell() and next_cell() only walk over active cells, since cell data
- * cannot be interpolated to a coarser cell. If you do have cell data and use
- * this pair of functions and they return a non-active cell, then an exception
- * will be thrown.
- *
- * @pre This class only makes sense if the first template argument,
- * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim ==
- * DoFHandlerType::dimension</code>. This redundancy is a historical relic
- * from the time where the library had only a single DoFHandler class and this
- * class consequently only a single template argument.
+ * values on these cells children for output).
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
@@ -162,6 +150,12 @@ class DataOut : public DataOut_DoFData<DoFHandlerType,
                                        DoFHandlerType::space_dimension>
 {
 public:
+  static_assert(dim == DoFHandlerType::dimension,
+                "The dimension given explicitly as a template argument to "
+                "this class must match the dimension of the DoFHandler "
+                "template argument");
+  static constexpr unsigned int spacedim = DoFHandlerType::space_dimension;
+
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
@@ -170,10 +164,21 @@ public:
     typename DataOut_DoFData<DoFHandlerType,
                              DoFHandlerType::dimension,
                              DoFHandlerType::space_dimension>::cell_iterator;
-  using active_cell_iterator = typename DataOut_DoFData<
-    DoFHandlerType,
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>::active_cell_iterator;
+
+  /**
+   * The type of the function object returning the first cell as used in
+   * set_cell_selection().
+   */
+  using FirstCellFunctionType =
+    typename std::function<cell_iterator(const Triangulation<dim, spacedim> &)>;
+
+  /**
+   * The type of the function object returning the next cell as used in
+   * set_cell_selection().
+   */
+  using NextCellFunctionType =
+    typename std::function<cell_iterator(const Triangulation<dim, spacedim> &,
+                                         const cell_iterator &)>;
 
   /**
    * Enumeration describing the part of the domain in which cells
@@ -191,33 +196,37 @@ public:
   enum CurvedCellRegion
   {
     /**
-     * The geometry or boundary description
-     * will never be queried for curved geometries. This means that even
-     * if you have more than one subdivision per cell (see
-     * DataOut::build_patches() for what exactly this means) and even
-     * if the geometry really is curved, each cell will still be
-     * subdivided as if it was just a bi- or trilinear cell.
+     * The geometry or boundary description will never be queried for
+     * curved geometries. This means that even if you have more than
+     * one subdivision per cell (see DataOut::build_patches() for what
+     * exactly this means) and even if the geometry really is curved,
+     * each cell will still be subdivided as if it was just a bi- or
+     * trilinear cell.
      */
     no_curved_cells,
 
     /**
-     * The geometry or boundary description
-     * will be queried for curved geometries for cells located
-     * at the boundary, i.e., for cells that have at least one
-     * face at the boundary. This is sufficient if you have not
-     * attached a manifold description to the interiors of cells
-     * but only to faces at the boundary.
+     * The geometry or boundary description will be queried for curved
+     * geometries for cells located at the boundary, i.e., for cells
+     * that have at least one face at the boundary. This is sufficient
+     * if you have not attached a manifold description to the
+     * interiors of cells but only to faces at the boundary.
      */
     curved_boundary,
 
     /**
-     * The geometry description will be
-     * queried for all cells and all faces, whether they are
-     * at the boundary or not. This option is appropriate if you
-     * have attached a manifold object to cells (not only to faces).
+     * The geometry description will be queried for all cells and all
+     * faces, whether they are at the boundary or not. This option is
+     * appropriate if you have attached a manifold object to cells
+     * (not only to boundary faces).
      */
     curved_inner_cells
   };
+
+  /**
+   * Constructor.
+   */
+  DataOut();
 
   /**
    * This is the central function of this class since it builds the list of
@@ -271,8 +280,9 @@ public:
    *   structure that includes the
    *   DataOutBase::VtkFlags::write_higher_order_cells flag. When set, the
    *   subdivisions produced by this function will be interpreted as
-   *   support point for a higher order polynomial that will then actually
-   *   be visualized as such. On the other hand, this requires a
+   *   support points for a higher order polynomial that will then actually
+   *   be visualized as such. This is shown in step-11, for example. It
+   *   is worth noting, however, that this requires a
    *   sufficiently new version of one of the VTK-based visualization
    *   programs.
    */
@@ -317,16 +327,117 @@ public:
                 const CurvedCellRegion curved_region  = curved_boundary);
 
   /**
+   * A function that allows selecting for which cells output should be
+   * generated. This function takes two arguments, both `std::function`
+   * objects that can be used what the first cell on which output is
+   * generated is supposed to be, and what given one cell the next
+   * function is supposed to be. Through these function objects,
+   * it is possible to select a subset of cells on which output should
+   * be produced (e.g., only selecting those cells that belong to a
+   * part of the domain -- say, the fluid domain in a code such as step-46),
+   * or to completely change *where* output is produced (e.g., to produce
+   * output on non-active cells of a multigrid hierarchy or if the finest
+   * level of a mesh is so fine that generating graphical output would lead
+   * to an overwhelming amount of data).
+   *
+   * @param[in] first_cell A function object that takes as argument the
+   *   triangulation this class works on and that should return the first cell
+   *   on which output should be generated.
+   * @param[in] next_cell A function object that takes as arguments the
+   *   triangulation as well as the last cell
+   *   on which output was generated, and that should return the next
+   *   cell on which output should be generated. If there is no next
+   *   cell, i.e., if the input argument to the `next_cell` function object
+   *   is the last cell on which output is to be generated, then `next_cell`
+   *   must return `triangulation.end()`.
+   *
+   * These function objects are not difficult to write, but also not immediately
+   * obvious. As a consequence, there is a second variation of this function
+   * that takes a IteratorFilter argument and generates the corresponding
+   * functions itself.
+   *
+   * @note This function is also called in the constructor of this class,
+   *   where the default behavior is set. By default, this class will select all
+   *   @ref GlossLocallyOwnedCell "locally owned"
+   *   and
+   *   @ref GlossActive "active"
+   *   cells for output.
+   *
+   * @note If you have cell data (in contrast to nodal, or dof, data) such as
+   *   error indicators, then you must make sure that the `first_cell` and
+   *   `next_cell` function objects only walk over active cells, since cell data
+   *   cannot be interpolated to a coarser cell. If you do have cell data and
+   *   use this pair of functions and they return a non-active cell, then an
+   *   exception will be thrown.
+   */
+  void
+  set_cell_selection(
+    const std::function<cell_iterator(const Triangulation<dim, spacedim> &)>
+      &                                                        first_cell,
+    const std::function<cell_iterator(const Triangulation<dim, spacedim> &,
+                                      const cell_iterator &)> &next_cell);
+
+  /**
+   * A variation of the previous function that selects a subset of all
+   * cells for output based on the filter encoded in the FilteredIterator
+   * object given as argument. A typical way to generate the argument
+   * is via the make_filtered_iterator() function.
+   *
+   * Alternatively, since FilteredIterator objects can be created from
+   * just a predicate (i.e., a function object that returns a `bool`), it is
+   * possible to call this function with just a lambda function, which will then
+   * automatically be converted to a FilteredIterator object. For example, the
+   * following piece of code works:
+   * @code
+   *   DataOut<dim> data_out;
+   *   data_out.set_cell_selection(
+   *          [](const typename Triangulation<dim>::cell_iterator &cell) {
+   *              return (cell->is_active() && cell->subdomain_id() == 0);
+   *          });
+   * @endcode
+   * In this case, the lambda function selects all of those cells that are
+   * @ref GlossActive "active"
+   * and whose subdomain id is zero. These will then be the only cells on
+   * which output is generated.
+   *
+   * @note Not all filters will result in subsets of cells for which
+   *   output can actually be generated. For example, if you are working
+   *   on parallel meshes where data is only available on some cells,
+   *   then you better make sure that your `filtered_iterator` only
+   *   loops over the
+   *   @ref GlossLocallyOwnedCell "locally owned"
+   *   cells; likewise, in most cases you will probably only want to work on
+   *   @ref GlossActive "active"
+   *   cells since this is where the solution actually lives. In particular,
+   *   if you have added vectors that represent data defined on cells
+   *   (instead of nodal data), then you can not generate output on non-active
+   *   cells and your iterator filter should reflect this.
+   */
+  void
+  set_cell_selection(const FilteredIterator<cell_iterator> &filtered_iterator);
+
+  /**
+   * Return the two function objects that are in use for determining the first
+   * and the next cell as set by set_cell_selection().
+   */
+  const std::pair<FirstCellFunctionType, NextCellFunctionType>
+  get_cell_selection() const;
+
+  /**
    * Return the first cell which we want output for. The default
    * implementation returns the first active cell, but you might want to
    * return other cells in a derived class.
+   *
+   * @deprecated Use the set_cell_selection() function instead.
    */
+  DEAL_II_DEPRECATED
   virtual cell_iterator
   first_cell();
 
   /**
    * Return the next cell after @p cell which we want output for.  If there
-   * are no more cells, <tt>#dofs->end()</tt> shall be returned.
+   * are no more cells, any implementation of this function should return
+   * <tt>dof_handler->end()</tt>.
    *
    * The default implementation returns the next active cell, but you might
    * want to return other cells in a derived class. Note that the default
@@ -334,16 +445,39 @@ public:
    * guaranteed as long as first_cell() is also used from the default
    * implementation. Overloading only one of the two functions might not be a
    * good idea.
+   *
+   * @deprecated Use the set_cell_selection() function instead.
    */
+  DEAL_II_DEPRECATED
   virtual cell_iterator
   next_cell(const cell_iterator &cell);
 
 private:
   /**
+   * A function object that is used to select what the first cell is going to
+   * be on which to generate graphical output. See the set_cell_selection()
+   * function for more information.
+   */
+  std::function<cell_iterator(const Triangulation<dim, spacedim> &)>
+    first_cell_function;
+
+  /**
+   * A function object that is used to select what the next cell is going to
+   * be on which to generate graphical output, given a previous cell. See
+   * the set_cell_selection() function for more information.
+   */
+  std::function<cell_iterator(const Triangulation<dim, spacedim> &,
+                              const cell_iterator &)>
+    next_cell_function;
+
+  /**
    * Return the first cell produced by the first_cell()/next_cell() function
    * pair that is locally owned. If this object operates on a non-distributed
    * triangulation, the result equals what first_cell() returns.
+   *
+   * @deprecated Use the set_cell_selection() function instead.
    */
+  DEAL_II_DEPRECATED
   virtual cell_iterator
   first_locally_owned_cell();
 
@@ -351,7 +485,10 @@ private:
    * Return the next cell produced by the next_cell() function that is locally
    * owned. If this object operates on a non-distributed triangulation, the
    * result equals what first_cell() returns.
+   *
+   * @deprecated Use the set_cell_selection() function instead.
    */
+  DEAL_II_DEPRECATED
   virtual cell_iterator
   next_locally_owned_cell(const cell_iterator &cell);
 

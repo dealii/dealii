@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include "../tests.h"
+
 #include "mesh_3d.h"
 
 
@@ -39,7 +40,7 @@ count_wrong_faces(const Triangulation<3> &tria)
   for (Triangulation<3>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
-    for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+    for (const unsigned int f : GeometryInfo<3>::face_indices())
       if (cell->face_orientation(f) == false)
         ++count;
   return count;

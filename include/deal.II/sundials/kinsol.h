@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ namespace SUNDIALS
    * accelerated with Anderson acceleration. KINSOL is based on the previous
    * Fortran package NKSOL of Brown and Saad.
    *
-   * KINSOL’s Newton solver employs the inexact Newton method. As this solver
+   * KINSOL's Newton solver employs the inexact Newton method. As this solver
    * is intended mainly for large systems, the user is required to provide
    * their own solver function. If a solver function is not provided, the
    * internal dense solver of KINSOL is used. Be warned that this solver
@@ -66,7 +66,7 @@ namespace SUNDIALS
    * scheme:
    *  - set $u_0$ = an initial guess
    *  - For $n = 0, 1, 2, \ldots$ until convergence do:
-   *    - Solve $J(u_n)\delta_n = −F(u_n)$
+   *    - Solve $J(u_n)\delta_n = -F(u_n)$
    *    - Set $u_{n+1} = u_n + \lambda \delta_n, 0 < \lambda \leq 1$
    *    - Test for convergence
    *
@@ -154,14 +154,14 @@ namespace SUNDIALS
    * convergence is made before the iteration continues.
    *
    * For Picard iteration, as implemented in KINSOL, we consider a special form
-   * of the nonlinear function $F$, such that $F(u) = Lu − N(u)$, where $L$ is
+   * of the nonlinear function $F$, such that $F(u) = Lu - N(u)$, where $L$ is
    * a constant nonsingular matrix and $N$ is (in general) nonlinear.
    *
-   * Then the fixed-point function $G$ is defined as $G(u) = u − L^{-1}F(u)$.
+   * Then the fixed-point function $G$ is defined as $G(u) = u - L^{-1}F(u)$.
    * Within each iteration, the Picard step is computed then added to $u_n$ to
    * produce the new iterate. Next, the nonlinear residual function is
    * evaluated at the new iterate, and convergence is checked. The Picard and
-   * fixed point methods can be significantly accelerated using Anderson’s
+   * fixed point methods can be significantly accelerated using Anderson's
    * method.
    *
    * The user has to provide the implementation of the following std::functions:

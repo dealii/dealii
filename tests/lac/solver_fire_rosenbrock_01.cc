@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,7 +105,7 @@ check_value(const unsigned int N, const double tol)
 
   deallog << "FIRE::Solution vector: ";
 
-  X.print(deallog);
+  X.print(deallog.get_file_stream());
 }
 
 

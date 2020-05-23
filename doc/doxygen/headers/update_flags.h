@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2016 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,9 +16,9 @@
 
 /**
  * @defgroup UpdateFlags The interplay of UpdateFlags, Mapping, and FiniteElement in FEValues
- * 
+ *
  * <h2>Introduction</h2>
- * 
+ *
  * In order to compute local contributions of an individual cell to the global
  * matrix and right hand side, we usually employ two techniques:
  * - First, the integral is transformed from the actual cell $K$ to the
@@ -52,7 +52,7 @@
  *   @f]
  *   where $q$ indicates the index of the quadrature point, $\hat{\bf x}_q$ its
  *   location on the reference cell, and $w_q$ its weight.
- * 
+ *
  * In order to evaluate such an expression in an application code, we
  * have to access three different kinds of objects: a quadrature
  * object that describes locations $\hat{\bf x}_q$ and weights $w_q$ of
@@ -61,7 +61,7 @@
  * functions on the unit cell; and a mapping object that provides the
  * Jacobian as well as its determinant. Dealing with all these
  * objects would be cumbersome and error prone.
- * 
+ *
  * On the other hand, these three kinds of objects almost always appear together,
  * and it is in fact very rare for deal.II application codes to do anything with
  * quadrature, finite element, or mapping objects besides using them together.
@@ -73,7 +73,7 @@
  * points and weights, mapped shape function values and derivatives as well as
  * some properties of the transformation from the reference cell to the actual
  * mesh cell.
- * 
+ *
  * Since computation of any of these values is potentially expensive (for
  * example when using high order mappings with high order elements), the
  * FEValues class only computes what it is explicitly asked for. To this
@@ -108,10 +108,10 @@
  * property does not hold for the shape functions of Raviart-Thomas
  * elements, however, which must be rotated with the local cell).
  * This allows further optimization of the computations underlying assembly.
- * 
+ *
  *
  * <h2> Tracking dependencies </h2>
- * 
+ *
  * Let's say you want to compute the Laplace matrix as shown above. In that
  * case, you need to specify the <code>update_gradients</code> flag
  * (for $\nabla\varphi_i(\bf x_q)$) and the <code>update_JxW_values</code>
@@ -120,7 +120,7 @@
  * Jacobian matrix, $J^{-1}(\bf x_q)$ (and not just the determinant of the matrix),
  * and to compute the inverse of the Jacobian, it is also necessary to compute
  * the Jacobian matrix first.
- * 
+ *
  * Since these are requirements that are not important to the user, it
  * is not necessary to specify this in user code. Rather, given a set
  * of update flags, the FEValues object first asks the finite element
@@ -144,15 +144,15 @@
  * store some temporary information that can be computed once and for
  * all, and these flags will be used when re-computing data on each
  * cell we will visit later on.
- * 
- * 
+ *
+ *
  * <h2>Update once or each</h2>
- * 
+ *
  * As outlined above, we have now determined the final set of things that are
  * necessary to satisfy a user's desired pieces of information as conveyed by
- * the update flags she provided. This information will then typically be queried
+ * the update flags they provided. This information will then typically be queried
  * on every cell the user code visits in a subsequent integration loop.
- * 
+ *
  * Given that many of the things mappings or finite element classes compute are
  * potentially expensive, FEValues employs a system whereby mappings and finite
  * element objects are encouraged to pre-compute information that can be computed
@@ -170,7 +170,7 @@
  * Jacobian of the mapping which depends on the geometry of the cell we visit;
  * thus, for this element, simply copying pre-computed information is not
  * sufficient to evaluate the values of shape functions on a particular cell.)
- * 
+ *
  * To accommodate this structure, both mappings and finite element classes
  * may internally split the update flags into two sets commonly referenced as
  * <code>update_once</code> and <code>update_each</code> (though these names
@@ -183,23 +183,23 @@
  * set <code>update_once=update_values</code> and
  * <code>update_each=0</code>, whereas the Raviart-Thomas element will
  * do it the other way around.
- * 
+ *
  * These sets of flags are intended to be mutually exclusive. There is,
  * on the other hand, nothing that ever provides this decomposition to
  * anything outside the mapping or finite element classes -- it is a purely
  * internal decomposition.
- * 
- * 
+ *
+ *
  * <h2>Generation of the actual data</h2>
- * 
+ *
  * As outlined above, data is computed at two different times: once at
  * the beginning on the reference cell, and once whenever we move to an
  * actual cell. The functions involved in each of these steps are
  * discussed next:
- * 
- * 
+ *
+ *
  * <h3>Initialization</h3>
- * 
+ *
  * Computing data on the reference cell before we even visit the first
  * real cell is a two-step process. First, the constructor of FEValues,
  * FEFaceValues and FESubfaceValues, respectively, need to allow the
@@ -219,7 +219,7 @@
  * <li>FiniteElement::get_face_data()
  * <li>FiniteElement::get_subface_data()
  * </ul>
- * 
+ *
  * The FEValues object then takes over ownership of these objects and will
  * destroy them at the end of the FEValues object's lifetime. After this,
  * the FEValues object asks the FiniteElement and Mapping objects to fill
@@ -231,10 +231,10 @@
  * <li>FEFaceValues::initialize()
  * <li>FESubfaceValues::initialize()
  * </ul>
- * 
- * 
+ *
+ *
  * <h3>Reinitialization for a mesh cell</h3>
- * 
+ *
  * Once initialization is over and we call FEValues::reinit, FEFaceValues::reinit
  * or FESubfaceValues::reinit to move to a concrete cell or face, we need
  * to calculate the "update_each" kinds of data. This is done in the following
@@ -245,13 +245,13 @@
  * <li>FESubfaceValues::reinit() calls Mapping::fill_fe_subface_values(),
  * then FiniteElement::fill_fe_subface_values()
  * </ul>
- * 
+ *
  * This is where the actual data fields for FEValues, stored in
  * internal::FEValues::MappingRelatedData and
  * internal::FEValues::FiniteElementRelatedData objects, are
  * computed. These functions call the function in Mapping first, such
  * that all the mapping data required by the finite element is
  * available. Then, the FiniteElement function is called.
- * 
+ *
  * @ingroup feall
  */

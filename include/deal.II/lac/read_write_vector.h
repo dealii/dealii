@@ -22,7 +22,6 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
@@ -43,6 +42,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
 namespace LinearAlgebra
 {
   class CommunicationPatternBase;
@@ -53,7 +54,7 @@ namespace LinearAlgebra
   } // namespace distributed
 } // namespace LinearAlgebra
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   namespace MPI
@@ -61,9 +62,9 @@ namespace PETScWrappers
     class Vector;
   }
 } // namespace PETScWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -71,9 +72,9 @@ namespace TrilinosWrappers
     class Vector;
   }
 } // namespace TrilinosWrappers
-#endif
+#  endif
 
-#ifdef DEAL_II_WITH_CUDA
+#  ifdef DEAL_II_WITH_CUDA
 namespace LinearAlgebra
 {
   namespace CUDAWrappers
@@ -82,6 +83,7 @@ namespace LinearAlgebra
     class Vector;
   }
 } // namespace LinearAlgebra
+#  endif
 #endif
 
 namespace LinearAlgebra
@@ -325,7 +327,7 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      *
-     * @note: The @p trilinos_vec is not allowed to have ghost entries.
+     * @note The @p trilinos_vec is not allowed to have ghost entries.
      */
     void
     import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
@@ -698,7 +700,7 @@ namespace LinearAlgebra
     /**
      * Pointer to the array of local elements of this vector.
      */
-    std::unique_ptr<Number[], decltype(free) *> values;
+    std::unique_ptr<Number[], decltype(std::free) *> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity

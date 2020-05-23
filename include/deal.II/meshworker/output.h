@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 #ifndef dealii_mesh_worker_output_h
 #define dealii_mesh_worker_output_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>

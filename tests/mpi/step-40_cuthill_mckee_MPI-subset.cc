@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,9 +64,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
-
-
   template <int dim>
   class LaplaceProblem
   {
@@ -162,12 +159,10 @@ namespace Step40
         {
           if (cell->is_locally_owned())
             {
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   if ((cell->face(face)->at_boundary()) ||
-                      (cell->neighbor(face)->active() &&
+                      (cell->neighbor(face)->is_active() &&
                        cell->neighbor(face)->is_ghost()))
                     {
                       fe_face_values.reinit(cell, face);
@@ -220,16 +215,17 @@ namespace Step40
                                dof_handler.n_dofs(),
                                locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
-    SparsityTools::distribute_sparsity_pattern(
-      csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      mpi_communicator,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(csp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
     system_matrix.reinit(
       mpi_communicator,
       csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 dof_handler.n_locally_owned_dofs()),
       Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
@@ -379,11 +375,14 @@ namespace Step40
         pcout << "   Number of active cells:       "
               << triangulation.n_global_active_cells() << std::endl
               << "      ";
+        const auto n_locally_owned_active_cells_per_processor =
+          Utilities::MPI::all_gather(
+            triangulation.get_communicator(),
+            triangulation.n_locally_owned_active_cells());
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << triangulation.n_locally_owned_active_cells_per_processor()[i]
-                << '+';
+          pcout << n_locally_owned_active_cells_per_processor[i] << '+';
         pcout << std::endl;
 
         pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
@@ -391,7 +390,8 @@ namespace Step40
               << "      ";
         const std::vector<types::global_dof_index>
           n_locally_owned_dofs_per_processor =
-            dof_handler.compute_n_locally_owned_dofs_per_processor();
+            Utilities::MPI::all_gather(mpi_communicator,
+                                       dof_handler.n_locally_owned_dofs());
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
@@ -412,7 +412,6 @@ test_mpi(MPI_Comm comm)
 {
   try
     {
-      using namespace dealii;
       using namespace Step40;
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace LocalIntegrators;
 
 template <int dim>
@@ -238,7 +237,7 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   mg_dof_handler.distribute_dofs(fe);
-  mg_dof_handler.distribute_mg_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs();
   deallog << "Number of degrees of freedom: " << mg_dof_handler.n_dofs();
 
   for (unsigned int l = 0; l < triangulation.n_levels(); ++l)
@@ -491,7 +490,7 @@ void
 LaplaceProblem<dim>::solve(bool use_mw)
 {
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
-  mg_transfer.build_matrices(mg_dof_handler);
+  mg_transfer.build(mg_dof_handler);
 
   FullMatrix<double> coarse_matrix;
   coarse_matrix.copy_from(mg_matrices[0]);
@@ -511,12 +510,8 @@ LaplaceProblem<dim>::solve(bool use_mw)
   // if (use_mw)
   // mg_interface_down.initialize(mg_interface_out);
 
-  Multigrid<Vector<double>> mg(mg_dof_handler,
-                               mg_matrix,
-                               coarse_grid_solver,
-                               mg_transfer,
-                               mg_smoother,
-                               mg_smoother);
+  Multigrid<Vector<double>> mg(
+    mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
@@ -546,9 +541,7 @@ LaplaceProblem<dim>::refine_grid(const std::string &reftype)
              triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
           {
             {
               const Point<dim> p = cell->vertex(vertex);

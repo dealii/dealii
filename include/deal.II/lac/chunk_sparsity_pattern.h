@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,9 +30,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+// Forward declaration
+#ifndef DOXYGEN
 template <typename>
 class ChunkSparseMatrix;
-
+#endif
 
 /*! @addtogroup Sparsity
  *@{
@@ -1121,7 +1123,7 @@ ChunkSparsityPattern::end() const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
   return {this, r};
 }
 
@@ -1130,7 +1132,7 @@ ChunkSparsityPattern::begin(const size_type r) const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  AssertIndexRange(r, n_rows());
   return {this, r + 1};
 }
 

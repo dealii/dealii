@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -151,10 +151,8 @@ plot_FE_DGQ_shape_functions()
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(8);
-  deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(8) << std::fixed;
 
   deallog.push("1d");
   plot_FE_Q_shape_functions<1>();

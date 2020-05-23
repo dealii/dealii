@@ -20,8 +20,7 @@
 # Usage:
 #   run_test.sh run TEST_FULL [COMMAND and ARGS]
 #
-#   run_test.sh diff TEST_FULL NUMDIFF_EXECUTABLE DIFF_EXECUTABLE \
-#     COMPARISON_FILE
+#   run_test.sh diff TEST_FULL NUMDIFF_EXECUTABLE COMPARISON_FILE
 #
 
 set -u
@@ -83,8 +82,7 @@ case $STAGE in
     ##
 
     NUMDIFF_EXECUTABLE="$1"
-    DIFF_EXECUTABLE="$2"
-    COMPARISON_FILE="$3"
+    COMPARISON_FILE="$2"
 
     rm -f failing_diff*
     rm -f diff*
@@ -101,27 +99,15 @@ case $STAGE in
       variant="${file#*.output}"
 
       #
-      # Run diff or numdiff (if available) to determine whether files are the
-      # same. Create a diff file "diff${variant}" for each variant file that
-      # is found (including the main comparison file).
+      # Configure numdiff with
+      #   - absolute precision set to 1e-6, everything below is
+      #     regarded as being equal to 0
+      #   - relative differences of 1e-8
+      #   - [space][tab][newline]=,:;<>[](){}^ as separators between
+      #     numbers
       #
-      case "${NUMDIFF_EXECUTABLE}" in
-        *numdiff*)
-          #
-          # Configure numdiff with
-          #   - absolute precision set to 1e-6, everything below is
-          #     regarded as being equal to 0
-          #   - relative differences of 1e-8
-          #   - [space][tab][newline]=,:;<>[](){}^ as separators between
-          #     numbers
-          #
-          "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\n=,:;<>[](){}^' \
-                                "${file}" output > diff${variant}
-          ;;
-        *)
-          "${DIFF_EXECUTABLE}" "${file}" output > diff${variant}
-          ;;
-      esac
+      "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\n=,:;<>[](){}^' \
+                              "${file}" output > diff${variant}
 
       if [ $? -eq 0 ]; then
         #
@@ -146,8 +132,7 @@ case $STAGE in
 
     #
     # If none of the diffs succeeded, use the diff against the main comparison
-    # file. Output the first few lines of the output of numdiff, followed by
-    # the results of regular diff since the latter is just more readable.
+    # file. Output the first few lines of the output of numdiff.
     #
     if [ $test_successful = false ] ; then
       for file in diff*; do
@@ -159,10 +144,8 @@ case $STAGE in
       echo "${TEST_FULL}: DIFF failed. ------ Result: `pwd`/output"
       echo "Check `pwd`/output ${COMPARISON_FILE}"
       echo "${TEST_FULL}: DIFF failed. ------ Diff:   `pwd`/failing_diff"
-      echo "${TEST_FULL}: DIFF failed. ------ First 8 lines of numdiff/diff output:"
-      cat failing_diff | head -n 8
-      echo "${TEST_FULL}: DIFF failed. ------ First 50 lines diff output:"
-      "${DIFF_EXECUTABLE}" -c "${COMPARISON_FILE}" output | head -n 50
+      echo "${TEST_FULL}: DIFF failed. ------ First 20 lines of numdiff output:"
+      head -n 20 failing_diff
       exit 1
     fi
     exit 0

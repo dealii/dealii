@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 #ifndef dealii_differentiation_ad_ad_number_traits_h
 #define dealii_differentiation_ad_ad_number_traits_h
+
+#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>
@@ -1428,22 +1430,6 @@ namespace Differentiation
 } // namespace Differentiation
 
 #endif // DOXYGEN
-
-
-namespace numbers
-{
-  template <typename ADNumberType>
-  bool
-  is_nan(const typename std::enable_if<
-         Differentiation::AD::is_ad_number<ADNumberType>::value,
-         ADNumberType>::type &x)
-  {
-    return is_nan(
-      Differentiation::AD::ADNumberTraits<ADNumberType>::get_value(x));
-  }
-
-} // namespace numbers
-
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,10 +68,7 @@
  * a thorough description of many of the terms used here, can be found in the
  * @ref distributed_paper "Distributed Computing paper". In particular, the
  * paper shows that the methods discussed in this module scale to thousands of
- * processors and well over a billion degrees of freedom (they may scale to
- * even bigger problems but at the time of writing this, we do not have
- * solvers that are capable of more than $2^{31}$ degrees of freedom due to
- * the use of <code>signed int</code> as index). The paper also gives a
+ * processors and well over a billion degrees of freedom. The paper also gives a
  * concise definition of many of the terms that are used here and in other
  * places of the library related to distributed computing.  The step-40
  * tutorial program shows an application of the classes and methods of this

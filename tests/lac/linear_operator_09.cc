@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,6 @@
 #include <deal.II/lac/petsc_block_vector.h>
 
 
-using namespace dealii;
 
 int
 main(int argc, char *argv[])

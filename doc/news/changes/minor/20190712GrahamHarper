@@ -1,7 +1,0 @@
-Improved: FE_PolyTensor now supports finite elements with different mapping 
-types for each shape function. The member variable mapping_type is now of 
-type std::vector<MappingType>. If the vector contains only one MappingType, 
-then the same mapping is applied to every shape function. If a list of 
-MappingTypes is provided, mapping_type[i] will be applied to shape function i.
-<br>
-(Graham Harper, 2019/07/12)

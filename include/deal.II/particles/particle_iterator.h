@@ -24,8 +24,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  // Forward declaration
+#ifndef DOXYGEN
   template <int, int>
   class ParticleHandler;
+#endif
 
   /**
    * A class that is used to iterate over particles. Together with the
@@ -104,7 +107,7 @@ namespace Particles
     operator++(int);
 
     /**
-     * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator moves
+     * Prefix <tt>\--</tt> operator: <tt>\--iterator</tt>. This operator moves
      * the iterator to the previous element and returns a reference to
      * <tt>*this</tt>.
      */
@@ -112,7 +115,7 @@ namespace Particles
     operator--();
 
     /**
-     * Postfix <tt>--</tt> operator: <tt>iterator--</tt>. This operator moves
+     * Postfix <tt>\--</tt> operator: <tt>iterator\--</tt>. This operator moves
      * the iterator to the previous element, but returns an iterator to the
      * element previously pointed to.
      */
