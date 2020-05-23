@@ -1802,7 +1802,7 @@ namespace Step70
           << Utilities::dim_string(dim, spacedim) << "> using Trilinos."
           << std::endl;
 #endif
-    par.prm.print_parameters(par.output_directory + "/" + "parameters_" +
+    par.prm.print_parameters(par.output_directory + "/" + "used_parameters_" +
                                std::to_string(dim) + std::to_string(spacedim) +
                                ".prm",
                              ParameterHandler::Short);
