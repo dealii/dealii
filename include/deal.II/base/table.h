@@ -224,10 +224,8 @@ namespace internal
       friend class dealii::Table;
       template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
-#ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class dealii::Table<N, T>;
       friend class Accessor<N, T, C, P + 1>;
-#endif
     };
 
 
@@ -331,10 +329,8 @@ namespace internal
       friend class dealii::Table;
       template <int N1, typename T1, bool C1, unsigned int P1>
       friend class Accessor;
-#ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class dealii::Table<2, T>;
       friend class Accessor<N, T, C, 2>;
-#endif
     };
   } // namespace TableBaseAccessors
 
