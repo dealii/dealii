@@ -1514,7 +1514,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::local_size() const
     {
-      return partitioner->local_size();
+      return locally_owned_size();
     }
 
 

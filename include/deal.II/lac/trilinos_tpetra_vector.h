@@ -308,6 +308,13 @@ namespace LinearAlgebra
       size() const override;
 
       /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      local_size() const;
+
+      /**
        * Return the MPI communicator object in use with this object.
        */
       MPI_Comm
