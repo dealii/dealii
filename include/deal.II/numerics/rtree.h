@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx20/iota_view.h>
 
 #include <deal.II/boost_adaptors/bounding_box.h>
 #include <deal.II/boost_adaptors/point.h>
@@ -127,25 +128,38 @@ DEAL_II_NAMESPACE_OPEN
  * // Returns the 3 closest points to the Segment defined above.
  * @endcode
  *
- * @author Luca Heltai, 2018.
+ * In general, a tree does not need to store the actual objects, as long as it
+ * knows how to access a const reference to an indexable type. This is
+ * achieved by passing the optional template argument @p IndexableGetter, that
+ * extracts a const reference to one of the possible indexable types given an
+ * object of type @p LeafType. As an example, one may store points in a container,
+ * and only create a tree of the indices within the container, using the
+ * IndexableGetterFromIndices class defined below, and the function
+ * pack_rtree_of_indices().
+ *
+ * @author Luca Heltai, 2018, 2020.
  */
 template <typename LeafType,
-          typename IndexType = boost::geometry::index::linear<16>>
-using RTree = boost::geometry::index::rtree<LeafType, IndexType>;
+          typename IndexType = boost::geometry::index::linear<16>,
+          typename IndexableGetter =
+            boost::geometry::index::indexable<LeafType>>
+using RTree =
+  boost::geometry::index::rtree<LeafType, IndexType, IndexableGetter>;
 
 /**
  * Construct the correct RTree object by passing an iterator range.
  *
  * Notice that the order of the parameters is the opposite with respect to the
  * RTree class, since we can automatically infer the @p LeafType from the
- * arguments, and we only need to specify the @p IndexType if the default is not
- * adequate.
+ * arguments.
  *
  * @author Luca Heltai, 2018.
  */
 template <typename IndexType = boost::geometry::index::linear<16>,
-          typename LeafTypeIterator>
-RTree<typename LeafTypeIterator::value_type, IndexType>
+          typename LeafTypeIterator,
+          typename IndexableGetter = boost::geometry::index::indexable<
+            typename LeafTypeIterator::value_type>>
+RTree<typename LeafTypeIterator::value_type, IndexType, IndexableGetter>
 pack_rtree(const LeafTypeIterator &begin, const LeafTypeIterator &end);
 
 /**
@@ -161,9 +175,120 @@ pack_rtree(const LeafTypeIterator &begin, const LeafTypeIterator &end);
  * @author Luca Heltai, 2018.
  */
 template <typename IndexType = boost::geometry::index::linear<16>,
-          typename ContainerType>
-RTree<typename ContainerType::value_type, IndexType>
+          typename ContainerType,
+          typename IndexableGetter = boost::geometry::index::indexable<
+            typename ContainerType::value_type>>
+RTree<typename ContainerType::value_type, IndexType, IndexableGetter>
 pack_rtree(const ContainerType &container);
+
+/**
+ * A class that may be used as an @p IndexableGetter template argument for an
+ * RTree that stores indices to entries in a @p Container type.
+ *
+ * This class may be used as a proxy to extract an indexable type from
+ * compatible containers. For example:
+ * @code
+ * std::vector<std::pair<Point<dim>, double> > point_temperature = fill();
+ * IndexableGetterFromIndices<decltype(point_temperature)>
+ *    getter(point_temperature);
+ *
+ * const Point<dim> &p = getter(i); // returns point_temperature[i].first;
+ * @endcode
+ *
+ * This class is used by the pack_rtree_of_indices() function to construct an
+ * RTree where the leaves are indices pointing to the entries of the container
+ * passed to this class.
+ *
+ * @author Luca Heltai, 2020.
+ */
+template <typename Container>
+class IndexableGetterFromIndices
+{
+public:
+  /**
+   * An alias for the boost type that is used to extract a Point, Segment, or
+   * BoundingBox from compatible types (pairs, tuples, etc.).
+   */
+  using IndexableGetter =
+    typename boost::geometry::index::indexable<typename Container::value_type>;
+
+  /**
+   * An alias to the actual geometrical type.
+   */
+  using result_type = typename IndexableGetter::result_type;
+
+  /**
+   * An alias to the index type.
+   */
+  using size_t = typename Container::size_type;
+
+  /**
+   * Constructor. Store a const reference to a container.
+   */
+  explicit IndexableGetterFromIndices(Container const &c)
+    : container(c)
+  {}
+
+  /**
+   * Implements the @p IndexableGetter requirements of the rtree class.
+   */
+  result_type
+  operator()(size_t i) const
+  {
+    return getter(container[i]);
+  }
+
+private:
+  /**
+   * A const reference to the container.
+   */
+  const Container &container;
+
+  /**
+   * An instantiation of the getter that allows easy translation from the
+   * container @p value_type and the actual indexable type.
+   */
+  IndexableGetter getter;
+};
+
+/**
+ * Construct a RTree object that stores the indices of an existing container of
+ * indexable types. The only requirement on the container is that it supports
+ * operator[] for any index between 0 and the size of the container (i.e., a
+ * std::vector, or an std::array will do, however an std::map won't).
+ *
+ * Differently from the object created by the pack_rtree() function, in this
+ * case we don't store the actual geometrical types, but just their indices:
+ *
+ * @code
+ * namespace bgi = boost::geometry::index;
+ * std::vector<Point<dim>> some_points = fill();
+ * auto tree = pack_rtree(points); // the tree contains a copy of the points
+ * auto index_tree = pack_rtree_of_indices(points); // the tree contains only
+ *                                                  // the indices of the
+ *                                                  // points
+ * BoundingBox<dim> box = build_a_box();
+ *
+ * for(const auto &p: tree       | bgi::adaptors::queried(bgi::intersects(box)))
+ *   std::cout << "Point p: " << p << std::endl;
+ *
+ * for(const auto &i: index_tree | bgi::adaptors::queried(bgi::intersects(box)))
+ *   std::cout << "Point p: " << some_points[i] << std::endl;
+ * @endcode
+ *
+ * The leaves stored in the tree are the indices of the corresponding entry in
+ * the container. A reference to the external container is stored internally,
+ * but keep in mind that if you change the container, you should rebuild the
+ * tree.
+ *
+ * @author Luca Heltai, 2020.
+ */
+template <typename IndexType = boost::geometry::index::linear<16>,
+          typename ContainerType>
+RTree<typename ContainerType::size_type,
+      IndexType,
+      IndexableGetterFromIndices<ContainerType>>
+pack_rtree_of_indices(const ContainerType &container);
 
 /**
  * Helper structure that allows one to extract a level from an RTree as a vector
@@ -319,20 +444,46 @@ extract_rtree_level(const Rtree &tree, const unsigned int level);
 
 // Inline and template functions
 #ifndef DOXYGEN
-template <typename IndexType, typename LeafTypeIterator>
-RTree<typename LeafTypeIterator::value_type, IndexType>
+
+template <typename IndexType,
+          typename LeafTypeIterator,
+          typename IndexableGetter>
+RTree<typename LeafTypeIterator::value_type, IndexType, IndexableGetter>
 pack_rtree(const LeafTypeIterator &begin, const LeafTypeIterator &end)
 {
-  return RTree<typename LeafTypeIterator::value_type, IndexType>(begin, end);
+  return RTree<typename LeafTypeIterator::value_type,
+               IndexType,
+               IndexableGetter>(begin, end);
+}
+
+
+
+template <typename IndexType, typename ContainerType, typename IndexableGetter>
+RTree<typename ContainerType::value_type, IndexType, IndexableGetter>
+pack_rtree(const ContainerType &container)
+{
+  return pack_rtree<IndexType, decltype(container.begin()), IndexableGetter>(
+    container.begin(), container.end());
 }
 
 
 
 template <typename IndexType, typename ContainerType>
-RTree<typename ContainerType::value_type, IndexType>
-pack_rtree(const ContainerType &container)
+RTree<typename ContainerType::size_type,
+      IndexType,
+      IndexableGetterFromIndices<ContainerType>>
+pack_rtree_of_indices(const ContainerType &container)
 {
-  return pack_rtree<IndexType>(container.begin(), container.end());
+  std_cxx20::ranges::iota_view<typename ContainerType::size_type,
+                               typename ContainerType::size_type>
+    indices(0, container.size());
+  return RTree<typename ContainerType::size_type,
+               IndexType,
+               IndexableGetterFromIndices<ContainerType>>(
+    indices.begin(),
+    indices.end(),
+    IndexType(),
+    IndexableGetterFromIndices<ContainerType>(container));
 }
 
 
