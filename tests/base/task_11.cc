@@ -27,18 +27,18 @@ unsigned int   n_max_running;
 void
 a_task()
 {
-  mutex.acquire();
+  mutex.lock();
   n_running++;
   n_max_running = std::max(n_max_running, n_running);
-  mutex.release();
+  mutex.unlock();
 
   // Sleep some time to make sure all other concurrently running tasks enter
   // here.
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  mutex.acquire();
+  mutex.lock();
   n_running--;
-  mutex.release();
+  mutex.unlock();
 }
 
 
@@ -51,17 +51,15 @@ test()
   n_max_running = 0;
 
   // force all tasks to wait until we are done starting
-  mutex.acquire();
+  mutex.lock();
 
   for (unsigned int t = 0; t < 10; ++t)
     tg += Threads::new_task(a_task);
 
   // now let the tasks run
-  mutex.release();
+  mutex.unlock();
 
   tg.join_all();
-  deallog << "max concurrent running: " << n_max_running
-          << " should be: " << MultithreadInfo::n_threads() << std::endl;
 }
 
 

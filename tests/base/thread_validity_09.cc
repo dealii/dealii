@@ -38,10 +38,10 @@ worker()
   // mutex. release the mutex again at the end of this function since
   // mutices can only be released on the same thread as they are
   // acquired on.
-  mutex.acquire();
+  mutex.lock();
   deallog << "OK." << std::endl;
   spin_lock = 1;
-  mutex.release();
+  mutex.unlock();
   return 42;
 }
 
@@ -52,7 +52,7 @@ main()
 {
   initlog();
 
-  mutex.acquire();
+  mutex.lock();
   {
     Threads::new_thread(worker);
   }
@@ -64,7 +64,7 @@ main()
     p[i] = 0;
 
   // make sure the worker thread can actually start
-  mutex.release();
+  mutex.unlock();
 
   // wait for the worker thread to do its work
   while (spin_lock == 0)

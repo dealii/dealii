@@ -67,50 +67,21 @@ namespace Threads
    * Mutexes are used to lock data structures to ensure that only a
    * single thread of execution can access them at the same time.
    *
-   *
-   * <h3>Differences to std::mutex and copy semantics</h3>
-   *
-   * This class is like `std::mutex` in almost every regard and in
-   * fact is derived from `std::mutex`. The only difference is that
-   * this class is copyable when `std::mutex` is not.  Indeed, when
-   * copied, the receiving object does not copy any state from the
-   * object being copied, i.e. an entirely new mutex is created. These
-   * semantics are consistent with the common use case if a mutex is
-   * used as a member variable to lock the other member variables of a
-   * class: in that case, the mutex of the copied-to object should
-   * only guard the members of the copied-to object, not the members
-   * of both the copied-to and copied-from object. Since at the time
-   * when the class is copied, the destination's member variable is
-   * not used yet, its corresponding mutex should also remain in its
-   * original state.
-   *
-   * @author Wolfgang Bangerth, 2002, 2003, 2009
+   * This class is a thin wrapper around `std::mutex`. The only difference
+   * is that this class is copyable when `std::mutex` is not.  Indeed, when
+   * copied, the receiving object does not copy any state from the object
+   * being copied, i.e. an entirely new mutex is created. These semantics
+   * are consistent with the common use case if a mutex is used as a member
+   * variable to lock the other member variables of a class: in that case,
+   * the mutex of the copied-to object should only guard the members of the
+   * copied-to object, not the members of both the copied-to and
+   * copied-from object. Since at the time when the class is copied, the
+   * destination's member variable is not used yet, its corresponding mutex
+   * should also remain in its original state.
    */
   class Mutex : public std::mutex
   {
   public:
-    /**
-     * This declaration introduces a scoped lock class. It is
-     * deprecated: use `std::lock_guard<std::mutex>` or any of the
-     * other, related classes offered by C++ instead.
-     *
-     * When you declare an object of this type, you have to pass it a
-     * mutex, which is locked in the constructor of this class and
-     * unlocked in the destructor. The lock is thus held during the
-     * entire lifetime of this object, i.e. until the end of the
-     * present scope, which explains where the name comes from. This
-     * pattern of using locks with mutexes follows the
-     * resource-acquisition-is-initialization pattern, and was used
-     * first for mutexes by Doug Schmidt. It has the advantage that
-     * locking a mutex this way is thread-safe, i.e. when an exception
-     * is thrown between the locking and unlocking point, the
-     * destructor makes sure that the mutex is unlocked; this would
-     * not automatically be the case when you lock and unlock the
-     * mutex "by hand", i.e. using Mutex::acquire() and
-     * Mutex::release().
-     */
-    using ScopedLock DEAL_II_DEPRECATED = std::lock_guard<std::mutex>;
-
     /**
      * Default constructor.
      */
@@ -124,7 +95,6 @@ namespace Threads
       : std::mutex()
     {}
 
-
     /**
      * Copy operators. As discussed in this class's documentation, no state
      * is copied from the object given as argument.
@@ -134,154 +104,12 @@ namespace Threads
     {
       return *this;
     }
-
-
-    /**
-     * Acquire a mutex.
-     *
-     * @deprecated This function is deprecated. Use the
-     * std::mutex::lock() function of the base class instead.
-     */
-    DEAL_II_DEPRECATED
-    inline void
-    acquire()
-    {
-      this->lock();
-    }
-
-    /**
-     * Release the mutex again.
-     *
-     * @deprecated This function is deprecated. Use the
-     * std::mutex::unlock() function of the base class instead.
-     */
-    DEAL_II_DEPRECATED
-    inline void
-    release()
-    {
-      this->unlock();
-    }
   };
-
-
-  /**
-   * Class implementing a condition variable. The semantics of this class and
-   * its member functions are the same as those of the POSIX functions.
-   *
-   * @deprecated Use std::condition_variable instead.
-   *
-   * @author Wolfgang Bangerth, 2003
-   */
-  class DEAL_II_DEPRECATED ConditionVariable
-  {
-  public:
-    /**
-     * Signal to a single listener that a condition has been met, i.e. that
-     * some data will now be available.
-     */
-    inline void
-    signal()
-    {
-      condition_variable.notify_one();
-    }
-
-    /**
-     * Signal to multiple listener that a condition has been met, i.e. that
-     * some data will now be available.
-     */
-    inline void
-    broadcast()
-    {
-      condition_variable.notify_all();
-    }
-
-    /**
-     * Wait for the condition to be signaled. Signal variables need to be
-     * guarded by a mutex which needs to be given to this function as an
-     * argument.
-     *
-     * The mutex is assumed held at the entry to this function but is released
-     * upon exit.
-     */
-    inline void
-    wait(Mutex &mutex)
-    {
-      std::unique_lock<std::mutex> lock(mutex, std::adopt_lock);
-      condition_variable.wait(lock);
-    }
-
-  private:
-    /**
-     * Data object storing the necessary data.
-     */
-    std::condition_variable condition_variable;
-  };
-
 } // namespace Threads
 
 
 namespace Threads
 {
-  /**
-   * Return the number of presently existing threads. This function may be
-   * useful in a situation where a large number of threads are concurrently,
-   * and you want to decide whether creation of another thread is reasonable
-   * or whether running the respective operation sequentially is more useful
-   * since already many more threads than processors are running.
-   *
-   * Note that the function returns the total number of threads, not those
-   * actually running. Some of the threads may be waiting for locks and
-   * mutexes, or may be sleeping until they are delivered with data to work
-   * on.
-   *
-   * Upon program start, this number is one. It is increased each time a
-   * thread is created using the Threads::new_thread function. It is decreased
-   * once a thread terminates by returning from the function that was spawned.
-   *
-   * Note that this means that only threads created and terminated through the
-   * interfaces of this namespace are taken care of. If threads are created by
-   * directly calling the respective functions of the operating system (e.g.
-   * <code>pthread_create</code> for the POSIX thread interface, or
-   * `std::thread` for C++11 facilities), or if they
-   * are killed (e.g. either through <code>pthread_exit</code> from the
-   * spawned thread, or <code>pthread_kill</code> from another thread), then
-   * these events are not registered and counted for the result of this
-   * function. Likewise, threads that the Threading Building Blocks library
-   * may have created to work on tasks created using the Threads::new_task
-   * functions are not counted.
-   *
-   * @deprecated This function is a left-over from a time when deal.II was
-   *   in charge of creating all threads itself. But this is no longer the
-   *   case: Both deal.II itself and applications can create threads via
-   *   C++11 functions, and deal.II also relies on libraries such as the
-   *   Threading Building Blocks that can create threads when executing
-   *   certain functionality. As a consequence, we can no longer compute
-   *   an accurate number of threads currently operating, and whatever
-   *   this function returns is not accurate.
-   *
-   * @ingroup threads
-   */
-  DEAL_II_DEPRECATED
-  unsigned int
-  n_existing_threads();
-
-  /**
-   * Return a number used as id of this thread. This number is generated using
-   * the system call <code>getpid</code>, or, if it exists
-   * <code>gettid</code>. The result of either is converted to an integer and
-   * returned by this function.
-   *
-   * @todo As of now, none of our systems seems to support
-   * <code>gettid</code>, so that part of the code is untested yet.
-   *
-   * @deprecated Use std::thread::get_id() or std::this_thread::get_id() instead.
-   *
-   * @ingroup threads
-   */
-  DEAL_II_DEPRECATED
-  unsigned int
-  this_thread_id();
-
   /**
    * Split the range <code>[begin,end)</code> into <code>n_intervals</code>
    * subintervals of equal size. The last interval will be a little bit
@@ -355,26 +183,6 @@ namespace Threads
      */
     [[noreturn]] void
     handle_unknown_exception();
-
-    /**
-     * @internal
-     *
-     * The following function is used for internal bookkeeping of the number
-     * of existing threads. It is not thought for use in application programs,
-     * but only for use in the template functions below.
-     */
-    void
-    register_thread();
-
-    /**
-     * @internal
-     *
-     * The following function is used for internal bookkeeping of the number
-     * of existing threads. It is not thought for use in application programs,
-     * but only for use in the template functions below.
-     */
-    void
-    deregister_thread();
   } // namespace internal
 
   /**
@@ -663,7 +471,7 @@ namespace Threads
         if (thread_is_active == false)
           return;
 
-        Mutex::ScopedLock lock(thread_is_active_mutex);
+        std::lock_guard<std::mutex> lock(thread_is_active_mutex);
         if (thread_is_active == true)
           {
             Assert(thread.joinable(), ExcInternalError());
@@ -685,7 +493,6 @@ namespace Threads
         // to the main thread, it will kill the program if not treated
         // here before we return to the operating system's thread
         // library
-        internal::register_thread();
         try
           {
             call(function, *ret_val);
@@ -698,7 +505,6 @@ namespace Threads
           {
             internal::handle_unknown_exception();
           }
-        internal::deregister_thread();
       }
     };
 
