@@ -2312,6 +2312,19 @@ struct GeometryInfo
                              const bool         face_flip        = false,
                              const bool         face_rotation    = false);
 
+  static unsigned int
+  standard_to_real_line_vertex(const unsigned int line,
+                               const bool         face_orientation = true);
+
+  static std::array<unsigned int, 2>
+  standard_corner_to_line_vertex_index(const unsigned int corner);
+
+  static std::array<unsigned int, 2>
+  standard_corner_to_quad_vertex_index(const unsigned int corner);
+
+  static std::array<unsigned int, 2>
+  standard_line_to_quad_line_index(const unsigned int line);
+
   /**
    * Map the line index @p line of a face with arbitrary @p face_orientation,
    * @p face_flip and @p face_rotation to a face in standard orientation. The
@@ -4047,6 +4060,118 @@ GeometryInfo<dim>::standard_to_real_face_line(const unsigned int line,
 {
   Assert(false, ExcNotImplemented());
   return line;
+}
+
+
+
+template <>
+inline unsigned int
+GeometryInfo<2>::standard_to_real_line_vertex(const unsigned int corner,
+                                              const bool line_orientation)
+{
+  return line_orientation ? corner : (1 - corner);
+}
+
+
+
+template <int dim>
+inline unsigned int
+GeometryInfo<dim>::standard_to_real_line_vertex(const unsigned int corner,
+                                                const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return corner;
+}
+
+
+
+template <>
+inline std::array<unsigned int, 2>
+GeometryInfo<2>::standard_corner_to_line_vertex_index(const unsigned int corner)
+{
+  return {{corner % 2, corner / 2}};
+}
+
+
+
+template <int dim>
+inline std::array<unsigned int, 2>
+GeometryInfo<dim>::standard_corner_to_line_vertex_index(
+  const unsigned int corner)
+{
+  Assert(false, ExcNotImplemented());
+  (void)corner;
+  return {{0, 0}};
+}
+
+
+
+template <>
+inline std::array<unsigned int, 2>
+GeometryInfo<3>::standard_line_to_quad_line_index(const unsigned int i)
+{
+  // set up a table that for each
+  // line describes a) from which
+  // quad to take it, b) which line
+  // therein it is if the face is
+  // oriented correctly
+  static const unsigned int lookup_table[GeometryInfo<3>::lines_per_cell][2] = {
+    {4, 0}, // take first four lines from bottom face
+    {4, 1},
+    {4, 2},
+    {4, 3},
+
+    {5, 0}, // second four lines from top face
+    {5, 1},
+    {5, 2},
+    {5, 3},
+
+    {0, 0}, // the rest randomly
+    {1, 0},
+    {0, 1},
+    {1, 1}};
+
+  return {{lookup_table[i][0], lookup_table[i][1]}};
+}
+
+
+
+template <int dim>
+inline std::array<unsigned int, 2>
+GeometryInfo<dim>::standard_line_to_quad_line_index(const unsigned int corner)
+{
+  Assert(false, ExcNotImplemented());
+  (void)corner;
+  return {{0, 0}};
+}
+
+
+
+template <>
+inline std::array<unsigned int, 2>
+GeometryInfo<3>::standard_corner_to_quad_vertex_index(const unsigned int corner)
+{
+  // get the corner indices by asking either
+  // the bottom or the top face for its
+  // vertices. handle non-standard faces by
+  // calling the vertex reordering function
+  // from GeometryInfo
+
+  // bottom face (4) for first four vertices,
+  // top face (5) for the rest
+  return {{4 + corner / 4, corner % 4}};
+}
+
+
+
+template <int dim>
+inline std::array<unsigned int, 2>
+GeometryInfo<dim>::standard_corner_to_quad_vertex_index(
+  const unsigned int corner)
+{
+  Assert(false, ExcNotImplemented());
+  (void)corner;
+  return {{0, 0}};
 }
 
 
