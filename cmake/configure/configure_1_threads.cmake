@@ -90,51 +90,6 @@ MACRO(SETUP_THREADING)
   ENDIF()
 
   ADD_FLAGS(THREADS_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
-  #
-  # Set up some posix thread specific configuration toggles:
-  #
-  IF(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
-
-    IF(NOT CMAKE_USE_PTHREADS_INIT)
-      MESSAGE(FATAL_ERROR
-        "\nInternal configuration error: Not on Windows but posix thread support unavailable\n\n"
-        )
-    ENDIF()
-
-    SET(DEAL_II_USE_MT_POSIX TRUE)
-
-    #
-    # Check whether posix thread barriers are available:
-    #
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-    CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <pthread.h>
-    int main()
-    {
-      pthread_barrier_t pb;
-      pthread_barrier_init (&pb, 0, 1);
-      pthread_barrier_wait (&pb);
-      pthread_barrier_destroy (&pb);
-      return 0;
-    }
-    "
-    DEAL_II_HAVE_MT_POSIX_BARRIERS)
-    RESET_CMAKE_REQUIRED()
-    IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
-      SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
-    ENDIF()
-
-  ELSE()
-
-    #
-    # Poor Windows:
-    #
-    SET(DEAL_II_USE_MT_POSIX FALSE)
-    SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
-  ENDIF()
-
 ENDMACRO()
 
 
