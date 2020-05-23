@@ -132,9 +132,9 @@ namespace DataPostprocessorInputs
    *       ... // overload other necessary member variables
    *       virtual
    *       void
-   *       evaluate_vector_field(
-   *         const DataPostprocessorInputs::Vector<dim> &input_data,
-   *         std::vector<Vector<double> > &computed_quantities) const
+   *       evaluate_vector_field
+   *       (const DataPostprocessorInputs::Vector<dim> &input_data,
+   *        std::vector<Vector<double> > &computed_quantities) const override
    *       {
    *         const typename hp::DoFHandler<dim>::cell_iterator current_cell =
    *           input_data.template get_cell<hp::DoFHandler<dim> >();
@@ -729,9 +729,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field(
- *     const DataPostprocessorInputs::Scalar<dim> &input_data,
- *     std::vector<Vector<double> >               &computed_quantities) const
+ *   evaluate_scalar_field
+ *   (const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *    std::vector<Vector<double> > &computed_quantities) const override
  *   {
  *     // ensure that there really are as many output slots
  *     // as there are points at which DataOut provides the
@@ -815,9 +815,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field(
- *     const DataPostprocessorInputs::Scalar<dim> &input_data,
- *     std::vector<Vector<double> >               &computed_quantities) const
+ *   evaluate_scalar_field
+ *   (const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *    std::vector<Vector<double> > &computed_quantities) const override
  *   {
  *     AssertDimension (input_data.solution_gradients.size(),
  *                      computed_quantities.size());
@@ -991,9 +991,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field(
- *       const DataPostprocessorInputs::Vector<dim> &input_data,
- *       std::vector<Vector<double> >               &computed_quantities) const
+ *     evaluate_vector_field
+ *     (const DataPostprocessorInputs::Vector<dim> &input_data,
+ *      std::vector<Vector<double> > &computed_quantities) const override
  *     {
  *       // ensure that there really are as many output slots
  *       // as there are points at which DataOut provides the
@@ -1081,9 +1081,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field(
- *       const DataPostprocessorInputs::Vector<dim> &input_data,
- *       std::vector<Vector<double> >               &computed_quantities) const
+ *     evaluate_vector_field
+ *     (const DataPostprocessorInputs::Vector<dim> &input_data,
+ *      std::vector<Vector<double> > &computed_quantities) const override
  *     {
  *       AssertDimension (input_data.solution_gradients.size(),
  *                        computed_quantities.size());
