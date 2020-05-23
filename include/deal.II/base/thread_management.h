@@ -861,7 +861,6 @@ namespace Threads
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
-#  ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
   /**
    * Overload of the new_thread function for const member functions.
    *
@@ -877,7 +876,6 @@ namespace Threads
     return new_thread(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
-#  endif
 
   // ------------------------ ThreadGroup -------------------------------------
 
@@ -1499,7 +1497,6 @@ namespace Threads
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
-#  ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
   /**
    * Overload of the new_task function.
    *
@@ -1515,7 +1512,6 @@ namespace Threads
     return new_task(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
-#  endif
 
 
   // ------------------------ TaskGroup -------------------------------------

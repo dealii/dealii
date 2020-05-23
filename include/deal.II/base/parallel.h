@@ -452,14 +452,7 @@ namespace parallel
     // warnings about unused arguments
     (void)grainsize;
 
-#  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
     f(begin, end);
-#  else
-    // work around a problem with MS VC++ where there is no const
-    // operator() in 'Function' if 'Function' is the result of std::bind
-    Function ff = f;
-    ff(begin, end);
-#  endif
 #else
     internal::parallel_for(begin,
                            end,
@@ -694,14 +687,7 @@ namespace parallel
     // warnings about unused arguments
     (void)grainsize;
 
-#  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
     return f(begin, end);
-#  else
-    // work around a problem with MS VC++ where there is no const
-    // operator() in 'Function' if 'Function' is the result of std::bind
-    Function ff = f;
-    return ff(begin, end);
-#  endif
 #else
     internal::ReductionOnSubranges<ResultType, Function> reductor(
       f, std::plus<ResultType>(), 0);

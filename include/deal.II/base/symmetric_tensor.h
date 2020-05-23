@@ -439,10 +439,8 @@ namespace internal
       friend class dealii::SymmetricTensor;
       template <int, int, bool, int, typename>
       friend class Accessor;
-#ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class ::dealii::SymmetricTensor<rank, dim, Number>;
       friend class Accessor<rank, dim, constness, P + 1, Number>;
-#endif
     };
 
 
@@ -523,11 +521,9 @@ namespace internal
       friend class dealii::SymmetricTensor;
       template <int, int, bool, int, typename>
       friend class SymmetricTensorAccessors::Accessor;
-#ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
       friend class ::dealii::SymmetricTensor<rank, dim, Number>;
       friend class SymmetricTensorAccessors::
         Accessor<rank, dim, constness, 2, Number>;
-#endif
     };
   } // namespace SymmetricTensorAccessors
 } // namespace internal
