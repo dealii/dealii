@@ -447,9 +447,9 @@ public:
     DEAL_II_DEPRECATED unsigned int &level_mg_handler;
 
     /**
-     * Controls whether to allow reading from vectors without resolving
+     * Controls whether to enable reading from vectors without resolving
      * constraints, i.e., just read the local values of the vector. By
-     * default, this option is disabled, so if you want to use
+     * default, this option is enabled. In case you want to use
      * FEEvaluationBase::read_dof_values_plain, this flag needs to be set.
      */
     bool store_plain_indices;
