@@ -221,12 +221,13 @@ namespace Step53
   }
 
 
-  // This function is required by the interface of the Manifold base class,
-  // and allows you to clone the AfricaGeometry class. This is where we use
-  // a C++14 feature, namely the make_unique function, that simplifies the
-  // creation of std::unique_ptr objects. Notice that, while the function
-  // returns a std::unique_ptr<Manifold<3,3>>, we internally create a
-  // unique_ptr<AfricaGeometry>.
+  // The next function is required by the interface of the
+  // Manifold base class, and allows cloning the AfricaGeometry
+  // class. Notice that, while the function returns a
+  // `std::unique_ptr<Manifold<3,3>>`, we internally create a
+  // `unique_ptr<AfricaGeometry>`. In other words, the library
+  // requires a pointer-to-base-class, which we provide by creating a
+  // pointer-to-derived-class.
   std::unique_ptr<Manifold<3, 3>> AfricaGeometry::clone() const
   {
     return std::make_unique<AfricaGeometry>();
