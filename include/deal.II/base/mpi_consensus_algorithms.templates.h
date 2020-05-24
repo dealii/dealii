@@ -238,10 +238,8 @@ namespace Utilities
             AssertThrowMPI(ierr);
 
             // allocate memory for answer message
-            request_buffers.emplace_back(
-              std_cxx14::make_unique<std::vector<T2>>());
-            request_requests.emplace_back(
-              std_cxx14::make_unique<MPI_Request>());
+            request_buffers.emplace_back(std::make_unique<std::vector<T2>>());
+            request_requests.emplace_back(std::make_unique<MPI_Request>());
 
             // process request
             auto &request_buffer = *request_buffers.back();

@@ -19,7 +19,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -55,7 +54,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ1<dim, spacedim>>(*this);
+  return std::make_unique<MappingQ1<dim, spacedim>>(*this);
 }
 
 //---------------------------------------------------------------------------

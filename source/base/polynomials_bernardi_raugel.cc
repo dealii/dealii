@@ -15,7 +15,8 @@
 
 
 #include <deal.II/base/polynomials_bernardi_raugel.h>
-#include <deal.II/base/std_cxx14/memory.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -254,7 +255,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsBernardiRaugel<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsBernardiRaugel<dim>>(*this);
+  return std::make_unique<PolynomialsBernardiRaugel<dim>>(*this);
 }
 
 template class PolynomialsBernardiRaugel<1>; // to prevent errors

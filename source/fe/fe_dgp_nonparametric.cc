@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -28,6 +27,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <memory>
 #include <sstream>
 
 
@@ -127,7 +127,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGPNonparametric<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGPNonparametric<dim, spacedim>>(*this);
+  return std::make_unique<FE_DGPNonparametric<dim, spacedim>>(*this);
 }
 
 
@@ -283,8 +283,8 @@ FE_DGPNonparametric<dim, spacedim>::get_data(
     & /*output_data*/) const
 {
   // generate a new data object
-  auto data_ptr = std_cxx14::make_unique<
-    typename FiniteElement<dim, spacedim>::InternalDataBase>();
+  auto data_ptr =
+    std::make_unique<typename FiniteElement<dim, spacedim>::InternalDataBase>();
   data_ptr->update_each = requires_update_flags(update_flags);
 
   // other than that, there is nothing we can add here as discussed

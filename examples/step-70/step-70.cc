@@ -51,7 +51,6 @@ namespace LA
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/parsed_function.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
@@ -1232,20 +1231,21 @@ namespace Step70
   {
     TimerOutput::Scope t(computing_timer, "Initial setup");
 
-    fluid_fe = std_cxx14::make_unique<FESystem<spacedim>>(
-      FE_Q<spacedim>(par.velocity_degree),
-      spacedim,
-      FE_Q<spacedim>(par.velocity_degree - 1),
-      1);
+    fluid_fe =
+      std::make_unique<FESystem<spacedim>>(FE_Q<spacedim>(par.velocity_degree),
+                                           spacedim,
+                                           FE_Q<spacedim>(par.velocity_degree -
+                                                          1),
+                                           1);
 
 
-    solid_fe = std_cxx14::make_unique<FE_Nothing<dim, spacedim>>();
+    solid_fe = std::make_unique<FE_Nothing<dim, spacedim>>();
     solid_dh.distribute_dofs(*solid_fe);
 
     fluid_quadrature_formula =
-      std_cxx14::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
+      std::make_unique<QGauss<spacedim>>(par.velocity_degree + 1);
     solid_quadrature_formula =
-      std_cxx14::make_unique<QGauss<dim>>(par.velocity_degree + 1);
+      std::make_unique<QGauss<dim>>(par.velocity_degree + 1);
   }
 
 

@@ -21,7 +21,6 @@
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/cuda_size.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -29,6 +28,8 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
+
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN

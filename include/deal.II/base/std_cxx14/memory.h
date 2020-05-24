@@ -17,6 +17,9 @@
 
 #include <deal.II/base/config.h>
 
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++14 header <memory>.")
+
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN

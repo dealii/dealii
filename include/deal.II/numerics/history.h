@@ -19,9 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deque>
+#include <memory>
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -172,7 +172,7 @@ FiniteSizeHistory<T>::add(const T &element)
       if (cache.size() == 0)
         // nothing is cached, just copy a given element
         {
-          new_el = std_cxx14::make_unique<T>(element);
+          new_el = std::make_unique<T>(element);
         }
       else
         // something is cached, take one element and copy

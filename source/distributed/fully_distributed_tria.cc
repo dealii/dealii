@@ -16,11 +16,12 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 
 #include <deal.II/grid/grid_tools.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -251,7 +252,7 @@ namespace parallel
                          *>(&other_tria) == nullptr)
         {
           serial_tria =
-            std_cxx14::make_unique<dealii::Triangulation<dim, spacedim>>();
+            std::make_unique<dealii::Triangulation<dim, spacedim>>();
 
           // actually copy the serial triangulation
           serial_tria->copy_triangulation(other_tria);

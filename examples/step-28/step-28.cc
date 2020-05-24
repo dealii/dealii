@@ -1460,7 +1460,7 @@ namespace Step28
     // of energy group objects and let them initialize their individual meshes
     // with the coarse mesh generated above:
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      energy_groups.emplace_back(std_cxx14::make_unique<EnergyGroup<dim>>(
+      energy_groups.emplace_back(std::make_unique<EnergyGroup<dim>>(
         group, material_data, coarse_grid, fe));
     convergence_table_stream.open("convergence_table");
     convergence_table_stream.precision(12);

@@ -106,7 +106,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim>>
 Geometry<dim>::clone() const
 {
-  return std_cxx14::make_unique<Geometry<dim>>();
+  return std::make_unique<Geometry<dim>>();
 }
 
 template <int dim>

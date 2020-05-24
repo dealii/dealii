@@ -20,10 +20,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/qprojector.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe.h>
 
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -97,7 +97,7 @@ protected:
                                                                        spacedim>
       & /*output_data*/) const override
   {
-    return std_cxx14::make_unique<InternalData>();
+    return std::make_unique<InternalData>();
   }
 
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
@@ -112,7 +112,7 @@ protected:
     // generate a new data object and
     // initialize some fields
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-          data_ptr   = std_cxx14::make_unique<InternalData>();
+          data_ptr   = std::make_unique<InternalData>();
     auto &data       = dynamic_cast<InternalData &>(*data_ptr);
     data.update_each = requires_update_flags(update_flags);
 

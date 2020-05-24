@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/ginkgo_solver.h>
 
@@ -24,6 +23,7 @@
 #  include <deal.II/lac/exceptions.h>
 
 #  include <cmath>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN

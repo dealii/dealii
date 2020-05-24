@@ -17,7 +17,6 @@
 #include <deal.II/base/polynomials_p.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -31,6 +30,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 
@@ -124,7 +124,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_BDM<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_BDM<dim>>(*this);
+  return std::make_unique<FE_BDM<dim>>(*this);
 }
 
 

@@ -18,7 +18,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_dgq.h>
@@ -26,6 +25,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -342,7 +342,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Bernstein<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Bernstein<dim, spacedim>>(*this);
+  return std::make_unique<FE_Bernstein<dim, spacedim>>(*this);
 }
 
 

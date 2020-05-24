@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <memory>
 
@@ -29,9 +28,9 @@ main()
   // create a pattern and let it
   // output its description
   std::vector<std::unique_ptr<Patterns::PatternBase>> ps;
-  ps.push_back(std_cxx14::make_unique<Patterns::Integer>());
-  ps.push_back(std_cxx14::make_unique<Patterns::Double>());
-  ps.push_back(std_cxx14::make_unique<Patterns::Anything>());
+  ps.push_back(std::make_unique<Patterns::Integer>());
+  ps.push_back(std::make_unique<Patterns::Double>());
+  ps.push_back(std::make_unique<Patterns::Anything>());
 
   Patterns::Tuple   pattern(ps, ";");
   const std::string desc = pattern.description();

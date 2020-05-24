@@ -15,13 +15,13 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_rannacher_turek.h>
 
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
+#include <memory>
 #include <sstream>
 
 
@@ -78,8 +78,8 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_RannacherTurek<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_RannacherTurek<dim>>(
-    this->order, this->n_face_support_points);
+  return std::make_unique<FE_RannacherTurek<dim>>(this->order,
+                                                  this->n_face_support_points);
 }
 
 

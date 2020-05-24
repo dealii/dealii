@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_nothing.h>
@@ -24,6 +23,7 @@
 
 #include <deal.II/lac/householder.h>
 
+#include <memory>
 #include <sstream>
 
 DEAL_II_NAMESPACE_OPEN
@@ -121,7 +121,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_FaceQ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_FaceQ<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_FaceQ<dim, spacedim>>(this->degree);
 }
 
 
@@ -527,7 +527,7 @@ template <int spacedim>
 std::unique_ptr<FiniteElement<1, spacedim>>
 FE_FaceQ<1, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_FaceQ<1, spacedim>>(this->degree);
+  return std::make_unique<FE_FaceQ<1, spacedim>>(this->degree);
 }
 
 
@@ -761,7 +761,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_FaceP<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_FaceP<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_FaceP<dim, spacedim>>(this->degree);
 }
 
 

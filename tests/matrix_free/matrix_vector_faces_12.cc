@@ -106,7 +106,7 @@ public:
   virtual std::unique_ptr<Manifold<dim>>
   clone() const override
   {
-    return std_cxx14::make_unique<PeriodicHillManifold<dim>>();
+    return std::make_unique<PeriodicHillManifold<dim>>();
   }
 
   virtual Point<dim>

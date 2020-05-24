@@ -429,18 +429,17 @@ namespace TrilinosWrappers
     if (needs_deep_copy)
       {
         column_space_map =
-          std_cxx14::make_unique<Epetra_Map>(rhs.trilinos_matrix().DomainMap());
+          std::make_unique<Epetra_Map>(rhs.trilinos_matrix().DomainMap());
 
         // release memory before reallocation
-        matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(*rhs.matrix);
+        matrix = std::make_unique<Epetra_FECrsMatrix>(*rhs.matrix);
 
         matrix->FillComplete(*column_space_map, matrix->RowMap());
       }
 
     if (rhs.nonlocal_matrix.get() != nullptr)
       nonlocal_matrix =
-        std_cxx14::make_unique<Epetra_CrsMatrix>(Copy,
-                                                 rhs.nonlocal_matrix->Graph());
+        std::make_unique<Epetra_CrsMatrix>(Copy, rhs.nonlocal_matrix->Graph());
   }
 
 
@@ -466,7 +465,7 @@ namespace TrilinosWrappers
       nonlocal_matrix.reset();
       nonlocal_matrix_exporter.reset();
 
-      column_space_map = std_cxx14::make_unique<Epetra_Map>(
+      column_space_map = std::make_unique<Epetra_Map>(
         column_parallel_partitioning.make_trilinos_map(communicator, false));
 
       if (column_space_map->Comm().MyPID() == 0)
@@ -492,7 +491,7 @@ namespace TrilinosWrappers
                                    sparsity_pattern,
                                    communicator,
                                    exchange_data);
-          matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(
+          matrix = std::make_unique<Epetra_FECrsMatrix>(
             Copy, trilinos_sparsity.trilinos_sparsity_pattern(), false);
 
           return;
@@ -522,11 +521,12 @@ namespace TrilinosWrappers
       // columns as well. Compare this with bug # 4123 in the Sandia Bugzilla.
       std::unique_ptr<Epetra_CrsGraph> graph;
       if (row_space_map.Comm().NumProc() > 1)
-        graph = std_cxx14::make_unique<Epetra_CrsGraph>(
-          Copy, row_space_map, n_entries_per_row.data(), true);
+        graph = std::make_unique<Epetra_CrsGraph>(Copy,
+                                                  row_space_map,
+                                                  n_entries_per_row.data(),
+                                                  true);
       else
-        graph =
-          std_cxx14::make_unique<Epetra_CrsGraph>(Copy,
+        graph = std::make_unique<Epetra_CrsGraph>(Copy,
                                                   row_space_map,
                                                   *column_space_map,
                                                   n_entries_per_row.data(),
@@ -570,7 +570,7 @@ namespace TrilinosWrappers
       (void)n_global_cols;
 
       // And now finally generate the matrix.
-      matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
+      matrix = std::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
     }
 
 
@@ -617,7 +617,7 @@ namespace TrilinosWrappers
       nonlocal_matrix.reset();
       nonlocal_matrix_exporter.reset();
 
-      column_space_map = std_cxx14::make_unique<Epetra_Map>(
+      column_space_map = std::make_unique<Epetra_Map>(
         column_parallel_partitioning.make_trilinos_map(communicator, false));
 
       AssertDimension(sparsity_pattern.n_rows(),
@@ -692,23 +692,26 @@ namespace TrilinosWrappers
       std::unique_ptr<Epetra_CrsGraphMod> nonlocal_graph;
       if (row_space_map.Comm().NumProc() > 1)
         {
-          graph = std_cxx14::make_unique<Epetra_CrsGraph>(
-            Copy,
-            row_space_map,
-            (n_entries_per_row.size() > 0) ? (n_entries_per_row.data()) :
-                                             nullptr,
-            exchange_data ? false : true);
+          graph =
+            std::make_unique<Epetra_CrsGraph>(Copy,
+                                              row_space_map,
+                                              (n_entries_per_row.size() > 0) ?
+                                                (n_entries_per_row.data()) :
+                                                nullptr,
+                                              exchange_data ? false : true);
           if (have_ghost_rows == true)
-            nonlocal_graph = std_cxx14::make_unique<Epetra_CrsGraphMod>(
+            nonlocal_graph = std::make_unique<Epetra_CrsGraphMod>(
               off_processor_map, n_entries_per_ghost_row.data());
         }
       else
-        graph = std_cxx14::make_unique<Epetra_CrsGraph>(
-          Copy,
-          row_space_map,
-          *column_space_map,
-          (n_entries_per_row.size() > 0) ? (n_entries_per_row.data()) : nullptr,
-          true);
+        graph =
+          std::make_unique<Epetra_CrsGraph>(Copy,
+                                            row_space_map,
+                                            *column_space_map,
+                                            (n_entries_per_row.size() > 0) ?
+                                              (n_entries_per_row.data()) :
+                                              nullptr,
+                                            true);
 
       // now insert the indices, select between the right matrix
       std::vector<TrilinosWrappers::types::int_type> row_indices;
@@ -761,7 +764,7 @@ namespace TrilinosWrappers
             }
 
           nonlocal_matrix =
-            std_cxx14::make_unique<Epetra_CrsMatrix>(Copy, *nonlocal_graph);
+            std::make_unique<Epetra_CrsMatrix>(Copy, *nonlocal_graph);
         }
 
       graph->FillComplete(*column_space_map, row_space_map);
@@ -770,7 +773,7 @@ namespace TrilinosWrappers
       AssertDimension(sparsity_pattern.n_cols(),
                       TrilinosWrappers::n_global_cols(*graph));
 
-      matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
+      matrix = std::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
     }
   } // namespace
 
@@ -829,13 +832,14 @@ namespace TrilinosWrappers
 
     // reinit with a (parallel) Trilinos sparsity pattern.
     column_space_map =
-      std_cxx14::make_unique<Epetra_Map>(sparsity_pattern.domain_partitioner());
-    matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(
+      std::make_unique<Epetra_Map>(sparsity_pattern.domain_partitioner());
+    matrix = std::make_unique<Epetra_FECrsMatrix>(
       Copy, sparsity_pattern.trilinos_sparsity_pattern(), false);
 
     if (sparsity_pattern.nonlocal_graph.get() != nullptr)
-      nonlocal_matrix = std_cxx14::make_unique<Epetra_CrsMatrix>(
-        Copy, *sparsity_pattern.nonlocal_graph);
+      nonlocal_matrix =
+        std::make_unique<Epetra_CrsMatrix>(Copy,
+                                           *sparsity_pattern.nonlocal_graph);
     else
       nonlocal_matrix.reset();
 
@@ -851,15 +855,15 @@ namespace TrilinosWrappers
     if (this == &sparse_matrix)
       return;
 
-    column_space_map = std_cxx14::make_unique<Epetra_Map>(
-      sparse_matrix.trilinos_matrix().DomainMap());
+    column_space_map =
+      std::make_unique<Epetra_Map>(sparse_matrix.trilinos_matrix().DomainMap());
     matrix.reset();
     nonlocal_matrix_exporter.reset();
-    matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(
+    matrix = std::make_unique<Epetra_FECrsMatrix>(
       Copy, sparse_matrix.trilinos_sparsity_pattern(), false);
 
     if (sparse_matrix.nonlocal_matrix != nullptr)
-      nonlocal_matrix = std_cxx14::make_unique<Epetra_CrsMatrix>(
+      nonlocal_matrix = std::make_unique<Epetra_CrsMatrix>(
         Copy, sparse_matrix.nonlocal_matrix->Graph());
     else
       nonlocal_matrix.reset();
@@ -1008,15 +1012,14 @@ namespace TrilinosWrappers
     Assert(input_matrix.Filled() == true,
            ExcMessage("Input CrsMatrix has not called FillComplete()!"));
 
-    column_space_map =
-      std_cxx14::make_unique<Epetra_Map>(input_matrix.DomainMap());
+    column_space_map = std::make_unique<Epetra_Map>(input_matrix.DomainMap());
 
     const Epetra_CrsGraph *graph = &input_matrix.Graph();
 
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
     matrix.reset();
-    matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
+    matrix = std::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
 
     matrix->FillComplete(*column_space_map, input_matrix.RangeMap(), true);
 
@@ -1071,8 +1074,8 @@ namespace TrilinosWrappers
         nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
         if (nonlocal_matrix_exporter.get() == nullptr)
           nonlocal_matrix_exporter =
-            std_cxx14::make_unique<Epetra_Export>(nonlocal_matrix->RowMap(),
-                                                  matrix->RowMap());
+            std::make_unique<Epetra_Export>(nonlocal_matrix->RowMap(),
+                                            matrix->RowMap());
         ierr =
           matrix->Export(*nonlocal_matrix, *nonlocal_matrix_exporter, mode);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -1102,11 +1105,8 @@ namespace TrilinosWrappers
     // the pointer and generate an
     // empty matrix.
     column_space_map =
-      std_cxx14::make_unique<Epetra_Map>(0,
-                                         0,
-                                         Utilities::Trilinos::comm_self());
-    matrix =
-      std_cxx14::make_unique<Epetra_FECrsMatrix>(View, *column_space_map, 0);
+      std::make_unique<Epetra_Map>(0, 0, Utilities::Trilinos::comm_self());
+    matrix = std::make_unique<Epetra_FECrsMatrix>(View, *column_space_map, 0);
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
 

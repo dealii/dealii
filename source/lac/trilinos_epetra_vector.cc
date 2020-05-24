@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/lac/trilinos_epetra_vector.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -72,7 +70,7 @@ namespace LinearAlgebra
       Epetra_Map input_map =
         parallel_partitioner.make_trilinos_map(communicator, false);
       if (vector->Map().SameAs(input_map) == false)
-        vector = std_cxx14::make_unique<Epetra_FEVector>(input_map);
+        vector = std::make_unique<Epetra_FEVector>(input_map);
       else if (omit_zeroing_entries == false)
         {
           const int ierr = vector->PutScalar(0.);
@@ -123,8 +121,7 @@ namespace LinearAlgebra
               (void)ierr;
             }
           else
-            vector =
-              std_cxx14::make_unique<Epetra_FEVector>(V.trilinos_vector());
+            vector = std::make_unique<Epetra_FEVector>(V.trilinos_vector());
         }
 
       return *this;

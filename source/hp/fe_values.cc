@@ -13,12 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/hp/fe_values.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -90,11 +91,10 @@ namespace hp
               nullptr)
             task_group += Threads::new_task([&, fe_index, m_index, q_index]() {
               fe_values_table[fe_index][m_index][q_index] =
-                std_cxx14::make_unique<FEValuesType>(
-                  (*mapping_collection)[m_index],
-                  (*fe_collection)[fe_index],
-                  q_collection[q_index],
-                  update_flags);
+                std::make_unique<FEValuesType>((*mapping_collection)[m_index],
+                                               (*fe_collection)[fe_index],
+                                               q_collection[q_index],
+                                               update_flags);
             });
 
     task_group.join_all();
@@ -124,11 +124,10 @@ namespace hp
     // of indices
     if (fe_values_table(present_fe_values_index).get() == nullptr)
       fe_values_table(present_fe_values_index) =
-        std_cxx14::make_unique<FEValuesType>(
-          (*mapping_collection)[mapping_index],
-          (*fe_collection)[fe_index],
-          q_collection[q_index],
-          update_flags);
+        std::make_unique<FEValuesType>((*mapping_collection)[mapping_index],
+                                       (*fe_collection)[fe_index],
+                                       q_collection[q_index],
+                                       update_flags);
 
     // now there definitely is one!
     return *fe_values_table(present_fe_values_index);
@@ -160,7 +159,7 @@ namespace hp
         task_group +=
           Threads::new_task([&, fe_index, mapping_index, q_index]() {
             fe_values_table(TableIndices<3>(fe_index, mapping_index, q_index)) =
-              std_cxx14::make_unique<FEValuesType>(
+              std::make_unique<FEValuesType>(
                 (*mapping_collection)[mapping_index],
                 (*fe_collection)[fe_index],
                 q_collection[q_index],

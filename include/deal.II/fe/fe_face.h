@@ -343,7 +343,7 @@ protected:
                                                                        spacedim>
       & /*output_data*/) const override
   {
-    return std_cxx14::make_unique<
+    return std::make_unique<
       typename FiniteElement<1, spacedim>::InternalDataBase>();
   }
 
@@ -357,8 +357,8 @@ protected:
       & /*output_data*/) const override
   {
     // generate a new data object and initialize some fields
-    auto data_ptr = std_cxx14::make_unique<
-      typename FiniteElement<1, spacedim>::InternalDataBase>();
+    auto data_ptr =
+      std::make_unique<typename FiniteElement<1, spacedim>::InternalDataBase>();
     data_ptr->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();

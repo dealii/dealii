@@ -16,7 +16,6 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_bernstein.h>
@@ -32,6 +31,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 
@@ -163,7 +163,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGQ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGQ<dim, spacedim>>(*this);
+  return std::make_unique<FE_DGQ<dim, spacedim>>(*this);
 }
 
 
@@ -958,8 +958,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
   Quadrature<1> pquadrature(qpoints);
 
-  return std_cxx14::make_unique<FE_DGQArbitraryNodes<dim, spacedim>>(
-    pquadrature);
+  return std::make_unique<FE_DGQArbitraryNodes<dim, spacedim>>(pquadrature);
 }
 
 
@@ -1002,7 +1001,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGQLegendre<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGQLegendre<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_DGQLegendre<dim, spacedim>>(this->degree);
 }
 
 
@@ -1031,7 +1030,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGQHermite<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGQHermite<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_DGQHermite<dim, spacedim>>(this->degree);
 }
 
 

@@ -17,12 +17,12 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <cmath>
 #include <cstdlib>
 #include <iterator>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -153,7 +153,7 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
 
   if (is_tensor_product_flag)
     {
-      tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>>();
+      tensor_basis = std::make_unique<std::array<Quadrature<1>, dim>>();
       for (unsigned int i = 0; i < dim - 1; ++i)
         (*tensor_basis)[i] = q1.get_tensor_basis()[i];
       (*tensor_basis)[dim - 1] = q2;
@@ -251,7 +251,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
           ++k;
         }
 
-  tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>>();
+  tensor_basis = std::make_unique<std::array<Quadrature<1>, dim>>();
   for (unsigned int i = 0; i < dim; ++i)
     (*tensor_basis)[i] = q;
 }
@@ -267,7 +267,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim> &q)
 {
   if (dim > 1 && is_tensor_product_flag)
     tensor_basis =
-      std_cxx14::make_unique<std::array<Quadrature<1>, dim>>(*q.tensor_basis);
+      std::make_unique<std::array<Quadrature<1>, dim>>(*q.tensor_basis);
 }
 
 
@@ -282,8 +282,8 @@ Quadrature<dim>::operator=(const Quadrature<dim> &q)
   if (dim > 1 && is_tensor_product_flag)
     {
       if (tensor_basis == nullptr)
-        tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>>(
-          *q.tensor_basis);
+        tensor_basis =
+          std::make_unique<std::array<Quadrature<1>, dim>>(*q.tensor_basis);
       else
         *tensor_basis = *q.tensor_basis;
     }
@@ -384,8 +384,7 @@ QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy)
   Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
   const std::array<Quadrature<1>, 2> q_array{{qx, qy}};
-  this->tensor_basis =
-    std_cxx14::make_unique<std::array<Quadrature<1>, 2>>(q_array);
+  this->tensor_basis = std::make_unique<std::array<Quadrature<1>, 2>>(q_array);
 }
 
 
@@ -420,8 +419,7 @@ QAnisotropic<3>::QAnisotropic(const Quadrature<1> &qx,
   Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
   const std::array<Quadrature<1>, 3> q_array{{qx, qy, qz}};
-  this->tensor_basis =
-    std_cxx14::make_unique<std::array<Quadrature<1>, 3>>(q_array);
+  this->tensor_basis = std::make_unique<std::array<Quadrature<1>, 3>>(q_array);
 }
 
 

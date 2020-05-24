@@ -22,7 +22,6 @@
 // degree used.
 
 
-#include <deal.II/base/std_cxx14/algorithm.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>
@@ -53,6 +52,8 @@
 #include <deal.II/multigrid/multigrid.h>
 
 #include <deal.II/numerics/vector_tools.h>
+
+#include <algorithm>
 
 #include "../tests.h"
 
@@ -260,7 +261,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
       constraints_ptrs[i] = &constraints[i];
     }
   QGauss<1>     quad(n_q_points_1d);
-  constexpr int max_degree = std_cxx14::max(fe_degree_1, fe_degree_2);
+  constexpr int max_degree = std::max(fe_degree_1, fe_degree_2);
   MappingQ<dim> mapping(max_degree);
 
   typename MatrixFree<dim, number>::AdditionalData fine_level_additional_data;
@@ -431,7 +432,7 @@ test()
     parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(6 - dim);
-  constexpr int      max_degree = std_cxx14::max(fe_degree_1, fe_degree_2);
+  constexpr int      max_degree = std::max(fe_degree_1, fe_degree_2);
   const unsigned int n_runs     = max_degree == 1 ? 6 - dim : 5 - dim;
   for (unsigned int i = 0; i < n_runs; ++i)
     {
@@ -457,8 +458,7 @@ test()
 
       std::vector<const DoFHandler<dim, dim> *> dh_ptrs{&dof_1, &dof_2};
 
-      constexpr int n_q_points_1d =
-        std_cxx14::max(fe_degree_1, fe_degree_2) + 1;
+      constexpr int n_q_points_1d = std::max(fe_degree_1, fe_degree_2) + 1;
       do_test<dim, fe_degree_1, fe_degree_2, n_q_points_1d, double>(dh_ptrs);
     }
 }

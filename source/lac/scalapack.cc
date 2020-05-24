@@ -21,13 +21,14 @@
 #  include <deal.II/base/array_view.h>
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/mpi.templates.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/lac/scalapack.templates.h>
 
 #  ifdef DEAL_II_WITH_HDF5
 #    include <hdf5.h>
 #  endif
+
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1501,10 +1502,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   // distributed matrix
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
-                                                          grid,
-                                                          row_block_size) :
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                    grid,
+                                                    row_block_size) :
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
   eigenvectors->property = property;
@@ -1832,10 +1833,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   // distributed matrix.
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
-                                                          grid,
-                                                          row_block_size) :
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                    grid,
+                                                    row_block_size) :
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
   eigenvectors->property = property;

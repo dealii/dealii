@@ -17,7 +17,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/utilities.h>
 
@@ -33,6 +32,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 // TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
@@ -136,7 +136,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_RaviartThomas<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_RaviartThomas<dim>>(*this);
+  return std::make_unique<FE_RaviartThomas<dim>>(*this);
 }
 
 
@@ -215,8 +215,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
         poly[d] = Polynomials::Legendre::generate_complete_basis(deg);
       poly[dd] = Polynomials::Legendre::generate_complete_basis(deg - 1);
 
-      polynomials[dd] =
-        std_cxx14::make_unique<AnisotropicPolynomials<dim>>(poly);
+      polynomials[dd] = std::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
 
   interior_weights.reinit(
@@ -351,8 +350,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
       poly[dd] =
         Polynomials::Legendre::generate_complete_basis(this->degree - 2);
 
-      polynomials[dd] =
-        std_cxx14::make_unique<AnisotropicPolynomials<dim>>(poly);
+      polynomials[dd] = std::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
 
   QGauss<dim>        q_cell(this->degree);

@@ -450,7 +450,7 @@ ChunkSparseMatrix<number>::reinit(const ChunkSparsityPattern &sparsity)
     cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size;
   if (N > max_len || max_len == 0)
     {
-      val     = std_cxx14::make_unique<number[]>(N);
+      val     = std::make_unique<number[]>(N);
       max_len = N;
     }
 
@@ -1598,7 +1598,7 @@ ChunkSparseMatrix<number>::block_read(std::istream &in)
   AssertThrow(c == '[', ExcIO());
 
   // reallocate space
-  val = std_cxx14::make_unique<number[]>(max_len);
+  val = std::make_unique<number[]>(max_len);
 
   // then read data
   in.read(reinterpret_cast<char *>(val.get()),

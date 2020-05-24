@@ -17,7 +17,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -64,23 +63,28 @@ namespace internal
           {
             case 1:
               if (spacedim == 1)
-                q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
+                q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               else if (spacedim == 2)
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), q_dummy);
+                q_fine =
+                  std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
+                                                      q_dummy);
               else
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), q_dummy, q_dummy);
+                q_fine =
+                  std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
+                                                      q_dummy,
+                                                      q_dummy);
               break;
             case 2:
               if (spacedim == 2)
-                q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
+                q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               else
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), QGauss<1>(degree + 1), q_dummy);
+                q_fine =
+                  std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
+                                                      QGauss<1>(degree + 1),
+                                                      q_dummy);
               break;
             case 3:
-              q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
+              q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               break;
             default:
               Assert(false, ExcInternalError());
@@ -343,7 +347,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Q_Bubbles<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_Bubbles<dim, spacedim>>(*this);
+  return std::make_unique<FE_Q_Bubbles<dim, spacedim>>(*this);
 }
 
 
