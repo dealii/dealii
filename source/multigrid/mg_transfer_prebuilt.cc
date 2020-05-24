@@ -86,8 +86,8 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
   prolongation_matrices[to_level - 1]->vmult(dst, src);
-  this->mg_constrained_dofs->get_user_constraint_matrix(to_level)
-    .distribute(dst);
+  this->mg_constrained_dofs->get_user_constraint_matrix(to_level).distribute(
+    dst);
 }
 
 
