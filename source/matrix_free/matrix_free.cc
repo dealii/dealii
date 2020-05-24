@@ -30,11 +30,4 @@ DEAL_II_NAMESPACE_OPEN
 #endif
 #include "matrix_free.inst"
 
-#if SPLIT_INSTANTIATIONS_INDEX == 0
-
-template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<float>;
-
-#endif
-
 DEAL_II_NAMESPACE_CLOSE
