@@ -216,14 +216,14 @@ TensorProductManifold<dim,
                       spacedim_B,
                       chartdim_B>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductManifold<dim,
-                                                      dim_A,
-                                                      spacedim_A,
-                                                      chartdim_A,
-                                                      dim_B,
-                                                      spacedim_B,
-                                                      chartdim_B>>(*manifold_A,
-                                                                   *manifold_B);
+  return std::make_unique<TensorProductManifold<dim,
+                                                dim_A,
+                                                spacedim_A,
+                                                chartdim_A,
+                                                dim_B,
+                                                spacedim_B,
+                                                chartdim_B>>(*manifold_A,
+                                                             *manifold_B);
 }
 
 template <int dim,

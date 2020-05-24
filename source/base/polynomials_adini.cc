@@ -260,7 +260,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 PolynomialsAdini<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsAdini<dim>>(*this);
+  return std::make_unique<PolynomialsAdini<dim>>(*this);
 }
 
 

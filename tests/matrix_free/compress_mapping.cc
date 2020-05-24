@@ -186,7 +186,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, dim>>
   clone() const
   {
-    return std_cxx14::make_unique<DeformedManifold<dim>>();
+    return std::make_unique<DeformedManifold<dim>>();
   }
 
   virtual Point<dim>

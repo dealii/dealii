@@ -403,7 +403,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 PolynomialSpace<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialSpace<dim>>(*this);
+  return std::make_unique<PolynomialSpace<dim>>(*this);
 }
 
 

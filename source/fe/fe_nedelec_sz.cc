@@ -134,7 +134,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 {
   std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr   = std_cxx14::make_unique<InternalData>();
+        data_ptr   = std::make_unique<InternalData>();
   auto &data       = dynamic_cast<InternalData &>(*data_ptr);
   data.update_each = requires_update_flags(update_flags);
 
@@ -2221,7 +2221,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_NedelecSZ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_NedelecSZ<dim, spacedim>>(*this);
+  return std::make_unique<FE_NedelecSZ<dim, spacedim>>(*this);
 }
 
 

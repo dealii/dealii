@@ -131,7 +131,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 PolarManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<PolarManifold<dim, spacedim>>(center);
+  return std::make_unique<PolarManifold<dim, spacedim>>(center);
 }
 
 
@@ -362,7 +362,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 SphericalManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<SphericalManifold<dim, spacedim>>(center);
+  return std::make_unique<SphericalManifold<dim, spacedim>>(center);
 }
 
 
@@ -1072,8 +1072,9 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 CylindricalManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<CylindricalManifold<dim, spacedim>>(
-    direction, point_on_axis, tolerance);
+  return std::make_unique<CylindricalManifold<dim, spacedim>>(direction,
+                                                              point_on_axis,
+                                                              tolerance);
 }
 
 
@@ -1231,8 +1232,9 @@ std::unique_ptr<Manifold<dim, spacedim>>
 EllipticalManifold<dim, spacedim>::clone() const
 {
   const double eccentricity = 1.0 / cosh_u;
-  return std_cxx14::make_unique<EllipticalManifold<dim, spacedim>>(
-    center, direction, eccentricity);
+  return std::make_unique<EllipticalManifold<dim, spacedim>>(center,
+                                                             direction,
+                                                             eccentricity);
 }
 
 
@@ -1461,7 +1463,7 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
   // used to construct this class.
   if (!(push_forward_expression.empty() && pull_back_expression.empty()))
     {
-      return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
+      return std::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
         push_forward_expression,
         pull_back_expression,
         this->get_periodicity(),
@@ -1473,7 +1475,7 @@ FunctionManifold<dim, spacedim, chartdim>::clone() const
     }
   else
     {
-      return std_cxx14::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
+      return std::make_unique<FunctionManifold<dim, spacedim, chartdim>>(
         *push_forward_function,
         *pull_back_function,
         this->get_periodicity(),
@@ -1596,7 +1598,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim, 3>>
 TorusManifold<dim>::clone() const
 {
-  return std_cxx14::make_unique<TorusManifold<dim>>(R, r);
+  return std::make_unique<TorusManifold<dim>>(R, r);
 }
 
 

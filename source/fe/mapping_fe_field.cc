@@ -610,7 +610,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_data(
   const Quadrature<dim> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
+    std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   this->compute_data(update_flags, quadrature, quadrature.size(), data);
 
@@ -626,7 +626,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_face_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
+    std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(QProjector<dim>::project_to_all_faces(quadrature));
   this->compute_face_data(update_flags, q, quadrature.size(), data);
@@ -642,7 +642,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
+    std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(QProjector<dim>::project_to_all_subfaces(quadrature));
   this->compute_face_data(update_flags, q, quadrature.size(), data);
@@ -2308,7 +2308,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::clone() const
 {
-  return std_cxx14::make_unique<
+  return std::make_unique<
     MappingFEField<dim, spacedim, VectorType, DoFHandlerType>>(*this);
 }
 

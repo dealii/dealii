@@ -55,7 +55,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ1<dim, spacedim>>(*this);
+  return std::make_unique<MappingQ1<dim, spacedim>>(*this);
 }
 
 //---------------------------------------------------------------------------

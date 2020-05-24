@@ -72,7 +72,7 @@ namespace PETScWrappers
     // is necessary
     if (solver_data.get() == nullptr)
       {
-        solver_data = std_cxx14::make_unique<SolverData>();
+        solver_data = std::make_unique<SolverData>();
 
         PetscErrorCode ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -214,7 +214,7 @@ namespace PETScWrappers
   {
     PetscErrorCode ierr;
 
-    solver_data = std_cxx14::make_unique<SolverData>();
+    solver_data = std::make_unique<SolverData>();
 
     ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -698,7 +698,7 @@ namespace PETScWrappers
      */
     if (solver_data == nullptr)
       {
-        solver_data = std_cxx14::make_unique<SolverDataMUMPS>();
+        solver_data = std::make_unique<SolverDataMUMPS>();
 
         /**
          * creates the default KSP context and puts it in the location

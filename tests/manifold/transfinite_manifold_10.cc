@@ -38,7 +38,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std_cxx14::make_unique<InnerTorusManifold>();
+    return std::make_unique<InnerTorusManifold>();
   }
 
   virtual Point<chartdim>

@@ -620,8 +620,8 @@ public:
    * This constructor is useful because it allows creating function objects at
    * the place of calling the constructor without having to name and later
    * delete these objects. This allows the following idiom:
-   * FunctionManifold<dim> manifold(std_cxx14::make_unique<MyPushForward>(...),
-   *                                std_cxx14::make_unique<MyPullBack>(...));
+   * FunctionManifold<dim> manifold(std::make_unique<MyPushForward>(...),
+   *                                std::make_unique<MyPullBack>(...));
    */
   FunctionManifold(
     std::unique_ptr<Function<chartdim>> push_forward,

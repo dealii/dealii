@@ -347,7 +347,7 @@ FESystem<dim, spacedim>::clone() const
       fes.push_back(&base_element(i));
       multiplicities.push_back(this->element_multiplicity(i));
     }
-  return std_cxx14::make_unique<FESystem<dim, spacedim>>(fes, multiplicities);
+  return std::make_unique<FESystem<dim, spacedim>>(fes, multiplicities);
 }
 
 
@@ -923,8 +923,8 @@ FESystem<dim, spacedim>::get_data(
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr = std_cxx14::make_unique<InternalData>(this->n_base_elements());
-  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
+        data_ptr   = std::make_unique<InternalData>(this->n_base_elements());
+  auto &data       = dynamic_cast<InternalData &>(*data_ptr);
   data.update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
@@ -986,8 +986,8 @@ FESystem<dim, spacedim>::get_face_data(
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr = std_cxx14::make_unique<InternalData>(this->n_base_elements());
-  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
+        data_ptr   = std::make_unique<InternalData>(this->n_base_elements());
+  auto &data       = dynamic_cast<InternalData &>(*data_ptr);
   data.update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
@@ -1049,7 +1049,7 @@ FESystem<dim, spacedim>::get_subface_data(
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr = std_cxx14::make_unique<InternalData>(this->n_base_elements());
+        data_ptr = std::make_unique<InternalData>(this->n_base_elements());
   auto &data     = dynamic_cast<InternalData &>(*data_ptr);
 
   data.update_each = requires_update_flags(flags);

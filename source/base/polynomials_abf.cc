@@ -185,7 +185,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsABF<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsABF<dim>>(*this);
+  return std::make_unique<PolynomialsABF<dim>>(*this);
 }
 
 

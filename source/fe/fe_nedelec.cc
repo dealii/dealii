@@ -224,7 +224,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_Nedelec<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Nedelec<dim>>(*this);
+  return std::make_unique<FE_Nedelec<dim>>(*this);
 }
 
 //---------------------------------------------------------------------------

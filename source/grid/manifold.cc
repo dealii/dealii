@@ -527,8 +527,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 FlatManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FlatManifold<dim, spacedim>>(periodicity,
-                                                             tolerance);
+  return std::make_unique<FlatManifold<dim, spacedim>>(periodicity, tolerance);
 }
 
 

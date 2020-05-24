@@ -101,8 +101,8 @@ void
 KDTree<dim>::set_points(const std::vector<Point<dim>> &pts)
 {
   Assert(pts.size() > 0, ExcMessage("Expecting a non zero set of points."));
-  adaptor = std_cxx14::make_unique<PointCloudAdaptor>(pts);
-  kdtree  = std_cxx14::make_unique<NanoFlannKDTree>(
+  adaptor = std::make_unique<PointCloudAdaptor>(pts);
+  kdtree  = std::make_unique<NanoFlannKDTree>(
     dim, *adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
   kdtree->buildIndex();
 }

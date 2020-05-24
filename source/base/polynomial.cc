@@ -374,7 +374,7 @@ namespace Polynomials
     const Polynomial<number> *          q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
-        q_data = std_cxx14::make_unique<Polynomial<number>>(p);
+        q_data = std::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -418,7 +418,7 @@ namespace Polynomials
     const Polynomial<number> *          q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
-        q_data = std_cxx14::make_unique<Polynomial<number>>(p);
+        q_data = std::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -454,7 +454,7 @@ namespace Polynomials
     const Polynomial<number> *          q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
-        q_data = std_cxx14::make_unique<Polynomial<number>>(p);
+        q_data = std::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -599,7 +599,7 @@ namespace Polynomials
     const Polynomial<number> *          q = nullptr;
     if (in_lagrange_product_form == true)
       {
-        q_data = std_cxx14::make_unique<Polynomial<number>>(*this);
+        q_data = std::make_unique<Polynomial<number>>(*this);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -625,7 +625,7 @@ namespace Polynomials
     const Polynomial<number> *          q = nullptr;
     if (in_lagrange_product_form == true)
       {
-        q_data = std_cxx14::make_unique<Polynomial<number>>(*this);
+        q_data = std::make_unique<Polynomial<number>>(*this);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -1071,9 +1071,9 @@ namespace Polynomials
             // now make these arrays
             // const
             recursive_coefficients[0] =
-              std_cxx14::make_unique<const std::vector<double>>(std::move(c0));
+              std::make_unique<const std::vector<double>>(std::move(c0));
             recursive_coefficients[1] =
-              std_cxx14::make_unique<const std::vector<double>>(std::move(c1));
+              std::make_unique<const std::vector<double>>(std::move(c1));
           }
         else if (k == 2)
           {
@@ -1090,7 +1090,7 @@ namespace Polynomials
             c2[2] = 4. * a;
 
             recursive_coefficients[2] =
-              std_cxx14::make_unique<const std::vector<double>>(std::move(c2));
+              std::make_unique<const std::vector<double>>(std::move(c2));
           }
         else
           {
@@ -1134,7 +1134,7 @@ namespace Polynomials
             // const pointer in the
             // coefficients array
             recursive_coefficients[k] =
-              std_cxx14::make_unique<const std::vector<double>>(std::move(ck));
+              std::make_unique<const std::vector<double>>(std::move(ck));
           }
       }
   }

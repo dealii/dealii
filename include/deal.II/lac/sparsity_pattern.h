@@ -1595,8 +1595,8 @@ SparsityPatternBase::load(Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
-  colnums  = std_cxx14::make_unique<size_type[]>(max_vec_len);
+  rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
+  colnums  = std::make_unique<size_type[]>(max_vec_len);
 
   ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
   ar &boost::serialization::make_array(colnums.get(), max_vec_len);

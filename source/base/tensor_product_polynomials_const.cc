@@ -203,7 +203,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 TensorProductPolynomialsConst<dim>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductPolynomialsConst<dim>>(*this);
+  return std::make_unique<TensorProductPolynomialsConst<dim>>(*this);
 }
 
 

@@ -232,8 +232,10 @@ namespace Step27
     // Now we are ready to set-up the FESeries::Fourier object
     const std::vector<unsigned int> n_coefficients_per_direction(
       fe_collection.size(), N);
-    fourier = std_cxx14::make_unique<FESeries::Fourier<dim>>(
-      n_coefficients_per_direction, fe_collection, fourier_q_collection);
+    fourier =
+      std::make_unique<FESeries::Fourier<dim>>(n_coefficients_per_direction,
+                                               fe_collection,
+                                               fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.

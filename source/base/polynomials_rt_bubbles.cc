@@ -849,7 +849,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsRT_Bubbles<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsRT_Bubbles<dim>>(*this);
+  return std::make_unique<PolynomialsRT_Bubbles<dim>>(*this);
 }
 
 

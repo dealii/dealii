@@ -192,8 +192,8 @@ namespace FETools
                 .get() == nullptr)
             {
               auto interpolation_matrix =
-                std_cxx14::make_unique<FullMatrix<double>>(dofs_per_cell2,
-                                                           dofs_per_cell1);
+                std::make_unique<FullMatrix<double>>(dofs_per_cell2,
+                                                     dofs_per_cell1);
 
               get_interpolation_matrix(cell1->get_fe(),
                                        cell2->get_fe(),
@@ -342,8 +342,8 @@ namespace FETools
           if (interpolation_matrices[&cell->get_fe()] == nullptr)
             {
               interpolation_matrices[&cell->get_fe()] =
-                std_cxx14::make_unique<FullMatrix<double>>(dofs_per_cell1,
-                                                           dofs_per_cell1);
+                std::make_unique<FullMatrix<double>>(dofs_per_cell1,
+                                                     dofs_per_cell1);
               get_back_interpolation_matrix(
                 cell->get_fe(), fe2, *interpolation_matrices[&cell->get_fe()]);
             }

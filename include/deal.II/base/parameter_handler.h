@@ -1939,7 +1939,7 @@ operator|(const ParameterHandler::OutputStyle f1,
  *
  *     void HelperClass::create_new (const unsigned int run_no)
  *     {
- *       p = std_cxx14::make_unique<Problem>());
+ *       p = std::make_unique<Problem>());
  *     }
  *
  *

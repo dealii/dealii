@@ -141,7 +141,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_Q_Hierarchical<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_Hierarchical<dim>>(*this);
+  return std::make_unique<FE_Q_Hierarchical<dim>>(*this);
 }
 
 

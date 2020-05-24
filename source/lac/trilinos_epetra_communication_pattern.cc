@@ -63,8 +63,8 @@ namespace LinearAlgebra
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
-      import = std_cxx14::make_unique<Epetra_Import>(read_write_vector_map,
-                                                     vector_space_vector_map);
+      import = std::make_unique<Epetra_Import>(read_write_vector_map,
+                                               vector_space_vector_map);
     }
 
 

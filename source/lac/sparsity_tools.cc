@@ -311,8 +311,7 @@ namespace SparsityTools
       (void)cell_weights;
 
       // MPI environment must have been initialized by this point.
-      std::unique_ptr<Zoltan> zz =
-        std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
+      std::unique_ptr<Zoltan> zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
 
       // General parameters
       // DEBUG_LEVEL call must precede the call to LB_METHOD
@@ -465,7 +464,7 @@ namespace SparsityTools
     return 0;
 #else
     // coloring algorithm is run in serial by each processor.
-    std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
+    std::unique_ptr<Zoltan> zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
 
     // Coloring parameters
     // DEBUG_LEVEL must precede all other calls

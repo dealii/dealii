@@ -56,7 +56,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQCache<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQCache<dim, spacedim>>(*this);
+  return std::make_unique<MappingQCache<dim, spacedim>>(*this);
 }
 
 

@@ -1415,7 +1415,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
            dof_handler.get_triangulation().n_active_cells()));
 
 
-  auto new_entry = std_cxx14::make_unique<
+  auto new_entry = std::make_unique<
     internal::DataOutImplementation::DataEntry<DoFHandlerType, VectorType>>(
     &dof_handler, &vec, &data_postprocessor);
   dof_data.emplace_back(std::move(new_entry));
@@ -1537,7 +1537,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
          DataComponentInterpretation::component_is_scalar));
 
   // finally, add the data vector:
-  auto new_entry = std_cxx14::make_unique<
+  auto new_entry = std::make_unique<
     internal::DataOutImplementation::DataEntry<DoFHandlerType, VectorType>>(
     dof_handler, &data_vector, deduced_names, data_component_interpretation);
 
@@ -1610,7 +1610,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
          ExcMessage(
            "Invalid number of entries in data_component_interpretation."));
 
-  auto new_entry = std_cxx14::make_unique<
+  auto new_entry = std::make_unique<
     internal::DataOutImplementation::MGDataEntry<DoFHandlerType, VectorType>>(
     &dof_handler, &data, deduced_names, data_component_interpretation);
   dof_data.emplace_back(std::move(new_entry));

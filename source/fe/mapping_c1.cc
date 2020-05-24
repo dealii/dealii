@@ -222,7 +222,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingC1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingC1<dim, spacedim>>();
+  return std::make_unique<MappingC1<dim, spacedim>>();
 }
 
 

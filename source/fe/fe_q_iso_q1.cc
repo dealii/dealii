@@ -100,7 +100,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Q_iso_Q1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_iso_Q1<dim, spacedim>>(*this);
+  return std::make_unique<FE_Q_iso_Q1<dim, spacedim>>(*this);
 }
 
 

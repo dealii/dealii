@@ -1504,7 +1504,7 @@ namespace Patterns
                                 std::unique_ptr<Patterns::PatternBase>>::type
         to_pattern()
       {
-        return std_cxx14::make_unique<Patterns::Bool>();
+        return std::make_unique<Patterns::Bool>();
       }
 
       template <typename Dummy = T>
@@ -1515,7 +1515,7 @@ namespace Patterns
                                 std::unique_ptr<Patterns::PatternBase>>::type
         to_pattern()
       {
-        return std_cxx14::make_unique<Patterns::Integer>(
+        return std::make_unique<Patterns::Integer>(
           std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
       }
 
@@ -1527,7 +1527,7 @@ namespace Patterns
                                 std::unique_ptr<Patterns::PatternBase>>::type
         to_pattern()
       {
-        return std_cxx14::make_unique<Patterns::Double>(
+        return std::make_unique<Patterns::Double>(
           std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
       }
 
@@ -1677,8 +1677,7 @@ namespace Patterns
       constexpr int
       max_list_rank()
       {
-        return std_cxx14::max(RankInfo<T1>::list_rank,
-                              max_list_rank<T2, Types...>());
+        return std::max(RankInfo<T1>::list_rank, max_list_rank<T2, Types...>());
       }
 
       // Helper function for map_rank
@@ -1693,8 +1692,7 @@ namespace Patterns
       constexpr int
       max_map_rank()
       {
-        return std_cxx14::max(RankInfo<T1>::map_rank,
-                              max_map_rank<T2, Types...>());
+        return std::max(RankInfo<T1>::map_rank, max_map_rank<T2, Types...>());
       }
 
       // Rank of vector types
@@ -1762,10 +1760,9 @@ namespace Patterns
       struct RankInfo<std::pair<Key, Value>>
       {
         static constexpr int list_rank =
-          std_cxx14::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
+          std::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
         static constexpr int map_rank =
-          std_cxx14::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank) +
-          1;
+          std::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank) + 1;
       };
 
 
@@ -1787,7 +1784,7 @@ namespace Patterns
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
-        return std_cxx14::make_unique<Patterns::List>(
+        return std::make_unique<Patterns::List>(
           *Convert<typename T::value_type>::to_pattern(),
           0,
           std::numeric_limits<unsigned int>::max(),
@@ -1857,7 +1854,7 @@ namespace Patterns
                       "Cannot use this class for non List-compatible types.");
         static_assert(internal::RankInfo<T>::map_rank > 0,
                       "Cannot use this class for non Map-compatible types.");
-        return std_cxx14::make_unique<Patterns::Map>(
+        return std::make_unique<Patterns::Map>(
           *Convert<typename T::key_type>::to_pattern(),
           *Convert<typename T::mapped_type>::to_pattern(),
           0,
@@ -1938,7 +1935,7 @@ namespace Patterns
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
-        return std_cxx14::make_unique<Patterns::List>(
+        return std::make_unique<Patterns::List>(
           *Convert<typename T::value_type>::to_pattern(),
           dim,
           dim,
@@ -2037,7 +2034,7 @@ namespace Patterns
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
 
-        return std_cxx14::make_unique<Patterns::List>(
+        return std::make_unique<Patterns::List>(
           Patterns::Anything(),
           1,
           Patterns::List::max_int_value,
@@ -2082,7 +2079,7 @@ namespace Patterns
         const auto expressions =
           Utilities::split_string_list(s, p->get_separator());
 
-        T t = std_cxx14::make_unique<FunctionParser<dim>>(expressions.size());
+        T t = std::make_unique<FunctionParser<dim>>(expressions.size());
         const std::string var =
           FunctionParser<dim>::default_variable_names() + ",t";
         const typename FunctionParser<dim>::ConstMap constants;
@@ -2136,7 +2133,7 @@ namespace Patterns
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
-        return std_cxx14::make_unique<Patterns::List>(
+        return std::make_unique<Patterns::List>(
           *Convert<typename T::value_type>::to_pattern(),
           2,
           2,
@@ -2198,7 +2195,7 @@ namespace Patterns
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
       {
-        return std_cxx14::make_unique<Patterns::Anything>();
+        return std::make_unique<Patterns::Anything>();
       }
 
       static std::string
@@ -2231,7 +2228,7 @@ namespace Patterns
       {
         static_assert(internal::RankInfo<T>::map_rank > 0,
                       "Cannot use this class for non Map-compatible types.");
-        return std_cxx14::make_unique<Patterns::Tuple>(
+        return std::make_unique<Patterns::Tuple>(
           internal::default_map_separator[internal::RankInfo<T>::map_rank - 1],
           *Convert<Key>::to_pattern(),
           *Convert<Value>::to_pattern());
@@ -2270,7 +2267,7 @@ namespace Patterns
       {
         static_assert(internal::RankInfo<T>::map_rank > 0,
                       "Cannot use this class for non tuple-compatible types.");
-        return std_cxx14::make_unique<Patterns::Tuple>(
+        return std::make_unique<Patterns::Tuple>(
           internal::default_map_separator[internal::RankInfo<T>::map_rank - 1],
           *Convert<Args>::to_pattern()...);
       }
@@ -2315,7 +2312,7 @@ namespace Patterns
       static std::array<std::string, std::tuple_size<T>::value>
       to_string_internal_1(const T &              t,
                            const Patterns::Tuple &pattern,
-                           std_cxx14::index_sequence<U...>)
+                           std::index_sequence<U...>)
       {
         std::array<std::string, std::tuple_size<T>::value> a = {
           {Convert<typename std::tuple_element<U, T>::type>::to_string(
@@ -2327,16 +2324,14 @@ namespace Patterns
       to_string_internal_2(const T &t, const Patterns::Tuple &pattern)
       {
         return Convert<T>::to_string_internal_1(
-          t,
-          pattern,
-          std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
+          t, pattern, std::make_index_sequence<std::tuple_size<T>::value>{});
       }
 
       template <std::size_t... U>
       static T
       to_value_internal_1(const std::vector<std::string> &s,
                           const Patterns::Tuple &         pattern,
-                          std_cxx14::index_sequence<U...>)
+                          std::index_sequence<U...>)
       {
         return std::make_tuple(
           Convert<typename std::tuple_element<U, T>::type>::to_value(
@@ -2348,9 +2343,7 @@ namespace Patterns
                           const Patterns::Tuple &         pattern)
       {
         return Convert<T>::to_value_internal_1(
-          s,
-          pattern,
-          std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
+          s, pattern, std::make_index_sequence<std::tuple_size<T>::value>{});
       }
     };
 

@@ -46,7 +46,7 @@ public:
   std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std_cxx14::make_unique<MyManifold<dim, spacedim>>();
+    return std::make_unique<MyManifold<dim, spacedim>>();
   }
 };
 

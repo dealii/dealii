@@ -78,8 +78,8 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_RannacherTurek<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_RannacherTurek<dim>>(
-    this->order, this->n_face_support_points);
+  return std::make_unique<FE_RannacherTurek<dim>>(this->order,
+                                                  this->n_face_support_points);
 }
 
 

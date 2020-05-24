@@ -29,7 +29,7 @@ namespace std_cxx17
 #ifndef __cpp_lib_apply
   template <typename F, typename Tuple, size_t... S>
   auto
-  apply_impl(F &&fn, Tuple &&t, std_cxx14::index_sequence<S...>)
+  apply_impl(F &&fn, Tuple &&t, std::index_sequence<S...>)
     -> decltype(std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...))
   {
     return std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...);
@@ -40,14 +40,14 @@ namespace std_cxx17
   apply(F &&fn, Tuple &&t) -> decltype(apply_impl(
     std::forward<F>(fn),
     std::forward<Tuple>(t),
-    std_cxx14::make_index_sequence<
+    std::make_index_sequence<
       std::tuple_size<typename std::remove_reference<Tuple>::type>::value>()))
   {
     std::size_t constexpr tSize =
       std::tuple_size<typename std::remove_reference<Tuple>::type>::value;
     return apply_impl(std::forward<F>(fn),
                       std::forward<Tuple>(t),
-                      std_cxx14::make_index_sequence<tSize>());
+                      std::make_index_sequence<tSize>());
   }
 #else
   using std::apply;

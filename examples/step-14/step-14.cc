@@ -2706,56 +2706,53 @@ namespace Step14
       {
         case ProblemDescription::dual_weighted_error_estimator:
           {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::WeightedResidual<dim>>(
-                triangulation,
-                primal_fe,
-                dual_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values(),
-                *descriptor.dual_functional);
+            solver = std::make_unique<LaplaceSolver::WeightedResidual<dim>>(
+              triangulation,
+              primal_fe,
+              dual_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values(),
+              *descriptor.dual_functional);
             break;
           }
 
         case ProblemDescription::global_refinement:
           {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
-                triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
-            break;
-          }
-
-        case ProblemDescription::kelly_indicator:
-          {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>(
-                triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
-            break;
-          }
-
-        case ProblemDescription::weighted_kelly_indicator:
-          {
-            solver = std_cxx14::make_unique<
-              LaplaceSolver::RefinementWeightedKelly<dim>>(
+            solver = std::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
               triangulation,
               primal_fe,
               quadrature,
               face_quadrature,
               descriptor.data->get_right_hand_side(),
-              descriptor.data->get_boundary_values(),
-              *descriptor.kelly_weight);
+              descriptor.data->get_boundary_values());
+            break;
+          }
+
+        case ProblemDescription::kelly_indicator:
+          {
+            solver = std::make_unique<LaplaceSolver::RefinementKelly<dim>>(
+              triangulation,
+              primal_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values());
+            break;
+          }
+
+        case ProblemDescription::weighted_kelly_indicator:
+          {
+            solver =
+              std::make_unique<LaplaceSolver::RefinementWeightedKelly<dim>>(
+                triangulation,
+                primal_fe,
+                quadrature,
+                face_quadrature,
+                descriptor.data->get_right_hand_side(),
+                descriptor.data->get_boundary_values(),
+                *descriptor.kelly_weight);
             break;
           }
 
@@ -2838,7 +2835,7 @@ int main()
       // take here the description of <code>Exercise_2_3</code>, but you can
       // also use <code>CurvedRidges@<dim@></code>:
       descriptor.data =
-        std_cxx14::make_unique<Data::SetUp<Data::Exercise_2_3<dim>, dim>>();
+        std::make_unique<Data::SetUp<Data::Exercise_2_3<dim>, dim>>();
 
       // Next set first a dual functional, then a list of evaluation
       // objects. We choose as default the evaluation of the value at an
@@ -2855,7 +2852,7 @@ int main()
       // each step.
       const Point<dim> evaluation_point(0.75, 0.75);
       descriptor.dual_functional =
-        std_cxx14::make_unique<DualFunctional::PointValueEvaluation<dim>>(
+        std::make_unique<DualFunctional::PointValueEvaluation<dim>>(
           evaluation_point);
 
       Evaluation::PointValueEvaluation<dim> postprocessor1(evaluation_point);

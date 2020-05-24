@@ -237,7 +237,7 @@ namespace Step53
   // unique pointer to its base class automatically:
   std::unique_ptr<Manifold<3, 3>> AfricaGeometry::clone() const
   {
-    return std_cxx14::make_unique<AfricaGeometry>();
+    return std::make_unique<AfricaGeometry>();
   }
 
 

@@ -1477,7 +1477,7 @@ namespace FETools
   std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension>>
   FEFactory<FE>::get(const unsigned int degree) const
   {
-    return std_cxx14::make_unique<FE>(degree);
+    return std::make_unique<FE>(degree);
   }
 
   namespace Compositing

@@ -194,7 +194,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 PolynomialsRannacherTurek<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsRannacherTurek<dim>>(*this);
+  return std::make_unique<PolynomialsRannacherTurek<dim>>(*this);
 }
 
 

@@ -141,7 +141,7 @@ Problem4<dim>::Problem4(const Function<dim> &force_function,
 
   // after the FECollection has been generated, create a corresponding legendre
   // series expansion object
-  legendre = std_cxx14::make_unique<FESeries::Legendre<dim>>(
+  legendre = std::make_unique<FESeries::Legendre<dim>>(
     SmoothnessEstimator::Legendre::default_fe_series(Laplace<dim>::fe));
 }
 

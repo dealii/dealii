@@ -264,7 +264,7 @@ protected:
     // generate a new data object and
     // initialize some fields
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-          data_ptr   = std_cxx14::make_unique<InternalData>();
+          data_ptr   = std::make_unique<InternalData>();
     auto &data       = dynamic_cast<InternalData &>(*data_ptr);
     data.update_each = requires_update_flags(update_flags);
 

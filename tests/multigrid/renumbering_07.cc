@@ -87,8 +87,8 @@ check()
  tr.execute_coarsening_and_refinement();
   */
 
-  auto fe_scalar = std_cxx14::make_unique<dealii::FE_Q<dim>>(1);
-  auto fe = std_cxx14::make_unique<dealii::FESystem<dim>>(*fe_scalar, dim);
+  auto fe_scalar = std::make_unique<dealii::FE_Q<dim>>(1);
+  auto fe        = std::make_unique<dealii::FESystem<dim>>(*fe_scalar, dim);
 
   dealii::DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(*fe);

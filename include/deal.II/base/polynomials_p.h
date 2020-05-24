@@ -82,7 +82,7 @@ public:
   std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override
   {
-    return std_cxx14::make_unique<PolynomialsP<dim>>(*this);
+    return std::make_unique<PolynomialsP<dim>>(*this);
   }
 
 private:

@@ -188,7 +188,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsRaviartThomas<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsRaviartThomas<dim>>(*this);
+  return std::make_unique<PolynomialsRaviartThomas<dim>>(*this);
 }
 
 

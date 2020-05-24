@@ -121,8 +121,7 @@ template <int dim, class VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(
-    *this);
+  return std::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(*this);
 }
 
 

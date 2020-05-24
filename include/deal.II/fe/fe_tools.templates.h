@@ -1035,21 +1035,21 @@ namespace FETools
   std::unique_ptr<FiniteElement<1, 1>>
   FEFactory<FE_Q<1, 1>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q<1>>(quad);
+    return std::make_unique<FE_Q<1>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<2, 2>>
   FEFactory<FE_Q<2, 2>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q<2>>(quad);
+    return std::make_unique<FE_Q<2>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<3, 3>>
   FEFactory<FE_Q<3, 3>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q<3>>(quad);
+    return std::make_unique<FE_Q<3>>(quad);
   }
 
   // Specializations for FE_Q_DG0.
@@ -1057,21 +1057,21 @@ namespace FETools
   std::unique_ptr<FiniteElement<1, 1>>
   FEFactory<FE_Q_DG0<1, 1>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q_DG0<1>>(quad);
+    return std::make_unique<FE_Q_DG0<1>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<2, 2>>
   FEFactory<FE_Q_DG0<2, 2>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q_DG0<2>>(quad);
+    return std::make_unique<FE_Q_DG0<2>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<3, 3>>
   FEFactory<FE_Q_DG0<3, 3>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q_DG0<3>>(quad);
+    return std::make_unique<FE_Q_DG0<3>>(quad);
   }
 
   // Specializations for FE_Q_Bubbles.
@@ -1079,21 +1079,21 @@ namespace FETools
   std::unique_ptr<FiniteElement<1, 1>>
   FEFactory<FE_Q_Bubbles<1, 1>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q_Bubbles<1>>(quad);
+    return std::make_unique<FE_Q_Bubbles<1>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<2, 2>>
   FEFactory<FE_Q_Bubbles<2, 2>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q_Bubbles<2>>(quad);
+    return std::make_unique<FE_Q_Bubbles<2>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<3, 3>>
   FEFactory<FE_Q_Bubbles<3, 3>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_Q_Bubbles<3>>(quad);
+    return std::make_unique<FE_Q_Bubbles<3>>(quad);
   }
 
   // Specializations for FE_DGQArbitraryNodes.
@@ -1101,42 +1101,42 @@ namespace FETools
   std::unique_ptr<FiniteElement<1, 1>>
   FEFactory<FE_DGQ<1>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_DGQArbitraryNodes<1>>(quad);
+    return std::make_unique<FE_DGQArbitraryNodes<1>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<1, 2>>
   FEFactory<FE_DGQ<1, 2>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_DGQArbitraryNodes<1, 2>>(quad);
+    return std::make_unique<FE_DGQArbitraryNodes<1, 2>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<1, 3>>
   FEFactory<FE_DGQ<1, 3>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_DGQArbitraryNodes<1, 3>>(quad);
+    return std::make_unique<FE_DGQArbitraryNodes<1, 3>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<2, 2>>
   FEFactory<FE_DGQ<2>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_DGQArbitraryNodes<2>>(quad);
+    return std::make_unique<FE_DGQArbitraryNodes<2>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<2, 3>>
   FEFactory<FE_DGQ<2, 3>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_DGQArbitraryNodes<2, 3>>(quad);
+    return std::make_unique<FE_DGQArbitraryNodes<2, 3>>(quad);
   }
 
   template <>
   std::unique_ptr<FiniteElement<3, 3>>
   FEFactory<FE_DGQ<3>>::get(const Quadrature<1> &quad) const
   {
-    return std_cxx14::make_unique<FE_DGQArbitraryNodes<3>>(quad);
+    return std::make_unique<FE_DGQArbitraryNodes<3>>(quad);
   }
 
 
@@ -1156,57 +1156,52 @@ namespace FETools
         std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
       {
         result["FE_Q_Hierarchical"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q_Hierarchical<dim>>>();
-        result["FE_ABF"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_ABF<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Q_Hierarchical<dim>>>();
+        result["FE_ABF"] = std::make_unique<FETools::FEFactory<FE_ABF<dim>>>();
         result["FE_Bernstein"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim>>>();
-        result["FE_BDM"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_BDM<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Bernstein<dim>>>();
+        result["FE_BDM"] = std::make_unique<FETools::FEFactory<FE_BDM<dim>>>();
         result["FE_DGBDM"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGBDM<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGBDM<dim>>>();
         result["FE_DGNedelec"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGNedelec<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGNedelec<dim>>>();
         result["FE_DGRaviartThomas"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGRaviartThomas<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGRaviartThomas<dim>>>();
         result["FE_RaviartThomas"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_RaviartThomas<dim>>>();
-        result["FE_RaviartThomasNodal"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_RaviartThomasNodal<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_RaviartThomas<dim>>>();
+        result["FE_RaviartThomasNodal"] =
+          std::make_unique<FETools::FEFactory<FE_RaviartThomasNodal<dim>>>();
         result["FE_RT_Bubbles"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_RT_Bubbles<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_RT_Bubbles<dim>>>();
         result["FE_Nedelec"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Nedelec<dim>>>();
-        result["FE_DGPNonparametric"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_DGPNonparametric<dim>>>();
-        result["FE_DGP"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Nedelec<dim>>>();
+        result["FE_DGPNonparametric"] =
+          std::make_unique<FETools::FEFactory<FE_DGPNonparametric<dim>>>();
+        result["FE_DGP"] = std::make_unique<FETools::FEFactory<FE_DGP<dim>>>();
         result["FE_DGPMonomial"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGPMonomial<dim>>>();
-        result["FE_DGQ"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGPMonomial<dim>>>();
+        result["FE_DGQ"] = std::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
         result["FE_DGQArbitraryNodes"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGQ<dim>>>();
         result["FE_DGQLegendre"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGQLegendre<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGQLegendre<dim>>>();
         result["FE_DGQHermite"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGQHermite<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGQHermite<dim>>>();
         result["FE_FaceQ"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_FaceQ<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_FaceQ<dim>>>();
         result["FE_FaceP"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_FaceP<dim>>>();
-        result["FE_Q"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_FaceP<dim>>>();
+        result["FE_Q"] = std::make_unique<FETools::FEFactory<FE_Q<dim>>>();
         result["FE_Q_DG0"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Q_DG0<dim>>>();
         result["FE_Q_Bubbles"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim>>>();
         result["FE_Q_iso_Q1"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim>>>();
         result["FE_Nothing"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Nothing<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_Nothing<dim>>>();
         result["FE_RannacherTurek"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_RannacherTurek<dim>>>();
+          std::make_unique<FETools::FEFactory<FE_RannacherTurek<dim>>>();
       }
 
 
@@ -1219,30 +1214,30 @@ namespace FETools
       fill_codim_fe_names(
         std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
       {
-        result["FE_Bernstein"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
+        result["FE_Bernstein"] =
+          std::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
         result["FE_DGP"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim, spacedim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGP<dim, spacedim>>>();
         result["FE_DGQ"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
-        result["FE_Nothing"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_Nothing<dim, spacedim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
+        result["FE_Nothing"] =
+          std::make_unique<FETools::FEFactory<FE_Nothing<dim, spacedim>>>();
         result["FE_DGQArbitraryNodes"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
-        result["FE_DGQLegendre"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_DGQLegendre<dim, spacedim>>>();
-        result["FE_DGQHermite"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_DGQHermite<dim, spacedim>>>();
-        result["FE_Q_Bubbles"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_Q_Bubbles<dim, spacedim>>>();
+          std::make_unique<FETools::FEFactory<FE_DGQ<dim, spacedim>>>();
+        result["FE_DGQLegendre"] =
+          std::make_unique<FETools::FEFactory<FE_DGQLegendre<dim, spacedim>>>();
+        result["FE_DGQHermite"] =
+          std::make_unique<FETools::FEFactory<FE_DGQHermite<dim, spacedim>>>();
+        result["FE_Q_Bubbles"] =
+          std::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim, spacedim>>>();
         result["FE_Q_DG0"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim, spacedim>>>();
-        result["FE_Q_iso_Q1"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_Q_iso_Q1<dim, spacedim>>>();
+          std::make_unique<FETools::FEFactory<FE_Q_DG0<dim, spacedim>>>();
+        result["FE_Q_iso_Q1"] =
+          std::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim, spacedim>>>();
         result["FE_Q"] =
-          std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim, spacedim>>>();
-        result["FE_Bernstein"] = std_cxx14::make_unique<
-          FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
+          std::make_unique<FETools::FEFactory<FE_Q<dim, spacedim>>>();
+        result["FE_Bernstein"] =
+          std::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
       }
 
       // The function filling the vector fe_name_map below. It iterates
@@ -2508,7 +2503,7 @@ namespace FETools
 
             // ok, apparently everything went ok. so generate the composed
             // element. and return it.
-            return std_cxx14::make_unique<FESystem<dim, spacedim>>(
+            return std::make_unique<FESystem<dim, spacedim>>(
               raw_base_fes, base_multiplicities);
           }
         else if (name_part == "FE_Nothing")

@@ -145,7 +145,7 @@ namespace internal
 
             if (dim > 1)
               dof_handler.faces =
-                std_cxx14::make_unique<internal::hp::DoFIndicesOnFaces<dim>>();
+                std::make_unique<internal::hp::DoFIndicesOnFaces<dim>>();
           }
         }
 
@@ -1721,9 +1721,10 @@ namespace hp
     if (dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
                        *>(&this->get_triangulation()))
       {
-        policy = std_cxx14::make_unique<
-          internal::DoFHandlerImplementation::Policy::ParallelDistributed<
-            DoFHandler<dim, spacedim>>>(*this);
+        policy =
+          std::make_unique<internal::DoFHandlerImplementation::Policy::
+                             ParallelDistributed<DoFHandler<dim, spacedim>>>(
+            *this);
 
         // repartitioning signals
         tria_listeners.push_back(
@@ -1756,9 +1757,8 @@ namespace hp
                             *>(&this->get_triangulation()) != nullptr)
       {
         policy =
-          std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
-                                   ParallelShared<DoFHandler<dim, spacedim>>>(
-            *this);
+          std::make_unique<internal::DoFHandlerImplementation::Policy::
+                             ParallelShared<DoFHandler<dim, spacedim>>>(*this);
 
         // partitioning signals
         tria_listeners.push_back(
@@ -1776,9 +1776,8 @@ namespace hp
     else
       {
         policy =
-          std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
-                                   Sequential<DoFHandler<dim, spacedim>>>(
-            *this);
+          std::make_unique<internal::DoFHandlerImplementation::Policy::
+                             Sequential<DoFHandler<dim, spacedim>>>(*this);
 
         // refinement signals
         tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
@@ -2011,8 +2010,7 @@ namespace hp
       {
         Assert(active_fe_index_transfer == nullptr, ExcInternalError());
 
-        active_fe_index_transfer =
-          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+        active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
         dealii::internal::hp::DoFHandlerImplementation::Implementation::
           collect_fe_indices_on_cells_to_be_refined(*this);
@@ -2044,8 +2042,7 @@ namespace hp
       {
         Assert(active_fe_index_transfer == nullptr, ExcInternalError());
 
-        active_fe_index_transfer =
-          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+        active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
         // If we work on a p::d::Triangulation, we have to transfer all
         // active_fe_indices since ownership of cells may change. We will
@@ -2068,7 +2065,7 @@ namespace hp
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &this->get_triangulation());
 
-        active_fe_index_transfer->cell_data_transfer = std_cxx14::make_unique<
+        active_fe_index_transfer->cell_data_transfer = std::make_unique<
           parallel::distributed::
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
@@ -2188,15 +2185,14 @@ namespace hp
       {
         Assert(active_fe_index_transfer == nullptr, ExcInternalError());
 
-        active_fe_index_transfer =
-          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+        active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
         // Create transfer object and attach to it.
         const auto *distributed_tria = dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &this->get_triangulation());
 
-        active_fe_index_transfer->cell_data_transfer = std_cxx14::make_unique<
+        active_fe_index_transfer->cell_data_transfer = std::make_unique<
           parallel::distributed::
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,
@@ -2281,15 +2277,14 @@ namespace hp
       {
         Assert(active_fe_index_transfer == nullptr, ExcInternalError());
 
-        active_fe_index_transfer =
-          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+        active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
         // Create transfer object and attach to it.
         const auto *distributed_tria = dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &this->get_triangulation());
 
-        active_fe_index_transfer->cell_data_transfer = std_cxx14::make_unique<
+        active_fe_index_transfer->cell_data_transfer = std::make_unique<
           parallel::distributed::
             CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
           *distributed_tria,

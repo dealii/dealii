@@ -1765,7 +1765,7 @@ namespace internal
 
         // reserve enough space
         triangulation.levels.push_back(
-          std_cxx14::make_unique<
+          std::make_unique<
             internal::TriangulationImplementation::TriaLevel<dim>>());
         triangulation.levels[0]->reserve_space(cells.size(), dim, spacedim);
         triangulation.levels[0]->cells.reserve_space(0, cells.size());
@@ -2035,9 +2035,9 @@ namespace internal
 
         // reserve enough space
         triangulation.levels.push_back(
-          std_cxx14::make_unique<
+          std::make_unique<
             internal::TriangulationImplementation::TriaLevel<dim>>());
-        triangulation.faces = std_cxx14::make_unique<
+        triangulation.faces = std::make_unique<
           internal::TriangulationImplementation::TriaFaces<dim>>();
         triangulation.levels[0]->reserve_space(cells.size(), dim, spacedim);
         triangulation.faces->lines.reserve_space(0, needed_lines.size());
@@ -2415,9 +2415,9 @@ namespace internal
         // for the lines
         // reserve enough space
         triangulation.levels.push_back(
-          std_cxx14::make_unique<
+          std::make_unique<
             internal::TriangulationImplementation::TriaLevel<dim>>());
-        triangulation.faces = std_cxx14::make_unique<
+        triangulation.faces = std::make_unique<
           internal::TriangulationImplementation::TriaFaces<dim>>();
         triangulation.levels[0]->reserve_space(cells.size(), dim, spacedim);
         triangulation.faces->lines.reserve_space(0, needed_lines.size());
@@ -4652,7 +4652,7 @@ namespace internal
               if (cell->refine_flag_set())
                 {
                   triangulation.levels.push_back(
-                    std_cxx14::make_unique<
+                    std::make_unique<
                       internal::TriangulationImplementation::TriaLevel<dim>>());
                   break;
                 }
@@ -4896,7 +4896,7 @@ namespace internal
               if (cell->refine_flag_set())
                 {
                   triangulation.levels.push_back(
-                    std_cxx14::make_unique<
+                    std::make_unique<
                       internal::TriangulationImplementation::TriaLevel<dim>>());
                   break;
                 }
@@ -5227,7 +5227,7 @@ namespace internal
               if (cell->refine_flag_set())
                 {
                   triangulation.levels.push_back(
-                    std_cxx14::make_unique<
+                    std::make_unique<
                       internal::TriangulationImplementation::TriaLevel<dim>>());
                   break;
                 }
@@ -10065,9 +10065,9 @@ Triangulation<dim, spacedim>::Triangulation(
   if (dim == 1)
     {
       vertex_to_boundary_id_map_1d =
-        std_cxx14::make_unique<std::map<unsigned int, types::boundary_id>>();
+        std::make_unique<std::map<unsigned int, types::boundary_id>>();
       vertex_to_manifold_id_map_1d =
-        std_cxx14::make_unique<std::map<unsigned int, types::manifold_id>>();
+        std::make_unique<std::map<unsigned int, types::manifold_id>>();
     }
 
   // connect the any_change signal to the other top level signals
@@ -10409,8 +10409,9 @@ Triangulation<dim, spacedim>::copy_triangulation(
   smooth_grid            = other_tria.smooth_grid;
 
   if (dim > 1)
-    faces = std_cxx14::make_unique<
-      internal::TriangulationImplementation::TriaFaces<dim>>(*other_tria.faces);
+    faces =
+      std::make_unique<internal::TriangulationImplementation::TriaFaces<dim>>(
+        *other_tria.faces);
 
   auto bdry_iterator = other_tria.manifold.begin();
   for (; bdry_iterator != other_tria.manifold.end(); ++bdry_iterator)
@@ -10419,20 +10420,20 @@ Triangulation<dim, spacedim>::copy_triangulation(
 
   levels.reserve(other_tria.levels.size());
   for (unsigned int level = 0; level < other_tria.levels.size(); ++level)
-    levels.push_back(std_cxx14::make_unique<
-                     internal::TriangulationImplementation::TriaLevel<dim>>(
-      *other_tria.levels[level]));
+    levels.push_back(
+      std::make_unique<internal::TriangulationImplementation::TriaLevel<dim>>(
+        *other_tria.levels[level]));
 
   number_cache = other_tria.number_cache;
 
   if (dim == 1)
     {
       vertex_to_boundary_id_map_1d =
-        std_cxx14::make_unique<std::map<unsigned int, types::boundary_id>>(
+        std::make_unique<std::map<unsigned int, types::boundary_id>>(
           *other_tria.vertex_to_boundary_id_map_1d);
 
       vertex_to_manifold_id_map_1d =
-        std_cxx14::make_unique<std::map<unsigned int, types::manifold_id>>(
+        std::make_unique<std::map<unsigned int, types::manifold_id>>(
           *other_tria.vertex_to_manifold_id_map_1d);
     }
 

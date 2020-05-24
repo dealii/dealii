@@ -336,7 +336,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 TensorProductPolynomialsBubbles<dim>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductPolynomialsBubbles<dim>>(*this);
+  return std::make_unique<TensorProductPolynomialsBubbles<dim>>(*this);
 }
 
 

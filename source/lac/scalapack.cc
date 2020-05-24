@@ -1501,10 +1501,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   // distributed matrix
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
-                                                          grid,
-                                                          row_block_size) :
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                    grid,
+                                                    row_block_size) :
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
   eigenvectors->property = property;
@@ -1832,10 +1832,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   // distributed matrix.
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
-                                                          grid,
-                                                          row_block_size) :
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                    grid,
+                                                    row_block_size) :
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
   eigenvectors->property = property;

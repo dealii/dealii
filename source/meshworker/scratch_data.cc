@@ -130,8 +130,10 @@ namespace MeshWorker
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell)
   {
     if (!fe_values)
-      fe_values = std_cxx14::make_unique<FEValues<dim, spacedim>>(
-        *mapping, *fe, cell_quadrature, cell_update_flags);
+      fe_values = std::make_unique<FEValues<dim, spacedim>>(*mapping,
+                                                            *fe,
+                                                            cell_quadrature,
+                                                            cell_update_flags);
 
     fe_values->reinit(cell);
     cell->get_dof_indices(local_dof_indices);
@@ -148,7 +150,7 @@ namespace MeshWorker
     const unsigned int                                              face_no)
   {
     if (!fe_face_values)
-      fe_face_values = std_cxx14::make_unique<FEFaceValues<dim, spacedim>>(
+      fe_face_values = std::make_unique<FEFaceValues<dim, spacedim>>(
         *mapping, *fe, face_quadrature, face_update_flags);
 
     fe_face_values->reinit(cell, face_no);
@@ -169,9 +171,8 @@ namespace MeshWorker
     if (subface_no != numbers::invalid_unsigned_int)
       {
         if (!fe_subface_values)
-          fe_subface_values =
-            std_cxx14::make_unique<FESubfaceValues<dim, spacedim>>(
-              *mapping, *fe, face_quadrature, face_update_flags);
+          fe_subface_values = std::make_unique<FESubfaceValues<dim, spacedim>>(
+            *mapping, *fe, face_quadrature, face_update_flags);
         fe_subface_values->reinit(cell, face_no, subface_no);
         cell->get_dof_indices(local_dof_indices);
 
@@ -190,7 +191,7 @@ namespace MeshWorker
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell)
   {
     if (!neighbor_fe_values)
-      neighbor_fe_values = std_cxx14::make_unique<FEValues<dim, spacedim>>(
+      neighbor_fe_values = std::make_unique<FEValues<dim, spacedim>>(
         *mapping, *fe, cell_quadrature, neighbor_cell_update_flags);
 
     neighbor_fe_values->reinit(cell);
@@ -208,9 +209,8 @@ namespace MeshWorker
     const unsigned int                                              face_no)
   {
     if (!neighbor_fe_face_values)
-      neighbor_fe_face_values =
-        std_cxx14::make_unique<FEFaceValues<dim, spacedim>>(
-          *mapping, *fe, face_quadrature, neighbor_face_update_flags);
+      neighbor_fe_face_values = std::make_unique<FEFaceValues<dim, spacedim>>(
+        *mapping, *fe, face_quadrature, neighbor_face_update_flags);
     neighbor_fe_face_values->reinit(cell, face_no);
     cell->get_dof_indices(neighbor_dof_indices);
     current_neighbor_fe_values = neighbor_fe_face_values.get();
@@ -230,7 +230,7 @@ namespace MeshWorker
       {
         if (!neighbor_fe_subface_values)
           neighbor_fe_subface_values =
-            std_cxx14::make_unique<FESubfaceValues<dim, spacedim>>(
+            std::make_unique<FESubfaceValues<dim, spacedim>>(
               *mapping, *fe, face_quadrature, neighbor_face_update_flags);
         neighbor_fe_subface_values->reinit(cell, face_no, subface_no);
         cell->get_dof_indices(neighbor_dof_indices);

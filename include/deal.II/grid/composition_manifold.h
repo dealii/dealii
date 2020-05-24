@@ -161,7 +161,7 @@ std::unique_ptr<Manifold<dim, spacedim>>
 CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
   clone() const
 {
-  return std_cxx14::make_unique<
+  return std::make_unique<
     CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>>(
     *F, *G);
 }

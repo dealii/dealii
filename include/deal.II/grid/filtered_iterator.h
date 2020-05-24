@@ -1152,7 +1152,7 @@ template <typename Predicate>
 std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::clone() const
 {
-  return std_cxx14::make_unique<PredicateTemplate>(predicate);
+  return std::make_unique<PredicateTemplate>(predicate);
 }
 
 

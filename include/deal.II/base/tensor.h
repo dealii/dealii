@@ -774,7 +774,7 @@ private:
    */
   template <typename ArrayLike, std::size_t... Indices>
   constexpr DEAL_II_CUDA_HOST_DEV
-  Tensor(const ArrayLike &initializer, std_cxx14::index_sequence<Indices...>);
+  Tensor(const ArrayLike &initializer, std::index_sequence<Indices...>);
 
   // Allow an arbitrary Tensor to access the underlying values.
   template <int, int, typename>
@@ -1143,7 +1143,7 @@ template <int rank_, int dim, typename Number>
 template <typename ArrayLike, std::size_t... indices>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
-                                   std_cxx14::index_sequence<indices...>)
+                                   std::index_sequence<indices...>)
   : values{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}
 {
   static_assert(sizeof...(indices) == dim,
@@ -1154,7 +1154,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<rank_, dim, Number>::Tensor(const array_type &initializer)
-  : Tensor(initializer, std_cxx14::make_index_sequence<dim>{})
+  : Tensor(initializer, std::make_index_sequence<dim>{})
 {}
 
 
@@ -1163,7 +1163,7 @@ template <typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<rank_, dim, Number>::Tensor(
   const Tensor<rank_, dim, OtherNumber> &initializer)
-  : Tensor(initializer, std_cxx14::make_index_sequence<dim>{})
+  : Tensor(initializer, std::make_index_sequence<dim>{})
 {}
 
 
@@ -1172,7 +1172,7 @@ template <typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(
   const Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> &initializer)
-  : Tensor(initializer, std_cxx14::make_index_sequence<dim>{})
+  : Tensor(initializer, std::make_index_sequence<dim>{})
 {}
 
 

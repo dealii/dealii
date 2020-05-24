@@ -124,7 +124,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_BDM<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_BDM<dim>>(*this);
+  return std::make_unique<FE_BDM<dim>>(*this);
 }
 
 

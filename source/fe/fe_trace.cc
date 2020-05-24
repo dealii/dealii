@@ -73,7 +73,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_TraceQ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_TraceQ<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_TraceQ<dim, spacedim>>(this->degree);
 }
 
 

@@ -1512,7 +1512,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsNedelec<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsNedelec<dim>>(*this);
+  return std::make_unique<PolynomialsNedelec<dim>>(*this);
 }
 
 

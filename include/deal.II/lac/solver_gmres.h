@@ -869,7 +869,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_ = std_cxx14::make_unique<dealii::Vector<double>>(gamma.size());
+      gamma_ = std::make_unique<dealii::Vector<double>>(gamma.size());
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;

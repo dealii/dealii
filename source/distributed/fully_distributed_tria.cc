@@ -251,7 +251,7 @@ namespace parallel
                          *>(&other_tria) == nullptr)
         {
           serial_tria =
-            std_cxx14::make_unique<dealii::Triangulation<dim, spacedim>>();
+            std::make_unique<dealii::Triangulation<dim, spacedim>>();
 
           // actually copy the serial triangulation
           serial_tria->copy_triangulation(other_tria);

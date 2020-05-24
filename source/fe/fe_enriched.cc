@@ -190,8 +190,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
                                                        false))
   , enrichments(functions)
   , is_enriched(internal::FE_Enriched::check_if_enriched(fes))
-  , fe_system(
-      std_cxx14::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
+  , fe_system(std::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
 {
   // descriptive error are thrown within the function.
   Assert(internal::FE_Enriched::consistency_check(fes,
@@ -332,7 +331,7 @@ FE_Enriched<dim, spacedim>::setup_data(
   // that fes_data points to, to the new InternalData object.
   auto update_each_flags = fes_data->update_each;
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr = std_cxx14::make_unique<InternalData>(std::move(fes_data));
+        data_ptr = std::make_unique<InternalData>(std::move(fes_data));
   auto &data     = dynamic_cast<InternalData &>(*data_ptr);
 
   // copy update_each from FESystem data:
