@@ -133,6 +133,7 @@
 
 #cmakedefine DEAL_II_HAVE_CXX14
 #cmakedefine DEAL_II_HAVE_CXX17
+#cmakedefine DEAL_II_HAVE_CXX20
 
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
