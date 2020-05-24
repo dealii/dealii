@@ -725,6 +725,34 @@ namespace internal
       }
 
 
+      /**
+       * Check if the bit at position @p n in @p number is set.
+       */
+      inline static bool
+      get_bit(const char number, const unsigned int n)
+      {
+        // source:
+        // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+        // "Checking a bit"
+        return (number >> n) & 1U;
+      }
+
+
+
+      /**
+       * Set the bit at position @p n in @p number to value @p x.
+       */
+      inline static void
+      set_bit(char &number, const unsigned int n, const bool x)
+      {
+        // source:
+        // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+        // "Changing the nth bit to x"
+        number ^= (-x ^ number) & (1UL << n);
+      }
+
+
+
       template <int dim, int spacedim>
       inline static bool
       face_flip(const TriaAccessor<3, dim, spacedim> &accessor,
@@ -733,12 +761,13 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_flips.size(),
+                   ->cells.face_orientations.size(),
                ExcInternalError());
 
-        return (
-          accessor.tria->levels[accessor.present_level]->cells.face_flips
-            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face]);
+        return get_bit(
+          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
+          1 /*=flip_bit*/);
       }
 
 
@@ -769,12 +798,13 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_rotations.size(),
+                   ->cells.face_orientations.size(),
                ExcInternalError());
 
-        return (
-          accessor.tria->levels[accessor.present_level]->cells.face_rotations
-            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face]);
+        return get_bit(
+          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
+          2 /*=rotation_bit*/);
       }
 
       /**
@@ -926,9 +956,11 @@ namespace internal
                  accessor.tria->levels[accessor.present_level]
                    ->cells.face_orientations.size(),
                ExcInternalError());
-        accessor.tria->levels[accessor.present_level]->cells.face_orientations
-          [accessor.present_index * GeometryInfo<3>::faces_per_cell + face] =
-          value;
+        set_bit(
+          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
+          0 /*=orientation_bit*/,
+          value);
       }
 
 
@@ -955,12 +987,14 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_flips.size(),
+                   ->cells.face_orientations.size(),
                ExcInternalError());
 
-        accessor.tria->levels[accessor.present_level]->cells.face_flips
-          [accessor.present_index * GeometryInfo<3>::faces_per_cell + face] =
-          value;
+        set_bit(
+          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
+          1 /*=flip_bit*/,
+          value);
       }
 
 
@@ -987,12 +1021,14 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_rotations.size(),
+                   ->cells.face_orientations.size(),
                ExcInternalError());
 
-        accessor.tria->levels[accessor.present_level]->cells.face_rotations
-          [accessor.present_index * GeometryInfo<3>::faces_per_cell + face] =
-          value;
+        set_bit(
+          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
+          2 /*=rotation_bit*/,
+          value);
       }
 
       /**
