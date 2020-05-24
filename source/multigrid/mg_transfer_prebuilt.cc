@@ -85,15 +85,8 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
   Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
-#ifdef DEBUG
-  if (this->mg_constrained_dofs != nullptr)
-    Assert(this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
-               .get_local_lines()
-               .size() == 0,
-           ExcNotImplemented());
-#endif
-
   prolongation_matrices[to_level - 1]->vmult(dst, src);
+  this->mg_constrained_dofs->get_user_constraint_matrix(to_level).distribute(dst);
 }
 
 
@@ -109,6 +102,7 @@ MGTransferPrebuilt<VectorType>::restrict_and_add(const unsigned int from_level,
   (void)from_level;
 
   prolongation_matrices[from_level - 1]->Tvmult_add(dst, src);
+  this->mg_constrained_dofs->get_user_constraint_matrix(from_level - 1).distribute(dst);
 }
 
 
