@@ -347,9 +347,23 @@ namespace PETScWrappers
      *
      * To figure out which elements exactly are stored locally, use
      * local_range().
+     *
+     * @deprecated use locally_owned_size() instead.
      */
+    DEAL_II_DEPRECATED
     size_type
     local_size() const;
+
+    /**
+     * Return the local dimension of the vector, i.e. the number of elements
+     * stored on the present MPI process. For sequential vectors, this number
+     * is the same as size(), but for parallel vectors it may be smaller.
+     *
+     * To figure out which elements exactly are stored locally, use
+     * local_range().
+     */
+    size_type
+    locally_owned_size() const;
 
     /**
      * Return a pair of indices indicating which elements of this vector are

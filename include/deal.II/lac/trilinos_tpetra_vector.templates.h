@@ -550,7 +550,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     typename Vector<Number>::size_type
-    Vector<Number>::local_size() const
+    Vector<Number>::locally_owned_size() const
     {
       return vector->getLocalLength();
     }

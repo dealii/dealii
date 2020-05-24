@@ -258,6 +258,18 @@ namespace PETScWrappers
 
 
   VectorBase::size_type
+  VectorBase::locally_owned_size() const
+  {
+    PetscInt             sz;
+    const PetscErrorCode ierr = VecGetLocalSize(vector, &sz);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return sz;
+  }
+
+
+
+  VectorBase::size_type
   VectorBase::local_size() const
   {
     PetscInt             sz;
@@ -869,10 +881,10 @@ namespace PETScWrappers
       out.setf(std::ios::fixed, std::ios::floatfield);
 
     if (across)
-      for (size_type i = 0; i < local_size(); ++i)
+      for (size_type i = 0; i < locally_owned_size(); ++i)
         out << val[i] << ' ';
     else
-      for (size_type i = 0; i < local_size(); ++i)
+      for (size_type i = 0; i < locally_owned_size(); ++i)
         out << val[i] << std::endl;
     out << std::endl;
 
@@ -915,7 +927,7 @@ namespace PETScWrappers
     // TH: I am relatively sure that PETSc is
     // storing the local data in a contiguous
     // block without indices:
-    mem += local_size() * sizeof(PetscScalar);
+    mem += locally_owned_size() * sizeof(PetscScalar);
     // assume that PETSc is storing one index
     // and one double per ghost element
     if (ghosted)

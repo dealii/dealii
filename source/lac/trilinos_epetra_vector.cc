@@ -541,7 +541,7 @@ namespace LinearAlgebra
 
 
     Vector::size_type
-    Vector::local_size() const
+    Vector::locally_owned_size() const
     {
       return vector->MyLength();
     }

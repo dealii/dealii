@@ -960,7 +960,7 @@ public:
    * LinearAlgebra::ReadWriteVector.
    */
   size_type
-  local_size() const;
+  locally_owned_size() const;
 
   /**
    * Return whether the vector contains only elements with value zero. This
@@ -1100,7 +1100,7 @@ Vector<Number>::size() const
 
 template <typename Number>
 inline typename Vector<Number>::size_type
-Vector<Number>::local_size() const
+Vector<Number>::locally_owned_size() const
 {
   return values.size();
 }

@@ -269,7 +269,7 @@ namespace LinearAlgebra
                         &start_ptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          const size_type vec_size = this->block(i).local_size();
+          const size_type vec_size = this->block(i).locally_owned_size();
           petsc_helpers::copy_petsc_vector(start_ptr,
                                            start_ptr + vec_size,
                                            this->block(i).begin());
