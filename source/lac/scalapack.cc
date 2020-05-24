@@ -21,13 +21,14 @@
 #  include <deal.II/base/array_view.h>
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/mpi.templates.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/lac/scalapack.templates.h>
 
 #  ifdef DEAL_II_WITH_HDF5
 #    include <hdf5.h>
 #  endif
+
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

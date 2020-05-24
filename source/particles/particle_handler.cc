@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/particles/particle_handler.h>
 
+#include <memory>
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN

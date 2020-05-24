@@ -22,7 +22,6 @@
 // degree used.
 
 
-#include <deal.II/base/std_cxx14/algorithm.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>
@@ -53,6 +52,8 @@
 #include <deal.II/multigrid/multigrid.h>
 
 #include <deal.II/numerics/vector_tools.h>
+
+#include <algorithm>
 
 #include "../tests.h"
 

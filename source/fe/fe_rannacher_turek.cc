@@ -15,13 +15,13 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_rannacher_turek.h>
 
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
+#include <memory>
 #include <sstream>
 
 

@@ -16,7 +16,8 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomials_rannacher_turek.h>
-#include <deal.II/base/std_cxx14/memory.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -16,7 +16,6 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/mapping_q1.h>
 
@@ -38,6 +37,7 @@
 #include <functional>
 #include <list>
 #include <map>
+#include <memory>
 #include <numeric>
 
 

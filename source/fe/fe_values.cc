@@ -19,7 +19,6 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/differentiation/ad.h>
 
@@ -48,6 +47,7 @@
 #include <boost/container/small_vector.hpp>
 
 #include <iomanip>
+#include <memory>
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN

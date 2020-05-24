@@ -20,9 +20,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/vector_memory.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

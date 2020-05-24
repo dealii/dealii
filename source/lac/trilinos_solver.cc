@@ -18,7 +18,6 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/conditional_ostream.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/lac/trilinos_precondition.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -32,6 +31,7 @@
 
 #  include <cmath>
 #  include <limits>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

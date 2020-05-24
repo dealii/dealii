@@ -16,11 +16,11 @@
 
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 // TODO[WB]: This class is not thread-safe: it uses mutable member variables
 // that contain temporary state. this is not what one would want when one uses a

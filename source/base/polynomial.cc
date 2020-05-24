@@ -18,12 +18,12 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

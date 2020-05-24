@@ -16,12 +16,12 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_piecewise.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <boost/container/small_vector.hpp>
 
 #include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

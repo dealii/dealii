@@ -19,7 +19,7 @@
 // the STL.
 
 
-#include <deal.II/base/std_cxx14/algorithm.h>
+#include <algorithm>
 
 #include "../tests.h"
 

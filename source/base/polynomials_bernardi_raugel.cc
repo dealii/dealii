@@ -15,7 +15,8 @@
 
 
 #include <deal.II/base/polynomials_bernardi_raugel.h>
-#include <deal.II/base/std_cxx14/memory.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

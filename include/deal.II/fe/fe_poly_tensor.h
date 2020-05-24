@@ -21,7 +21,6 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/thread_management.h>
 
@@ -29,6 +28,7 @@
 
 #include <deal.II/lac/full_matrix.h>
 
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

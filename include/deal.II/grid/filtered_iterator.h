@@ -21,10 +21,10 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/iterator_range.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/grid/tria_iterator_base.h>
 
+#  include <memory>
 #  include <set>
 #  include <tuple>
 

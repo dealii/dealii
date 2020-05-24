@@ -16,7 +16,6 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_bernstein.h>
@@ -32,6 +31,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 

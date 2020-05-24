@@ -21,9 +21,10 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/scalar_polynomials_base.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

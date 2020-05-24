@@ -20,8 +20,6 @@
 // Note: This test currently only works in serial and asserts when run with
 // more than one processor.
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -35,6 +33,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <algorithm>
+#include <memory>
 
 #include "../tests.h"
 

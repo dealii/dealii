@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -36,6 +35,8 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

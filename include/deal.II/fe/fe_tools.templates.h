@@ -22,7 +22,6 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 

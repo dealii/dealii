@@ -18,7 +18,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/tensor_product_polynomials_bubbles.h>
@@ -30,6 +29,7 @@
 #include <deal.II/fe/fe_q_base.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <memory>
 #include <sstream>
 #include <vector>
 

@@ -15,7 +15,6 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
@@ -34,6 +33,7 @@
 #include <deal.II/grid/tria_levels.h>
 
 #include <algorithm>
+#include <memory>
 #include <set>
 #include <unordered_set>
 

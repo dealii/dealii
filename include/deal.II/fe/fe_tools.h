@@ -22,7 +22,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
@@ -33,6 +32,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 

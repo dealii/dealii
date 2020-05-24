@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -34,6 +33,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

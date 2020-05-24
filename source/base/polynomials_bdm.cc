@@ -18,10 +18,10 @@
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -22,7 +22,6 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 // boost::serialization::make_array used to be in array.hpp, but was
@@ -37,6 +36,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

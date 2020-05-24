@@ -18,7 +18,6 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/mpi.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/lac/read_write_vector.h>
 #  include <deal.II/lac/trilinos_index_access.h>
@@ -32,6 +31,7 @@
 #  include <Epetra_Vector.h>
 
 #  include <cmath>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN

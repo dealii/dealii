@@ -19,10 +19,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/patterns.h>
-#include <deal.II/base/std_cxx14/utility.h>
 #include <deal.II/base/std_cxx17/tuple.h>
 
 #include <tuple>
+#include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 

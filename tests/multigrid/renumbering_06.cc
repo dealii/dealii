@@ -20,8 +20,6 @@
 // correctly (at the point when this test was written, renumbering that
 // changes the set of owned dofs is not implemented).
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -35,6 +33,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <algorithm>
+#include <memory>
 
 #include "../tests.h"
 

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 
@@ -27,6 +26,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <cmath>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

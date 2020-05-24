@@ -19,12 +19,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/utilities.h>
 
 #include <boost/signals2/signal.hpp>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

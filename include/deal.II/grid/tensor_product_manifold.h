@@ -19,11 +19,12 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/manifold.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

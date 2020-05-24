@@ -13,12 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/manifold_lib.h>
 
 #include <manifold_wrapper.h>
 #include <point_wrapper.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

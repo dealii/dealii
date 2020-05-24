@@ -15,7 +15,6 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/distributed/cell_data_transfer.templates.h>
@@ -41,6 +40,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <set>
 #include <unordered_set>
 

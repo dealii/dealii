@@ -16,10 +16,10 @@
 
 // This test verifies that the transfinite interpolation works on a torus
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
+
+#include <memory>
 
 #include "../tests.h"
 

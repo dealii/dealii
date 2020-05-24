@@ -20,7 +20,7 @@
 #include <tuple>
 
 #ifndef __cpp_lib_apply
-#  include <deal.II/base/std_cxx14/utility.h>
+#  include <utility>
 #endif // __cpp_lib_apply
 
 DEAL_II_NAMESPACE_OPEN

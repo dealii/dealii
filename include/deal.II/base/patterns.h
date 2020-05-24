@@ -21,9 +21,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx14/algorithm.h>
-#include <deal.II/base/std_cxx14/memory.h>
-#include <deal.II/base/std_cxx14/utility.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
@@ -38,10 +35,12 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/split_member.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#include <algorithm>
 #include <array>
 #include <deque>
 #include <list>
 #include <map>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <string>

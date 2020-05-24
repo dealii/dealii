@@ -41,8 +41,6 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #endif
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <algorithm>
 #include <array>
 #include <memory>

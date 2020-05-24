@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -23,6 +22,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <set>
 
 #ifdef DEAL_II_WITH_MPI

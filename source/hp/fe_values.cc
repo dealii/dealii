@@ -13,12 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/hp/fe_values.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

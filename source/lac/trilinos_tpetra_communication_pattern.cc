@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA

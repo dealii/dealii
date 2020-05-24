@@ -17,12 +17,12 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <cmath>
 #include <cstdlib>
 #include <iterator>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

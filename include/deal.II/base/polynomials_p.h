@@ -23,9 +23,9 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor.h>
 
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

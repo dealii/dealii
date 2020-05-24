@@ -17,7 +17,7 @@
 
 #ifdef DEAL_II_WITH_NANOFLANN
 
-#  include <deal.II/base/std_cxx14/memory.h>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

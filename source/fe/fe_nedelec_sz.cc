@@ -13,9 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_nedelec_sz.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

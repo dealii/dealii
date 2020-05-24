@@ -20,11 +20,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dg_vector.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

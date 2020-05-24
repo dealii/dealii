@@ -51,7 +51,6 @@ namespace LA
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/parsed_function.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>

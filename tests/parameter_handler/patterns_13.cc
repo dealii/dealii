@@ -16,7 +16,6 @@
 // test add_parameters with tuples.
 
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <memory>
 

@@ -16,7 +16,6 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -28,6 +27,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <memory>
 #include <sstream>
 
 

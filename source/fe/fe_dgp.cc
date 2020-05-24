@@ -14,12 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <memory>
 #include <sstream>
 
 
