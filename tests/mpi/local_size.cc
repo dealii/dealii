@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// check Vector::local_size() for all supported vector types
+// check Vector::locally_owned_size() for all supported vector types
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
@@ -37,9 +37,9 @@ void
 check_serial()
 {
   const auto dofs_per_proc = 4;
-  VEC vec(dofs_per_proc);
+  VEC        vec(dofs_per_proc);
   deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
-  deallog << "local size: " << vec.local_size() << std::endl;
+  deallog << "local size: " << vec.locally_owned_size() << std::endl;
   deallog << "size: " << vec.size() << std::endl;
 }
 
@@ -53,18 +53,18 @@ check_unghosted_parallel()
   const auto my_rank = dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   const auto dofs_per_proc = 4;
-  const auto n_dofs = dofs_per_proc*n_procs;
+  const auto n_dofs        = dofs_per_proc * n_procs;
 
-  IndexSet local_indices(n_dofs);
-  const auto my_dofs_begin = dofs_per_proc*my_rank;
-  const auto my_dofs_end = dofs_per_proc*(my_rank + 1);
+  IndexSet   local_indices(n_dofs);
+  const auto my_dofs_begin = dofs_per_proc * my_rank;
+  const auto my_dofs_end   = dofs_per_proc * (my_rank + 1);
   local_indices.add_range(my_dofs_begin, my_dofs_end);
   local_indices.compress();
 
   VEC vec(local_indices, MPI_COMM_WORLD);
   deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
   deallog << "index set size: " << local_indices.n_elements() << std::endl;
-  deallog << "local size: " << vec.local_size() << std::endl;
+  deallog << "local size: " << vec.locally_owned_size() << std::endl;
   deallog << "size: " << vec.size() << std::endl;
 }
 
@@ -78,12 +78,12 @@ check_ghosted_parallel()
   const auto my_rank = dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   const auto dofs_per_proc = 4;
-  const auto n_dofs = dofs_per_proc*n_procs;
+  const auto n_dofs        = dofs_per_proc * n_procs;
 
-  IndexSet local_indices(n_dofs);
-  IndexSet ghost_indices(n_dofs);
-  const auto my_dofs_begin = dofs_per_proc*my_rank;
-  const auto my_dofs_end = dofs_per_proc*(my_rank + 1);
+  IndexSet   local_indices(n_dofs);
+  IndexSet   ghost_indices(n_dofs);
+  const auto my_dofs_begin = dofs_per_proc * my_rank;
+  const auto my_dofs_end   = dofs_per_proc * (my_rank + 1);
   local_indices.add_range(my_dofs_begin, my_dofs_end);
   local_indices.compress();
   if (my_rank == 0)
@@ -99,7 +99,7 @@ check_ghosted_parallel()
   VEC vec(local_indices, ghost_indices, MPI_COMM_WORLD);
   deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
   deallog << "index set size: " << local_indices.n_elements() << std::endl;
-  deallog << "local size: " << vec.local_size() << std::endl;
+  deallog << "local size: " << vec.locally_owned_size() << std::endl;
   deallog << "size: " << vec.size() << std::endl;
 }
 
@@ -113,12 +113,12 @@ check_ghosted_parallel_block()
   const auto my_rank = dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   const auto dofs_per_proc = 4;
-  const auto n_dofs = dofs_per_proc*n_procs;
+  const auto n_dofs        = dofs_per_proc * n_procs;
 
-  IndexSet local_indices(n_dofs);
-  IndexSet ghost_indices(n_dofs);
-  const auto my_dofs_begin = dofs_per_proc*my_rank;
-  const auto my_dofs_end = dofs_per_proc*(my_rank + 1);
+  IndexSet   local_indices(n_dofs);
+  IndexSet   ghost_indices(n_dofs);
+  const auto my_dofs_begin = dofs_per_proc * my_rank;
+  const auto my_dofs_end   = dofs_per_proc * (my_rank + 1);
   local_indices.add_range(my_dofs_begin, my_dofs_end);
   local_indices.compress();
   if (my_rank == 0)
@@ -131,13 +131,13 @@ check_ghosted_parallel_block()
       ghost_indices.add_index(my_dofs_end % n_dofs);
     }
 
-  std::vector<IndexSet> local_blocks {local_indices, local_indices};
+  std::vector<IndexSet> local_blocks{local_indices, local_indices};
   // for variety do not ghost the second component
-  std::vector<IndexSet> ghost_blocks {ghost_indices, IndexSet()};
+  std::vector<IndexSet> ghost_blocks{ghost_indices, IndexSet()};
 
   VEC vec(local_blocks, ghost_blocks, MPI_COMM_WORLD);
   deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
-  deallog << "local size: " << vec.local_size() << std::endl;
+  deallog << "local size: " << vec.locally_owned_size() << std::endl;
   deallog << "size: " << vec.size() << std::endl;
 }
 
@@ -161,7 +161,8 @@ main(int argc, char *argv[])
   check_ghosted_parallel<TrilinosWrappers::MPI::Vector>();
 
   // block vectors:
-  check_ghosted_parallel_block<LinearAlgebra::distributed::BlockVector<double>>();
+  check_ghosted_parallel_block<
+    LinearAlgebra::distributed::BlockVector<double>>();
   check_ghosted_parallel_block<PETScWrappers::MPI::BlockVector>();
   check_ghosted_parallel_block<TrilinosWrappers::MPI::BlockVector>();
 }

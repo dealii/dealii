@@ -105,8 +105,9 @@ namespace LinearAlgebra
      * <li> Besides the usual global access operator() it is also possible to
      * access vector entries in the local index space with the function @p
      * local_element(). Locally owned indices are placed first, [0,
-     * local_size()), and then all ghost indices follow after them
-     * contiguously, [local_size(), local_size()+n_ghost_entries()).
+     * locally_owned_size()), and then all ghost indices follow after them
+     * contiguously, [locally_owned_size(),
+     * locally_owned_size()+n_ghost_entries()).
      * </ul>
      *
      * Functions related to parallel functionality:
@@ -923,9 +924,19 @@ namespace LinearAlgebra
       /**
        * Return the local size of the vector, i.e., the number of indices
        * owned locally.
+       *
+       * @deprecated use locally_owned_size() instead.
        */
+      DEAL_II_DEPRECATED
       size_type
       local_size() const;
+
+      /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      locally_owned_size() const;
 
       /**
        * Return true if the given global index is in the local range of this
@@ -1515,6 +1526,15 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::local_size() const
     {
       return locally_owned_size();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename Vector<Number, MemorySpace>::size_type
+    Vector<Number, MemorySpace>::locally_owned_size() const
+    {
+      return partitioner->local_size();
     }
 
 

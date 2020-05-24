@@ -550,7 +550,7 @@ public:
    * components.
    */
   std::size_t
-  local_size() const;
+  locally_owned_size() const;
 
   /**
    * Return an index set that describes which elements of this vector are
@@ -1440,11 +1440,11 @@ BlockVectorBase<VectorType>::size() const
 
 template <class VectorType>
 inline std::size_t
-BlockVectorBase<VectorType>::local_size() const
+BlockVectorBase<VectorType>::locally_owned_size() const
 {
   std::size_t local_size = 0;
   for (unsigned int b = 0; b < n_blocks(); ++b)
-    local_size += block(b).local_size();
+    local_size += block(b).locally_owned_size();
   return local_size;
 }
 

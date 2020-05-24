@@ -738,9 +738,19 @@ namespace TrilinosWrappers
        *
        * If the vector contains ghost elements, they are included in this
        * number.
+       *
+       * @deprecated This function is deprecated.
        */
+      DEAL_II_DEPRECATED
       size_type
       local_size() const;
+
+      /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      locally_owned_size() const;
 
       /**
        * Return a pair of indices indicating which elements of this vector are
@@ -1735,6 +1745,14 @@ namespace TrilinosWrappers
     Vector::local_size() const
     {
       return vector->Map().NumMyElements();
+    }
+
+
+
+    inline Vector::size_type
+    Vector::locally_owned_size() const
+    {
+      return owned_elements.n_elements();
     }
 
 

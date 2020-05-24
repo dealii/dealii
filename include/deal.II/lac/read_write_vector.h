@@ -400,7 +400,7 @@ namespace LinearAlgebra
      * equal to the dimension of the vector space that is modeled by an object
      * of this kind. This dimension is return by size().
      *
-     * @deprecated use local_size() instead.
+     * @deprecated use locally_owned_size() instead.
      */
     DEAL_II_DEPRECATED
     size_type
@@ -411,8 +411,7 @@ namespace LinearAlgebra
      * owned locally.
      */
     size_type
-    local_size() const;
-
+    locally_owned_size() const;
 
     /**
      * Return the IndexSet that represents the indices of the elements stored.
@@ -834,7 +833,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline typename ReadWriteVector<Number>::size_type
-  ReadWriteVector<Number>::local_size() const
+  ReadWriteVector<Number>::locally_owned_size() const
   {
     return stored_elements.n_elements();
   }
