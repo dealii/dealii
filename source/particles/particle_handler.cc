@@ -295,7 +295,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  unsigned int
+  types::particle_index
   ParticleHandler<dim, spacedim>::n_particles_in_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     const
