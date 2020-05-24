@@ -19,14 +19,10 @@
 
 #include <tuple>
 
-#ifndef __cpp_lib_apply
-#  include <utility>
-#endif // __cpp_lib_apply
-
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
-#ifndef __cpp_lib_apply
+#ifndef DEAL_II_HAVE_CXX17
   template <typename F, typename Tuple, size_t... S>
   auto
   apply_impl(F &&fn, Tuple &&t, std::index_sequence<S...>)
@@ -51,7 +47,7 @@ namespace std_cxx17
   }
 #else
   using std::apply;
-#endif // __cpp_lib_apply
+#endif
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 

@@ -64,11 +64,21 @@ MACRO(_test_cxx17_support)
   # Test that the c++17 attributes are supported.
   CHECK_CXX_SOURCE_COMPILES(
     "
+    #include <cmath>
     #include <iostream>
+    #include <optional>
+    #include <tuple>
 
     #if __cplusplus < 201703L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
     #  error \"insufficient support for C++17\"
     #endif
+
+    //check for some C++17 features that we use in our headers:
+    using std::apply;
+    using std::cyl_bessel_j;
+    using std::cyl_bessel_jf;
+    using std::cyl_bessel_jl;
+    using std::optional;
 
     [[nodiscard]] int test_nodiscard()
     {
