@@ -1364,12 +1364,8 @@ namespace Step13
 
     // Create a solver object of the kind indicated by the argument to this
     // function. If the name is not recognized, throw an exception!
-    // The respective solver object is stored in a std::unique_ptr to avoid
-    // having to delete the pointer after use. For initializing, we want to use
-    // the C++14 function std::make_unique. Since deal.II only requires C++11 up
-    // to now, we define this function in a separate namespace called
-    // `std`. In case the compiler supports C++14, this just calls
-    // std::make_unique.
+    // The respective solver object is stored in a `std::unique_ptr` to avoid
+    // having to delete the pointer after use.
     std::unique_ptr<LaplaceSolver::Base<dim>> solver;
     if (solver_name == "global")
       solver = std::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
