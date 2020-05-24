@@ -291,7 +291,9 @@ _test_cxx17_support()
 
 
 #
-# In the following we have to avoid
+# Some compilers are too generous in accepting some of the language
+# features that we test below and do not issue an error but a warning. Set
+# -Werror to make the feature detection more reliable.
 #
 SET(_werror_flag "")
 IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
