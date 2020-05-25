@@ -90,9 +90,11 @@ namespace PETScWrappers
       , communicator(v.communicator)
     {
       if (v.has_ghost_elements())
-        Vector::create_vector(v.size(), v.local_size(), v.ghost_indices);
+        Vector::create_vector(v.size(),
+                              v.locally_owned_size(),
+                              v.ghost_indices);
       else
-        Vector::create_vector(v.size(), v.local_size());
+        Vector::create_vector(v.size(), v.locally_owned_size());
 
       this->operator=(v);
     }
@@ -128,7 +130,7 @@ namespace PETScWrappers
           if (v.has_ghost_elements())
             reinit(v.locally_owned_elements(), v.ghost_indices, v.communicator);
           else
-            reinit(v.communicator, v.size(), v.local_size(), true);
+            reinit(v.communicator, v.size(), v.locally_owned_size(), true);
         }
 
       PetscErrorCode ierr = VecCopy(v.vector, vector);
@@ -168,7 +170,7 @@ namespace PETScWrappers
       // only do something if the sizes
       // mismatch (may not be true for every proc)
 
-      int k_global, k = ((size() != n) || (local_size() != local_sz));
+      int k_global, k = ((size() != n) || (locally_owned_size() != local_sz));
       {
         const int ierr =
           MPI_Allreduce(&k, &k_global, 1, MPI_INT, MPI_LOR, communicator);
@@ -213,7 +215,10 @@ namespace PETScWrappers
             }
         }
       else
-        reinit(v.communicator, v.size(), v.local_size(), omit_zeroing_entries);
+        reinit(v.communicator,
+               v.size(),
+               v.locally_owned_size(),
+               omit_zeroing_entries);
     }
 
 
@@ -257,8 +262,10 @@ namespace PETScWrappers
       AssertIndexRange(locally_owned_size, n + 1);
       ghosted = false;
 
-      const PetscErrorCode ierr =
-        VecCreateMPI(communicator, locally_owned_size, PETSC_DETERMINE, &vector);
+      const PetscErrorCode ierr = VecCreateMPI(communicator,
+                                               locally_owned_size,
+                                               PETSC_DETERMINE,
+                                               &vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
@@ -302,7 +309,8 @@ namespace PETScWrappers
         ierr = VecGetOwnershipRange(vector, &begin, &end);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        AssertDimension(locally_owned_size, static_cast<size_type>(end - begin));
+        AssertDimension(locally_owned_size,
+                        static_cast<size_type>(end - begin));
 
         Vec l;
         ierr = VecGhostGetLocalForm(vector, &l);
