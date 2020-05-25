@@ -1261,7 +1261,7 @@ namespace CUDAWrappers
     internal::copy_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
                                                       n_constrained_dofs,
-                                                      src.local_size(),
+                                                      src.locally_owned_size(),
                                                       src.get_values(),
                                                       dst.get_values());
     AssertCudaKernel();
@@ -1306,7 +1306,7 @@ namespace CUDAWrappers
     internal::set_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
                                                       n_constrained_dofs,
-                                                      dst.local_size(),
+                                                      dst.locally_owned_size(),
                                                       val,
                                                       dst.get_values());
     AssertCudaKernel();

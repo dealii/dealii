@@ -559,7 +559,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = v.thread_loop_partitioner;
 
-      const size_type this_size = local_size();
+      const size_type this_size = locally_owned_size();
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
@@ -1165,7 +1165,7 @@ namespace LinearAlgebra
         }
       Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(comm_pattern);
 
-      data.copy_to(tmp_vector.begin(), local_size());
+      data.copy_to(tmp_vector.begin(), locally_owned_size());
 
       // fill entries from ReadWriteVector into the distributed vector,
       // including ghost entries. this is not really efficient right now
@@ -1214,7 +1214,7 @@ namespace LinearAlgebra
         }
       tmp_vector.compress(operation);
 
-      data.copy_from(tmp_vector.begin(), local_size());
+      data.copy_from(tmp_vector.begin(), locally_owned_size());
     }
 
     template <typename Number, typename MemorySpaceType>
@@ -1273,7 +1273,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator=(const Number s)
     {
-      const size_type this_size = local_size();
+      const size_type this_size = locally_owned_size();
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
@@ -1318,7 +1318,7 @@ namespace LinearAlgebra
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_vector(
@@ -1346,7 +1346,7 @@ namespace LinearAlgebra
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::subtract_vector(
@@ -1392,7 +1392,7 @@ namespace LinearAlgebra
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
       AssertIsFinite(a);
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       // nothing to do if a is zero
       if (a == Number(0.))
@@ -1441,8 +1441,8 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertIsFinite(b);
 
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
+      AssertDimension(locally_owned_size(), w.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_avpbw(
@@ -1480,7 +1480,7 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpaceType> &v)
     {
       AssertIsFinite(x);
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::sadd_xv(
@@ -1511,7 +1511,7 @@ namespace LinearAlgebra
 
       AssertIsFinite(x);
       AssertIsFinite(a);
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::sadd_xav(
@@ -1580,11 +1580,11 @@ namespace LinearAlgebra
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::scale(
-          thread_loop_partitioner, local_size(), v.data, data);
+          thread_loop_partitioner, locally_owned_size(), v.data, data);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1604,7 +1604,7 @@ namespace LinearAlgebra
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
       AssertIsFinite(a);
-      AssertDimension(local_size(), v.local_size());
+      AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::equ_au(
@@ -1824,10 +1824,10 @@ namespace LinearAlgebra
     {
       real_type max = 0.;
 
-      const size_type local_size = partitioner->locally_owned_size();
+      const size_type locally_owned_size = partitioner->locally_owned_size();
       internal::la_parallel_vector_templates_functions<
         Number,
-        MemorySpaceType>::linfty_norm_local(data, local_size, max);
+        MemorySpaceType>::linfty_norm_local(data, locally_owned_size, max);
 
       return max;
     }
@@ -1856,8 +1856,8 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpaceType> &w)
     {
       const size_type vec_size = partitioner->locally_owned_size();
-      AssertDimension(vec_size, v.local_size());
-      AssertDimension(vec_size, w.local_size());
+      AssertDimension(vec_size, v.locally_owned_size());
+      AssertDimension(vec_size, w.locally_owned_size());
 
       Number sum = dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_and_dot(
