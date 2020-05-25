@@ -1534,7 +1534,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::locally_owned_size() const
     {
-      return partitioner->local_size();
+      return partitioner->locally_owned_size();
     }
 
 
@@ -1586,7 +1586,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::end()
     {
       return internal::Policy<Number, MemorySpace>::begin(data) +
-             partitioner->local_size();
+             partitioner->locally_owned_size();
     }
 
 
@@ -1596,7 +1596,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::end() const
     {
       return internal::Policy<Number, MemorySpace>::begin(data) +
-             partitioner->local_size();
+             partitioner->locally_owned_size();
     }
 
 
@@ -1686,7 +1686,7 @@ namespace LinearAlgebra
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       AssertIndexRange(local_index,
-                       partitioner->local_size() +
+                       partitioner->locally_owned_size() +
                          partitioner->n_ghost_indices());
       // do not allow reading a vector which is not in ghost mode
       Assert(local_index < local_size() || vector_is_ghosted == true,
@@ -1707,7 +1707,7 @@ namespace LinearAlgebra
                "This function is only implemented for the Host memory space"));
 
       AssertIndexRange(local_index,
-                       partitioner->local_size() +
+                       partitioner->locally_owned_size() +
                          partitioner->n_ghost_indices());
 
       return data.values[local_index];

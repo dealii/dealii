@@ -130,7 +130,8 @@ namespace LinearAlgebra
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
           communication_pattern);
 
-        const unsigned int n_elements = communication_pattern->local_size();
+        const unsigned int n_elements =
+          communication_pattern->locally_owned_size();
         std::copy(values, values + n_elements, tmp_vector.begin());
         tmp_vector.update_ghost_values();
 
@@ -173,8 +174,9 @@ namespace LinearAlgebra
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
           communication_pattern);
 
-        const unsigned int n_elements = communication_pattern->local_size();
-        cudaError_t        cuda_error_code = cudaMemcpy(tmp_vector.begin(),
+        const unsigned int n_elements =
+          communication_pattern->locally_owned_size();
+        cudaError_t cuda_error_code = cudaMemcpy(tmp_vector.begin(),
                                                  values,
                                                  n_elements * sizeof(Number),
                                                  cudaMemcpyDeviceToHost);

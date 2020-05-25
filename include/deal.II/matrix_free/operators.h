@@ -1375,11 +1375,14 @@ namespace MatrixFreeOperators
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
-        Assert(
-          BlockHelper::subblock(src, i).get_partitioner()->local_size() ==
-            data->get_dof_info(mf_component).vector_partitioner->local_size(),
-          ExcMessage("The vector passed to the vmult() function does not have "
-                     "the correct size for compatibility with MatrixFree."));
+        Assert(BlockHelper::subblock(src, i)
+                   .get_partitioner()
+                   ->locally_owned_size() ==
+                 data->get_dof_info(mf_component)
+                   .vector_partitioner->locally_owned_size(),
+               ExcMessage(
+                 "The vector passed to the vmult() function does not have "
+                 "the correct size for compatibility with MatrixFree."));
 
         // copy the vector content to a temporary vector so that it does not get
         // lost

@@ -123,9 +123,10 @@ namespace Utilities
      * The partitioner includes a mechanism for converting global to local and
      * local to global indices. Internally, this class stores vector elements
      * using the convention as follows: The local range is associated with
-     * local indices [0,@p local_size), and ghost indices are stored
-     * consecutively in [@p local_size, @p local_size + @p n_ghost_indices).
-     * The ghost indices are sorted according to their global index.
+     * local indices [0, locally_owned_size()), and ghost indices are stored
+     * consecutively in [locally_owned_size(), locally_owned_size() +
+     * n_ghost_indices()). The ghost indices are sorted according to their
+     * global index.
      *
      *
      * <h4>Parallel data exchange</h4>
@@ -282,11 +283,22 @@ namespace Utilities
       size() const;
 
       /**
-       * Return the local size, i.e. local_range().second minus
-       * local_range().first.
+       * Return the number of locally owned indices,
+       * i.e., local_range().second minus local_range().first.
+       *
+       * @deprecated Use the more clearly named function locally_owned_size()
+       * instead.
        */
+      DEAL_II_DEPRECATED
       unsigned int
       local_size() const;
+
+      /**
+       * Return the number of locally owned indices,
+       * i.e., local_range().second minus local_range().first.
+       */
+      unsigned int
+      locally_owned_size() const;
 
       /**
        * Return an IndexSet representation of the local range. This class
@@ -317,10 +329,10 @@ namespace Utilities
        * the given global index is neither locally owned nor a ghost, an
        * exception is thrown.
        *
-       * Note that the returned local index for locally owned indices
-       * will be between 0 and
-       * `local_size()-1`, and the local index for ghosts is between
-       * `local_size()` and `local_size()+n_ghost_indices()-1`.
+       * Note that the returned local index for locally owned indices will be
+       * between 0 and locally_owned_size() - 1, and the local index for
+       * ghosts is between locally_owned_size() and locally_owned_size() +
+       * n_ghost_indices() - 1.
        */
       unsigned int
       global_to_local(const types::global_dof_index global_index) const;
@@ -329,8 +341,9 @@ namespace Utilities
        * Return the global index corresponding to the given local index.
        *
        * Note that the local index for locally owned indices must be between 0
-       * and `local_size()-1`, and the local index for ghosts must be between
-       * `local_size()` and `local_size()+n_ghost_indices()-1`.
+       * and locally_owned_size() - 1, and the local index for ghosts must be
+       * between locally_owned_size() and locally_owned_size() +
+       * n_ghost_indices() - 1.
        */
       types::global_dof_index
       local_to_global(const unsigned int local_index) const;
@@ -811,6 +824,14 @@ namespace Utilities
     inline unsigned int
     Partitioner::local_size() const
     {
+      return locally_owned_size();
+    }
+
+
+
+    inline unsigned int
+    Partitioner::locally_owned_size() const
+    {
       types::global_dof_index size =
         local_range_data.second - local_range_data.first;
       Assert(size <= std::numeric_limits<unsigned int>::max(),
@@ -852,7 +873,7 @@ namespace Utilities
       if (in_local_range(global_index))
         return static_cast<unsigned int>(global_index - local_range_data.first);
       else if (is_ghost_entry(global_index))
-        return (local_size() +
+        return (locally_owned_size() +
                 static_cast<unsigned int>(
                   ghost_indices_data.index_within_set(global_index)));
       else
@@ -867,11 +888,13 @@ namespace Utilities
     inline types::global_dof_index
     Partitioner::local_to_global(const unsigned int local_index) const
     {
-      AssertIndexRange(local_index, local_size() + n_ghost_indices_data);
-      if (local_index < local_size())
+      AssertIndexRange(local_index,
+                       locally_owned_size() + n_ghost_indices_data);
+      if (local_index < locally_owned_size())
         return local_range_data.first + types::global_dof_index(local_index);
       else
-        return ghost_indices_data.nth_index_in_set(local_index - local_size());
+        return ghost_indices_data.nth_index_in_set(local_index -
+                                                   locally_owned_size());
     }
 
 
