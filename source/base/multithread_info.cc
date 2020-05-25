@@ -27,15 +27,13 @@
 
 #include <algorithm>
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
 #  define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #  include <tbb/task_scheduler_init.h>
 #  undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #endif
 
 DEAL_II_NAMESPACE_OPEN
-
-#ifdef DEAL_II_WITH_THREADS
 
 /* Detecting how many processors a given machine has is something that
    varies greatly between operating systems. For a few operating
@@ -45,8 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 
-#  if defined(__linux__) || defined(__sun__) || defined(__osf__) || \
-    defined(_AIX)
+#if defined(__linux__) || defined(__sun__) || defined(__osf__) || defined(_AIX)
 
 unsigned int
 MultithreadInfo::get_n_cpus()
@@ -54,7 +51,7 @@ MultithreadInfo::get_n_cpus()
   return sysconf(_SC_NPROCESSORS_ONLN);
 }
 
-#  elif (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
+#elif (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
 // This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
 // and on an Intel Mac Book Pro.
 // If it doesn't work please contact the mailinglist.
@@ -73,7 +70,7 @@ MultithreadInfo::get_n_cpus()
   return n_cpus;
 }
 
-#  else
+#else
 
 // If you get n_cpus=1 although you are on a multi-processor machine,
 // then this may have two reasons: either because the system macros,
@@ -103,7 +100,7 @@ MultithreadInfo::get_n_cpus()
   return 1;
 }
 
-#  endif
+#endif
 
 unsigned int
 MultithreadInfo::n_cores()
@@ -152,6 +149,8 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
           n_max_threads = max_threads_env;
       }
   }
+
+#ifdef DEAL_II_WITH_TBB
   // Without restrictions from the user query TBB for the recommended number
   // of threads:
   if (n_max_threads == numbers::invalid_unsigned_int)
@@ -162,7 +161,11 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   if (dummy.is_active())
     dummy.terminate();
   dummy.initialize(n_max_threads);
+#endif
+  if (n_max_threads == numbers::invalid_unsigned_int)
+    n_max_threads = get_n_cpus();
 }
+
 
 
 unsigned int
@@ -173,38 +176,13 @@ MultithreadInfo::n_threads()
 }
 
 
-#else // not in MT mode
-
-unsigned int
-MultithreadInfo::get_n_cpus()
-{
-  return 1;
-}
-
-unsigned int
-MultithreadInfo::n_cores()
-{
-  return 1;
-}
-
-unsigned int
-MultithreadInfo::n_threads()
-{
-  return 1;
-}
-
-void
-MultithreadInfo::set_thread_limit(const unsigned int)
-{}
-
-#endif
-
 
 bool
 MultithreadInfo::is_running_single_threaded()
 {
   return n_threads() == 1;
 }
+
 
 
 std::size_t
@@ -214,6 +192,7 @@ MultithreadInfo::memory_consumption()
   // use sizeof operator
   return sizeof(MultithreadInfo);
 }
+
 
 
 void
