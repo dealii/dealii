@@ -606,8 +606,9 @@ namespace PETScWrappers
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
-    bool               flag = true;
+    const PetscScalar *ptr  = start_ptr,
+                      *eptr = start_ptr + locally_owned_size();
+    bool flag               = true;
     while (ptr != eptr)
       {
         if (*ptr != value_type())
@@ -659,8 +660,9 @@ namespace PETScWrappers
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
-    bool               flag = true;
+    const PetscScalar *ptr  = start_ptr,
+                      *eptr = start_ptr + locally_owned_size();
+    bool flag               = true;
     while (ptr != eptr)
       {
         if (!internal::is_non_negative(*ptr))
