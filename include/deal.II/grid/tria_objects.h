@@ -461,7 +461,7 @@ namespace internal
        *
        * rotation by 90 degrees
        */
-      std::vector<char> face_orientations;
+      std::vector<unsigned char> face_orientations;
 
       /**
        * Assert that enough space is allocated to accommodate
@@ -527,7 +527,7 @@ namespace internal
        * In effect, this field has <code>4*n_quads</code> elements, being the
        * number of quads times the four lines each has.
        */
-      std::vector<char> line_orientations;
+      std::vector<unsigned char> line_orientations;
 
       /**
        * Assert that enough space is allocated to accommodate
