@@ -39,7 +39,8 @@ SuperLU_MT::~SuperLU_MT()
 void
 SuperLU_MT::clear()
 {
-  // \todo complete this definition
+	Destroy_SuperMatrix_Store(&this->A);
+	Destroy_SuperMatrix_Store(&this->b);
 }
 
 
@@ -51,8 +52,6 @@ SuperLU_MT::initialize(const matrix_type &A, const vector_type &b)
   Assert(A.m() == b.size(), ExcDimensionMismatch(A.m(), b.size()));
   //   Assert(typeid(number_type) ==
   //   typeid(matrix_type::value_type),ExcMessage("Types mismatch"));
-
-  // \todo clear all datastructures here before going ahead
 
   this->n_rows = A.m();
   this->n_cols = A.n();
@@ -70,7 +69,7 @@ SuperLU_MT::initialize(const matrix_type &A, const vector_type &b)
 
   // first fill the rowptr array
   this->rowptr[0] = 0;
-  for (size_type row_ctr = 1; row_ctr < this->n_rows; ++row_ctr)
+  for (size_type row_ctr = 1; row_ctr <= this->n_rows; ++row_ctr)
     this->rowptr[row_ctr] =
       this->rowptr[row_ctr - 1] + A.get_row_length(row_ctr - 1);
   Assert(static_cast<size_type>(this->rowptr.back()) == this->colind.size(),
@@ -108,6 +107,7 @@ SuperLU_MT::initialize(const matrix_type &A, const vector_type &b)
   }
 
   // now copy the right hand side values
+  this->rhs_vals.resize(b.size());
   std::copy(b.begin(), b.end(), this->rhs_vals.begin());
 
   // now create the \c SuperMatrix objects needed by the solve routine.
@@ -126,7 +126,7 @@ SuperLU_MT::create_supermatrices()
   if (typeid(number_type) == typeid(double))
     {
       const Dtype_t Dtype = Dtype_t::SLU_D;
-      dCreate_CompCol_Matrix(&A,
+      dCreate_CompRow_Matrix(&this->A,
                              this->n_rows,
                              this->n_cols,
                              this->nzval.size(),
@@ -136,7 +136,7 @@ SuperLU_MT::create_supermatrices()
                              Stype_matrix,
                              Dtype,
                              Mtype);
-      dCreate_Dense_Matrix(&b,
+      dCreate_Dense_Matrix(&this->b,
                            this->n_rows,
                            1,
                            rhs_vals.data(),
@@ -193,12 +193,19 @@ SuperLU_MT::solve(vector_type &x)
     }
 
   // copy solution
-  DNformat *bStore;
-  bStore = (DNformat *)b.Store;
-  // std::copy(bStore->nzval, bStore->nzval + this->nzval.size() *
-  // sizeof(number_type), x.begin()); \todo remove error in this copy operation
+	DNformat *bStore;
+	bStore = (DNformat *)b.Store;
+	double *dp;
+	dp = (double *)bStore->nzval;
+	// \todo check if this manual copy can be replaced by std::copy()
+	for (size_type i = 0; i < bStore->lda; ++i)
+		x[i] = dp[i];
 
-  // \todo clear vectors before leaving
+	// clear the datastructures before leaving
+	Destroy_SuperNode_SCP(&L);
+	Destroy_CompCol_NCP(&U);
+	dp = nullptr;
+	bStore = nullptr;
 }
 
 

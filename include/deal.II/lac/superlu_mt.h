@@ -72,15 +72,25 @@ public:
   {
   public:
     AdditionalData()
-    {}
+    :column_ordering(0)
+    {
+    	options_.nprocs = MultithreadInfo::n_threads();
+    	options_.fact = DOFACT;
+    	options_.PrintStat = NO;
+    }
 
     explicit AdditionalData(const unsigned int &num_threads,
                             const unsigned int &factorize,
-                            const size_type &   col_order)
-      : column_ordering(col_order)
+                            const size_type &   col_order,
+                            const bool printSolverStats)
+                            : column_ordering(col_order)
     {
       options_.nprocs = num_threads;
       options_.fact   = static_cast<fact_t>(factorize);
+      if(printSolverStats)
+      	options_.PrintStat = YES;
+      else
+      	options_.PrintStat = NO;
     }
     /**
      * Object to store additional options for the solver
@@ -88,7 +98,7 @@ public:
     superlumt_options_t options_;
     /**
      * Parameter to define the type of column ordering for LU factorization.
-     * See \c ispec argument of \c pdgssv routine for details.
+     * See \c permc_spec argument of \c get_perm_c routine for details.
      */
     size_type column_ordering = 0;
   };
