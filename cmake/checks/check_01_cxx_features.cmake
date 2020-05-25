@@ -350,6 +350,8 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}"
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+  DEAL_II_HAVE_CXX17_ATTRIBUTE_DEPRECATED
+  DEAL_II_HAVE_ATTRIBUTE_DEPRECATED
   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
@@ -367,23 +369,23 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
 # - Timo Heister, 2015
 #
 SET(_snippet
-    "
-    #include <cfenv>
-    #include <limits>
-    #include <sstream>
+  "
+  #include <cfenv>
+  #include <limits>
+  #include <sstream>
 
-    int main()
-    {
-      feenableexcept(FE_DIVBYZERO|FE_INVALID);
-      std::ostringstream description;
-      const double lower_bound = -std::numeric_limits<double>::max();
+  int main()
+  {
+    feenableexcept(FE_DIVBYZERO|FE_INVALID);
+    std::ostringstream description;
+    const double lower_bound = -std::numeric_limits<double>::max();
 
-      description << lower_bound;
+    description << lower_bound;
 
-      return 0;
-    }
-    "
-    )
+    return 0;
+  }
+  "
+  )
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   CHECK_CXX_SOURCE_RUNS("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ELSE()
@@ -427,27 +429,27 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
-          [[deprecated]] int old_fn ();
-          int old_fn () { return 0; }
+  [[deprecated]] int old_fn ();
+  int old_fn () { return 0; }
 
-          struct [[deprecated]] bob
-          {
-            [[deprecated]] bob(int i);
-            [[deprecated]] void test();
-          };
+  struct [[deprecated]] bob
+  {
+    [[deprecated]] bob(int i);
+    [[deprecated]] void test();
+  };
 
-          enum color
-          {
-            red [[deprecated]]
-          };
+  enum color
+  {
+    red [[deprecated]]
+  };
 
-          template <int dim>
-          struct foo {};
-          using bar [[deprecated]] = foo<2>;
+  template <int dim>
+  struct foo {};
+  using bar [[deprecated]] = foo<2>;
 
-          int main () {}
+  int main () {}
   "
-  DEAL_II_COMPILER_HAS_CXX17_ATTRIBUTE_DEPRECATED
+  DEAL_II_HAVE_CXX17_ATTRIBUTE_DEPRECATED
   )
 
 #
@@ -455,32 +457,32 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
-          __attribute__((deprecated)) int old_fn ();
-          int old_fn () { return 0; }
+  __attribute__((deprecated)) int old_fn ();
+  int old_fn () { return 0; }
 
-          struct __attribute__((deprecated)) bob
-          {
-            __attribute__((deprecated)) bob(int i);
-            __attribute__((deprecated)) void test();
-          };
+  struct __attribute__((deprecated)) bob
+  {
+    __attribute__((deprecated)) bob(int i);
+    __attribute__((deprecated)) void test();
+  };
 
-          enum color
-          {
-            red __attribute__((deprecated))
-          };
+  enum color
+  {
+    red __attribute__((deprecated))
+  };
 
-          template <int dim>
-          struct foo {};
-          using bar __attribute__((deprecated)) = foo<2>;
+  template <int dim>
+  struct foo {};
+  using bar __attribute__((deprecated)) = foo<2>;
 
-          int main () {}
+  int main () {}
   "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+  DEAL_II_HAVE_ATTRIBUTE_DEPRECATED
   )
 
-IF(DEAL_II_COMPILER_HAS_CXX17_ATTRIBUTE_DEPRECATED)
+IF(DEAL_II_HAVE_CXX17_ATTRIBUTE_DEPRECATED)
   SET(DEAL_II_DEPRECATED "[[deprecated]]")
-ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
+ELSEIF(DEAL_II_HAVE_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
   SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
 ELSE()
   SET(DEAL_II_DEPRECATED " ")
