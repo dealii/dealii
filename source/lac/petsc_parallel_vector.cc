@@ -257,8 +257,10 @@ namespace PETScWrappers
       AssertIndexRange(locally_owned_size, n + 1);
       ghosted = false;
 
-      const PetscErrorCode ierr =
-        VecCreateMPI(communicator, locally_owned_size, PETSC_DETERMINE, &vector);
+      const PetscErrorCode ierr = VecCreateMPI(communicator,
+                                               locally_owned_size,
+                                               PETSC_DETERMINE,
+                                               &vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
@@ -302,7 +304,8 @@ namespace PETScWrappers
         ierr = VecGetOwnershipRange(vector, &begin, &end);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        AssertDimension(locally_owned_size, static_cast<size_type>(end - begin));
+        AssertDimension(locally_owned_size,
+                        static_cast<size_type>(end - begin));
 
         Vec l;
         ierr = VecGhostGetLocalForm(vector, &l);

@@ -1689,7 +1689,7 @@ namespace LinearAlgebra
                        partitioner->locally_owned_size() +
                          partitioner->n_ghost_indices());
       // do not allow reading a vector which is not in ghost mode
-      Assert(local_index < local_size() || vector_is_ghosted == true,
+      Assert(local_index < locally_owned_size() || vector_is_ghosted == true,
              ExcMessage("You tried to read a ghost element of this vector, "
                         "but it has not imported its ghost values."));
 

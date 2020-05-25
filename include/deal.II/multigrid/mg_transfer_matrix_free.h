@@ -507,7 +507,7 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
 
   for (unsigned int level = min_level; level <= max_level; ++level)
     if (dst[level].size() != dof_handler.n_dofs(level) ||
-        dst[level].local_size() !=
+        dst[level].locally_owned_size() !=
           dof_handler.locally_owned_mg_dofs(level).n_elements())
       dst[level].reinit(this->vector_partitioners[level]);
 
@@ -643,7 +643,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
             LinearAlgebra::distributed::Vector<Number> &v = dst[level].block(b);
             if (v.size() !=
                   dof_handler[b]->locally_owned_mg_dofs(level).size() ||
-                v.local_size() !=
+                v.locally_owned_size() !=
                   dof_handler[b]->locally_owned_mg_dofs(level).n_elements())
               {
                 do_reinit[level] = true;
