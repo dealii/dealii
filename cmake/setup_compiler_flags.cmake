@@ -45,7 +45,7 @@
 #   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 #   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
-# Checks for compiler features (such as C++11 support) and compiler
+# Checks for compiler features (such as C++14 support) and compiler
 # specific bugs that
 #   - usually set up further configuration (such as preprocessor
 #     definitions)

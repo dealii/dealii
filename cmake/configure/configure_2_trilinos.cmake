@@ -293,15 +293,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
         )
 
-      IF(EXISTS ${SACADO_CONFIG_H})
-        #
-        # Determine whether Trilinos was configured with C++11 support and
-        # enabling C++11 in deal.II is mandatory.
-        #
-        FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
-          REGEX "#define HAVE_SACADO_CXX11")
-      ENDIF()
-
       #
       # GCC 6.3.0 has a bug that prevents the creation of complex
       # numbers templated on Sacado::Rad::ADvar types:
