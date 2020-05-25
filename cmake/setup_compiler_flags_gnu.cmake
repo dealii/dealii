@@ -23,7 +23,7 @@
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
     CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9" )
   MESSAGE(WARNING "\n"
-    "deal.II requires support for features of C++11 that are not present in\n"
+    "deal.II requires support for features of C++14 that are not present in\n"
     "versions of GCC prior to 4.9."
     )
 ENDIF()
@@ -31,7 +31,7 @@ ENDIF()
 IF( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
     CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0" )
   MESSAGE(WARNING "\n"
-    "deal.II requires support for features of C++11 that are not present in\n"
+    "deal.II requires support for features of C++14 that are not present in\n"
     "versions of Clang prior to 4.0."
     )
 ENDIF()
