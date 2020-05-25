@@ -40,7 +40,7 @@ OPTION(DEAL_II_FORCE_BUNDLED_CPP_TASKFLOW
   "Always use the bundled taskflow header library instead of an external one."
   OFF)
 
-SET(CPP_TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/cpp-taskflow")
+SET(CPP_TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/cpp-taskflow-2.4.0")
 
 
 #
