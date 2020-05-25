@@ -73,6 +73,36 @@ MappingQCache<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
+  const Triangulation<dim, spacedim> &             triangulation,
+  const std::vector<std::vector<Point<spacedim>>> &support_points)
+{
+  initialize(triangulation,
+             [this, &support_points](
+               const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+               -> std::vector<Point<spacedim>> {
+               // check if level is zero, since no mesh refinement is supported
+               // yet
+               AssertDimension(cell->level(), 0);
+
+               std::vector<Point<spacedim>> result;
+               const auto &                 vertices = this->get_vertices(cell);
+               // add vertices
+               for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+                 result.emplace_back(vertices[i]);
+               // add support points
+               result.insert(result.end(),
+                             support_points[cell->index()].begin(),
+                             support_points[cell->index()].end());
+
+               return result;
+             });
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingQCache<dim, spacedim>::initialize(
   const Triangulation<dim, spacedim> &  triangulation,
   const MappingQGeneric<dim, spacedim> &mapping)
 {

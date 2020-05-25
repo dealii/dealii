@@ -92,6 +92,9 @@ MappingQ2<dim, spacedim>::compute_mapping_support_points(
     result[i + GeometryInfo<dim>::vertices_per_cell] = sup_points[i];
 
   return result;
+
+  // new version since now vertices are also stored in the support points vector
+  //  return support_points[cell->active_cell_index()];
 }
 
 

@@ -25,6 +25,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_manifold.h>
+#include <deal.II/fe/mapping_q_cache.h>
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
@@ -67,6 +68,10 @@ check_file(const std::string file_name)
   // additional input parameter support_points
   MappingQ2<dim, spacedim> mapping_2(support_points);
 
+  // added functionality to MaapingQCache
+  MappingQCache<dim, spacedim> mapping_3(2);
+  mapping_3.initialize(tria, support_points);
+
   // create quadrature rules. Use GaussLobatto since the quadrature
   // points correspond to the support points
   QGaussLobatto<dim> quad_1(2);
@@ -84,6 +89,8 @@ check_file(const std::string file_name)
   FEValues<dim, spacedim> fe_values_1(mapping_1, fe_1, quad_1, flags);
   FEValues<dim, spacedim> fe_values_2(mapping_1, fe_2, quad_2, flags);
   FEValues<dim, spacedim> fe_values_3(mapping_2, fe_2, quad_2, flags);
+
+  FEValues<dim, spacedim> fe_values_4(mapping_3, fe_2, quad_2, flags);
 
   for (auto cell : tria.active_cell_iterators())
     {
@@ -114,6 +121,15 @@ check_file(const std::string file_name)
       deallog << "MappingQ2()" << std::endl;
       fe_values_3.reinit(cell);
       for (auto q : fe_values_3.get_quadrature_points())
+        deallog << q << std::endl;
+      deallog << std::endl;
+
+      // print quadrature points, this time the support points should
+      // be at the same location as specified in the input file, the
+      // ordering will be different though.
+      deallog << "MappingQCache(2)" << std::endl;
+      fe_values_4.reinit(cell);
+      for (auto q : fe_values_4.get_quadrature_points())
         deallog << q << std::endl;
       deallog << std::endl;
     }

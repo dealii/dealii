@@ -87,6 +87,19 @@ public:
              const MappingQGeneric<dim, spacedim> &mapping);
 
   /**
+   * Initialize the data cache by getting the support points from a Gmsh file
+   * read through GridIn::read_msh(). Currently mesh refinement is not
+   * supported.
+   *
+   * Note that the cache is
+   * invalidated upon the signal Triangulation::Signals::any_change of the
+   * underlying triangulation.
+   */
+  void
+  initialize(const Triangulation<dim, spacedim> &             triangulation,
+             const std::vector<std::vector<Point<spacedim>>> &support_points);
+
+  /**
    * Initialize the data cache by letting the function given as an argument
    * provide the mapping support points for all cells (on all levels) of the
    * given triangulation. The function must return a vector of

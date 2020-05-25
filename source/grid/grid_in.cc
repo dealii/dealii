@@ -127,6 +127,39 @@ namespace
     // and now copy the sorted points back into points. done.
     points = sorted_points;
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  combine_vertices_and_support_points(
+    const std::vector<Point<spacedim>> &       vertices,
+    const std::vector<CellData<dim>> &         cells,
+    std::vector<std::vector<Point<spacedim>>> &sup_points)
+  {
+    // check if both have the same length
+    AssertDimension(cells.size(), sup_points.size());
+
+    const unsigned int n_vertices   = GeometryInfo<dim>::vertices_per_cell;
+    const unsigned int n_sup_points = sup_points[0].size();
+
+    for (unsigned int i = 0; i < cells.size(); ++i)
+      {
+        // combine vertices and support points in temporary vector
+        std::vector<Point<spacedim>> temp;
+
+        // insert vertices
+        for (unsigned int j = 0; j < n_vertices; ++j)
+          temp.emplace_back(vertices[cells[i].vertices[j]]);
+
+        // insert support points
+        for (unsigned int j = n_vertices; j < n_vertices + n_sup_points; ++j)
+          temp.emplace_back(sup_points[i][j - n_vertices]);
+
+        // put this new combined vector in sup_points
+        sup_points[i] = temp;
+      }
+  }
 } // namespace
 
 
@@ -2151,6 +2184,11 @@ GridIn<dim, spacedim>::read_msh(
                                                                      cells);
   GridReordering<dim, spacedim>::reorder_cells(cells);
   tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+
+  // in case quad9 or hex27 elements were read, the 4 (quad9) or 8 (hex27)
+  // vertices are combined with the support points, both already in the
+  // proper ordering
+  //  combine_vertices_and_support_points(vertices, cells, support_points);
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
   // currently work through the call above
