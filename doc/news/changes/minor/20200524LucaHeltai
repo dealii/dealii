@@ -1,0 +1,4 @@
+New: pack_rtree_of_indices() and IndexableGetterFromIndices allow to construct an
+RTree object that stores indices to existing containers of indexable objects.
+<br>
+(Luca Heltai, 2020/05/24)
