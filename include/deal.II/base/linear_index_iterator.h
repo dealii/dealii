@@ -252,11 +252,13 @@ public:
   bool
   operator==(const DerivedIterator &) const;
 
+#ifndef DEAL_II_HAVE_CXX20
   /**
    * Inverse of operator==().
    */
   bool
   operator!=(const DerivedIterator &) const;
+#endif
 
   /**
    * Comparison operator: uses the same ordering as operator<(), but also
@@ -456,6 +458,7 @@ operator==(const DerivedIterator &other) const
 
 
 
+#ifndef DEAL_II_HAVE_CXX20
 template <class DerivedIterator, class AccessorType>
 inline bool
 LinearIndexIterator<DerivedIterator, AccessorType>::
@@ -463,6 +466,7 @@ operator!=(const DerivedIterator &other) const
 {
   return !(*this == other);
 }
+#endif
 
 
 
