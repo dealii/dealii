@@ -20,6 +20,7 @@
 #
 #   DEAL_II_HAVE_CXX14
 #   DEAL_II_HAVE_CXX17
+#   DEAL_II_HAVE_CXX20
 #
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
@@ -53,6 +54,49 @@ ENDMACRO()
 #
 # Wrap the following checks into a macro to make it easier to rerun them.
 #
+MACRO(_test_cxx20_support)
+
+  UNSET_IF_CHANGED(CHECK_CXX20_FEATURES_FLAGS_SAVED
+    "${CMAKE_REQUIRED_FLAGS}"
+    DEAL_II_HAVE_CXX20_FEATURES
+    )
+
+  # Strictly speaking "201709L" indicates support for a preliminary version
+  # of C++20 standard (which will have "202002L" when finalized). gcc-10
+  # exports this version number when configured with C++20 support.
+  # clang-10 exports the final "202002L" version instead.
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <cmath>
+    #include <ranges>
+
+    #if __cplusplus < 201709L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+    #  error \"insufficient support for C++20\"
+    #endif
+
+    #if !(defined __cpp_lib_ranges) || (__cpp_lib_ranges < 201911)
+    #  error \"insufficient support for C++20\"
+    #endif
+
+    int main()
+    {
+    }
+    "
+    DEAL_II_HAVE_CXX20_FEATURES)
+
+  IF(DEAL_II_HAVE_CXX20_FEATURES)
+    MESSAGE(STATUS "C++20 support is enabled.")
+    SET(DEAL_II_HAVE_CXX20 TRUE)
+  ELSE()
+    MESSAGE(STATUS "C++20 support is disabled.")
+    SET(DEAL_II_HAVE_CXX20 FALSE)
+  ENDIF()
+ENDMACRO()
+
+
+#
+# Wrap the following checks into a macro to make it easier to rerun them.
+#
 MACRO(_test_cxx17_support)
 
   UNSET_IF_CHANGED(CHECK_CXX17_FEATURES_FLAGS_SAVED
@@ -64,11 +108,21 @@ MACRO(_test_cxx17_support)
   # Test that the c++17 attributes are supported.
   CHECK_CXX_SOURCE_COMPILES(
     "
+    #include <cmath>
     #include <iostream>
+    #include <optional>
+    #include <tuple>
 
     #if __cplusplus < 201703L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
     #  error \"insufficient support for C++17\"
     #endif
+
+    //check for some C++17 features that we use in our headers:
+    using std::apply;
+    using std::cyl_bessel_j;
+    using std::cyl_bessel_jf;
+    using std::cyl_bessel_jl;
+    using std::optional;
 
     [[nodiscard]] int test_nodiscard()
     {
@@ -246,6 +300,7 @@ MACRO(_test_cxx14_support)
   ENDIF()
 ENDMACRO()
 
+
 #
 # Try to find out what we support:
 #
@@ -271,6 +326,7 @@ IF(NOT DEAL_II_HAVE_CXX14)
 ENDIF()
 
 _test_cxx17_support()
+_test_cxx20_support()
 
 
 ########################################################################
@@ -281,7 +337,9 @@ _test_cxx17_support()
 
 
 #
-# In the following we have to avoid
+# Some compilers are too generous in accepting some of the language
+# features that we test below and do not issue an error but a warning. Set
+# -Werror to make the feature detection more reliable.
 #
 SET(_werror_flag "")
 IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
