@@ -364,7 +364,6 @@ namespace PETScWrappers
 #  ifdef DEBUG
 #    ifdef DEAL_II_WITH_MPI
       // Check that all processors agree that last_action is the same (or none!)
-
       int my_int_last_action = last_action;
       int all_int_last_action;
 
@@ -390,28 +389,18 @@ namespace PETScWrappers
       ExcMessage(
         "Missing compress() or calling with wrong VectorOperation argument."));
 
-    // note that one may think that
-    // we only need to do something
-    // if in fact the state is
-    // anything but
-    // last_action::unknown. but
-    // that's not true: one
-    // frequently gets into
-    // situations where only one
-    // processor (or a subset of
-    // processors) actually writes
-    // something into a vector, but
-    // we still need to call
-    // VecAssemblyBegin/End on all
-    // processors.
+    // note that one may think that we only need to do something if in fact
+    // the state is anything but last_action::unknown. but that's not true:
+    // one frequently gets into situations where only one processor (or a
+    // subset of processors) actually writes something into a vector, but we
+    // still need to call VecAssemblyBegin/End on all processors.
     PetscErrorCode ierr = VecAssemblyBegin(vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = VecAssemblyEnd(vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    // reset the last action field to
-    // indicate that we're back to a
-    // pristine state
+    // reset the last action field to indicate that we're back to a pristine
+    // state
     last_action = ::dealii::VectorOperation::unknown;
   }
 
