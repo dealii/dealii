@@ -1032,6 +1032,8 @@ namespace Particles
                 {
                   // We can find no cell for this particle. It has left the
                   // domain due to an integration error or an open boundary.
+                  // Signal the loss and move on.
+                  signals.particle_lost(*it, current_cell);
                   continue;
                 }
             }
