@@ -3292,11 +3292,11 @@ namespace internal
 
           part.export_to_ghosted_array_start(
             component_in_block_vector + channel_shift,
-            ArrayView<const Number>(vec.begin(), part.local_size()),
+            ArrayView<const Number>(vec.begin(), part.locally_owned_size()),
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
                               part.n_import_indices()),
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
-                                vec.get_partitioner()->local_size(),
+                                vec.get_partitioner()->locally_owned_size(),
                               vec.get_partitioner()->n_ghost_indices()),
             this->requests[component_in_block_vector]);
 #  endif
@@ -3386,7 +3386,7 @@ namespace internal
 
           part.export_to_ghosted_array_finish(
             ArrayView<Number>(const_cast<Number *>(vec.begin()) +
-                                vec.get_partitioner()->local_size(),
+                                vec.get_partitioner()->locally_owned_size(),
                               vec.get_partitioner()->n_ghost_indices()),
             this->requests[component_in_block_vector]);
 
@@ -3507,7 +3507,8 @@ namespace internal
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
             component_in_block_vector + channel_shift,
-            ArrayView<Number>(vec.begin() + vec.get_partitioner()->local_size(),
+            ArrayView<Number>(vec.begin() +
+                                vec.get_partitioner()->locally_owned_size(),
                               vec.get_partitioner()->n_ghost_indices()),
             ArrayView<Number>(tmp_data[component_in_block_vector]->begin(),
                               part.n_import_indices()),
@@ -3601,8 +3602,9 @@ namespace internal
             ArrayView<const Number>(
               tmp_data[component_in_block_vector]->begin(),
               part.n_import_indices()),
-            ArrayView<Number>(vec.begin(), part.local_size()),
-            ArrayView<Number>(vec.begin() + vec.get_partitioner()->local_size(),
+            ArrayView<Number>(vec.begin(), part.locally_owned_size()),
+            ArrayView<Number>(vec.begin() +
+                                vec.get_partitioner()->locally_owned_size(),
                               vec.get_partitioner()->n_ghost_indices()),
             this->requests[component_in_block_vector]);
 
@@ -3693,7 +3695,7 @@ namespace internal
                   {
                     const_cast<LinearAlgebra::distributed::Vector<Number> &>(
                       vec)
-                      .local_element(j + part.local_size()) = 0.;
+                      .local_element(j + part.locally_owned_size()) = 0.;
                   }
             }
 
@@ -4573,7 +4575,7 @@ namespace internal
               // Case with threaded loop -> currently no overlap implemented
               dealii::parallel::apply_to_subranges(
                 0U,
-                dof_info.vector_partitioner->local_size(),
+                dof_info.vector_partitioner->locally_owned_size(),
                 operation_before_loop,
                 internal::VectorImplementation::minimum_parallel_grain_size);
             }
@@ -4603,7 +4605,7 @@ namespace internal
               // Case with threaded loop -> currently no overlap implemented
               dealii::parallel::apply_to_subranges(
                 0U,
-                dof_info.vector_partitioner->local_size(),
+                dof_info.vector_partitioner->locally_owned_size(),
                 operation_after_loop,
                 internal::VectorImplementation::minimum_parallel_grain_size);
             }

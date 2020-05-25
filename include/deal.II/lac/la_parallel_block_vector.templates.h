@@ -665,9 +665,9 @@ namespace LinearAlgebra
 
       Number local_result = Number();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        local_result +=
-          this->block(i).mean_value_local() *
-          static_cast<real_type>(this->block(i).partitioner->local_size());
+        local_result += this->block(i).mean_value_local() *
+                        static_cast<real_type>(
+                          this->block(i).partitioner->locally_owned_size());
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(

@@ -1463,7 +1463,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                        di.row_starts[(cell + 1) * di.start_components.back()]
                          .first;
                        ++i)
-                    if (di.dof_indices[i] >= part.local_size())
+                    if (di.dof_indices[i] >= part.locally_owned_size())
                       ghost_indices.push_back(
                         part.local_to_global(di.dof_indices[i]));
 
@@ -1476,7 +1476,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                   for (unsigned int i = di.row_starts_plain_indices[cell];
                        i < di.row_starts_plain_indices[cell] + dofs_this_cell;
                        ++i)
-                    if (di.plain_dof_indices[i] >= part.local_size())
+                    if (di.plain_dof_indices[i] >= part.locally_owned_size())
                       ghost_indices.push_back(
                         part.local_to_global(di.plain_dof_indices[i]));
                 }
@@ -1610,7 +1610,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                              IndexStorageVariants::contiguous &&
                          di.dof_indices_contiguous
                              [internal::MatrixFreeFunctions::DoFInfo::
-                                dof_access_cell][p] >= part.local_size()))
+                                dof_access_cell][p] >=
+                           part.locally_owned_size()))
                       {
                         const unsigned int stride =
                           di.dof_indices_interleave_strides[2][p];
@@ -1732,7 +1733,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                              IndexStorageVariants::contiguous &&
                          di.dof_indices_contiguous
                              [internal::MatrixFreeFunctions::DoFInfo::
-                                dof_access_cell][p] >= part.local_size()))
+                                dof_access_cell][p] >=
+                           part.locally_owned_size()))
                       {
                         const unsigned int stride =
                           di.dof_indices_interleave_strides[2][p];

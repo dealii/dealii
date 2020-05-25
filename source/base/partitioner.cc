@@ -193,7 +193,7 @@ namespace Utilities
           return;
         }
 
-      types::global_dof_index my_size = local_size();
+      types::global_dof_index my_size = locally_owned_size();
 
       // Allow non-zero start index for the vector. Part 1:
       // Assume for now that the index set of rank 0 starts with 0
@@ -224,9 +224,10 @@ namespace Utilities
       // information.
       if (local_range_data.first == 0 && my_shift != 0)
         {
-          const types::global_dof_index old_local_size = local_size();
-          local_range_data.first                       = my_shift;
-          local_range_data.second = my_shift + old_local_size;
+          const types::global_dof_index old_locally_owned_size =
+            locally_owned_size();
+          local_range_data.first  = my_shift;
+          local_range_data.second = my_shift + old_locally_owned_size;
         }
 
       std::vector<unsigned int> owning_ranks_of_ghosts(
@@ -359,8 +360,8 @@ namespace Utilities
       if (larger_ghost_index_set.size() == 0)
         {
           ghost_indices_subset_chunks_by_rank_data.clear();
-          ghost_indices_subset_data.emplace_back(local_size(),
-                                                 local_size() +
+          ghost_indices_subset_data.emplace_back(locally_owned_size(),
+                                                 locally_owned_size() +
                                                    n_ghost_indices());
           n_ghost_indices_in_larger_set = n_ghost_indices_data;
         }
