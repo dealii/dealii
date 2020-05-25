@@ -24,6 +24,7 @@
 #
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
 #   DEAL_II_FALLTHROUGH
 #   DEAL_II_DEPRECATED
 #   DEAL_II_CONSTEXPR
@@ -105,10 +106,8 @@ MACRO(_test_cxx17_support)
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
     )
 
-  # Test that the c++17 attributes are supported.
   CHECK_CXX_SOURCE_COMPILES(
     "
-    #include <cmath>
     #include <iostream>
     #include <optional>
     #include <tuple>
@@ -119,9 +118,6 @@ MACRO(_test_cxx17_support)
 
     //check for some C++17 features that we use in our headers:
     using std::apply;
-    using std::cyl_bessel_j;
-    using std::cyl_bessel_jf;
-    using std::cyl_bessel_jl;
     using std::optional;
 
     [[nodiscard]] int test_nodiscard()
@@ -356,6 +352,7 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
   DEAL_II_CXX14_CONSTEXPR_BUG_OK
   )
 
@@ -549,6 +546,25 @@ ELSEIF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
 ELSE()
   SET(DEAL_II_FALLTHROUGH " ")
 ENDIF()
+
+
+#
+# Check for c++17 bessel function support. Unfortunately libc++ version 10
+# does not have those.
+#
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+  using std::cyl_bessel_j;
+  using std::cyl_bessel_jf;
+  using std::cyl_bessel_jl;
+  int main()
+  {
+  }
+  "
+  DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+  )
 
 
 #
