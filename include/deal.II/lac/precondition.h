@@ -2135,12 +2135,12 @@ namespace internal
     template <typename Number>
     __global__ void
     set_initial_guess_kernel(const types::global_dof_index offset,
-                             const unsigned int            local_size,
+                             const unsigned int            locally_owned_size,
                              Number *                      values)
 
     {
       const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
-      if (index < local_size)
+      if (index < locally_owned_size)
         values[index] = (index + offset) % 11;
     }
 

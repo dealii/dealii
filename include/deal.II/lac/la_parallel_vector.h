@@ -893,7 +893,7 @@ namespace LinearAlgebra
        * the C++ standard library by returning iterators to the start and end
        * of the <i>locally owned</i> elements of this vector.
        *
-       * It holds that end() - begin() == local_size().
+       * It holds that end() - begin() == locally_owned_size().
        *
        * @note For the CUDA memory space, the iterator points to memory on the
        * device.
@@ -975,8 +975,8 @@ namespace LinearAlgebra
       /**
        * Read access to the data field specified by @p local_index. Locally
        * owned indices can be accessed with indices
-       * <code>[0,local_size)</code>, and ghost indices with indices
-       * <code>[local_size,local_size+ n_ghost_entries]</code>.
+       * <code>[0,locally_owned_size)</code>, and ghost indices with indices
+       * <code>[locally_owned_size,locally_owned_size+ n_ghost_entries]</code>.
        *
        * Performance: Direct array access (fast).
        */
@@ -986,8 +986,8 @@ namespace LinearAlgebra
       /**
        * Read and write access to the data field specified by @p local_index.
        * Locally owned indices can be accessed with indices
-       * <code>[0,local_size)</code>, and ghost indices with indices
-       * <code>[local_size,local_size+n_ghosts]</code>.
+       * <code>[0,locally_owned_size())</code>, and ghost indices with indices
+       * <code>[locally_owned_size(), locally_owned_size()+n_ghosts]</code>.
        *
        * Performance: Direct array access (fast).
        */

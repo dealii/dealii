@@ -172,8 +172,8 @@ namespace PETScWrappers
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
        *
-       * @arg local_size denotes the size of the chunk that shall be stored on
-       * the present process.
+       * @arg locally_owned_size denotes the size of the chunk that shall be
+       * stored on the present process.
        *
        * @arg communicator denotes the MPI communicator over which the
        * different parts of the vector shall communicate
@@ -186,15 +186,14 @@ namespace PETScWrappers
        */
       explicit Vector(const MPI_Comm &communicator,
                       const size_type n,
-                      const size_type local_size);
-
+                      const size_type locally_owned_size);
 
       /**
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
        * the given vector, and copies all elements.
        *
-       * @arg local_size denotes the size of the chunk that shall be stored on
-       * the present process.
+       * @arg locally_owned_size denotes the size of the chunk that shall be
+       * stored on the present process.
        *
        * @arg communicator denotes the MPI communicator over which the
        * different parts of the vector shall communicate
@@ -202,7 +201,7 @@ namespace PETScWrappers
       template <typename Number>
       explicit Vector(const MPI_Comm &              communicator,
                       const dealii::Vector<Number> &v,
-                      const size_type               local_size);
+                      const size_type               locally_owned_size);
 
 
       /**
@@ -310,8 +309,8 @@ namespace PETScWrappers
        * actually also reduces memory consumption, or if for efficiency the
        * same amount of memory is used
        *
-       * @p local_size denotes how many of the @p N values shall be stored
-       * locally on the present process. for less data.
+       * @p locally_owned_size denotes how many of the @p N values shall be
+       * stored locally on the present process. for less data.
        *
        * @p communicator denotes the MPI communicator henceforth to be used
        * for this vector.
@@ -322,7 +321,7 @@ namespace PETScWrappers
       void
       reinit(const MPI_Comm &communicator,
              const size_type N,
-             const size_type local_size,
+             const size_type locally_owned_size,
              const bool      omit_zeroing_entries = false);
 
       /**
@@ -331,7 +330,7 @@ namespace PETScWrappers
        * The same applies as for the other @p reinit function.
        *
        * The elements of @p v are not copied, i.e. this function is the same
-       * as calling <tt>reinit(v.size(), v.local_size(),
+       * as calling <tt>reinit(v.size(), v.locally_owned_size(),
        * omit_zeroing_entries)</tt>.
        */
       void
@@ -396,22 +395,22 @@ namespace PETScWrappers
       /**
        * Create a vector of length @p n. For this class, we create a parallel
        * vector. @p n denotes the total size of the vector to be created. @p
-       * local_size denotes how many of these elements shall be stored
+       * locally_owned_size denotes how many of these elements shall be stored
        * locally.
        */
       virtual void
-      create_vector(const size_type n, const size_type local_size);
+      create_vector(const size_type n, const size_type locally_owned_size);
 
 
 
       /**
-       * Create a vector of global length @p n, local size @p local_size and
-       * with the specified ghost indices. Note that you need to call
-       * update_ghost_values() before accessing those.
+       * Create a vector of global length @p n, local size @p
+       * locally_owned_size and with the specified ghost indices. Note that
+       * you need to call update_ghost_values() before accessing those.
        */
       virtual void
       create_vector(const size_type n,
-                    const size_type local_size,
+                    const size_type locally_owned_size,
                     const IndexSet &ghostnodes);
 
 
@@ -446,10 +445,10 @@ namespace PETScWrappers
     template <typename number>
     Vector::Vector(const MPI_Comm &              communicator,
                    const dealii::Vector<number> &v,
-                   const size_type               local_size)
+                   const size_type               locally_owned_size)
       : communicator(communicator)
     {
-      Vector::create_vector(v.size(), local_size);
+      Vector::create_vector(v.size(), locally_owned_size);
 
       *this = v;
     }
