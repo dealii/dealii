@@ -34,13 +34,13 @@ SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
 # CPP Taskflow
 #
 
-SET(FEATURE_TASKFLOW_HAVE_BUNDLED TRUE)
+SET(FEATURE_CPP_TASKFLOW_HAVE_BUNDLED TRUE)
 
-OPTION(DEAL_II_FORCE_BUNDLED_TASKFLOW
+OPTION(DEAL_II_FORCE_BUNDLED_CPP_TASKFLOW
   "Always use the bundled taskflow header library instead of an external one."
   OFF)
 
-SET(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/cpp-taskflow")
+SET(CPP_TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/cpp-taskflow")
 
 
 #
