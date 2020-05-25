@@ -72,25 +72,25 @@ public:
   {
   public:
     AdditionalData()
-    :column_ordering(0)
+      : column_ordering(0)
     {
-    	options_.nprocs = MultithreadInfo::n_threads();
-    	options_.fact = DOFACT;
-    	options_.PrintStat = NO;
+      options_.nprocs    = MultithreadInfo::n_threads();
+      options_.fact      = DOFACT;
+      options_.PrintStat = NO;
     }
 
     explicit AdditionalData(const unsigned int &num_threads,
                             const unsigned int &factorize,
                             const size_type &   col_order,
-                            const bool printSolverStats)
-                            : column_ordering(col_order)
+                            const bool          printSolverStats)
+      : column_ordering(col_order)
     {
       options_.nprocs = num_threads;
       options_.fact   = static_cast<fact_t>(factorize);
-      if(printSolverStats)
-      	options_.PrintStat = YES;
+      if (printSolverStats)
+        options_.PrintStat = YES;
       else
-      	options_.PrintStat = NO;
+        options_.PrintStat = NO;
     }
     /**
      * Object to store additional options for the solver

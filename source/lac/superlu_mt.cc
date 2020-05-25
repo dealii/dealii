@@ -39,8 +39,8 @@ SuperLU_MT::~SuperLU_MT()
 void
 SuperLU_MT::clear()
 {
-	Destroy_SuperMatrix_Store(&this->A);
-	Destroy_SuperMatrix_Store(&this->b);
+  Destroy_SuperMatrix_Store(&this->A);
+  Destroy_SuperMatrix_Store(&this->b);
 }
 
 
@@ -193,19 +193,19 @@ SuperLU_MT::solve(vector_type &x)
     }
 
   // copy solution
-	DNformat *bStore;
-	bStore = (DNformat *)b.Store;
-	double *dp;
-	dp = (double *)bStore->nzval;
-	// \todo check if this manual copy can be replaced by std::copy()
-	for (size_type i = 0; i < bStore->lda; ++i)
-		x[i] = dp[i];
+  DNformat *bStore;
+  bStore = (DNformat *)b.Store;
+  double *dp;
+  dp = (double *)bStore->nzval;
+  // \todo check if this manual copy can be replaced by std::copy()
+  for (size_type i = 0; i < bStore->lda; ++i)
+    x[i] = dp[i];
 
-	// clear the datastructures before leaving
-	Destroy_SuperNode_SCP(&L);
-	Destroy_CompCol_NCP(&U);
-	dp = nullptr;
-	bStore = nullptr;
+  // clear the datastructures before leaving
+  Destroy_SuperNode_SCP(&L);
+  Destroy_CompCol_NCP(&U);
+  dp     = nullptr;
+  bStore = nullptr;
 }
 
 
