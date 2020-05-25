@@ -275,20 +275,16 @@ namespace PETScWrappers
       clear() override;
 
       /**
+       * Explicitly use the base class operator= functions.
+       */
+      using VectorBase::operator=;
+
+      /**
        * Copy the given vector. Resize the present vector if necessary. Also
        * take over the MPI communicator of @p v.
        */
       Vector &
       operator=(const Vector &v);
-
-      /**
-       * Set all components of the vector to the given number @p s. Simply
-       * pass this down to the base class, but we still need to declare this
-       * function to make the example given in the discussion about making the
-       * constructor explicit work.
-       */
-      Vector &
-      operator=(const PetscScalar s);
 
       /**
        * Copy the values of a deal.II vector (as opposed to those of the PETSc
@@ -302,6 +298,11 @@ namespace PETScWrappers
       template <typename number>
       Vector &
       operator=(const dealii::Vector<number> &v);
+
+      /**
+       * Explicitly use the base class reinit functions.
+       */
+      using VectorBase::reinit;
 
       /**
        * Change the dimension of the vector to @p N. It is unspecified how
@@ -377,11 +378,11 @@ namespace PETScWrappers
        * that the right thing happens for parallel vectors that are
        * distributed across processors.
        */
-      void
+      virtual void
       print(std::ostream &     out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
-            const bool         across     = true) const;
+            const bool         across     = true) const override;
 
       /**
        * @copydoc PETScWrappers::VectorBase::all_zero()
@@ -389,8 +390,8 @@ namespace PETScWrappers
        * @note This function overloads the one in the base class to make this
        * a collective operation.
        */
-      bool
-      all_zero() const;
+      virtual bool
+      all_zero() const override;
 
     protected:
       /**
@@ -452,16 +453,6 @@ namespace PETScWrappers
       Vector::create_vector(v.size(), local_size);
 
       *this = v;
-    }
-
-
-
-    inline Vector &
-    Vector::operator=(const PetscScalar s)
-    {
-      VectorBase::operator=(s);
-
-      return *this;
     }
 
 

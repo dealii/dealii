@@ -173,6 +173,13 @@ namespace PETScWrappers
 
 
   void
+  VectorBase::reinit(const VectorSpaceVector<PetscScalar> &, const bool)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  void
   VectorBase::clear()
   {
     if (obtained_ownership)
@@ -325,9 +332,12 @@ namespace PETScWrappers
 
 
 
-  PetscScalar VectorBase::operator*(const VectorBase &vec) const
+  PetscScalar VectorBase::
+              operator*(const VectorSpaceVector<PetscScalar> &vec) const
   {
     Assert(size() == vec.size(), ExcDimensionMismatch(size(), vec.size()));
+    const auto *vp = dynamic_cast<const VectorBase *>(&vec);
+    Assert(vp, ExcNotImplemented());
 
     PetscScalar result;
 
@@ -338,7 +348,7 @@ namespace PETScWrappers
     // complex inner product where the SECOND argument gets the
     // complex conjugate, which is also how we document this
     // operation.
-    const PetscErrorCode ierr = VecDot(vec.vector, vector, &result);
+    const PetscErrorCode ierr = VecDot(vp->vector, vector, &result);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return result;
@@ -347,9 +357,9 @@ namespace PETScWrappers
 
 
   PetscScalar
-  VectorBase::add_and_dot(const PetscScalar a,
-                          const VectorBase &V,
-                          const VectorBase &W)
+  VectorBase::add_and_dot(const PetscScalar                     a,
+                          const VectorSpaceVector<PetscScalar> &V,
+                          const VectorSpaceVector<PetscScalar> &W)
   {
     this->add(a, V);
     return *this * W;
@@ -690,10 +700,12 @@ namespace PETScWrappers
 
 
   VectorBase &
-  VectorBase::operator+=(const VectorBase &v)
+  VectorBase::operator+=(const VectorSpaceVector<PetscScalar> &v)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecAXPY(vector, 1, v);
+    const auto *pv = dynamic_cast<const VectorBase *>(&v);
+    Assert(pv, ExcNotImplemented());
+    const PetscErrorCode ierr = VecAXPY(vector, 1, *pv);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -702,13 +714,25 @@ namespace PETScWrappers
 
 
   VectorBase &
-  VectorBase::operator-=(const VectorBase &v)
+  VectorBase::operator-=(const VectorSpaceVector<PetscScalar> &v)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecAXPY(vector, -1, v);
+    const auto *pv = dynamic_cast<const VectorBase *>(&v);
+    Assert(pv, ExcNotImplemented());
+    const PetscErrorCode ierr = VecAXPY(vector, -1, *pv);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return *this;
+  }
+
+
+
+  void
+  VectorBase::import(const ReadWriteVector<PetscScalar> &,
+                     VectorOperation::values,
+                     std::shared_ptr<const CommunicationPatternBase>)
+  {
+    Assert(false, ExcNotImplemented());
   }
 
 
@@ -726,29 +750,34 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add(const PetscScalar a, const VectorBase &v)
+  VectorBase::add(const PetscScalar a, const VectorSpaceVector<PetscScalar> &v)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
-
-    const PetscErrorCode ierr = VecAXPY(vector, a, v);
+    const auto *vp = dynamic_cast<const VectorBase *>(&v);
+    Assert(vp, ExcNotImplemented());
+    const PetscErrorCode ierr = VecAXPY(vector, a, vp->vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
 
   void
-  VectorBase::add(const PetscScalar a,
-                  const VectorBase &v,
-                  const PetscScalar b,
-                  const VectorBase &w)
+  VectorBase::add(const PetscScalar                     a,
+                  const VectorSpaceVector<PetscScalar> &v,
+                  const PetscScalar                     b,
+                  const VectorSpaceVector<PetscScalar> &w)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
     AssertIsFinite(b);
 
+    const auto *vp = dynamic_cast<const VectorBase *>(&v);
+    const auto *wp = dynamic_cast<const VectorBase *>(&w);
+    Assert(vp && wp, ExcNotImplemented());
+
     const PetscScalar weights[2] = {a, b};
-    Vec               addends[2] = {v.vector, w.vector};
+    Vec               addends[2] = {vp->vector, wp->vector};
 
     const PetscErrorCode ierr = VecMAXPY(vector, 2, weights, addends);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -769,9 +798,9 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::sadd(const PetscScalar s,
-                   const PetscScalar a,
-                   const VectorBase &v)
+  VectorBase::sadd(const PetscScalar                     s,
+                   const PetscScalar                     a,
+                   const VectorSpaceVector<PetscScalar> &v)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
@@ -787,27 +816,32 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::scale(const VectorBase &factors)
+  VectorBase::scale(const VectorSpaceVector<PetscScalar> &factors)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseMult(vector, factors, vector);
+    const auto *fp = dynamic_cast<const VectorBase *>(&factors);
+    Assert(fp, ExcNotImplemented());
+
+    const PetscErrorCode ierr = VecPointwiseMult(vector, fp->vector, vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
 
   void
-  VectorBase::equ(const PetscScalar a, const VectorBase &v)
+  VectorBase::equ(const PetscScalar a, const VectorSpaceVector<PetscScalar> &v)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
 
-    Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+    const auto *vp = dynamic_cast<const VectorBase *>(&v);
+    Assert(vp, ExcNotImplemented());
+    Assert(size() == vp->size(), ExcDimensionMismatch(size(), vp->size()));
 
     // there is no simple operation for this
     // in PETSc. there are multiple ways to
     // emulate it, we choose this one:
-    const PetscErrorCode ierr = VecCopy(v.vector, vector);
+    const PetscErrorCode ierr = VecCopy(vp->vector, vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     *this *= a;

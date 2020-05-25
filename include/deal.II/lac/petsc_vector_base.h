@@ -27,6 +27,7 @@
 #    include <deal.II/lac/exceptions.h>
 #    include <deal.II/lac/vector.h>
 #    include <deal.II/lac/vector_operation.h>
+#    include <deal.II/lac/vector_space_vector.h>
 
 #    include <petscvec.h>
 
@@ -55,6 +56,9 @@ namespace PETScWrappers
  */
 namespace PETScWrappers
 {
+  // todo - get rid of this
+  using namespace ::dealii::LinearAlgebra;
+
   /**
    * @cond internal
    */
@@ -237,7 +241,7 @@ namespace PETScWrappers
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, 2004
    */
-  class VectorBase : public Subscriptor
+  class VectorBase : public Subscriptor, public VectorSpaceVector<PetscScalar>
   {
   public:
     /**
@@ -283,6 +287,14 @@ namespace PETScWrappers
     virtual ~VectorBase() override;
 
     /**
+     * Change the dimension to that of the vector V. The elements of V are not
+     * copied.
+     */
+    virtual void
+    reinit(const VectorSpaceVector<PetscScalar> &V,
+           const bool omit_zeroing_entries = false) override;
+
+    /**
      * Release all memory and return to a state just like after having called
      * the default constructor.
      */
@@ -299,8 +311,8 @@ namespace PETScWrappers
      * @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void
-    compress(const VectorOperation::values operation);
+    virtual void
+    compress(const VectorOperation::values operation) override;
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -315,8 +327,8 @@ namespace PETScWrappers
      * <tt>v=0</tt>. Assigning other values is deprecated and may be
      * disallowed in the future.
      */
-    VectorBase &
-    operator=(const PetscScalar s);
+    virtual VectorBase &
+    operator=(const PetscScalar s) override;
 
     /**
      * Test for equality. This function assumes that the present vector and
@@ -337,8 +349,8 @@ namespace PETScWrappers
     /**
      * Return the global dimension of the vector.
      */
-    size_type
-    size() const;
+    virtual size_type
+    size() const override;
 
     /**
      * Return the local dimension of the vector, i.e. the number of elements
@@ -382,8 +394,8 @@ namespace PETScWrappers
      *   vec.locally_owned_elements() == complete_index_set (vec.size())
      * @endcode
      */
-    IndexSet
-    locally_owned_elements() const;
+    virtual IndexSet
+    locally_owned_elements() const override;
 
     /**
      * Return if the vector contains ghost elements.
@@ -523,7 +535,8 @@ namespace PETScWrappers
      *
      * For complex valued vector, this gives$\left(v^\ast,vec\right)$.
      */
-    PetscScalar operator*(const VectorBase &vec) const;
+    virtual PetscScalar
+    operator*(const VectorSpaceVector<PetscScalar> &vec) const override;
 
     /**
      * Return the square of the $l_2$-norm.
@@ -534,8 +547,8 @@ namespace PETScWrappers
     /**
      * Return the mean value of the elements of this vector.
      */
-    PetscScalar
-    mean_value() const;
+    virtual PetscScalar
+    mean_value() const override;
 
     /**
      * $l_1$-norm of the vector. The sum of the absolute values.
@@ -544,15 +557,15 @@ namespace PETScWrappers
      * as the sum of absolute values of real and imaginary parts of elements
      * of a complex vector.
      */
-    real_type
-    l1_norm() const;
+    virtual real_type
+    l1_norm() const override;
 
     /**
      * $l_2$-norm of the vector.  The square root of the sum of the squares of
      * the elements.
      */
-    real_type
-    l2_norm() const;
+    virtual real_type
+    l2_norm() const override;
 
     /**
      * $l_p$-norm of the vector. The pth root of the sum of the pth powers of
@@ -565,8 +578,8 @@ namespace PETScWrappers
      * $l_\infty$-norm of the vector. Return the value of the vector element
      * with the maximum absolute value.
      */
-    real_type
-    linfty_norm() const;
+    virtual real_type
+    linfty_norm() const override;
 
     /**
      * Performs a combined operation of a vector addition and a subsequent
@@ -587,8 +600,10 @@ namespace PETScWrappers
      * implemented as
      * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
      */
-    PetscScalar
-    add_and_dot(const PetscScalar a, const VectorBase &V, const VectorBase &W);
+    virtual PetscScalar
+    add_and_dot(const PetscScalar                     a,
+                const VectorSpaceVector<PetscScalar> &V,
+                const VectorSpaceVector<PetscScalar> &W) override;
 
     /**
      * Return the value of the vector element with the largest negative value.
@@ -607,8 +622,8 @@ namespace PETScWrappers
      * is a collective operation. This function is expensive, because
      * potentially all elements have to be checked.
      */
-    bool
-    all_zero() const;
+    virtual bool
+    all_zero() const override;
 
     /**
      * Return @p true if the vector has no negative entries, i.e. all entries
@@ -621,48 +636,59 @@ namespace PETScWrappers
     /**
      * Multiply the entire vector by a fixed factor.
      */
-    VectorBase &
-    operator*=(const PetscScalar factor);
+    virtual VectorBase &
+    operator*=(const PetscScalar factor) override;
 
     /**
      * Divide the entire vector by a fixed factor.
      */
-    VectorBase &
-    operator/=(const PetscScalar factor);
+    virtual VectorBase &
+    operator/=(const PetscScalar factor) override;
 
     /**
      * Add the given vector to the present one.
      */
-    VectorBase &
-    operator+=(const VectorBase &V);
+    virtual VectorBase &
+    operator+=(const VectorSpaceVector<PetscScalar> &V) override;
 
     /**
      * Subtract the given vector from the present one.
      */
-    VectorBase &
-    operator-=(const VectorBase &V);
+    virtual VectorBase &
+    operator-=(const VectorSpaceVector<PetscScalar> &V) override;
+
+    /**
+     * Import all the elements present in the vector's IndexSet from @p V. @p
+     * operation is used to decide how the values are imported.
+     */
+    virtual void
+    import(
+      const ReadWriteVector<PetscScalar> &            V,
+      VectorOperation::values                         operation,
+      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+        std::shared_ptr<const CommunicationPatternBase>()) override;
 
     /**
      * Addition of @p s to all components. Note that @p s is a scalar and not
      * a vector.
      */
-    void
-    add(const PetscScalar s);
+    virtual void
+    add(const PetscScalar s) override;
 
     /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
-    void
-    add(const PetscScalar a, const VectorBase &V);
+    virtual void
+    add(const PetscScalar a, const VectorSpaceVector<PetscScalar> &V) override;
 
     /**
      * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
      */
-    void
-    add(const PetscScalar a,
-        const VectorBase &V,
-        const PetscScalar b,
-        const VectorBase &W);
+    virtual void
+    add(const PetscScalar                     a,
+        const VectorSpaceVector<PetscScalar> &V,
+        const PetscScalar                     b,
+        const VectorSpaceVector<PetscScalar> &W) override;
 
     /**
      * Scaling and simple vector addition, i.e. <tt>*this = s*(*this)+V</tt>.
@@ -673,22 +699,24 @@ namespace PETScWrappers
     /**
      * Scaling and simple addition, i.e. <tt>*this = s*(*this)+a*V</tt>.
      */
-    void
-    sadd(const PetscScalar s, const PetscScalar a, const VectorBase &V);
+    virtual void
+    sadd(const PetscScalar                     s,
+         const PetscScalar                     a,
+         const VectorSpaceVector<PetscScalar> &V) override;
 
     /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
      * immediate re-assignment) by a diagonal scaling matrix.
      */
-    void
-    scale(const VectorBase &scaling_factors);
+    virtual void
+    scale(const VectorSpaceVector<PetscScalar> &scaling_factors) override;
 
     /**
      * Assignment <tt>*this = a*V</tt>.
      */
-    void
-    equ(const PetscScalar a, const VectorBase &V);
+    virtual void
+    equ(const PetscScalar a, const VectorSpaceVector<PetscScalar> &V) override;
 
     /**
      * Prints the PETSc vector object values using PETSc internal vector
@@ -707,11 +735,11 @@ namespace PETScWrappers
      * printed in a line, while if @p false then the elements are printed on a
      * separate line each.
      */
-    void
+    virtual void
     print(std::ostream &     out,
           const unsigned int precision  = 3,
           const bool         scientific = true,
-          const bool         across     = true) const;
+          const bool         across     = true) const override;
 
     /**
      * Swap the contents of this vector and the other vector @p v. One could
@@ -740,8 +768,8 @@ namespace PETScWrappers
     /**
      * Estimate for the memory consumption (not implemented for this class).
      */
-    std::size_t
-    memory_consumption() const;
+    virtual std::size_t
+    memory_consumption() const override;
 
     /**
      * Return a reference to the MPI communicator object in use with this
