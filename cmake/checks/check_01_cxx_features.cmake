@@ -261,7 +261,7 @@ MACRO(_test_cxx14_support)
     int main()
     {
       std::condition_variable c;
-      p[0];
+      p[0] = 1;
       c.notify_all();
 
      // type traits functionality

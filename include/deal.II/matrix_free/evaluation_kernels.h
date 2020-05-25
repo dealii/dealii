@@ -1907,7 +1907,7 @@ namespace internal
 
       VectorizedArrayType
                            temp_data[static_dofs_per_face < stack_array_size_threshold ?
-                    n_components * 2 * static_dofs_per_face :
+                    n_components * 2ull * static_dofs_per_face :
                     1];
       VectorizedArrayType *temp1;
       if (static_dofs_per_face < stack_array_size_threshold)

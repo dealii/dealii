@@ -5,7 +5,7 @@ build_script:
 - cmd: >-
     mkdir build &&
     cd build &&
-    cmake c:\projects\source -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX="c:\projects\dealii" &&
+    cmake c:\projects\source -DCMAKE_BUILD_TYPE=Debug -DDEAL_II_CXX_FLAGS="-WX" -G "Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX="c:\projects\dealii" &&
     cmake --build . --target install -- -m
 
 for:
