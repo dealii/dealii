@@ -250,7 +250,7 @@ public:
    * the same entry in the same container.
    */
   bool
-  operator==(const DerivedIterator &) const;
+  operator==(const LinearIndexIterator &) const;
 
   /**
    * Inverse of operator==().
@@ -446,12 +446,11 @@ inline typename LinearIndexIterator<DerivedIterator, AccessorType>::pointer
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator==(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator==(
+  const LinearIndexIterator<DerivedIterator, AccessorType> &other) const
 {
-  const auto &other_2 = static_cast<decltype(*this) &>(other);
-  return accessor.container == other_2.accessor.container &&
-         accessor.linear_index == other_2.accessor.linear_index;
+  return accessor.container == other.accessor.container &&
+         accessor.linear_index == other.accessor.linear_index;
 }
 
 

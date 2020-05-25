@@ -379,8 +379,10 @@ public:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const TriaRawIterator &) const;
+  template <typename OtherAccessor = Accessor>
+  typename std::enable_if<std::is_convertible<OtherAccessor, Accessor>::value,
+                          bool>::type
+  operator==(const TriaRawIterator<OtherAccessor> &) const;
 
   /**
    * Compare for inequality.
