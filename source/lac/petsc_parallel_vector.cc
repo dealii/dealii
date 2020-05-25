@@ -41,17 +41,17 @@ namespace PETScWrappers
 
     Vector::Vector(const MPI_Comm &communicator,
                    const size_type n,
-                   const size_type local_size)
+                   const size_type locally_owned_size)
       : communicator(communicator)
     {
-      Vector::create_vector(n, local_size);
+      Vector::create_vector(n, locally_owned_size);
     }
 
 
 
     Vector::Vector(const MPI_Comm &  communicator,
                    const VectorBase &v,
-                   const size_type   local_size)
+                   const size_type   locally_owned_size)
       : VectorBase(v)
       , communicator(communicator)
     {
@@ -63,8 +63,8 @@ namespace PETScWrappers
       //
       // For the sake of backwards compatibility, preserve the behavior of the
       // copy, but correct the ownership bug. Note that in both this (and the
-      // original) implementation local_size is ultimately unused.
-      (void)local_size;
+      // original) implementation locally_owned_size is ultimately unused.
+      (void)locally_owned_size;
     }
 
 
@@ -251,14 +251,14 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector(const size_type n, const size_type local_size)
+    Vector::create_vector(const size_type n, const size_type locally_owned_size)
     {
       (void)n;
-      AssertIndexRange(local_size, n + 1);
+      AssertIndexRange(locally_owned_size, n + 1);
       ghosted = false;
 
       const PetscErrorCode ierr =
-        VecCreateMPI(communicator, local_size, PETSC_DETERMINE, &vector);
+        VecCreateMPI(communicator, locally_owned_size, PETSC_DETERMINE, &vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
@@ -268,11 +268,11 @@ namespace PETScWrappers
 
     void
     Vector::create_vector(const size_type n,
-                          const size_type local_size,
+                          const size_type locally_owned_size,
                           const IndexSet &ghostnodes)
     {
       (void)n;
-      AssertIndexRange(local_size, n + 1);
+      AssertIndexRange(locally_owned_size, n + 1);
       ghosted       = true;
       ghost_indices = ghostnodes;
 
@@ -285,7 +285,7 @@ namespace PETScWrappers
            nullptr);
 
       PetscErrorCode ierr = VecCreateGhost(communicator,
-                                           local_size,
+                                           locally_owned_size,
                                            PETSC_DETERMINE,
                                            ghostindices.size(),
                                            ptr,
@@ -302,7 +302,7 @@ namespace PETScWrappers
         ierr = VecGetOwnershipRange(vector, &begin, &end);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        AssertDimension(local_size, static_cast<size_type>(end - begin));
+        AssertDimension(locally_owned_size, static_cast<size_type>(end - begin));
 
         Vec l;
         ierr = VecGhostGetLocalForm(vector, &l);
@@ -329,7 +329,7 @@ namespace PETScWrappers
       // see https://code.google.com/p/dealii/issues/detail?id=233
 #  if DEAL_II_PETSC_VERSION_LT(3, 6, 0)
       PETScWrappers::MPI::Vector zero;
-      zero.reinit(communicator, this->size(), local_size);
+      zero.reinit(communicator, this->size(), locally_owned_size);
       *this = zero;
 #  endif
     }

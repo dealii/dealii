@@ -90,13 +90,13 @@ namespace PETScWrappers
       /**
        * Constructor. Generate a block vector with @p n_blocks blocks, each of
        * which is a parallel vector across @p communicator with @p block_size
-       * elements of which @p local_size elements are stored on the present
-       * process.
+       * elements of which @p locally_owned_size elements are stored on the
+       * present process.
        */
       explicit BlockVector(const unsigned int n_blocks,
                            const MPI_Comm &   communicator,
                            const size_type    block_size,
-                           const size_type    local_size);
+                           const size_type    locally_owned_size);
 
       /**
        * Copy constructor. Set all the properties of the parallel vector to
@@ -151,9 +151,9 @@ namespace PETScWrappers
 
       /**
        * Reinitialize the BlockVector to contain @p n_blocks of size @p
-       * block_size, each of which stores @p local_size elements locally. The
-       * @p communicator argument denotes which MPI channel each of these
-       * blocks shall communicate.
+       * block_size, each of which stores @p locally_owned_size elements
+       * locally. The @p communicator argument denotes which MPI channel each
+       * of these blocks shall communicate.
        *
        * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
        * zeros.
@@ -162,14 +162,14 @@ namespace PETScWrappers
       reinit(const unsigned int n_blocks,
              const MPI_Comm &   communicator,
              const size_type    block_size,
-             const size_type    local_size,
+             const size_type    locally_owned_size,
              const bool         omit_zeroing_entries = false);
 
       /**
        * Reinitialize the BlockVector such that it contains
        * <tt>block_sizes.size()</tt> blocks. Each block is reinitialized to
        * dimension <tt>block_sizes[i]</tt>. Each of them stores
-       * <tt>local_sizes[i]</tt> elements on the present process.
+       * <tt>locally_owned_sizes[i]</tt> elements on the present process.
        *
        * If the number of blocks is the same as before this function was
        * called, all vectors remain the same and reinit() is called for each
@@ -188,7 +188,7 @@ namespace PETScWrappers
       void
       reinit(const std::vector<size_type> &block_sizes,
              const MPI_Comm &              communicator,
-             const std::vector<size_type> &local_sizes,
+             const std::vector<size_type> &locally_owned_sizes,
              const bool                    omit_zeroing_entries = false);
 
       /**
@@ -292,9 +292,9 @@ namespace PETScWrappers
     inline BlockVector::BlockVector(const unsigned int n_blocks,
                                     const MPI_Comm &   communicator,
                                     const size_type    block_size,
-                                    const size_type    local_size)
+                                    const size_type    locally_owned_size)
     {
-      reinit(n_blocks, communicator, block_size, local_size);
+      reinit(n_blocks, communicator, block_size, locally_owned_size);
     }
 
 
@@ -365,12 +365,12 @@ namespace PETScWrappers
     BlockVector::reinit(const unsigned int n_blocks,
                         const MPI_Comm &   communicator,
                         const size_type    block_size,
-                        const size_type    local_size,
+                        const size_type    locally_owned_size,
                         const bool         omit_zeroing_entries)
     {
       reinit(std::vector<size_type>(n_blocks, block_size),
              communicator,
-             std::vector<size_type>(n_blocks, local_size),
+             std::vector<size_type>(n_blocks, locally_owned_size),
              omit_zeroing_entries);
     }
 
@@ -379,7 +379,7 @@ namespace PETScWrappers
     inline void
     BlockVector::reinit(const std::vector<size_type> &block_sizes,
                         const MPI_Comm &              communicator,
-                        const std::vector<size_type> &local_sizes,
+                        const std::vector<size_type> &locally_owned_sizes,
                         const bool                    omit_zeroing_entries)
     {
       this->block_indices.reinit(block_sizes);
@@ -389,7 +389,7 @@ namespace PETScWrappers
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->components[i].reinit(communicator,
                                    block_sizes[i],
-                                   local_sizes[i],
+                                   locally_owned_sizes[i],
                                    omit_zeroing_entries);
     }
 

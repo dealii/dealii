@@ -381,7 +381,7 @@ namespace PETScWrappers
      * stored, the second the index of the one past the last one that is
      * stored locally. If this is a sequential vector, then the result will be
      * the pair (0,N), otherwise it will be a pair (i,i+n), where
-     * <tt>n=local_size()</tt>.
+     * <tt>n=locally_owned_size()</tt>.
      */
     std::pair<size_type, size_type>
     local_range() const;

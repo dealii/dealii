@@ -1382,9 +1382,9 @@ namespace DoFRenumbering
             &dof_handler.get_triangulation()))
       {
 #ifdef DEAL_II_WITH_MPI
-        types::global_dof_index local_size =
+        types::global_dof_index locally_owned_size =
           dof_handler.locally_owned_dofs().n_elements();
-        MPI_Exscan(&local_size,
+        MPI_Exscan(&locally_owned_size,
                    &my_starting_index,
                    1,
                    DEAL_II_DOF_INDEX_MPI_TYPE,
