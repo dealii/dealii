@@ -2312,18 +2312,44 @@ struct GeometryInfo
                              const bool         face_flip        = false,
                              const bool         face_rotation    = false);
 
+  /**
+   * Map the vertex index @p vertex of a line in standard orientation to one of a
+   * face with arbitrary @p line_orientation. The value of this flag default to
+   * <tt>true</tt>.
+   */
   static unsigned int
-  standard_to_real_line_vertex(const unsigned int line,
-                               const bool         face_orientation = true);
+  standard_to_real_line_vertex(const unsigned int vertex,
+                               const bool         line_orientation = true);
 
+  /**
+   * Decompose the vertex index in a quad into a pair of a line index and a
+   * vertex index within this line.
+   *
+   * @note Which line is selected is not of importance (and not exposed on
+   *   purpose).
+   */
   static std::array<unsigned int, 2>
-  standard_corner_to_line_vertex_index(const unsigned int corner);
+  standard_quad_vertex_to_line_vertex_index(const unsigned int vertex);
 
+  /**
+   * Decompose the vertex index in a hex into a pair of a quad index and a
+   * vertex index within this quad.
+   *
+   * @note Which quad is selected is not of importance (and not exposed on
+   *   purpose).
+   */
   static std::array<unsigned int, 2>
-  standard_corner_to_quad_vertex_index(const unsigned int corner);
+  standard_hex_vertex_to_quad_vertex_index(const unsigned int vertex);
 
+  /**
+   * Decompose the line index in a hex into a pair of a quad index and a line
+   * index within this quad.
+   *
+   * @note Which quad is selected is not of importance (and not exposed on
+   *   purpose).
+   */
   static std::array<unsigned int, 2>
-  standard_line_to_quad_line_index(const unsigned int line);
+  standard_hex_line_to_quad_line_index(const unsigned int line);
 
   /**
    * Map the line index @p line of a face with arbitrary @p face_orientation,
@@ -4066,41 +4092,42 @@ GeometryInfo<dim>::standard_to_real_face_line(const unsigned int line,
 
 template <>
 inline unsigned int
-GeometryInfo<2>::standard_to_real_line_vertex(const unsigned int corner,
+GeometryInfo<2>::standard_to_real_line_vertex(const unsigned int vertex,
                                               const bool line_orientation)
 {
-  return line_orientation ? corner : (1 - corner);
+  return line_orientation ? vertex : (1 - vertex);
 }
 
 
 
 template <int dim>
 inline unsigned int
-GeometryInfo<dim>::standard_to_real_line_vertex(const unsigned int corner,
+GeometryInfo<dim>::standard_to_real_line_vertex(const unsigned int vertex,
                                                 const bool)
 {
   Assert(false, ExcNotImplemented());
-  return corner;
+  return vertex;
 }
 
 
 
 template <>
 inline std::array<unsigned int, 2>
-GeometryInfo<2>::standard_corner_to_line_vertex_index(const unsigned int corner)
+GeometryInfo<2>::standard_quad_vertex_to_line_vertex_index(
+  const unsigned int vertex)
 {
-  return {{corner % 2, corner / 2}};
+  return {{vertex % 2, vertex / 2}};
 }
 
 
 
 template <int dim>
 inline std::array<unsigned int, 2>
-GeometryInfo<dim>::standard_corner_to_line_vertex_index(
-  const unsigned int corner)
+GeometryInfo<dim>::standard_quad_vertex_to_line_vertex_index(
+  const unsigned int vertex)
 {
   Assert(false, ExcNotImplemented());
-  (void)corner;
+  (void)vertex;
   return {{0, 0}};
 }
 
@@ -4108,7 +4135,7 @@ GeometryInfo<dim>::standard_corner_to_line_vertex_index(
 
 template <>
 inline std::array<unsigned int, 2>
-GeometryInfo<3>::standard_line_to_quad_line_index(const unsigned int i)
+GeometryInfo<3>::standard_hex_line_to_quad_line_index(const unsigned int i)
 {
   // set up a table that for each
   // line describes a) from which
@@ -4138,10 +4165,10 @@ GeometryInfo<3>::standard_line_to_quad_line_index(const unsigned int i)
 
 template <int dim>
 inline std::array<unsigned int, 2>
-GeometryInfo<dim>::standard_line_to_quad_line_index(const unsigned int corner)
+GeometryInfo<dim>::standard_hex_line_to_quad_line_index(const unsigned int line)
 {
   Assert(false, ExcNotImplemented());
-  (void)corner;
+  (void)line;
   return {{0, 0}};
 }
 
@@ -4149,28 +4176,26 @@ GeometryInfo<dim>::standard_line_to_quad_line_index(const unsigned int corner)
 
 template <>
 inline std::array<unsigned int, 2>
-GeometryInfo<3>::standard_corner_to_quad_vertex_index(const unsigned int corner)
+GeometryInfo<3>::standard_hex_vertex_to_quad_vertex_index(
+  const unsigned int vertex)
 {
-  // get the corner indices by asking either
-  // the bottom or the top face for its
-  // vertices. handle non-standard faces by
-  // calling the vertex reordering function
-  // from GeometryInfo
+  // get the corner indices by asking either the bottom or the top face for its
+  // vertices. handle non-standard faces by calling the vertex reordering
+  // function from GeometryInfo
 
-  // bottom face (4) for first four vertices,
-  // top face (5) for the rest
-  return {{4 + corner / 4, corner % 4}};
+  // bottom face (4) for first four vertices, top face (5) for the rest
+  return {{4 + vertex / 4, vertex % 4}};
 }
 
 
 
 template <int dim>
 inline std::array<unsigned int, 2>
-GeometryInfo<dim>::standard_corner_to_quad_vertex_index(
-  const unsigned int corner)
+GeometryInfo<dim>::standard_hex_vertex_to_quad_vertex_index(
+  const unsigned int vertex)
 {
   Assert(false, ExcNotImplemented());
-  (void)corner;
+  (void)vertex;
   return {{0, 0}};
 }
 
