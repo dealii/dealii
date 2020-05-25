@@ -90,6 +90,7 @@ operator==(const TriaRawIterator<Accessor> &other) const
 }
 
 
+#ifndef DEAL_II_HAVE_CXX20
 template <typename Accessor>
 inline bool
 TriaRawIterator<Accessor>::
@@ -97,6 +98,7 @@ operator!=(const TriaRawIterator<Accessor> &other) const
 {
   return !(*this == other);
 }
+#endif
 
 
 template <typename Accessor>
