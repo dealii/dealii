@@ -39,6 +39,7 @@
 #cmakedefine DEAL_II_WITH_ARPACK
 #cmakedefine DEAL_II_WITH_ASSIMP
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
+#cmakedefine DEAL_II_WITH_CPP_TASKFLOW
 #cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_GINKGO
 #cmakedefine DEAL_II_WITH_GSL
@@ -59,10 +60,18 @@
 #cmakedefine DEAL_II_WITH_SLEPC
 #cmakedefine DEAL_II_WITH_SUNDIALS
 #cmakedefine DEAL_II_WITH_SYMENGINE
-#cmakedefine DEAL_II_WITH_THREADS
+#cmakedefine DEAL_II_WITH_TBB
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
+
+/*
+ * Backward compatibility setting:
+ * FIXME: Update once transition to cpp-taskflow is complete
+ */
+#ifdef DEAL_II_WITH_TBB
+#define DEAL_II_WITH_THREADS
+#endif
 
 /***********************************************************************
  * Compiler bugs:
