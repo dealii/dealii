@@ -252,10 +252,10 @@ namespace Threads
 
     // Note that std::map<..>::emplace guarantees that no iterators or
     // references to stored objects are invalidated. We thus only have to
-    // ensure that we do not performa a lookup while writing, and that we
+    // ensure that we do not perform a lookup while writing, and that we
     // do not write concurrently. This is precisely the "reader-writer
     // lock" paradigm supported by C++14 by means of the std::shared_lock
-    // and th std::unique_lock
+    // and the std::unique_lock.
 
     {
       // Take a shared ("reader") lock for lookup and record the fact
