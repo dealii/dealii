@@ -34,6 +34,30 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Threads
 {
+#  ifndef DOXYGEN
+  namespace
+  {
+    /*
+     * Workaround: The standard unfortunately has a flaw in the type traits
+     * when it comes to std::is_copy_constructible and a std::vector<T>
+     * containing non-copyable objects T. The type trait is true even
+     * though any attempted invocation leads to a compilation error. Work
+     * around this issue by removing the "std::vector" container from the
+     * type trait.
+     */
+    template <typename T>
+    struct unpack_vector
+    {
+      using type = T;
+    };
+    template <typename T, typename A>
+    struct unpack_vector<std::vector<T, A>>
+    {
+      using type = T;
+    };
+  } // namespace
+#  endif
+
   /**
    * @brief A class that provides a separate storage location on each thread
    * that accesses the object.
@@ -65,7 +89,7 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<T>::value ||
+      std::is_copy_constructible<typename unpack_vector<T>::type>::value ||
         std::is_default_constructible<T>::value,
       "The stored type must be either copyable, or default constructible");
 
@@ -191,7 +215,7 @@ namespace Threads
     /**
      * An exemplar for creating a new (thread specific) copy.
      */
-    std::shared_ptr<T> exemplar;
+    std::shared_ptr<const T> exemplar;
   };
 } // namespace Threads
 /**
@@ -210,16 +234,14 @@ namespace Threads
 
   template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(const T &t)
-  {
-    exemplar = std::make_shared<T>(t);
-  }
+    : exemplar(std::make_shared<const T>(t))
+  {}
 
 
   template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(T &&t)
-  {
-    exemplar = std::make_shared<T>(std::forward<T>(t));
-  }
+    : exemplar(std::make_shared<T>(std::forward<T>(t)))
+  {}
 
 
   template <typename T>
@@ -258,7 +280,8 @@ namespace Threads
       //
       std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
 
-      if constexpr (std::is_copy_constructible<T>::value)
+      if constexpr (std::is_copy_constructible<
+                      typename unpack_vector<T>::type>::value)
         if (exemplar)
           {
             const auto it = data.emplace(my_id, *exemplar).first;
