@@ -127,13 +127,30 @@ namespace GridTools
     get_used_vertices_rtree() const;
 
     /**
-     * Return the cached RTree object of the cell bounging boxes, constructed
-     * using the active cell iterators of the stored triangulation.
+     * Return the cached RTree object of the cell bounding boxes, constructed
+     * using the active cell iterators of the stored triangulation. For
+     * parallel::distributed::Triangulation objects, this function will return
+     * also the bounding boxes of ghost and artificial cells.
      */
     const RTree<
       std::pair<BoundingBox<spacedim>,
                 typename Triangulation<dim, spacedim>::active_cell_iterator>> &
     get_cell_bounding_boxes_rtree() const;
+
+    /**
+     * Return the cached RTree object of bounding boxes containing locally owned
+     * active cells, constructed using the active cell iterators of the stored
+     * triangulation.
+     *
+     * In contrast to the previous function, this function builds the RTree
+     * using only the locally owned cells, i.e., not including ghost or
+     * artificial cells. The two functions return the same result in serial
+     * computations.
+     */
+    const RTree<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>> &
+    get_locally_owned_cell_bounding_boxes_rtree() const;
 
     /**
      * Return a reference to the stored triangulation.
@@ -155,7 +172,9 @@ namespace GridTools
      * object -- an Rtree -- are pairs of bounding boxes denoting
      * areas that cover all or parts of the local portion of a
      * parallel triangulation, and an unsigned int representing
-     * the process or subdomain that owns these cells.
+     * the process or subdomain that owns the cells falling within the given
+     * bounding box.
+     *
      * Given a point on a parallel::TriangulationBase, this tree
      * allows to identify one, or few candidate processes, for
      * which the point lies on a locally owned cell.
@@ -167,12 +186,15 @@ namespace GridTools
      * Therefore this function must be called by all processes
      * at the same time.
      *
-     * While each box may only cover part of a process's locally
-     * owned part of the triangulation, the boxes associated with
-     * each process jointly cover the entire local portion.
+     * The local bounding boxes are constructed by extracting the
+     * specified @p level from the rtree object returned by the
+     * get_locally_owned_cell_bounding_boxes_rtree(). Notice that @p level
+     * in this context does not refer to the level of the triangulation, but
+     * refer to the level of the RTree object (see, e.g.,
+     * https://en.wikipedia.org/wiki/R-tree).
      */
     const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
-    get_covering_rtree() const;
+    get_covering_rtree(const unsigned int level = 0) const;
 
   private:
     /**
@@ -207,9 +229,15 @@ namespace GridTools
       vertex_to_cell_centers;
 
     /**
-     * An rtree object covering the whole mesh.
+     * A collection of rtree objects covering the whole mesh.
+     *
+     * Each entry of the map is constructed from the function
+     * extract_rtree_level() applied to the rtree returned by the function
+     * get_locally_owned_cell_bounding_boxes_rtree(), with the specified level
+     * in input.
      */
-    mutable RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
+    mutable std::map<unsigned int,
+                     RTree<std::pair<BoundingBox<spacedim>, unsigned int>>>
       covering_rtree;
 
     /**
@@ -231,6 +259,15 @@ namespace GridTools
       std::pair<BoundingBox<spacedim>,
                 typename Triangulation<dim, spacedim>::active_cell_iterator>>
       cell_bounding_boxes_rtree;
+
+    /**
+     * Store an RTree object, containing the bounding boxes of the locally owned
+     * cells of the triangulation.
+     */
+    mutable RTree<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>>
+      locally_owned_cell_bounding_boxes_rtree;
 
     /**
      * Storage for the status of the triangulation signal.

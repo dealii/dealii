@@ -75,6 +75,11 @@ namespace GridTools
     update_covering_rtree = 0x040,
 
     /**
+     * Update an RTree of locally owned cell bounding boxes.
+     */
+    update_locally_owned_cell_bounding_boxes_rtree = 0x080,
+
+    /**
      * Update all objects.
      */
     update_all = 0x0FF,

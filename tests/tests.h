@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/job_identifier.h>
@@ -264,6 +265,20 @@ random_point(const double &min = 0.0, const double &max = 1.0)
   for (unsigned int i = 0; i < dim; ++i)
     p[i] = random_value(min, max);
   return p;
+}
+
+
+
+// Construct a uniformly distributed random box, with each coordinate
+// between min and max
+template <int dim>
+inline BoundingBox<dim>
+random_box(const double &min = 0.0, const double &max = 1.0)
+{
+  Assert(max >= min, ExcMessage("Make sure max>=min"));
+  std::vector<Point<dim>> p = {random_point<dim>(min, max),
+                               random_point<dim>(min, max)};
+  return BoundingBox<dim>(p);
 }
 
 
