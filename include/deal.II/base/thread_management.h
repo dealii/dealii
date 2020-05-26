@@ -256,6 +256,16 @@ namespace Threads
      * access to it through functions get() and set(). There are
      * specializations for reference types (which need to be stored as
      * pointers to the object being referenced), and for type void.
+     *
+     * This function is not dissimilar to the `std::promise`/`std::future`
+     * combination of classes. The difference is that a `std::promise`
+     * can only be read once via `std::future::get()` (presumably this
+     * design is due to the fact that `std::future::get()` can throw
+     * an exception previously stored in the `std::promise`). On
+     * the other hand, this class makes the result available for
+     * as many times as desired. It also doesn't store any exceptions
+     * (though they will be forwarded by the classes using the current
+     * class).
      */
     template <typename RT>
     struct return_value
@@ -292,6 +302,16 @@ namespace Threads
      * reference types: since references cannot be set after construction time,
      * we store a pointer instead, which holds the address of the object being
      * referenced.
+     *
+     * This function is not dissimilar to the `std::promise`/`std::future`
+     * combination of classes. The difference is that a `std::promise`
+     * can only be read once via `std::future::get()` (presumably this
+     * design is due to the fact that `std::future::get()` can throw
+     * an exception previously stored in the `std::promise`). On
+     * the other hand, this class makes the result available for
+     * as many times as desired. It also doesn't store any exceptions
+     * (though they will be forwarded by the classes using the current
+     * class).
      */
     template <typename RT>
     struct return_value<RT &>
@@ -327,6 +347,16 @@ namespace Threads
      * it through functions get() and set(). This is the specialization for
      * type void: there is obviously nothing to store, so no function set(),
      * and a function get() that returns void.
+     *
+     * This function is not dissimilar to the `std::promise`/`std::future`
+     * combination of classes. The difference is that a `std::promise`
+     * can only be read once via `std::future::get()` (presumably this
+     * design is due to the fact that `std::future::get()` can throw
+     * an exception previously stored in the `std::promise`). On
+     * the other hand, this class makes the result available for
+     * as many times as desired. It also doesn't store any exceptions
+     * (though they will be forwarded by the classes using the current
+     * class).
      */
     template <>
     struct return_value<void>
