@@ -609,6 +609,44 @@ namespace Particles
     void
     serialize(Archive &ar, const unsigned int version);
 
+    /**
+     * A structure that has boost::signal objects for a number of actions that a
+     * particle handler can do to itself. How signals can be used in
+     * applications is explained in the "Getting notice when a triangulation
+     * changes" section in the Triangulation class with more information and
+     * examples. In short these signals allow the particle handler to notify
+     * applications about certain events inside the particle handler, e.g. when
+     * a particle is lost.
+     *
+     * For documentation on signals, see
+     * http://www.boost.org/doc/libs/release/libs/signals2 .
+     */
+    struct Signals
+    {
+      /**
+       * This signal is triggered whenever the
+       * ParticleHandler::sort_particles_into_subdomains_and_cells() function
+       * encounters a particle that can not be associated with a cell. This can
+       * happen if the particle leaves the domain of the triangulation, or if it
+       * leaves the locally known domain in a parallel triangulation (including
+       * the ghost cells for a parallel::distributed::triangulation).
+       *
+       * The connected function receives an iterator to the particle in
+       * question, and its last known cell association.
+       */
+      boost::signals2::signal<void(
+        const typename Particles::ParticleIterator<dim, spacedim> &particle,
+        const typename Triangulation<dim, spacedim>::active_cell_iterator
+          &cell)>
+        particle_lost;
+    };
+
+    /**
+     * Signals for the events that a particle handler can notify the
+     * calling application about.
+     */
+    mutable Signals signals;
+
   private:
     /**
      * Address of the triangulation to work on.
