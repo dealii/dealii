@@ -616,7 +616,7 @@ namespace Particles
      * changes" section in the Triangulation class with more information and
      * examples. In short these signals allow the particle handler to notify
      * applications about certain events inside the particle handler, e.g. when
-     * a particle gets lost.
+     * a particle is lost.
      *
      * For documentation on signals, see
      * http://www.boost.org/doc/libs/release/libs/signals2 .
@@ -625,11 +625,11 @@ namespace Particles
     {
       /**
        * This signal is triggered whenever the
-       * ParticleHandler::sort_particles_into_subdomains_and_cells encounters
-       * a particle that can not be associated with a cell. This can happen if
-       * the particle leaves the domain of the triangulation, or if it leaves
-       * the locally known domain in a parallel triangulation (including the
-       * ghost cells for a parallel::distributed::triangulation).
+       * ParticleHandler::sort_particles_into_subdomains_and_cells() function
+       * encounters a particle that can not be associated with a cell. This can
+       * happen if the particle leaves the domain of the triangulation, or if it
+       * leaves the locally known domain in a parallel triangulation (including
+       * the ghost cells for a parallel::distributed::triangulation).
        *
        * The connected function receives an iterator to the particle in
        * question, and its last known cell association.
