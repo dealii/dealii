@@ -256,8 +256,7 @@ public:
   operator==(const LinearIndexIterator &left, const OtherIterator &right)
   {
     const auto &right_2 = static_cast<const DerivedIterator &>(right);
-    return left.accessor.container == right_2.accessor.container &&
-           left.accessor.linear_index == right_2.accessor.linear_index;
+    return left.accessor == right_2.accessor;
   }
 
   /**
