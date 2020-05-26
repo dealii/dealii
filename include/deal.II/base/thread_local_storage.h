@@ -19,6 +19,9 @@
 
 #  include <deal.II/base/config.h>
 
+#  include <deal.II/base/exceptions.h>
+
+#  include <map>
 #  include <shared_mutex>
 #  include <thread>
 
@@ -62,8 +65,8 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_trivially_copyable<T>::value ||
-        std::is_copy_constructible<T>::value,
+      std::is_copy_constructible<T>::value ||
+        std::is_default_constructible<T>::value,
       "The stored type must be either copyable, or default constructible");
 
   public:
@@ -80,10 +83,20 @@ namespace Threads
     explicit ThreadLocalStorage(const T &t);
 
     /**
+     * FIXME
+     */
+    explicit ThreadLocalStorage(T &&t);
+
+    /**
      * Copy constructor. Initialize each thread local object with the
      * corresponding object of the given object.
      */
     ThreadLocalStorage(const ThreadLocalStorage<T> &t) = default;
+
+    /**
+     * Move constructor. FIXME
+     */
+    ThreadLocalStorage(ThreadLocalStorage<T> &&t) = default;
 
     /**
      * Return a reference to the data stored by this object for the current
@@ -130,6 +143,13 @@ namespace Threads
      */
     ThreadLocalStorage<T> &
     operator=(const T &t);
+
+
+    /**
+     * FIXME
+     */
+    ThreadLocalStorage<T> &
+    operator=(T &&t);
 
     /**
      * Remove the thread-local objects stored for all threads that have
@@ -196,6 +216,13 @@ namespace Threads
 
 
   template <typename T>
+  inline ThreadLocalStorage<T>::ThreadLocalStorage(T &&t)
+  {
+    exemplar = std::make_shared<T>(std::forward<T>(t));
+  }
+
+
+  template <typename T>
   inline T &
   ThreadLocalStorage<T>::get(bool &exists)
   {
@@ -212,7 +239,8 @@ namespace Threads
       // Take a shared ("reader") lock for lookup and record the fact
       // whether we could find an entry in the boolean exists.
       std::shared_lock<decltype(insertion_mutex)> lock(insertion_mutex);
-      const auto                                  it = data.find(my_id);
+
+      const auto it = data.find(my_id);
       if (it != data.end())
         {
           exists = true;
@@ -230,19 +258,19 @@ namespace Threads
       //
       std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
 
-      if constexpr (std::is_trivially_copyable<T>::value)
+      if constexpr (std::is_copy_constructible<T>::value)
         if (exemplar)
           {
-            const auto it =
-              data.emplace(std::make_pair(my_id, *exemplar)).first;
+            const auto it = data.emplace(my_id, *exemplar).first;
             return it->second;
           }
 
       if constexpr (std::is_default_constructible<T>::value)
         {
-          const auto it = data.emplace(std::make_pair(my_id, T())).first;
-          return it->second;
+          return data[my_id]; // default construct
         }
+
+      Assert(false, ExcInternalError());
     }
   }
 
@@ -268,6 +296,15 @@ namespace Threads
   ThreadLocalStorage<T>::operator=(const T &t)
   {
     get() = t;
+    return *this;
+  }
+
+
+  template <typename T>
+  inline ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator=(T &&t)
+  {
+    get() = std::forward<T>(t);
     return *this;
   }
 
