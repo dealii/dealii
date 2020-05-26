@@ -75,13 +75,13 @@ namespace parallel
         this->set_mesh_smoothing(
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
-            dealii::Triangulation<dim>::none |
+            dealii::Triangulation<dim, spacedim>::none |
             Triangulation<dim, spacedim>::limit_level_difference_at_vertices));
       else
         this->set_mesh_smoothing(
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
-            dealii::Triangulation<dim>::none));
+            dealii::Triangulation<dim, spacedim>::none));
 
       this->set_mesh_smoothing(construction_data.smoothing);
 

@@ -908,6 +908,19 @@ namespace MatrixTableIterators
                  const std::ptrdiff_t         linear_index);
 
     /**
+     * Comparison operator.
+     */
+    template <bool OtherConstness>
+    friend bool
+    operator==(
+      const AccessorBase<TableType, Constness, storage_order> &     left,
+      const AccessorBase<TableType, OtherConstness, storage_order> &right)
+    {
+      return left.container == right.container &&
+             left.linear_index == right.linear_index;
+    }
+
+    /**
      * Get a constant reference to the value of the element represented by
      * this accessor.
      */

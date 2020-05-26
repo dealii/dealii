@@ -1418,8 +1418,6 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
-    Assert(container != nullptr, DummyAccessor());
-    Assert(other.container != nullptr, DummyAccessor());
     return (container == other.container && linear_index == other.linear_index);
   }
 
