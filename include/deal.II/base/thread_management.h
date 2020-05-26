@@ -1377,6 +1377,17 @@ namespace Threads
    * function object without arguments and returning an object of type RT (or
    * void).
    *
+   * @note Threads::new_task() is, in essence, equivalent to calling
+   *   `std::async(std::launch::async, ...)` in that it runs the given task
+   *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
+   *   for more information.) The only difference is if you configured deal.II
+   *   with `DEAL_II_WITH_THREADS=OFF`, then the operation described by the
+   *   arguments of this function are executed immediately and the returned
+   *   value is placed in the Task object returned here. This is useful for
+   *   cases where one wants to run a program in a way where deal.II does not
+   *   internally create parallel tasks, for example because one is already
+   *   using one MPI process per core in a parallel computation.
+   *
    * @ingroup threads
    */
   template <typename RT>
@@ -1450,6 +1461,17 @@ namespace Threads
    *   or capture have a lifetime that extends at least until the time
    *   where the task finishes.
    *
+   * @note Threads::new_task() is, in essence, equivalent to calling
+   *   `std::async(std::launch::async, ...)` in that it runs the given task
+   *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
+   *   for more information.) The only difference is if you configured deal.II
+   *   with `DEAL_II_WITH_THREADS=OFF`, then the operation described by the
+   *   arguments of this function are executed immediately and the returned
+   *   value is placed in the Task object returned here. This is useful for
+   *   cases where one wants to run a program in a way where deal.II does not
+   *   internally create parallel tasks, for example because one is already
+   *   using one MPI process per core in a parallel computation.
+   *
    * @ingroup CPP11
    */
   template <typename FunctionObjectType>
@@ -1466,7 +1488,7 @@ namespace Threads
 
   /**
    * Overload of the new_task function for non-member or static member
-   * functions.
+   * functions. See the other functions of same name for more information.
    *
    * @ingroup threads
    */
@@ -1482,7 +1504,8 @@ namespace Threads
 
 
   /**
-   * Overload of the non-const new_task function.
+   * Overload of the non-const new_task function. See the other functions of
+   * same name for more information.
    *
    * @ingroup threads
    */
@@ -1498,7 +1521,8 @@ namespace Threads
   }
 
   /**
-   * Overload of the new_task function.
+   * Overload of the new_task function. See the other functions of same name for
+   * more information.
    *
    * @ingroup threads
    */
