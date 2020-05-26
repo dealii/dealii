@@ -249,8 +249,16 @@ public:
    * Comparison operator. Returns <code>true</code> if both iterators point to
    * the same entry in the same container.
    */
-  bool
-  operator==(const LinearIndexIterator &) const;
+  template <typename OtherIterator>
+  friend typename std::enable_if<
+    std::is_convertible<OtherIterator, DerivedIterator>::value,
+    bool>::type
+  operator==(const LinearIndexIterator &left, const OtherIterator &right)
+  {
+    const auto &right_2 = static_cast<const DerivedIterator &>(right);
+    return left.accessor.container == right_2.accessor.container &&
+           left.accessor.linear_index == right_2.accessor.linear_index;
+  }
 
   /**
    * Inverse of operator==().
@@ -440,17 +448,6 @@ inline typename LinearIndexIterator<DerivedIterator, AccessorType>::pointer
   LinearIndexIterator<DerivedIterator, AccessorType>::operator->() const
 {
   return &accessor;
-}
-
-
-
-template <class DerivedIterator, class AccessorType>
-inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::operator==(
-  const LinearIndexIterator<DerivedIterator, AccessorType> &other) const
-{
-  return accessor.container == other.accessor.container &&
-         accessor.linear_index == other.accessor.linear_index;
 }
 
 
