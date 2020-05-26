@@ -729,8 +729,10 @@ namespace internal
        * Check if the bit at position @p n in @p number is set.
        */
       inline static bool
-      get_bit(const char number, const unsigned int n)
+      get_bit(const unsigned char number, const unsigned int n)
       {
+        AssertIndexRange(n, 8);
+
         // source:
         // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
         // "Checking a bit"
@@ -743,12 +745,14 @@ namespace internal
        * Set the bit at position @p n in @p number to value @p x.
        */
       inline static void
-      set_bit(char &number, const unsigned int n, const bool x)
+      set_bit(unsigned char &number, const unsigned int n, const bool x)
       {
+        AssertIndexRange(n, 8);
+
         // source:
         // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
         // "Changing the nth bit to x"
-        number ^= (-x ^ number) & (1UL << n);
+        number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
       }
 
 
