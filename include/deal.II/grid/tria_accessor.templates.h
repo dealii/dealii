@@ -632,7 +632,8 @@ namespace internal
       line_index(const TriaAccessor<3, dim, spacedim> &accessor,
                  const unsigned int                    i)
       {
-        const auto pair = GeometryInfo<3>::standard_line_to_quad_line_index(i);
+        const auto pair =
+          GeometryInfo<3>::standard_hex_line_to_quad_line_index(i);
         const auto quad_index = pair[0];
         const auto line_index = GeometryInfo<3>::standard_to_real_face_line(
           pair[1],
@@ -1110,7 +1111,7 @@ namespace internal
                    const unsigned int                    corner)
       {
         const auto pair =
-          GeometryInfo<2>::standard_corner_to_line_vertex_index(corner);
+          GeometryInfo<2>::standard_quad_vertex_to_line_vertex_index(corner);
         const auto line_index   = pair[0];
         const auto vertex_index = GeometryInfo<2>::standard_to_real_line_vertex(
           pair[1], accessor.line_orientation(line_index));
@@ -1126,7 +1127,7 @@ namespace internal
                    const unsigned int                    corner)
       {
         const auto pair =
-          GeometryInfo<3>::standard_corner_to_quad_vertex_index(corner);
+          GeometryInfo<3>::standard_hex_vertex_to_quad_vertex_index(corner);
         const auto face_index   = pair[0];
         const auto vertex_index = GeometryInfo<3>::standard_to_real_face_vertex(
           pair[1],
