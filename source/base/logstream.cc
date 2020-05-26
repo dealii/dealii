@@ -73,7 +73,8 @@ LogStream::Prefix::~Prefix()
 
 
 LogStream::LogStream()
-  : std_out(&std::cout)
+  : master_thread(std::this_thread::get_id())
+  , std_out(&std::cout)
   , file(nullptr)
   , std_depth(0)
   , file_depth(10000)
@@ -385,25 +386,14 @@ LogStream::get_prefixes() const
   bool                     exists         = false;
   std::stack<std::string> &local_prefixes = prefixes.get(exists);
 
-#  if 0 // FIXME
   // If this is a new locally stored stack, copy the "blessed" prefixes
   // from the initial thread that created logstream.
   if (!exists)
     {
-      const tbb::enumerable_thread_specific<std::stack<std::string>> &impl =
-        prefixes.get_implementation();
-
-      // The thread that created this LogStream object should be the first
-      // in tbb's enumerable_thread_specific container.
-      const tbb::enumerable_thread_specific<
-        std::stack<std::string>>::const_iterator first_elem = impl.begin();
-
-      if (first_elem != impl.end())
-        {
-          local_prefixes = *first_elem;
-        }
+      auto it = prefixes.data.find(master_thread);
+      if (it != prefixes.data.end())
+        local_prefixes = it->second;
     }
-#  endif
 
   return local_prefixes;
 

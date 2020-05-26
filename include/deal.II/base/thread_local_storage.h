@@ -31,6 +31,9 @@ DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup threads */
 /*@{*/
 
+#  ifndef DOXYGEN
+class LogStream;
+#  endif
 
 namespace Threads
 {
@@ -216,6 +219,8 @@ namespace Threads
      * An exemplar for creating a new (thread specific) copy.
      */
     std::shared_ptr<const T> exemplar;
+
+    friend class dealii::LogStream;
   };
 } // namespace Threads
 /**
