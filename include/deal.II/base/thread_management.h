@@ -1337,18 +1337,6 @@ namespace Threads
 
 
     /**
-     * Check for equality of task objects. Since objects of this class store
-     * an implicit pointer to an object that exists exactly once for each
-     * task, the check is simply to compare these pointers.
-     */
-    bool
-    operator==(const Task &t) const
-    {
-      AssertThrow(joinable(), ExcNoTask());
-      return task_descriptor == t.task_descriptor;
-    }
-
-    /**
      * @addtogroup Exceptions
      * @{
      */
