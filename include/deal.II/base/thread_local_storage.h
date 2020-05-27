@@ -21,10 +21,11 @@
 
 #  include <deal.II/base/exceptions.h>
 
+#  include <list>
 #  include <map>
 #  include <shared_mutex>
 #  include <thread>
-
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -41,20 +42,27 @@ namespace Threads
   namespace
   {
     /*
-     * Workaround: The standard unfortunately has a flaw in the type traits
-     * when it comes to std::is_copy_constructible and a std::vector<T>
-     * containing non-copyable objects T. The type trait is true even
-     * though any attempted invocation leads to a compilation error. Work
-     * around this issue by removing the "std::vector" container from the
-     * type trait.
+     * Workaround: The standard unfortunately has an unfortunate design
+     * "flaw" in the std::is_copy_constructible type trait
+     * when it comes to STL containers and containing non-copyable objects
+     * T. The type trait is true even though any attempted invocation leads
+     * to a compilation error. Work around this issue by unpacking some
+     * commonly used containers:
      */
     template <typename T>
-    struct unpack_vector
+    struct unpack_container
     {
       using type = T;
     };
+
     template <typename T, typename A>
-    struct unpack_vector<std::vector<T, A>>
+    struct unpack_container<std::vector<T, A>>
+    {
+      using type = T;
+    };
+
+    template <typename T, typename A>
+    struct unpack_container<std::list<T, A>>
     {
       using type = T;
     };
@@ -92,7 +100,7 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<typename unpack_vector<T>::type>::value ||
+      std::is_copy_constructible<typename unpack_container<T>::type>::value ||
         std::is_default_constructible<T>::value,
       "The stored type must be either copyable, or default constructible");
 
@@ -101,7 +109,7 @@ namespace Threads
      * Default constructor. Initialize each thread local object using its
      * default constructor.
      */
-    ThreadLocalStorage();
+    ThreadLocalStorage() = default;
 
     /**
      * A kind of copy constructor. Initializes an internal exemplar by the
@@ -127,7 +135,7 @@ namespace Threads
      * Move constructor. Copies the internal state over from the given
      * object.
      */
-    ThreadLocalStorage(ThreadLocalStorage<T> &&t) = default;
+    ThreadLocalStorage(ThreadLocalStorage<T> &&t) noexcept = default;
 
     /**
      * Return a reference to the data stored by this object for the current
@@ -247,11 +255,6 @@ namespace Threads
   // ----------------- inline and template functions --------------------------
 
   template <typename T>
-  inline ThreadLocalStorage<T>::ThreadLocalStorage()
-  {}
-
-
-  template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(const T &t)
     : exemplar(std::make_shared<const T>(t))
   {}
@@ -274,7 +277,7 @@ namespace Threads
      */
     template <typename T>
     typename std::enable_if_t<
-      std::is_copy_constructible<typename unpack_vector<T>::type>::value,
+      std::is_copy_constructible<typename unpack_container<T>::type>::value,
       T &>
     construct_element(std::map<std::thread::id, T> &  data,
                       const std::thread::id &         id,
@@ -290,7 +293,7 @@ namespace Threads
 
     template <typename T>
     typename std::enable_if_t<
-      !std::is_copy_constructible<typename unpack_vector<T>::type>::value,
+      !std::is_copy_constructible<typename unpack_container<T>::type>::value,
       T &>
     construct_element(std::map<std::thread::id, T> &data,
                       const std::thread::id &       id,
