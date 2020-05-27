@@ -16,16 +16,9 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
-#ifdef DEAL_II_HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
-
-#if (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
-#  include <sys/sysctl.h>
-#  include <sys/types.h>
-#endif
-
 #include <algorithm>
+#include <cstdlib> // for std::getenv
+#include <thread>
 
 #ifdef DEAL_II_WITH_TBB
 #  define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
@@ -35,77 +28,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/* Detecting how many processors a given machine has is something that
-   varies greatly between operating systems. For a few operating
-   systems, we have figured out how to do that below, but some others
-   are still missing. If you find a way to do this on your favorite
-   system, please let us know.
- */
-
-
-#if defined(__linux__) || defined(__sun__) || defined(__osf__) || defined(_AIX)
-
-unsigned int
-MultithreadInfo::get_n_cpus()
-{
-  return sysconf(_SC_NPROCESSORS_ONLN);
-}
-
-#elif (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
-// This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
-// and on an Intel Mac Book Pro.
-// If it doesn't work please contact the mailinglist.
-unsigned int
-MultithreadInfo::get_n_cpus()
-{
-  int         mib[2];
-  int         n_cpus;
-  std::size_t len;
-
-  mib[0] = CTL_HW;
-  mib[1] = HW_NCPU;
-  len    = sizeof(n_cpus);
-  sysctl(mib, 2, &n_cpus, &len, nullptr, 0);
-
-  return n_cpus;
-}
-
-#else
-
-// If you get n_cpus=1 although you are on a multi-processor machine,
-// then this may have two reasons: either because the system macros,
-// e.g.__linux__, __sgi__, etc. weren't defined by the compiler or the
-// detection of processors is really not implemented for your specific
-// system. In the first case you can add e.g. -D__sgi__ to your
-// compiling flags, in the latter case you need to implement the
-// get_n_cpus() function for your system.
-//
-// In both cases, this #else case is compiled, a fact that you can
-// easily verify by uncommenting the following #error directive,
-// recompiling and getting a compilation error right at that line.
-// After definition of the system macro or the implementation of the
-// new detection this #error message during compilation shouldn't
-// occur any more.
-//
-// Please send all new implementations of detection of processors to
-// the deal.II mailing list, such that it can be included into the
-// next deal.II release.
-
-//#error Detection of Processors not supported on this OS. Setting n_cpus=1 by
-// default.
-
-unsigned int
-MultithreadInfo::get_n_cpus()
-{
-  return 1;
-}
-
-#endif
 
 unsigned int
 MultithreadInfo::n_cores()
 {
-  return MultithreadInfo::n_cpus;
+  // There is a slight semantic change between our n_cores() call and the
+  // std::thread alternative: in case of an error the latter one returns 0
+  // in contrast to a 1 that n_cores() used to do. For compatibility, let's
+  // translate to our numbering scheme:
+  const unsigned int n_cores = std::thread::hardware_concurrency();
+  return n_cores == 0 ? 1 : n_cores;
 }
 
 
@@ -117,8 +49,7 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 
   // then also see if something was given in the environment
   {
-    const char *penv = getenv("DEAL_II_NUM_THREADS");
-    if (penv != nullptr)
+    if (const char *penv = std::getenv("DEAL_II_NUM_THREADS"))
       {
         unsigned int max_threads_env = numbers::invalid_unsigned_int;
         try
@@ -163,7 +94,7 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   dummy.initialize(n_max_threads);
 #endif
   if (n_max_threads == numbers::invalid_unsigned_int)
-    n_max_threads = get_n_cpus();
+    n_max_threads = n_cores();
 }
 
 
@@ -188,8 +119,7 @@ MultithreadInfo::is_running_single_threaded()
 std::size_t
 MultithreadInfo::memory_consumption()
 {
-  // only simple data elements, so
-  // use sizeof operator
+  // only simple data elements, so use sizeof operator
   return sizeof(MultithreadInfo);
 }
 
@@ -207,8 +137,6 @@ MultithreadInfo::initialize_multithreading()
 }
 
 
-
-const unsigned int MultithreadInfo::n_cpus  = MultithreadInfo::get_n_cpus();
 unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
 namespace
