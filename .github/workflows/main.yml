@@ -28,7 +28,6 @@ jobs:
         path: detailed.log
     - name: build
       run: |
-        ./contrib/utilities/check_indentation.sh
         make -j 2
 
   osx-serial:
@@ -56,7 +55,6 @@ jobs:
         path: detailed.log
     - name: build
       run: |
-        ./contrib/utilities/check_indentation.sh
         make -j 2
         make -j 2 test # quicktests
 
@@ -92,7 +90,6 @@ jobs:
         path: detailed.log
     - name: build
       run: |
-        ./contrib/utilities/check_indentation.sh
         make -j 2
         make -j 2 test #quicktests
 
