@@ -1494,7 +1494,7 @@ TriaAccessor<structdim, dim, spacedim>::set(
   const internal::TriangulationImplementation::TriaObject<structdim> &object)
   const
 {
-  this->objects().cells[this->present_index] = object;
+  this->objects().get_object(this->present_index) = object;
 }
 
 

@@ -54,10 +54,32 @@ namespace internal
      *
      * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2007
      */
-    template <int dim>
     class TriaLevel
     {
     public:
+      /**
+       * Constructor.
+       *
+       * @param dim Dimension of the Triangulation.
+       */
+      TriaLevel(const unsigned int dim)
+        : dim(dim)
+        , cells(dim)
+      {}
+
+      /**
+       * Default constructor (needed by Boost).
+       */
+      TriaLevel()
+        : dim(numbers::invalid_unsigned_int)
+        , cells(numbers::invalid_unsigned_int)
+      {}
+
+      /**
+       * Dimension of the Triangulation.
+       */
+      unsigned int dim;
+
       /**
        * @p RefinementCase<dim>::Type flags for the cells to be refined with
        * or not (RefinementCase<dim>::no_refinement). The meaning what a cell
@@ -159,8 +181,33 @@ namespace internal
       /**
        * The object containing the data on lines and related functions
        */
-      TriaObjects<TriaObject<dim>> cells;
+      TriaObjects cells;
 
+      /**
+       * For edges, we enforce a standard convention that opposite
+       * edges should be parallel. Now, that's enforceable in most
+       * cases, and we have code that makes sure that if a mesh allows
+       * this to happen, that we have this convention. We also know
+       * that it is always possible to have opposite faces have
+       * parallel normal vectors. (For both things, see the paper by
+       * Agelek, Anderson, Bangerth, Barth in the ACM Transactions on
+       * Mathematical Software mentioned in the documentation of the
+       * GridReordering class.)
+       *
+       * The problem is that we originally had another condition, namely that
+       * faces 0, 2 and 4 have normals that point into the cell, while the
+       * other faces have normals that point outward. It turns out that this
+       * is not always possible. In effect, we have to store whether the
+       * normal vector of each face of each cell follows this convention or
+       * not. If this is so, then this variable stores a @p true value,
+       * otherwise a @p false value.
+       *
+       * In effect, this field has <code>6*n_cells</code> elements, being the
+       * number of cells times the six faces each has.
+       *
+       * @note Only needed for dim=3.
+       */
+      std::vector<unsigned char> face_orientations;
 
       /**
        * Reserve enough space to accommodate @p total_cells cells on this
@@ -211,70 +258,13 @@ namespace internal
                      << ", which is not as expected.");
     };
 
-    // TODO: Replace TriaObjectsHex to avoid this specialization
 
-    /**
-     * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
-     * instead of TriaObjects. Refer to the documentation of the general class
-     * template for details.
-     */
-    template <>
-    class TriaLevel<3>
-    {
-    public:
-      std::vector<std::uint8_t>        refine_flags;
-      std::vector<bool>                coarsen_flags;
-      std::vector<unsigned int>        active_cell_indices;
-      std::vector<std::pair<int, int>> neighbors;
-      std::vector<types::subdomain_id> subdomain_ids;
-      std::vector<types::subdomain_id> level_subdomain_ids;
-      std::vector<int>                 parents;
-
-      // The following is not used
-      // since we don't support
-      // codim=1 meshes in 3d; only
-      // needed to allow
-      // compilation
-      // TODO[TH]: this is no longer true and might be a bug.
-      std::vector<bool> direction_flags;
-
-      TriaObjectsHex cells;
-
-
-      void
-      reserve_space(const unsigned int total_cells,
-                    const unsigned int dimension,
-                    const unsigned int space_dimension);
-      void
-      monitor_memory(const unsigned int true_dimension) const;
-      std::size_t
-      memory_consumption() const;
-
-      /**
-       * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
-       */
-      template <class Archive>
-      void
-      serialize(Archive &ar, const unsigned int version);
-
-      /**
-       * Exception
-       */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
-    };
-
-
-
-    template <int dim>
     template <class Archive>
     void
-    TriaLevel<dim>::serialize(Archive &ar, const unsigned int)
+    TriaLevel::serialize(Archive &ar, const unsigned int)
     {
+      ar &dim;
+
       ar &refine_flags &coarsen_flags;
 
       // do not serialize 'active_cell_indices' here. instead of storing them
@@ -287,32 +277,13 @@ namespace internal
       ar &parents;
       ar &direction_flags;
       ar &cells;
-    }
 
-
-
-    template <class Archive>
-    void
-    TriaLevel<3>::serialize(Archive &ar, const unsigned int)
-    {
-      ar &refine_flags &coarsen_flags;
-
-      // do not serialize 'active_cell_indices' here. instead of storing them
-      // to the stream and re-reading them again later, we just rebuild them
-      // in Triangulation::load()
-
-      ar &neighbors;
-      ar &subdomain_ids;
-      ar &level_subdomain_ids;
-      ar &parents;
-      ar &direction_flags;
-      ar &cells;
+      if (dim == 3)
+        ar &face_orientations;
     }
 
   } // namespace TriangulationImplementation
 } // namespace internal
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -25,25 +25,87 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
+    TriaFaces::TriaFaces(const unsigned int dim)
+      : dim(dim)
+      , quads(2)
+      , lines(1)
+    {}
+
     std::size_t
-    TriaFaces<1>::memory_consumption() const
+    TriaFaces::memory_consumption() const
     {
+      if (dim == 2)
+        return MemoryConsumption::memory_consumption(lines);
+      if (dim == 3)
+        return (MemoryConsumption::memory_consumption(quads) +
+                MemoryConsumption::memory_consumption(lines));
+
       return 0;
     }
 
-
-    std::size_t
-    TriaFaces<2>::memory_consumption() const
+    void
+    TriaFaces::reserve_space(const unsigned int new_quads_in_pairs,
+                             const unsigned int new_quads_single)
     {
-      return MemoryConsumption::memory_consumption(lines);
-    }
+      AssertDimension(this->dim, 3);
 
+      Assert(new_quads_in_pairs % 2 == 0, ExcInternalError());
 
-    std::size_t
-    TriaFaces<3>::memory_consumption() const
-    {
-      return (MemoryConsumption::memory_consumption(quads) +
-              MemoryConsumption::memory_consumption(lines));
+      unsigned int next_free_single = 0;
+      unsigned int next_free_pair   = 0;
+
+      // count the number of objects, of unused single objects and of
+      // unused pairs of objects
+      unsigned int n_quads          = 0;
+      unsigned int n_unused_pairs   = 0;
+      unsigned int n_unused_singles = 0;
+      for (unsigned int i = 0; i < quads.used.size(); ++i)
+        {
+          if (quads.used[i])
+            ++n_quads;
+          else if (i + 1 < quads.used.size())
+            {
+              if (quads.used[i + 1])
+                {
+                  ++n_unused_singles;
+                  if (next_free_single == 0)
+                    next_free_single = i;
+                }
+              else
+                {
+                  ++n_unused_pairs;
+                  if (next_free_pair == 0)
+                    next_free_pair = i;
+                  ++i;
+                }
+            }
+          else
+            ++n_unused_singles;
+        }
+      Assert(n_quads + 2 * n_unused_pairs + n_unused_singles ==
+               quads.used.size(),
+             ExcInternalError());
+
+      // how many single quads are needed in addition to n_unused_quads?
+      const int additional_single_quads = new_quads_single - n_unused_singles;
+
+      unsigned int new_size =
+        quads.used.size() + new_quads_in_pairs - 2 * n_unused_pairs;
+      if (additional_single_quads > 0)
+        new_size += additional_single_quads;
+
+      // see above...
+      if (new_size > quads.n_objects())
+        {
+          // reserve the field of the derived class
+          quads_line_orientations.reserve(new_size *
+                                          GeometryInfo<2>::lines_per_cell);
+          quads_line_orientations.insert(quads_line_orientations.end(),
+                                         new_size *
+                                             GeometryInfo<2>::lines_per_cell -
+                                           quads_line_orientations.size(),
+                                         true);
+        }
     }
   } // namespace TriangulationImplementation
 } // namespace internal

@@ -206,14 +206,14 @@ TriaAccessorBase<structdim, dim, spacedim>::operator++()
       // have to set the level, since
       // dim!=1 and the object therefore
       // has no level)
-      if (this->present_index >= static_cast<int>(objects().cells.size()))
+      if (this->present_index >= static_cast<int>(objects().n_objects()))
         this->present_index = -1;
     }
   else
     {
       while (this->present_index >=
              static_cast<int>(
-               this->tria->levels[this->present_level]->cells.cells.size()))
+               this->tria->levels[this->present_level]->cells.n_objects()))
         {
           // no -> go one level up until we find
           // one with more than zero cells
@@ -259,127 +259,29 @@ TriaAccessorBase<structdim, dim, spacedim>::operator--()
             }
           // else
           this->present_index =
-            this->tria->levels[this->present_level]->cells.cells.size() - 1;
+            this->tria->levels[this->present_level]->cells.n_objects() - 1;
         }
     }
 }
 
 
-namespace internal
-{
-  namespace TriaAccessorBaseImplementation
-  {
-    /**
-     * Out of a face object, get the sub-objects of dimensionality given by
-     * the last argument.
-     */
-    template <int dim>
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<1>> *
-    get_objects(
-      dealii::internal::TriangulationImplementation::TriaFaces<dim> *faces,
-      const std::integral_constant<int, 1>)
-    {
-      return &faces->lines;
-    }
-
-
-    template <int dim>
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<2>> *
-    get_objects(
-      dealii::internal::TriangulationImplementation::TriaFaces<dim> *faces,
-      const std::integral_constant<int, 2>)
-    {
-      return &faces->quads;
-    }
-
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<1>> *
-      get_objects(dealii::internal::TriangulationImplementation::TriaFaces<1> *,
-                  const std::integral_constant<int, 1>)
-    {
-      Assert(false, ExcInternalError());
-      return nullptr;
-    }
-
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<2>> *
-      get_objects(dealii::internal::TriangulationImplementation::TriaFaces<2> *,
-                  const std::integral_constant<int, 2>)
-    {
-      Assert(false, ExcInternalError());
-      return nullptr;
-    }
-
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<3>> *
-      get_objects(dealii::internal::TriangulationImplementation::TriaFaces<3> *,
-                  const std::integral_constant<int, 3>)
-    {
-      Assert(false, ExcInternalError());
-      return nullptr;
-    }
-
-    /**
-     * This function should never be used, but we need it for the template
-     * instantiation of TriaAccessorBase<dim,dim,spacedim>::objects() const
-     */
-    template <int dim>
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<3>> *
-    get_objects(dealii::internal::TriangulationImplementation::TriaFaces<dim> *,
-                const std::integral_constant<int, 3>)
-    {
-      Assert(false, ExcInternalError());
-      return nullptr;
-    }
-
-    /**
-     * Copy the above functions for cell objects.
-     */
-    template <int structdim, int dim>
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<structdim>> *
-    get_objects(
-      dealii::internal::TriangulationImplementation::TriaObjects<
-        dealii::internal::TriangulationImplementation::TriaObject<dim>> *,
-      const std::integral_constant<int, structdim>)
-    {
-      Assert(false, ExcInternalError());
-      return nullptr;
-    }
-
-    template <int dim>
-    inline dealii::internal::TriangulationImplementation::TriaObjects<
-      dealii::internal::TriangulationImplementation::TriaObject<dim>> *
-    get_objects(
-      dealii::internal::TriangulationImplementation::TriaObjects<
-        dealii::internal::TriangulationImplementation::TriaObject<dim>> *cells,
-      const std::integral_constant<int, dim>)
-    {
-      return cells;
-    }
-  } // namespace TriaAccessorBaseImplementation
-} // namespace internal
-
-
 
 template <int structdim, int dim, int spacedim>
-inline dealii::internal::TriangulationImplementation::TriaObjects<
-  dealii::internal::TriangulationImplementation::TriaObject<structdim>> &
+inline dealii::internal::TriangulationImplementation::TriaObjects &
 TriaAccessorBase<structdim, dim, spacedim>::objects() const
 {
-  if (structdim != dim)
-    // get sub-objects. note that the
-    // current class is only used for
-    // objects that are *not* cells
-    return *dealii::internal::TriaAccessorBaseImplementation::get_objects(
-      this->tria->faces.get(), std::integral_constant<int, structdim>());
-  else
-    return *dealii::internal::TriaAccessorBaseImplementation::get_objects(
-      &this->tria->levels[this->present_level]->cells,
-      std::integral_constant<int, structdim>());
+  if (structdim == dim)
+    return this->tria->levels[this->present_level]->cells;
+
+  if (structdim == 1 && dim > 1)
+    return this->tria->faces->lines;
+
+  if (structdim == 2 && dim > 2)
+    return this->tria->faces->quads;
+
+  Assert(false, ExcInternalError());
+
+  return this->tria->levels[this->present_level]->cells;
 }
 
 
@@ -623,7 +525,7 @@ namespace internal
       line_index(const TriaAccessor<2, dim, spacedim> &accessor,
                  const unsigned int                    i)
       {
-        return accessor.objects().cells[accessor.present_index].face(i);
+        return accessor.objects().get_object(accessor.present_index).face(i);
       }
 
 
@@ -668,7 +570,7 @@ namespace internal
                  const unsigned int                    i)
       {
         return accessor.tria->levels[accessor.present_level]
-          ->cells.cells[accessor.present_index]
+          ->cells.get_object(accessor.present_index)
           .face(i);
       }
 
@@ -697,8 +599,10 @@ namespace internal
       face_orientation(const TriaAccessor<3, dim, spacedim> &accessor,
                        const unsigned int                    face)
       {
-        return (accessor.tria->levels[accessor.present_level]
-                  ->cells.face_orientation(accessor.present_index, face));
+        return get_bit(
+          accessor.tria->levels[accessor.present_level]->face_orientations
+            [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
+          0 /*=orientation_bit*/);
       }
 
 
@@ -766,11 +670,11 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_orientations.size(),
+                   ->face_orientations.size(),
                ExcInternalError());
 
         return get_bit(
-          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+          accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           1 /*=flip_bit*/);
       }
@@ -803,11 +707,11 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_orientations.size(),
+                   ->face_orientations.size(),
                ExcInternalError());
 
         return get_bit(
-          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+          accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           2 /*=rotation_bit*/);
       }
@@ -838,12 +742,14 @@ namespace internal
       line_orientation(const TriaAccessor<2, 3, spacedim> &accessor,
                        const unsigned int                  line)
       {
-        // quads as part of 3d hexes can have non-standard orientation
+        Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
+        Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
+                 accessor.tria->faces->quads_line_orientations.size(),
+               ExcInternalError());
 
-        // TODO: why is this face_orientation, not line_orientation as in the
-        // setter function?
-        return accessor.tria->faces->quads.face_orientation(
-          accessor.present_index, line);
+        // quads as part of 3d hexes can have non-standard orientation
+        return accessor.tria->faces->quads_line_orientations
+          [accessor.present_index * GeometryInfo<3>::lines_per_face + line];
       }
 
 
@@ -959,10 +865,10 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_orientations.size(),
+                   ->face_orientations.size(),
                ExcInternalError());
         set_bit(
-          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+          accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           0 /*=orientation_bit*/,
           value);
@@ -992,11 +898,11 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_orientations.size(),
+                   ->face_orientations.size(),
                ExcInternalError());
 
         set_bit(
-          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+          accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           1 /*=flip_bit*/,
           value);
@@ -1026,11 +932,11 @@ namespace internal
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
-                   ->cells.face_orientations.size(),
+                   ->face_orientations.size(),
                ExcInternalError());
 
         set_bit(
-          accessor.tria->levels[accessor.present_level]->cells.face_orientations
+          accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
           2 /*=rotation_bit*/,
           value);
@@ -1070,12 +976,11 @@ namespace internal
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
         AssertIndexRange(line, GeometryInfo<3>::lines_per_face);
         Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
-                 accessor.tria->faces->quads.line_orientations.size(),
+                 accessor.tria->faces->quads_line_orientations.size(),
                ExcInternalError());
-        // quads as part of 3d hexes
-        // can have non-standard
-        // orientation
-        accessor.tria->faces->quads.line_orientations
+
+        // quads as part of 3d hexes can have non-standard orientation
+        accessor.tria->faces->quads_line_orientations
           [accessor.present_index * GeometryInfo<3>::lines_per_face + line] =
           value;
       }
@@ -1101,7 +1006,9 @@ namespace internal
       vertex_index(const TriaAccessor<1, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        return accessor.objects().cells[accessor.present_index].face(corner);
+        return accessor.objects()
+          .get_object(accessor.present_index)
+          .face(corner);
       }
 
 
