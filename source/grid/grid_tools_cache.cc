@@ -142,21 +142,6 @@ namespace GridTools
   }
 
 
-#ifdef DEAL_II_WITH_NANOFLANN
-  template <int dim, int spacedim>
-  const KDTree<spacedim> &
-  Cache<dim, spacedim>::get_vertex_kdtree() const
-  {
-    if (update_flags & update_vertex_kdtree)
-      {
-        vertex_kdtree.set_points(tria->get_vertices());
-        update_flags = update_flags & ~update_vertex_kdtree;
-      }
-    return vertex_kdtree;
-  }
-#endif
-
-
 
   template <int dim, int spacedim>
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &

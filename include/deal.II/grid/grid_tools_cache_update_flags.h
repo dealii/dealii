@@ -53,12 +53,6 @@ namespace GridTools
       update_vertex_to_cell_map | 0x002,
 
     /**
-     * Update a KDTree object, initialized with the vertices of the
-     * Triangulation.
-     */
-    update_vertex_kdtree = 0x004,
-
-    /**
      * Update a mapping of used vertices.
      */
     update_used_vertices = 0x008,
@@ -106,10 +100,6 @@ namespace GridTools
       s << "|vertex_to_cells_centers_directions";
     if (u & update_covering_rtree)
       s << "|covering_rtree";
-#ifdef DEAL_II_WITH_NANOFLANN
-    if (u & update_vertex_kdtree)
-      s << "|vertex_kdtree";
-#endif
     return s;
   }
 

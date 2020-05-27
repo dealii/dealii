@@ -152,11 +152,6 @@ IF (DEAL_II_WITH_HDF5)
   make_quicktest("hdf5" ${_mybuild} "")
 ENDIF()
 
-# Test Nanoflann
-IF (DEAL_II_WITH_NANOFLANN)
-  make_quicktest("nanoflann" ${_mybuild} "")
-ENDIF()
-
 # Test Arpack
 IF (DEAL_II_WITH_ARPACK AND DEAL_II_WITH_UMFPACK)
   make_quicktest("arpack" ${_mybuild} "")

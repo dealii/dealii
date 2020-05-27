@@ -206,7 +206,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_MPI_VERSION_MAJOR=3 \
                          DEAL_II_MPI_VERSION_MINOR=0 \
                          DEAL_II_WITH_MUPARSER=1 \
-                         DEAL_II_WITH_NANOFLANN=1 \
                          DEAL_II_WITH_NETCDF=1 \
                          DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_P4EST=1 \
