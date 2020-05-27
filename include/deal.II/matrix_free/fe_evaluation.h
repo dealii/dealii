@@ -58,29 +58,36 @@ class FEEvaluation;
 
 
 /**
- * @brief The EvaluationFlags enum
+ * @brief The namespace for the EvaluationFlags enum
+ *
+ * This namespace contains the enum EvaluationFlags used in FEEvaluation
+ * to control evaluation and integration of values, gradients, etc..
  */
 namespace EvaluationFlags
 {
   /**
-   * @brief The type enum
+   * @brief The EvaluationFlags enum
+   *
+   * This enum contains a set of flags used by FEEvaluation::integrate(),
+   * FEEvaluation::evaluate() and others to determine if values, gradients,
+   * hessians, or a combination of them is being used.
    */
   enum EvaluationFlags
   {
     /**
-     *
+     * Do not use or compute anything.
      */
     nothing = 0,
     /**
-     *
+     * Use or evaluate values.
      */
     values = 0x1,
     /**
-     *
+     * Use or evaluate gradients.
      */
     gradients = 0x2,
     /**
-     *
+     * Use or evaluate hessians.
      */
     hessians = 0x4
   };
@@ -93,7 +100,7 @@ namespace EvaluationFlags
    * integer which would in turn trigger a compiler warning when we tried to
    * assign it to an object of type UpdateFlags.
    *
-   * @ref type
+   * @ref EvaluationFlags
    */
   inline EvaluationFlags
   operator|(const EvaluationFlags f1, const EvaluationFlags f2)
@@ -108,7 +115,7 @@ namespace EvaluationFlags
    * Global operator which sets the bits from the second argument also in the
    * first one.
    *
-   * @ref type
+   * @ref EvaluationFlags
    */
   inline EvaluationFlags &
   operator|=(EvaluationFlags &f1, const EvaluationFlags f2)
@@ -125,7 +132,7 @@ namespace EvaluationFlags
    * an integer which would in turn trigger a compiler warning when we tried to
    * assign it to an object of type UpdateFlags.
    *
-   * @ref UpdateFlags
+   * @ref EvaluationFlags
    */
   inline EvaluationFlags operator&(const EvaluationFlags f1,
                                    const EvaluationFlags f2)
@@ -139,7 +146,7 @@ namespace EvaluationFlags
    * Global operator which clears all the bits in the first argument if they are
    * not also set in the second argument.
    *
-   * @ref UpdateFlags
+   * @ref EvaluationFlags
    */
   inline EvaluationFlags &
   operator&=(EvaluationFlags &f1, const EvaluationFlags f2)

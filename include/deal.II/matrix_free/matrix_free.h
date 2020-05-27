@@ -728,7 +728,7 @@ public:
 
     /**
      * The loop does only involve FEFaceEvaluation access into neighbors by
-     * function values, such as `FEFaceEvaluation::gather_evaluate() with
+     * function values, such as FEFaceEvaluation::gather_evaluate() with
      * argument EvaluationFlags::values, but no access to shape function
      * derivatives (which typically need to access more data). For FiniteElement
      * types where only some of the shape functions have support on a face, such
