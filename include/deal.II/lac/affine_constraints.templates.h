@@ -2505,23 +2505,11 @@ namespace internal
     class GlobalRowsFromLocal
     {
     public:
-      GlobalRowsFromLocal()
-        : n_active_rows(0)
-        , n_inhomogeneous_rows(0)
-      {}
+      GlobalRowsFromLocal();
 
       void
-      reinit(const size_type n_local_rows)
-      {
-        total_row_indices.resize(n_local_rows);
-        for (unsigned int i = 0; i < n_local_rows; ++i)
-          total_row_indices[i].constraint_position = numbers::invalid_size_type;
-        n_active_rows        = n_local_rows;
-        n_inhomogeneous_rows = 0;
-        data_cache.reinit();
-      }
+      reinit(const size_type n_local_rows);
 
-      // implemented below
       void
       insert_index(const size_type global_row,
                    const size_type local_row,
@@ -2529,157 +2517,83 @@ namespace internal
       void
       sort();
 
-      // Print object for debugging purpose
       void
-      print(std::ostream &os)
-      {
-        os << "Active rows " << n_active_rows << std::endl
-           << "Constr rows " << n_constraints() << std::endl
-           << "Inhom  rows " << n_inhomogeneous_rows << std::endl
-           << "Local: ";
-        for (const auto &total_row_index : total_row_indices)
-          os << ' ' << std::setw(4) << total_row_index.local_row;
-        os << std::endl << "Global:";
-        for (const auto &total_row_index : total_row_indices)
-          os << ' ' << std::setw(4) << total_row_index.global_row;
-        os << std::endl << "ConPos:";
-        for (const auto &total_row_index : total_row_indices)
-          os << ' ' << std::setw(4) << total_row_index.constraint_position;
-        os << std::endl;
-      }
+      print(std::ostream &os);
 
       // return all kind of information on the constraints
 
       // returns the number of global indices in the struct
       size_type
-      size() const
-      {
-        return n_active_rows;
-      }
+      size() const;
 
       // returns the number of constraints that are associated to the
       // counter_index-th entry in the list
       size_type
-      size(const size_type counter_index) const
-      {
-        return (total_row_indices[counter_index].constraint_position ==
-                    numbers::invalid_size_type ?
-                  0 :
-                  data_cache.get_size(
-                    total_row_indices[counter_index].constraint_position));
-      }
+      size(const size_type counter_index) const;
 
       // returns the global row of the counter_index-th entry in the list
       size_type
-      global_row(const size_type counter_index) const
-      {
-        return total_row_indices[counter_index].global_row;
-      }
+      global_row(const size_type counter_index) const;
 
       // returns the global row of the counter_index-th entry in the list
       size_type &
-      global_row(const size_type counter_index)
-      {
-        return total_row_indices[counter_index].global_row;
-      }
+      global_row(const size_type counter_index);
 
       // returns the local row in the cell matrix associated with the
       // counter_index-th entry in the list. Returns invalid_size_type for
       // constrained rows
       size_type
-      local_row(const size_type counter_index) const
-      {
-        return total_row_indices[counter_index].local_row;
-      }
+      local_row(const size_type counter_index) const;
 
       // writable index
       size_type &
-      local_row(const size_type counter_index)
-      {
-        return total_row_indices[counter_index].local_row;
-      }
+      local_row(const size_type counter_index);
 
       // returns the local row in the cell matrix associated with the
       // counter_index-th entry in the list in the index_in_constraint-th
       // position of constraints
       size_type
       local_row(const size_type counter_index,
-                const size_type index_in_constraint) const
-      {
-        return (data_cache.get_entry(
-                  total_row_indices[counter_index]
-                    .constraint_position)[index_in_constraint])
-          .first;
-      }
+                const size_type index_in_constraint) const;
 
       // returns the value of the constraint in the counter_index-th entry in
       // the list in the index_in_constraint-th position of constraints
       number
       constraint_value(const size_type counter_index,
-                       const size_type index_in_constraint) const
-      {
-        return (data_cache.get_entry(
-                  total_row_indices[counter_index]
-                    .constraint_position)[index_in_constraint])
-          .second;
-      }
+                       const size_type index_in_constraint) const;
 
       // returns whether there is one row with indirect contributions (i.e.,
       // there has been at least one constraint with non-trivial ConstraintLine)
       bool
-      have_indirect_rows() const
-      {
-        return data_cache.individual_size.empty() == false;
-      }
+      have_indirect_rows() const;
 
       // append an entry that is constrained. This means that there is one less
       // nontrivial row
       void
-      insert_constraint(const size_type constrained_local_dof)
-      {
-        --n_active_rows;
-        total_row_indices[n_active_rows].local_row = constrained_local_dof;
-        total_row_indices[n_active_rows].global_row =
-          numbers::invalid_size_type;
-      }
+      insert_constraint(const size_type constrained_local_dof);
 
       // returns the number of constrained dofs in the structure. Constrained
       // dofs do not contribute directly to the matrix, but are needed in order
       // to set matrix diagonals and resolve inhomogeneities
       size_type
-      n_constraints() const
-      {
-        return total_row_indices.size() - n_active_rows;
-      }
+      n_constraints() const;
 
       // returns the number of constrained dofs in the structure that have an
       // inhomogeneity
       size_type
-      n_inhomogeneities() const
-      {
-        return n_inhomogeneous_rows;
-      }
+      n_inhomogeneities() const;
 
       // tells the structure that the ith constraint is
       // inhomogeneous. inhomogeneous constraints contribute to right hand
       // sides, so to have fast access to them, put them before homogeneous
       // constraints
       void
-      set_ith_constraint_inhomogeneous(const size_type i)
-      {
-        Assert(i >= n_inhomogeneous_rows, ExcInternalError());
-        std::swap(total_row_indices[n_active_rows + i],
-                  total_row_indices[n_active_rows + n_inhomogeneous_rows]);
-        n_inhomogeneous_rows++;
-      }
+      set_ith_constraint_inhomogeneous(const size_type i);
 
       // the local row where constraint number i was detected, to find that row
       // easily when the GlobalRowsToLocal has been set up
       size_type
-      constraint_origin(size_type i) const
-      {
-        return total_row_indices[n_active_rows + i].local_row;
-      }
+      constraint_origin(size_type i) const;
 
       // a vector that contains all the global ids and the corresponding local
       // ids as well as a pointer to that data where we store how to resolve
@@ -2696,6 +2610,195 @@ namespace internal
       // the number of rows with inhomogeneous constraints
       size_type n_inhomogeneous_rows;
     };
+
+
+
+    template <typename number>
+    GlobalRowsFromLocal<number>::GlobalRowsFromLocal()
+      : n_active_rows(0)
+      , n_inhomogeneous_rows(0)
+    {}
+
+
+
+    template <typename number>
+    void
+    GlobalRowsFromLocal<number>::reinit(const size_type n_local_rows)
+    {
+      total_row_indices.resize(n_local_rows);
+      for (unsigned int i = 0; i < n_local_rows; ++i)
+        total_row_indices[i].constraint_position = numbers::invalid_size_type;
+      n_active_rows        = n_local_rows;
+      n_inhomogeneous_rows = 0;
+      data_cache.reinit();
+    }
+
+
+
+    template <typename number>
+    void
+    GlobalRowsFromLocal<number>::print(std::ostream &os)
+    {
+      os << "Active rows " << n_active_rows << std::endl
+         << "Constr rows " << n_constraints() << std::endl
+         << "Inhom  rows " << n_inhomogeneous_rows << std::endl
+         << "Local: ";
+      for (const auto &total_row_index : total_row_indices)
+        os << ' ' << std::setw(4) << total_row_index.local_row;
+      os << std::endl << "Global:";
+      for (const auto &total_row_index : total_row_indices)
+        os << ' ' << std::setw(4) << total_row_index.global_row;
+      os << std::endl << "ConPos:";
+      for (const auto &total_row_index : total_row_indices)
+        os << ' ' << std::setw(4) << total_row_index.constraint_position;
+      os << std::endl;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::size() const
+    {
+      return n_active_rows;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::size(const size_type counter_index) const
+    {
+      return (total_row_indices[counter_index].constraint_position ==
+                  numbers::invalid_size_type ?
+                0 :
+                data_cache.get_size(
+                  total_row_indices[counter_index].constraint_position));
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::global_row(const size_type counter_index) const
+    {
+      return total_row_indices[counter_index].global_row;
+    }
+
+
+
+    template <typename number>
+    size_type &
+    GlobalRowsFromLocal<number>::global_row(const size_type counter_index)
+    {
+      return total_row_indices[counter_index].global_row;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::local_row(const size_type counter_index) const
+    {
+      return total_row_indices[counter_index].local_row;
+    }
+
+
+
+    template <typename number>
+    size_type &
+    GlobalRowsFromLocal<number>::local_row(const size_type counter_index)
+    {
+      return total_row_indices[counter_index].local_row;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::local_row(
+      const size_type counter_index,
+      const size_type index_in_constraint) const
+    {
+      return (data_cache.get_entry(total_row_indices[counter_index]
+                                     .constraint_position)[index_in_constraint])
+        .first;
+    }
+
+
+
+    template <typename number>
+    number
+    GlobalRowsFromLocal<number>::constraint_value(
+      const size_type counter_index,
+      const size_type index_in_constraint) const
+    {
+      return (data_cache.get_entry(total_row_indices[counter_index]
+                                     .constraint_position)[index_in_constraint])
+        .second;
+    }
+
+
+
+    template <typename number>
+    bool
+    GlobalRowsFromLocal<number>::have_indirect_rows() const
+    {
+      return data_cache.individual_size.empty() == false;
+    }
+
+
+
+    template <typename number>
+    void
+    GlobalRowsFromLocal<number>::insert_constraint(
+      const size_type constrained_local_dof)
+    {
+      --n_active_rows;
+      total_row_indices[n_active_rows].local_row  = constrained_local_dof;
+      total_row_indices[n_active_rows].global_row = numbers::invalid_size_type;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::n_constraints() const
+    {
+      return total_row_indices.size() - n_active_rows;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::n_inhomogeneities() const
+    {
+      return n_inhomogeneous_rows;
+    }
+
+
+
+    template <typename number>
+    void
+    GlobalRowsFromLocal<number>::set_ith_constraint_inhomogeneous(
+      const size_type i)
+    {
+      Assert(i >= n_inhomogeneous_rows, ExcInternalError());
+      std::swap(total_row_indices[n_active_rows + i],
+                total_row_indices[n_active_rows + n_inhomogeneous_rows]);
+      n_inhomogeneous_rows++;
+    }
+
+
+
+    template <typename number>
+    size_type
+    GlobalRowsFromLocal<number>::constraint_origin(size_type i) const
+    {
+      return total_row_indices[n_active_rows + i].local_row;
+    }
+
 
     // a function that appends an additional row to the list of values, or
     // appends a value to an already existing row. Similar functionality as for
