@@ -728,11 +728,56 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::import(const ReadWriteVector<PetscScalar> &,
-                     VectorOperation::values,
-                     std::shared_ptr<const CommunicationPatternBase>)
+  VectorBase::import(
+    const ReadWriteVector<PetscScalar> &            V,
+    VectorOperation::values                         operation,
+    std::shared_ptr<const CommunicationPatternBase> communication_pattern)
   {
-    Assert(false, ExcNotImplemented());
+    const IndexSet &v_stored     = V.get_stored_elements();
+    const IndexSet &v_n_elements = v_stored.n_elements();
+
+    Vec            tmp_vector;
+    PetscErrorCode ierr = VecDuplicate(comm_pattern, &tmp_vector);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr =
+      VecCopy(vector, tmp_vector); // todo - this ignores ghost values, right?
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // actually import V into tmp_vector
+    PetscScalar *data = nullptr;
+    ierr              = VecGetArray(tmp_vector, &data);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    PetscInt low  = -1;
+    PetscInt high = -1;
+    ierr          = VecGetOwnershipRange(tmp_vector, &low, &high);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    for (size_type i = 0; i < v_n_elements; ++i)
+      {
+        const auto global_tmp_index = v_stored.nth_index_in_set(i);
+        Assert(low <= global_tmp_index && global_tmp_index < high,
+               ExcIndexRange(global_tmp_index, low, high));
+        const auto local_tmp_index = global_tmp_index - low;
+
+        switch (operation)
+          {
+            case VectorOperation::insert:
+              data[local_tmp_index] = V.local_element(i);
+              break;
+            case VectorOperation::add:
+              data[local_tmp_index] += V.local_element(i);
+              break;
+            default:
+              Assert(false,
+                     ExcMessage(
+                       "The only supported vector operations with PETSc are "
+                       "VectorOperation::insert and VectorOperation::add."));
+          }
+      }
+
+    ierr = VecRestoreArray(tmp_vector, &data);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    VecDestroy(tmp_vector);
   }
 
 
