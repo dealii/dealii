@@ -491,7 +491,7 @@
  * - Classes designed to operate at the quadrature point level (or any general continuum point):
  *   - Differentiation::AD::ScalarFunction: %Differentiation of a scalar-valued function.
  *       One typical use would be the the development of constitutive laws directly from a strain
- *       energy function.
+ *       energy function. An example of this exact use case is given in step-71.
  *   - Differentiation::AD::VectorFunction: %Differentiation of a vector-valued function.
  *       This could be used to linearize the kinematic variables of a constitutive law, or assist
  *       in solving the evolution equations of local internal variables.
@@ -591,6 +591,7 @@
  * expressions using methods such as common subexpression elimination (CSE), as well as by generating
  * high performance code-paths to evaluate these expressions through the use of a custom-generated
  * `std::function` or by compiling the expression using the LLVM JIT compiler.
+ * The usage of the Differentiation::SD::BatchOptimizer class is exemplified in step-71.
  *
  * As a final note, it is important to recognize the remaining major deficiencies in deal.II's current
  * implementation of the interface to the supported symbolic library.
@@ -598,6 +599,7 @@
  * symbolic algebra to the traditional use case (i.e. scalar and tensor algebra, as might be useful to
  * define constitutive relations or complex functions for application as boundary conditions or
  * source terms).
+ * In fact, step-71 demonstrates how it can be used to implement challenging constitutive models.
  * In the future we will also implement classes to assist in performing assembly operations in
  * the same spirit as that which has been done in the Differentiation::AD namespace.
  *
