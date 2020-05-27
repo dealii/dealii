@@ -23,7 +23,6 @@ SET(_unity_include_src
   data_postprocessor.cc
   dof_output_operator.cc
   histogram.cc
-  kdtree.cc
   matrix_tools_once.cc
   matrix_tools.cc
   time_dependent.cc

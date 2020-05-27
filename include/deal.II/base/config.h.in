@@ -51,7 +51,6 @@
 #cmakedefine DEAL_II_WITH_METIS
 #cmakedefine DEAL_II_WITH_MPI
 #cmakedefine DEAL_II_WITH_MUPARSER
-#cmakedefine DEAL_II_WITH_NANOFLANN
 #cmakedefine DEAL_II_WITH_NETCDF
 #cmakedefine DEAL_II_WITH_OPENCASCADE
 #cmakedefine DEAL_II_WITH_P4EST
