@@ -23,10 +23,39 @@ namespace Particles
   template <int dim, int spacedim>
   void
   DataOut<dim, spacedim>::build_patches(
-    const Particles::ParticleHandler<dim, spacedim> &particles)
+    const Particles::ParticleHandler<dim, spacedim> &particles,
+    const std::vector<std::string> &                 data_component_names,
+    const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      &data_component_interpretation)
   {
+    AssertThrow(
+      data_component_names.size() == data_component_interpretation.size(),
+      ExcMessage(
+        "When calling Particles::DataOut::build_patches with data component "
+        "names and interpretations you need to provide as many data component "
+        "names as interpretations. Provide the same name for components that "
+        "belong to a single vector or tensor."));
+
+    if (data_component_names.size() > 0)
+      {
+        AssertThrow(
+          data_component_names.size() ==
+            particles.begin()->get_properties().size(),
+          ExcMessage(
+            "When calling Particles::DataOut::build_patches with data component "
+            "names and interpretations you need to provide as many data component "
+            "names as the particles have properties."));
+      }
+
     dataset_names.clear();
     dataset_names.emplace_back("id");
+    dataset_names.insert(dataset_names.end(),
+                         data_component_names.begin(),
+                         data_component_names.end());
+
+    const unsigned int n_property_components = data_component_names.size();
+    const unsigned int n_data_components     = dataset_names.size();
+
     patches.resize(particles.n_locally_owned_particles());
 
     auto particle = particles.begin();
@@ -35,9 +64,21 @@ namespace Particles
         patches[i].vertices[0]    = particle->get_location();
         patches[i].patch_index    = i;
         patches[i].n_subdivisions = 1;
-        patches[i].data.reinit(dataset_names.size(), 1);
+
+        // We have one more data components than dataset_names (the particle id)
+        patches[i].data.reinit(n_data_components, 1);
 
         patches[i].data(0, 0) = particle->get_id();
+
+        if (n_data_components > 1)
+          {
+            const ArrayView<double> properties = particle->get_properties();
+            for (unsigned int property_index = 0;
+                 property_index < n_property_components;
+                 ++property_index)
+              patches[i].data(property_index + 1, 0) =
+                properties[property_index];
+          }
       }
   }
 

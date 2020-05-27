@@ -19,6 +19,8 @@
 
 #include <deal.II/base/data_out_base.h>
 
+#include <deal.II/numerics/data_component_interpretation.h>
+
 #include <string>
 #include <vector>
 
@@ -66,7 +68,11 @@ namespace Particles
      * @author Bruno Blais, Luca Heltai 2019
      */
     void
-    build_patches(const Particles::ParticleHandler<dim, spacedim> &particles);
+    build_patches(const Particles::ParticleHandler<dim, spacedim> &particles,
+                  const std::vector<std::string> &                 names = {},
+                  const std::vector<
+                    DataComponentInterpretation::DataComponentInterpretation>
+                    &data_component_interpretation = {});
 
   protected:
     /**
