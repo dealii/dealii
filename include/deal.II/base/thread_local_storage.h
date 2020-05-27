@@ -104,13 +104,16 @@ namespace Threads
     ThreadLocalStorage();
 
     /**
-     * A kind of copy constructor. Initialize each thread local object by
-     * copying the given object.
+     * A kind of copy constructor. Initializes an internal exemplar by the
+     * given object. The exemplar is in turn used to initialize each thread
+     * local object instead of invoking the default constructor.
      */
     explicit ThreadLocalStorage(const T &t);
 
     /**
-     * FIXME
+     * A kind of move constructor. Moves the given object into an internal
+     * exemplar. The exemplar is in turn used to initialize each thread
+     * local object instead of invoking the default constructor.
      */
     explicit ThreadLocalStorage(T &&t);
 
@@ -121,7 +124,8 @@ namespace Threads
     ThreadLocalStorage(const ThreadLocalStorage<T> &t) = default;
 
     /**
-     * Move constructor. FIXME
+     * Move constructor. Copies the internal state over from the given
+     * object.
      */
     ThreadLocalStorage(ThreadLocalStorage<T> &&t) = default;
 
@@ -173,7 +177,17 @@ namespace Threads
 
 
     /**
-     * FIXME
+     * Move the given argument into the storage space used to represent the
+     * current thread. Calling this function as <code>tls_data =
+     * object</code> is equivalent to calling <code>tls_data.get() =
+     * object</code>. The intent of this operator is to make the
+     * ThreadLocalStorage object look more like the object it represents on
+     * the current thread. Move assignment operator.
+     *
+     * @param t The object to be copied into the storage space used for the
+     * current thread.
+     *
+     * @return The current object, after the changes have been made
      */
     ThreadLocalStorage<T> &
     operator=(T &&t);
@@ -282,7 +296,6 @@ namespace Threads
     {
       // Take a unique ("writer") lock for manipulating the std::map. This
       // lock ensures that no other threat does a lookup at the same time.
-      //
       std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
 
       if constexpr (std::is_copy_constructible<
@@ -295,7 +308,7 @@ namespace Threads
 
       if constexpr (std::is_default_constructible<T>::value)
         {
-          return data[my_id]; // default construct
+          return data[my_id]; // invokes default constructor
         }
 
       Assert(false, ExcInternalError());
