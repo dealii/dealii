@@ -153,6 +153,20 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
       ENDIF()
     ENDFOREACH()
 
+    #
+    # Remove certain system libraries from the link interface. This is
+    # purely cosmetic (we always implicitly link against the C library, and
+    # we always set up threading by linking against libpthread.so if
+    # necessary).
+    #
+    FOREACH(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
+      IF(NOT "${${_feature}_${_suffix}}" STREQUAL "")
+        LIST(REMOVE_ITEM ${_feature}_${_suffix}
+          "pthread" "-pthread" "-lpthread" "c" "-lc"
+          )
+      ENDIF()
+    ENDFOREACH()
+
     MESSAGE(STATUS "Found ${_feature}")
 
     MARK_AS_ADVANCED(${_feature}_DIR ${_feature}_ARCH)

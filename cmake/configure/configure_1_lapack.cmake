@@ -34,8 +34,6 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     SET(CMAKE_REQUIRED_LIBRARIES
       ${DEAL_II_LINKER_FLAGS_SAVED} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
       )
-    # Push -pthread as well:
-    ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
     CHECK_C_SOURCE_COMPILES("
       char daxpy_(); char dgeev_(); char dgeevx_(); char dgelsd_(); char
