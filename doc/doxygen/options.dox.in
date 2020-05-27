@@ -191,6 +191,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_ARPACK_WITH_PARPACK=1 \
                          DEAL_II_WITH_ASSIMP=1 \
                          DEAL_II_WITH_BOOST=1 \
+                         DEAL_II_WITH_CPP_TASKFLOW=1 \
                          DEAL_II_WITH_COMPLEX_VALUES=1 \
                          DEAL_II_WITH_CUDA=1 \
                          DEAL_II_COMPILER_CUDA_AWARE=1 \
@@ -227,7 +228,8 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_SUNDIALS_VERSION_LT=0 \
                          DEAL_II_WITH_SYMENGINE=1 \
                          DEAL_II_SYMENGINE_WITH_LLVM=1 \
-                         DEAL_II_WITH_THREAD=1 \
+                         DEAL_II_WITH_TBB=1 \
+                         DEAL_II_WITH_THREADS=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
                          DEAL_II_TRILINOS_WITH_MUELU=1 \
