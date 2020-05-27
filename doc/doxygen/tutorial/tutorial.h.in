@@ -607,6 +607,15 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-72</td>
+ *       <td> A nonlinear elliptic problem: The minimal surface equation.
+ *       Newton's method. Using automatic differentiation to linearize the 
+ *       residual, or to compute the full linear system from an energy
+ *       functional.
+ *       <br/> Keywords: Automatic differentiation, MeshWorker::mesh_loop()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-74</td>
  *       <td> The Symmetric interior penalty Galerkin (SIPG) method for Poisson's equation.
  *       <br/> Keywords: MeshWorker::mesh_loop(), FEInterfaceValues, ConvergenceTable
@@ -730,7 +739,8 @@
  *       step-43,
  *       step-50,
  *       step-55,
- *       step-71
+ *       step-71,
+ *       step-72
  *     </td>
  *   </tr>
  *
@@ -809,7 +819,8 @@
  *       step-62,
  *       step-69,
  *       step-70,
- *       step-71
+ *       step-71,
+ *       step-72
  *     </td>
  *   </tr>
  *
@@ -892,7 +903,8 @@
  *     </td>
  *     <td>
  *       step-33,
- *       step-71
+ *       step-71,
+ *       step-72
  *     </td>
  *   </tr>
  *

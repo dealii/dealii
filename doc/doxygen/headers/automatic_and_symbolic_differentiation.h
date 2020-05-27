@@ -497,9 +497,11 @@
  *       in solving the evolution equations of local internal variables.
  * - Classes designed to operate at the cell level:
  *   - Differentiation::AD::EnergyFunctional: %Differentiation of a scalar-valued energy functional,
- *       such as might arise from variational formulations.
+ *       such as might arise from variational formulations. An example of where this class is used
+ *       is in step-72.
  *   - Differentiation::AD::ResidualLinearization: %Differentiation of a vector-valued finite element
- *       residual, leading to its consistent linearization.
+ *       residual, leading to its consistent linearization. step-72 also provides a demonstration
+ *       of how this class can be used.
  *
  * Naturally, it is also possible for users to manage the initialization and derivative
  * computations themselves.

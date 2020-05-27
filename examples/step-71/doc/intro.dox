@@ -62,9 +62,9 @@ a final discussion on the topic of computational performance.
 
 Once we have the foundation upon which we can build further concepts, we
 will see how AD in particular can be exploited at a finite element (rather than
-continuum) level: this is a topic that is covered in step-33. But before then, let's take a moment to
-think about why we might want to consider using these sorts of tools, and what
-benefits they can potentially offer you.
+continuum) level: this is a topic that is covered in step-72, as well as step-33.
+But before then, let's take a moment to think about why we might want to consider
+using these sorts of tools, and what benefits they can potentially offer you.
 
 
 <h3>A motivation: Why would I use these tools?</h3>
