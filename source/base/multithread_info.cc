@@ -81,20 +81,18 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
       }
   }
 
-#ifdef DEAL_II_WITH_TBB
-  // Without restrictions from the user query TBB for the recommended number
-  // of threads:
+  // If we have not set the number of allowed threads yet, just default to
+  // the number of available cores
   if (n_max_threads == numbers::invalid_unsigned_int)
-    n_max_threads = tbb::task_scheduler_init::default_num_threads();
+    n_max_threads = n_cores();
 
+#ifdef DEAL_II_WITH_TBB
   // Initialize the scheduler and destroy the old one before doing so
   static tbb::task_scheduler_init dummy(tbb::task_scheduler_init::deferred);
   if (dummy.is_active())
     dummy.terminate();
   dummy.initialize(n_max_threads);
 #endif
-  if (n_max_threads == numbers::invalid_unsigned_int)
-    n_max_threads = n_cores();
 }
 
 
