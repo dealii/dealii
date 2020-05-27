@@ -39,7 +39,7 @@ class LogStream;
 namespace Threads
 {
 #  ifndef DOXYGEN
-  namespace
+  namespace internal
   {
     /*
      * Workaround: The standard unfortunately has an unfortunate design
@@ -66,7 +66,7 @@ namespace Threads
     {
       using type = T;
     };
-  } // namespace
+  } // namespace internal
 #  endif
 
   /**
@@ -100,7 +100,8 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<typename unpack_container<T>::type>::value ||
+      std::is_copy_constructible<
+        typename internal::unpack_container<T>::type>::value ||
         std::is_default_constructible<T>::value,
       "The stored type must be either copyable, or default constructible");
 
@@ -182,7 +183,6 @@ namespace Threads
      */
     ThreadLocalStorage<T> &
     operator=(const T &t);
-
 
     /**
      * Move the given argument into the storage space used to represent the
