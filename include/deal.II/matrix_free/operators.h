@@ -684,7 +684,7 @@ namespace MatrixFreeOperators
      * @code
      * for (unsigned int q=0; q<phi.n_q_points; ++q)
      *   phi.submit_value(array[q], q);
-     * phi.integrate(true, false);
+     * phi.integrate(EvaluationFlags::values);
      * inverse_mass.apply(coefficients, 1, phi.begin_dof_values(),
      *                    phi.begin_dof_values());
      * @endcode
@@ -1878,10 +1878,10 @@ namespace MatrixFreeOperators
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(true, false, false);
+        phi.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_value(phi.get_value(q), q);
-        phi.integrate(true, false);
+        phi.integrate(EvaluationFlags::values);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -2074,7 +2074,7 @@ namespace MatrixFreeOperators
         typename Base<dim, VectorType, VectorizedArrayType>::value_type> &phi,
       const unsigned int cell) const
   {
-    phi.evaluate(false, true, false);
+    phi.evaluate(EvaluationFlags::gradients);
     if (scalar_coefficient.get())
       {
         Assert(scalar_coefficient->size(1) == 1 ||
@@ -2111,7 +2111,7 @@ namespace MatrixFreeOperators
             phi.submit_gradient(phi.get_gradient(q), q);
           }
       }
-    phi.integrate(false, true);
+    phi.integrate(EvaluationFlags::gradients);
   }
 
 

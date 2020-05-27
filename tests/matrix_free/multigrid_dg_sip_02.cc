@@ -191,10 +191,10 @@ private:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -217,9 +217,10 @@ private:
         fe_eval_neighbor.reinit(face);
 
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval_neighbor.read_dof_values(src);
-        fe_eval_neighbor.evaluate(true, true);
+        fe_eval_neighbor.evaluate(EvaluationFlags::values |
+                                  EvaluationFlags::gradients);
         VectorizedArray<number> sigmaF =
           (std::abs((fe_eval.get_normal_vector(0) *
                      fe_eval.inverse_jacobian(0))[dim - 1]) +
@@ -241,9 +242,10 @@ private:
             fe_eval.submit_value(average_valgrad, q);
             fe_eval_neighbor.submit_value(-average_valgrad, q);
           }
-        fe_eval.integrate(true, true);
+        fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval.distribute_local_to_global(dst);
-        fe_eval_neighbor.integrate(true, true);
+        fe_eval_neighbor.integrate(EvaluationFlags::values |
+                                   EvaluationFlags::gradients);
         fe_eval_neighbor.distribute_local_to_global(dst);
       }
   }
@@ -261,7 +263,7 @@ private:
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         VectorizedArray<number> sigmaF =
           std::abs((fe_eval.get_normal_vector(0) *
                     fe_eval.inverse_jacobian(0))[dim - 1]) *
@@ -277,7 +279,7 @@ private:
             fe_eval.submit_value(average_valgrad, q);
           }
 
-        fe_eval.integrate(true, true);
+        fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval.distribute_local_to_global(dst);
       }
   }
@@ -318,10 +320,10 @@ private:
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(false, true, false);
+            phi.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(phi.get_gradient(q), q);
-            phi.integrate(false, true);
+            phi.integrate(EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -346,7 +348,8 @@ private:
                 for (unsigned int j = 0; j < phif.dofs_per_cell; ++j)
                   phif.begin_dof_values()[j] = VectorizedArray<number>();
                 phif.begin_dof_values()[i] = 1.;
-                phif.evaluate(true, true);
+                phif.evaluate(EvaluationFlags::values |
+                              EvaluationFlags::gradients);
                 for (unsigned int q = 0; q < phif.n_q_points; ++q)
                   {
                     VectorizedArray<number> average_value =
@@ -358,7 +361,8 @@ private:
                     phif.submit_normal_derivative(-average_value, q);
                     phif.submit_value(average_valgrad, q);
                   }
-                phif.integrate(true, true);
+                phif.integrate(EvaluationFlags::values |
+                               EvaluationFlags::gradients);
                 local_diagonal_vector[i] += phif.begin_dof_values()[i];
               }
           }

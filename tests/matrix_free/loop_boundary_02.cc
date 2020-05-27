@@ -85,13 +85,15 @@ do_test(const unsigned int n_refine)
       {
         eval.reinit(cell);
         eval.read_dof_values_plain(in);
-        eval.evaluate(false, true);
+        eval.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < eval.n_q_points; ++q)
           {
             eval.submit_gradient(eval.get_gradient(q), q);
             eval.submit_value(eval.quadrature_point(q).square(), q);
           }
-        eval.integrate_scatter(true, true, out);
+        eval.integrate_scatter(EvaluationFlags::values |
+                                 EvaluationFlags::gradients,
+                               out);
       }
   };
 
@@ -110,14 +112,14 @@ do_test(const unsigned int n_refine)
       {
         eval.reinit(face);
         eval.read_dof_values_plain(in);
-        eval.evaluate(true, false);
+        eval.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < eval.n_q_points; ++q)
           {
             eval.submit_value(eval.quadrature_point(q).square() -
                                 6. * eval.get_value(q),
                               q);
           }
-        eval.integrate_scatter(true, false, out);
+        eval.integrate_scatter(EvaluationFlags::values, out);
       }
   };
 

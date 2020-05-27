@@ -436,7 +436,7 @@ public:
 
   /**
    * Return the value of a finite element function at quadrature point number
-   * @p q_point after a call to @p evaluate(true,...), or the value that has
+   * @p q_point after a call to @p evaluate() with EvaluationFlags::value set, or the value that has
    * been stored there with a call to @p submit_value. If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
    * vectorization is enabled, values from several cells are grouped together.
@@ -451,7 +451,7 @@ public:
   /**
    * Write a value to the field containing the values on quadrature points
    * with component @p q_point. Access to the same field as through @p
-   * get_value. If applied before the function @p integrate(true,...) is
+   * get_value. If applied before the function @p integrate() with EvaluationFlags::values set is
    * called, this specifies the value which is tested by all basis function on
    * the current cell and integrated over.
    *
@@ -464,7 +464,7 @@ public:
 
   /**
    * Return the gradient of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true,...), or the value
+   * number @p q_point after a call to @p evaluate() with EvaluationFlags::gradients, or the value
    * that has been stored there with a call to @p submit_gradient.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
@@ -1835,8 +1835,8 @@ protected:
  *   {
  *     phi.reinit(cell_index);
  *     phi.read_dof_values(vector);
- *     phi.evaluate(true, false);   // interpolate values, but not gradients
- *     for (unsigned int q_index=0; q_index<phi.n_q_points; ++q_index)
+ *     phi.evaluate(EvaluationFlags::values);   // interpolate values, but not
+ * gradients for (unsigned int q_index=0; q_index<phi.n_q_points; ++q_index)
  *       {
  *         VectorizedArray<double> val = phi.get_value(q_index);
  *         // do something with val
@@ -1885,7 +1885,7 @@ protected:
  *           }
  *         phi.submit_value(f_value, q);
  *       }
- *     phi.integrate(true, false);
+ *     phi.integrate(EvaluationFlags::values);
  *     phi.distribute_local_to_global(dst);
  *   }
  * @endcode
@@ -1984,13 +1984,13 @@ protected:
  *
  *         // Apply operator on unit vector to generate the next few matrix
  *         // columns
- *         fe_eval.evaluate(true, true);
+ *         fe_eval.evaluate(EvaluationFlags::values|EvaluationFlags::gradients);
  *         for (unsigned int q=0; q<n_q_points; ++q)
  *           {
  *             fe_eval.submit_value(10.*fe_eval.get_value(q), q);
  *             fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
  *           }
- *         fe_eval.integrate(true, true);
+ *         fe_eval.integrate(EvaluationFlags::values|EvaluationFlags::gradients);
  *
  *         // Insert computed entries in matrix
  *         for (unsigned int v=0; v<n_items; ++v)
@@ -2227,10 +2227,10 @@ protected:
  *   {
  *     velocity.reinit (cell);
  *     velocity.read_dof_values (src.block(0));
- *     velocity.evaluate (false,true);
+ *     velocity.evaluate (EvaluationFlags::gradients);
  *     pressure.reinit (cell);
  *     pressure.read_dof_values (src.block(1));
- *     pressure.evaluate (true,false);
+ *     pressure.evaluate (EvaluationFlags::values);
  *
  *     for (unsigned int q=0; q<velocity.n_q_points; ++q)
  *       {
@@ -2247,9 +2247,9 @@ protected:
  *         velocity.submit_symmetric_gradient(sym_grad_u, q);
  *      }
  *
- *     velocity.integrate (false,true);
+ *     velocity.integrate (EvaluationFlags::gradients);
  *     velocity.distribute_local_to_global (dst.block(0));
- *     pressure.integrate (true,false);
+ *     pressure.integrate (EvaluationFlags::values);
  *     pressure.distribute_local_to_global (dst.block(1));
  *   }
  * @endcode
@@ -2284,8 +2284,8 @@ protected:
  * points:
  *
  * @code
- * phi1.evaluate(true, false);
- * phi2.evaluate(false, true);
+ * phi1.evaluate(EvaluationFlags::values);
+ * phi2.evaluate(EvaluationFlags::gradients);
  * for (unsigned int q_index=0; q_index<phi1.n_q_points; ++q_index)
  *   {
  *     VectorizedArray<double> val1 = phi1.get_value(q);

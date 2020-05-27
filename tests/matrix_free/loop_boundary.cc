@@ -83,13 +83,15 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
     for (unsigned int cell = range.first; cell < range.second; ++cell)
       {
         eval.reinit(cell);
-        eval.gather_evaluate(in, false, true);
+        eval.gather_evaluate(in, EvaluationFlags::gradients);
         for (unsigned int q = 0; q < eval.n_q_points; ++q)
           {
             eval.submit_gradient(eval.get_gradient(q), q);
             eval.submit_value(eval.quadrature_point(q).square(), q);
           }
-        eval.integrate_scatter(true, true, out);
+        eval.integrate_scatter(EvaluationFlags::values |
+                                 EvaluationFlags::gradients,
+                               out);
       }
   };
 
@@ -107,14 +109,14 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
     for (unsigned int face = range.first; face < range.second; ++face)
       {
         eval.reinit(face);
-        eval.gather_evaluate(in, true, false);
+        eval.gather_evaluate(in, EvaluationFlags::values);
         for (unsigned int q = 0; q < eval.n_q_points; ++q)
           {
             eval.submit_value(eval.quadrature_point(q).square() -
                                 6. * eval.get_value(q),
                               q);
           }
-        eval.integrate_scatter(true, false, out);
+        eval.integrate_scatter(EvaluationFlags::values, out);
       }
   };
 

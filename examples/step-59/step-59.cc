@@ -484,10 +484,10 @@ namespace Step59
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, false, true);
+        phi.gather_evaluate(src, EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate_scatter(false, true, dst);
+        phi.integrate_scatter(EvaluationFlags::gradients, dst);
       }
   }
 
@@ -553,9 +553,13 @@ namespace Step59
         // gathering values from cells that are farther apart in the index
         // list of cells.
         phi_inner.reinit(face);
-        phi_inner.gather_evaluate(src, true, true);
+        phi_inner.gather_evaluate(src,
+                                  EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
         phi_outer.reinit(face);
-        phi_outer.gather_evaluate(src, true, true);
+        phi_outer.gather_evaluate(src,
+                                  EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
 
         // The next two statements compute the penalty parameter for the
         // interior penalty method. As explained in the introduction, we would
@@ -623,8 +627,12 @@ namespace Step59
         // vector using the same pattern as in `gather_evaluate`. Like before,
         // the combined integrate + write operation allows us to reduce the
         // data access.
-        phi_inner.integrate_scatter(true, true, dst);
-        phi_outer.integrate_scatter(true, true, dst);
+        phi_inner.integrate_scatter(EvaluationFlags::values |
+                                      EvaluationFlags::gradients,
+                                    dst);
+        phi_outer.integrate_scatter(EvaluationFlags::values |
+                                      EvaluationFlags::gradients,
+                                    dst);
       }
   }
 
@@ -669,7 +677,9 @@ namespace Step59
     for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi_inner.reinit(face);
-        phi_inner.gather_evaluate(src, true, true);
+        phi_inner.gather_evaluate(src,
+                                  EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
 
         const VectorizedArray<number> inverse_length_normal_to_face =
           std::abs((phi_inner.get_normal_vector(0) *
@@ -696,7 +706,9 @@ namespace Step59
             phi_inner.submit_normal_derivative(-solution_jump * number(0.5), q);
             phi_inner.submit_value(test_by_value, q);
           }
-        phi_inner.integrate_scatter(true, true, dst);
+        phi_inner.integrate_scatter(EvaluationFlags::values |
+                                      EvaluationFlags::gradients,
+                                    dst);
       }
   }
 
@@ -1091,7 +1103,7 @@ namespace Step59
               }
             phi.submit_value(rhs_val, q);
           }
-        phi.integrate_scatter(true, false, system_rhs);
+        phi.integrate_scatter(EvaluationFlags::values, system_rhs);
       }
 
     // Secondly, we also need to apply the Dirichlet and Neumann boundary
@@ -1169,7 +1181,9 @@ namespace Step59
                                   q);
             phi_face.submit_normal_derivative(-0.5 * test_value, q);
           }
-        phi_face.integrate_scatter(true, true, system_rhs);
+        phi_face.integrate_scatter(EvaluationFlags::values |
+                                     EvaluationFlags::gradients,
+                                   system_rhs);
       }
 
     // Since we have manually run the loop over cells rather than using

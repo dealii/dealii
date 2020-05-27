@@ -146,10 +146,10 @@ private:
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, false, true);
+        phi.gather_evaluate(src, EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate_scatter(false, true, dst);
+        phi.integrate_scatter(EvaluationFlags::gradients, dst);
       }
   }
 

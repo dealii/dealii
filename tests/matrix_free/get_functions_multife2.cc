@@ -92,15 +92,18 @@ public:
       {
         fe_eval0.reinit(cell);
         fe_eval0.read_dof_values(src[0]);
-        fe_eval0.evaluate(true, true, true);
+        fe_eval0.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         fe_eval1.reinit(cell);
         fe_eval1.read_dof_values(src[1]);
-        fe_eval1.evaluate(true, true, true);
+        fe_eval1.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         fe_eval2.reinit(cell);
         fe_eval2.read_dof_values(src[2]);
-        fe_eval2.evaluate(true, true, true);
+        fe_eval2.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         // compare values with the ones the FEValues
         // gives us. Those are seen as reference

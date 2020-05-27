@@ -68,8 +68,8 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
 
       phi0.read_dof_values(src, 0);
       phi1.read_dof_values(src, 1);
-      phi0.evaluate(true, true, false);
-      phi1.evaluate(true, true, false);
+      phi0.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+      phi1.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
           phi0.submit_value(make_vectorized_array(Number(10)) *
@@ -81,9 +81,9 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
                             q);
           phi1.submit_gradient(phi1.get_gradient(q), q);
         }
-      phi0.integrate(true, true);
+      phi0.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       phi0.distribute_local_to_global(dst, 0);
-      phi1.integrate(true, true);
+      phi1.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       phi1.distribute_local_to_global(dst, 1);
     }
 }

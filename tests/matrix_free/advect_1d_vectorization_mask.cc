@@ -113,10 +113,10 @@ private:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(true, false);
+        phi.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(advection * phi.get_value(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask;
@@ -149,10 +149,10 @@ private:
       {
         phi_m.reinit(face);
         phi_m.read_dof_values(src);
-        phi_m.evaluate(true, false);
+        phi_m.evaluate(EvaluationFlags::values);
         phi_p.reinit(face);
         phi_p.read_dof_values(src);
-        phi_p.evaluate(true, false);
+        phi_p.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
@@ -168,14 +168,14 @@ private:
             phi_p.submit_value(flux_times_normal, q);
           }
 
-        phi_m.integrate(true, false);
+        phi_m.integrate(EvaluationFlags::values);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask;
             mask[v] = true;
             phi_m.distribute_local_to_global(dst, 0, mask);
           }
-        phi_p.integrate(true, false);
+        phi_p.integrate(EvaluationFlags::values);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask;
@@ -206,7 +206,7 @@ private:
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, false);
+        fe_eval.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
@@ -221,7 +221,7 @@ private:
             fe_eval.submit_value(-flux_times_normal, q);
           }
 
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         for (unsigned int v = 0; v < n_vect; ++v)
           {
             std::bitset<n_vect> mask =
