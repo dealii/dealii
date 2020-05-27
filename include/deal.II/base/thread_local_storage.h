@@ -263,6 +263,45 @@ namespace Threads
   {}
 
 
+#    ifndef DOXYGEN
+  namespace internal
+  {
+    /*
+     * We have to make sure not to call "data.emplace(id, *exemplar)" if
+     * the corresponding element is not copy constructible. We use some
+     * SFINAE magic to work around the fact that C++14 does not have
+     * "if constexpr".
+     */
+    template <typename T>
+    typename std::enable_if_t<
+      std::is_copy_constructible<typename unpack_vector<T>::type>::value,
+      T &>
+    construct_element(std::map<std::thread::id, T> &  data,
+                      const std::thread::id &         id,
+                      const std::shared_ptr<const T> &exemplar)
+    {
+      if (exemplar)
+        {
+          const auto it = data.emplace(id, *exemplar).first;
+          return it->second;
+        }
+      return data[id];
+    }
+
+    template <typename T>
+    typename std::enable_if_t<
+      !std::is_copy_constructible<typename unpack_vector<T>::type>::value,
+      T &>
+    construct_element(std::map<std::thread::id, T> &data,
+                      const std::thread::id &       id,
+                      const std::shared_ptr<const T> &)
+    {
+      return data[id];
+    }
+  } // namespace internal
+#    endif
+
+
   template <typename T>
   inline T &
   ThreadLocalStorage<T>::get(bool &exists)
@@ -298,20 +337,7 @@ namespace Threads
       // lock ensures that no other threat does a lookup at the same time.
       std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
 
-      if constexpr (std::is_copy_constructible<
-                      typename unpack_vector<T>::type>::value)
-        if (exemplar)
-          {
-            const auto it = data.emplace(my_id, *exemplar).first;
-            return it->second;
-          }
-
-      if constexpr (std::is_default_constructible<T>::value)
-        {
-          return data[my_id]; // invokes default constructor
-        }
-
-      Assert(false, ExcInternalError());
+      return internal::construct_element(data, my_id, exemplar);
     }
   }
 
