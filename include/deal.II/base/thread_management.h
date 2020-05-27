@@ -1004,6 +1004,26 @@ namespace Threads
      * may block until the task has completed running, all successive attempts
      * to join will return immediately).
      *
+     * If the operation that was executed on the task with which this
+     * object was initialized throws an exception instead of returning
+     * regularly, then calling the current join() function will first
+     * wait for that task to finish, and then in turn throw the
+     * exception that the task operation had thrown originally. This
+     * allows for the propagation of exceptions from tasks executed on
+     * a separate thread to the calling thread.
+     *
+     * (This behavior differs from that of
+     * [`std::future`](https://en.cppreference.com/w/cpp/thread/future),
+     * where the `std::future::wait()` function only waits for
+     * completion of the operation, whereas the exception is
+     * propagated only once one calls `std::future::get()`. However,
+     * this is awkward when putting `void` functions onto separate
+     * tasks because these do not actually return anything;
+     * consequently, it is more natural to call `std::task::wait()`
+     * for such tasks than the `std::task::get()` function since the
+     * latter does not, actually, return anything that could be
+     * gotten.)
+     *
      * @pre You can't call this function if you have used the default
      * constructor of this class and have not assigned a task object to it. In
      * other words, the function joinable() must return true.
@@ -1074,6 +1094,12 @@ namespace Threads
      * to get the pointer out of the object returned from the task, it needs
      * to be moved, and in order to be moved, the current function needs to
      * return a writable (non-@p const) reference.
+     *
+     * This function internally calls the join() member function. As a
+     * consequence, and as explained there, if the packaged task
+     * throws an exception that is then re-thrown by the join()
+     * function and consequently also the current function if you have
+     * not previously called join().
      *
      * @pre You can't call this function if you have used the default
      * constructor of this class and have not assigned a task object to it. In
