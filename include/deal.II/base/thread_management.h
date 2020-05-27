@@ -1481,7 +1481,7 @@ namespace Threads
   {
     using return_type = decltype(function_object());
     dealii::MultithreadInfo::initialize_multithreading();
-    return Task<return_type>(std::function<return_type()>(function_object));
+    return new_task(std::function<return_type()>(function_object));
   }
 
 
