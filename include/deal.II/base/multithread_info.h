@@ -55,13 +55,11 @@ public:
   MultithreadInfo() = delete;
 
   /**
-   * The number of CPUs in the system. At the moment detection of CPUs is only
-   * implemented on Linux, FreeBSD, and Mac computers.  It is one if detection
-   * failed or is not implemented on your system.
+   * The number of CPUs in the system.
    *
-   * If it is one, although you are on a multi-processor machine, please refer
-   * to the documentation in <tt>multithread_info.cc</tt> near to the
-   * <tt>error</tt> directive.
+   * This internally calls
+   * [<code>std::thread::hardware_concurrency</code>](https://en.cppreference.com/w/cpp/thread/thread/hardware_concurrency)
+   * but sets the result to 1 if the call returns an error.
    */
   static unsigned int
   n_cores();
@@ -117,23 +115,9 @@ public:
 
 private:
   /**
-   * Private function to determine the number of CPUs. Implementation for
-   * Linux, OSF, SGI, and Sun machines; if no detection of the number of CPUs
-   * is supported, or if detection fails, this function returns one.
-   */
-  static unsigned int
-  get_n_cpus();
-
-  /**
    * Variable representing the maximum number of threads.
    */
   static unsigned int n_max_threads;
-
-  /**
-   * Variable representing the number of cores in the system. This is computed
-   * by get_n_cpus() and is returned by n_cores().
-   */
-  static const unsigned int n_cpus;
 };
 
 
