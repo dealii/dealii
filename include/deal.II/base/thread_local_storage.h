@@ -230,6 +230,11 @@ namespace Threads
 
     /**
      * A mutex to guard insertion into the data object.
+     *
+     * We use a std::shared_timed_mutex (or std::shared_mutex if available)
+     * here to be able to use std::unique_lock and std::shared_lock for a
+     * readers-writer lock
+     * (https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock).
      */
 #  ifdef DEAL_II_HAVE_CXX17
     std::shared_mutex insertion_mutex;
