@@ -95,7 +95,4 @@ main()
   test(SOURCE_DIR "/grid_in_3d/evil_2.in");
   test(SOURCE_DIR "/grid_in_3d/evil_3.in");
   test(SOURCE_DIR "/grid_in_3d/evil_4.in");
-
-  // test1 needs NetCDF
-  //    test1 ();
 }

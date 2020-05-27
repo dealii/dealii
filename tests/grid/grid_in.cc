@@ -147,8 +147,6 @@ main()
 
   test1<2>();
   test2<2>();
-  // test3 needs NetCDF
-  //    test3<2> ();
 
   filename_resolution();
 }
