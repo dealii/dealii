@@ -1204,13 +1204,26 @@ namespace Threads
 
 
   /**
-   * Describes one task object based on the Threading Building Blocks' Task.
-   * Note that the call to join() must be executed on the same thread as the
-   * call to the constructor. Otherwise, there might be a deadlock. In other
-   * words, a Task object should never passed on to another task for calling
-   * the join() method.
+   * This class describes a task object, i.e., what one obtains by calling
+   * Threads::new_task(). The idea is that Threads::new_task() allows one to run
+   * a function whenever the C++ run-time system finds it convenient --
+   * typically, when there is an idle processor available. This can be used to
+   * run things in the background when there is no immediate need for the
+   * result, or if there are other things that could well be done in parallel.
+   * Whenever the result of that background task is needed, one can call either
+   * join() to just wait for the task to finish, or return_value() to obtain the
+   * value that was returned by the function that was run on that background
+   * task.
    *
-   * @author Wolfgang Bangerth, 2009
+   * This class is conceptually similar to the
+   * [`std::future`](https://en.cppreference.com/w/cpp/thread/future) class that
+   * is returned by
+   * [`std::async`](https://en.cppreference.com/w/cpp/thread/async) (which is
+   * itself similar to what Threads::new_task() does). The principal conceptual
+   * difference is that one can only call `std::future::get()` once, whereas one
+   * can call Threads::Task::return_value() as many times as desired.
+   *
+   * @author Wolfgang Bangerth, 2009, 2020
    * @ingroup threads
    */
   template <typename RT = void>
