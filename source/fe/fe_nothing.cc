@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/fe/fe_nothing.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -45,7 +45,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Nothing<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Nothing<dim, spacedim>>(*this);
+  return std::make_unique<FE_Nothing<dim, spacedim>>(*this);
 }
 
 
@@ -103,7 +103,7 @@ FE_Nothing<dim, spacedim>::get_data(
   // Create a default data object.  Normally we would then
   // need to resize things to hold the appropriate numbers
   // of dofs, but in this case all data fields are empty.
-  return std_cxx14::make_unique<
+  return std::make_unique<
     typename FiniteElement<dim, spacedim>::InternalDataBase>();
 }
 

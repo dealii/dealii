@@ -18,7 +18,6 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 
@@ -152,7 +151,7 @@ MappingQ<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // build the Q1 and Qp internal data objects in parallel
@@ -184,7 +183,7 @@ MappingQ<dim, spacedim>::get_face_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // build the Q1 and Qp internal data objects in parallel
@@ -217,7 +216,7 @@ MappingQ<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // build the Q1 and Qp internal data objects in parallel
@@ -535,7 +534,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ<dim, spacedim>>(
+  return std::make_unique<MappingQ<dim, spacedim>>(
     this->polynomial_degree, this->use_mapping_q_on_all_cells);
 }
 

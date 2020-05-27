@@ -19,7 +19,7 @@
 // the STL.
 
 
-#include <deal.II/base/std_cxx14/algorithm.h>
+#include <algorithm>
 
 #include "../tests.h"
 
@@ -35,14 +35,14 @@ main()
 {
   initlog();
 
-  constexpr int max_1 = std_cxx14::max(0, 1);
+  constexpr int max_1 = std::max(0, 1);
   deallog << max_1 << std::endl;
-  constexpr int max_2 = std_cxx14::max(3, 2, comp);
+  constexpr int max_2 = std::max(3, 2, comp);
   deallog << max_2 << std::endl;
 
-  constexpr int min_1 = std_cxx14::min(1, 2);
+  constexpr int min_1 = std::min(1, 2);
   deallog << min_1 << std::endl;
-  constexpr int min_2 = std_cxx14::min(1, 2, comp);
+  constexpr int min_2 = std::min(1, 2, comp);
   deallog << min_2 << std::endl;
 
   deallog << "OK" << std::endl;

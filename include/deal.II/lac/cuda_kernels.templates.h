@@ -93,7 +93,7 @@ namespace LinearAlgebra
       __device__ Number
                  ElemSum<Number>::atomic_op(Number *dst, const Number a)
       {
-        return atomicAdd_wrapper(dst, a);
+        return atomicAdd(dst, a);
       }
 
 
@@ -129,7 +129,7 @@ namespace LinearAlgebra
       __device__ Number
                  L1Norm<Number>::atomic_op(Number *dst, const Number a)
       {
-        return atomicAdd_wrapper(dst, a);
+        return atomicAdd(dst, a);
       }
 
 
@@ -269,7 +269,7 @@ namespace LinearAlgebra
       __device__ Number
                  DotProduct<Number>::atomic_op(Number *dst, const Number a)
       {
-        return atomicAdd_wrapper(dst, a);
+        return atomicAdd(dst, a);
       }
 
 

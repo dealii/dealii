@@ -29,8 +29,10 @@ namespace LinearAlgebra
     /**
      * Provide atomicAdd for floats.
      *
+     * @deprecated Use atomicAdd(address, val) directly.
      * @ingroup CUDAWrappers
      */
+    DEAL_II_DEPRECATED
     inline __device__ float
     atomicAdd_wrapper(float *address, float val)
     {
@@ -42,8 +44,10 @@ namespace LinearAlgebra
     /**
      * Provide atomicAdd for doubles.
      *
+     * @deprecated Use atomicAdd(address, val) directly.
      * @ingroup CUDAWrappers
      */
+    DEAL_II_DEPRECATED
     inline __device__ double
     atomicAdd_wrapper(double *address, double val)
     {

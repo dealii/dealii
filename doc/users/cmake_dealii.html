@@ -417,7 +417,18 @@ library        - builds and installs the 'library' component
       configuration.
     </p>
 
+    <p>
+      The library will be compiled with the default C++ standard enabled by
+      the compiler. This is (as of May 2020) C++14 for all compilers. If
+      you want to override this behavior, please set the C++ standard
+      directly for example by configuring with
+      <code>-DDEAL_II_CXX_FLAGS="-std=c++17"</code>, or by setting the
+      environement variable <code>CXXFLAGS="-std=c++17"</code>.
 
+      Similarly, for enabling SIMD vectorization support, you have to set
+      an appropriate target architecture via <code>-march=...</code>, for
+      example <code>-DDEAL_II_CXX_FLAGS="-march=native"</code>.
+    </p>
 
     <a name="configurefeature"></a>
     <h3>Feature configuration</h3>
@@ -428,18 +439,6 @@ library        - builds and installs the 'library' component
       of <code>C++</code>. All of these options are represented
       by <code>cmake</code> variables that may be set to either <code>ON</code>
       or <code>OFF</code>.
-
-      By default, <acronym>deal.II</acronym>'s <code>CMake</code> build scripts
-      will attempt to find the newest <code>C++</code> version available by
-      checking which language version flags work with the detected compiler. For
-      example: if <code>CMake</code> detects <code>GCC 5.1</code> or <code>Clang
-      3.6</code>, <acronym>deal.II</acronym> will be compiled
-      in <code>C++14</code> mode unless <code>C++14</code> support is explicitly
-      disabled. Another example: if <code>DEAL_II_WITH_CXX14=ON</code> is passed
-      to <code>CMake</code>, then <acronym>deal.II</acronym> will check if the
-      compiler supports enough of the <code>C++14</code> standard to enable
-      the <code>C++14</code>-specific parts of the library. The configuration
-      process will fail if a feature flag is passed in that cannot be supported.
 
       The remaining flags are set to <code>ON</code> if an external package is
       found or to <code>OFF</code> otherwise. By explicitly setting it to off
@@ -459,8 +458,6 @@ DEAL_II_WITH_ASSIMP
 DEAL_II_WITH_BOOST
 DEAL_II_WITH_COMPLEX_VALUES
 DEAL_II_WITH_CUDA
-DEAL_II_WITH_CXX14
-DEAL_II_WITH_CXX17
 DEAL_II_WITH_GINKGO
 DEAL_II_WITH_GMSH
 DEAL_II_WITH_GSL

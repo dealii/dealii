@@ -21,10 +21,10 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/iterator_range.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/grid/tria_iterator_base.h>
 
+#  include <memory>
 #  include <set>
 #  include <tuple>
 
@@ -1152,7 +1152,7 @@ template <typename Predicate>
 std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::clone() const
 {
-  return std_cxx14::make_unique<PredicateTemplate>(predicate);
+  return std::make_unique<PredicateTemplate>(predicate);
 }
 
 

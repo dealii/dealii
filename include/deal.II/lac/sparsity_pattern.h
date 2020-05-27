@@ -22,7 +22,6 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 // boost::serialization::make_array used to be in array.hpp, but was
@@ -37,6 +36,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1418,8 +1418,6 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
-    Assert(container != nullptr, DummyAccessor());
-    Assert(other.container != nullptr, DummyAccessor());
     return (container == other.container && linear_index == other.linear_index);
   }
 
@@ -1595,8 +1593,8 @@ SparsityPatternBase::load(Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
-  colnums  = std_cxx14::make_unique<size_type[]>(max_vec_len);
+  rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
+  colnums  = std::make_unique<size_type[]>(max_vec_len);
 
   ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
   ar &boost::serialization::make_array(colnums.get(), max_vec_len);

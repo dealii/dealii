@@ -16,7 +16,6 @@
 
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -29,6 +28,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <memory>
 #include <sstream>
 
 
@@ -117,7 +117,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_RT_Bubbles<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_RT_Bubbles<dim>>(*this);
+  return std::make_unique<FE_RT_Bubbles<dim>>(*this);
 }
 
 
@@ -177,18 +177,18 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       switch (dim)
         {
           case 1:
-            quadrature = std_cxx14::make_unique<QAnisotropic<dim>>(high);
+            quadrature = std::make_unique<QAnisotropic<dim>>(high);
             break;
           case 2:
-            quadrature = std_cxx14::make_unique<QAnisotropic<dim>>(
-              ((d == 0) ? low : high), ((d == 1) ? low : high));
+            quadrature =
+              std::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
+                                                  ((d == 1) ? low : high));
             break;
           case 3:
             quadrature =
-              std_cxx14::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
-                                                        ((d == 1) ? low : high),
-                                                        ((d == 2) ? low :
-                                                                    high));
+              std::make_unique<QAnisotropic<dim>>(((d == 0) ? low : high),
+                                                  ((d == 1) ? low : high),
+                                                  ((d == 2) ? low : high));
             break;
           default:
             Assert(false, ExcNotImplemented());

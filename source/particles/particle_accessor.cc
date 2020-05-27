@@ -137,7 +137,18 @@ namespace Particles
     Assert(particle != map->end(), ExcInternalError());
 
     particle->second.set_properties(new_properties);
-    return;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  ParticleAccessor<dim, spacedim>::set_properties(
+    const ArrayView<const double> &new_properties)
+  {
+    Assert(particle != map->end(), ExcInternalError());
+
+    particle->second.set_properties(new_properties);
   }
 
 

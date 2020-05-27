@@ -31,26 +31,6 @@ namespace Threads
 {
   namespace internal
   {
-    static std::atomic<unsigned int> n_existing_threads_counter(1);
-
-
-    void
-    register_thread()
-    {
-      ++n_existing_threads_counter;
-    }
-
-
-
-    void
-    deregister_thread()
-    {
-      --n_existing_threads_counter;
-      Assert(n_existing_threads_counter >= 1, ExcInternalError());
-    }
-
-
-
     [[noreturn]] void
     handle_std_exception(const std::exception &exc) {
       // lock the following context
@@ -62,7 +42,7 @@ namespace Threads
       // std::abort, though
       static Mutex mutex;
       {
-        Mutex::ScopedLock lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
 
         std::cerr
           << std::endl
@@ -101,7 +81,7 @@ namespace Threads
       // std::abort, though
       static Mutex mutex;
       {
-        Mutex::ScopedLock lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
 
         std::cerr
           << std::endl
@@ -122,29 +102,6 @@ namespace Threads
       std::abort();
     }
   } // namespace internal
-
-
-
-  unsigned int
-  n_existing_threads()
-  {
-    return internal::n_existing_threads_counter;
-  }
-
-
-  unsigned int
-  this_thread_id()
-  {
-#ifdef SYS_gettid
-    const pid_t this_id = syscall(SYS_gettid);
-#elif defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETPID)
-    const pid_t this_id = getpid();
-#else
-    const unsigned int this_id = 0;
-#endif
-
-    return static_cast<unsigned int>(this_id);
-  }
 
 
 

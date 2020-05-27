@@ -535,7 +535,7 @@ namespace Utilities
           else
 #      endif
             {
-#      ifdef DEAL_II_WITH_CXX17
+#      ifdef DEAL_II_HAVE_CXX17
               if constexpr (std::is_trivial<Number>::value)
 #      else
             if (std::is_trivial<Number>::value)
@@ -738,7 +738,7 @@ namespace Utilities
           else
 #    endif
             {
-#    ifdef DEAL_II_WITH_CXX17
+#    ifdef DEAL_II_HAVE_CXX17
               if constexpr (std::is_trivial<Number>::value)
 #    else
             if (std::is_trivial<Number>::value)

@@ -24,13 +24,14 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -161,7 +162,7 @@ std::unique_ptr<Manifold<dim, spacedim>>
 CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
   clone() const
 {
-  return std_cxx14::make_unique<
+  return std::make_unique<
     CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>>(
     *F, *G);
 }

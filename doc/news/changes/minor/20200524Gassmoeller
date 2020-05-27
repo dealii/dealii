@@ -1,0 +1,5 @@
+New: The class ParticleHandler now provides a signal 'signals.particle_lost'
+that is triggered whenever a particles can not be associated with a cell while
+calling its function sort_particles_into_subdomains_and_cells().
+<br>
+(Rene Gassmoeller, 2020/05/25)

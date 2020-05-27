@@ -84,7 +84,7 @@ to as $\mathcal{L}^2$ penalization whereas if the penalization depends
 on both the velocity and its gradient, it is an $\mathcal{H}^1$ penalization.
 The case of the $\mathcal{L}^2$ penalization is very similar to a Darcy-type
 approach. Both $\mathcal{L}^2$ and $\mathcal{H}^1$ penalizations have been
-analyzed extensively (see, for example, Angot 1999).
+analyzed extensively (see, for example, @cite Angot1999).
 
 - The embedded domain $\Gamma$ has an intrinsic dimension `dim` which is smaller
 than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
@@ -93,8 +93,9 @@ surface embedded in a three-dimensional domain. This is of course
 physically impossible, but one may consider very thin sheets of metal
 moving in a fluid as essentially lower-dimensional if the thickness of
 the sheet is negligible. In this case, the boundary
-condition is imposed weakly on $\Gamma$ by applying the <a href="https://en.wikipedia.org/wiki/Joachim_Nitsche">Nitsche</a> method (see
-Freund, 1995).
+condition is imposed weakly on $\Gamma$ by applying the
+<a href="https://en.wikipedia.org/wiki/Joachim_Nitsche">Nitsche</a> method (see
+@cite Freund1995).
 
 Both approaches have very similar requirements and result in highly
 similar formulations. Thus, we treat them almost in the same way.
@@ -199,8 +200,8 @@ on the fluid domain, where no strong conditions on the test functions on $\Gamma
  + \beta (\textbf{v},\textbf{g})_{\Gamma}.
 @f}
 
-The integrals over $\Gamma$ are lower-dimensional integrals. It can be shown (see  Freund,
-1995) that there exists a positive constant
+The integrals over $\Gamma$ are lower-dimensional integrals. It can be shown (see
+@cite Freund1995) that there exists a positive constant
 $C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
 be consistent and stable. The first two additional integrals on $\Gamma$ (the
 second line in the equation above) appear naturally after integrating by parts,
@@ -426,27 +427,51 @@ of processor and the number of cells in $\Gamma$ increases, this leads
 to a severe bottleneck in terms of memory. Consequently, an alternative strategy is sought
 in this step.
 
-When looking at the formulation for both the penalization approach ($\mathcal{L}^2$ or $\mathcal{H}^1$)
-and the Nitsche method, we can come to the conclusion that we only require limited information
-related to $\Gamma$ on its quadrature points that is:
-- Their reference location with regard to the embedding fluid cell;
-- The weights times the Jacobian of the transformation, i.e. `JxW`.
 
+<h4>Using particles to track Γ</h4>
+
+Remember that for both the penalization approach ($\mathcal{L}^2$ or $\mathcal{H}^1$)
+and the Nitsche method, we want to compute integrals that are approximated by
+the quadrature. That is, we need to compute
+\f[
+\beta (\textbf{v},\textbf{u})_{\Gamma} =
+\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat{\textbf{u}}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
+\f]
+If you followed the discussion above, then you will recall that $\textbf{u}$
+and $\textbf{v}$ are shape functions defined on the fluid mesh.
+The only things defined on the solid mesh are:
+$F_K(\hat x_i)$, which is the location of a quadrature point on a solid cell that
+is part of $\Gamma$, $J_K$ is the determinant of its Jacobian, and $w_i$ the corresponding
+quadrature weight.
+
+The important part to realize is now this: $w_i$ is a property of
+the quadrature formula and does not change with time. Furthermore,
+the Jacobian matrix of $F_K$ itself changes as the solid obstacle
+moves around in the fluid, but because the solid is considered
+non-deforming (it only translates and rotates, but doesn't dilate),
+the determinant of the Jacobian remains constant. As a consequence,
+the product $J_K(\hat x_i) w_i$ (which we typically denote by `JxW`)
+remains constant for each quadrature point. So the only thing we need
+keep track of are the positions $x_i=F_K(\hat x_i)$ -- but these
+move with the velocity of the solid domain.
+
+In other words, we don't actually need to keep the solid mesh at all.
+All we need is the positions $x_i(t)$ and corresponding `JxW` values.
 Since both of these properties are point-properties (or point-vectors) that are
 attached to the solid material, they can be idealized as a set of disconnected
-infinitesimally small particles, which carry the required information with the
-movement of the solid. deal.II already possesses the ability to distribute and
-store such a set of particles in large-scale parallel computations in form of
-the ParticleHandler class (for details on the implementation see Gassmöller et
-al., 2018), and we will make use of this functionality in this tutorial.
+infinitesimally small "particles", which carry the required `JxW` information with the
+movement of the solid. deal.II has the ability to distribute and
+store such a set of particles in large-scale parallel computations in the form of
+the ParticleHandler class (for details on the implementation see @cite GLHPW2018),
+and we will make use of this functionality in this tutorial.
 
 Thus, the approach taken in this step is as follows:
-- Create a parallel::distributed::Triangulation for the domain $\Gamma$
-- Create Particles::Particle at the position of the quadrature points on $\Gamma$
+- Create a parallel::distributed::Triangulation for the domain $\Gamma$;
+- Create Particles::Particle at the positions of the quadrature points on $\Gamma$;
 - Call the Particles::ParticleHandler::insert_global_particles() function,
   to distribute the particles across processors, *following the solid
-  triangulation*
-- Attach the quadrature weight as a property to each Particles::Particle object.
+  triangulation*;
+- Attach the `JxW` values as a "property" to each Particles::Particle object.
 
 This structure is relatively expensive to generate, but must only be generated
 once per simulation. Once the Particles::ParticleHandler is generated and the
@@ -497,31 +522,14 @@ case, this is illustrated by inserting a circle of passive tracer particles that
 are advected by the fluid and which return to their original position, thus
 demonstrating the time-reversibility of the flow.
 
-<h3>References</h3>
 
-<ul>
-<li> Freund, J., Stenberg, R. (1995). "On weakly imposed boundary conditions for
-  second order problems". Proceedings of the Ninth International Conference on
-  Finite Elements in Fluids. 327-336.
+<h3> More references</h3>
 
-<li> Angot, Philippe, Charles-Henri Bruneau and Pierre Fabrie. 1999. "A penalization
-  method to take into account obstacles in incompressible viscous flows."
-  Numerische Mathematik 81.4 : 497-520.
-
-<li> Glowinski, R., T.-W. Pan, T.I. Hesla, and D.D. Joseph. 1999. “A Distributed
-  Lagrange Multiplier/fictitious Domain Method for Particulate Flows.”
-  International Journal of Multiphase Flow 25 (5). Pergamon: 755–94.
-
-<li> Boffi, D., L. Gastaldi, L. Heltai, and C.S. Peskin. 2008. “On the
-  Hyper-Elastic Formulation of the Immersed Boundary Method.” Computer Methods
-  in Applied Mechanics and Engineering 197 (25–28).
-
-<li> Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
-  Finite Element Methods.” Computer Methods in Applied Mechanics and Engineering
-  229–232.
-
-<li> Gassmöller, R., H. Lokavarapu, E. Heien, E. G. Puckett, and
-  W. Bangerth. 2018.  "Flexible and Scalable Particle‐in‐Cell Methods
-  With Adaptive Mesh Refinement for Geodynamic Computations."
-  Geochemistry, Geophysics, Geosystems 19(9).  3596-3604.
-</ul>
+This tutorial program uses a number of techniques on imposing velocity
+conditions on non-matching interfaces in the interior of the fluid.
+For more background material, you may want to look up the following references:
+@cite Freund1995,
+@cite Angot1999,
+@cite Glowinski1999,
+@cite Boffi2008,
+@cite Heltai2012.

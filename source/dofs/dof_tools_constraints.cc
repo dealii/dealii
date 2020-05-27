@@ -41,8 +41,6 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #endif
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <algorithm>
 #include <array>
 #include <memory>
@@ -309,7 +307,7 @@ namespace DoFTools
         if (master_dof_mask == nullptr)
           {
             master_dof_mask =
-              std_cxx14::make_unique<std::vector<bool>>(fe1.dofs_per_face);
+              std::make_unique<std::vector<bool>>(fe1.dofs_per_face);
             select_master_dofs_for_face_restriction(fe1,
                                                     fe2,
                                                     face_interpolation_matrix,
@@ -333,9 +331,8 @@ namespace DoFTools
       {
         if (matrix == nullptr)
           {
-            matrix =
-              std_cxx14::make_unique<FullMatrix<double>>(fe2.dofs_per_face,
-                                                         fe1.dofs_per_face);
+            matrix = std::make_unique<FullMatrix<double>>(fe2.dofs_per_face,
+                                                          fe1.dofs_per_face);
             fe1.get_face_interpolation_matrix(fe2, *matrix);
           }
       }
@@ -355,9 +352,8 @@ namespace DoFTools
       {
         if (matrix == nullptr)
           {
-            matrix =
-              std_cxx14::make_unique<FullMatrix<double>>(fe2.dofs_per_face,
-                                                         fe1.dofs_per_face);
+            matrix = std::make_unique<FullMatrix<double>>(fe2.dofs_per_face,
+                                                          fe1.dofs_per_face);
             fe1.get_subface_interpolation_matrix(fe2, subface, *matrix);
           }
       }
@@ -385,7 +381,7 @@ namespace DoFTools
 
         if (split_matrix == nullptr)
           {
-            split_matrix = std_cxx14::make_unique<
+            split_matrix = std::make_unique<
               std::pair<FullMatrix<double>, FullMatrix<double>>>();
 
             const unsigned int n_master_dofs = face_interpolation_matrix.n();

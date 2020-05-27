@@ -17,7 +17,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/utilities.h>
 
@@ -33,6 +32,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 
@@ -135,7 +135,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_ABF<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_ABF<dim>>(rt_order);
+  return std::make_unique<FE_ABF<dim>>(rt_order);
 }
 
 

@@ -155,8 +155,10 @@ namespace Step27
 
     const std::vector<unsigned int> n_coefficients_per_direction(
       fe_collection.size(), max_degree);
-    fourier = std_cxx14::make_unique<FESeries::Fourier<dim>>(
-      n_coefficients_per_direction, fe_collection, fourier_q_collection);
+    fourier =
+      std::make_unique<FESeries::Fourier<dim>>(n_coefficients_per_direction,
+                                               fe_collection,
+                                               fourier_q_collection);
   }
 
 

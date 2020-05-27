@@ -219,7 +219,7 @@ SparseMatrix<number>::operator=(const double d)
       grain_size);
   else if (matrix_size > 0)
     {
-#ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
       if constexpr (std::is_trivial<number>::value)
 #else
       if (std::is_trivial<number>::value)
@@ -269,7 +269,7 @@ SparseMatrix<number>::reinit(const SparsityPattern &sparsity)
   const std::size_t N = cols->n_nonzero_elements();
   if (N > max_len || max_len == 0)
     {
-      val     = std_cxx14::make_unique<number[]>(N);
+      val     = std::make_unique<number[]>(N);
       max_len = N;
     }
 
@@ -2056,7 +2056,7 @@ SparseMatrix<number>::block_read(std::istream &in)
   AssertThrow(c == '[', ExcIO());
 
   // reallocate space
-  val = std_cxx14::make_unique<number[]>(max_len);
+  val = std::make_unique<number[]>(max_len);
 
   // then read data
   in.read(reinterpret_cast<char *>(val.get()),

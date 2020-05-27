@@ -141,11 +141,11 @@ namespace internal
 {
   namespace AffineConstraints
   {
-#define SCRATCH_INITIALIZER(number, Name)                                     \
-  AffineConstraintsData<number>::ScratchData scratch_data_initializer_##Name; \
-  template <>                                                                 \
-  Threads::ThreadLocalStorage<AffineConstraintsData<number>::ScratchData>     \
-    AffineConstraintsData<number>::scratch_data(                              \
+#define SCRATCH_INITIALIZER(number, Name)              \
+  ScratchData<number> scratch_data_initializer_##Name; \
+  template <>                                          \
+  Threads::ThreadLocalStorage<ScratchData<number>>     \
+    AffineConstraintsData<number>::scratch_data(       \
       scratch_data_initializer_##Name)
 
     SCRATCH_INITIALIZER(double, d);

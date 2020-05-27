@@ -14,12 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <memory>
 #include <sstream>
 
 
@@ -184,7 +184,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_DGPMonomial<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGPMonomial<dim>>(*this);
+  return std::make_unique<FE_DGPMonomial<dim>>(*this);
 }
 
 

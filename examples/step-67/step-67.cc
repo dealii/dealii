@@ -2012,7 +2012,7 @@ namespace Euler_DG
             triangulation.refine_global(2);
 
             euler_operator.set_inflow_boundary(
-              0, std_cxx14::make_unique<ExactSolution<dim>>(0));
+              0, std::make_unique<ExactSolution<dim>>(0));
 
             break;
           }
@@ -2023,16 +2023,16 @@ namespace Euler_DG
               triangulation, 0.03, 1, 0, true);
 
             euler_operator.set_inflow_boundary(
-              0, std_cxx14::make_unique<ExactSolution<dim>>(0));
+              0, std::make_unique<ExactSolution<dim>>(0));
             euler_operator.set_subsonic_outflow_boundary(
-              1, std_cxx14::make_unique<ExactSolution<dim>>(0));
+              1, std::make_unique<ExactSolution<dim>>(0));
 
             euler_operator.set_wall_boundary(2);
             euler_operator.set_wall_boundary(3);
 
             if (dim == 3)
               euler_operator.set_body_force(
-                std_cxx14::make_unique<Functions::ConstantFunction<dim>>(
+                std::make_unique<Functions::ConstantFunction<dim>>(
                   std::vector<double>({0., 0., -0.2})));
 
             break;

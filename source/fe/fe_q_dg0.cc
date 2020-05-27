@@ -17,7 +17,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -26,6 +25,7 @@
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q_dg0.h>
 
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -173,7 +173,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Q_DG0<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_DG0<dim, spacedim>>(*this);
+  return std::make_unique<FE_Q_DG0<dim, spacedim>>(*this);
 }
 
 

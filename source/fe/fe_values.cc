@@ -19,7 +19,6 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/differentiation/ad.h>
 
@@ -48,6 +47,7 @@
 #include <boost/container/small_vector.hpp>
 
 #include <iomanip>
+#include <memory>
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -4468,8 +4468,8 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   if (flags & update_mapping)
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
-    this->mapping_data = std_cxx14::make_unique<
-      typename Mapping<dim, spacedim>::InternalDataBase>();
+    this->mapping_data =
+      std::make_unique<typename Mapping<dim, spacedim>::InternalDataBase>();
 }
 
 
@@ -4499,7 +4499,7 @@ namespace
       }
     else
       // if the types don't match, there is nothing we can do here
-      present_cell = std_cxx14::make_unique<Type>(new_cell);
+      present_cell = std::make_unique<Type>(new_cell);
   }
 } // namespace
 
@@ -4728,8 +4728,8 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   if (flags & update_mapping)
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
-    this->mapping_data = std_cxx14::make_unique<
-      typename Mapping<dim, spacedim>::InternalDataBase>();
+    this->mapping_data =
+      std::make_unique<typename Mapping<dim, spacedim>::InternalDataBase>();
 }
 
 
@@ -4929,8 +4929,8 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   if (flags & update_mapping)
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
-    this->mapping_data = std_cxx14::make_unique<
-      typename Mapping<dim, spacedim>::InternalDataBase>();
+    this->mapping_data =
+      std::make_unique<typename Mapping<dim, spacedim>::InternalDataBase>();
 }
 
 

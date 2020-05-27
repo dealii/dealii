@@ -19,12 +19,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/utilities.h>
 
 #include <boost/signals2/signal.hpp>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -597,7 +598,7 @@ ImplicitQR<VectorType>::append_column(const VectorType &column)
   if (this->current_size == 0)
     {
       this->R.grow_or_shrink(this->current_size + 1);
-      this->columns.push_back(std_cxx14::make_unique<VectorType>(column));
+      this->columns.push_back(std::make_unique<VectorType>(column));
       this->R(0, 0) = column.l2_norm();
       ++this->current_size;
     }
@@ -630,7 +631,7 @@ ImplicitQR<VectorType>::append_column(const VectorType &column)
 
       // at this point we update is successful and we can enlarge R
       // and store the column:
-      this->columns.push_back(std_cxx14::make_unique<VectorType>(column));
+      this->columns.push_back(std::make_unique<VectorType>(column));
       this->R.grow_or_shrink(this->current_size + 1);
       this->R(this->current_size, this->current_size) = std::sqrt(rho2);
       for (unsigned int i = 0; i < this->current_size; ++i)
@@ -756,7 +757,7 @@ QR<VectorType>::append_column(const VectorType &column)
 {
   // resize R:
   this->R.grow_or_shrink(this->current_size + 1);
-  this->columns.push_back(std_cxx14::make_unique<VectorType>(column));
+  this->columns.push_back(std::make_unique<VectorType>(column));
 
   // now a Gram-Schmidt part: orthonormalize the new column
   // against everything we have so far:

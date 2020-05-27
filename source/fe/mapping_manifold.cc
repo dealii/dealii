@@ -20,7 +20,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -152,7 +151,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingManifold<dim, spacedim>>(*this);
+  return std::make_unique<MappingManifold<dim, spacedim>>(*this);
 }
 
 
@@ -271,7 +270,7 @@ MappingManifold<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                          const Quadrature<dim> &q) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize(this->requires_update_flags(update_flags), q, q.size());
 
@@ -287,7 +286,7 @@ MappingManifold<dim, spacedim>::get_face_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_faces(quadrature),
@@ -305,7 +304,7 @@ MappingManifold<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>();
+    std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_subfaces(quadrature),

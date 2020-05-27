@@ -403,8 +403,7 @@ namespace CUDAWrappers
     if (use_coloring)
       dst[destination_idx] += values[idx];
     else
-      LinearAlgebra::CUDAWrappers::atomicAdd_wrapper(&dst[destination_idx],
-                                                     values[idx]);
+      atomicAdd(&dst[destination_idx], values[idx]);
   }
 
 

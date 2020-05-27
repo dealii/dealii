@@ -23,9 +23,9 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor.h>
 
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -82,7 +82,7 @@ public:
   std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override
   {
-    return std_cxx14::make_unique<PolynomialsP<dim>>(*this);
+    return std::make_unique<PolynomialsP<dim>>(*this);
   }
 
 private:

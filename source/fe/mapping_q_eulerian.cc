@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -36,6 +35,8 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -86,7 +87,7 @@ template <int dim, class VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQEulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQEulerian<dim, VectorType, spacedim>>(
+  return std::make_unique<MappingQEulerian<dim, VectorType, spacedim>>(
     this->get_degree(), *euler_dof_handler, *euler_vector);
 }
 

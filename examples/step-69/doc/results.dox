@@ -151,3 +151,57 @@ And with the following result:
 
 That's substantially better, although of course at the price of having run
 the code for roughly 2 hours on 16 cores.
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The program showcased here is really only first-order accurate, as
+discussed above. The pictures above illustrate how much diffusion that
+introduces and how far the solution is from one that actually resolves
+the features we care about.
+
+This can be fixed, but it would exceed what a *tutorial* is
+about. Nevertheless, it is worth showing what one can achieve by
+adding a second-order scheme. For example, here is a video that shows
+(with a different color scheme) a 2d simulation that corresponds to
+the cases shown above:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/xIwJZlsXpZ4"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+This simulation was done with 38 million degrees of freedom
+(continuous $Q_1$ finite elements) per component of the solution
+vector. The exquisite detail of the solution is remarkable for these
+kinds of simulations, including in the sub-sonic region behind the
+obstacle.
+
+One can also with relative ease further extend this to the 3d case:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/vBCRAF_c8m8"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+Solving this becomes expensive, however: The simulation was done with
+1,817 million degrees of freedom (continuous $Q_1$ finite elements)
+per component (for a total of 9.09 billion spatial degrees of freedom)
+and ran on 30,720 MPI ranks. The code achieved an average througput of
+969M grid points per second (0.04M gridpoints per second per CPU). The
+front and back wall show a "Schlieren plot": the magnitude of the
+gradient of the density on an exponential scale from white (low) to
+black (high). All other cutplanes and the surface of the obstacle show
+the magnitude of the vorticity on a white (low) - yellow (medium) -
+red (high) scale. (The scales of the individual cutplanes have been
+adjusted for a nicer visualization.)

@@ -51,8 +51,8 @@ execute(Threads::Mutex &m)
   AssertThrow(exists == true, ExcInternalError());
 
   // wait for the barrier to clear
-  m.acquire();
-  m.release();
+  m.lock();
+  m.unlock();
 
   // at this point, the tls object should have been cleared and should
   // be back at its original value
@@ -68,22 +68,22 @@ test()
   const unsigned int N = 10;
   Threads::Mutex     m[N];
 
-  // start N threads with mutices locked
+  // start N threads with mutexes locked
   Threads::ThreadGroup<> tg;
   for (unsigned int i = 0; i < N; ++i)
     {
-      m[i].acquire();
+      m[i].lock();
       tg += Threads::new_thread(execute, m[i]);
     }
 
   // let threads work through their first part
   std::this_thread::sleep_for(std::chrono::seconds(3));
 
-  // then reset the thread local object and release the mutices so the
+  // then reset the thread local object and release the mutexes so the
   // threads can actually run to an end
   tls_data.clear();
   for (unsigned int i = 0; i < N; ++i)
-    m[i].release();
+    m[i].unlock();
 
   // now make sure the threads all finish
   tg.join_all();

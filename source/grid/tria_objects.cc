@@ -214,17 +214,6 @@ namespace internal
           refinement_cases.insert(refinement_cases.end(),
                                   new_size - refinement_cases.size(),
                                   RefinementCase<3>::no_refinement);
-
-          face_flips.reserve(new_size * GeometryInfo<3>::faces_per_cell);
-          face_flips.insert(face_flips.end(),
-                            new_size * GeometryInfo<3>::faces_per_cell -
-                              face_flips.size(),
-                            false);
-          face_rotations.reserve(new_size * GeometryInfo<3>::faces_per_cell);
-          face_rotations.insert(face_rotations.end(),
-                                new_size * GeometryInfo<3>::faces_per_cell -
-                                  face_rotations.size(),
-                                false);
         }
       next_free_single = next_free_pair = 0;
     }
@@ -360,14 +349,6 @@ namespace internal
                face_orientations.size(),
              ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell,
                               face_orientations.size()));
-      Assert(cells.size() * GeometryInfo<3>::faces_per_cell ==
-               face_flips.size(),
-             ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell,
-                              face_flips.size()));
-      Assert(cells.size() * GeometryInfo<3>::faces_per_cell ==
-               face_rotations.size(),
-             ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell,
-                              face_rotations.size()));
     }
 
 
@@ -406,8 +387,6 @@ namespace internal
     {
       TriaObjects<TriaObject<3>>::clear();
       face_orientations.clear();
-      face_flips.clear();
-      face_rotations.clear();
     }
 
 
@@ -438,8 +417,6 @@ namespace internal
     TriaObjectsHex::memory_consumption() const
     {
       return (MemoryConsumption::memory_consumption(face_orientations) +
-              MemoryConsumption::memory_consumption(face_flips) +
-              MemoryConsumption::memory_consumption(face_rotations) +
               TriaObjects<TriaObject<3>>::memory_consumption());
     }
 

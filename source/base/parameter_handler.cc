@@ -774,7 +774,7 @@ ParameterHandler::parse_input_from_json(std::istream &in,
 void
 ParameterHandler::clear()
 {
-  entries = std_cxx14::make_unique<boost::property_tree::ptree>();
+  entries = std::make_unique<boost::property_tree::ptree>();
   entries_set_status.clear();
 }
 

@@ -76,6 +76,18 @@ DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
 
 
 template <int structdim, int dim, int spacedim>
+types::global_dof_index
+DoFInvalidAccessor<structdim, dim, spacedim>::dof_index(
+  const unsigned int,
+  const unsigned int) const
+{
+  Assert(false, ExcInternalError());
+  return 0;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 void
 DoFInvalidAccessor<structdim, dim, spacedim>::set_dof_index(
   const unsigned int,
@@ -118,8 +130,11 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_indices(
 
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
-  internal::DoFCellAccessorImplementation::Implementation::set_dof_indices(
-    *this, local_dof_indices);
+  AssertDimension(local_dof_indices.size(), this->get_fe().dofs_per_cell);
+
+  internal::DoFAccessorImplementation::Implementation::
+    template set_dof_indices<DoFHandlerType, lda, DoFHandlerType::dimension>(
+      *this, local_dof_indices, this->active_fe_index());
 }
 
 

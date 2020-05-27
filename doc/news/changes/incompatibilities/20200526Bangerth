@@ -1,0 +1,8 @@
+Removed: The Threads::Task class had an `operator==` that allowed
+comparing objects of this type for equality. This operator has been
+removed. If you want to store objects of this kind in a collection
+that requires this kind of operator (say, `std::set`), then you
+probably can't do so any more in a reasonable way. However, this is
+exactly what the Threads::TaskGroup class is there for.
+<br>
+(Wolfgang Bangerth, 2020/05/26)

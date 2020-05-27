@@ -16,12 +16,12 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_piecewise.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <boost/container/small_vector.hpp>
 
 #include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -202,7 +202,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  return Tensor<1, 0>();
+  return {};
 }
 
 
@@ -258,7 +258,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  return Tensor<2, 0>();
+  return {};
 }
 
 
@@ -430,8 +430,7 @@ template <int dim, typename PolynomialType>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 TensorProductPolynomials<dim, PolynomialType>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductPolynomials<dim, PolynomialType>>(
-    *this);
+  return std::make_unique<TensorProductPolynomials<dim, PolynomialType>>(*this);
 }
 
 
@@ -738,7 +737,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 AnisotropicPolynomials<dim>::clone() const
 {
-  return std_cxx14::make_unique<AnisotropicPolynomials<dim>>(*this);
+  return std::make_unique<AnisotropicPolynomials<dim>>(*this);
 }
 
 

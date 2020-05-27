@@ -1289,6 +1289,16 @@ public:
   DoFInvalidAccessor(const OtherAccessor &);
 
   /**
+   * Return the index of the <i>i</i>th degree of freedom of this object to
+   * @p index. Since the current object doesn't point to anything useful, like
+   * all other functions in this class this function only throws an exception.
+   */
+  types::global_dof_index
+  dof_index(const unsigned int i,
+            const unsigned int fe_index =
+              DoFHandler<dim, spacedim>::default_fe_index) const;
+
+  /**
    * Set the index of the <i>i</i>th degree of freedom of this object to @p
    * index. Since the current object doesn't point to anything useful, like
    * all other functions in this class this function only throws an exception.

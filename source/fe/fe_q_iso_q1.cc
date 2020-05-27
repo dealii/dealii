@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
@@ -23,6 +22,7 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -100,7 +100,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Q_iso_Q1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_iso_Q1<dim, spacedim>>(*this);
+  return std::make_unique<FE_Q_iso_Q1<dim, spacedim>>(*this);
 }
 
 

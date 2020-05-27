@@ -594,7 +594,7 @@ namespace Step60
   // @sect3{Set up}
   //
   // The function `DistributedLagrangeProblem::setup_grids_and_dofs()` is used
-  // to set up the finite element spaces. Notice how `std_cxx14::make_unique` is
+  // to set up the finite element spaces. Notice how `std::make_unique` is
   // used to create objects wrapped inside `std::unique_ptr` objects.
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_grids_and_dofs()
@@ -603,7 +603,7 @@ namespace Step60
 
     // Initializing $\Omega$: constructing the Triangulation and wrapping it
     // into a `std::unique_ptr` object
-    space_grid = std_cxx14::make_unique<Triangulation<spacedim>>();
+    space_grid = std::make_unique<Triangulation<spacedim>>();
 
     // Next, we actually create the triangulation using
     // GridGenerator::hyper_cube(). The last argument is set to true: this
@@ -617,22 +617,22 @@ namespace Step60
     // GridTools::Cache with it.
     space_grid->refine_global(parameters.initial_refinement);
     space_grid_tools_cache =
-      std_cxx14::make_unique<GridTools::Cache<spacedim, spacedim>>(*space_grid);
+      std::make_unique<GridTools::Cache<spacedim, spacedim>>(*space_grid);
 
     // The same is done with the embedded grid. Since the embedded grid is
     // deformed, we first need to setup the deformation mapping. We do so in the
     // following few lines:
-    embedded_grid = std_cxx14::make_unique<Triangulation<dim, spacedim>>();
+    embedded_grid = std::make_unique<Triangulation<dim, spacedim>>();
     GridGenerator::hyper_cube(*embedded_grid);
     embedded_grid->refine_global(parameters.initial_embedded_refinement);
 
-    embedded_configuration_fe = std_cxx14::make_unique<FESystem<dim, spacedim>>(
+    embedded_configuration_fe = std::make_unique<FESystem<dim, spacedim>>(
       FE_Q<dim, spacedim>(
         parameters.embedded_configuration_finite_element_degree),
       spacedim);
 
     embedded_configuration_dh =
-      std_cxx14::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
+      std::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
 
     embedded_configuration_dh->distribute_dofs(*embedded_configuration_fe);
     embedded_configuration.reinit(embedded_configuration_dh->n_dofs());
@@ -671,16 +671,16 @@ namespace Step60
 
     if (parameters.use_displacement == true)
       embedded_mapping =
-        std_cxx14::make_unique<MappingQEulerian<dim, Vector<double>, spacedim>>(
+        std::make_unique<MappingQEulerian<dim, Vector<double>, spacedim>>(
           parameters.embedded_configuration_finite_element_degree,
           *embedded_configuration_dh,
           embedded_configuration);
     else
       embedded_mapping =
-        std_cxx14::make_unique<MappingFEField<dim,
-                                              spacedim,
-                                              Vector<double>,
-                                              DoFHandler<dim, spacedim>>>(
+        std::make_unique<MappingFEField<dim,
+                                        spacedim,
+                                        Vector<double>,
+                                        DoFHandler<dim, spacedim>>>(
           *embedded_configuration_dh, embedded_configuration);
 
     setup_embedded_dofs();
@@ -836,8 +836,8 @@ namespace Step60
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_embedding_dofs()
   {
-    space_dh = std_cxx14::make_unique<DoFHandler<spacedim>>(*space_grid);
-    space_fe = std_cxx14::make_unique<FE_Q<spacedim>>(
+    space_dh = std::make_unique<DoFHandler<spacedim>>(*space_grid);
+    space_fe = std::make_unique<FE_Q<spacedim>>(
       parameters.embedding_space_finite_element_degree);
     space_dh->distribute_dofs(*space_fe);
 
@@ -863,9 +863,8 @@ namespace Step60
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_embedded_dofs()
   {
-    embedded_dh =
-      std_cxx14::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
-    embedded_fe = std_cxx14::make_unique<FE_Q<dim, spacedim>>(
+    embedded_dh = std::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
+    embedded_fe = std::make_unique<FE_Q<dim, spacedim>>(
       parameters.embedded_space_finite_element_degree);
     embedded_dh->distribute_dofs(*embedded_fe);
 

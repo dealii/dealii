@@ -297,7 +297,7 @@ namespace Patterns
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
       {
-        return std_cxx14::make_unique<Patterns::Selection>(
+        return std::make_unique<Patterns::Selection>(
           "mean|L1_norm|L2_norm|Lp_norm|"
           "Linfty_norm|H1_seminorm|Hdiv_seminorm|"
           "H1_norm|W1p_seminorm|W1p_norm|"

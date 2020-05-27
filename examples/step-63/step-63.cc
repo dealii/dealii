@@ -918,9 +918,9 @@ namespace Step63
         using Smoother = PreconditionSOR<SparseMatrix<double>>;
 
         auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
+          std::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
+                                                  Smoother,
+                                                  Vector<double>>>();
         smoother->initialize(mg_matrices,
                              Smoother::AdditionalData(fe.degree == 1 ? 1.0 :
                                                                        0.62));
@@ -931,9 +931,9 @@ namespace Step63
       {
         using Smoother = PreconditionJacobi<SparseMatrix<double>>;
         auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
+          std::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
+                                                  Smoother,
+                                                  Vector<double>>>();
         smoother->initialize(mg_matrices,
                              Smoother::AdditionalData(fe.degree == 1 ? 0.6667 :
                                                                        0.47));
@@ -991,7 +991,7 @@ namespace Step63
 
         if (settings.smoother_type == "block SOR")
           {
-            auto smoother = std_cxx14::make_unique<MGSmootherPrecondition<
+            auto smoother = std::make_unique<MGSmootherPrecondition<
               SparseMatrix<double>,
               RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>,
               Vector<double>>>();
@@ -1001,7 +1001,7 @@ namespace Step63
           }
         else if (settings.smoother_type == "block Jacobi")
           {
-            auto smoother = std_cxx14::make_unique<
+            auto smoother = std::make_unique<
               MGSmootherPrecondition<SparseMatrix<double>,
                                      RelaxationBlockJacobi<SparseMatrix<double>,
                                                            double,

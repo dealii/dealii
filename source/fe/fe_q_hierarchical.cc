@@ -14,13 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 
 #include <cmath>
+#include <memory>
 #include <sstream>
 
 // TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
@@ -141,7 +140,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_Q_Hierarchical<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_Hierarchical<dim>>(*this);
+  return std::make_unique<FE_Q_Hierarchical<dim>>(*this);
 }
 
 

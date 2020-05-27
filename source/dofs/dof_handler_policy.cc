@@ -175,21 +175,21 @@ namespace internal
                 {
                   case 0:
                     {
-                      identities = std_cxx14::make_unique<DoFIdentities>(
+                      identities = std::make_unique<DoFIdentities>(
                         fe1.hp_vertex_dof_identities(fe2));
                       break;
                     }
 
                   case 1:
                     {
-                      identities = std_cxx14::make_unique<DoFIdentities>(
+                      identities = std::make_unique<DoFIdentities>(
                         fe1.hp_line_dof_identities(fe2));
                       break;
                     }
 
                   case 2:
                     {
-                      identities = std_cxx14::make_unique<DoFIdentities>(
+                      identities = std::make_unique<DoFIdentities>(
                         fe1.hp_quad_dof_identities(fe2));
                       break;
                     }
@@ -1669,8 +1669,11 @@ namespace internal
                 {
                   dof_indices.resize(cell->get_fe().dofs_per_cell);
 
-                  internal::DoFAccessorImplementation::get_dof_indices(
-                    *cell, dof_indices, cell->active_fe_index());
+                  // circumvent cache
+                  internal::DoFAccessorImplementation::Implementation::
+                    get_dof_indices(*cell,
+                                    dof_indices,
+                                    cell->active_fe_index());
 
                   for (auto &dof_index : dof_indices)
                     if (dof_index == numbers::invalid_dof_index)

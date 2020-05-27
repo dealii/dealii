@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined __cpp_lib_ranges && __cpp_lib_ranges >= 201911
+#ifdef DEAL_II_HAVE_CXX20
 #  include <ranges>
 #else
 #  include <boost/range/irange.hpp>
@@ -29,9 +29,7 @@ namespace std_cxx20
 {
   namespace ranges
   {
-#if defined __cpp_lib_ranges && __cpp_lib_ranges >= 201911
-    using std::ranges::iota_view;
-#else
+#ifndef DEAL_II_HAVE_CXX20
     /**
      * A poor-man's implementation of std::ranges::iota_view using
      * boost's integer_range class. The two classes are not completely
@@ -46,6 +44,8 @@ namespace std_cxx20
      */
     template <typename IncrementableType, typename /*BoundType*/>
     using iota_view = boost::integer_range<IncrementableType>;
+#else
+    using std::ranges::iota_view;
 #endif
   } // namespace ranges
 } // namespace std_cxx20

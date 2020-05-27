@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/fe/fe_p1nc.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,7 +68,7 @@ FE_P1NC::requires_update_flags(const UpdateFlags flags) const
 std::unique_ptr<FiniteElement<2, 2>>
 FE_P1NC::clone() const
 {
-  return std_cxx14::make_unique<FE_P1NC>(*this);
+  return std::make_unique<FE_P1NC>(*this);
 }
 
 
@@ -140,8 +140,7 @@ FE_P1NC::get_data(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
 {
-  auto data_ptr =
-    std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
+  auto data_ptr = std::make_unique<FiniteElement<2, 2>::InternalDataBase>();
 
   data_ptr->update_each = requires_update_flags(update_flags);
 
@@ -165,8 +164,7 @@ FE_P1NC::get_face_data(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
 {
-  auto data_ptr =
-    std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
+  auto data_ptr = std::make_unique<FiniteElement<2, 2>::InternalDataBase>();
 
   data_ptr->update_each = requires_update_flags(update_flags);
 
@@ -190,8 +188,7 @@ FE_P1NC::get_subface_data(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
 {
-  auto data_ptr =
-    std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
+  auto data_ptr = std::make_unique<FiniteElement<2, 2>::InternalDataBase>();
 
   data_ptr->update_each = requires_update_flags(update_flags);
 

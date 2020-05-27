@@ -16,10 +16,10 @@
 
 #include <deal.II/base/polynomials_abf.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -185,7 +185,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsABF<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsABF<dim>>(*this);
+  return std::make_unique<PolynomialsABF<dim>>(*this);
 }
 
 

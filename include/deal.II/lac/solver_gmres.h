@@ -21,7 +21,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -33,6 +32,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -869,7 +869,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_ = std_cxx14::make_unique<dealii::Vector<double>>(gamma.size());
+      gamma_ = std::make_unique<dealii::Vector<double>>(gamma.size());
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;

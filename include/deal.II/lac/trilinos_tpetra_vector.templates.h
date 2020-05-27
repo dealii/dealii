@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -88,7 +86,7 @@ namespace LinearAlgebra
       Tpetra::Map<int, types::global_dof_index> input_map =
         parallel_partitioner.make_tpetra_map(communicator, false);
       if (vector->getMap()->isSameAs(input_map) == false)
-        vector = std_cxx14::make_unique<
+        vector = std::make_unique<
           Tpetra::Vector<Number, int, types::global_dof_index>>(Teuchos::rcp(
           new Tpetra::Map<int, types::global_dof_index>(input_map)));
       else if (omit_zeroing_entries == false)
@@ -140,7 +138,7 @@ namespace LinearAlgebra
                                Tpetra::REPLACE);
             }
           else
-            vector = std_cxx14::make_unique<
+            vector = std::make_unique<
               Tpetra::Vector<Number, int, types::global_dof_index>>(
               V.trilinos_vector());
         }

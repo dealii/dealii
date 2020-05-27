@@ -33,8 +33,8 @@ worker()
   // wait for the mutex to make sure the main
   // thread has already moved on. we can immediately
   // release the mutex again.
-  mutex.acquire();
-  mutex.release();
+  mutex.lock();
+  mutex.unlock();
   deallog << "OK." << std::endl;
   spin_lock = 1;
 }
@@ -46,7 +46,7 @@ main()
 {
   initlog();
 
-  mutex.acquire();
+  mutex.lock();
   // start and abandon the
   // thread. because we hold the
   // lock, the started task can not
@@ -66,7 +66,7 @@ main()
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // let abandoned thread continue
-  mutex.release();
+  mutex.unlock();
 
   // wait for thread to finish
   while (spin_lock == 0)

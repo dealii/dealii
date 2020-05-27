@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/particles/particle_handler.h>
 
+#include <memory>
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN
@@ -121,8 +120,7 @@ namespace Particles
     , handle(numbers::invalid_unsigned_int)
   {
     triangulation_cache =
-      std_cxx14::make_unique<GridTools::Cache<dim, spacedim>>(triangulation,
-                                                              mapping);
+      std::make_unique<GridTools::Cache<dim, spacedim>>(triangulation, mapping);
   }
 
 
@@ -138,13 +136,13 @@ namespace Particles
     mapping       = &new_mapping;
 
     // Create the memory pool that will store all particle properties
-    property_pool = std_cxx14::make_unique<PropertyPool>(n_properties);
+    property_pool = std::make_unique<PropertyPool>(n_properties);
 
     // Create the grid cache to cache the information about the triangulation
     // that is used to locate the particles into subdomains and cells
     triangulation_cache =
-      std_cxx14::make_unique<GridTools::Cache<dim, spacedim>>(new_triangulation,
-                                                              new_mapping);
+      std::make_unique<GridTools::Cache<dim, spacedim>>(new_triangulation,
+                                                        new_mapping);
   }
 
 
@@ -297,6 +295,30 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  types::particle_index
+  ParticleHandler<dim, spacedim>::n_particles_in_cell(
+    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+    const
+  {
+    const internal::LevelInd found_cell =
+      std::make_pair(cell->level(), cell->index());
+
+    if (cell->is_locally_owned())
+      return particles.count(found_cell);
+    else if (cell->is_ghost())
+      return ghost_particles.count(found_cell);
+    else
+      AssertThrow(false,
+                  ExcMessage("You can't ask for the particles on an artificial "
+                             "cell since we don't know what exists on these "
+                             "kinds of cells."));
+
+    return numbers::invalid_unsigned_int;
+  }
+
+
+
+  template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator_range
   ParticleHandler<dim, spacedim>::particles_in_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
@@ -323,11 +345,20 @@ namespace Particles
           particle_iterator(ghost_particles, particles_in_cell.first),
           particle_iterator(ghost_particles, particles_in_cell.second));
       }
+    else if (cell->is_locally_owned())
+      {
+        const auto particles_in_cell = particles.equal_range(level_index);
+        return boost::make_iterator_range(
+          particle_iterator(particles, particles_in_cell.first),
+          particle_iterator(particles, particles_in_cell.second));
+      }
+    else
+      AssertThrow(false,
+                  ExcMessage("You can't ask for the particles on an artificial "
+                             "cell since we don't know what exists on these "
+                             "kinds of cells."));
 
-    const auto particles_in_cell = particles.equal_range(level_index);
-    return boost::make_iterator_range(
-      particle_iterator(particles, particles_in_cell.first),
-      particle_iterator(particles, particles_in_cell.second));
+    return {};
   }
 
 
@@ -687,27 +718,6 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  unsigned int
-  ParticleHandler<dim, spacedim>::n_particles_in_cell(
-    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-    const
-  {
-    const internal::LevelInd found_cell =
-      std::make_pair(cell->level(), cell->index());
-
-    if (cell->is_locally_owned())
-      return particles.count(found_cell);
-    else if (cell->is_ghost())
-      return ghost_particles.count(found_cell);
-    else if (cell->is_artificial())
-      AssertThrow(false, ExcInternalError());
-
-    return 0;
-  }
-
-
-
-  template <int dim, int spacedim>
   types::particle_index
   ParticleHandler<dim, spacedim>::get_next_free_particle_index() const
   {
@@ -1022,6 +1032,8 @@ namespace Particles
                 {
                   // We can find no cell for this particle. It has left the
                   // domain due to an integration error or an open boundary.
+                  // Signal the loss and move on.
+                  signals.particle_lost(*it, current_cell);
                   continue;
                 }
             }
@@ -1624,22 +1636,12 @@ namespace Particles
             for (const auto &particle : loaded_particles_on_cell)
               {
                 // Use std::multimap::emplace_hint to speed up insertion of
-                // particles. This is a C++11 function, but not all compilers
-                // that report a -std=c++11 (like gcc 4.6) implement it, so
-                // require C++14 instead.
-#ifdef DEAL_II_WITH_CXX14
+                // particles.
                 position_hint =
                   particles.emplace_hint(position_hint,
                                          std::make_pair(cell->level(),
                                                         cell->index()),
                                          std::move(particle));
-#else
-                position_hint =
-                  particles.insert(position_hint,
-                                   std::make_pair(std::make_pair(cell->level(),
-                                                                 cell->index()),
-                                                  std::move(particle)));
-#endif
                 // Move the hint position forward by one, i.e., for the next
                 // particle. The 'hint' position will thus be right after the
                 // one just inserted.
@@ -1660,22 +1662,12 @@ namespace Particles
                                                        particle.get_location());
                 particle.set_reference_location(p_unit);
                 // Use std::multimap::emplace_hint to speed up insertion of
-                // particles. This is a C++11 function, but not all compilers
-                // that report a -std=c++11 (like gcc 4.6) implement it, so
-                // require C++14 instead.
-#ifdef DEAL_II_WITH_CXX14
+                // particles.
                 position_hint =
                   particles.emplace_hint(position_hint,
                                          std::make_pair(cell->level(),
                                                         cell->index()),
                                          std::move(particle));
-#else
-                position_hint =
-                  particles.insert(position_hint,
-                                   std::make_pair(std::make_pair(cell->level(),
-                                                                 cell->index()),
-                                                  std::move(particle)));
-#endif
                 // Move the hint position forward by one, i.e., for the next
                 // particle. The 'hint' position will thus be right after the
                 // one just inserted.
@@ -1718,23 +1710,12 @@ namespace Particles
                           {
                             particle.set_reference_location(p_unit);
                             // Use std::multimap::emplace_hint to speed up
-                            // insertion of particles. This is a C++11
-                            // function, but not all compilers that report a
-                            // -std=c++11 (like gcc 4.6) implement it, so
-                            // require C++14 instead.
-#ifdef DEAL_II_WITH_CXX14
+                            // insertion of particles.
                             position_hints[child_index] =
                               particles.emplace_hint(
                                 position_hints[child_index],
                                 std::make_pair(child->level(), child->index()),
                                 std::move(particle));
-#else
-                            position_hints[child_index] = particles.insert(
-                              position_hints[child_index],
-                              std::make_pair(std::make_pair(child->level(),
-                                                            child->index()),
-                                             std::move(particle)));
-#endif
                             // Move the hint position forward by one, i.e.,
                             // for the next particle. The 'hint' position will
                             // thus be right after the one just inserted.
