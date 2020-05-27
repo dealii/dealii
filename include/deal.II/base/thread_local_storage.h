@@ -19,22 +19,56 @@
 
 #  include <deal.II/base/config.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  ifdef DEAL_II_WITH_THREADS
-#    include <tbb/enumerable_thread_specific.h>
-#  endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#  include <deal.II/base/exceptions.h>
 
-
+#  include <list>
+#  include <map>
+#  include <shared_mutex>
+#  include <thread>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup threads */
 /*@{*/
 
+#  ifndef DOXYGEN
+class LogStream;
+#  endif
 
 namespace Threads
 {
+#  ifndef DOXYGEN
+  namespace internal
+  {
+    /*
+     * Workaround: The standard unfortunately has an unfortunate design
+     * "flaw" in the std::is_copy_constructible type trait
+     * when it comes to STL containers and containing non-copyable objects
+     * T. The type trait is true even though any attempted invocation leads
+     * to a compilation error. Work around this issue by unpacking some
+     * commonly used containers:
+     */
+    template <typename T>
+    struct unpack_container
+    {
+      using type = T;
+    };
+
+    template <typename T, typename A>
+    struct unpack_container<std::vector<T, A>>
+    {
+      using type = T;
+    };
+
+    template <typename T, typename A>
+    struct unpack_container<std::list<T, A>>
+    {
+      using type = T;
+    };
+  } // namespace internal
+#  endif
+
   /**
    * @brief A class that provides a separate storage location on each thread
    * that accesses the object.
@@ -43,12 +77,6 @@ namespace Threads
    * copy of an object of type T. In essence, accessing this object can never
    * result in race conditions in multithreaded programs since no other thread
    * than the current one can ever access it.
-   *
-   * The class builds on the Threading Building Blocks's
-   * tbb::enumerable_thread_specific class but wraps it in such a way that
-   * this class can also be used when deal.II is configured not to use threads
-   * at all -- in that case, this class simply stores a single copy of an
-   * object of type T.
    *
    * <h3>Construction and destruction</h3>
    *
@@ -71,6 +99,12 @@ namespace Threads
   template <typename T>
   class ThreadLocalStorage
   {
+    static_assert(
+      std::is_copy_constructible<
+        typename internal::unpack_container<T>::type>::value ||
+        std::is_default_constructible<T>::value,
+      "The stored type must be either copyable, or default constructible");
+
   public:
     /**
      * Default constructor. Initialize each thread local object using its
@@ -79,16 +113,30 @@ namespace Threads
     ThreadLocalStorage() = default;
 
     /**
-     * A kind of copy constructor. Initialize each thread local object by
-     * copying the given object.
+     * A kind of copy constructor. Initializes an internal exemplar by the
+     * given object. The exemplar is in turn used to initialize each thread
+     * local object instead of invoking the default constructor.
      */
     explicit ThreadLocalStorage(const T &t);
+
+    /**
+     * A kind of move constructor. Moves the given object into an internal
+     * exemplar. The exemplar is in turn used to initialize each thread
+     * local object instead of invoking the default constructor.
+     */
+    explicit ThreadLocalStorage(T &&t);
 
     /**
      * Copy constructor. Initialize each thread local object with the
      * corresponding object of the given object.
      */
-    ThreadLocalStorage(const ThreadLocalStorage<T> &t);
+    ThreadLocalStorage(const ThreadLocalStorage<T> &t) = default;
+
+    /**
+     * Move constructor. Copies the internal state over from the given
+     * object.
+     */
+    ThreadLocalStorage(ThreadLocalStorage<T> &&t) noexcept = default;
 
     /**
      * Return a reference to the data stored by this object for the current
@@ -137,6 +185,22 @@ namespace Threads
     operator=(const T &t);
 
     /**
+     * Move the given argument into the storage space used to represent the
+     * current thread. Calling this function as <code>tls_data =
+     * object</code> is equivalent to calling <code>tls_data.get() =
+     * object</code>. The intent of this operator is to make the
+     * ThreadLocalStorage object look more like the object it represents on
+     * the current thread. Move assignment operator.
+     *
+     * @param t The object to be copied into the storage space used for the
+     * current thread.
+     *
+     * @return The current object, after the changes have been made
+     */
+    ThreadLocalStorage<T> &
+    operator=(T &&t);
+
+    /**
      * Remove the thread-local objects stored for all threads that have
      * created one with this object (i.e., that have called get() at least
      * once on this thread. This includes the current thread. If you call
@@ -158,29 +222,32 @@ namespace Threads
     void
     clear();
 
-    /**
-     * Return a reference to the internal Threading Building Blocks
-     * implementation. This function is really only useful if deal.II has been
-     * configured with multithreading and has no useful purpose otherwise.
-     */
-#  ifdef DEAL_II_WITH_THREADS
-    tbb::enumerable_thread_specific<T> &
-#  else
-    T &
-#  endif
-    get_implementation();
-
   private:
-#  ifdef DEAL_II_WITH_THREADS
     /**
-     * The data element we store. If we support threads, then this object will
-     * be of a type that provides a separate object for each thread.
-     * Otherwise, it is simply a single object of type T.
+     * The data element we store.
      */
-    tbb::enumerable_thread_specific<T> data;
+    std::map<std::thread::id, T> data;
+
+    /**
+     * A mutex to guard insertion into the data object.
+     *
+     * We use a std::shared_timed_mutex (or std::shared_mutex if available)
+     * here to be able to use std::unique_lock and std::shared_lock for a
+     * readers-writer lock
+     * (https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock).
+     */
+#  ifdef DEAL_II_HAVE_CXX17
+    std::shared_mutex insertion_mutex;
 #  else
-    T data;
+    std::shared_timed_mutex insertion_mutex;
 #  endif
+
+    /**
+     * An exemplar for creating a new (thread specific) copy.
+     */
+    std::shared_ptr<const T> exemplar;
+
+    friend class dealii::LogStream;
   };
 } // namespace Threads
 /**
@@ -194,39 +261,101 @@ namespace Threads
 
   template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(const T &t)
-    : data(t)
+    : exemplar(std::make_shared<const T>(t))
   {}
 
 
   template <typename T>
-  inline ThreadLocalStorage<T>::ThreadLocalStorage(
-    const ThreadLocalStorage<T> &t)
-    : data(t)
+  inline ThreadLocalStorage<T>::ThreadLocalStorage(T &&t)
+    : exemplar(std::make_shared<T>(std::forward<T>(t)))
   {}
 
 
-  template <typename T>
-  inline T &
-  ThreadLocalStorage<T>::get()
+#    ifndef DOXYGEN
+  namespace internal
   {
-#    ifdef DEAL_II_WITH_THREADS
-    return data.local();
-#    else
-    return data;
+    /*
+     * We have to make sure not to call "data.emplace(id, *exemplar)" if
+     * the corresponding element is not copy constructible. We use some
+     * SFINAE magic to work around the fact that C++14 does not have
+     * "if constexpr".
+     */
+    template <typename T>
+    typename std::enable_if_t<
+      std::is_copy_constructible<typename unpack_container<T>::type>::value,
+      T &>
+    construct_element(std::map<std::thread::id, T> &  data,
+                      const std::thread::id &         id,
+                      const std::shared_ptr<const T> &exemplar)
+    {
+      if (exemplar)
+        {
+          const auto it = data.emplace(id, *exemplar).first;
+          return it->second;
+        }
+      return data[id];
+    }
+
+    template <typename T>
+    typename std::enable_if_t<
+      !std::is_copy_constructible<typename unpack_container<T>::type>::value,
+      T &>
+    construct_element(std::map<std::thread::id, T> &data,
+                      const std::thread::id &       id,
+                      const std::shared_ptr<const T> &)
+    {
+      return data[id];
+    }
+  } // namespace internal
 #    endif
-  }
 
 
   template <typename T>
   inline T &
   ThreadLocalStorage<T>::get(bool &exists)
   {
-#    ifdef DEAL_II_WITH_THREADS
-    return data.local(exists);
-#    else
-    exists = true;
-    return data;
-#    endif
+    const std::thread::id my_id = std::this_thread::get_id();
+
+    // Note that std::map<..>::emplace guarantees that no iterators or
+    // references to stored objects are invalidated. We thus only have to
+    // ensure that we do not perform a lookup while writing, and that we
+    // do not write concurrently. This is precisely the "reader-writer
+    // lock" paradigm supported by C++14 by means of the std::shared_lock
+    // and the std::unique_lock.
+
+    {
+      // Take a shared ("reader") lock for lookup and record the fact
+      // whether we could find an entry in the boolean exists.
+      std::shared_lock<decltype(insertion_mutex)> lock(insertion_mutex);
+
+      const auto it = data.find(my_id);
+      if (it != data.end())
+        {
+          exists = true;
+          return it->second;
+        }
+      else
+        {
+          exists = false;
+        }
+    }
+
+    {
+      // Take a unique ("writer") lock for manipulating the std::map. This
+      // lock ensures that no other threat does a lookup at the same time.
+      std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
+
+      return internal::construct_element(data, my_id, exemplar);
+    }
+  }
+
+
+  template <typename T>
+  inline T &
+  ThreadLocalStorage<T>::get()
+  {
+    bool exists;
+    return get(exists);
   }
 
 
@@ -247,28 +376,20 @@ namespace Threads
 
 
   template <typename T>
-  inline
-#    ifdef DEAL_II_WITH_THREADS
-    tbb::enumerable_thread_specific<T> &
-#    else
-    T &
-#    endif
-    ThreadLocalStorage<T>::get_implementation()
+  inline ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator=(T &&t)
   {
-    return data;
+    get() = std::forward<T>(t);
+    return *this;
   }
-
 
 
   template <typename T>
   inline void
   ThreadLocalStorage<T>::clear()
   {
-#    ifdef DEAL_II_WITH_THREADS
+    std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
     data.clear();
-#    else
-    data = T{};
-#    endif
   }
 } // namespace Threads
 

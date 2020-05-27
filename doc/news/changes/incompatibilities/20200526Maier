@@ -1,0 +1,7 @@
+Changed: The ThreadLocalStorage class has been reimplemented with C++14 STL
+primitives and does not depend on the TBB library any more. With that the
+obscure ThreadLocalStorage::get_implementation() function that exposed the
+underlying TBB container has been removed.
+<br>
+(Matthias Maier, 2020/05/23)
+
