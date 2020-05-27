@@ -111,13 +111,15 @@ SparseVanka<number>::compute_inverses()
 #else
   const size_type n_inverses =
     std::count(selected->begin(), selected->end(), true);
-  const std::size_t n_threads = MultithreadInfo::n_threads();
-  const size_type   n_inverses_per_thread =
-    std::max(n_inverses / n_threads, static_cast<size_type>(1U));
+  // somewhat arbitrarily set up an equal number of tasks as we have threads
+  const std::size_t n_tasks = MultithreadInfo::n_threads();
+  const size_type   n_inverses_per_task =
+    std::max(static_cast<size_type>(n_inverses / n_tasks),
+             static_cast<size_type>(1U));
 
   // set up start and end index
   // for each of the
-  // threads. note that we have
+  // tasks. note that we have
   // to work somewhat to get this
   // appropriate, since the
   // indices for which inverses
@@ -131,39 +133,34 @@ SparseVanka<number>::compute_inverses()
   // consecutive, with other
   // consecutive regions where we
   // do not have to do something
-  std::vector<std::pair<size_type, unsigned int>> blocking(n_threads);
+  std::vector<std::pair<size_type, unsigned int>> blocking(n_tasks);
 
   unsigned int c      = 0;
-  unsigned int thread = 0;
+  unsigned int task_n = 0;
   blocking[0].first   = 0;
 
-  for (size_type i = 0; (i < matrix->m()) && (thread + 1 < n_threads); ++i)
+  for (size_type i = 0; (i < matrix->m()) && (task_n + 1 < n_tasks); ++i)
     {
       if ((*selected)[i] == true)
         ++c;
-      if (c == n_inverses_per_thread)
+      if (c == n_inverses_per_task)
         {
-          blocking[thread].second    = i;
-          blocking[thread + 1].first = i;
-          ++thread;
+          blocking[task_n].second    = i;
+          blocking[task_n + 1].first = i;
+          ++task_n;
 
           c = 0;
         }
     }
-  blocking[n_threads - 1].second = matrix->m();
+  blocking[n_tasks - 1].second = matrix->m();
 
-  using FunPtr =
-    void (SparseVanka<number>::*)(const size_type, const size_type);
-  const FunPtr fun_ptr = &SparseVanka<number>::compute_inverses;
-
-  // Now spawn the threads
-  Threads::ThreadGroup<> threads;
-  for (unsigned int i = 0; i < n_threads; ++i)
-    threads += Threads::new_thread(fun_ptr,
-                                   *this,
-                                   blocking[i].first,
-                                   blocking[i].second);
-  threads.join_all();
+  // Now spawn the tasks
+  Threads::TaskGroup<> tasks;
+  for (unsigned int i = 0; i < n_tasks; ++i)
+    tasks += Threads::new_task([&, i]() {
+      this->compute_inverses(blocking[i].first, blocking[i].second);
+    });
+  tasks.join_all();
 #endif
 }
 
@@ -603,38 +600,11 @@ SparseBlockVanka<number>::vmult(Vector<number2> &      dst,
 {
   dst = 0;
 
-  // if no blocking is required, pass down to the underlying class
-  if (n_blocks == 1)
-    this->apply_preconditioner(dst, src);
-  else
-    // otherwise: blocking requested
-    {
-#ifdef DEAL_II_WITH_THREADS
-      // spawn threads. since some compilers have trouble finding out which
-      // 'encapsulate' function to take of all those possible ones if we simply
-      // idrop in the address of an overloaded template member function, make it
-      // simpler for the compiler by giving it the correct type right away:
-      using mem_fun_p =
-        void (SparseVanka<number>::*)(Vector<number2> &,
-                                      const Vector<number2> &,
-                                      const std::vector<bool> *const) const;
-
-      const mem_fun_p comp =
-        &SparseVanka<number>::template apply_preconditioner<number2>;
-      Threads::ThreadGroup<> threads;
-      for (unsigned int block = 0; block < n_blocks; ++block)
-        threads +=
-          Threads::new_thread(comp,
-                              *static_cast<const SparseVanka<number> *>(this),
-                              dst,
-                              src,
-                              &dof_masks[block]);
-      threads.join_all();
-#else
-      for (unsigned int block = 0; block < n_blocks; ++block)
-        this->apply_preconditioner(dst, src, &dof_masks[block]);
-#endif
-    }
+  Threads::TaskGroup<> tasks;
+  for (unsigned int block = 0; block < n_blocks; ++block)
+    tasks += Threads::new_task(
+      [&, block] { this->apply_preconditioner(dst, src, &dof_masks[block]); });
+  tasks.join_all();
 }
 
 
