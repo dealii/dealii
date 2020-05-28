@@ -683,7 +683,7 @@ public:
    * times the quadrature weight.
    */
   VectorizedArrayType
-  JxW(const unsigned int q_index) const;
+  JxW(const unsigned int q_point) const;
 
   /**
    * Return the inverse and transposed version of Jacobian of the mapping
@@ -692,7 +692,7 @@ public:
    * the unit cell gradients to gradients on the real cell.
    */
   Tensor<2, dim, VectorizedArrayType>
-  inverse_jacobian(const unsigned int q_index) const;
+  inverse_jacobian(const unsigned int q_point) const;
 
   /**
    * Return the unit normal vector on a face. Note that both sides of a face
@@ -1042,7 +1042,7 @@ protected:
    * memory on the stack, this approach allows for very large polynomial
    * degrees.
    */
-  VectorizedArrayType *values_quad[n_components];
+  VectorizedArrayType *values_quad;
 
   /**
    * This field stores the gradients of the finite element function on
@@ -1057,7 +1057,7 @@ protected:
    * memory on the stack, this approach allows for very large polynomial
    * degrees.
    */
-  VectorizedArrayType *gradients_quad[n_components][dim];
+  VectorizedArrayType *gradients_quad;
 
   /**
    * This field stores the Hessians of the finite element function on
@@ -1070,7 +1070,7 @@ protected:
    * memory on the stack, this approach allows for very large polynomial
    * degrees.
    */
-  VectorizedArrayType *hessians_quad[n_components][(dim * (dim + 1)) / 2];
+  VectorizedArrayType *hessians_quad;
 
   /**
    * Stores the number of the quadrature formula of the present cell.
@@ -1844,10 +1844,10 @@ protected:
  *   {
  *     phi.reinit(cell_index);
  *     phi.read_dof_values(vector);
- *     phi.evaluate(EvaluationFlags::values);   // interpolate values, but not
- * gradients for (unsigned int q_index=0; q_index<phi.n_q_points; ++q_index)
+ *     phi.evaluate(EvaluationFlags::values);   // interpolate values only
+ *     for (unsigned int q=0; q<phi.n_q_points; ++q)
  *       {
- *         VectorizedArray<double> val = phi.get_value(q_index);
+ *         VectorizedArray<double> val = phi.get_value(q);
  *         // do something with val
  *       }
  *   }
@@ -1879,10 +1879,10 @@ protected:
  *      cell_index < cell_range.second; ++cell_index)
  *   {
  *     phi.reinit(cell_index);
- *     for (unsigned int q_index=0; q_index<phi.n_q_points; ++q_index)
+ *     for (unsigned int q=0; q<phi.n_q_points; ++q)
  *       {
  *         Point<dim,VectorizedArray<double> > p_vect =
- *           phi.quadrature_point(q_index);
+ *           phi.quadrature_point(q);
  *         // Need to evaluate function for each component in VectorizedArray
  *         VectorizedArray<double> f_value;
  *         for (unsigned int v=0; v<VectorizedArray<double>::size(); ++v)
@@ -2039,8 +2039,8 @@ protected:
  * typically cheap and does not involve any expensive operation. Only a few
  * dozen pointers to the actual data fields are set during
  * construction. Therefore, no negative performance impact arises when
- * creating an FEEvaluation several times per loop, such as at the top of a @p
- * local_cell_operation operation that is split in small chunks for a parallel
+ * creating an FEEvaluation several times per loop, such as at the top of a
+ * `local_cell_operation` operation that is split in small chunks for a parallel
  * for loop, obviating a separate scratch data field for parallel loops as
  * necessary in the loop of @p WorkStream.
  *
@@ -2295,7 +2295,7 @@ protected:
  * @code
  * phi1.evaluate(EvaluationFlags::values);
  * phi2.evaluate(EvaluationFlags::gradients);
- * for (unsigned int q_index=0; q_index<phi1.n_q_points; ++q_index)
+ * for (unsigned int q=0; q<phi1.n_q_points; ++q)
  *   {
  *     VectorizedArray<double> val1 = phi1.get_value(q);
  *     Tensor<1,dim,VectorizedArray<double> > grad2 = phi2.get_gradient(q);
@@ -3591,7 +3591,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     2 * n_quadrature_points;
   const unsigned int allocated_size =
     shift + n_components_ * dofs_per_component +
-    (n_components_ * (dim * dim + 2 * dim + 1) * n_quadrature_points);
+    (n_components_ * ((dim * (dim + 1)) / 2 + dim + 1) * n_quadrature_points);
   scratch_data_array->resize_fast(allocated_size);
 
   // set the pointers to the correct position in the data array
@@ -3599,24 +3599,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       this->values_dofs[c] =
         scratch_data_array->begin() + c * dofs_per_component;
-      this->values_quad[c] = scratch_data_array->begin() +
-                             n_components * dofs_per_component +
-                             c * n_quadrature_points;
-      for (unsigned int d = 0; d < dim; ++d)
-        this->gradients_quad[c][d] =
-          scratch_data_array->begin() +
-          n_components * (dofs_per_component + n_quadrature_points) +
-          (c * dim + d) * n_quadrature_points;
-      for (unsigned int d = 0; d < (dim * dim + dim) / 2; ++d)
-        this->hessians_quad[c][d] =
-          scratch_data_array->begin() +
-          n_components *
-            ((dim + 1) * n_quadrature_points + dofs_per_component) +
-          (c * (dim * dim + dim) + d) * n_quadrature_points;
     }
+  this->values_quad =
+    scratch_data_array->begin() + n_components * dofs_per_component;
+  this->gradients_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + n_quadrature_points);
+  this->hessians_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
   scratch_data =
     scratch_data_array->begin() + n_components_ * dofs_per_component +
-    (n_components_ * (dim * dim + 2 * dim + 1) * n_quadrature_points);
+    (n_components_ * ((dim * (dim + 1)) / 2 + dim + 1) * n_quadrature_points);
 }
 
 
@@ -3678,14 +3672,14 @@ template <int dim,
           typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
                              FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  get_normal_vector(const unsigned int q_index) const
+  get_normal_vector(const unsigned int q_point) const
 {
-  AssertIndexRange(q_index, n_quadrature_points);
+  AssertIndexRange(q_point, n_quadrature_points);
   Assert(normal_vectors != nullptr, ExcMessage("Did not call reinit()!"));
   if (this->cell_type <= internal::MatrixFreeFunctions::flat_faces)
     return normal_vectors[0];
   else
-    return normal_vectors[q_index];
+    return normal_vectors[q_point];
 }
 
 
@@ -3697,17 +3691,17 @@ template <int dim,
           typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
                              FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::JxW(
-  const unsigned int q_index) const
+  const unsigned int q_point) const
 {
-  AssertIndexRange(q_index, n_quadrature_points);
+  AssertIndexRange(q_point, n_quadrature_points);
   Assert(J_value != nullptr, ExcNotInitialized());
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       Assert(this->quadrature_weights != nullptr, ExcInternalError());
-      return J_value[0] * this->quadrature_weights[q_index];
+      return J_value[0] * this->quadrature_weights[q_point];
     }
   else
-    return J_value[q_index];
+    return J_value[q_point];
 }
 
 
@@ -3719,14 +3713,14 @@ template <int dim,
           typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
                              FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  inverse_jacobian(const unsigned int q_index) const
+  inverse_jacobian(const unsigned int q_point) const
 {
-  AssertIndexRange(q_index, n_quadrature_points);
+  AssertIndexRange(q_point, n_quadrature_points);
   Assert(this->jacobian != nullptr, ExcNotImplemented());
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     return jacobian[0];
   else
-    return jacobian[q_index];
+    return jacobian[q_point];
 }
 
 
@@ -4845,7 +4839,7 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
 #  ifdef DEBUG
   Assert(values_quad_initialized || values_quad_submitted, ExcNotInitialized());
 #  endif
-  return &values_quad[0][0];
+  return values_quad;
 }
 
 
@@ -4863,7 +4857,7 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   values_quad_initialized = true;
   values_quad_submitted   = true;
 #  endif
-  return &values_quad[0][0];
+  return values_quad;
 }
 
 
@@ -4881,7 +4875,7 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   Assert(gradients_quad_initialized || gradients_quad_submitted,
          ExcNotInitialized());
 #  endif
-  return &gradients_quad[0][0][0];
+  return gradients_quad;
 }
 
 
@@ -4899,7 +4893,7 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
   gradients_quad_submitted   = true;
   gradients_quad_initialized = true;
 #  endif
-  return &gradients_quad[0][0][0];
+  return gradients_quad;
 }
 
 
@@ -4916,7 +4910,7 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
 #  ifdef DEBUG
   Assert(hessians_quad_initialized, ExcNotInitialized());
 #  endif
-  return &hessians_quad[0][0][0];
+  return hessians_quad;
 }
 
 
@@ -4933,7 +4927,7 @@ FEEvaluationBase<dim, n_components, Number, is_face, VectorizedArrayType>::
 #  ifdef DEBUG
   hessians_quad_initialized = true;
 #  endif
-  return &hessians_quad[0][0][0];
+  return hessians_quad;
 }
 
 
@@ -4969,10 +4963,12 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, n_components_, VectorizedArrayType>
   Assert(this->values_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
+
   AssertIndexRange(q_point, this->n_quadrature_points);
+  const std::size_t                             nqp = this->n_quadrature_points;
   Tensor<1, n_components_, VectorizedArrayType> return_value;
   for (unsigned int comp = 0; comp < n_components; comp++)
-    return_value[comp] = this->values_quad[comp][q_point];
+    return_value[comp] = values_quad[comp * nqp + q_point];
   return return_value;
 }
 
@@ -4992,19 +4988,19 @@ inline DEAL_II_ALWAYS_INLINE
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
 #  endif
+
   AssertIndexRange(q_point, this->n_quadrature_points);
-
   Assert(jacobian != nullptr, ExcNotInitialized());
-
+  const std::size_t nqp = this->n_quadrature_points;
   Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>> grad_out;
 
   // Cartesian cell
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      for (unsigned int comp = 0; comp < n_components; comp++)
-        for (unsigned int d = 0; d < dim; ++d)
-          grad_out[comp][d] =
-            (this->gradients_quad[comp][d][q_point] * jacobian[0][d][d]);
+      for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int comp = 0; comp < n_components; comp++)
+          grad_out[comp][d] = gradients_quad[(comp * dim + d) * nqp + q_point] *
+                              jacobian[0][d][d];
     }
   // cell with general/affine Jacobian
   else
@@ -5017,10 +5013,10 @@ inline DEAL_II_ALWAYS_INLINE
         for (unsigned int d = 0; d < dim; ++d)
           {
             grad_out[comp][d] =
-              jac[d][0] * this->gradients_quad[comp][0][q_point];
+              jac[d][0] * gradients_quad[(comp * dim) * nqp + q_point];
             for (unsigned int e = 1; e < dim; ++e)
               grad_out[comp][d] +=
-                jac[d][e] * this->gradients_quad[comp][e][q_point];
+                jac[d][e] * gradients_quad[(comp * dim + e) * nqp + q_point];
           }
     }
   return grad_out;
@@ -5045,21 +5041,23 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, n_components_, VectorizedArrayType>
 
   Assert(normal_x_jacobian != nullptr, ExcNotInitialized());
 
+  const std::size_t                            nqp = this->n_quadrature_points;
   Tensor<1, n_components, VectorizedArrayType> grad_out;
+
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     for (unsigned int comp = 0; comp < n_components; comp++)
-      grad_out[comp] = this->gradients_quad[comp][dim - 1][q_point] *
+      grad_out[comp] = gradients_quad[(comp * dim + dim - 1) * nqp + q_point] *
                        (this->normal_x_jacobian[0][dim - 1]);
   else
     {
-      const unsigned int index =
+      const std::size_t index =
         this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
       for (unsigned int comp = 0; comp < n_components; comp++)
         {
-          grad_out[comp] = this->gradients_quad[comp][0][q_point] *
+          grad_out[comp] = gradients_quad[comp * dim * nqp + q_point] *
                            this->normal_x_jacobian[index][0];
           for (unsigned int d = 1; d < dim; ++d)
-            grad_out[comp] += this->gradients_quad[comp][d][q_point] *
+            grad_out[comp] += gradients_quad[(comp * dim + d) * nqp + q_point] *
                               this->normal_x_jacobian[index][d];
         }
     }
@@ -5075,47 +5073,46 @@ namespace internal
   template <typename VectorizedArrayType>
   inline void
   hessian_unit_times_jac(const Tensor<2, 1, VectorizedArrayType> &jac,
-                         const VectorizedArrayType *const hessians_quad[1],
-                         const unsigned int               q_point,
+                         const VectorizedArrayType *const         hessians,
+                         const unsigned int,
                          VectorizedArrayType (&tmp)[1][1])
   {
-    tmp[0][0] = jac[0][0] * hessians_quad[0][q_point];
+    tmp[0][0] = jac[0][0] * hessians[0];
   }
 
   template <typename VectorizedArrayType>
   inline void
   hessian_unit_times_jac(const Tensor<2, 2, VectorizedArrayType> &jac,
-                         const VectorizedArrayType *const hessians_quad[3],
-                         const unsigned int               q_point,
+                         const VectorizedArrayType *const         hessians,
+                         const unsigned int                       nqp,
                          VectorizedArrayType (&tmp)[2][2])
   {
     for (unsigned int d = 0; d < 2; ++d)
       {
-        tmp[0][d] = (jac[d][0] * hessians_quad[0][q_point] +
-                     jac[d][1] * hessians_quad[2][q_point]);
-        tmp[1][d] = (jac[d][0] * hessians_quad[2][q_point] +
-                     jac[d][1] * hessians_quad[1][q_point]);
+        tmp[0][d] = (jac[d][0] * hessians[0] + jac[d][1] * hessians[2 * nqp]);
+        tmp[1][d] =
+          (jac[d][0] * hessians[2 * nqp] + jac[d][1] * hessians[1 * nqp]);
       }
   }
 
   template <typename VectorizedArrayType>
   inline void
   hessian_unit_times_jac(const Tensor<2, 3, VectorizedArrayType> &jac,
-                         const VectorizedArrayType *const hessians_quad[6],
-                         const unsigned int               q_point,
+                         const VectorizedArrayType *const         hessians,
+                         const unsigned int                       nqp,
                          VectorizedArrayType (&tmp)[3][3])
   {
     for (unsigned int d = 0; d < 3; ++d)
       {
-        tmp[0][d] = (jac[d][0] * hessians_quad[0][q_point] +
-                     jac[d][1] * hessians_quad[3][q_point] +
-                     jac[d][2] * hessians_quad[4][q_point]);
-        tmp[1][d] = (jac[d][0] * hessians_quad[3][q_point] +
-                     jac[d][1] * hessians_quad[1][q_point] +
-                     jac[d][2] * hessians_quad[5][q_point]);
-        tmp[2][d] = (jac[d][0] * hessians_quad[4][q_point] +
-                     jac[d][1] * hessians_quad[5][q_point] +
-                     jac[d][2] * hessians_quad[2][q_point]);
+        tmp[0][d] =
+          (jac[d][0] * hessians[0 * nqp] + jac[d][1] * hessians[3 * nqp] +
+           jac[d][2] * hessians[4 * nqp]);
+        tmp[1][d] =
+          (jac[d][0] * hessians[3 * nqp] + jac[d][1] * hessians[1 * nqp] +
+           jac[d][2] * hessians[5 * nqp]);
+        tmp[2][d] =
+          (jac[d][0] * hessians[4 * nqp] + jac[d][1] * hessians[5 * nqp] +
+           jac[d][2] * hessians[2 * nqp]);
       }
   }
 } // namespace internal
@@ -5144,55 +5141,56 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                0 :
                q_point];
 
-  Tensor<2, dim, VectorizedArrayType> hessian_out[n_components];
+  Tensor<1, n_components, Tensor<2, dim, VectorizedArrayType>> hessian_out;
+
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int comp = 0; comp < n_components; comp++)
-        for (unsigned int d = 0; d < dim; ++d)
-          {
+        {
+          for (unsigned int d = 0; d < dim; ++d)
             hessian_out[comp][d][d] =
-              (this->hessians_quad[comp][d][q_point] * jac[d][d] * jac[d][d]);
-            switch (dim)
-              {
-                case 1:
-                  break;
-                case 2:
-                  hessian_out[comp][0][1] =
-                    (this->hessians_quad[comp][2][q_point] * jac[0][0] *
-                     jac[1][1]);
-                  break;
-                case 3:
-                  hessian_out[comp][0][1] =
-                    (this->hessians_quad[comp][3][q_point] * jac[0][0] *
-                     jac[1][1]);
-                  hessian_out[comp][0][2] =
-                    (this->hessians_quad[comp][4][q_point] * jac[0][0] *
-                     jac[2][2]);
-                  hessian_out[comp][1][2] =
-                    (this->hessians_quad[comp][5][q_point] * jac[1][1] *
-                     jac[2][2]);
-                  break;
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+              hessians_quad[(comp * hdim + d) * nqp + q_point] *
+              (jac[d][d] * jac[d][d]);
+          switch (dim)
+            {
+              case 1:
+                break;
+              case 2:
+                hessian_out[comp][0][1] =
+                  hessians_quad[(comp * hdim + 2) * nqp + q_point] *
+                  (jac[0][0] * jac[1][1]);
+                break;
+              case 3:
+                hessian_out[comp][0][1] =
+                  hessians_quad[(comp * hdim + 3) * nqp + q_point] *
+                  (jac[0][0] * jac[1][1]);
+                hessian_out[comp][0][2] =
+                  hessians_quad[(comp * hdim + 4) * nqp + q_point] *
+                  (jac[0][0] * jac[2][2]);
+                hessian_out[comp][1][2] =
+                  hessians_quad[(comp * hdim + 5) * nqp + q_point] *
+                  (jac[1][1] * jac[2][2]);
+                break;
+              default:
+                Assert(false, ExcNotImplemented());
+            }
+          for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = d + 1; e < dim; ++e)
               hessian_out[comp][e][d] = hessian_out[comp][d][e];
-          }
+        }
     }
   // cell with general Jacobian, but constant within the cell
   else if (this->cell_type == internal::MatrixFreeFunctions::affine)
     {
       for (unsigned int comp = 0; comp < n_components; comp++)
         {
-          // compute laplacian before the gradient because it needs to access
-          // unscaled gradient data
           VectorizedArrayType tmp[dim][dim];
-          internal::hessian_unit_times_jac(jac,
-                                           this->hessians_quad[comp],
-                                           q_point,
-                                           tmp);
+          internal::hessian_unit_times_jac(
+            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute first part of hessian, J * tmp = J * hess_unit(u) * J^T
           for (unsigned int d = 0; d < dim; ++d)
@@ -5215,20 +5213,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // cell with general Jacobian
   else
     {
-      const Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, VectorizedArrayType>>
-        &jac_grad =
-          mapping_data->jacobian_gradients
-            [1 - this->is_interior_face]
-            [this->mapping_data->data_index_offsets[this->cell] + q_point];
+      const auto &jac_grad =
+        mapping_data->jacobian_gradients
+          [1 - this->is_interior_face]
+          [this->mapping_data->data_index_offsets[this->cell] + q_point];
       for (unsigned int comp = 0; comp < n_components; comp++)
         {
           // compute laplacian before the gradient because it needs to access
           // unscaled gradient data
           VectorizedArrayType tmp[dim][dim];
-          internal::hessian_unit_times_jac(jac,
-                                           this->hessians_quad[comp],
-                                           q_point,
-                                           tmp);
+          internal::hessian_unit_times_jac(
+            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute first part of hessian, J * tmp = J * hess_unit(u) * J^T
           for (unsigned int d = 0; d < dim; ++d)
@@ -5243,14 +5238,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               hessian_out[comp][d][d] +=
-                (jac_grad[d][e] * this->gradients_quad[comp][e][q_point]);
+                jac_grad[d][e] *
+                gradients_quad[(comp * dim + e) * nqp + q_point];
 
           // add off-diagonal part of J' * grad(u)
           for (unsigned int d = 0, count = dim; d < dim; ++d)
             for (unsigned int e = d + 1; e < dim; ++e, ++count)
               for (unsigned int f = 0; f < dim; ++f)
                 hessian_out[comp][d][e] +=
-                  (jac_grad[count][f] * this->gradients_quad[comp][f][q_point]);
+                  jac_grad[count][f] *
+                  gradients_quad[(comp * dim + f) * nqp + q_point];
 
           // take symmetric part
           for (unsigned int d = 0; d < dim; ++d)
@@ -5258,8 +5255,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               hessian_out[comp][e][d] = hessian_out[comp][d][e];
         }
     }
-  return Tensor<1, n_components_, Tensor<2, dim, VectorizedArrayType>>(
-    hessian_out);
+  return hessian_out;
 }
 
 
@@ -5286,6 +5282,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                0 :
                q_point];
 
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
   Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>> hessian_out;
 
   // Cartesian cell
@@ -5294,7 +5292,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int comp = 0; comp < n_components; comp++)
         for (unsigned int d = 0; d < dim; ++d)
           hessian_out[comp][d] =
-            (this->hessians_quad[comp][d][q_point] * jac[d][d] * jac[d][d]);
+            hessians_quad[(comp * hdim + d) * nqp + q_point] *
+            (jac[d][d] * jac[d][d]);
     }
   // cell with general Jacobian, but constant within the cell
   else if (this->cell_type == internal::MatrixFreeFunctions::affine)
@@ -5304,10 +5303,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           // compute laplacian before the gradient because it needs to access
           // unscaled gradient data
           VectorizedArrayType tmp[dim][dim];
-          internal::hessian_unit_times_jac(jac,
-                                           this->hessians_quad[comp],
-                                           q_point,
-                                           tmp);
+          internal::hessian_unit_times_jac(
+            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute only the trace part of hessian, J * tmp = J *
           // hess_unit(u) * J^T
@@ -5331,10 +5328,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           // compute laplacian before the gradient because it needs to access
           // unscaled gradient data
           VectorizedArrayType tmp[dim][dim];
-          internal::hessian_unit_times_jac(jac,
-                                           this->hessians_quad[comp],
-                                           q_point,
-                                           tmp);
+          internal::hessian_unit_times_jac(
+            jac, hessians_quad + comp * hdim * nqp + q_point, nqp, tmp);
 
           // compute only the trace part of hessian, J * tmp = J *
           // hess_unit(u) * J^T
@@ -5348,7 +5343,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               hessian_out[comp][d] +=
-                (jac_grad[d][e] * this->gradients_quad[comp][e][q_point]);
+                jac_grad[d][e] *
+                gradients_quad[(comp * dim + e) * nqp + q_point];
         }
     }
   return hessian_out;
@@ -5373,8 +5369,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Tensor<1, n_components_, VectorizedArrayType> laplacian_out;
-  const Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>>
-    hess_diag = get_hessian_diagonal(q_point);
+  const auto hess_diag = get_hessian_diagonal(q_point);
   for (unsigned int comp = 0; comp < n_components; ++comp)
     {
       laplacian_out[comp] = hess_diag[comp][0];
@@ -5423,17 +5418,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->values_quad_submitted = true;
 #  endif
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       const VectorizedArrayType JxW = J_value[0] * quadrature_weights[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
-        this->values_quad[comp][q_point] = val_in[comp] * JxW;
+        values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
     }
   else
     {
       const VectorizedArrayType JxW = J_value[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
-        this->values_quad[comp][q_point] = val_in[comp] * JxW;
+        values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
     }
 }
 
@@ -5458,17 +5454,21 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType JxW = J_value[0] * quadrature_weights[q_point];
-      for (unsigned int comp = 0; comp < n_components; comp++)
-        for (unsigned int d = 0; d < dim; ++d)
-          this->gradients_quad[comp][d][q_point] =
-            (grad_in[comp][d] * jacobian[0][d][d] * JxW);
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const VectorizedArrayType factor = jacobian[0][d][d] * JxW;
+          for (unsigned int comp = 0; comp < n_components; comp++)
+            gradients_quad[(comp * dim + d) * nqp + q_point] =
+              grad_in[comp][d] * factor;
+        }
     }
   else
     {
-      const Tensor<2, dim, VectorizedArrayType> &jac =
+      const Tensor<2, dim, VectorizedArrayType> jac =
         this->cell_type > internal::MatrixFreeFunctions::affine ?
           jacobian[q_point] :
           jacobian[0];
@@ -5482,7 +5482,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             VectorizedArrayType new_val = jac[0][d] * grad_in[comp][0];
             for (unsigned int e = 1; e < dim; ++e)
               new_val += (jac[e][d] * grad_in[comp][e]);
-            this->gradients_quad[comp][d][q_point] = new_val * JxW;
+            gradients_quad[(comp * dim + d) * nqp + q_point] = new_val * JxW;
           }
     }
 }
@@ -5506,12 +5506,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     for (unsigned int comp = 0; comp < n_components; comp++)
       {
         for (unsigned int d = 0; d < dim - 1; ++d)
-          this->gradients_quad[comp][d][q_point] = VectorizedArrayType();
-        this->gradients_quad[comp][dim - 1][q_point] =
+          gradients_quad[(comp * dim + d) * nqp + q_point] =
+            VectorizedArrayType();
+        gradients_quad[(comp * dim + dim - 1) * nqp + q_point] =
           grad_in[comp] *
           (this->normal_x_jacobian[0][dim - 1] * this->J_value[0] *
            this->quadrature_weights[q_point]);
@@ -5520,14 +5522,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       const unsigned int index =
         this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
+      const Tensor<1, dim, VectorizedArrayType> jac =
+        this->normal_x_jacobian[index];
       for (unsigned int comp = 0; comp < n_components; comp++)
         {
           VectorizedArrayType factor = grad_in[comp] * this->J_value[index];
           if (this->cell_type <= internal::MatrixFreeFunctions::affine)
             factor = factor * this->quadrature_weights[q_point];
           for (unsigned int d = 0; d < dim; ++d)
-            this->gradients_quad[comp][d][q_point] =
-              factor * this->normal_x_jacobian[index][d];
+            gradients_quad[(comp * dim + d) * nqp + q_point] = factor * jac[d];
         }
     }
 }
@@ -5548,13 +5551,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->values_quad_submitted == true,
          internal::ExcAccessToUninitializedField());
 #  endif
+
   Tensor<1, n_components_, VectorizedArrayType> return_value;
-  for (unsigned int comp = 0; comp < n_components; ++comp)
-    return_value[comp] = this->values_quad[comp][0];
-  const unsigned int n_q_points = this->n_quadrature_points;
-  for (unsigned int q = 1; q < n_q_points; ++q)
+  const std::size_t                             nqp = this->n_quadrature_points;
+  for (unsigned int q = 0; q < nqp; ++q)
     for (unsigned int comp = 0; comp < n_components; ++comp)
-      return_value[comp] += this->values_quad[comp][q];
+      return_value[comp] += this->values_quad[comp * nqp + q];
   return (return_value);
 }
 
@@ -5765,7 +5767,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
          internal::ExcAccessToUninitializedField());
 #  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
-  return this->values_quad[0][q_point];
+  return this->values_quad[q_point];
 }
 
 
@@ -5798,11 +5800,12 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
 
   Tensor<1, dim, VectorizedArrayType> grad_out;
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int d = 0; d < dim; ++d)
         grad_out[d] =
-          (this->gradients_quad[0][d][q_point] * this->jacobian[0][d][d]);
+          this->gradients_quad[d * nqp + q_point] * this->jacobian[0][d][d];
     }
   // cell with general/affine Jacobian
   else
@@ -5813,9 +5816,9 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
                          0];
       for (unsigned int d = 0; d < dim; ++d)
         {
-          grad_out[d] = jac[d][0] * this->gradients_quad[0][0][q_point];
+          grad_out[d] = jac[d][0] * this->gradients_quad[q_point];
           for (unsigned int e = 1; e < dim; ++e)
-            grad_out[d] += jac[d][e] * this->gradients_quad[0][e][q_point];
+            grad_out[d] += jac[d][e] * this->gradients_quad[e * nqp + q_point];
         }
     }
   return grad_out;
@@ -5871,10 +5874,10 @@ template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline void DEAL_II_ALWAYS_INLINE
             FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::submit_value(
   const VectorizedArrayType val_in,
-  const unsigned int        q_index)
+  const unsigned int        q_point)
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange(q_index, this->n_quadrature_points);
+  AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr, ExcNotInitialized());
 #  ifdef DEBUG
   this->values_quad_submitted = true;
@@ -5883,12 +5886,12 @@ inline void DEAL_II_ALWAYS_INLINE
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       const VectorizedArrayType JxW =
-        this->J_value[0] * this->quadrature_weights[q_index];
-      this->values_quad[0][q_index] = val_in * JxW;
+        this->J_value[0] * this->quadrature_weights[q_point];
+      this->values_quad[q_point] = val_in * JxW;
     }
   else // if (this->cell_type < internal::MatrixFreeFunctions::general)
     {
-      this->values_quad[0][q_index] = val_in * this->J_value[q_index];
+      this->values_quad[q_point] = val_in * this->J_value[q_point];
     }
 }
 
@@ -5922,22 +5925,23 @@ template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   submit_gradient(const Tensor<1, dim, VectorizedArrayType> grad_in,
-                  const unsigned int                        q_index)
+                  const unsigned int                        q_point)
 {
   Assert(this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange(q_index, this->n_quadrature_points);
+  AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr, ExcNotInitialized());
   Assert(this->jacobian != nullptr, ExcNotInitialized());
 #  ifdef DEBUG
   this->gradients_quad_submitted = true;
 #  endif
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType JxW =
-        this->J_value[0] * this->quadrature_weights[q_index];
+        this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int d = 0; d < dim; ++d)
-        this->gradients_quad[0][d][q_index] =
+        this->gradients_quad[d * nqp + q_point] =
           (grad_in[d] * this->jacobian[0][d][d] * JxW);
     }
   // general/affine cell type
@@ -5945,18 +5949,18 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
     {
       const Tensor<2, dim, VectorizedArrayType> &jac =
         this->cell_type > internal::MatrixFreeFunctions::affine ?
-          this->jacobian[q_index] :
+          this->jacobian[q_point] :
           this->jacobian[0];
       const VectorizedArrayType JxW =
         this->cell_type > internal::MatrixFreeFunctions::affine ?
-          this->J_value[q_index] :
-          this->J_value[0] * this->quadrature_weights[q_index];
+          this->J_value[q_point] :
+          this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int d = 0; d < dim; ++d)
         {
           VectorizedArrayType new_val = jac[0][d] * grad_in[0];
           for (unsigned int e = 1; e < dim; ++e)
             new_val += jac[e][d] * grad_in[e];
-          this->gradients_quad[0][d][q_index] = new_val * JxW;
+          this->gradients_quad[d * nqp + q_point] = new_val * JxW;
         }
     }
 }
@@ -6068,15 +6072,15 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
   Assert(this->jacobian != nullptr, ExcNotInitialized());
 
   VectorizedArrayType divergence;
+  const std::size_t   nqp = this->n_quadrature_points;
 
   // Cartesian cell
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      divergence =
-        (this->gradients_quad[0][0][q_point] * this->jacobian[0][0][0]);
+      divergence = this->gradients_quad[q_point] * this->jacobian[0][0][0];
       for (unsigned int d = 1; d < dim; ++d)
-        divergence +=
-          (this->gradients_quad[d][d][q_point] * this->jacobian[0][d][d]);
+        divergence += this->gradients_quad[(dim * d + d) * nqp + q_point] *
+                      this->jacobian[0][d][d];
     }
   // cell with general/constant Jacobian
   else
@@ -6085,12 +6089,13 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
         this->cell_type == internal::MatrixFreeFunctions::general ?
           this->jacobian[q_point] :
           this->jacobian[0];
-      divergence = (jac[0][0] * this->gradients_quad[0][0][q_point]);
+      divergence = jac[0][0] * this->gradients_quad[q_point];
       for (unsigned int e = 1; e < dim; ++e)
-        divergence += (jac[0][e] * this->gradients_quad[0][e][q_point]);
+        divergence += jac[0][e] * this->gradients_quad[e * nqp + q_point];
       for (unsigned int d = 1; d < dim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
-          divergence += (jac[d][e] * this->gradients_quad[d][e][q_point]);
+          divergence +=
+            jac[d][e] * this->gradients_quad[(d * dim + e) * nqp + q_point];
     }
   return divergence;
 }
@@ -6103,9 +6108,9 @@ inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, VectorizedArrayType>
   get_symmetric_gradient(const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
-  const Tensor<2, dim, VectorizedArrayType> grad = get_gradient(q_point);
-  VectorizedArrayType                       symmetrized[(dim * dim + dim) / 2];
-  VectorizedArrayType                       half = Number(0.5);
+  const auto          grad = get_gradient(q_point);
+  VectorizedArrayType symmetrized[(dim * dim + dim) / 2];
+  VectorizedArrayType half = Number(0.5);
   for (unsigned int d = 0; d < dim; ++d)
     symmetrized[d] = grad[d][d];
   switch (dim)
@@ -6226,17 +6231,21 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType fac =
         this->J_value[0] * this->quadrature_weights[q_point] * div_in;
       for (unsigned int d = 0; d < dim; ++d)
         {
-          this->gradients_quad[d][d][q_point] = (fac * this->jacobian[0][d][d]);
+          this->gradients_quad[(d * dim + d) * nqp + q_point] =
+            (fac * this->jacobian[0][d][d]);
           for (unsigned int e = d + 1; e < dim; ++e)
             {
-              this->gradients_quad[d][e][q_point] = VectorizedArrayType();
-              this->gradients_quad[e][d][q_point] = VectorizedArrayType();
+              this->gradients_quad[(d * dim + e) * nqp + q_point] =
+                VectorizedArrayType();
+              this->gradients_quad[(e * dim + d) * nqp + q_point] =
+                VectorizedArrayType();
             }
         }
     }
@@ -6254,7 +6263,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       for (unsigned int d = 0; d < dim; ++d)
         {
           for (unsigned int e = 0; e < dim; ++e)
-            this->gradients_quad[d][e][q_point] = jac[d][e] * fac;
+            this->gradients_quad[(d * dim + e) * nqp + q_point] =
+              jac[d][e] * fac;
         }
     }
 }
@@ -6279,22 +6289,23 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
+  const std::size_t nqp = this->n_quadrature_points;
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int d = 0; d < dim; ++d)
-        this->gradients_quad[d][d][q_point] =
+        this->gradients_quad[(d * dim + d) * nqp + q_point] =
           (sym_grad.access_raw_entry(d) * JxW * this->jacobian[0][d][d]);
       for (unsigned int e = 0, counter = dim; e < dim; ++e)
         for (unsigned int d = e + 1; d < dim; ++d, ++counter)
           {
             const VectorizedArrayType value =
               sym_grad.access_raw_entry(counter) * JxW;
-            this->gradients_quad[e][d][q_point] =
-              (value * this->jacobian[0][d][d]);
-            this->gradients_quad[d][e][q_point] =
-              (value * this->jacobian[0][e][e]);
+            this->gradients_quad[(e * dim + d) * nqp + q_point] =
+              value * this->jacobian[0][d][d];
+            this->gradients_quad[(d * dim + e) * nqp + q_point] =
+              value * this->jacobian[0][e][e];
           }
     }
   // general/affine cell type
@@ -6325,7 +6336,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             VectorizedArrayType new_val = jac[0][d] * weighted[comp][0];
             for (unsigned int e = 1; e < dim; ++e)
               new_val += jac[e][d] * weighted[comp][e];
-            this->gradients_quad[comp][d][q_point] = new_val;
+            this->gradients_quad[(comp * dim + d) * nqp + q_point] = new_val;
           }
     }
 }
@@ -6455,7 +6466,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
          internal::ExcAccessToUninitializedField());
 #  endif
   AssertIndexRange(q_point, this->n_quadrature_points);
-  return this->values_quad[0][q_point];
+  return this->values_quad[q_point];
 }
 
 
@@ -6480,7 +6491,7 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, 1, VectorizedArrayType>
       this->jacobian[0];
 
   Tensor<1, 1, VectorizedArrayType> grad_out;
-  grad_out[0] = jac[0][0] * this->gradients_quad[0][0][q_point];
+  grad_out[0] = jac[0][0] * this->gradients_quad[q_point];
 
   return grad_out;
 }
@@ -6556,13 +6567,13 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_value(
   if (this->cell_type == internal::MatrixFreeFunctions::general)
     {
       const VectorizedArrayType JxW = this->J_value[q_point];
-      this->values_quad[0][q_point] = val_in * JxW;
+      this->values_quad[q_point]    = val_in * JxW;
     }
   else // if (this->cell_type == internal::MatrixFreeFunctions::general)
     {
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
-      this->values_quad[0][q_point] = val_in * JxW;
+      this->values_quad[q_point] = val_in * JxW;
     }
 }
 
@@ -6611,7 +6622,7 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient(
       this->J_value[q_point] :
       this->J_value[0] * this->quadrature_weights[q_point];
 
-  this->gradients_quad[0][0][q_point] = jac[0][0] * grad_in * JxW;
+  this->gradients_quad[q_point] = jac[0][0] * grad_in * JxW;
 }
 
 
@@ -7242,9 +7253,9 @@ FEEvaluation<dim,
     VectorizedArrayType>::evaluate(*this->data,
                                    const_cast<VectorizedArrayType *>(
                                      values_array),
-                                   this->values_quad[0],
-                                   this->gradients_quad[0][0],
-                                   this->hessians_quad[0][0],
+                                   this->values_quad,
+                                   this->gradients_quad,
+                                   this->hessians_quad,
                                    this->scratch_data,
                                    evaluate_values,
                                    evaluate_gradients,
@@ -7285,9 +7296,9 @@ FEEvaluation<dim,
                   VectorizedArrayType>::
     evaluate(*this->data,
              const_cast<VectorizedArrayType *>(values_array),
-             this->values_quad[0],
-             this->gradients_quad[0][0],
-             this->hessians_quad[0][0],
+             this->values_quad,
+             this->gradients_quad,
+             this->hessians_quad,
              this->scratch_data,
              evaluation_flags & EvaluationFlags::values,
              evaluation_flags & EvaluationFlags::gradients,
@@ -7479,8 +7490,8 @@ FEEvaluation<dim,
                   n_components,
                   VectorizedArrayType>::integrate(*this->data,
                                                   values_array,
-                                                  this->values_quad[0],
-                                                  this->gradients_quad[0][0],
+                                                  this->values_quad,
+                                                  this->gradients_quad,
                                                   this->scratch_data,
                                                   integrate_values,
                                                   integrate_gradients,
@@ -7533,8 +7544,8 @@ FEEvaluation<dim,
                   n_components,
                   VectorizedArrayType>::integrate(*this->data,
                                                   values_array,
-                                                  this->values_quad[0],
-                                                  this->gradients_quad[0][0],
+                                                  this->values_quad,
+                                                  this->gradients_quad,
                                                   this->scratch_data,
                                                   integration_flag &
                                                     EvaluationFlags::values,
@@ -7628,8 +7639,8 @@ FEEvaluation<dim,
         n_components,
         VectorizedArrayType>::integrate(*this->data,
                                         vec_values,
-                                        this->values_quad[0],
-                                        this->gradients_quad[0][0],
+                                        this->values_quad,
+                                        this->gradients_quad,
                                         this->scratch_data,
                                         evaluation_flag &
                                           EvaluationFlags::values,
