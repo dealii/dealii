@@ -102,8 +102,13 @@ IF (DEAL_II_WITH_MPI)
 ENDIF()
 
 # Test if TBB works correctly
-IF (DEAL_II_WITH_THREADS)
+IF (DEAL_II_WITH_TBB)
   make_quicktest("tbb" ${_mybuild} "")
+ENDIF()
+
+# test cpp-taskflow
+IF (DEAL_II_WITH_CPP_TASKFLOW)
+  make_quicktest("taskflow" ${_mybuild} "")
 ENDIF()
 
 # Test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
