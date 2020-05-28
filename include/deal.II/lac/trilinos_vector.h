@@ -108,6 +108,11 @@ namespace TrilinosWrappers
 
     public:
       /**
+       * Copy constructor.
+       */
+      VectorReference(const VectorReference &) = default;
+
+      /**
        * This looks like a copy operator, but does something different than
        * usual. In particular, it does not copy the member variables of this
        * reference. Rather, it handles the situation where we have two vectors

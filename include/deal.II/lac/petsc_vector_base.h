@@ -93,8 +93,12 @@ namespace PETScWrappers
        */
       VectorReference(const VectorBase &vector, const size_type index);
 
-
     public:
+      /*
+       * Copy constrcutor.
+       */
+      VectorReference(const VectorReference &vector) = default;
+
       /**
        * This looks like a copy operator, but does something different than
        * usual. In particular, it does not copy the member variables of this
