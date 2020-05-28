@@ -97,6 +97,16 @@ DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
 DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
 DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
+DEAL:5-SparseMatrix<double>::Vanka
+DEAL:5-SparseMatrix<double>:vanka:Richardson::Starting value 4.00
+DEAL:5-SparseMatrix<double>:vanka:Richardson::Failure step 10 value 0.000523
+DEAL:5-SparseMatrix<double>:block_vanka_1:Richardson::Starting value 4.00
+DEAL:5-SparseMatrix<double>:block_vanka_1:Richardson::Failure step 10 value 6.00
+DEAL:5-SparseMatrix<double>:block_vanka_2:Richardson::Starting value 4.00
+DEAL:5-SparseMatrix<double>:block_vanka_2:Richardson::Failure step 10 value 0.0179
+DEAL:5-SparseMatrix<double>::vanka residual: 0.0179
+DEAL:5-SparseMatrix<double>::vanka residual: 6.00
+DEAL:5-SparseMatrix<double>::vanka residual: 0.000523
 DEAL::	0	0	5.00
 DEAL::	0	1	-2.00
 DEAL::	0	4	-1.00
@@ -395,6 +405,16 @@ DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
 DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
 DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 1.86e-06
+DEAL:9-SparseMatrix<double>::Vanka
+DEAL:9-SparseMatrix<double>:vanka:Richardson::Starting value 4.00
+DEAL:9-SparseMatrix<double>:vanka:Richardson::Failure step 10 value 1.75e-10
+DEAL:9-SparseMatrix<double>:block_vanka_1:Richardson::Starting value 4.00
+DEAL:9-SparseMatrix<double>:block_vanka_1:Richardson::Failure step 10 value 5.61
+DEAL:9-SparseMatrix<double>:block_vanka_2:Richardson::Starting value 4.00
+DEAL:9-SparseMatrix<double>:block_vanka_2:Richardson::Failure step 10 value 0.00189
+DEAL:9-SparseMatrix<double>::vanka residual: 0.00189
+DEAL:9-SparseMatrix<double>::vanka residual: 5.61
+DEAL:9-SparseMatrix<double>::vanka residual: 1.75e-10
 DEAL::Assemble
 DEAL:9-SparseMatrixEZ<double>:identity:Richardson::Starting value 4.00
 DEAL:9-SparseMatrixEZ<double>:identity:Richardson::Failure step 10 value 2.41
