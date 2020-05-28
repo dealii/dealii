@@ -438,7 +438,10 @@ namespace PETScWrappers
      * vector, this function allows to set a whole set of elements at once.
      * The indices of the elements to be set are stated in the first argument,
      * the corresponding values in the second.
+     *
+     * @deprecated Use import() instead.
      */
+    DEAL_II_DEPRECATED
     void
     set(const std::vector<size_type> &  indices,
         const std::vector<PetscScalar> &values);
@@ -596,13 +599,23 @@ namespace PETScWrappers
 
     /**
      * Return the value of the vector element with the largest negative value.
+     *
+     * @deprecated This function has been deprecated to improve compatibility
+     * with other classes inheriting from VectorSpaceVector. If you need to
+     * use this functionality then use the PETSc function VecMin instead.
      */
+    DEAL_II_DEPRECATED
     real_type
     min() const;
 
     /**
      * Return the value of the vector element with the largest positive value.
+     *
+     * @deprecated This function has been deprecated to improve compatibility
+     * with other classes inheriting from VectorSpaceVector. If you need to
+     * use this functionality then use the PETSc function VecMax instead.
      */
+    DEAL_II_DEPRECATED
     real_type
     max() const;
 
@@ -618,7 +631,11 @@ namespace PETScWrappers
      * Return @p true if the vector has no negative entries, i.e. all entries
      * are zero or positive. This function is used, for example, to check
      * whether refinement indicators are really all positive (or zero).
+     *
+     * @deprecated This function has been deprecated to improve compatibility
+     * with other classes inheriting from VectorSpaceVector.
      */
+    DEAL_II_DEPRECATED
     bool
     is_non_negative() const;
 
