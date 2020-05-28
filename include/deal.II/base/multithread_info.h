@@ -23,6 +23,14 @@
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/types.h>
 
+#  include <memory>
+
+// forward declaration from <taskflow/taskflow.hpp>
+namespace tf
+{
+  class Executor;
+}
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -113,11 +121,32 @@ public:
   static void
   initialize_multithreading();
 
+
+#  ifdef DEAL_II_WITH_CPP_TASKFLOW
+  /**
+   * Return a reference to the global Executor from cpp-taskflow.
+   *
+   * The Executor is set to use n_threads() worker threads that you can
+   * control using set_thread_limit() and the DEAL_II_NUM_THREADS environment
+   * variable.
+   */
+  static tf::Executor &
+  get_taskflow_executor();
+#  endif
+
 private:
   /**
    * Variable representing the maximum number of threads.
    */
   static unsigned int n_max_threads;
+
+#  ifdef DEAL_II_WITH_CPP_TASKFLOW
+  /**
+   * Store a cpp-taskflow Executor that is constructed with N workers (from
+   * set_thread_limit).
+   */
+  static std::unique_ptr<tf::Executor> executor;
+#  endif
 };
 
 
