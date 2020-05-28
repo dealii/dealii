@@ -372,8 +372,6 @@ namespace Threads
 
   namespace internal
   {
-#  ifdef DEAL_II_WITH_THREADS
-
     /**
      * A class that represents threads. For each thread, we create exactly one
      * of these objects -- exactly one because it carries the returned value
@@ -516,45 +514,6 @@ namespace Threads
           }
       }
     };
-
-#  else
-    /**
-     * A class that represents threads. For each thread, we create exactly one
-     * of these objects -- exactly one because it carries the returned value
-     * of the function called on the thread.
-     *
-     * While we have only one of these objects per thread, several
-     * Threads::Thread objects may refer to this descriptor.
-     */
-    template <typename RT>
-    struct ThreadDescriptor
-    {
-      /**
-       * An object that will hold the value returned by the function called on
-       * the thread.
-       */
-      std::shared_ptr<return_value<RT>> ret_val;
-
-      /**
-       * Start the thread and let it put its return value into the ret_val
-       * object.
-       */
-      void
-      start(const std::function<RT()> &function)
-      {
-        ret_val = std::make_shared<return_value<RT>>();
-        call(function, *ret_val);
-      }
-
-      /**
-       * Wait for the thread to end.
-       */
-      void
-      join()
-      {}
-    };
-
-#  endif
   } // namespace internal
 
 
