@@ -1129,7 +1129,7 @@ namespace Step28
   // in many of the other tutorial programs in that it has a public
   // <code>run</code> function and private functions doing all the rest. In
   // several places, we have to do something for all energy groups, in which
-  // case we will start threads for each group to let these things run in
+  // case we will start tasks for each group to let these things run in
   // parallel if deal.II was configured for multithreading.  For strategies of
   // parallelization, take a look at the @ref threads module.
   //
@@ -1477,31 +1477,36 @@ namespace Step28
   // since each of these sums can be computed independently, we actually do
   // this in parallel. One of the problems is that the function in the
   // <code>EnergyGroup</code> class that computes the fission source returns a
-  // value. If we now simply spin off a new thread, we have to later capture
-  // the return value of the function run on that thread. The way this can be
-  // done is to use the return value of the Threads::new_thread function,
-  // which returns an object of type Threads::Thread@<double@> if the function
-  // spawned returns a double. We can then later ask this object for the
-  // returned value (when doing so, the Threads::Thread::return_value function
-  // first waits for the thread to finish if it hasn't done so already).
+  // value. We would like to add these values together in the loop itself:
+  // ideally, each task would compute its value and then immediately add it to
+  // the total. Concurrently summing values in this way requires two features:
+  // <ol>
+  //   <li>We need a way of storing a value such that multiple threads can
+  //   read and write into concurrently in a way that prevents data races
+  //   (i.e., thread-safe reading and writing).</li>
+  //   <li>We need a way to increment such a value that is also
+  //   thread-safe.</li>
+  // </ol>
   //
-  // The way this function then works is to first spawn one thread for each
-  // energy group we work with, then one-by-one collecting the returned values
-  // of each thread and return the sum.
+  // The first feature is available through the template class
+  // <code>std::atomic</code>. However, the second feature, implemented by
+  // <code>std::atomic<double>::fetch_add()</code>, is only available in C++20
+  // and later: since deal.II supports older versions of the C++ language
+  // standard we cannot use this feature yet. Hence, instead, we simply write
+  // each group's value out to an entry in a vector and sum the values at the
+  // end of the function.
   template <int dim>
   double NeutronDiffusionProblem<dim>::get_total_fission_source() const
   {
-    std::vector<Threads::Thread<double>> threads;
+    std::vector<double>  fission_sources(parameters.n_groups);
+    Threads::TaskGroup<> tasks;
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      threads.push_back(
-        Threads::new_thread(&EnergyGroup<dim>::get_fission_source,
-                            *energy_groups[group]));
+      tasks += Threads::new_task<>([&, group]() {
+        fission_sources[group] = energy_groups[group]->get_fission_source();
+      });
+    tasks.join_all();
 
-    double fission_source = 0;
-    for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      fission_source += threads[group].return_value();
-
-    return fission_source;
+    return std::accumulate(fission_sources.begin(), fission_sources.end(), 0.0);
   }
 
 
@@ -1525,27 +1530,28 @@ namespace Step28
     BlockVector<float> group_error_indicators(n_cells);
 
     {
-      Threads::ThreadGroup<void> threads;
+      Threads::TaskGroup<> tasks;
       for (unsigned int group = 0; group < parameters.n_groups; ++group)
-        threads += Threads::new_thread(&EnergyGroup<dim>::estimate_errors,
-                                       *energy_groups[group],
-                                       group_error_indicators.block(group));
-      threads.join_all();
+        tasks += Threads::new_task([&, group]() {
+          energy_groups[group]->estimate_errors(
+            group_error_indicators.block(group));
+        });
     }
+    // The destructor of Threads::TaskGroup joins all threads so we know that
+    // the computation is done by the time we exit the scope.
 
     const float max_error         = group_error_indicators.linfty_norm();
     const float refine_threshold  = 0.3 * max_error;
     const float coarsen_threshold = 0.01 * max_error;
 
     {
-      Threads::ThreadGroup<void> threads;
+      Threads::TaskGroup<void> tasks;
       for (unsigned int group = 0; group < parameters.n_groups; ++group)
-        threads += Threads::new_thread(&EnergyGroup<dim>::refine_grid,
-                                       *energy_groups[group],
-                                       group_error_indicators.block(group),
-                                       refine_threshold,
-                                       coarsen_threshold);
-      threads.join_all();
+        tasks += Threads::new_task([&, group]() {
+          energy_groups[group]->refine_grid(group_error_indicators.block(group),
+                                            refine_threshold,
+                                            coarsen_threshold);
+        });
     }
   }
 
@@ -1580,9 +1586,9 @@ namespace Step28
       {
         // We will measure the CPU time that each cycle takes below. The
         // constructor for Timer calls Timer::start(), so once we create a
-        // timer we can query it for information. Since we use a thread pool
-        // to assemble the system matrices, the CPU time we measure (if we run
-        // with more than one thread) will be larger than the wall time.
+        // timer we can query it for information. Since many parts of this
+        // loop are parallelized with tasks, the CPU time we measure (if we
+        // run with more than one thread) will be larger than the wall time.
         Timer timer;
 
         std::cout << "Cycle " << cycle << ':' << std::endl;
@@ -1611,13 +1617,11 @@ namespace Step28
           std::cout << energy_groups[group]->n_dofs() << ' ';
         std::cout << std::endl << std::endl;
 
-
-        Threads::ThreadGroup<void> threads;
+        Threads::TaskGroup<> tasks;
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
-          threads +=
-            Threads::new_thread(&EnergyGroup<dim>::assemble_system_matrix,
-                                *energy_groups[group]);
-        threads.join_all();
+          tasks += Threads::new_task(
+            [&, group]() { energy_groups[group]->assemble_system_matrix(); });
+        tasks.join_all();
 
         double       error;
         unsigned int iteration = 1;
