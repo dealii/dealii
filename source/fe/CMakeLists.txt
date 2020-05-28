@@ -59,6 +59,7 @@ SET(_unity_include_src
   mapping_q.cc
   mapping_q_cache.cc
   mapping_manifold.cc
+  mapping_q2.cc
   )
 
 SET(_separate_src
@@ -138,6 +139,7 @@ SET(_inst
   mapping_q_eulerian.inst.in
   mapping_q.inst.in
   mapping_manifold.inst.in
+  mapping_q2.inst.in
   )
 
 FILE(GLOB _header
