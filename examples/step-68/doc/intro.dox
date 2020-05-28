@@ -1,0 +1,120 @@
+<br>
+
+<i>
+
+Bruno Blais (Polytechnique Montréal),
+Toni El Geitani Nehme (Polytechnique Montreal),
+Rene Gassmöller (University of California Davis),
+and Peter Munch
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.3829064,https://zenodo.org/badge/DOI/10.5281/zenodo.3829064.svg}
+
+
+<h1>Introduction</h1>
+
+<h3>Simulation of the motion of massless tracer particles in a vortical flow</h3>
+
+Particles play an important part in numerical models for a large
+ number of applications. Particles are routinely used
+ as massless tracer to visualize the dynamic of a transient flow. They
+ can also play an intrinsic role as part of a more complex finite element
+ model, as is the case of the Particle-In-Cell (PIC) method (Gassmöller et al. 2018)
+ or they can even be used to simulate the motion of granular matter, as is
+ the case with the Discrete Element Method (DEM) (Blais et al. 2019). In the case
+ of DEM, the resulting model is not related to the finite element method anymore,
+ but just leads to a serie of ordinary differential equation which describes
+ the motion of the particles and the dynamic of their collisions. All of
+ these models can be built using deal.II particle handling capabilities.
+
+In the present step, we use particles as massless tracer to illustrate
+the dynamic of a vortical flows. Since the particles are massless tracers,
+the position of each particle $i$ is described by the
+following ordinary differential equation (ODE):
+@f[
+\frac{d \textbf{x}_i}{dt} =\textbf{u}(\textbf{x}_i)
+@f]
+
+where $\textbf{x}_i$ is the postion of particle $i$. In the present step,
+this ODE is solved using the explicit Euler method. The resulting scheme is:
+@f[
+\textbf{x}_{i}^{t+\Delta t} = \textbf{x}_{i}^{t} + \Delta t \; \textbf{u}(\textbf{x}_{i}^{t})
+@f]
+
+where $\textbf{x}_{i}^{t+\Delta t}$ and $\textbf{x}_{i}^{t}$ are the position
+of particle $i$ at time $t+\Delta t$ and $t$, respectively and where $\Delta t$
+is the time step. In the present step, the velocity at the location of particles
+is obtainedin two different fashions:
+- By evaluating the velocity function at the location of the particles
+- By evaluating the velocity function on a background triangulation and, using
+a  finite element support, interpolating at the position of the particle.
+
+The first approach is not really practical, since in general, the velocity profile
+is not known analytically. The second approach, based on interpolating a solution
+at the position of the particles, mimics exactly what would be done in a
+realistic computational fluid dynamic simulation. In this step, we illustrate both strategies.
+
+
+We note that much greater accuracy could be obtained by using a fourth
+order Runge-Kutta method or another appropriate scheme for the time integration
+of the motion of the particles. However, this does not alter which capacities
+are displayed in the present step.
+
+<h3>Particles in deal.II</h3>
+
+In deal.II, Particles::Particle are very simple and flexible entities that can be used
+to build PIC, DEM or any type of particle-based models. Particles have a location
+in real space, a location in the reference space of the element in which they
+lie and a unique ID. In the majority of cases, simulations that include
+particles require a significant number of them. Thus, it becomes interesting
+to handle all particles through an entity which agglomerates all particles.
+In deal.II, this is achieved through the use of the Particles::ParticleHandler class.
+
+By default, particles do not have a diameter,
+a mass or any other physical properties which we would generally expect of physical particles. Howevever, through
+a ParticleHandler, particles have access to a Particles::PropertyPool. This PropertyPool is
+an array which can be used to store any  arbitrary number of properties
+associated with the particles. Consequently, users can build their own
+particle solver and attribute the desired properties to the particles (e.g. mass,
+  diameter, temperature, etc.). In the present tutorial, this is used to
+  store the value of the fluid velocity and the processor id to which the particles
+  belong.
+
+
+<h3>The testcase</h3>
+
+In the present step, we use particles as massless tracer to illustrate
+the dynamic of a vortical flow : the Rayleigh-Kotte Vortex. This flow pattern
+is generally used as a complex test case for interface tracking methods (e.g.
+  volume-of-fluid and level set approches) since
+it leads to strong rotation and elongation of the fluid (Blais 2014).
+
+The
+stream function $\Psi$ of this Rayleigh-Kotte vortex is defined as:
+
+@f[
+\Psi = \frac{1}{\pi} sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
+@f]
+where $T$ is the period of the flow. The velocity profile in 2D ($\textbf{u}=[u,v]^T$) is :
+@f{eqnarray*}
+   u &=&  - \frac{\partial\Psi}{\partial y} = \frac{1}{\pi} \sin^2 (\pi x) \sin (\pi y) \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\
+   v &=&  \frac{\partial\Psi}{\partial x} = \frac{1}{\pi} \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
+@f}
+
+
+
+
+
+<h3>References</h3>
+
+<ul>
+<li> Blais, Bruno, et al. (2019) "Experimental Methods in Chemical Engineering: Discrete
+ Element Method—DEM."  The Canadian Journal of Chemical Engineering 97.7 :  1964-1973.
+
+<li>Gassmöller, Rene, et al. (2018). "Flexible and Scalable Particle‐in‐Cell Methods With
+  Adaptive Mesh Refinement for Geodynamic Computations." Geochemistry, Geophysics,
+   Geosystems 19.9 : 3596-3604.
+
+ <li>Blais, Bruno, et al. (2013) "Dealing with more than two materials in the FVCF–ENIP method."
+ European Journal of Mechanics-B/Fluids 42 1-9.
+ </ul>
