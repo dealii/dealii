@@ -38,6 +38,4 @@ src/muParserTest.cpp
 src/muParserTokenReader.cpp
   )
 
-#IF(DEAL_II_WITH_THREADS)
-#  DEAL_II_ADD_DEFINITIONS(obj_muparser "FP_USE_THREAD_SAFE_EVAL")
-#ENDIF()
+#DEAL_II_ADD_DEFINITIONS(obj_muparser "FP_USE_THREAD_SAFE_EVAL")

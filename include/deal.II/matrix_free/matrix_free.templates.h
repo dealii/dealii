@@ -40,7 +40,7 @@
 #include <deal.II/matrix_free/face_setup_internal.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
 #  include <deal.II/base/parallel.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -434,7 +434,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
         // initialize the basic multithreading information that needs to be
         // passed to the DoFInfo structure
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
       if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
           MultithreadInfo::n_threads() > 1)
         {
@@ -1849,7 +1849,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::clear()
 
 
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
 
 namespace internal
 {
@@ -1958,7 +1958,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::make_connectivity_graph_faces(
   DynamicSparsityPattern &connectivity)
 {
   (void)connectivity;
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
   // step 1: build map between the index in the matrix-free context and the
   // one in the triangulation
   tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,

@@ -27,7 +27,7 @@
 #  include <deal.II/base/thread_local_storage.h>
 #  include <deal.II/base/thread_management.h>
 
-#  ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_TBB
 #    include <tbb/pipeline.h>
 #  endif
 
@@ -156,7 +156,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace WorkStream
 {
-#  ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_TBB
 
   namespace internal
   {
@@ -880,7 +880,7 @@ namespace WorkStream
   } // namespace internal
 
 
-#  endif // DEAL_II_WITH_THREADS
+#  endif // DEAL_II_WITH_TBB
 
 
   /**
@@ -1023,7 +1023,7 @@ namespace WorkStream
 
       // we want to use TBB if we have support and if it is not disabled at
       // runtime:
-#  ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_TBB
     if (MultithreadInfo::n_threads() == 1)
 #  endif
       {
@@ -1043,7 +1043,7 @@ namespace WorkStream
               copier(copy_data);
           }
       }
-#  ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_TBB
     else // have TBB and use more than one thread
       {
         // Check that the copier exist
@@ -1198,7 +1198,7 @@ namespace WorkStream
 
     // we want to use TBB if we have support and if it is not disabled at
     // runtime:
-#  ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_TBB
     if (MultithreadInfo::n_threads() == 1)
 #  endif
       {
@@ -1222,7 +1222,7 @@ namespace WorkStream
                 copier(copy_data);
             }
       }
-#  ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_TBB
     else // have TBB and use more than one thread
       {
         // loop over the various colors of what we're given
