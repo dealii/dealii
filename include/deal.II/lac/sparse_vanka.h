@@ -154,6 +154,18 @@ public:
   SparseVanka();
 
   /**
+   * Constructor which also takes two deprecated inputs.
+   *
+   * @deprecated The use of the last two parameters is deprecated. They are
+   * currently ignored.
+   */
+  DEAL_II_DEPRECATED
+  SparseVanka(const SparseMatrix<number> &M,
+              const std::vector<bool> &   selected,
+              const bool                  conserve_memory,
+              const unsigned int n_threads = MultithreadInfo::n_threads());
+
+  /**
    * Constructor. Gets the matrix for preconditioning and a bit vector with
    * entries @p true for all rows to be updated. A reference to this vector
    * will be stored, so it must persist longer than the Vanka object. The same
@@ -164,24 +176,8 @@ public:
    * conceivable that the preconditioner is build up for one matrix once, but
    * is used for subsequent steps in a nonlinear process as well, where the
    * matrix changes in each step slightly.
-   *
-   * If @p conserve_mem is @p false, then the inverses of the local systems
-   * are computed now; if the flag is @p true, then they are computed every
-   * time the preconditioner is applied. This saves some memory, but makes
-   * preconditioning very slow. Note also, that if the flag is @p false, then
-   * the contents of the matrix @p M at the time of calling this constructor
-   * are used, while if the flag is @p true, then the values in @p M at the
-   * time of preconditioning are used. This may lead to different results,
-   * obviously, of @p M changes.
-   *
-   * The parameter @p n_threads determines how many threads shall be used in
-   * parallel when building the inverses of the diagonal blocks. This
-   * parameter is ignored if not in multithreaded mode.
    */
-  SparseVanka(const SparseMatrix<number> &M,
-              const std::vector<bool> &   selected,
-              const bool                  conserve_memory = false,
-              const unsigned int n_threads = MultithreadInfo::n_threads());
+  SparseVanka(const SparseMatrix<number> &M, const std::vector<bool> &selected);
 
   /**
    * Destructor. Delete all allocated matrices.
@@ -197,25 +193,23 @@ public:
     /**
      * Constructor. For the parameters' description, see below.
      */
+    explicit AdditionalData(const std::vector<bool> &selected);
+
+    /**
+     * Constructor. For the parameters' description, see below.
+     *
+     * @deprecated The use of this constructor is deprecated - the second and
+     * third parameters are ignored.
+     */
+    DEAL_II_DEPRECATED
     AdditionalData(const std::vector<bool> &selected,
-                   const bool               conserve_memory = false,
+                   const bool               conserve_memory,
                    const unsigned int n_threads = MultithreadInfo::n_threads());
 
     /**
      * Indices of those degrees of freedom that we shall work on.
      */
     const std::vector<bool> &selected;
-
-    /**
-     * Conserve memory flag.
-     */
-    const bool conserve_mem;
-
-    /**
-     * Number of threads to be used when building the inverses. Only relevant
-     * in multithreaded mode.
-     */
-    const unsigned int n_threads;
   };
 
 
@@ -311,20 +305,9 @@ private:
   SmartPointer<const SparseMatrix<number>, SparseVanka<number>> matrix;
 
   /**
-   * Conserve memory flag.
-   */
-  bool conserve_mem;
-
-  /**
    * Indices of those degrees of freedom that we shall work on.
    */
   const std::vector<bool> *selected;
-
-  /**
-   * Number of threads to be used when building the inverses. Only relevant in
-   * multithreaded mode.
-   */
-  unsigned int n_threads;
 
   /**
    * Array of inverse matrices, one for each degree of freedom. Only those
@@ -544,13 +527,25 @@ public:
 
   /**
    * Constructor. Pass all arguments except for @p n_blocks to the base class.
+   *
+   * @deprecated This constructor is deprecated. The values passed to the last
+   * two arguments are ignored.
    */
+  DEAL_II_DEPRECATED
   SparseBlockVanka(const SparseMatrix<number> &M,
                    const std::vector<bool> &   selected,
                    const unsigned int          n_blocks,
                    const BlockingStrategy      blocking_strategy,
-                   const bool                  conserve_memory = false,
+                   const bool                  conserve_memory,
                    const unsigned int n_threads = MultithreadInfo::n_threads());
+
+  /**
+   * Constructor. Pass all arguments except for @p n_blocks to the base class.
+   */
+  SparseBlockVanka(const SparseMatrix<number> &M,
+                   const std::vector<bool> &   selected,
+                   const unsigned int          n_blocks,
+                   const BlockingStrategy      blocking_strategy);
 
   /**
    * Apply the preconditioner.
