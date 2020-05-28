@@ -1286,8 +1286,6 @@ namespace
 
 
   // a 2d face in 3d space
-
-  // a 2d face in 3d space
   template <int dim>
   double
   measure(const TriaAccessor<2, dim, 3> &accessor)
