@@ -218,11 +218,6 @@ namespace Step68
   // @sect3{The <code>PatricleTracking</code> class declaration}
 
   // We are now ready to introduce the main class of our tutorial program.
-  // Contrarily to some other steps, there is an additional function that is
-  // left public other than the constructor and the `run()` method, which is the
-  // cell_weight() function. This function is connected to the triangulation and
-  // must be callable from outside of the scope of this class. Everything else
-  // is left `private`, and accessed through the run method itself.
   template <int dim>
   class ParticleTracking
   {
@@ -230,16 +225,6 @@ namespace Step68
     ParticleTracking(const ParticleTrackingParameters &par,
                      const bool                        interpolated_velocity);
     void run();
-
-    // The cell_weight() function indicates to the triangulation how much
-    // computational work is expected to happen on this cell, and consequently
-    // how the domain needs to be partitioned so that every MPI rank receives a
-    // roughly equal amount of work (potentially not an equal number of cells).
-    unsigned int cell_weight(
-      const typename parallel::distributed::Triangulation<dim>::cell_iterator
-        &cell,
-      const typename parallel::distributed::Triangulation<dim>::CellStatus
-        status);
 
   private:
     // The particles_generation function is responsible for the initial
@@ -260,6 +245,18 @@ namespace Step68
     // respectively
     void euler_interpolated(double dt);
     void euler_analytical(double dt);
+
+    // The cell_weight() function indicates to the triangulation how much
+    // computational work is expected to happen on this cell, and consequently
+    // how the domain needs to be partitioned so that every MPI rank receives a
+    // roughly equal amount of work (potentially not an equal number of cells).
+    // While the function is called from the outside, it is connected to the
+    // corresponding signal from inside this class, therefore it can be private.
+    unsigned int cell_weight(
+      const typename parallel::distributed::Triangulation<dim>::cell_iterator
+        &cell,
+      const typename parallel::distributed::Triangulation<dim>::CellStatus
+        status) const;
 
     // The following two functions are responsible for outputting the simulation
     // results for the particles and for the velocity profile on the background
@@ -333,9 +330,10 @@ namespace Step68
   unsigned int ParticleTracking<dim>::cell_weight(
     const typename parallel::distributed::Triangulation<dim>::cell_iterator
       &                                                                  cell,
-    const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+    const typename parallel::distributed::Triangulation<dim>::CellStatus status) const
   {
-    if (cell->is_active() && !cell->is_locally_owned())
+    // Assign no weight to cells we do not own.
+    if (!cell->is_locally_owned())
       return 0;
 
     // This determines how important particle work is compared to cell
@@ -390,10 +388,12 @@ namespace Step68
 
     // In order to consider the particles when repartitioning the triangulation
     // the algorithm needs to know three things:
+    //
     // 1. How much weight to assign to each cell (how many particles are in
     // there)
     // 2. How to pack the particles before shipping data around
     // 3. How to unpack the particles after repartitioning
+    //
     // Attach the correct functions to the signals inside
     // parallel::distributed::Triangulation, which will be called every time the
     // repartition() function is called.

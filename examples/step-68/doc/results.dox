@@ -6,7 +6,7 @@ line, the program will try to read the file "`parameters.prm`" by default, and
 will execute the two dimensional version of the code.
 
 Regardless of the specific parameter file name, if the specified file does not
-exist, when you execute the program you will get an exception that no such file
+exist when you execute the program you will get an exception that no such file
 can be found:
 
 @code
@@ -63,9 +63,9 @@ Writing particle output file: interpolated-particles-2000
 Writing background field file: background-2000
 @endcode
 
-We notice that, by default, the simulation runs the particle tracking with
+We note that, by default, the simulation runs the particle tracking with
 an analytical velocity for 2000 iterations, then runs the particle tracking with
-velocity interpolationn for the same duration. The results are written every
+velocity interpolation for the same duration. The results are written every
 10 iterations.
 
 <h3> Motion of the particles </h3>
