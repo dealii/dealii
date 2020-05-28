@@ -1398,9 +1398,9 @@ namespace GridGenerator
    * radius of the $k$th shell is given by
    *
    * @f[
-   *     r = r_{\text{inner}} + (r_\text{outer} - r_\text{inner})
-   *     \frac{1 - \tanh(\text{skewness}(1 - k/\text{n\_shells}))}
-   *          {\tanh(\text{skewness})}
+   *     r = r_{\mathrm{inner}} + (r_\mathrm{outer} - r_\mathrm{inner})
+   *     \frac{1 - \tanh(\mathrm{skewness}(1 - k/\mathrm{n\_shells}))}
+   *          {\tanh(\mathrm{skewness})}
    * @f]
    *
    * where @p skewness is a parameter controlling the shell spacing in the

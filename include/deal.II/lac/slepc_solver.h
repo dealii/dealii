@@ -313,7 +313,7 @@ namespace SLEPcWrappers
     /**
      * Access the real parts of solutions for a solved eigenvector problem,
      * pair index solutions, $\text{index}\,\in\,0\dots
-     * \text{n\_converged}-1$.
+     * \mathrm{n\_converged}-1$.
      */
     void
     get_eigenpair(const unsigned int         index,
@@ -323,7 +323,7 @@ namespace SLEPcWrappers
     /**
      * Access the real and imaginary parts of solutions for a solved
      * eigenvector problem, pair index solutions, $\text{index}\,\in\,0\dots
-     * \text{n\_converged}-1$.
+     * \mathrm{n\_converged}-1$.
      */
     void
     get_eigenpair(const unsigned int         index,
