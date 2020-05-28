@@ -220,7 +220,7 @@ namespace Step68
   // We are now ready to introduce the main class of our tutorial program.
   // Contrarily to some other steps, there is an additional function that is
   // left public other than the constructor and the `run()` method, which is the
-  // cell_weight function. This function is connected to the triangulation and
+  // cell_weight() function. This function is connected to the triangulation and
   // must be callable from outside of the scope of this class. Everything else
   // is left `private`, and accessed through the run method itself.
   template <int dim>
@@ -231,8 +231,10 @@ namespace Step68
                      const bool                        interpolated_velocity);
     void run();
 
-
-    // Rene you would be more proefficient than me to write this
+    // The cell_weight() function indicates to the triangulation how much
+    // computational work is expected to happen on this cell, and consequently
+    // how the domain needs to be partitioned so that every MPI rank receives a
+    // roughly equal amount of work (potentially not an equal number of cells).
     unsigned int cell_weight(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
@@ -250,7 +252,6 @@ namespace Step68
     // initialize the degrees of freedom on the background grid
     void setup_background_dofs();
 
-
     void interpolate_function_to_field();
 
     // The next two functions are responsible for carrying out explicit Euler
@@ -266,18 +267,16 @@ namespace Step68
     void output_particles(unsigned int it);
     void output_background(unsigned int it);
 
-    // The private member of this class are similar to other parallel deal.II
+    // The private members of this class are similar to other parallel deal.II
     // examples. The parameters are stored as a const member. It is important
     // to note that we keep the Vortex class as a member since its time
     // must be modified as the simulation proceeds.
 
     const ParticleTrackingParameters &par;
 
-
     MPI_Comm                                  mpi_communicator;
     parallel::distributed::Triangulation<dim> background_triangulation;
     Particles::ParticleHandler<dim>           particle_handler;
-
 
     DoFHandler<dim> fluid_dh;
     FESystem<dim>   fluid_fe;
@@ -319,11 +318,17 @@ namespace Step68
 
   // @sect4{Cell weight}
 
-  // To be completed by Rene
-  // This function is the key component that allow us to do dynamic load
-  // balancing. It attributes a weight to every cell that depends on the number
-  // of particles that lie within that cell.
-
+  // This function is the key component that allow us to dynamically balance the
+  // computational load for this example. The function attributes a weight to
+  // every cell that represents the computational work on this cell. Here the
+  // majority of work is expected to happen on the particles, therefore the
+  // return value of this function (representing "work for this cell") is
+  // calculated based on the number of particles in the current cell.
+  // The function is
+  // connected to the cell_weight() signal inside the triangulation, and will be
+  // called once per cell, whenever the triangulation repartitions the domain
+  // between ranks (the connection is created inside the
+  // particles_generation() function of this class).
   template <int dim>
   unsigned int ParticleTracking<dim>::cell_weight(
     const typename parallel::distributed::Triangulation<dim>::cell_iterator
@@ -333,11 +338,20 @@ namespace Step68
     if (cell->is_active() && !cell->is_locally_owned())
       return 0;
 
-    // This determines how important particle distribution is compared to cell
-    // distribution (1 cell == 1000). We set this number much higher to indicate
-    // the particle load is the only one that is important to distribute.
+    // This determines how important particle work is compared to cell
+    // work (by default every cell has a weight of 1000). 
+    // We set the weight per particle much higher to indicate that
+    // the particle load is the only one that is important to distribute
+    // in this example. The optimal value of this number depends on the
+    // application and can range from 0 (cheap particle operations,
+    // expensive cell operations) to much larger than 1000 (expensive
+    // particle operations, cheap cell operations, like in this example).
     const unsigned int particle_weight = 10000;
 
+    // This example does not use adaptive refinement, therefore every cell
+    // should have the status CELL_PERSIST. However this function can also
+    // be used to distribute load during refinement, therefore we consider
+    // refined or coarsened cells as well.
     if (status == parallel::distributed::Triangulation<dim>::CELL_PERSIST ||
         status == parallel::distributed::Triangulation<dim>::CELL_REFINE)
       {
@@ -383,6 +397,9 @@ namespace Step68
     // Attach the correct functions to the signals inside
     // parallel::distributed::Triangulation, which will be called every time the
     // repartition() function is called.
+    // These connections only need to be created once, so we might as well
+    // have set them up in the constructor of this class, but for the purpose
+    // of this example we want to group the particle related instructions.
     background_triangulation.signals.cell_weight.connect(
       [&](
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
@@ -453,7 +470,6 @@ namespace Step68
 
   // @sect4{Background DOFs and interpolation}
 
-
   // Sets up the background degree of freedom used for the velocity
   // interpolation And allocate the field vector where the entire
   // solution of the velocity field is stored
@@ -517,8 +533,6 @@ namespace Step68
   {
     std::vector<types::global_dof_index> dof_indices(fluid_fe.dofs_per_cell);
     Vector<double> dof_data_per_cell(fluid_fe.dofs_per_cell);
-    Tensor<1, dim> particle_velocity;
-
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us
@@ -548,11 +562,19 @@ namespace Step68
             dof_data_per_cell[j] = field_relevant(dof_indices[j]);
           }
 
+        // Compute the velocity at the particle locations by evaluating
+        // the finite element solution at the position of the particles.
+        // This is essentially an optimized version of the particle advection
+        // functionality in step-19, but instead of creating quadrature
+        // objects and FEValues objects for each cell, we do the
+        // evaluation by hand, which is somewhat more efficient and only
+        // matters for this tutorial, because the particle work is the
+        // dominant cost of the whole program.
         const auto pic = particle_handler.particles_in_cell(cell);
         for (; particle != pic.end(); ++particle)
           {
             const auto &reference_location = particle->get_reference_location();
-            particle_velocity              = 0.;
+            Tensor<1, dim> particle_velocity;
             for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
               {
                 const auto comp_j = fluid_fe.system_to_component_index(j);
