@@ -132,7 +132,7 @@ namespace Step48
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(make_vectorized_array(1.), q);
-        fe_eval.integrate();
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
 
