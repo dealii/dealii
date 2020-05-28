@@ -39,8 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  * derivatives of order 3 or higher.
  *
  * @ingroup Polynomials
- * @author Bärbel Janssen
- * @date 2007
  */
 template <int dim>
 class PolynomialsAdini : public ScalarPolynomialsBase<dim>

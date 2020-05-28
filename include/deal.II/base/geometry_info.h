@@ -413,7 +413,6 @@ namespace internal
  * the object represented, this class provides conversion operators to and
  * from unsigned integers.
  *
- * @author Wolfgang Bangerth, 2014
  */
 class GeometryPrimitive
 {
@@ -483,7 +482,6 @@ private:
  * <code>RefinementPossibilities@<3@></code>.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <int dim>
 struct RefinementPossibilities
@@ -554,7 +552,6 @@ struct RefinementPossibilities
  * refinement in x-direction.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <>
 struct RefinementPossibilities<1>
@@ -621,7 +618,6 @@ struct RefinementPossibilities<1>
  * refinement in both directions at the same time.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <>
 struct RefinementPossibilities<2>
@@ -697,7 +693,6 @@ struct RefinementPossibilities<2>
  * these and isotropic refinement in all directions at the same time.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <>
 struct RefinementPossibilities<3>
@@ -789,7 +784,6 @@ struct RefinementPossibilities<3>
  * more information.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <int dim>
 class RefinementCase : public RefinementPossibilities<dim>
@@ -912,7 +906,6 @@ namespace internal
    * <code>SubfacePossibilities@<3@></code>.
    *
    * @ingroup aniso
-   * @author Tobias Leicht 2007, Ralf Hartmann, 2008
    */
   template <int dim>
   struct SubfacePossibilities
@@ -942,7 +935,6 @@ namespace internal
    * For <code>dim=0</code> we provide a dummy implementation only.
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<0>
@@ -976,7 +968,6 @@ namespace internal
    * possibilities.
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<1>
@@ -1011,7 +1002,6 @@ namespace internal
    * (<code>case_x</code>) or not refined (<code>case_no</code>).
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<2>
@@ -1131,7 +1121,6 @@ namespace internal
    * @endcode
    *
    * @ingroup aniso
-   * @author Tobias Leicht 2007, Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<3>
@@ -1166,7 +1155,6 @@ namespace internal
    * dimension @p dim) might be subdivided into subfaces.
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <int dim>
   class SubfaceCase : public SubfacePossibilities<dim>
@@ -1240,7 +1228,6 @@ struct GeometryInfo;
  * neighbors and so on, since it can be used dimension independently.
  *
  * @ingroup grid geomprimitives aniso
- * @author Wolfgang Bangerth, 1998
  */
 template <>
 struct GeometryInfo<0>
@@ -1913,7 +1900,6 @@ struct GeometryInfo<0>
  * in the manual).
  *
  * @ingroup grid geomprimitives aniso
- * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005, Tobias Leicht, 2007
  */
 template <int dim>
 struct GeometryInfo

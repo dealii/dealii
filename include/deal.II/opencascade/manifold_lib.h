@@ -60,7 +60,6 @@ namespace OpenCASCADE
    * face would be collapsed to the edge, and your surrounding points would
    * not be lying on the given shape, raising an exception.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class NormalProjectionManifold : public FlatManifold<dim, spacedim>
@@ -131,7 +130,6 @@ namespace OpenCASCADE
    * TopoDS_Shape, or when the direction you use at construction time does not
    * intersect the shape. An exception is thrown when this happens.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class DirectionalProjectionManifold : public FlatManifold<dim, spacedim>
@@ -228,7 +226,6 @@ namespace OpenCASCADE
    * points does not intersect the shape.  An exception is thrown when this
    * happens.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class NormalToMeshProjectionManifold : public FlatManifold<dim, spacedim>
@@ -291,7 +288,6 @@ namespace OpenCASCADE
    * OpenCASCADE::closest_point() on those points leaves them untouched. If
    * this is not the case, an ExcPointNotOnManifold is thrown.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class ArclengthProjectionLineManifold : public ChartManifold<dim, spacedim, 1>
@@ -352,7 +348,6 @@ namespace OpenCASCADE
    *
    * @ingroup manifold
    *
-   * @author Andrea Mola, Mauro Bardelloni, 2016
    */
   template <int dim, int spacedim>
   class NURBSPatchManifold : public ChartManifold<dim, spacedim, 2>

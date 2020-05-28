@@ -295,7 +295,6 @@ namespace Particles
      * process, and that falls within the part of triangulation owned by this
      * mpi process.
      *
-     * @author Bruno Blais, Luca Heltai 2019
      */
     std::map<unsigned int, IndexSet>
     insert_global_particles(
@@ -347,7 +346,6 @@ namespace Particles
      * be interpreted as a displacement vector, or a vector of absolute
      * positions.
      *
-     * @authors Luca Heltai, Bruno Blais, 2019.
      */
     template <class VectorType>
     typename std::enable_if<
@@ -376,7 +374,6 @@ namespace Particles
      * amount given by the function. When false, the position of the
      * particle is replaced by the value in the vector.
      *
-     * @authors Bruno Blais, Luca Heltai (2019)
      */
     void
     set_particle_positions(const std::vector<Point<spacedim>> &new_positions,
@@ -401,7 +398,6 @@ namespace Particles
      * them by the amount given by the function. When false, the position of the
      * particle is replaced by the value of the function.
      *
-     * @authors Bruno Blais, Luca Heltai (2019)
      */
     void
     set_particle_positions(const Function<spacedim> &function,
@@ -434,7 +430,6 @@ namespace Particles
      * @param[in] add_to_output_vector Control if the function should set the
      * entries of the @p output_vector or if should add to them.
      *
-     * @author Luca Heltai, Bruno Blais, 2019.
      */
     template <class VectorType>
     void
@@ -455,7 +450,6 @@ namespace Particles
      * the value of the points in the positions vector are replaced by the
      * position of the particles.
      *
-     * @authors Bruno Blais, Luca Heltai (2019)
      *
      */
     void
@@ -547,7 +541,6 @@ namespace Particles
      * @return An IndexSet of size get_next_free_particle_index(), containing
      * n_locally_owned_particle() indices.
      *
-     * @author Luca Heltai, Bruno Blais, 2019.
      */
     IndexSet
     locally_relevant_ids() const;

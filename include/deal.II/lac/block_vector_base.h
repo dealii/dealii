@@ -61,7 +61,6 @@ class BlockVectorBase;
  * do things differently depending on whether a template type denotes a
  * regular or a block vector type.
  *
- * @author Wolfgang Bangerth, 2010
  */
 template <typename VectorType>
 struct IsBlockVector
@@ -114,7 +113,6 @@ namespace internal
   /**
    * Namespace in which iterators in block vectors are implemented.
    *
-   * @author Wolfgang Bangerth, 2001
    */
   namespace BlockVectorIterators
   {
@@ -133,7 +131,6 @@ namespace internal
      * constant and we again have that the iterator satisfies the requirements
      * of a random access iterator.
      *
-     * @author Wolfgang Bangerth, 2001
      */
     template <class BlockVectorType, bool Constness>
     class Iterator
@@ -444,7 +441,6 @@ namespace internal
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
 class BlockVectorBase : public Subscriptor

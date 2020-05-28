@@ -158,7 +158,6 @@ namespace Functions
    * @endcode
    *
    * @ingroup functions
-   * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
   template <int dim,
             typename DoFHandlerType = DoFHandler<dim>,

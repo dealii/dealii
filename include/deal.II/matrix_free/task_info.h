@@ -41,7 +41,6 @@ namespace internal
    * An interface for the worker object that runs the various operations we
    * want to perform during the matrix-free loop.
    *
-   * @author Katharina Kormann, Martin Kronbichler, 2018
    */
   struct MFWorkerInterface
   {
@@ -100,7 +99,6 @@ namespace internal
      * threads: The work is subdivided into tasks that can be done
      * independently.
      *
-     * @author Katharina Kormann, Martin Kronbichler, 2011, 2018
      */
     struct TaskInfo
     {

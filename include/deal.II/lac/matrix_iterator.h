@@ -29,7 +29,6 @@ DEAL_II_NAMESPACE_OPEN
  * This iterator is abstracted from the actual matrix type and can be used for
  * any matrix having the required ACCESSOR type.
  *
- * @author Guido Kanschat, 2006, based on previous a implementation
  */
 template <class ACCESSOR>
 class MatrixIterator

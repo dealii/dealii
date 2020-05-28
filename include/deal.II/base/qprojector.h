@@ -72,7 +72,6 @@ DEAL_II_NAMESPACE_OPEN
  * for more information on this.) The DataSetDescriptor member class is used
  * to identify where each dataset starts.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2003, 2005
  */
 template <int dim>
 class QProjector
@@ -215,7 +214,6 @@ public:
    * subface indices, and you can then use the generated object in place of an
    * integer that denotes the offset of a given dataset.
    *
-   * @author Wolfgang Bangerth, 2003
    */
   class DataSetDescriptor
   {

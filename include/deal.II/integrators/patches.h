@@ -34,8 +34,6 @@ namespace LocalIntegrators
   /**
    * @brief Integrators writing patches with values in quadrature points
    *
-   * @author Guido Kanschat
-   * @date 2011
    */
   namespace Patches
   {

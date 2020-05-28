@@ -305,7 +305,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <td align="center"></td> </tr> </table>
  *
- * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
 template <int dim, int spacedim = dim>
 class FE_DGP : public FE_Poly<dim, spacedim>

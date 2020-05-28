@@ -345,7 +345,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * See the tutorial program step-60 for an example on how to use this class.
  *
- * @author Luca Heltai, 2017.
  */
 class ParameterAcceptor : public Subscriptor
 {
@@ -602,7 +601,6 @@ protected:
  *
  * See the tutorial program step-60 for an example on how to use this class.
  *
- * @author Luca Heltai, 2018
  */
 template <class SourceClass>
 class ParameterAcceptorProxy : public SourceClass, public ParameterAcceptor

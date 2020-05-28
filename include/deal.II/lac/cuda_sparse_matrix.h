@@ -43,8 +43,6 @@ namespace CUDAWrappers
    * @<double@></tt>.
    *
    * @ingroup Matrix1
-   * @author Bruno Turcksin
-   * @date 2018
    */
   template <typename Number>
   class SparseMatrix : public virtual Subscriptor

@@ -79,7 +79,6 @@ DEAL_II_NAMESPACE_OPEN
  * and 3 (see the section on
  * @ref Instantiations).
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -314,7 +313,6 @@ protected:
  * @note Each constructor can only be used in the dimension matching the
  * number of arguments.
  *
- * @author Guido Kanschat, 2005
  */
 template <int dim>
 class QAnisotropic : public Quadrature<dim>
@@ -363,7 +361,6 @@ public:
  * constant can be tuned by increasing the number of quadrature points. This
  * is useful in integrating non-differentiable functions on cells.
  *
- * @author Wolfgang Bangerth 1999
  */
 template <int dim>
 class QIterated : public Quadrature<dim>

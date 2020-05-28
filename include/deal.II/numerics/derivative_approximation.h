@@ -155,7 +155,6 @@ DEAL_II_NAMESPACE_OPEN
  * derivative that is to be approximated.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 2000
  */
 namespace DerivativeApproximation
 {

@@ -60,7 +60,6 @@ namespace LinearAlgebra
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Bruno Turcksin, 2015
      */
     class Vector : public VectorSpaceVector<double>, public Subscriptor
     {

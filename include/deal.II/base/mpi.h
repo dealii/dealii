@@ -957,7 +957,6 @@ namespace Utilities
      * @return A map from the rank (unsigned int) of the process
      *  which sent the data and object received.
      *
-     * @author Giovanni Alzetta, Luca Heltai, 2017
      */
     template <typename T>
     std::map<unsigned int, T>
@@ -977,7 +976,6 @@ namespace Utilities
      *  received from the processor with the corresponding rank within the
      *  communicator.
      *
-     * @author Giovanni Alzetta, Luca Heltai, 2017
      */
     template <typename T>
     std::vector<T>
@@ -998,7 +996,6 @@ namespace Utilities
      *  received from the processor with the corresponding rank within the
      *  communicator. All other processes receive an empty vector.
      *
-     * @author Benjamin Brands, 2017
      */
     template <typename T>
     std::vector<T>
@@ -1048,7 +1045,6 @@ namespace Utilities
      *         set @p indices_to_look_up. The order coincides with the order
      *         within the ElementIterator.
      *
-     * @author Peter Munch, 2019
      */
     std::vector<unsigned int>
     compute_index_owner(const IndexSet &owned_indices,

@@ -125,7 +125,6 @@ namespace LinearAlgebra
    * The function IndexSet::largest_range_starting_index() can be used to
    * get the first index of the largest range.
    *
-   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class ReadWriteVector : public Subscriptor

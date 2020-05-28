@@ -106,7 +106,6 @@ class Vector;
  *
  *
  * @ingroup functions
- * @author Konrad Simon, 2019
  */
 template <int rank, int dim, typename Number = double>
 class TensorFunctionParser : public TensorFunction<rank, dim, Number>

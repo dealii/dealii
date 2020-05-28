@@ -123,7 +123,6 @@ namespace GridGenerator
    * @note Implemented for <tt>Triangulation@<2,2@></tt>,
    * <tt>Triangulation@<3,3@></tt>.
    *
-   * @author Guido Kanschat
    */
   template <int dim>
   void
@@ -330,7 +329,6 @@ namespace GridGenerator
    * calling this function.
    *
    * @param holes Positive number of holes in each of the dim directions.
-   * @author Guido Kanschat
    */
   template <int dim, int spacedim>
   void
@@ -380,7 +378,6 @@ namespace GridGenerator
    * @p tria is the triangulation to be created. It needs to be empty upon
    * calling this function.
    *
-   * @author Denis Davydov, 2018
    */
   template <int dim>
   void
@@ -512,7 +509,6 @@ namespace GridGenerator
    * @param vertices The 2^dim vertices of the cell
    * @param colorize If true, set different boundary ids.
    *
-   * @author Bruno Turcksin
    */
   template <int dim, int spacedim>
   void
@@ -923,7 +919,6 @@ namespace GridGenerator
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
    *
-   * @author Markus B&uuml;rg, 2009
    */
   template <int dim>
   void
@@ -958,7 +953,6 @@ namespace GridGenerator
    * @image html hyper_cross_2d.png
    * @image html hyper_cross_3d.png
    *
-   * @author Guido Kanschat
    */
   template <int dim, int spacedim>
   void
@@ -1037,7 +1031,6 @@ namespace GridGenerator
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1D.
    *
-   * @author Mae Markowski, 2019
    */
   template <int dim, int spacedim>
   void
@@ -1521,7 +1514,6 @@ namespace GridGenerator
    * @param grid_generator_function_arguments The arguments of the function, in
    * the format of a tuple-convertible string
    *
-   * @author Luca Heltai, 2019.
    */
   template <int dim, int spacedim>
   void
@@ -1862,7 +1854,6 @@ namespace GridGenerator
    * manifold objects are copied (nor are any manifold ids set) by this
    * function.
    *
-   * @author Weixiong Zheng, 2018
    */
   void
   extrude_triangulation(
@@ -1920,7 +1911,6 @@ namespace GridGenerator
    * manifold objects are copied by this function: you must attach new
    * manifold objects to @p out_tria.
    *
-   * @author Luca Heltai, 2014
    */
   template <int dim, int spacedim1, int spacedim2>
   void

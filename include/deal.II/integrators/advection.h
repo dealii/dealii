@@ -46,8 +46,6 @@ namespace LocalIntegrators
    * function.
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2012
    */
   namespace Advection
   {
@@ -72,8 +70,6 @@ namespace LocalIntegrators
      * entries as quadrature points if the velocity is not constant.
      * @param factor is an optional multiplication factor for the result.
      *
-     * @author Guido Kanschat
-     * @date 2012
      */
     template <int dim>
     void

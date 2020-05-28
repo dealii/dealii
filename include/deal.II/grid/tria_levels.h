@@ -52,7 +52,6 @@ namespace internal
      * need to know how to refine a line if the two adjacent faces have
      * different boundary indicators), and material data for cells.
      *
-     * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2007
      */
     class TriaLevel
     {

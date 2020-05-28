@@ -54,8 +54,6 @@ class Vector;
  * only the inverses. These are for instance used in the intermediate step of
  * the SSOR preconditioner.
  *
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename number>
 class PreconditionBlockBase

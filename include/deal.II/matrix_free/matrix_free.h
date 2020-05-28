@@ -108,7 +108,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
 
 template <int dim,

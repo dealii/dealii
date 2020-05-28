@@ -30,7 +30,6 @@ DEAL_II_NAMESPACE_OPEN
  * Given a list of names to search for (provided by add()), objects of this
  * class provide an index list of the selected data.
  *
- * @author Guido Kanschat, 2009
  */
 class NamedSelection
 {

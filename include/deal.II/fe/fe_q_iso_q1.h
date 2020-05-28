@@ -107,7 +107,6 @@ DEAL_II_NAMESPACE_OPEN
  * assumes coupling between all degrees of freedom within the element, whereas
  * FE_Q_iso_Q1 with more than one subdivision does have less coupling.
  *
- * @author Martin Kronbichler, 2013
  */
 template <int dim, int spacedim = dim>
 class FE_Q_iso_Q1

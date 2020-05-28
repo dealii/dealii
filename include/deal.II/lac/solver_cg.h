@@ -92,7 +92,6 @@ class PreconditionIdentity;
  * to observe the progress of the iteration.
  *
  *
- * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
 template <typename VectorType = Vector<double>>
 class SolverCG : public SolverBase<VectorType>

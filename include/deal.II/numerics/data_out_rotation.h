@@ -117,7 +117,6 @@ namespace internal
  * class consequently only a single template argument.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2000
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
 class DataOutRotation

@@ -1254,7 +1254,6 @@ namespace FEValuesViews
    *
    * @ingroup feaccess vector_valued
    *
-   * @author Andrew McBride, 2009
    */
   template <int dim, int spacedim>
   class SymmetricTensor<2, dim, spacedim>
@@ -1543,7 +1542,6 @@ namespace FEValuesViews
    *
    * @ingroup feaccess vector_valued
    *
-   * @author Denis Davydov, 2013, 2018
    */
   template <int dim, int spacedim>
   class Tensor<2, dim, spacedim>
@@ -1879,7 +1877,6 @@ namespace internal
      * A class whose specialization is used to define what FEValuesViews
      * object corresponds to the given FEValuesExtractors object.
      *
-     * @author Luca Heltai, 2019.
      */
     template <int dim, int spacedim, typename Extractor>
     struct ViewType
@@ -1973,7 +1970,6 @@ namespace FEValuesViews
    * A templated alias that associates to a given Extractor class
    * the corresponding view in FEValuesViews.
    *
-   * @author Luca Heltai, 2019.
    */
   template <int dim, int spacedim, typename Extractor>
   using View = typename dealii::internal::FEValuesViews::
@@ -2079,7 +2075,6 @@ namespace FEValuesViews
  *
  *
  * @ingroup feaccess
- * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim, int spacedim>
 class FEValuesBase : public Subscriptor
@@ -3445,7 +3440,6 @@ protected:
    * <a href="https://www.artima.com/cppsource/type_erasure.html">type
    * erasure</a> design pattern.
    *
-   * @author Wolfgang Bangerth, 2003
    */
   class CellIteratorBase;
 
@@ -3610,7 +3604,6 @@ private:
  * see this class.
  *
  * @ingroup feaccess
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
  */
 template <int dim, int spacedim = dim>
 class FEValues : public FEValuesBase<dim, spacedim>
@@ -3729,7 +3722,6 @@ private:
  * See FEValuesBase
  *
  * @ingroup feaccess
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
 template <int dim, int spacedim = dim>
 class FEFaceValuesBase : public FEValuesBase<dim, spacedim>
@@ -3826,7 +3818,6 @@ protected:
  * either of the neighboring cells.
  *
  * @ingroup feaccess
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
 template <int dim, int spacedim = dim>
 class FEFaceValues : public FEFaceValuesBase<dim, spacedim>
@@ -3972,7 +3963,6 @@ private:
  * number corresponds to the number of the child of the neighboring face.
  *
  * @ingroup feaccess
- * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
 template <int dim, int spacedim = dim>
 class FESubfaceValues : public FEFaceValuesBase<dim, spacedim>

@@ -59,8 +59,6 @@ namespace ChunkSparsityPatternIterators
    * row and column number. It does not allow modifying the sparsity pattern
    * itself.
    *
-   * @author Martin Kronbichler
-   * @date 2013
    */
   class Accessor
   {
@@ -242,7 +240,6 @@ namespace ChunkSparsityPatternIterators
  *
  * The use of this class is demonstrated in step-51.
  *
- * @author Wolfgang Bangerth, 2008
  */
 class ChunkSparsityPattern : public Subscriptor
 {

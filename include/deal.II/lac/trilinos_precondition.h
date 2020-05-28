@@ -76,8 +76,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008; extension for full compatibility with
-   * LinearOperator class: Jean-Paul Pelteret, 2015
    */
   class PreconditionBase : public Subscriptor
   {
@@ -270,7 +268,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionJacobi : public PreconditionBase
   {
@@ -352,7 +349,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Wolfgang Bangerth, 2008
    */
   class PreconditionSSOR : public PreconditionBase
   {
@@ -447,7 +443,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionSOR : public PreconditionBase
   {
@@ -533,7 +528,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2014
    */
   class PreconditionBlockJacobi : public PreconditionBase
   {
@@ -635,7 +629,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2014
    */
   class PreconditionBlockSSOR : public PreconditionBase
   {
@@ -747,7 +740,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2014
    */
   class PreconditionBlockSOR : public PreconditionBase
   {
@@ -872,7 +864,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionIC : public PreconditionBase
   {
@@ -977,7 +968,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionILU : public PreconditionBase
   {
@@ -1096,7 +1086,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2009
    */
   class PreconditionILUT : public PreconditionBase
   {
@@ -1199,7 +1188,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionBlockwiseDirect : public PreconditionBase
   {
@@ -1241,7 +1229,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionChebyshev : public PreconditionBase
   {
@@ -1356,7 +1343,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionAMG : public PreconditionBase
   {
@@ -1734,7 +1720,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Bruno Turcksin, 2014
    */
   class PreconditionAMGMueLu : public PreconditionBase
   {
@@ -1967,8 +1952,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Bruno Turcksin, 2013; extension for full compatibility with
-   * LinearOperator class: Jean-Paul Pelteret, 2016
    */
   class PreconditionIdentity : public PreconditionBase
   {

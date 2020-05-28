@@ -216,7 +216,6 @@ namespace internal
      * <a href="https://www.artima.com/cppsource/type_erasure.html">type
      * erasure</a> design pattern.
      *
-     * @author Wolfgang Bangerth, 2004
      */
     template <typename DoFHandlerType>
     class DataEntryBase
@@ -594,7 +593,6 @@ namespace internal
  * value as the second one.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 1999
  */
 template <typename DoFHandlerType,
           int patch_dim,

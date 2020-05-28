@@ -41,7 +41,6 @@ DEAL_II_NAMESPACE_OPEN
  * most of its functionality from TensorProductPolynomials. The bubble
  * enrichments are added for the last indices. index.
  *
- * @author Daniel Arndt, 2015
  */
 template <int dim>
 class TensorProductPolynomialsBubbles : public ScalarPolynomialsBase<dim>

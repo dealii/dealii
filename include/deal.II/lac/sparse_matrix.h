@@ -490,8 +490,6 @@ namespace SparseMatrixIterators
  * in the manual).
  *
  * @ingroup Matrix1
- * @author Essentially everyone who has ever worked on deal.II
- * @date 1994-2013
  */
 template <typename number>
 class SparseMatrix : public virtual Subscriptor

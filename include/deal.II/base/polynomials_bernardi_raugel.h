@@ -80,8 +80,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup Polynomials
- * @author Graham Harper
- * @date 2018
  */
 template <int dim>
 class PolynomialsBernardiRaugel : public TensorPolynomialsBase<dim>

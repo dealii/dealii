@@ -55,9 +55,6 @@ namespace internal
      * treatment of templates is a little more complicated. See the
      * @ref Iterators
      * module for more information.
-     *
-     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
-     * 2003, 2008, 2010
      */
     template <template <int, int> class DoFHandlerType, int spacedim, bool lda>
     struct Iterators<DoFHandlerType<1, spacedim>, lda>
@@ -101,9 +98,6 @@ namespace internal
      * treatment of templates is a little more complicated. See the
      * @ref Iterators
      * module for more information.
-     *
-     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
-     * 2003, 2008, 2010
      */
     template <template <int, int> class DoFHandlerType, int spacedim, bool lda>
     struct Iterators<DoFHandlerType<2, spacedim>, lda>
@@ -145,9 +139,6 @@ namespace internal
      * treatment of templates is a little more complicated. See the
      * @ref Iterators
      * module for more information.
-     *
-     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
-     * 2003, 2008, 2010
      */
     template <template <int, int> class DoFHandlerType, int spacedim, bool lda>
     struct Iterators<DoFHandlerType<3, spacedim>, lda>

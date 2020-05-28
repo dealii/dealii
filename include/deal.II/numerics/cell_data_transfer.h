@@ -102,7 +102,6 @@ DEAL_II_NAMESPACE_OPEN
  *   for transfer.
  *
  * @ingroup numerics
- * @author Marc Fehling, 2019 - 2020
  */
 template <int dim, int spacedim = dim, typename VectorType = Vector<double>>
 class CellDataTransfer

@@ -57,7 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * list_subscribers().
  *
  * @ingroup memory
- * @author Guido Kanschat, Daniel Arndt, 1998 - 2005, 2018
  */
 class Subscriptor
 {

@@ -248,7 +248,6 @@ namespace TriangulationDescription
    * Configuration flags for Triangulations.
    * Settings can be combined using bitwise OR.
    *
-   * @author Peter Munch, 2019
    */
   enum Settings
   {
@@ -276,7 +275,6 @@ namespace TriangulationDescription
    * a unique id, partitioning information, and information related to cell
    * faces and edges.
    *
-   * @author Peter Munch, 2019
    */
   template <int dim>
   struct CellData
@@ -341,7 +339,6 @@ namespace TriangulationDescription
   /**
    * Data used in Triangulation::create_triangulation().
    *
-   * @author Peter Munch, 2019
    */
   template <int dim, int spacedim>
   struct Description
@@ -437,7 +434,6 @@ namespace TriangulationDescription
      * @note If construct_multigrid_hierarchy is set in the settings, the source
      *   triangulation has to be setup with limit_level_difference_at_vertices.
      *
-     * @author Peter Munch, 2019
      */
     template <int dim, int spacedim = dim>
     Description<dim, spacedim>
@@ -477,7 +473,6 @@ namespace TriangulationDescription
      *   @p smoothing parameter is extended with the
      *   limit_level_difference_at_vertices flag.
      *
-     * @author Peter Munch, 2019
      */
     template <int dim, int spacedim = dim>
     Description<dim, spacedim>

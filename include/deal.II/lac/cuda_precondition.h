@@ -57,8 +57,6 @@ namespace CUDAWrappers
    * @<double@></tt>.
    *
    * @ingroup Preconditioners CUDAWrappers
-   * @author Daniel Arndt
-   * @date 2018
    */
   template <typename Number>
   class PreconditionIC
@@ -272,8 +270,6 @@ namespace CUDAWrappers
    * @<double@></tt>.
    *
    * @ingroup Preconditioners CUDAWrappers
-   * @author Daniel Arndt
-   * @date 2018
    */
   template <typename Number>
   class PreconditionILU

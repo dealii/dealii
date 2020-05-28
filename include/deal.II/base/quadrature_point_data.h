@@ -58,7 +58,6 @@ DEAL_II_NAMESPACE_OPEN
  * data type. For this reason, this class may not be sufficiently flexible when,
  * for example, adopting a level-set approach to describe material behavior.
  *
- * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
 template <typename CellIteratorType, typename DataType>
 class CellDataStorage : public Subscriptor
@@ -274,7 +273,6 @@ private:
  * To store and access instances of classes derived from this class, see the
  * CellDataStorage class.
  *
- * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
 class TransferableQuadraturePointData
 {
@@ -437,7 +435,6 @@ namespace parallel
      * quadrature points (on child or parent cells) results in values that will
      * not make much sense.
      *
-     * @author Denis Davydov, Jean-Paul Pelteret, 2016
      */
     template <int dim, typename DataType>
     class ContinuousQuadratureDataTransfer

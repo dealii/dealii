@@ -69,7 +69,6 @@ DEAL_II_NAMESPACE_OPEN
  * @todo Since nearly all functions for spacedim != dim are specialized, this
  * class needs cleaning up.
  *
- * @author Ralf Hartmann 2004, Guido Kanschat, 2009
  */
 
 template <int dim, int spacedim = dim>

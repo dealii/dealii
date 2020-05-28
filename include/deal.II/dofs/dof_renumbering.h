@@ -339,8 +339,6 @@ DEAL_II_NAMESPACE_OPEN
  * information on this.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004, 2007,
- * 2008
  */
 namespace DoFRenumbering
 {

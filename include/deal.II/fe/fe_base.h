@@ -140,8 +140,6 @@ namespace FiniteElementDomination
  * more information.
  *
  * @ingroup febase
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003,
- * 2005
  */
 template <int dim>
 class FiniteElementData

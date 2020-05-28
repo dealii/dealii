@@ -105,7 +105,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, 1997
  */
 template <int dim, typename Number = double>
 class Point : public Tensor<1, dim, Number>

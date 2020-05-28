@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * Usually, the derived class mg::Matrix, which operates on an MGLevelObject
  * of matrices, will be sufficient for applications.
  *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGMatrixBase : public Subscriptor
@@ -105,7 +104,6 @@ public:
  * operator, being the interface used by multigrid methods. Any implementation
  * will be done by derived classes.
  *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGCoarseGridBase : public Subscriptor
@@ -171,7 +169,6 @@ public:
  * Therefore, a tested implementation of this case will be supplied when
  * needed.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
 template <typename VectorType>
 class MGTransferBase : public Subscriptor
@@ -239,7 +236,6 @@ public:
  * hand, all subsequent operations need to smooth the content already present
  * in the vector @p u given the right hand side, which is done by smooth().
  *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGSmootherBase : public Subscriptor

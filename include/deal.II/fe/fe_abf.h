@@ -94,10 +94,6 @@ DEAL_II_NAMESPACE_OPEN
  * RT<sub>0</sub>). See the
  * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
  * for more information.
- *
- *
- * @author Oliver Kayser-Herold, 2006, based on previous work by Guido
- * Kanschat and Wolfgang Bangerth
  */
 template <int dim>
 class FE_ABF : public FE_PolyTensor<dim>

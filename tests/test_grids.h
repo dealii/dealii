@@ -41,8 +41,6 @@
  * level</td></tr>
  * </table>
  *
- * @author Guido Kanschat
- * @date 2006, 2010
  */
 namespace TestGrids
 {

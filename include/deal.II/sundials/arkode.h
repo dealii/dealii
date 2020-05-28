@@ -307,7 +307,6 @@ namespace SUNDIALS
    * ode.solve_ode(y);
    * @endcode
    *
-   * @author Luca Heltai, 2017.
    */
   template <typename VectorType = Vector<double>>
   class ARKode

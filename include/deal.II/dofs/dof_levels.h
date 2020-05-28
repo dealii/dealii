@@ -65,7 +65,6 @@ namespace internal
      * encapsulated to the present hierarchy of classes as well as the
      * dealii::DoFHandler class.
      *
-     * @author Wolfgang Bangerth, 1998, 2006, Guido Kanschat, 2012
      */
     template <int dim>
     class DoFLevel

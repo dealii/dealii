@@ -71,7 +71,6 @@ DEAL_II_NAMESPACE_OPEN
  *  available in C++20.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2015, David Wells, 2017
  */
 template <typename ElementType, typename MemorySpaceType = MemorySpace::Host>
 class ArrayView

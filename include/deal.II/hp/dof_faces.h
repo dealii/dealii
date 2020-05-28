@@ -89,7 +89,6 @@ namespace internal
      *
      *
      * @ingroup hp
-     * @author Tobias Leicht, 2006
      */
     template <int structdim>
     class DoFIndicesOnFacesOrEdges
@@ -233,7 +232,6 @@ namespace internal
      * ::DoFHandler class.
      *
      * @ingroup dofs
-     * @author Tobias Leicht, 2006
      */
     template <int dim>
     class DoFIndicesOnFaces;
@@ -244,7 +242,6 @@ namespace internal
      * be vertices, which are treated separately, don't do anything.
      *
      * @ingroup hp
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFIndicesOnFaces<1>
@@ -271,7 +268,6 @@ namespace internal
      * lines.
      *
      * @ingroup hp
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFIndicesOnFaces<2>
@@ -303,7 +299,6 @@ namespace internal
      * quads, additionally also on lines.
      *
      * @ingroup hp
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFIndicesOnFaces<3>

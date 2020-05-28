@@ -66,7 +66,6 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  *
  *
- * @author Thomas Richter, 2000, Luca Heltai, 2006
  */
 template <class VectorType = Vector<double>>
 class SolverMinRes : public SolverBase<VectorType>

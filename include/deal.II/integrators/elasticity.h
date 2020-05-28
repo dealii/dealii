@@ -37,8 +37,6 @@ namespace LocalIntegrators
    * @brief Local integrators related to elasticity problems.
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace Elasticity
   {
@@ -254,8 +252,6 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $n$ is the outer normal vector and $\gamma$ is
      * the usual penalty parameter.
      *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim, typename number>
     void
@@ -387,8 +383,6 @@ namespace LocalIntegrators
      * respectively. $n$ is the outer normal vector and $\gamma$ is the usual
      * penalty parameter.
      *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim, typename number>
     void
@@ -543,8 +537,6 @@ namespace LocalIntegrators
     /**
      * Elasticity residual term for the symmetric interior penalty method.
      *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim, typename number>
     void

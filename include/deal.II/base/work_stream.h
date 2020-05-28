@@ -152,7 +152,6 @@ DEAL_II_NAMESPACE_OPEN
  * simply work on each item sequentially.
  *
  * @ingroup threads
- * @author Wolfgang Bangerth, 2007, 2008, 2009, 2013. Bruno Turcksin, 2013.
  */
 namespace WorkStream
 {

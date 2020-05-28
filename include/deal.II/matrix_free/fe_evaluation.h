@@ -87,7 +87,6 @@ class FEEvaluation;
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010-2018
  */
 template <int dim,
           int n_components_,
@@ -1185,7 +1184,6 @@ private:
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim,
           int n_components_,
@@ -1267,7 +1265,6 @@ protected:
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 class FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>
@@ -1408,7 +1405,6 @@ protected:
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 class FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>
@@ -1570,7 +1566,6 @@ protected:
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, Shiva
  * Rudraraju, 2014
  */
 template <typename Number, bool is_face, typename VectorizedArrayType>
@@ -2256,7 +2251,6 @@ protected:
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim,
           int fe_degree,
@@ -2678,7 +2672,6 @@ private:
  * @note Currently only VectorizedArray<Number, width> is supported as
  *       VectorizedArrayType.
  *
- * @author Katharina Kormann and Martin Kronbichler, 2018
  */
 template <int dim,
           int fe_degree,

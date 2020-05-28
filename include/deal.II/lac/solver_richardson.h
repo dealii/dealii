@@ -57,7 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  *
  *
- * @author Ralf Hartmann
  */
 template <class VectorType = Vector<double>>
 class SolverRichardson : public SolverBase<VectorType>

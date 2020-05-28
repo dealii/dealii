@@ -69,7 +69,6 @@ class Function;
  * standard in place when this programming pattern was conceived.)
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
 template <int dim, typename Number = double>
 struct DEAL_II_DEPRECATED FunctionMap

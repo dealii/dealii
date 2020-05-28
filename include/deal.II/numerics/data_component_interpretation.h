@@ -44,7 +44,6 @@ namespace DataComponentInterpretation
    * See the step-22 tutorial program for an example on how this information
    * can be used in practice.
    *
-   * @author Wolfgang Bangerth, 2007
    */
   enum DataComponentInterpretation
   {

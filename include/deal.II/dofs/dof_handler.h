@@ -198,8 +198,6 @@ namespace internal
  * serialization archive.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Markus Buerg, Timo Heister, Guido Kanschat,
- * @date 1998, 1999, 2000, 2012
  */
 template <int dim, int spacedim = dim>
 class DoFHandler : public Subscriptor

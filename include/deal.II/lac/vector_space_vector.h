@@ -51,7 +51,6 @@ namespace LinearAlgebra
    * ReadWriteVector which allows the access of individual elements but does
    * not allow global operations.
    *
-   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class VectorSpaceVector

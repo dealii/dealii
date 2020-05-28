@@ -74,7 +74,6 @@ namespace DerivativeApproximation
      * general documentation of this class for more information on
      * implementation details.
      *
-     * @author Wolfgang Bangerth, 2000
      */
     template <int dim>
     class Gradient
@@ -187,7 +186,6 @@ namespace DerivativeApproximation
      * the general documentation of this class for more information on
      * implementational details.
      *
-     * @author Wolfgang Bangerth, 2000
      */
     template <int dim>
     class SecondDerivative

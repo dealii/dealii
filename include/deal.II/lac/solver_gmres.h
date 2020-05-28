@@ -172,7 +172,6 @@ namespace internal
  * will then be called from the solver with the estimates as argument.
  *
  *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
 template <class VectorType = Vector<double>>
 class SolverGMRES : public SolverBase<VectorType>
@@ -458,7 +457,6 @@ protected:
  *
  * For more details see @cite Saad1991.
  *
- * @author Guido Kanschat, 2003
  */
 template <class VectorType = Vector<double>>
 class SolverFGMRES : public SolverBase<VectorType>

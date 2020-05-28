@@ -36,7 +36,6 @@ namespace Utilities
      * A flexible Partitioner class, which does not impose restrictions
      * regarding the order of the underlying index sets.
      *
-     * @author Peter Munch, 2020
      */
     class NoncontiguousPartitioner
       : public dealii::LinearAlgebra::CommunicationPatternBase

@@ -76,8 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  * in 3d, the result would be <code>[true, true, true, false]</code>.
  *
  * @ingroup fe
- * @author Wolfgang Bangerth
- * @date 2012
  * @ingroup vector_valued
  */
 class ComponentMask

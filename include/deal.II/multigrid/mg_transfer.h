@@ -272,8 +272,6 @@ namespace internal
  * Implementation of transfer between the global vectors and the multigrid
  * levels for use in the derived class MGTransferPrebuilt and other classes.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, Timo Heister, Martin Kronbichler
- * @date 1999, 2000, 2001, 2002, 2003, 2004, 2012, 2015
  */
 template <typename VectorType>
 class MGLevelGlobalTransfer : public MGTransferBase<VectorType>
@@ -437,8 +435,6 @@ private:
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.
  *
- * @author Martin Kronbichler
- * @date 2016
  */
 template <typename Number>
 class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
@@ -664,8 +660,6 @@ private:
  * See MGTransferBase to find out which of the transfer classes is best for
  * your needs.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, Timo Heister, Martin Kronbichler
- * @date 1999, 2000, 2001, 2002, 2003, 2004, 2012, 2015
  */
 template <typename VectorType>
 class MGTransferPrebuilt : public MGLevelGlobalTransfer<VectorType>

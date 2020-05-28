@@ -165,7 +165,6 @@ class FE_Enriched;
  *
  * @ingroup febase fe vector_valued
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf
  * Hartmann 2001.
  */
 template <int dim, int spacedim = dim>

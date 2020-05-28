@@ -69,8 +69,6 @@ DEAL_II_NAMESPACE_OPEN
  * eddy current problems</b>, Computers & Structures 181, 41-54, 2017 (see
  * https://doi.org/10.1016/j.compstruc.2016.05.021).
  *
- * @author Ross Kynch
- * @date 2016, 2017, 2018
  */
 template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>

@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * @ingroup data
- * @author Guido Kanschat, 2004
  *
  * @deprecated Use the more general ArrayView class instead.
  */
@@ -84,7 +83,6 @@ protected:
  * arguments.
  *
  * @relatesalso VectorSlice
- * @author Guido Kanschat, 2004
  */
 template <typename VectorType>
 inline const VectorSlice<const VectorType>
@@ -101,7 +99,6 @@ make_slice(VectorType &v)
  * arguments.
  *
  * @relatesalso VectorSlice
- * @author Guido Kanschat, 2004
  */
 template <typename VectorType>
 inline const VectorSlice<const VectorType>

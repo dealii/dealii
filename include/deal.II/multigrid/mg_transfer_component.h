@@ -58,7 +58,6 @@ class DoFHandler;
  * eventually, a class should be developed allowing to select multiple
  * components.
  *
- * @author Guido Kanschat, 2001-2003
  */
 class MGTransferComponentBase
 {
@@ -188,7 +187,6 @@ protected:
  * See MGTransferBase to find out which of the transfer classes is best for
  * your needs.
  *
- * @author Guido Kanschat, 2001, 2002, 2003
  */
 template <typename number>
 class MGTransferSelect : public MGTransferBase<Vector<number>>,

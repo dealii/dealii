@@ -43,8 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k,k+1,k</sub>, Q<sub>k,k,k+1</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
- * @author Guido Kanschat
- * @date 2005
  */
 template <int dim>
 class PolynomialsRaviartThomas : public TensorPolynomialsBase<dim>

@@ -132,7 +132,6 @@ DEAL_II_NAMESPACE_OPEN
  *  Year = {2018}}
  * @endcode
  *
- * @author Luca Heltai, 2019.
  */
 class ParsedConvergenceTable
 {

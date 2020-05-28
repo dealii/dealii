@@ -39,7 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  * This class generates graphical output for BoundingBox objects, starting from
  * any object that can be converted by boost to a BoundingBox.
  *
- * @author Luca Heltai, 2020.
  */
 template <int dim>
 class BoundingBoxDataOut : public DataOutInterface<dim, dim>

@@ -62,7 +62,6 @@ class ParameterHandler;
  * number of iterations.
  * </ul>
  *
- * @author Guido Kanschat
  */
 class SolverControl : public Subscriptor
 {
@@ -422,7 +421,6 @@ protected:
  * will break if 20 iteration are completed or the new residual is less then
  * 2.5*1% or if it is less then 0.1%.
  *
- * @author Guido Kanschat
  */
 class ReductionControl : public SolverControl
 {
@@ -512,7 +510,6 @@ protected:
  * or the maximum iteration count were reached. The only difference to
  * SolverControl is that the solver returns success in the latter case.
  *
- * @author Martin Kronbichler
  */
 class IterationNumberControl : public SolverControl
 {
@@ -567,7 +564,6 @@ public:
  * SolverControl::State::success only at the last step in the sequence 0.5,
  * 0.0005, 1.0, 0.05, 0.01.
  *
- * @author Denis Davydov, 2017
  */
 class ConsecutiveControl : public SolverControl
 {

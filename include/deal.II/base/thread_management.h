@@ -144,7 +144,6 @@ namespace Threads
    * subsystem are implemented. The members of this namespace are not meant
    * for public use.
    *
-   * @author Wolfgang Bangerth, 2003
    */
   namespace internal
   {
@@ -565,7 +564,6 @@ namespace Threads
    * the function you are calling on a new thread has no return value, you can
    * omit the template argument.
    *
-   * @author Wolfgang Bangerth, 2003, 2009
    * @ingroup threads
    * @ingroup threads
    */
@@ -882,7 +880,6 @@ namespace Threads
    * for them all together. The thread objects need to have the same return
    * value for the called function.
    *
-   * @author Wolfgang Bangerth, 2003
    * @ingroup threads
    */
   template <typename RT = void>
@@ -977,7 +974,6 @@ namespace Threads
    * class. However, `std::shared_future` can not be used for types that can not
    * be copied -- a particular restriction for `std::unique_ptr`, for example.
    *
-   * @author Wolfgang Bangerth, 2009, 2020
    * @ingroup threads
    */
   template <typename RT = void>
@@ -1470,7 +1466,6 @@ namespace Threads
    * other words, a Task object should never passed on to another task for
    * calling the join() method.
    *
-   * @author Wolfgang Bangerth, 2003
    * @ingroup tasks
    */
   template <typename RT = void>

@@ -836,11 +836,6 @@ class MultipleParameterLoop;
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
- * @author Alberto Sartori, 2015
- * @author David Wells, 2016
- * @author Denis Davydov, 2018
- * @author Pasquale Claudio Africa, 2020
  */
 class ParameterHandler : public Subscriptor
 {
@@ -2078,7 +2073,6 @@ operator|(const ParameterHandler::OutputStyle f1,
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, 2010
  */
 class MultipleParameterLoop : public ParameterHandler
 {

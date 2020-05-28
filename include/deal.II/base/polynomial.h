@@ -56,7 +56,6 @@ namespace Polynomials
    * must be used. In case a manipulation is done that changes the roots, the
    * representation is switched to the coefficient form.
    *
-   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, Martin Kronbichler, 2011, 2017
    */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -293,7 +292,6 @@ namespace Polynomials
    * Class generates Polynomial objects representing a monomial of degree n,
    * that is, the function $x^n$.
    *
-   * @author Guido Kanschat, 2004
    */
   template <typename number>
   class Monomial : public Polynomial<number>
@@ -338,7 +336,6 @@ namespace Polynomials
    *
    * The Lagrange polynomials are implemented up to degree 10.
    *
-   * @author Ralf Hartmann, 2000
    */
   class LagrangeEquidistant : public Polynomial<double>
   {
@@ -398,7 +395,6 @@ namespace Polynomials
    * that they are orthonormal, not just orthogonal; consequently, the
    * polynomials do not necessarily have boundary values equal to one.
    *
-   * @author Guido Kanschat, 2000
    */
   class Legendre : public Polynomial<double>
   {
@@ -437,7 +433,6 @@ namespace Polynomials
    * These polynomials are used for the construction of the shape functions of
    * N&eacute;d&eacute;lec elements of arbitrary order.
    *
-   * @author Markus B&uuml;rg, 2009
    */
   class Lobatto : public Polynomial<double>
   {
@@ -502,7 +497,6 @@ namespace Polynomials
    * <b>not</b> return the linear polynomial described above, but rather a
    * constant polynomial.
    *
-   * @author Brian Carnes, 2002
    */
   class Hierarchical : public Polynomial<double>
   {
@@ -581,8 +575,6 @@ namespace Polynomials
    * p_k(x) &= x^2(x-1)^2 L_{k-4}(x)
    * @f}
    *
-   * @author Guido Kanschat
-   * @date 2012
    */
   class HermiteInterpolation : public Polynomial<double>
   {
@@ -705,8 +697,6 @@ namespace Polynomials
    * performance of some iterative schemes like conjugate gradients with
    * point-Jacobi. This polynomial is used in FE_DGQHermite.
    *
-   * @author Martin Kronbichler
-   * @date 2018
    */
   class HermiteLikeInterpolation : public Polynomial<double>
   {

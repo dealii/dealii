@@ -48,7 +48,6 @@ namespace hp
    *
    * @ingroup hp hpcollection
    *
-   * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim = dim>
   class FECollection : public Subscriptor

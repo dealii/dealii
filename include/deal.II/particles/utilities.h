@@ -91,7 +91,6 @@ namespace Particles
      * AffineConstraints::add_entries_local_to_global() is used to fill the
      * final sparsity pattern.
      *
-     * @author Bruno Blais, Luca Heltai, 2019
      */
     template <int dim,
               int spacedim,
@@ -149,7 +148,6 @@ namespace Particles
      * AffineConstraints::distribute_local_to_global() is used to distribute
      * the entries of the matrix to respect the given constraints.
      *
-     * @author Bruno Blais, Luca Heltai, 2019
      */
     template <int dim, int spacedim, typename MatrixType>
     void
@@ -183,7 +181,6 @@ namespace Particles
      * @param[in] field_comps An optional component mask that decides which
      * subset of the vector fields are interpolated
      *
-     * @author Bruno Blais, Luca Heltai, 2019
      */
     template <int dim,
               int spacedim,

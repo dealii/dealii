@@ -70,7 +70,6 @@ namespace NonMatching
    *
    * @image html immersed_surface_quadrature.svg
    *
-   * @author Simon Sticko, 2017
    */
   template <int dim>
   class ImmersedSurfaceQuadrature : public Quadrature<dim>

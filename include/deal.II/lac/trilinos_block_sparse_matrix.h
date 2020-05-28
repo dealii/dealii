@@ -67,7 +67,6 @@ namespace TrilinosWrappers
    *
    * @ingroup Matrix1 @see
    * @ref GlossBlockLA "Block (linear algebra)"
-   * @author Martin Kronbichler, Wolfgang Bangerth, 2008
    */
   class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
   {
@@ -576,7 +575,6 @@ namespace TrilinosWrappers
        * while retaining compatibility with the Trilinos sparse matrix and
        * preconditioner classes.
        *
-       * @author Jean-Paul Pelteret, 2016
        *
        * @ingroup TrilinosWrappers
        */

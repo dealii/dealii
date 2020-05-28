@@ -44,7 +44,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup mg
  * @ingroup data
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2005, 2010
  */
 template <class Object>
 class MGLevelObject : public Subscriptor

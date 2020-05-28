@@ -50,7 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  * data!
  *
  * @ingroup output
- * @author Guido Kanschat, 2000
  */
 template <int dim, typename SolverType, class VectorType = Vector<double>>
 class DoFPrintSolverStep : public SolverType

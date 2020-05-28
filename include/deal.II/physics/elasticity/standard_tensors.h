@@ -41,7 +41,6 @@ namespace Physics
      *
      * @relatesalso Tensor
      * @relatesalso SymmetricTensor
-     * @author Jean-Paul Pelteret, Andrew McBride, 2016
      */
     template <int dim>
     class StandardTensors

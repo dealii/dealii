@@ -54,7 +54,6 @@ DEAL_II_NAMESPACE_OPEN
  * DerivativeForm@<1,dim,spacedim,Number@>,
  * DerivativeForm@<2,dim,spacedim,Number@> and so on.
  *
- * @author Sebastian Pauletti, 2011, Luca Heltai, 2015
  */
 template <int order, int dim, int spacedim, typename Number = double>
 class DerivativeForm
@@ -392,7 +391,6 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
  * $[\Delta \mathbf x] [\nabla \mathbf F(\mathbf x)]^T$ in matrix notation.
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
  */
 template <int spacedim, int dim, typename Number>
 inline Tensor<1, spacedim, Number>
@@ -413,7 +411,6 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
  * by @p grad_F, equivalent to $\text{D\_X} \, \text{grad\_F}^T$ in matrix notation.
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
  */
 // rank=2
 template <int spacedim, int dim, typename Number>
@@ -442,7 +439,6 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
  * @f]
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
  */
 template <int spacedim, int dim, typename Number>
 inline Tensor<2, spacedim, Number>
@@ -463,7 +459,6 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &DF1,
  * reasons.
  *
  * @relatesalso DerivativeForm
- * @author Sebastian Pauletti, 2011
  */
 template <int dim, int spacedim, typename Number>
 inline DerivativeForm<1, spacedim, dim, Number>

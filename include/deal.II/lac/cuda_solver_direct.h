@@ -36,8 +36,6 @@ namespace CUDAWrappers
    * and <tt>@<double@></tt>.
    *
    * @ingroup CUDAWrappers
-   * @author Bruno Turcksin
-   * @date 2018
    */
   template <typename Number>
   class SolverDirect

@@ -38,7 +38,6 @@ namespace Differentiation
      * considered to have the necessary characteristics to fulfill this
      * condition.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <typename NumberType>
     struct is_sd_number : std::false_type
@@ -51,7 +50,6 @@ namespace Differentiation
      * considered to have the necessary characteristics to fulfill this
      * condition.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <typename NumberType>
     struct is_symengine_number : std::false_type
@@ -66,7 +64,6 @@ namespace Differentiation
      * symbolically differentiable number or not.
      * This is a specialization for the SymEngine Expression class.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <>
     struct is_symengine_number<SymEngine::Expression> : std::true_type
@@ -78,7 +75,6 @@ namespace Differentiation
      * symbolically differentiable number or not.
      * This is a specialization for the SymEngine Expression class.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <>
     struct is_sd_number<SymEngine::Expression> : std::true_type

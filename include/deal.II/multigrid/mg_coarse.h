@@ -34,7 +34,6 @@ DEAL_II_NAMESPACE_OPEN
  * Coarse grid solver using smoother only. This is a little wrapper,
  * transforming a smoother into a coarse grid solver.
  *
- * @author Denis Davydov, 2016.
  */
 template <class VectorType = Vector<double>>
 class MGCoarseGridApplySmoother : public MGCoarseGridBase<VectorType>
@@ -91,7 +90,6 @@ private:
  *
  * @deprecated Use MGCoarseGridIterativeSolver instead.
  *
- * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
 template <typename SolverType, class VectorType = Vector<double>>
 class DEAL_II_DEPRECATED MGCoarseGridLACIteration
@@ -259,7 +257,6 @@ private:
  * the operator() uses Householder::least_squares() to compute the action of
  * the inverse.
  *
- * @author Guido Kanschat, 2003, 2012
  */
 template <typename number = double, class VectorType = Vector<number>>
 class MGCoarseGridHouseholder : public MGCoarseGridBase<VectorType>
@@ -294,7 +291,6 @@ private:
  * Upon initialization, the singular value decomposition of the matrix is
  * computed. then, the operator() uses
  *
- * @author Guido Kanschat, 2003, 2012
  */
 template <typename number = double, class VectorType = Vector<number>>
 class MGCoarseGridSVD : public MGCoarseGridBase<VectorType>

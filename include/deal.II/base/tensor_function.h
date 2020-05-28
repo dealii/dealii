@@ -51,7 +51,6 @@ DEAL_II_NAMESPACE_OPEN
  * them the size can be determined similarly simply.
  *
  * @ingroup functions
- * @author Guido Kanschat, 1999
  */
 template <int rank, int dim, typename Number = double>
 class TensorFunction
@@ -126,7 +125,6 @@ public:
  * value. Obviously, all derivates of this function are zero.
  *
  * @ingroup functions
- * @author Matthias Maier, 2013
  */
 template <int rank, int dim, typename Number = double>
 class ConstantTensorFunction : public TensorFunction<rank, dim, Number>
@@ -179,7 +177,6 @@ private:
  * derivates of this function are zero.
  *
  * @ingroup functions
- * @author Matthias Maier, 2013
  */
 template <int rank, int dim, typename Number = double>
 class ZeroTensorFunction : public ConstantTensorFunction<rank, dim, Number>

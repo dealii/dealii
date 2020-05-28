@@ -328,7 +328,6 @@ namespace Manifolds
  *
  *
  * @ingroup manifold
- * @author Luca Heltai, Wolfgang Bangerth, 2014, 2016
  */
 template <int dim, int spacedim = dim>
 class Manifold : public Subscriptor
@@ -676,7 +675,6 @@ public:
  *
  * @ingroup manifold
  *
- * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim = dim>
 class FlatManifold : public Manifold<dim, spacedim>
@@ -945,7 +943,6 @@ private:
  *
  * @ingroup manifold
  *
- * @author Luca Heltai, 2013, 2014
  */
 template <int dim, int spacedim = dim, int chartdim = dim>
 class ChartManifold : public Manifold<dim, spacedim>

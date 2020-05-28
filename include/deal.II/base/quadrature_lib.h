@@ -34,7 +34,6 @@ DEAL_II_NAMESPACE_OPEN
  * href="http://en.wikipedia.org/wiki/Numerical_Recipes">Numerical
  * Recipes</a>.
  *
- * @author Guido Kanschat, 2001
  */
 template <int dim>
 class QGauss : public Quadrature<dim>
@@ -70,7 +69,6 @@ public:
  * Karniadakis, G.E. and Sherwin, S.J.: Spectral/hp element methods for
  * computational fluid dynamics. Oxford: Oxford University Press, 2005
  *
- * @author Guido Kanschat, 2005, 2006; F. Prill, 2006
  */
 template <int dim>
 class QGaussLobatto : public Quadrature<dim>
@@ -120,7 +118,6 @@ public:
  * language skills led them to translate the name incorrectly from the German
  * "Trapezregel".
  *
- * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class QTrapez : public Quadrature<dim>
@@ -461,7 +458,6 @@ private:
  * The weights and functions for Gauss Legendre formula have been tabulated up
  * to order 12.
  *
- * @author Nicola Giuliani, Luca Heltai 2015
  */
 template <int dim>
 class QTelles : public Quadrature<dim>
@@ -493,7 +489,6 @@ public:
  * 1/\sqrt{x(1-x)}$. For details see: M. Abramowitz & I.A. Stegun: Handbook of
  * Mathematical Functions, par. 25.4.38
  *
- * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
 class QGaussChebyshev : public Quadrature<dim>
@@ -518,7 +513,6 @@ public:
  * imposed at the right endpoint through the variable ep that can assume the
  * values left or right.
  *
- * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
@@ -565,7 +559,6 @@ private:
  * details see: M. Abramowitz & I.A. Stegun: Handbook of Mathematical
  * Functions, par. 25.4.40
  *
- * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
 class QGaussLobattoChebyshev : public Quadrature<dim>
@@ -605,7 +598,6 @@ public:
  * co-dimension one surface inside the reference element, like in the extended
  * finite element method (XFEM).
  *
- * @author Luca Heltai, 2017.
  */
 template <int dim>
 class QSimplex : public Quadrature<dim>
@@ -665,7 +657,6 @@ public:
  *  \qquad \theta \dealcoloneq \frac\pi 2 \hat y
  * \f]
  *
- * @author Luca Heltai, 2017
  */
 class QTrianglePolar : public QSimplex<2>
 {
@@ -721,7 +712,6 @@ public:
  * When $\beta = 1$, this transformation is also known as the Lachat-Watson
  * transformation.
  *
- * @author Luca Heltai, Nicola Giuliani, 2017.
  */
 class QDuffy : public QSimplex<2>
 {
@@ -758,7 +748,6 @@ public:
  * A quadrature to use when the cell should be split into subregions to
  * integrate using one or more base quadratures.
  *
- * @author Luca Heltai, 2017.
  */
 template <int dim>
 class QSplit : public Quadrature<dim>

@@ -106,7 +106,6 @@ class Quadrature;
  * interval. The interior points are shifted towards the end points, which
  * gives a denser point distribution close to the element boundary.
  *
- * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
 template <int dim, int spacedim = dim>
 class FE_DGQ : public FE_Poly<dim, spacedim>
@@ -394,7 +393,6 @@ private:
  *
  * See the base class documentation in FE_DGQ for details.
  *
- * @author F. Prill 2006
  */
 template <int dim, int spacedim = dim>
 class FE_DGQArbitraryNodes : public FE_DGQ<dim, spacedim>
@@ -441,7 +439,6 @@ public:
  *
  * See the base class documentation in FE_DGQ for details.
  *
- * @author Martin Kronbichler, 2017
  */
 template <int dim, int spacedim = dim>
 class FE_DGQLegendre : public FE_DGQ<dim, spacedim>
@@ -492,7 +489,6 @@ public:
  *
  * See the base class documentation in FE_DGQ for details.
  *
- * @author Martin Kronbichler, 2017, 2018
  */
 template <int dim, int spacedim = dim>
 class FE_DGQHermite : public FE_DGQ<dim, spacedim>

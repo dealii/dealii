@@ -45,7 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  * smoother object. Therefore, the smoother object for each level must be
  * constructed by hand.
  *
- * @author Guido Kanschat, 2005
  */
 template <typename MatrixType, class RelaxationType, typename number>
 class MGSmootherBlock : public MGSmoother<BlockVector<number>>

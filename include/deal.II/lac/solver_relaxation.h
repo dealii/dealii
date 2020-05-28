@@ -52,8 +52,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup Solvers
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename VectorType = Vector<double>>
 class SolverRelaxation : public SolverBase<VectorType>

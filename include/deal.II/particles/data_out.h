@@ -40,7 +40,6 @@ namespace Particles
    *
    * @ingroup Particle
    *
-   * @author Bruno Blais, Luca Heltai 2019
    */
   template <int dim, int spacedim = dim>
   class DataOut : public dealii::DataOutInterface<0, spacedim>
@@ -72,7 +71,6 @@ namespace Particles
      * controls if the particle properties are interpreted as scalars, vectors,
      * or tensors. Has to be of the same length as @p data_component_names.
      *
-     * @author Bruno Blais, Luca Heltai 2019
      */
     void
     build_patches(const Particles::ParticleHandler<dim, spacedim> &particles,

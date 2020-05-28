@@ -296,7 +296,6 @@ enum MappingKind
  * by Ronald H. W. Hoppe, University of Houston, Chapter 7.
  *
  * @ingroup mapping
- * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
 template <int dim, int spacedim = dim>
 class Mapping : public Subscriptor
@@ -360,7 +359,6 @@ public:
    * transform_unit_to_real_cell() applied to the center of the reference cell
    * to computing the vertex averages.
    *
-   * @author Luca Heltai, 2019.
    */
   virtual Point<spacedim>
   get_center(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -383,7 +381,6 @@ public:
    *
    * @param[in] cell The cell for which you want to compute the bounding box
    *
-   * @author Luca Heltai, 2019.
    */
   virtual BoundingBox<spacedim>
   get_bounding_box(

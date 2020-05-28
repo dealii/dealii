@@ -70,7 +70,6 @@ namespace internal
    * to the elements of tables with <tt>operator[]</tt>, which generates
    * temporary objects of the types of this namespace).
    *
-   * @author Wolfgang Bangerth, 2002
    */
   namespace TableBaseAccessors
   {
@@ -158,7 +157,6 @@ namespace internal
      * access to elements of the table class, not for passing them around as
      * arguments of functions, etc.
      *
-     * @author Wolfgang Bangerth, 2002
      */
     template <int N, typename T, bool C, unsigned int P>
     class Accessor
@@ -237,7 +235,6 @@ namespace internal
      * The same holds for this specialization as for the general template; see
      * there for more information.
      *
-     * @author Wolfgang Bangerth, 2002
      */
     template <int N, typename T, bool C>
     class Accessor<N, T, C, 1>
@@ -402,7 +399,6 @@ namespace internal
  * itself.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002.
  */
 template <int N, typename T>
 class TableBase : public Subscriptor
@@ -689,7 +685,6 @@ protected:
  * See there, and in the documentation of the base class for more information.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <int N, typename T>
 class Table : public TableBase<N, T>
@@ -706,7 +701,6 @@ class Table : public TableBase<N, T>
  * the base class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
 class Table<1, T> : public TableBase<1, T>
@@ -1131,7 +1125,6 @@ namespace MatrixTableIterators
  * provided.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
 class Table<2, T> : public TableBase<2, T>
@@ -1379,7 +1372,6 @@ protected:
  * the base class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
 class Table<3, T> : public TableBase<3, T>
@@ -1511,7 +1503,6 @@ public:
  * the base class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <typename T>
 class Table<4, T> : public TableBase<4, T>
@@ -1605,7 +1596,6 @@ public:
  * the base class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <typename T>
 class Table<5, T> : public TableBase<5, T>
@@ -1702,7 +1692,6 @@ public:
  * the base class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <typename T>
 class Table<6, T> : public TableBase<6, T>
@@ -1800,7 +1789,6 @@ public:
  * the base class.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
  */
 template <typename T>
 class Table<7, T> : public TableBase<7, T>
@@ -1934,7 +1922,6 @@ namespace TransposeTableIterators
  * TableBase.
  *
  * @ingroup data
- * @author Guido Kanschat, 2005
  */
 template <typename T>
 class TransposeTable : public TableBase<2, T>
@@ -3764,7 +3751,6 @@ Table<7, T>::operator()(const TableIndices<7> &indices)
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two tables.
  *
- * @author Martin Kronbichler, 2013
  */
 template <int N, typename T>
 inline void

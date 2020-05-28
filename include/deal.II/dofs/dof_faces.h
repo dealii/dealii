@@ -64,7 +64,6 @@ namespace internal
      * encapsulated to the present hierarchy of classes as well as the
      * dealii::DoFHandler class.
      *
-     * @author Tobias Leicht, 2006
      */
     template <int dim>
     class DoFFaces
@@ -81,7 +80,6 @@ namespace internal
      * Store the indices of degrees of freedom on faces in 1D. As these would
      * be vertices, which are treated separately, don't do anything.
      *
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFFaces<1>
@@ -107,7 +105,6 @@ namespace internal
      * Store the indices of degrees of freedom on faces in 2D, which are
      * lines.
      *
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFFaces<2>
@@ -138,7 +135,6 @@ namespace internal
      * Store the indices of degrees of freedom on faces in 3D, which are
      * quads, additionally also on lines.
      *
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFFaces<3>

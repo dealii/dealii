@@ -140,8 +140,6 @@ DEAL_II_NAMESPACE_OPEN
  * QGauss<sub>k+2</sub> on each face and in the interior of the cell (or none
  * for N<sub>1</sub>).
  *
- * @author Markus B&uuml;rg
- * @date 2009, 2010, 2011
  */
 template <int dim>
 class FE_Nedelec : public FE_PolyTensor<dim>

@@ -768,7 +768,6 @@ namespace Patterns
    * The default separator is a colon, owing to the fact that a pair is in fact
    * a tuple with two elements.
    *
-   * @author Luca Heltai, 2017.
    */
   class Tuple : public PatternBase
   {
@@ -1285,7 +1284,6 @@ namespace Patterns
    * specialize the Convert struct as well as the RankInfo struct.
    *
    * @ingroup input
-   * @author Luca Heltai, 2017
    */
   namespace Tools
   {
@@ -1298,7 +1296,6 @@ namespace Patterns
      * SFINAE (substitution failure is not an error) tricks used to specialise
      * this class for arbitrary STL containers and maps.
      *
-     * @author Luca Heltai, 2017
      */
     template <class T, class Enable = void>
     struct Convert
@@ -1363,7 +1360,6 @@ namespace Patterns
      * helper class Patterns::Tools::RankInfo for details on the way separators
      * are selected when outputting STL container types.
      *
-     * @author Luca Heltai, 2018
      */
     template <typename T>
     std::string
@@ -1394,7 +1390,6 @@ namespace Patterns
      * used to infer how to interpret the string. If the string is successfully
      * parsed, then @p t will be set to the parsed content of @p s.
      *
-     * @author Luca Heltai, 2018
      */
     template <typename T>
     void
@@ -1481,7 +1476,6 @@ namespace Patterns
        * with the List type. Adding more compatible types is a matter of adding
        * a specialization of this struct for the given type.
        *
-       * @author Luca Heltai, 2017
        */
       template <class T, class Enable = void>
       struct RankInfo

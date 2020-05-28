@@ -59,8 +59,6 @@ DEAL_II_NAMESPACE_OPEN
  * details.
  *
  *
- * @author Marco Tezzele, Luca Heltai
- * @date 2013, 2015
  */
 
 template <int dim, int spacedim = dim>

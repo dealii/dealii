@@ -33,7 +33,6 @@ namespace Differentiation
      * Sacado number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
      *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_sacado_number : std::false_type
@@ -45,7 +44,6 @@ namespace Differentiation
      * number or not. By default, numbers are not considered to have the
      * necessary characteristics to fulfill this condition.
      *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_sacado_dfad_number : std::false_type
@@ -57,7 +55,6 @@ namespace Differentiation
      * number or not. By default, numbers are not considered to have the
      * necessary characteristics to fulfill this condition.
      *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_sacado_rad_number : std::false_type
@@ -107,7 +104,6 @@ namespace Differentiation
        * various number types, and records how many levels of
        * differentiation the number is able to support.
        *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename SacadoNumber, typename = void>
       struct SacadoNumberInfo;
@@ -381,7 +377,6 @@ namespace Differentiation
        * Sacado dynamic reverse auto-differentiable numbers. The @p NumberType
        * can be either a floating point number or another Sacado type.
        *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename NumberType>
       struct ExtractData<Sacado::Fad::DFad<NumberType>>
@@ -433,7 +428,6 @@ namespace Differentiation
        * Sacado dynamic reverse auto-differentiable numbers. The @p NumberType
        * can be either a floating point number or another Sacado type.
        *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename NumberType>
       struct ExtractData<Sacado::Rad::ADvar<NumberType>>

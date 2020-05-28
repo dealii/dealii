@@ -30,7 +30,6 @@ namespace GridTools
    * You can select more than one flag by concatenation using the bitwise or
    * <code>operator|(CacheUpdateFlags,CacheUpdateFlags)</code>.
    *
-   * @author Luca Heltai, 2017.
    */
   enum CacheUpdateFlags
   {

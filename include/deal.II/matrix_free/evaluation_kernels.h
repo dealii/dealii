@@ -100,7 +100,6 @@ namespace internal
    * transformed to a collocation space and can then use the identity in these
    * spaces), which both allow for shorter code.
    *
-   * @author Katharina Kormann, Martin Kronbichler, 2012, 2014, 2017
    */
   template <MatrixFreeFunctions::ElementType type,
             int                              dim,
@@ -656,7 +655,6 @@ namespace internal
    * This class allows for dimension-independent application of the operation,
    * implemented by template recursion. It has been tested up to 6D.
    *
-   * @author Katharina Kormann, Martin Kronbichler, 2017
    */
   template <EvaluatorVariant variant,
             int              dim,
@@ -1008,7 +1006,6 @@ namespace internal
    * evaluation, spectral collocation or simply collocation, meaning the same
    * location for shape functions and evaluation space (quadrature points).
    *
-   * @author Katharina Kormann, 2012
    */
   template <int dim, int fe_degree, int n_components, typename Number>
   struct FEEvaluationImplCollocation
@@ -1184,7 +1181,6 @@ namespace internal
    * the evaluation of the first and second derivatives in this transformed
    * space, using the identity operation for the shape values.
    *
-   * @author Katharina Kormann, Martin Kronbichler, 2017
    */
   template <int dim,
             int fe_degree,

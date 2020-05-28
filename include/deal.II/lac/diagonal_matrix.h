@@ -44,7 +44,6 @@ DEAL_II_NAMESPACE_OPEN
  *                        mpi_communicator);
  * @endcode
  *
- * @author Martin Kronbichler, 2016
  */
 template <typename VectorType = Vector<double>>
 class DiagonalMatrix : public Subscriptor

@@ -82,7 +82,6 @@ namespace CUDAWrappers
    *
    * @ingroup CUDAWrappers
    *
-   * @author Karl Ljungkvist, Bruno Turcksin, 2016
    */
   template <int dim,
             int fe_degree,

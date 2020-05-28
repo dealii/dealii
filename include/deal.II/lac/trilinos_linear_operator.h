@@ -65,7 +65,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -96,7 +95,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -131,7 +129,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -165,7 +162,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -210,7 +206,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -246,7 +241,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */

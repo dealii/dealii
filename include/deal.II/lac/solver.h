@@ -326,8 +326,6 @@ class Vector;
  * </td> </tr> </table>
  *
  * @ingroup Solvers
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,
- * 2014
  */
 template <class VectorType = Vector<double>>
 class SolverBase : public Subscriptor

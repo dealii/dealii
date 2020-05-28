@@ -64,7 +64,6 @@ namespace internal
      * classes are included in the DoFLevel and DoFFaces classes.
      *
      * @ingroup dofs
-     * @author Tobias Leicht, 2006
      */
     template <int dim>
     class DoFObjects

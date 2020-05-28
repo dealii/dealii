@@ -121,7 +121,6 @@ namespace parallel
      * parallel::distributed::CellDataTransfer class.
      *
      * @ingroup distributed
-     * @author Marc Fehling, 2019 - 2020
      */
     template <int dim, int spacedim = dim>
     class ErrorPredictor

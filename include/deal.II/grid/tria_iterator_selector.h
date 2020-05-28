@@ -74,7 +74,6 @@ namespace internal
      * substructures apart from vertices, which are handled in a different
      * way, however.
      *
-     * @author Wolfgang Bangerth, 1998
      */
     template <int spacedim>
     struct Iterators<1, spacedim>
@@ -136,7 +135,6 @@ namespace internal
      *    using active_face_iterator = active_line_iterator;
      *  @endcode
      *
-     * @author Wolfgang Bangerth, 1998
      */
     template <int spacedim>
     struct Iterators<2, spacedim>
@@ -181,7 +179,6 @@ namespace internal
      *    using active_face_iterator = active_quad_iterator;
      *  @endcode
      *
-     * @author Wolfgang Bangerth, 1998
      */
     template <int spacedim>
     struct Iterators<3, spacedim>

@@ -78,7 +78,6 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  *
  * @ingroup textoutput
- * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003, 2011
  */
 class LogStream : public Subscriptor
 {
@@ -416,7 +415,6 @@ operator<<(LogStream &log, const T &t)
 /**
  * The standard log object of deal.II:
  *
- * @author Guido Kanschat, 1999
  */
 extern LogStream deallog;
 

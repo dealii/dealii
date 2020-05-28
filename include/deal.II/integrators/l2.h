@@ -37,8 +37,6 @@ namespace LocalIntegrators
    * @brief Local integrators related to <i>L<sup>2</sup></i>-inner products.
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace L2
   {
@@ -55,8 +53,6 @@ namespace LocalIntegrators
      * space. #update_values and #update_JxW_values must be set.
      * @param factor A constant that multiplies the mass matrix.
      *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -109,8 +105,6 @@ namespace LocalIntegrators
      * points in the finite element (size must be equal to the number of
      * quadrature points in the element).
      *
-     * @author Guido Kanschat
-     * @date 2014
      */
     template <int dim>
     void
@@ -163,8 +157,6 @@ namespace LocalIntegrators
      * quadrature points in the element).
      * @param factor A constant that multiplies the result.
      *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim, typename number>
     void
@@ -196,8 +188,6 @@ namespace LocalIntegrators
      * must be equal to the number of quadrature points in the element).
      * @param factor A constant that multiplies the result.
      *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim, typename number>
     void
@@ -247,8 +237,6 @@ namespace LocalIntegrators
      * @param factor2 A constant that multiplies the shape functions for the
      * second cell.
      *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void

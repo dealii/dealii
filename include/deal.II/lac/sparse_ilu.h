@@ -55,7 +55,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ref Instantiations
  * in the manual).
  *
- * @author Wolfgang Bangerth, 2008, 2009; unified interface: Ralf Hartmann
  */
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>

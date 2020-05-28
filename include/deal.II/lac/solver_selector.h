@@ -85,7 +85,6 @@ DEAL_II_NAMESPACE_OPEN
  * quoted above only needs to 'set solver = xyz' in their parameter file to get
  * access to that new solver.
  *
- * @author Ralf Hartmann, 1999
  */
 template <typename VectorType = Vector<double>>
 class SolverSelector : public Subscriptor

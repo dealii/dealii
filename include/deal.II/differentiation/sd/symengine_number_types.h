@@ -174,7 +174,6 @@ namespace Differentiation
      *   // of course, the numeric value 20.
      * @endcode
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     class Expression
     {
@@ -880,7 +879,6 @@ namespace Differentiation
      * symbolically differentiable number or not.
      * This is a specialization for the deal.II Expression class.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <>
     struct is_symengine_number<Expression> : std::true_type
@@ -892,7 +890,6 @@ namespace Differentiation
      * SymEngine number or not.
      * This is a specialization for the deal.II Expression class.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <>
     struct is_sd_number<Expression> : std::true_type

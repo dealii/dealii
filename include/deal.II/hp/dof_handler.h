@@ -195,9 +195,6 @@ namespace hp
    * @ingroup dofs
    * @ingroup hp
    *
-   * @author Wolfgang Bangerth, 2003, 2004, 2017, 2018
-   * @author Oliver Kayser-Herold, 2003, 2004
-   * @author Marc Fehling, 2018
    */
   template <int dim, int spacedim = dim>
   class DoFHandler : public Subscriptor

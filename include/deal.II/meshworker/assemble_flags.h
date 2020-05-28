@@ -36,7 +36,6 @@ namespace MeshWorker
    * You can select more than one flag by concatenation using the bitwise or
    * <code>operator|(AssembleFlags,AssembleFlags)</code>.
    *
-   * @author Luca Heltai, 2017.
    */
   enum AssembleFlags
   {

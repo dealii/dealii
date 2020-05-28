@@ -228,7 +228,6 @@ DEAL_II_NAMESPACE_OPEN
  * }
  * @endcode
  *
- * @author Reza Rastak, 2019
  */
 class DiscreteTime
 {

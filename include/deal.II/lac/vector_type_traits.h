@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * for a vector type with support of distributed storage,
  * must be done in a header file of a vector declaration.
  *
- * @author Uwe Koecher, 2017
  */
 template <typename T>
 struct is_serial_vector;

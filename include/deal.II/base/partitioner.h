@@ -190,7 +190,6 @@ namespace Utilities
      * detect this case and only send the selected indices, taken from the
      * full array of ghost entries.
      *
-     * @author Katharina Kormann, Martin Kronbichler, 2010, 2011, 2017
      */
     class Partitioner : public ::dealii::LinearAlgebra::CommunicationPatternBase
     {

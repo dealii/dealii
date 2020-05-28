@@ -45,7 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  * $\{k-1,k-2,...,k-m\}$, then addition of the new element will make
  * the object contain elements from iterations $\{k,k-1,k-2,...,k-m+1\}$.
  *
- * @author Denis Davydov, 2018
  */
 template <typename T>
 class FiniteSizeHistory

@@ -106,7 +106,6 @@ namespace Rol
    * @ref Vector)
    * may not satisfy the above requirements.
    *
-   * @author Vishal Boddu, 2017
    */
   template <typename VectorType>
   class VectorAdaptor : public ROL::Vector<typename VectorType::value_type>

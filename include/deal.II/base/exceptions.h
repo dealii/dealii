@@ -44,7 +44,6 @@ DEAL_II_NAMESPACE_OPEN
  * derived from it.
  *
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 class ExceptionBase : public std::exception
 {
@@ -191,7 +190,6 @@ private:
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
  * deal.II headers have been included.
  *
- * @author Wolfgang Bangerth, November 1997
  * @ingroup Exceptions
  */
 #  define DeclException0(Exception0)                \
@@ -467,7 +465,6 @@ private:
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
  * deal.II headers have been included.
  *
- * @author Wolfgang Bangerth, November 1997
  * @ingroup Exceptions
  */
 #  define DeclException0(Exception0) \
@@ -1152,7 +1149,6 @@ namespace StandardExceptions
    * function.
    *
    * @ingroup Exceptions
-   * @author David Wells, 2016
    */
   class ExcMPI : public dealii::ExceptionBase
   {
@@ -1401,7 +1397,6 @@ namespace deal_II_exceptions
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
@@ -1465,7 +1460,6 @@ namespace deal_II_exceptions
  *
  * @note Active in DEBUG mode only
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
@@ -1514,7 +1508,6 @@ namespace deal_II_exceptions
  *
  * @note Active in both DEBUG and RELEASE modes
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #  define AssertThrow(cond, exc)                                       \
@@ -1563,7 +1556,6 @@ namespace deal_II_exceptions
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat 2007
  */
 #define AssertDimension(dim1, dim2)                                            \
   Assert(static_cast<typename ::dealii::internal::argument_type<void(          \
@@ -1591,7 +1583,6 @@ namespace deal_II_exceptions
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat 2010
  */
 #define AssertVectorVectorDimension(VEC, DIM1, DIM2) \
   AssertDimension(VEC.size(), DIM1);                 \
@@ -1633,7 +1624,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat, Daniel Arndt, 2007, 2018
  */
 #define AssertIndexRange(index, range)                                         \
   Assert(                                                                      \
@@ -1665,7 +1655,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 2015
  */
 #define AssertIsFinite(number)               \
   Assert(dealii::numbers::is_finite(number), \
@@ -1691,7 +1680,6 @@ namespace internal
  *
  * @note Active only if deal.II is compiled with MPI
  * @ingroup Exceptions
- * @author David Wells, 2016
  */
 #  define AssertThrowMPI(error_code) \
     AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
@@ -1717,7 +1705,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2016
  */
 #  ifdef DEBUG
 #    define AssertCuda(error_code)      \
@@ -1745,7 +1732,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Daniel Arndt, 2018
  */
 #  ifdef DEBUG
 #    define AssertNothrowCuda(error_code)      \
@@ -1774,7 +1760,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2020
  */
 #  ifdef DEBUG
 #    define AssertCudaKernel()                                \
@@ -1805,7 +1790,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2018
  */
 #  ifdef DEBUG
 #    define AssertCusparse(error_code)                                      \
@@ -1836,7 +1820,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Daniel Arndt, 2018
  */
 #  ifdef DEBUG
 #    define AssertNothrowCusparse(error_code)                               \
@@ -1868,7 +1851,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2018
  */
 #  ifdef DEBUG
 #    define AssertCusolver(error_code)                                      \

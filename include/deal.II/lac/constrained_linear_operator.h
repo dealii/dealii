@@ -53,7 +53,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ref constraints
  * module.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
  * structures.
@@ -150,7 +149,6 @@ distribute_constraints_linear_operator(
  * constrained degrees of freedom, i.e. all entries of the result vector that
  * correspond to unconstrained degrees of freedom are set to zero.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @relatesalso LinearOperator
  * @ingroup constraints
@@ -236,7 +234,6 @@ project_to_constrained_linear_operator(
  * @ref constraints
  * module.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
  * structures.
@@ -283,7 +280,6 @@ constrained_linear_operator(
  * @ref constraints
  * module.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
  * structures.

@@ -78,7 +78,6 @@ namespace Utilities
    *  exp(); // calls example_function(p, 3.0, 4);
    * @endcode
    *
-   * @authors Luca Heltai, Matthias Maier, 2019.
    */
   template <typename ReturnType, class... FunctionArgs>
   class MutableBind
@@ -185,7 +184,6 @@ namespace Utilities
    * bound(); // will execute my_function(3, 4.0);
    * @endcode
    *
-   * @authors Luca Heltai, Matthias Maier, 2019.
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>

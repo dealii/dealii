@@ -33,10 +33,6 @@ DEAL_II_NAMESPACE_OPEN
  * FE_Q_Bubbles. There is no public constructor for this class as it is not
  * functional as a stand-alone. The completion of definitions is left to the
  * derived classes.
- *
- * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann,
- * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
- * Martin Kronbichler, 2008, 2013
  */
 template <class PolynomialType,
           int dim      = PolynomialType::dimension,

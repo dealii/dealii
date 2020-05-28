@@ -89,7 +89,6 @@ class Vector;
  * parallel codes using the PETSc or Trilinos wrapper classes, the type
  * of the vector can be specified as template parameter <tt>VectorType</tt>.
  *
- * @author Joshua White, 2008
  */
 template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
 class MappingQEulerian : public MappingQ<dim, spacedim>

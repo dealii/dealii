@@ -265,7 +265,6 @@ DEAL_II_NAMESPACE_OPEN
  * FiniteElement::InternalDataBase without adding anything in a derived class
  * in this class.
  *
- * @author Guido Kanschat, 2002
  */
 template <int dim, int spacedim = dim>
 class FE_DGPNonparametric : public FiniteElement<dim, spacedim>

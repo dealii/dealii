@@ -73,9 +73,6 @@ namespace LinearAlgebra
  *
  * Alternatively, the IdentityMatrix class can be used to precondition in this
  * way.
- *
- * @author Guido Kanschat, 1999; extension for full compatibility with
- * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 class PreconditionIdentity : public Subscriptor
 {
@@ -192,9 +189,6 @@ private:
  * Using SolverRichardson, the two relaxation parameters will be just
  * multiplied. Still, this class is useful in multigrid smoother objects
  * (MGSmootherRelaxation).
- *
- * @author Guido Kanschat, 2005; extension for full compatibility with
- * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 class PreconditionRichardson : public Subscriptor
 {
@@ -358,7 +352,6 @@ private:
  *     matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
  *
- * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
 template <typename MatrixType = SparseMatrix<double>,
           class VectorType    = Vector<double>>
@@ -403,9 +396,6 @@ private:
  * Base class for other preconditioners. Here, only some common features
  * Jacobi, SOR and SSOR preconditioners are implemented. For preconditioning,
  * refer to derived classes.
- *
- * @author Guido Kanschat, 2000; extension for full compatibility with
- * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionRelaxation : public Subscriptor
@@ -502,7 +492,6 @@ protected:
  * solver.solve (A, x, b, precondition);
  * @endcode
  *
- * @author Guido Kanschat, 2000
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionJacobi : public PreconditionRelaxation<MatrixType>
@@ -590,7 +579,6 @@ public:
  * solver.solve (A, x, b, precondition);
  * @endcode
  *
- * @author Guido Kanschat, 2000
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionSOR : public PreconditionRelaxation<MatrixType>
@@ -659,7 +647,6 @@ public:
  * solver.solve (A, x, b, precondition);
  * @endcode
  *
- * @author Guido Kanschat, 2000
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionSSOR : public PreconditionRelaxation<MatrixType>
@@ -759,9 +746,6 @@ private:
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
- *
- * @author Guido Kanschat, 2003; extension for full compatibility with
- * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionPSOR : public PreconditionRelaxation<MatrixType>
@@ -1002,9 +986,6 @@ private:
  * entries that would be needed from the matrix alone), there is a backward
  * compatibility function that can extract the diagonal in case of a serial
  * computation.
- *
- * @author Martin Kronbichler, 2009, 2016; extension for full compatibility with
- * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,

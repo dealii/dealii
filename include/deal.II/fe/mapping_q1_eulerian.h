@@ -89,7 +89,6 @@ class Vector;
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
  *
- * @author Michael Stadler, 2001
  */
 template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
 class MappingQ1Eulerian : public MappingQGeneric<dim, spacedim>

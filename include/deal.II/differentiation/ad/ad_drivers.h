@@ -144,7 +144,6 @@ namespace Differentiation
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
      *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType, typename ScalarType, typename T = void>
     struct TapedDrivers
@@ -516,7 +515,6 @@ namespace Differentiation
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
      *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType, typename ScalarType, typename T = void>
     struct TapelessDrivers

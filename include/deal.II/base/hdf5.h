@@ -325,7 +325,6 @@ DEAL_II_NAMESPACE_OPEN
  * concurrency. To achieve high parallel performance with HDF5, we advice to use
  * HDF5 with MPI.
  *
- * @author Daniel Garcia-Sanchez, 2018, 2019.
  */
 // clang-format on
 namespace HDF5
@@ -333,7 +332,6 @@ namespace HDF5
   /**
    * Base class for the HDF5 objects.
    *
-   * @author Daniel Garcia-Sanchez, 2018, 2019.
    */
   class HDF5Object
   {
@@ -411,7 +409,6 @@ namespace HDF5
   /**
    * This class implements an HDF5 DataSet.
    *
-   * @author Daniel Garcia-Sanchez, 2018, 2019.
    */
   class DataSet : public HDF5Object
   {
@@ -963,7 +960,6 @@ namespace HDF5
   /**
    * This class implements an HDF5 Group
    *
-   * @author Daniel Garcia-Sanchez, 2018,2019.
    */
   class Group : public HDF5Object
   {
@@ -1062,7 +1058,6 @@ namespace HDF5
   /**
    * This class implements an HDF5 File
    *
-   * @author Daniel Garcia-Sanchez, 2018, 2019.
    */
   class File : public Group
   {

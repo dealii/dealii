@@ -254,7 +254,6 @@ DEAL_II_NAMESPACE_OPEN
  * is accessible at https://doi.org/10.1137/S0036142902404923 ,
  * see @cite park2003p .
  *
- * @author Jaeryun Yim, 2015, 2016.
  */
 class FE_P1NC : public FiniteElement<2, 2>
 {

@@ -288,7 +288,6 @@ namespace internal
  * element of that column.
  *
  * @ingroup textoutput
- * @author Ralf Hartmann, 1999; Wolfgang Bangerth, 2011
  */
 class TableHandler
 {

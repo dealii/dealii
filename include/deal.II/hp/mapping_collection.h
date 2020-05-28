@@ -50,7 +50,6 @@ namespace hp
    *
    * @ingroup hp hpcollection
    *
-   * @author Oliver Kayser-Herold, 2005
    */
   template <int dim, int spacedim = dim>
   class MappingCollection : public Subscriptor

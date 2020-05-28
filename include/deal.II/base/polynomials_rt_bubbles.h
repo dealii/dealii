@@ -80,8 +80,6 @@ DEAL_II_NAMESPACE_OPEN
  * right - $3D,\,k=2$.</td></tr> </table>
  *
  * @ingroup Polynomials
- * @author Eldar Khattatov
- * @date 2018
  */
 
 template <int dim>

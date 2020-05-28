@@ -207,7 +207,6 @@ extern "C"
  * also how to set the parameters appropriately please take a look into the
  * PARPACK manual.
  *
- * @author Denis Davydov, 2015, 2017
  */
 template <typename VectorType>
 class PArpackSolver : public Subscriptor

@@ -56,7 +56,6 @@ namespace PETScWrappers
      *
      * @ingroup Vectors @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Wolfgang Bangerth, 2004
      */
     class BlockVector : public BlockVectorBase<Vector>
     {
@@ -495,7 +494,6 @@ namespace PETScWrappers
      * exchanges the data of the two vectors.
      *
      * @relatesalso PETScWrappers::MPI::BlockVector
-     * @author Wolfgang Bangerth, 2000
      */
     inline void
     swap(BlockVector &u, BlockVector &v)
@@ -550,7 +548,6 @@ namespace internal
 /**
  * Declare dealii::PETScWrappers::MPI::BlockVector as distributed vector.
  *
- * @author Uwe Koecher, 2017
  */
 template <>
 struct is_serial_vector<PETScWrappers::MPI::BlockVector> : std::false_type

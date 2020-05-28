@@ -75,7 +75,6 @@ namespace Functions
    *   @endcode
    *
    * @ingroup functions
-   * @author Luca Heltai, 2006
    */
   template <int dim>
   class ParsedFunction : public AutoDerivativeFunction<dim>

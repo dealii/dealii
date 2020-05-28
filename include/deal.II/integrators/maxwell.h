@@ -61,8 +61,6 @@ namespace LocalIntegrators
    * @f]
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace Maxwell
   {
@@ -89,8 +87,6 @@ namespace LocalIntegrators
      * @note The third tensor argument is not used in two dimensions and can
      * for instance duplicate one of the previous.
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     Tensor<1, dim>
@@ -126,8 +122,6 @@ namespace LocalIntegrators
      * @note The third tensor argument is not used in two dimensions and can
      * for instance duplicate one of the previous.
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     Tensor<1, dim>
@@ -166,8 +160,6 @@ namespace LocalIntegrators
      * @f]
      * in weak form.
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -222,8 +214,6 @@ namespace LocalIntegrators
      * vector curl operator can be obtained by exchanging test and trial
      * functions.
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -274,8 +264,6 @@ namespace LocalIntegrators
      * \biggr)
      * @f]
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -340,8 +328,6 @@ namespace LocalIntegrators
      * \, ds.
      * @f]
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -400,8 +386,6 @@ namespace LocalIntegrators
      * \biggr)\;dx
      * @f]
      *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     inline void

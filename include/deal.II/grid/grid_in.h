@@ -299,7 +299,6 @@ struct CellData;
  *
  * @ingroup grid
  * @ingroup input
- * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004, 2007, Jean-Paul
  * Pelteret 2015, Timo Heister 2015,  Krzysztof Bzowski, 2015
  */
 
@@ -398,8 +397,6 @@ public:
    * The companion GridOut::write_vtk function can be used to write VTK files
    * compatible with this method.
    *
-   * @author Mayank Sabharwal, Andreas Putz, 2013
-   * @author Luca Heltai, 2018
    */
   void
   read_vtk(std::istream &in);
@@ -418,7 +415,6 @@ public:
    * triangulation in a xml section which is ignored by vtu general vtu readers.
    * If this section is absent, an exception is thrown.
    *
-   * @author Luca Heltai, Nicola Giuliani, 2020
    */
   void
   read_vtu(std::istream &in);

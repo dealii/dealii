@@ -67,7 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2001
  */
 class MatrixOut : public DataOutInterface<2, 2>
 {

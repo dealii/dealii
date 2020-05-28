@@ -49,7 +49,6 @@ namespace Polynomials
    * freedom into an equivalent of a refined mesh instead of higher order
    * polynomials, which is useful when using mixed finite elements.
    *
-   * @author Martin Kronbichler, 2013
    */
   template <typename number>
   class PiecewisePolynomial : public Subscriptor

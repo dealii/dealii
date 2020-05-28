@@ -81,7 +81,6 @@ namespace parallel
    * weighting function on the old Triangulation and connect it to the new one.
    *
    * @ingroup distributed
-   * @author Marc Fehling, 2018, 2019
    */
   template <int dim, int spacedim = dim>
   class CellWeights

@@ -52,7 +52,6 @@ DEAL_II_NAMESPACE_OPEN
  * to estimate local smoothness of the underlying FiniteElement field to decide
  * on h- or p-adaptive refinement strategy.
  *
- * @author Denis Davydov, 2016;
  */
 namespace FESeries
 {
@@ -85,7 +84,6 @@ namespace FESeries
    * we only need to compute $ c_{\bf k} $ for positive indices
    * $ \bf k $ .
    *
-   * @author Denis Davydov, 2016.
    */
   template <int dim, int spacedim = dim>
   class Fourier : public Subscriptor
@@ -253,7 +251,6 @@ namespace FESeries
    * $ dim $-dimensional Legendre polynomials constructed from
    * $ \widetilde P_m(x) $ using tensor product rule.
    *
-   * @author Denis Davydov, 2016.
    */
   template <int dim, int spacedim = dim>
   class Legendre : public Subscriptor

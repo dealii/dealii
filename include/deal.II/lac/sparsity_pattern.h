@@ -128,8 +128,6 @@ namespace SparsityPatternIterators
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
    *
-   * @author Wolfgang Bangerth
-   * @date 2004
    */
   class Accessor
   {
@@ -324,7 +322,6 @@ namespace SparsityPatternIterators
  * The ordering of non-zero elements within each row (i.e. increasing
  * column index order) depends on the derived classes.
  *
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPatternBase : public Subscriptor
 {
@@ -860,7 +857,6 @@ protected:
  * documentation module
  * @ref Sparsity.
  *
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPattern : public SparsityPatternBase
 {

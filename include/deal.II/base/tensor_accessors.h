@@ -67,7 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup geomprimitives
  *
- * @author Matthias Maier, 2015
  */
 namespace TensorAccessors
 {
@@ -185,7 +184,6 @@ namespace TensorAccessors
    * <code>operator[]()</code> that returns a (const or non-const) reference
    * of <code>value_type</code>.
    *
-   * @author Matthias Maier, 2015
    */
   template <int index, int rank, typename T>
   constexpr DEAL_II_ALWAYS_INLINE internal::ReorderedIndexView<index, rank, T>
@@ -219,7 +217,6 @@ namespace TensorAccessors
    * dealii::TableIndices  that stores at least @p rank indices that can be
    * accessed via operator[]().
    *
-   * @author Matthias Maier, 2015
    */
   template <int rank, typename T, typename ArrayType>
   constexpr DEAL_II_ALWAYS_INLINE typename ReturnType<rank, T>::value_type &
@@ -268,7 +265,6 @@ namespace TensorAccessors
    * 2 * no_contr, rank_1, or rank_2, respectively. Obviously, no_contr must
    * be less or equal than rank_1 and rank_2.
    *
-   * @author Matthias Maier, 2015
    */
   template <int no_contr,
             int rank_1,
@@ -322,7 +318,6 @@ namespace TensorAccessors
    * @note The Types @p T2, @p T3, and @p T4 must have rank rank_1, rank_1 +
    * rank_2, and rank_3, respectively. @p T1 must be a scalar type.
    *
-   * @author Matthias Maier, 2015
    */
   template <int rank_1,
             int rank_2,

@@ -56,7 +56,6 @@ namespace internal
      * given deal.II mapping (as passed to the constructor of this class) in a
      * form accessible to FEEvaluation.
      *
-     * @author Martin Kronbichler, 2014
      */
     template <int dim, typename Number, typename VectorizedArrayType>
     class MappingDataOnTheFly

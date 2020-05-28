@@ -42,7 +42,6 @@ DEAL_II_NAMESPACE_OPEN
  * works similarly to that class but adds a constant function for the last
  * index.
  *
- * @author Timo Heister, 2012
  */
 template <int dim>
 class TensorProductPolynomialsConst : public ScalarPolynomialsBase<dim>

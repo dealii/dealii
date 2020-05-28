@@ -40,8 +40,6 @@ namespace internal
      * store the information belonging to the faces of a triangulation
      * separately from the TriaLevel classes.
      *
-     * @author Tobias Leicht, 2006
-     * @author Peter Munch, 2020
      */
     class TriaFaces
     {

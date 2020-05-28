@@ -89,7 +89,6 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  *
  *
- * @author Guido Kanschat, 1999; Ingo Kligge 2017
  */
 template <typename VectorType = Vector<double>>
 class SolverQMRS : public SolverBase<VectorType>

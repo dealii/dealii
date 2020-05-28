@@ -66,7 +66,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  *
- * @author Wolfgang Bangerth, 2006
  */
 class IdentityMatrix
 {

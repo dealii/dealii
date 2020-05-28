@@ -51,8 +51,6 @@ namespace internal
      * Objects of these classes are included in the TriaLevel and TriaFaces
      * classes.
      *
-     * @author Tobias Leicht, Guido Kanschat, 2006, 2007, 2012
-     * @author Peter Munch, 2020
      */
     class TriaObjects
     {

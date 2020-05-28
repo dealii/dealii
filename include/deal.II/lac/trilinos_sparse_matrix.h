@@ -108,8 +108,6 @@ namespace TrilinosWrappers
      * sparsity pattern. For Trilinos matrices, this does not seem so simple,
      * therefore, we write a little base class here.
      *
-     * @author Guido Kanschat
-     * @date 2012
      */
     class AccessorBase
     {
@@ -351,7 +349,6 @@ namespace TrilinosWrappers
      * the elements.
      *
      * @ingroup TrilinosWrappers
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     template <bool Constness>
     class Iterator
@@ -510,7 +507,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Matrix1
-   * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
    */
   class SparseMatrix : public Subscriptor
   {
@@ -2009,7 +2005,6 @@ namespace TrilinosWrappers
        * TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload::SetUseTranspose()
        * function for further details.
        *
-       * @author Jean-Paul Pelteret, 2016
        *
        * @ingroup TrilinosWrappers
        */

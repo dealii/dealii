@@ -165,7 +165,6 @@ namespace Differentiation
      * @todo Make this class thread safe for Sacado number and ADOL-C tapeless
      * numbers (if supported).
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -833,7 +832,6 @@ namespace Differentiation
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -1217,7 +1215,6 @@ namespace Differentiation
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -1532,7 +1529,6 @@ namespace Differentiation
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -2632,7 +2628,6 @@ namespace Differentiation
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -3079,7 +3074,6 @@ namespace Differentiation
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -3472,7 +3466,6 @@ namespace Differentiation
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
      *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,

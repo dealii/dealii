@@ -112,7 +112,6 @@ namespace internal
  * these steps is stored and therefore there will be multiple values per
  * iteration.
  *
- * @author Conrad Clevenger, 2019
  */
 template <class VectorType = Vector<double>>
 class SolverIDR : public SolverBase<VectorType>

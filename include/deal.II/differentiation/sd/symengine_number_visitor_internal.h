@@ -57,7 +57,6 @@ namespace Differentiation
        * It is intended that this class only be used in conjunction
        * with the DictionarySubstitutionVisitor.
        *
-       * @author Jean-Paul Pelteret, Isuru Fernando, 2017, 2020
        */
       template <typename ReturnType, typename ExpressionType>
       class CSEDictionaryVisitor
@@ -264,7 +263,6 @@ namespace Differentiation
        * CSE into a dictionary substitution scheme. It is therefore only
        * intended to be created and used by a BatchOptimizer.
        *
-       * @author Jean-Paul Pelteret, Isuru Fernando, 2017, 2020
        */
       template <typename ReturnType, typename ExpressionType>
       class DictionarySubstitutionVisitor

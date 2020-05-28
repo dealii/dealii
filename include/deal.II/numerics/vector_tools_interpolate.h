@@ -162,7 +162,6 @@ namespace VectorTools
    * between cells), then each subsequent call will rewrite the intercell @p
    * dofs of the previous one.
    *
-   * @author Valentin Zingan, 2013
    */
   template <int dim,
             int spacedim,
@@ -285,7 +284,6 @@ namespace VectorTools
    * This function is only implemented for FiniteElements where the specified
    * components are primitive.
    *
-   * @author Luca Heltai, 2015
    */
   template <int dim,
             int spacedim,

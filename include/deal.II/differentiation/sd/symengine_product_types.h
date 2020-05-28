@@ -58,7 +58,6 @@ namespace internal
      * these as specializations of the ProductTypeImpl class
      * itself.
      *
-     * @author Jean-Paul Pelteret, 2019
      */
     template <typename T, typename U, typename V = void>
     struct GeneralProductTypeImpl;

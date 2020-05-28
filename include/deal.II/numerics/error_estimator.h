@@ -255,8 +255,6 @@ namespace hp
  * that accepts several in- and output vectors at the same time.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006, Denis Davydov,
- * 2015; parallelization by Thomas Richter, 2000
  */
 template <int dim, int spacedim = dim>
 class KellyErrorEstimator
@@ -582,7 +580,6 @@ public:
  * the same public functions as the general template, so that a user will not
  * see any difference.
  *
- * @author Wolfgang Bangerth, 1998, 2004.
  */
 template <int spacedim>
 class KellyErrorEstimator<1, spacedim>

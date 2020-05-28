@@ -70,7 +70,6 @@ class FullMatrix;
  * is determined at run-time by means of the matrices passed to the
  * reinit() function.
  *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSumBase
@@ -236,7 +235,6 @@ private:
  * is determined at run-time by means of the matrices passed to the
  * reinit() function.
  *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSum
@@ -330,7 +328,6 @@ private:
  * the main documentation of the generic
  * TensorProductMatrixSymmetricSum class.
  *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int n_rows_1d>
 class TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>

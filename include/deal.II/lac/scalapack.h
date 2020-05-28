@@ -71,7 +71,6 @@ DEAL_II_NAMESPACE_OPEN
  * @image html scalapack_invert.png
  *
  * @ingroup Matrix1
- * @author Denis Davydov, Benjamin Brands, 2017
  */
 template <typename NumberType>
 class ScaLAPACKMatrix : protected TransposeTable<NumberType>

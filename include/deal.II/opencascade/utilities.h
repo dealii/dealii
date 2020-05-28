@@ -98,7 +98,6 @@ DEAL_II_NAMESPACE_OPEN
  * make sure your CAD files are actually flat and that all z coordinates are
  * equal to zero, as otherwise you will get many exceptions.
  *
- * @author Luca Heltai, Andrea Mola, 2011--2017.
  */
 namespace OpenCASCADE
 {
@@ -290,7 +289,6 @@ namespace OpenCASCADE
    * @return An std::vector of TopoDS_Edge objects representing the smooth
    *  interpolation of the boundary of the `triangulation`
    *
-   * @author Dirk Peschka, Luca Heltai, 2017.
    */
   template <int spacedim>
   std::vector<TopoDS_Edge>

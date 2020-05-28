@@ -67,7 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
  */
 template <typename Number = double>
 class FunctionTime

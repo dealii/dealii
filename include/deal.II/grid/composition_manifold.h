@@ -64,7 +64,6 @@ DEAL_II_NAMESPACE_OPEN
  * @tparam dim2 The dimension of the second ChartManifold
  *
  * @ingroup manifold
- * @author Luca Heltai, Timo Heister, 2016
  */
 template <int dim,
           int spacedim         = dim,

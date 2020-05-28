@@ -102,7 +102,6 @@ namespace SmoothnessEstimator
    * example, one strategy to implement hp-refinement criteria is to perform
    * p-refinement if $\sigma>1$ (see @cite mavriplis1994hp).
    *
-   * @author Denis Davydov, 2018, Marc Fehling, 2018 - 2020
    */
   namespace Legendre
   {
@@ -344,9 +343,6 @@ namespace SmoothnessEstimator
    *
    * @note An extensive demonstration of the use of these functions is
    * provided in step-27.
-   *
-   * @author Wolfgang Bangerth 2006 - 2007, Denis Davydov, 2016,
-   * Marc Fehling, 2018 - 2020
    */
   namespace Fourier
   {

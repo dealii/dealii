@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * monomials in $P_k1$ matches the ordering of the monomials in $P_k2$ for
  * $k2>k1$.
  *
- * @author Ralf Hartmann, 2004
  */
 template <int dim>
 class PolynomialsP : public PolynomialSpace<dim>

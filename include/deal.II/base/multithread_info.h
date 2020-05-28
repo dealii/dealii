@@ -51,7 +51,6 @@ DEAL_II_NAMESPACE_OPEN
  * of cores in the system is returned by MultithreadInfo::n_cores().
  *
  * @ingroup threads
- * @author Thomas Richter, Wolfgang Bangerth, 2000
  */
 class MultithreadInfo
 {

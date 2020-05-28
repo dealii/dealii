@@ -103,7 +103,6 @@ DEAL_II_NAMESPACE_OPEN
  * restore().
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1999
  */
 template <int dim, int spacedim = dim>
 class PersistentTriangulation : public Triangulation<dim, spacedim>

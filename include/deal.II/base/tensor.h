@@ -87,7 +87,6 @@ namespace Differentiation
  * as argument.
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, 2009, Matthias Maier, 2015
  */
 template <int dim, typename Number>
 class Tensor<0, dim, Number>
@@ -444,7 +443,6 @@ private:
  * as argument.
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, 1998-2005, Matthias Maier, 2015
  */
 template <int rank_, int dim, typename Number>
 class Tensor
@@ -793,7 +791,6 @@ namespace internal
   // compile the library with Apple Clang 8 and older. We should remove
   // these overloads again when we bump the minimal required version to
   // something later than clang-3.6 / Apple Clang 6.3.
-  // - Jean-Paul Pelteret, Matthias Maier, Daniel Arndt 2020
   template <int rank, int dim, typename T, typename U>
   struct ProductTypeImpl<Tensor<rank, dim, T>, std::complex<U>>
   {
@@ -2055,7 +2052,6 @@ inline DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE
  * is returned as an unwrapped number type.
  *
  * @relatesalso Tensor
- * @author Matthias Maier, 2015
  */
 template <int rank_1,
           int rank_2,
@@ -2111,7 +2107,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * is returned as an unwrapped number type.
  *
  * @relatesalso Tensor
- * @author Matthias Maier, 2015
  */
 template <int index_1,
           int index_2,
@@ -2183,7 +2178,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * is returned as an unwrapped number type.
  *
  * @relatesalso Tensor
- * @author Matthias Maier, 2015
  */
 template <int index_1,
           int index_2,
@@ -2273,7 +2267,6 @@ DEAL_II_CONSTEXPR inline
  * @f]
  *
  * @relatesalso Tensor
- * @author Matthias Maier, 2015
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -2303,7 +2296,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * SymmetricTensor.
  *
  * @relatesalso Tensor
- * @author Matthias Maier, 2015, Jean-Paul Pelteret 2017
  */
 template <template <int, int, typename> class TensorT1,
           template <int, int, typename> class TensorT2,
@@ -2337,7 +2329,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * @f]
  *
  * @relatesalso Tensor
- * @author Matthias Maier, 2015
  */
 template <int rank_1,
           int rank_2,
@@ -2374,7 +2365,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * (e.g. from the <tt>dim==2</tt> case in the switch).
  *
  * @relatesalso Tensor
- * @author Guido Kanschat, 2001
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
@@ -2399,7 +2389,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
  * case in the switch).
  *
  * @relatesalso Tensor
- * @author Guido Kanschat, 2001
  */
 template <int dim, typename Number1, typename Number2>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -2435,7 +2424,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
  * Compute the determinant of a tensor or rank 2.
  *
  * @relatesalso Tensor
- * @author Wolfgang Bangerth, 2009
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
@@ -2478,7 +2466,6 @@ constexpr DEAL_II_ALWAYS_INLINE Number
  * diagonal entries.
  *
  * @relatesalso Tensor
- * @author Wolfgang Bangerth, 2001
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
@@ -2498,7 +2485,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
  * than by reference as a parameter.
  *
  * @relatesalso Tensor
- * @author Wolfgang Bangerth, 2000
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline Tensor<2, dim, Number>
@@ -2592,7 +2578,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
  * Return the transpose of the given tensor.
  *
  * @relatesalso Tensor
- * @author Wolfgang Bangerth, 2002
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
@@ -2624,7 +2609,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
  * @note This requires that the tensor is invertible.
  *
  * @relatesalso Tensor
- * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
 constexpr Tensor<2, dim, Number>
@@ -2646,7 +2630,6 @@ adjugate(const Tensor<2, dim, Number> &t)
  * @note This requires that the tensor is invertible.
  *
  * @relatesalso Tensor
- * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
 constexpr Tensor<2, dim, Number>
@@ -2698,7 +2681,6 @@ project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor)
  * (maximum of the sums over columns).
  *
  * @relatesalso Tensor
- * @author Wolfgang Bangerth, 2012
  */
 template <int dim, typename Number>
 inline Number
@@ -2725,7 +2707,6 @@ l1_norm(const Tensor<2, dim, Number> &t)
  * (maximum of the sums over rows).
  *
  * @relatesalso Tensor
- * @author Wolfgang Bangerth, 2012
  */
 template <int dim, typename Number>
 inline Number

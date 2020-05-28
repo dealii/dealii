@@ -297,8 +297,6 @@ DEAL_II_NAMESPACE_OPEN
  * in the manual).
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000,
- * 2001
  */
 namespace VectorTools
 {}

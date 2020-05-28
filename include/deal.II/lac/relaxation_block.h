@@ -50,8 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  * ghost vector in AdditionalData::temp_ghost_vector.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
@@ -282,8 +280,6 @@ private:
  * expected by Solver objects.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
@@ -380,8 +376,6 @@ public:
  * expected by Solver objects.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
@@ -478,8 +472,6 @@ public:
  * preconditioner interface expected by Solver objects.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,

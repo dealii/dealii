@@ -52,7 +52,6 @@ namespace LAPACKSupport
    * The elements of this enumeration are therefore used to track what is
    * currently being stored by this object.
    *
-   * @author Guido Kanschat, 2005
    */
   enum State
   {
