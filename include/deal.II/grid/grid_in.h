@@ -40,7 +40,7 @@ struct CellData;
 /**
  * This class implements an input mechanism for grid data. It allows to read a
  * grid structure into a triangulation object. At present, UCD (unstructured
- * cell data), DB Mesh, XDA, %Gmsh, Tecplot, NetCDF, UNV, VTK, ASSIMP, and Cubit
+ * cell data), DB Mesh, XDA, %Gmsh, Tecplot, UNV, VTK, ASSIMP, and Cubit
  * are supported as input format for grid data. Any numerical data other than
  * geometric (vertex locations) and topological (how vertices form cells,
  * faces, and edges) information is ignored, but the readers for the various
@@ -327,8 +327,6 @@ public:
     xda,
     /// Use read_msh()
     msh,
-    /// Use read_netcdf()
-    netcdf,
     /// Use read_tecplot()
     tecplot,
     /// Use read_vtk()
@@ -515,17 +513,6 @@ public:
    */
   void
   read_msh(std::istream &in);
-
-  /**
-   * Read grid data from a NetCDF file. The only data format currently
-   * supported is the <tt>TAU grid format</tt>.
-   *
-   * This function requires the library to be linked with the NetCDF library.
-   *
-   * @deprecated Support for NetCDF in deal.II is deprecated.
-   */
-  DEAL_II_DEPRECATED void
-  read_netcdf(const std::string &filename);
 
   /**
    * Read grid data from a file containing tecplot ASCII data. This also works

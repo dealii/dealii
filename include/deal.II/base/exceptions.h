@@ -1095,17 +1095,6 @@ namespace StandardExceptions
     "if deal.II was configured to use MPI.");
 
   /**
-   * This function requires support for the NetCDF library.
-   *
-   * @deprecated Support for NetCDF in deal.II is deprecated.
-   */
-  DeclExceptionMsg(
-    ExcNeedsNetCDF,
-    "You are attempting to use functionality that is only available "
-    "if deal.II was configured to use NetCDF, but cmake did not "
-    "find a valid NetCDF library.");
-
-  /**
    * This function requires support for the FunctionParser library.
    */
   DeclExceptionMsg(

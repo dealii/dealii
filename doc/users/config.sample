@@ -356,26 +356,6 @@
 
 
 #
-# Netcdf:
-#
-# SET(DEAL_II_WITH_NETCDF ON CACHE BOOL
-#   "Build deal.II with support for netcdf"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(NETCDF_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(NETCDF_FOUND TRUE CACHE BOOL "")
-# SET(NETCDF_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(NETCDF_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-#
-
-
-#
 # P4EST:
 #
 # SET(DEAL_II_WITH_P4EST ON CACHE BOOL
