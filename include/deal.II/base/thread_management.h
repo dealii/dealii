@@ -35,15 +35,6 @@
 #  include <tuple>
 #  include <utility>
 #  include <vector>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  ifdef DEAL_II_WITH_THREADS
-#    include <thread>
-#    define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
-#    include <tbb/task.h>
-#    undef TBB_SUPPRESS_DEPRECATED_MESSAGES
-#    include <tbb/tbb_stddef.h>
-#  endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
