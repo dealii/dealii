@@ -64,15 +64,22 @@ namespace Particles
      * A dim=0 patch is built for each particle. The position of the particle is
      * used to build the node position and the ID of the particle is added as a
      * single data element.
+     * @param [in] data_component_names An optional vector of strings that
+     * describe the properties of each particle. Particle properties will only
+     * be written if this vector
+     * is provided.
+     * @param [in] data_component_interpretations An optional vector that
+     * controls if the particle properties are interpreted as scalars, vectors,
+     * or tensors. Has to be of the same length as @p data_component_names.
      *
      * @author Bruno Blais, Luca Heltai 2019
      */
     void
     build_patches(const Particles::ParticleHandler<dim, spacedim> &particles,
-                  const std::vector<std::string> &                 names = {},
+                  const std::vector<std::string> &data_component_names = {},
                   const std::vector<
                     DataComponentInterpretation::DataComponentInterpretation>
-                    &data_component_interpretation = {});
+                    &data_component_interpretations = {});
 
   protected:
     /**
@@ -89,18 +96,40 @@ namespace Particles
     virtual std::vector<std::string>
     get_dataset_names() const override;
 
+
+    /**
+     * Overload of the respective DataOutInterface::get_nonscalar_data_ranges()
+     * function. See there for a more extensive documentation.
+     * This function is a reimplementation of the function
+     * DataOut_DoFData::get_nonscalar_data_ranges().
+     */
+    virtual std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+    get_nonscalar_data_ranges() const override;
+
   private:
     /**
-     * This is a list of patches that is created each time build_patches() is
+     * This is a vector of patches that is created each time build_patches() is
      * called. These patches are used in the output routines of the base
      * classes.
      */
     std::vector<DataOutBase::Patch<0, spacedim>> patches;
 
     /**
-     * A list of field names for all data components stored in patches.
+     * A vector of field names for all data components stored in patches.
      */
     std::vector<std::string> dataset_names;
+
+    /**
+     * A vector that for each of the data components of the
+     * current data set indicates whether they are scalar fields, parts of a
+     * vector-field, or any of the other supported kinds of data.
+     */
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      data_component_interpretations;
   };
 
 } // namespace Particles

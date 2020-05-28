@@ -5421,7 +5421,7 @@ namespace DataOutBase
                     for (unsigned int c = 0; c < size; ++c)
                       {
                         const auto ind =
-                          Tensor<2, dim>::unrolled_to_component_indices(c);
+                          Tensor<2, spacedim>::unrolled_to_component_indices(c);
                         vtk_data[ind[0]][ind[1]] =
                           data_vectors(first_component + c, n);
                       }
