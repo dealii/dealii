@@ -1307,7 +1307,7 @@ namespace
     // volume relative to |v01|*|v02|*|v03|. the test checks the
     // squares of these to avoid taking norms/square roots:
     if (std::abs((v03 * normal) * (v03 * normal) /
-                 ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
+                 ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-10)
       {
         // If the vectors are non planar we integrate the norm of the normal
         // vector using a numerical Gauss scheme of order 4. In particular we
