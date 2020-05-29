@@ -2,7 +2,7 @@
 
 The directory in which this program is run contains a example parameter file by defualt.
 If you do not specify a parameter file as an argument on the command
-line, the program will try to read the file "`parameters.prm`" by default, and
+line, the program will try to read the file "parameters.prm" by default, and
 will execute the two dimensional version of the code.
 
 Regardless of the specific parameter file name, if the specified file does not
