@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-The directory in which this program is run contains a example parameter file by defualt.
+The directory in which this program is run contains an example parameter file by default.
 If you do not specify a parameter file as an argument on the command
 line, the program will try to read the file "parameters.prm" by default, and
 will execute the two dimensional version of the code.
