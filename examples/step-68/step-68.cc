@@ -146,7 +146,7 @@ namespace Step68
 
   // There remains the task of declaring what run-time parameters we can accept
   // in input files. Since we have a very limited number of parameters, all
-  // parameters are declared in the same category.
+  // parameters are declared in the same section.
   ParticleTrackingParameters::ParticleTrackingParameters()
     : ParameterAcceptor("Particle Tracking Problem/")
   {
