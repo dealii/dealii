@@ -23,7 +23,7 @@ Particles play an important part in numerical models for a large
  or they can even be used to simulate the motion of granular matter, as is
  the case with the Discrete Element Method (DEM) (Blais et al. 2019). In the case
  of DEM, the resulting model is not related to the finite element method anymore,
- but just leads to a serie of ordinary differential equation which describes
+ but just leads to a system of ordinary differential equation which describes
  the motion of the particles and the dynamic of their collisions. All of
  these models can be built using deal.II particle handling capabilities.
 
