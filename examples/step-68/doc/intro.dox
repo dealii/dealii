@@ -35,8 +35,8 @@ following ordinary differential equation (ODE):
 \frac{d \textbf{x}_i}{dt} =\textbf{u}(\textbf{x}_i)
 @f]
 
-where $\textbf{x}_i$ is the postion of particle $i$. In the present step,
-this ODE is solved using the explicit Euler method. The resulting scheme is:
+where $\textbf{x}_i$ is the postion of particle $i$ and $\textbf{u}_i$ its velocity.
+In the present step, this ODE is solved using the explicit Euler method. The resulting scheme is:
 @f[
 \textbf{x}_{i}^{t+\Delta t} = \textbf{x}_{i}^{t} + \Delta t \; \textbf{u}(\textbf{x}_{i}^{t})
 @f]
@@ -57,8 +57,7 @@ realistic computational fluid dynamic simulation. In this step, we illustrate bo
 
 We note that much greater accuracy could be obtained by using a fourth
 order Runge-Kutta method or another appropriate scheme for the time integration
-of the motion of the particles. However, this does not alter which capacities
-are displayed in the present step.
+of the motion of the particles.
 
 <h3>Particles in deal.II</h3>
 

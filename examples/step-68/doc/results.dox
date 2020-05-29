@@ -5,30 +5,6 @@ If you do not specify a parameter file as an argument on the command
 line, the program will try to read the file "parameters.prm" by default, and
 will execute the two dimensional version of the code.
 
-Regardless of the specific parameter file name, if the specified file does not
-exist when you execute the program you will get an exception that no such file
-can be found:
-
-@code
-----------------------------------------------------
-Exception on processing:
-
---------------------------------------------------------
-An error occurred in line <74> of file <../source/base/parameter_acceptor.cc> in function
-    static void dealii::ParameterAcceptor::initialize(const std::string &, const std::string &, const ParameterHandler::OutputStyle, dealii::ParameterHandler &)
-The violated condition was:
-    false
-Additional information:
-    You specified <parameters.prm> as input parameter file, but it does not exist. We created it for you.
---------------------------------------------------------
-
-Aborting!
-----------------------------------------------------
-@endcode
-
-However, as the error message already states, the code that triggers the
-exception will also generate the specified file ("`parameters.prm`" in this case).
-
 On any number of core, the simulation output will look like:
 
 @code
@@ -111,4 +87,4 @@ used to increase the accuracy and allow for an increased time-step size.
 this case the particles would need to have additional properties such as their mass,
 and their diameter.
 - Coupling to a flow solver. This step could be straightforwardly coupled to any parallel
-steps in which the Stokes or the Navier-Stokes equations are solved (e.g. step-57)
+steps in which the Stokes (step-32, step-70) or the Navier-Stokes equations are solved (e.g. step-57)
