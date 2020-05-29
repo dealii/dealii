@@ -5415,13 +5415,24 @@ namespace DataOutBase
                   {
                     vtk_data[0][0] = data_vectors(first_component, n);
                   }
-                else if ((size == 4) || (size == 9))
-                  // 2D, 4 elements or 3D 9 elements
+                else if (size == 4)
+                  // 2D, 4 elements
                   {
                     for (unsigned int c = 0; c < size; ++c)
                       {
                         const auto ind =
-                          Tensor<2, dim>::unrolled_to_component_indices(c);
+                          Tensor<2, 2>::unrolled_to_component_indices(c);
+                        vtk_data[ind[0]][ind[1]] =
+                          data_vectors(first_component + c, n);
+                      }
+                  }
+                else if (size == 9)
+                  // 3D 9 elements
+                  {
+                    for (unsigned int c = 0; c < size; ++c)
+                      {
+                        const auto ind =
+                          Tensor<2, 3>::unrolled_to_component_indices(c);
                         vtk_data[ind[0]][ind[1]] =
                           data_vectors(first_component + c, n);
                       }
