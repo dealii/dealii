@@ -184,6 +184,11 @@ namespace CUDAWrappers
       Number *JxW;
 
       /**
+       * ID of the associated MatrixFree object.
+       */
+      unsigned int id;
+
+      /**
        * Number of cells.
        */
       unsigned int n_cells;
@@ -214,6 +219,11 @@ namespace CUDAWrappers
      * Default constructor.
      */
     MatrixFree();
+
+    /**
+     * Destructor.
+     */
+    ~MatrixFree();
 
     /**
      * Return the length of the padding.
@@ -442,6 +452,11 @@ namespace CUDAWrappers
     distributed_set_constrained_values(
       const Number                                 val,
       LinearAlgebra::CUDAWrappers::Vector<Number> &dst) const;
+
+    /**
+     * Unique ID associated with the object.
+     */
+    int my_id;
 
     /**
      * Parallelization scheme used, parallelization over degrees of freedom or

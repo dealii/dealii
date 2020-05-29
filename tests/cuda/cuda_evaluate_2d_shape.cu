@@ -42,23 +42,23 @@ evaluate_tensor_product(double *dst, double *src)
     M - 1,
     N,
     double>
-    evaluator;
+    evaluator(0);
 
   if (type == 0)
     {
       evaluator.template values<0, dof_to_quad, false, false>(
-        CUDAWrappers::internal::get_global_shape_values<double>(), src, src);
+        CUDAWrappers::internal::get_global_shape_values<double>(0), src, src);
       __syncthreads();
       evaluator.template values<1, dof_to_quad, add, false>(
-        CUDAWrappers::internal::get_global_shape_values<double>(), src, dst);
+        CUDAWrappers::internal::get_global_shape_values<double>(0), src, dst);
     }
   if (type == 1)
     {
       evaluator.template gradients<0, dof_to_quad, false, false>(
-        CUDAWrappers::internal::get_global_shape_values<double>(), src, src);
+        CUDAWrappers::internal::get_global_shape_values<double>(0), src, src);
       __syncthreads();
       evaluator.template gradients<1, dof_to_quad, add, false>(
-        CUDAWrappers::internal::get_global_shape_values<double>(), src, dst);
+        CUDAWrappers::internal::get_global_shape_values<double>(0), src, dst);
     }
 }
 
@@ -123,16 +123,17 @@ test()
 
   unsigned int size_shape_values = M * N * sizeof(double);
 
-  cudaError_t cuda_error = cudaMemcpyToSymbol(
-    CUDAWrappers::internal::get_global_shape_values<double>(),
-    shape_host.begin(),
-    size_shape_values,
-    0,
-    cudaMemcpyHostToDevice);
+  cudaError_t cuda_error =
+    cudaMemcpyToSymbol(CUDAWrappers::internal::get_global_shape_values<double>(
+                         0),
+                       shape_host.begin(),
+                       size_shape_values,
+                       0,
+                       cudaMemcpyHostToDevice);
   AssertCuda(cuda_error);
 
   cuda_error = cudaMemcpyToSymbol(
-    CUDAWrappers::internal::get_global_shape_gradients<double>(),
+    CUDAWrappers::internal::get_global_shape_gradients<double>(0),
     shape_host.begin(),
     size_shape_values,
     0,
