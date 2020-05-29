@@ -68,7 +68,7 @@
 #include <deal.II/particles/generators.h>
 
 // Since the particles do not form a triangulation, they have their
-// own specific data out class which will enable us to write them
+// own specific DataOut class which will enable us to write them
 // to commonly used parallel vtu format
 #include <deal.II/particles/data_out.h>
 
