@@ -106,7 +106,7 @@ This steps highlights some of the main capabilities of particles, notably their
 capacity to be use in distributed parallel simulations. However, this step could
 be exteded in numerous manners:
 - High-order time integration (for example using a Runge-Kutta 4 method) could be
-used to increase the accuracy and allow for an increased time-steps.
+used to increase the accuracy and allow for an increased time-step size.
 - The full equation of motion (with inertia) could be solved for the particles. In
 this case the particles would need to have additional properties such as their mass,
 and their diameter.
