@@ -102,7 +102,7 @@ the coarseness of the background mesh.
 
 <h3>Possibilities for extensions</h3>
 
-This steps highlights some of the main capabilities of particle, notably their
+This steps highlights some of the main capabilities of particles, notably their
 capacity to be use in distributed parallel simulations. However, this step could
 be exteded in numerous manners:
 - High-order time integration (for example using a Runge-Kutta 4 method) could be
