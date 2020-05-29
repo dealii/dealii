@@ -45,7 +45,7 @@ where $\textbf{x}_{i}^{t+\Delta t}$ and $\textbf{x}_{i}^{t}$ are the position
 of particle $i$ at time $t+\Delta t$ and $t$, respectively and where $\Delta t$
 is the time step. In the present step, the velocity at the location of particles
 is obtainedin two different fashions:
-- By evaluating the velocity function at the location of the particles
+- By evaluating the velocity function at the location of the particles.
 - By evaluating the velocity function on a background triangulation and, using
 a  finite element support, interpolating at the position of the particle.
 
