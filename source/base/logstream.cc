@@ -382,7 +382,6 @@ LogStream::log_thread_id(const bool flag)
 std::stack<std::string> &
 LogStream::get_prefixes() const
 {
-#ifdef DEAL_II_WITH_THREADS
   bool                     exists         = false;
   std::stack<std::string> &local_prefixes = prefixes.get(exists);
 
@@ -396,10 +395,6 @@ LogStream::get_prefixes() const
     }
 
   return local_prefixes;
-
-#else
-  return prefixes.get();
-#endif
 }
 
 
