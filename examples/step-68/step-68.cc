@@ -476,9 +476,28 @@ namespace Step68
 
     // We generate the particles at the position of the degree of
     // freedom of the dummy particle triangulation
-    Particles::Generators::dof_support_points(particles_dof_handler,
-                                              global_bounding_boxes,
-                                              particle_handler);
+    // Particles::Generators::dof_support_points(particles_dof_handler,
+    //                                          global_bounding_boxes,
+    //                                          particle_handler);
+    std::map<types::global_dof_index, Point<dim>> support_points_map;
+
+    DoFTools::map_dofs_to_support_points(mapping,
+                                         particles_dof_handler,
+                                         support_points_map);
+
+    // Generate the vector of points from the map
+    // Memory is reserved for efficiency reasons
+    std::vector<Point<dim>> support_points_vec;
+    support_points_vec.reserve(support_points_map.size());
+    for (auto const &element : support_points_map)
+      support_points_vec.push_back(element.second);
+
+    std::vector<std::vector<double>> properties(particles_dof_handler.n_dofs(),
+                                                {0., 0., 0.});
+
+    particle_handler.insert_global_particles(support_points_vec,
+                                             global_bounding_boxes,
+                                             properties);
 
     // Displaying the total number of generated particles in the domain
     pcout << "Number of particles inserted: "
@@ -703,7 +722,7 @@ namespace Step68
 
     pcout << "Repartitioning triangulation after particle generation"
           << std::endl;
-    //    background_triangulation.repartition();
+    background_triangulation.repartition();
 
     setup_background_dofs();
     interpolate_function_to_field();
