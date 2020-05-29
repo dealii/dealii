@@ -77,7 +77,7 @@ an array which can be used to store any  arbitrary number of properties
 associated with the particles. Consequently, users can build their own
 particle solver and attribute the desired properties to the particles (e.g. mass,
   diameter, temperature, etc.). In the present tutorial, this is used to
-  store the value of the fluid velocity and the processor id to which the particles
+  store the value of the fluid velocity and the process id to which the particles
   belong.
 
 
