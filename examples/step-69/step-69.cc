@@ -2841,7 +2841,7 @@ namespace Step69
     // the output function by value so that we have access to them inside
     // the lambda function.
     //
-    // The last capture argument of the lambda function, `data_out_copy`
+    // The first capture argument of the lambda function, `data_out_copy`
     // in essence creates a local variable inside the lambda function into
     // which we "move" the `data_out` variable from above. The way this works
     // is that we create a `std::unique_ptr` above that points to the DataOut
@@ -2856,12 +2856,12 @@ namespace Step69
     // owner. But using the `std::unique_ptr` is conceptually cleaner as it
     // makes it clear that the current function's `data_out` variable isn't
     // even pointing to the object any more.
-    const auto output_worker = [this,
+    const auto output_worker = [data_out_copy = std::move(data_out),
+                                this,
                                 name,
                                 t,
                                 cycle,
-                                checkpoint,
-                                data_out_copy = std::move(data_out)]() {
+                                checkpoint]() {
       if (checkpoint)
         {
           // We checkpoint the current state by doing the precise inverse
