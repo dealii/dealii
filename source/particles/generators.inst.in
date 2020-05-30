@@ -61,8 +61,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
-          const std::vector<std::vector<double>> &                   properties,
-          const ComponentMask &components);
+          const ComponentMask &                                      components,
+          const std::vector<std::vector<double>> &properties);
 
         template void
         quadrature_points<deal_II_dimension, deal_II_space_dimension>(

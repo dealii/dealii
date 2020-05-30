@@ -210,9 +210,9 @@ namespace Particles
                        ParticleHandler<dim, spacedim> &particle_handler,
                        const Mapping<dim, spacedim> &  mapping =
                          StaticMappingQ1<dim, spacedim>::mapping,
+                       const ComponentMask &components = ComponentMask(),
                        const std::vector<std::vector<double>> &properties =
-                         std::vector<std::vector<double>>(),
-                       const ComponentMask &components = ComponentMask());
+                         std::vector<std::vector<double>>());
 
     /**
      * A function that generates particles at the locations of the quadrature

@@ -409,8 +409,8 @@ namespace Particles
                          &                             global_bounding_boxes,
                        ParticleHandler<dim, spacedim> &particle_handler,
                        const Mapping<dim, spacedim> &  mapping,
-                       const std::vector<std::vector<double>> &properties,
-                       const ComponentMask &                   components)
+                       const ComponentMask &           components,
+                       const std::vector<std::vector<double>> &properties)
     {
       const auto &fe = dof_handler.get_fe();
 
@@ -471,7 +471,8 @@ namespace Particles
             }
         }
       particle_handler.insert_global_particles(points_to_generate,
-                                               global_bounding_boxes);
+                                               global_bounding_boxes,
+                                               properties);
     }
   } // namespace Generators
 } // namespace Particles
