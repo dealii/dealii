@@ -892,6 +892,36 @@ namespace Threads
   };
 
 
+  namespace internal
+  {
+    /**
+     * Set the value of a std::promise object by evaluating the action.
+     */
+    template <typename RT, typename Function>
+    void
+    evaluate_and_set_promise(Function &function, std::promise<RT> &promise)
+    {
+      promise.set_value(function());
+    }
+
+
+    /**
+     * Set the value of a std::promise object by evaluating the
+     * action. This function is a specialization of the previous one
+     * for the case where the return type is `void`. Consequently, we
+     * can't set a value. But we do evaluate the function object and
+     * call `std::promise::set_value()` without argument.
+     */
+    template <typename Function>
+    void
+    evaluate_and_set_promise(Function &function, std::promise<void> &promise)
+    {
+      function();
+      promise.set_value();
+    }
+  } // namespace internal
+
+
 
   /**
    * This class describes a task object, i.e., what one obtains by calling
@@ -925,16 +955,51 @@ namespace Threads
   {
   public:
     /**
-     * Construct a task object given a function object to execute on the task,
-     * and then schedule this function for execution.
+     * Construct a task object, given a function object to execute on
+     * the task, and then schedule this function for
+     * execution. However, when MultithreadInfo::n_threads() returns
+     * 1, i.e., if the deal.II runtime system has been configured to
+     * only use one thread, then just execute the given function
+     * object.
      *
      * @post Using this constructor automatically makes the task object
      * joinable().
      */
     Task(const std::function<RT()> &function_object)
     {
-      task_data = std::make_shared<TaskData>(
-        std::move(std::async(std::launch::async, function_object)));
+      if (MultithreadInfo::n_threads() > 1)
+        task_data = std::make_shared<TaskData>(
+          std::async(std::launch::async, function_object));
+      else
+        {
+          // Only one thread allowed. So let the task run to completion
+          // and just emplace a 'ready' future.
+          //
+          // The design of std::promise/std::future is unclear, but it
+          // seems that the intent is to obtain the std::future before
+          // we set the std::promise. So create the TaskData object at
+          // the top and then run the task and set the returned
+          // value. Since everything here happens sequentially, it
+          // really doesn't matter in which order all of this is
+          // happening.
+          std::promise<RT> promise;
+          task_data = std::make_shared<TaskData>(promise.get_future());
+          try
+            {
+              internal::evaluate_and_set_promise(function_object, promise);
+            }
+          catch (...)
+            {
+              try
+                {
+                  // store anything thrown in the promise
+                  promise.set_exception(std::current_exception());
+                }
+              catch (...)
+                {}
+              // set_exception() may throw too
+            }
+        }
     }
 
     /**
@@ -1092,11 +1157,20 @@ namespace Threads
     class TaskData
     {
     public:
+      /**
+       * Constructor. Initializes an std::future object and assumes
+       * that the task so set has not finished yet.
+       */
       TaskData(std::future<RT> &&future)
         : future(std::move(future))
         , task_has_finished(false)
       {}
 
+      /**
+       * Wait for the std::future object to be ready, i.e., for the
+       * time when the std::promise receives its value. If this has
+       * already happened, this function can follow a fast path.
+       */
       void
       wait()
       {
@@ -1181,6 +1255,12 @@ namespace Threads
    * function object without arguments and returning an object of type RT (or
    * void).
    *
+   * @note When MultithreadInfo::n_threads() returns 1, i.e., if the
+   *   deal.II runtime system has been configured to only use one
+   *   thread, then this function just executes the given function
+   *   object immediately and stores the return value in the Task
+   *   object returned by this function.
+   *
    * @note Threads::new_task() is, in essence, equivalent to calling
    *   `std::async(std::launch::async, ...)` in that it runs the given task
    *   in the background. (See https://en.cppreference.com/w/cpp/thread/async
@@ -1225,6 +1305,12 @@ namespace Threads
    * computed number), and this is going to be the returned value you
    * can later retrieve via <code>task.return_value()</code> once the
    * task (i.e., the body of the lambda function) has completed.
+   *
+   * @note When MultithreadInfo::n_threads() returns 1, i.e., if the
+   *   deal.II runtime system has been configured to only use one
+   *   thread, then this function just executes the given function
+   *   object immediately and stores the return value in the Task
+   *   object returned by this function.
    *
    * @note Every lambda function (or whatever else it is you pass to
    *   the new_task() function here, for example the result of a
