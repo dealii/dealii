@@ -2476,35 +2476,41 @@ namespace internal
       std::vector<size_type> individual_size;
     };
 
-    // collects all the global rows from a local contribution (cell) and their
-    // origin (direct/constraint). this is basically a vector consisting of
-    // "Distributing" structs using access via the DataCache. Provides some
-    // specialized sort and insert functions.
-    //
-    // in case there are no constraints, this is basically a list of pairs
-    // <uint,unit> with the first index being the global index and the second
-    // index the local index. The list is sorted with respect to the global
-    // index.
-    //
-    // in case there are constraints, a global dof might get a contribution also
-    // because it gets data from a constrained dof. This means that a global dof
-    // might also have indirect contributions from a local dof via a constraint,
-    // besides the direct ones.
-    //
-    // The actions performed here correspond to reshaping the constraint
-    // information from global degrees of freedom to local ones (i.e.,
-    // cell-related DoFs), and also transforming the constraint information from
-    // compressed row storage (each local dof that is constrained has a list of
-    // constraint entries associated to it) into compressed column storage based
-    // on the cell-related DoFs (we have a list of global degrees of freedom,
-    // and to each we have a list of local rows where the entries come from). To
-    // increase the speed, we additionally store whether an entry is generated
-    // directly from the local degrees of freedom or whether it comes from a
-    // constraint.
+    /**
+     * A data structure that collects all the global rows from a local
+     * contribution (cell) and their origin (direct/constraint). This
+     * is basically a vector consisting of "Distributing" structs
+     * using access via the DataCache. The structure provides some
+     * specialized sort and insert functions.
+     *
+     * In case there are no constraints, this is basically a list of pairs
+     * `<uint,uint>` with the first index being the global index and the second
+     * index the local index. The list is sorted with respect to the global
+     * index.
+     *
+     * In case there are constraints, a global dof might get a contribution also
+     * because it gets data from a constrained dof. This means that a global dof
+     * might also have indirect contributions from a local dof via a constraint,
+     * besides the direct ones.
+     *
+     * The actions performed here correspond to reshaping the constraint
+     * information from global degrees of freedom to local ones (i.e.,
+     * cell-related DoFs), and also transforming the constraint information from
+     * compressed row storage (each local dof that is constrained has a list of
+     * constraint entries associated to it) into compressed column storage based
+     * on the cell-related DoFs (we have a list of global degrees of freedom,
+     * and to each we have a list of local rows where the entries come from). To
+     * increase the speed, we additionally store whether an entry is generated
+     * directly from the local degrees of freedom or whether it comes from a
+     * constraint.
+     */
     template <typename number>
     class GlobalRowsFromLocal
     {
     public:
+      /**
+       * Constructor.
+       */
       GlobalRowsFromLocal();
 
       void
@@ -2520,94 +2526,131 @@ namespace internal
       void
       print(std::ostream &os);
 
-      // return all kind of information on the constraints
-
-      // returns the number of global indices in the struct
+      /**
+       * Return the number of global indices in the struct.
+       */
       size_type
       size() const;
 
-      // returns the number of constraints that are associated to the
-      // counter_index-th entry in the list
+      /**
+       * Return the number of constraints that are associated to the
+       * counter_index-th entry in the list.
+       */
       size_type
       size(const size_type counter_index) const;
 
-      // returns the global row of the counter_index-th entry in the list
+      /**
+       * Return the global row of the counter_index-th entry in the list.
+       */
       size_type
       global_row(const size_type counter_index) const;
 
-      // returns the global row of the counter_index-th entry in the list
+      /**
+       * Return the global row of the counter_index-th entry in the list.
+       */
       size_type &
       global_row(const size_type counter_index);
 
-      // returns the local row in the cell matrix associated with the
-      // counter_index-th entry in the list. Returns invalid_size_type for
-      // constrained rows
+      /**
+       * Return the local row in the cell matrix associated with the
+       * counter_index-th entry in the list. Return invalid_size_type for
+       * constrained rows.
+       */
       size_type
       local_row(const size_type counter_index) const;
 
-      // writable index
+      /**
+       * Return a reference instead of the value as in the function above.
+       */
       size_type &
       local_row(const size_type counter_index);
 
-      // returns the local row in the cell matrix associated with the
-      // counter_index-th entry in the list in the index_in_constraint-th
-      // position of constraints
+      /**
+       * Return the local row in the cell matrix associated with the
+       * counter_index-th entry in the list in the index_in_constraint-th
+       * position of constraints.
+       */
       size_type
       local_row(const size_type counter_index,
                 const size_type index_in_constraint) const;
 
-      // returns the value of the constraint in the counter_index-th entry in
-      // the list in the index_in_constraint-th position of constraints
+      /**
+       * Return the value of the constraint in the counter_index-th entry in
+       * the list in the index_in_constraint-th position of constraints.
+       */
       number
       constraint_value(const size_type counter_index,
                        const size_type index_in_constraint) const;
 
-      // returns whether there is one row with indirect contributions (i.e.,
-      // there has been at least one constraint with non-trivial ConstraintLine)
+      /**
+       * Return whether there is one row with indirect contributions (i.e.,
+       * there has been at least one constraint with non-trivial
+       * ConstraintLine).
+       */
       bool
       have_indirect_rows() const;
 
-      // append an entry that is constrained. This means that there is one less
-      // nontrivial row
+      /**
+       * Append an entry that is constrained. This means that there is one less
+       * nontrivial row.
+       */
       void
       insert_constraint(const size_type constrained_local_dof);
 
-      // returns the number of constrained dofs in the structure. Constrained
-      // dofs do not contribute directly to the matrix, but are needed in order
-      // to set matrix diagonals and resolve inhomogeneities
+      /**
+       * Return the number of constrained dofs in the structure. Constrained
+       * dofs do not contribute directly to the matrix, but are needed in order
+       * to set matrix diagonals and resolve inhomogeneities.
+       */
       size_type
       n_constraints() const;
 
-      // returns the number of constrained dofs in the structure that have an
-      // inhomogeneity
+      /**
+       * Return the number of constrained dofs in the structure that have an
+       * inhomogeneity.
+       */
       size_type
       n_inhomogeneities() const;
 
-      // tells the structure that the ith constraint is
-      // inhomogeneous. inhomogeneous constraints contribute to right hand
-      // sides, so to have fast access to them, put them before homogeneous
-      // constraints
+      /**
+       * This function tells the structure that the ith constraint is
+       * inhomogeneous. inhomogeneous constraints contribute to right hand
+       * sides, so to have fast access to them, put them before homogeneous
+       * constraints.
+       */
       void
       set_ith_constraint_inhomogeneous(const size_type i);
 
-      // the local row where constraint number i was detected, to find that row
-      // easily when the GlobalRowsToLocal has been set up
+      /**
+       * The local row where constraint number i was detected, to find that row
+       * easily when the GlobalRowsToLocal has been set up.
+       */
       size_type
       constraint_origin(size_type i) const;
 
-      // a vector that contains all the global ids and the corresponding local
-      // ids as well as a pointer to that data where we store how to resolve
-      // constraints.
+      /**
+       * A vector that contains all the global ids and the corresponding local
+       * ids as well as a pointer to that data where we store how to resolve
+       * constraints.
+       */
       std::vector<Distributing> total_row_indices;
 
     private:
-      // holds the actual data from the constraints
+      /**
+       * A data structure that holds the actual data from the constraints.
+       */
       DataCache<number> data_cache;
 
-      // how many rows there are, constraints disregarded
+      /**
+       * A number that states how many rows there are, constraints
+       * disregarded.
+       */
       size_type n_active_rows;
 
-      // the number of rows with inhomogeneous constraints
+      /**
+       * A number that represents the number of rows with
+       * inhomogeneous constraints.
+       */
       size_type n_inhomogeneous_rows;
     };
 
