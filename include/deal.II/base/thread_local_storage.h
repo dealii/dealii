@@ -127,16 +127,10 @@ namespace Threads
     explicit ThreadLocalStorage(T &&t);
 
     /**
-     * Copy constructor. Initialize each thread local object with the
-     * corresponding object of the given object.
+     * The copy constructor is deleted. Copying instances of this class is not
+     * allowed.
      */
-    ThreadLocalStorage(const ThreadLocalStorage<T> &t) = default;
-
-    /**
-     * Move constructor. Copies the internal state over from the given
-     * object.
-     */
-    ThreadLocalStorage(ThreadLocalStorage<T> &&t) noexcept = default;
+    ThreadLocalStorage(const ThreadLocalStorage<T> &t) = delete;
 
     /**
      * Return a reference to the data stored by this object for the current
