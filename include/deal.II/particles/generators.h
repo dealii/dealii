@@ -194,6 +194,9 @@ namespace Particles
      * @param[in] mapping An optional mapping object that is used to map
      * the DOF locations. If no mapping is provided a MappingQ1 is assumed.
      *
+     * @param[in] properties An optional vector of vector of properties
+     * for each particles to be inserted.
+     *
      * @param[in] components Component mask that decides which subset of the
      * support points of the dof_handler are used to generate the particles.
      *
@@ -207,6 +210,8 @@ namespace Particles
                        ParticleHandler<dim, spacedim> &particle_handler,
                        const Mapping<dim, spacedim> &  mapping =
                          StaticMappingQ1<dim, spacedim>::mapping,
+                       const std::vector<std::vector<double>> &properties =
+                         std::vector<std::vector<double>>(),
                        const ComponentMask &components = ComponentMask());
 
     /**
@@ -237,6 +242,9 @@ namespace Particles
      * the quadrature locations. If no mapping is provided a MappingQ1 is
      * assumed.
      *
+     * @param[in] properties An optional vector of vector of properties
+     * for each particles to be inserted.
+     *
      * @author Bruno Blais, Luca Heltai, 2019
      */
     template <int dim, int spacedim = dim>
@@ -247,7 +255,9 @@ namespace Particles
                         &                             global_bounding_boxes,
                       ParticleHandler<dim, spacedim> &particle_handler,
                       const Mapping<dim, spacedim> &  mapping =
-                        StaticMappingQ1<dim, spacedim>::mapping);
+                        StaticMappingQ1<dim, spacedim>::mapping,
+                      const std::vector<std::vector<double>> &properties =
+                        std::vector<std::vector<double>>());
   } // namespace Generators
 } // namespace Particles
 

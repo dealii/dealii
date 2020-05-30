@@ -61,6 +61,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const std::vector<std::vector<double>> &                   properties,
           const ComponentMask &components);
 
         template void
@@ -72,7 +73,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
             &global_bounding_boxes,
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
-          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const std::vector<std::vector<double>> &properties);
 
       \}
     \}
