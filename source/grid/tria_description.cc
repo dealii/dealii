@@ -30,13 +30,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int structdim>
 CellData<structdim>::CellData()
-  : material_id(0)
+  : vertices(GeometryInfo<structdim>::vertices_per_cell,
+             numbers::invalid_unsigned_int)
+  , material_id(0)
   , manifold_id(numbers::flat_manifold_id)
-{
-  std::fill(std::begin(vertices),
-            std::end(vertices),
-            numbers::invalid_unsigned_int);
-}
+{}
 
 
 
