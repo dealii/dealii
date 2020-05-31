@@ -83,15 +83,6 @@ namespace internal
       TriaObjects lines;
 
       /**
-       * Reserve space for line_orientations.
-       *
-       * @note Used only for dim=3.
-       */
-      void
-      reserve_space(const unsigned int new_quads_in_pairs,
-                    const unsigned int new_quads_single = 0);
-
-      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */

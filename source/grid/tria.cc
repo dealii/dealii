@@ -1306,6 +1306,473 @@ namespace internal
       << " appears multiple times with different (valid) " << arg5
       << ". This is not allowed.");
 
+    /*
+     * Reserve space for TriaFaces. Details:
+     *
+     * Reserve space for line_orientations.
+     *
+     * @note Used only for dim=3.
+     */
+    void
+    reserve_space(TriaFaces &        tria_faces,
+                  const unsigned int new_quads_in_pairs,
+                  const unsigned int new_quads_single)
+    {
+      AssertDimension(tria_faces.dim, 3);
+
+      Assert(new_quads_in_pairs % 2 == 0, ExcInternalError());
+
+      unsigned int next_free_single = 0;
+      unsigned int next_free_pair   = 0;
+
+      // count the number of objects, of unused single objects and of
+      // unused pairs of objects
+      unsigned int n_quads          = 0;
+      unsigned int n_unused_pairs   = 0;
+      unsigned int n_unused_singles = 0;
+      for (unsigned int i = 0; i < tria_faces.quads.used.size(); ++i)
+        {
+          if (tria_faces.quads.used[i])
+            ++n_quads;
+          else if (i + 1 < tria_faces.quads.used.size())
+            {
+              if (tria_faces.quads.used[i + 1])
+                {
+                  ++n_unused_singles;
+                  if (next_free_single == 0)
+                    next_free_single = i;
+                }
+              else
+                {
+                  ++n_unused_pairs;
+                  if (next_free_pair == 0)
+                    next_free_pair = i;
+                  ++i;
+                }
+            }
+          else
+            ++n_unused_singles;
+        }
+      Assert(n_quads + 2 * n_unused_pairs + n_unused_singles ==
+               tria_faces.quads.used.size(),
+             ExcInternalError());
+
+      // how many single quads are needed in addition to n_unused_quads?
+      const int additional_single_quads = new_quads_single - n_unused_singles;
+
+      unsigned int new_size =
+        tria_faces.quads.used.size() + new_quads_in_pairs - 2 * n_unused_pairs;
+      if (additional_single_quads > 0)
+        new_size += additional_single_quads;
+
+      // see above...
+      if (new_size > tria_faces.quads.n_objects())
+        {
+          // reserve the field of the derived class
+          tria_faces.quads_line_orientations.reserve(
+            new_size * GeometryInfo<2>::lines_per_cell);
+          tria_faces.quads_line_orientations.insert(
+            tria_faces.quads_line_orientations.end(),
+            new_size * GeometryInfo<2>::lines_per_cell -
+              tria_faces.quads_line_orientations.size(),
+            true);
+        }
+    }
+
+
+
+    /**
+     * Reserve space for TriaLevel. Details:
+     *
+     * Reserve enough space to accommodate @p total_cells cells on this
+     * level. Since there are no @p used flags on this level, you have to
+     * give the total number of cells, not only the number of newly to
+     * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
+     * functions, with <tt>N>0</tt>.
+     *
+     * Since the number of neighbors per cell depends on the dimensions, you
+     * have to pass that additionally.
+     */
+
+    void
+    reserve_space(TriaLevel &        tria_level,
+                  const unsigned int total_cells,
+                  const unsigned int dimension,
+                  const unsigned int space_dimension)
+    {
+      // we need space for total_cells cells. Maybe we have more already
+      // with those cells which are unused, so only allocate new space if
+      // needed.
+      //
+      // note that all arrays should have equal sizes (checked by
+      // @p{monitor_memory}
+      if (total_cells > tria_level.refine_flags.size())
+        {
+          tria_level.refine_flags.reserve(total_cells);
+          tria_level.refine_flags.insert(tria_level.refine_flags.end(),
+                                         total_cells -
+                                           tria_level.refine_flags.size(),
+                                         /*RefinementCase::no_refinement=*/0);
+
+          tria_level.coarsen_flags.reserve(total_cells);
+          tria_level.coarsen_flags.insert(tria_level.coarsen_flags.end(),
+                                          total_cells -
+                                            tria_level.coarsen_flags.size(),
+                                          false);
+
+          tria_level.active_cell_indices.reserve(total_cells);
+          tria_level.active_cell_indices.insert(
+            tria_level.active_cell_indices.end(),
+            total_cells - tria_level.active_cell_indices.size(),
+            numbers::invalid_unsigned_int);
+
+          tria_level.subdomain_ids.reserve(total_cells);
+          tria_level.subdomain_ids.insert(tria_level.subdomain_ids.end(),
+                                          total_cells -
+                                            tria_level.subdomain_ids.size(),
+                                          0);
+
+          tria_level.level_subdomain_ids.reserve(total_cells);
+          tria_level.level_subdomain_ids.insert(
+            tria_level.level_subdomain_ids.end(),
+            total_cells - tria_level.level_subdomain_ids.size(),
+            0);
+
+          if (dimension < space_dimension)
+            {
+              tria_level.direction_flags.reserve(total_cells);
+              tria_level.direction_flags.insert(
+                tria_level.direction_flags.end(),
+                total_cells - tria_level.direction_flags.size(),
+                true);
+            }
+          else
+            tria_level.direction_flags.clear();
+
+          tria_level.parents.reserve((total_cells + 1) / 2);
+          tria_level.parents.insert(tria_level.parents.end(),
+                                    (total_cells + 1) / 2 -
+                                      tria_level.parents.size(),
+                                    -1);
+
+          tria_level.neighbors.reserve(total_cells * (2 * dimension));
+          tria_level.neighbors.insert(tria_level.neighbors.end(),
+                                      total_cells * (2 * dimension) -
+                                        tria_level.neighbors.size(),
+                                      std::make_pair(-1, -1));
+
+
+          if (tria_level.dim == 3)
+            {
+              tria_level.face_orientations.reserve(
+                total_cells * GeometryInfo<3>::faces_per_cell);
+              tria_level.face_orientations.insert(
+                tria_level.face_orientations.end(),
+                total_cells * GeometryInfo<3>::faces_per_cell -
+                  tria_level.face_orientations.size(),
+                true);
+            }
+        }
+    }
+
+
+
+    /**
+     * Exception
+     */
+    DeclException2(ExcMemoryInexact,
+                   int,
+                   int,
+                   << "The containers have sizes " << arg1 << " and " << arg2
+                   << ", which is not as expected.");
+
+    /**
+     * Check the memory consistency of the different containers. Should only
+     * be called with the preprocessor flag @p DEBUG set. The function
+     * should be called from the functions of the higher TriaLevel classes.
+     */
+    void
+    monitor_memory(const TriaLevel &  tria_level,
+                   const unsigned int true_dimension)
+    {
+      (void)tria_level;
+      (void)true_dimension;
+      Assert(2 * true_dimension * tria_level.refine_flags.size() ==
+               tria_level.neighbors.size(),
+             ExcMemoryInexact(tria_level.refine_flags.size(),
+                              tria_level.neighbors.size()));
+      Assert(2 * true_dimension * tria_level.coarsen_flags.size() ==
+               tria_level.neighbors.size(),
+             ExcMemoryInexact(tria_level.coarsen_flags.size(),
+                              tria_level.neighbors.size()));
+    }
+
+
+
+    /**
+     * Reserve space for TriaObjects. Details:
+     *
+     * Assert that enough space is allocated to accommodate
+     * <code>new_objs_in_pairs</code> new objects, stored in pairs, plus
+     * <code>new_obj_single</code> stored individually. This function does
+     * not only call <code>vector::reserve()</code>, but does really append
+     * the needed elements.
+     *
+     * In 2D e.g. refined lines have to be stored in pairs, whereas new
+     * lines in the interior of refined cells can be stored as single lines.
+     */
+    void
+    reserve_space(TriaObjects &      tria_objects,
+                  const unsigned int new_objects_in_pairs,
+                  const unsigned int new_objects_single = 0)
+    {
+      if (tria_objects.structdim <= 2)
+        {
+          Assert(new_objects_in_pairs % 2 == 0, ExcInternalError());
+
+          tria_objects.next_free_single               = 0;
+          tria_objects.next_free_pair                 = 0;
+          tria_objects.reverse_order_next_free_single = false;
+
+          // count the number of objects, of unused single objects and of
+          // unused pairs of objects
+          unsigned int n_objects        = 0;
+          unsigned int n_unused_pairs   = 0;
+          unsigned int n_unused_singles = 0;
+          for (unsigned int i = 0; i < tria_objects.used.size(); ++i)
+            {
+              if (tria_objects.used[i])
+                ++n_objects;
+              else if (i + 1 < tria_objects.used.size())
+                {
+                  if (tria_objects.used[i + 1])
+                    {
+                      ++n_unused_singles;
+                      if (tria_objects.next_free_single == 0)
+                        tria_objects.next_free_single = i;
+                    }
+                  else
+                    {
+                      ++n_unused_pairs;
+                      if (tria_objects.next_free_pair == 0)
+                        tria_objects.next_free_pair = i;
+                      ++i;
+                    }
+                }
+              else
+                ++n_unused_singles;
+            }
+          Assert(n_objects + 2 * n_unused_pairs + n_unused_singles ==
+                   tria_objects.used.size(),
+                 ExcInternalError());
+
+          // how many single objects are needed in addition to
+          // n_unused_objects?
+          const int additional_single_objects =
+            new_objects_single - n_unused_singles;
+
+          unsigned int new_size = tria_objects.used.size() +
+                                  new_objects_in_pairs - 2 * n_unused_pairs;
+          if (additional_single_objects > 0)
+            new_size += additional_single_objects;
+
+          // only allocate space if necessary
+          if (new_size > tria_objects.n_objects())
+            {
+              unsigned int faces_per_cell        = 1;
+              unsigned int max_children_per_cell = 1;
+
+              if (tria_objects.structdim == 1)
+                faces_per_cell = GeometryInfo<1>::faces_per_cell;
+              else if (tria_objects.structdim == 2)
+                faces_per_cell = GeometryInfo<2>::faces_per_cell;
+              else if (tria_objects.structdim == 3)
+                faces_per_cell = GeometryInfo<3>::faces_per_cell;
+              else
+                AssertThrow(false, ExcNotImplemented());
+
+              if (tria_objects.structdim == 1)
+                max_children_per_cell = GeometryInfo<1>::max_children_per_cell;
+              else if (tria_objects.structdim == 2)
+                max_children_per_cell = GeometryInfo<2>::max_children_per_cell;
+              else if (tria_objects.structdim == 3)
+                max_children_per_cell = GeometryInfo<3>::max_children_per_cell;
+              else
+                AssertThrow(false, ExcNotImplemented());
+
+              tria_objects.cells.reserve(new_size * faces_per_cell);
+              tria_objects.cells.insert(tria_objects.cells.end(),
+                                        (new_size - tria_objects.n_objects()) *
+                                          faces_per_cell,
+                                        -1);
+
+              tria_objects.used.reserve(new_size);
+              tria_objects.used.insert(tria_objects.used.end(),
+                                       new_size - tria_objects.used.size(),
+                                       false);
+
+              tria_objects.user_flags.reserve(new_size);
+              tria_objects.user_flags.insert(tria_objects.user_flags.end(),
+                                             new_size -
+                                               tria_objects.user_flags.size(),
+                                             false);
+
+              const unsigned int factor = max_children_per_cell / 2;
+              tria_objects.children.reserve(factor * new_size);
+              tria_objects.children.insert(tria_objects.children.end(),
+                                           factor * new_size -
+                                             tria_objects.children.size(),
+                                           -1);
+
+              if (tria_objects.structdim > 1)
+                {
+                  tria_objects.refinement_cases.reserve(new_size);
+                  tria_objects.refinement_cases.insert(
+                    tria_objects.refinement_cases.end(),
+                    new_size - tria_objects.refinement_cases.size(),
+                    /*RefinementCase::no_refinement=*/0);
+                }
+
+              // first reserve, then resize. Otherwise the std library can
+              // decide to allocate more entries.
+              tria_objects.boundary_or_material_id.reserve(new_size);
+              tria_objects.boundary_or_material_id.resize(new_size);
+
+              tria_objects.user_data.reserve(new_size);
+              tria_objects.user_data.resize(new_size);
+
+              tria_objects.manifold_id.reserve(new_size);
+              tria_objects.manifold_id.insert(tria_objects.manifold_id.end(),
+                                              new_size -
+                                                tria_objects.manifold_id.size(),
+                                              numbers::flat_manifold_id);
+            }
+
+          if (n_unused_singles == 0)
+            {
+              tria_objects.next_free_single               = new_size - 1;
+              tria_objects.reverse_order_next_free_single = true;
+            }
+        }
+      else
+        {
+          const unsigned int new_hexes = new_objects_in_pairs;
+
+          const unsigned int new_size =
+            new_hexes + std::count(tria_objects.used.begin(),
+                                   tria_objects.used.end(),
+                                   true);
+
+          // see above...
+          if (new_size > tria_objects.n_objects())
+            {
+              unsigned int faces_per_cell = 1;
+
+              if (tria_objects.structdim == 1)
+                faces_per_cell = GeometryInfo<1>::faces_per_cell;
+              else if (tria_objects.structdim == 2)
+                faces_per_cell = GeometryInfo<2>::faces_per_cell;
+              else if (tria_objects.structdim == 3)
+                faces_per_cell = GeometryInfo<3>::faces_per_cell;
+              else
+                AssertThrow(false, ExcNotImplemented());
+
+              tria_objects.cells.reserve(new_size * faces_per_cell);
+              tria_objects.cells.insert(tria_objects.cells.end(),
+                                        (new_size - tria_objects.n_objects()) *
+                                          faces_per_cell,
+                                        -1);
+
+              tria_objects.used.reserve(new_size);
+              tria_objects.used.insert(tria_objects.used.end(),
+                                       new_size - tria_objects.used.size(),
+                                       false);
+
+              tria_objects.user_flags.reserve(new_size);
+              tria_objects.user_flags.insert(tria_objects.user_flags.end(),
+                                             new_size -
+                                               tria_objects.user_flags.size(),
+                                             false);
+
+              tria_objects.children.reserve(4 * new_size);
+              tria_objects.children.insert(tria_objects.children.end(),
+                                           4 * new_size -
+                                             tria_objects.children.size(),
+                                           -1);
+
+              // for the following fields, we know exactly how many elements
+              // we need, so first reserve then resize (resize itself, at least
+              // with some compiler libraries, appears to round up the size it
+              // actually reserves)
+              tria_objects.boundary_or_material_id.reserve(new_size);
+              tria_objects.boundary_or_material_id.resize(new_size);
+
+              tria_objects.manifold_id.reserve(new_size);
+              tria_objects.manifold_id.insert(tria_objects.manifold_id.end(),
+                                              new_size -
+                                                tria_objects.manifold_id.size(),
+                                              numbers::flat_manifold_id);
+
+              tria_objects.user_data.reserve(new_size);
+              tria_objects.user_data.resize(new_size);
+
+              tria_objects.refinement_cases.reserve(new_size);
+              tria_objects.refinement_cases.insert(
+                tria_objects.refinement_cases.end(),
+                new_size - tria_objects.refinement_cases.size(),
+                /*RefinementCase::no_refinement=*/0);
+            }
+          tria_objects.next_free_single = tria_objects.next_free_pair = 0;
+        }
+    }
+
+
+
+    /**
+     * Check the memory consistency of the different containers. Should only
+     * be called with the preprocessor flag @p DEBUG set. The function
+     * should be called from the functions of the higher TriaLevel classes.
+     */
+    void
+    monitor_memory(const TriaObjects &tria_object, const unsigned int)
+    {
+      Assert(tria_object.n_objects() == tria_object.used.size(),
+             ExcMemoryInexact(tria_object.n_objects(),
+                              tria_object.used.size()));
+      Assert(tria_object.n_objects() == tria_object.user_flags.size(),
+             ExcMemoryInexact(tria_object.n_objects(),
+                              tria_object.user_flags.size()));
+      Assert(tria_object.n_objects() ==
+               tria_object.boundary_or_material_id.size(),
+             ExcMemoryInexact(tria_object.n_objects(),
+                              tria_object.boundary_or_material_id.size()));
+      Assert(tria_object.n_objects() == tria_object.manifold_id.size(),
+             ExcMemoryInexact(tria_object.n_objects(),
+                              tria_object.manifold_id.size()));
+      Assert(tria_object.n_objects() == tria_object.user_data.size(),
+             ExcMemoryInexact(tria_object.n_objects(),
+                              tria_object.user_data.size()));
+
+      if (tria_object.structdim == 1)
+        {
+          Assert(1 * tria_object.n_objects() == tria_object.children.size(),
+                 ExcMemoryInexact(tria_object.n_objects(),
+                                  tria_object.children.size()));
+        }
+      else if (tria_object.structdim == 2)
+        {
+          Assert(2 * tria_object.n_objects() == tria_object.children.size(),
+                 ExcMemoryInexact(tria_object.n_objects(),
+                                  tria_object.children.size()));
+        }
+      else if (tria_object.structdim == 3)
+        {
+          Assert(4 * tria_object.n_objects() == tria_object.children.size(),
+                 ExcMemoryInexact(tria_object.n_objects(),
+                                  tria_object.children.size()));
+        }
+    }
+
     /**
      * A class into which we put many of the functions that implement
      * functionality of the Triangulation class. The main reason for this
@@ -1767,8 +2234,8 @@ namespace internal
         triangulation.levels.push_back(
           std::make_unique<internal::TriangulationImplementation::TriaLevel>(
             dim));
-        triangulation.levels[0]->reserve_space(cells.size(), dim, spacedim);
-        triangulation.levels[0]->cells.reserve_space(0, cells.size());
+        reserve_space(*triangulation.levels[0], cells.size(), dim, spacedim);
+        reserve_space(triangulation.levels[0]->cells, 0, cells.size());
 
         // make up cells
         typename Triangulation<dim, spacedim>::raw_line_iterator
@@ -2040,9 +2507,9 @@ namespace internal
         triangulation.faces =
           std::make_unique<internal::TriangulationImplementation::TriaFaces>(
             dim);
-        triangulation.levels[0]->reserve_space(cells.size(), dim, spacedim);
-        triangulation.faces->lines.reserve_space(0, needed_lines.size());
-        triangulation.levels[0]->cells.reserve_space(0, cells.size());
+        reserve_space(*triangulation.levels[0], cells.size(), dim, spacedim);
+        reserve_space(triangulation.faces->lines, 0, needed_lines.size());
+        reserve_space(triangulation.levels[0]->cells, 0, cells.size());
 
         // make up lines
         {
@@ -2421,8 +2888,8 @@ namespace internal
         triangulation.faces =
           std::make_unique<internal::TriangulationImplementation::TriaFaces>(
             dim);
-        triangulation.levels[0]->reserve_space(cells.size(), dim, spacedim);
-        triangulation.faces->lines.reserve_space(0, needed_lines.size());
+        reserve_space(*triangulation.levels[0], cells.size(), dim, spacedim);
+        reserve_space(triangulation.faces->lines, 0, needed_lines.size());
 
         // make up lines
         {
@@ -2649,8 +3116,8 @@ namespace internal
         // the arrays of the Triangulation
         //
         // first reserve enough space
-        triangulation.faces->reserve_space(0, needed_quads.size());
-        triangulation.faces->quads.reserve_space(0, needed_quads.size());
+        reserve_space(*triangulation.faces, 0, needed_quads.size());
+        reserve_space(triangulation.faces->quads, 0, needed_quads.size());
 
         {
           typename Triangulation<dim, spacedim>::raw_quad_iterator quad =
@@ -2682,7 +3149,7 @@ namespace internal
 
         /////////////////////////////////
         // finally create the cells
-        triangulation.levels[0]->cells.reserve_space(cells.size());
+        reserve_space(triangulation.levels[0]->cells, cells.size());
 
         // store for each quad index the
         // adjacent cells
@@ -4689,15 +5156,17 @@ namespace internal
             // reserve space for the used_cells cells already existing
             // on the next higher level as well as for the
             // 2*flagged_cells that will be created on that level
-            triangulation.levels[level + 1]->reserve_space(
-              used_cells +
-                GeometryInfo<1>::max_children_per_cell * flagged_cells,
-              1,
-              spacedim);
+            reserve_space(*triangulation.levels[level + 1],
+                          used_cells + GeometryInfo<1>::max_children_per_cell *
+                                         flagged_cells,
+                          1,
+                          spacedim);
             // reserve space for 2*flagged_cells new lines on the next
             // higher level
-            triangulation.levels[level + 1]->cells.reserve_space(
-              GeometryInfo<1>::max_children_per_cell * flagged_cells, 0);
+            reserve_space(triangulation.levels[level + 1]->cells,
+                          GeometryInfo<1>::max_children_per_cell *
+                            flagged_cells,
+                          0);
 
             needed_vertices += flagged_cells;
           }
@@ -4996,13 +5465,16 @@ namespace internal
             // reserve space for the used_cells cells already existing
             // on the next higher level as well as for the
             // needed_cells that will be created on that level
-            triangulation.levels[level + 1]->reserve_space(
-              used_cells + needed_cells, 2, spacedim);
+            reserve_space(*triangulation.levels[level + 1],
+                          used_cells + needed_cells,
+                          2,
+                          spacedim);
 
             // reserve space for needed_cells new quads on the next
             // higher level
-            triangulation.levels[level + 1]->cells.reserve_space(needed_cells,
-                                                                 0);
+            reserve_space(triangulation.levels[level + 1]->cells,
+                          needed_cells,
+                          0);
           }
 
         // now count the lines which were flagged for refinement
@@ -5023,7 +5495,7 @@ namespace internal
         // to store all lines. memory reservation for n_single_lines
         // can only be done AFTER we refined the lines of the current
         // cells
-        triangulation.faces->lines.reserve_space(n_lines_in_pairs, 0);
+        reserve_space(triangulation.faces->lines, n_lines_in_pairs, 0);
 
         // add to needed vertices how many vertices are already in use
         needed_vertices += std::count(triangulation.vertices_used.begin(),
@@ -5142,7 +5614,7 @@ namespace internal
 
         // reserve space for inner lines (can be stored as single
         // lines)
-        triangulation.faces->lines.reserve_space(0, n_single_lines);
+        reserve_space(triangulation.faces->lines, 0, n_single_lines);
 
         typename Triangulation<2, spacedim>::DistortedCellList
           cells_with_distorted_children;
@@ -5399,11 +5871,13 @@ namespace internal
             // reserve space for the used_cells cells already existing
             // on the next higher level as well as for the
             // 8*flagged_cells that will be created on that level
-            triangulation.levels[level + 1]->reserve_space(
-              used_cells + new_cells, 3, spacedim);
+            reserve_space(*triangulation.levels[level + 1],
+                          used_cells + new_cells,
+                          3,
+                          spacedim);
             // reserve space for 8*flagged_cells new hexes on the next
             // higher level
-            triangulation.levels[level + 1]->cells.reserve_space(new_cells);
+            reserve_space(triangulation.levels[level + 1]->cells, new_cells);
           } // for all levels
         // now count the quads and lines which were flagged for
         // refinement
@@ -5469,13 +5943,16 @@ namespace internal
             }
 
         // reserve space for needed_lines new lines stored in pairs
-        triangulation.faces->lines.reserve_space(needed_lines_pair,
-                                                 needed_lines_single);
+        reserve_space(triangulation.faces->lines,
+                      needed_lines_pair,
+                      needed_lines_single);
         // reserve space for needed_quads new quads stored in pairs
-        triangulation.faces->reserve_space(needed_quads_pair,
-                                           needed_quads_single);
-        triangulation.faces->quads.reserve_space(needed_quads_pair,
-                                                 needed_quads_single);
+        reserve_space(*triangulation.faces,
+                      needed_quads_pair,
+                      needed_quads_single);
+        reserve_space(triangulation.faces->quads,
+                      needed_quads_pair,
+                      needed_quads_single);
 
 
         // add to needed vertices how many vertices are already in use
@@ -13489,7 +13966,7 @@ Triangulation<dim, spacedim>::execute_refinement()
 
 #ifdef DEBUG
   for (const auto &level : levels)
-    level->cells.monitor_memory(dim);
+    monitor_memory(level->cells, dim);
 
   // check whether really all refinement flags are reset (also of
   // previously non-active cells which we may not have touched. If the
