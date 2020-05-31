@@ -1779,8 +1779,8 @@ namespace internal
               ++next_free_line;
 
             next_free_line->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                cells[cell].vertices[0], cells[cell].vertices[1]));
+              internal::TriangulationImplementation::TriaObject(
+                {cells[cell].vertices[0], cells[cell].vertices[1]}));
             next_free_line->set_used_flag();
             next_free_line->set_material_id(cells[cell].material_id);
             next_free_line->set_manifold_id(cells[cell].manifold_id);
@@ -2054,8 +2054,8 @@ namespace internal
           for (i = needed_lines.begin(); line != triangulation.end_line();
                ++line, ++i)
             {
-              line->set(internal::TriangulationImplementation::TriaObject<1>(
-                i->first.first, i->first.second));
+              line->set(internal::TriangulationImplementation::TriaObject(
+                {i->first.first, i->first.second}));
               line->set_used_flag();
               line->clear_user_flag();
               line->clear_user_data();
@@ -2088,11 +2088,11 @@ namespace internal
                   cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
                     line, 1)])];
 
-              cell->set(internal::TriangulationImplementation::TriaObject<2>(
-                lines[0]->index(),
-                lines[1]->index(),
-                lines[2]->index(),
-                lines[3]->index()));
+              cell->set(internal::TriangulationImplementation::TriaObject(
+                {lines[0]->index(),
+                 lines[1]->index(),
+                 lines[2]->index(),
+                 lines[3]->index()}));
 
               cell->set_used_flag();
               cell->set_material_id(cells[c].material_id);
@@ -2238,20 +2238,20 @@ namespace internal
 
       /**
        * Invent an object which compares two
-       * internal::TriangulationImplementation::TriaObject<2> against each
+       * internal::TriangulationImplementation::TriaObject against each
        * other. This comparison is needed in order to establish a map of
-       * TriaObject<2> to iterators in the
+       * TriaObject to iterators in the
        * Triangulation<3,3>::create_triangulation function.
        *
        * Since this comparison is not canonical, we do not include it into the
-       * general internal::TriangulationImplementation::TriaObject<2> class.
+       * general internal::TriangulationImplementation::TriaObject class.
        */
       struct QuadComparator
       {
         inline bool
         operator()(
-          const internal::TriangulationImplementation::TriaObject<2> &q1,
-          const internal::TriangulationImplementation::TriaObject<2> &q2) const
+          const internal::TriangulationImplementation::TriaObject &q1,
+          const internal::TriangulationImplementation::TriaObject &q2) const
         {
           // here is room to
           // optimize the repeated
@@ -2434,8 +2434,8 @@ namespace internal
           for (i = needed_lines.begin(); line != triangulation.end_line();
                ++line, ++i)
             {
-              line->set(internal::TriangulationImplementation::TriaObject<1>(
-                i->first.first, i->first.second));
+              line->set(internal::TriangulationImplementation::TriaObject(
+                {i->first.first, i->first.second}));
               line->set_used_flag();
               line->clear_user_flag();
               line->clear_user_data();
@@ -2461,7 +2461,7 @@ namespace internal
         // note that QuadComparator is a
         // class declared and defined in
         // this file
-        std::map<internal::TriangulationImplementation::TriaObject<2>,
+        std::map<internal::TriangulationImplementation::TriaObject,
                  std::pair<typename Triangulation<dim, spacedim>::quad_iterator,
                            std::array<bool, GeometryInfo<dim>::lines_per_face>>,
                  QuadComparator>
@@ -2544,11 +2544,11 @@ namespace internal
                     }
 
 
-                internal::TriangulationImplementation::TriaObject<2> quad(
-                  face_line_list[0],
-                  face_line_list[1],
-                  face_line_list[2],
-                  face_line_list[3]);
+                internal::TriangulationImplementation::TriaObject quad(
+                  {face_line_list[0],
+                   face_line_list[1],
+                   face_line_list[2],
+                   face_line_list[3]});
 
                 // insert quad, with
                 // invalid iterator
@@ -2588,48 +2588,48 @@ namespace internal
                 // new one and instead
                 // later set the
                 // face_orientation flag
-                const internal::TriangulationImplementation::TriaObject<2>
-                  test_quad_1(quad.face(2),
-                              quad.face(3),
-                              quad.face(0),
-                              quad.face(
-                                1)), // face_orientation=false, face_flip=false,
+                const internal::TriangulationImplementation::TriaObject
+                  test_quad_1(
+                    {quad.face(2),
+                     quad.face(3),
+                     quad.face(0),
+                     quad.face(1)}), // face_orientation=false, face_flip=false,
                                      // face_rotation=false
-                  test_quad_2(quad.face(0),
-                              quad.face(1),
-                              quad.face(3),
-                              quad.face(
-                                2)), // face_orientation=false, face_flip=false,
+                  test_quad_2(
+                    {quad.face(0),
+                     quad.face(1),
+                     quad.face(3),
+                     quad.face(2)}), // face_orientation=false, face_flip=false,
                                      // face_rotation=true
-                  test_quad_3(quad.face(3),
-                              quad.face(2),
-                              quad.face(1),
-                              quad.face(
-                                0)), // face_orientation=false, face_flip=true,
+                  test_quad_3(
+                    {quad.face(3),
+                     quad.face(2),
+                     quad.face(1),
+                     quad.face(0)}), // face_orientation=false, face_flip=true,
                                      // face_rotation=false
-                  test_quad_4(quad.face(1),
-                              quad.face(0),
-                              quad.face(2),
-                              quad.face(
-                                3)), // face_orientation=false, face_flip=true,
+                  test_quad_4(
+                    {quad.face(1),
+                     quad.face(0),
+                     quad.face(2),
+                     quad.face(3)}), // face_orientation=false, face_flip=true,
                                      // face_rotation=true
-                  test_quad_5(quad.face(2),
-                              quad.face(3),
-                              quad.face(1),
-                              quad.face(
-                                0)), // face_orientation=true,  face_flip=false,
+                  test_quad_5(
+                    {quad.face(2),
+                     quad.face(3),
+                     quad.face(1),
+                     quad.face(0)}), // face_orientation=true,  face_flip=false,
                                      // face_rotation=true
-                  test_quad_6(quad.face(1),
-                              quad.face(0),
-                              quad.face(3),
-                              quad.face(
-                                2)), // face_orientation=true,  face_flip=true,
+                  test_quad_6(
+                    {quad.face(1),
+                     quad.face(0),
+                     quad.face(3),
+                     quad.face(2)}), // face_orientation=true,  face_flip=true,
                                      // face_rotation=false
-                  test_quad_7(quad.face(3),
-                              quad.face(2),
-                              quad.face(0),
-                              quad.face(
-                                1)); // face_orientation=true,  face_flip=true,
+                  test_quad_7(
+                    {quad.face(3),
+                     quad.face(2),
+                     quad.face(0),
+                     quad.face(1)}); // face_orientation=true,  face_flip=true,
                                      // face_rotation=true
                 if (needed_quads.find(test_quad_1) == needed_quads.end() &&
                     needed_quads.find(test_quad_2) == needed_quads.end() &&
@@ -2656,7 +2656,7 @@ namespace internal
           typename Triangulation<dim, spacedim>::raw_quad_iterator quad =
             triangulation.begin_raw_quad();
           typename std::map<
-            internal::TriangulationImplementation::TriaObject<2>,
+            internal::TriangulationImplementation::TriaObject,
             std::pair<typename Triangulation<dim, spacedim>::quad_iterator,
                       std::array<bool, GeometryInfo<dim>::lines_per_face>>,
             QuadComparator>::iterator q;
@@ -2755,11 +2755,11 @@ namespace internal
                                        dim>::face_to_cell_lines(face, l)]]
                           ->index();
 
-                  internal::TriangulationImplementation::TriaObject<2> quad(
-                    face_line_list[0],
-                    face_line_list[1],
-                    face_line_list[2],
-                    face_line_list[3]);
+                  internal::TriangulationImplementation::TriaObject quad(
+                    {face_line_list[0],
+                     face_line_list[1],
+                     face_line_list[2],
+                     face_line_list[3]});
 
                   if (needed_quads.find(quad) != needed_quads.end())
                     {
@@ -2784,48 +2784,53 @@ namespace internal
                       // then. construct all
                       // possibilities and check
                       // them one after the other
-                      const internal::TriangulationImplementation::TriaObject<2>
+                      const internal::TriangulationImplementation::TriaObject
                         test_quad_1(
-                          quad.face(2),
-                          quad.face(3),
-                          quad.face(0),
-                          quad.face(1)), // face_orientation=false,
-                                         // face_flip=false, face_rotation=false
+                          {quad.face(2),
+                           quad.face(3),
+                           quad.face(0),
+                           quad.face(
+                             1)}), // face_orientation=false,
+                                   // face_flip=false, face_rotation=false
                         test_quad_2(
-                          quad.face(0),
-                          quad.face(1),
-                          quad.face(3),
-                          quad.face(2)), // face_orientation=false,
-                                         // face_flip=false, face_rotation=true
+                          {quad.face(0),
+                           quad.face(1),
+                           quad.face(3),
+                           quad.face(
+                             2)}), // face_orientation=false,
+                                   // face_flip=false, face_rotation=true
                         test_quad_3(
-                          quad.face(3),
-                          quad.face(2),
-                          quad.face(1),
-                          quad.face(0)), // face_orientation=false,
-                                         // face_flip=true,  face_rotation=false
-                        test_quad_4(quad.face(1),
-                                    quad.face(0),
-                                    quad.face(2),
-                                    quad.face(
-                                      3)), // face_orientation=false,
+                          {quad.face(3),
+                           quad.face(2),
+                           quad.face(1),
+                           quad.face(
+                             0)}), // face_orientation=false,
+                                   // face_flip=true,  face_rotation=false
+                        test_quad_4(
+                          {quad.face(1),
+                           quad.face(0),
+                           quad.face(2),
+                           quad.face(3)}), // face_orientation=false,
                                            // face_flip=true, face_rotation=true
                         test_quad_5(
-                          quad.face(2),
-                          quad.face(3),
-                          quad.face(1),
-                          quad.face(0)), // face_orientation=true,
-                                         // face_flip=false, face_rotation=true
+                          {quad.face(2),
+                           quad.face(3),
+                           quad.face(1),
+                           quad.face(
+                             0)}), // face_orientation=true,
+                                   // face_flip=false, face_rotation=true
                         test_quad_6(
-                          quad.face(1),
-                          quad.face(0),
-                          quad.face(3),
-                          quad.face(2)), // face_orientation=true,
-                                         // face_flip=true,  face_rotation=false
-                        test_quad_7(quad.face(3),
-                                    quad.face(2),
-                                    quad.face(0),
-                                    quad.face(
-                                      1)); // face_orientation=true,
+                          {quad.face(1),
+                           quad.face(0),
+                           quad.face(3),
+                           quad.face(
+                             2)}), // face_orientation=true,
+                                   // face_flip=true,  face_rotation=false
+                        test_quad_7(
+                          {quad.face(3),
+                           quad.face(2),
+                           quad.face(0),
+                           quad.face(1)}); // face_orientation=true,
                                            // face_flip=true, face_rotation=true
                       if (needed_quads.find(test_quad_1) != needed_quads.end())
                         {
@@ -2894,13 +2899,13 @@ namespace internal
 
               // make the cell out of
               // these iterators
-              cell->set(internal::TriangulationImplementation::TriaObject<3>(
-                face_iterator[0]->index(),
-                face_iterator[1]->index(),
-                face_iterator[2]->index(),
-                face_iterator[3]->index(),
-                face_iterator[4]->index(),
-                face_iterator[5]->index()));
+              cell->set(internal::TriangulationImplementation::TriaObject(
+                {face_iterator[0]->index(),
+                 face_iterator[1]->index(),
+                 face_iterator[2]->index(),
+                 face_iterator[3]->index(),
+                 face_iterator[4]->index(),
+                 face_iterator[5]->index()}));
 
               cell->set_used_flag();
               cell->set_material_id(cells[c].material_id);
@@ -3177,16 +3182,16 @@ namespace internal
             // and because boundary quad
             // orientation does not carry
             // any information.
-            internal::TriangulationImplementation::TriaObject<2> quad_compare_1(
-              line[0]->index(),
-              line[1]->index(),
-              line[2]->index(),
-              line[3]->index());
-            internal::TriangulationImplementation::TriaObject<2> quad_compare_2(
-              line[2]->index(),
-              line[3]->index(),
-              line[0]->index(),
-              line[1]->index());
+            internal::TriangulationImplementation::TriaObject quad_compare_1(
+              {line[0]->index(),
+               line[1]->index(),
+               line[2]->index(),
+               line[3]->index()});
+            internal::TriangulationImplementation::TriaObject quad_compare_2(
+              {line[2]->index(),
+               line[3]->index(),
+               line[0]->index(),
+               line[1]->index()});
 
             // try to find the quad with
             // lines situated as
@@ -3952,10 +3957,10 @@ namespace internal
 
                               switch_1->set(
                                 internal::TriangulationImplementation::
-                                  TriaObject<2>(switch_2->line_index(0),
-                                                switch_2->line_index(1),
-                                                switch_2->line_index(2),
-                                                switch_2->line_index(3)));
+                                  TriaObject({switch_2->line_index(0),
+                                              switch_2->line_index(1),
+                                              switch_2->line_index(2),
+                                              switch_2->line_index(3)}));
                               switch_1->set_line_orientation(
                                 0, switch_2->line_orientation(0));
                               switch_1->set_line_orientation(
@@ -3976,10 +3981,10 @@ namespace internal
 
                               switch_2->set(
                                 internal::TriangulationImplementation::
-                                  TriaObject<2>(switch_1_lines[0],
-                                                switch_1_lines[1],
-                                                switch_1_lines[2],
-                                                switch_1_lines[3]));
+                                  TriaObject({switch_1_lines[0],
+                                              switch_1_lines[1],
+                                              switch_1_lines[2],
+                                              switch_1_lines[3]}));
                               switch_2->set_line_orientation(
                                 0, switch_1_line_orientations[0]);
                               switch_2->set_line_orientation(
@@ -4414,18 +4419,16 @@ namespace internal
                 new_lines[l] = cell->line(face_no)->child(c);
             Assert(l == 8, ExcInternalError());
 
-            new_lines[8]->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                new_vertices[6], new_vertices[8]));
-            new_lines[9]->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                new_vertices[8], new_vertices[7]));
+            new_lines[8]->set(internal::TriangulationImplementation::TriaObject(
+              {new_vertices[6], new_vertices[8]}));
+            new_lines[9]->set(internal::TriangulationImplementation::TriaObject(
+              {new_vertices[8], new_vertices[7]}));
             new_lines[10]->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                new_vertices[4], new_vertices[8]));
+              internal::TriangulationImplementation::TriaObject(
+                {new_vertices[4], new_vertices[8]}));
             new_lines[11]->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                new_vertices[8], new_vertices[5]));
+              internal::TriangulationImplementation::TriaObject(
+                {new_vertices[8], new_vertices[5]}));
           }
         else if (ref_case == RefinementCase<dim>::cut_x)
           {
@@ -4440,9 +4443,8 @@ namespace internal
             new_lines[3] = cell->line(2)->child(1);
             new_lines[4] = cell->line(3)->child(0);
             new_lines[5] = cell->line(3)->child(1);
-            new_lines[6]->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                new_vertices[6], new_vertices[7]));
+            new_lines[6]->set(internal::TriangulationImplementation::TriaObject(
+              {new_vertices[6], new_vertices[7]}));
           }
         else
           {
@@ -4458,9 +4460,8 @@ namespace internal
             new_lines[3] = cell->line(1)->child(1);
             new_lines[4] = cell->line(2);
             new_lines[5] = cell->line(3);
-            new_lines[6]->set(
-              internal::TriangulationImplementation::TriaObject<1>(
-                new_vertices[4], new_vertices[5]));
+            new_lines[6]->set(internal::TriangulationImplementation::TriaObject(
+              {new_vertices[4], new_vertices[5]}));
           }
 
         for (unsigned int l = lmin; l < lmax; ++l)
@@ -4510,30 +4511,26 @@ namespace internal
             //   .-10.11-.
             //   0   8   2
             //   .-4-.-5-.
-            subcells[0]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[0]->index(),
-                new_lines[8]->index(),
-                new_lines[4]->index(),
-                new_lines[10]->index()));
-            subcells[1]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[8]->index(),
-                new_lines[2]->index(),
-                new_lines[5]->index(),
-                new_lines[11]->index()));
-            subcells[2]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[1]->index(),
-                new_lines[9]->index(),
-                new_lines[10]->index(),
-                new_lines[6]->index()));
-            subcells[3]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[9]->index(),
-                new_lines[3]->index(),
-                new_lines[11]->index(),
-                new_lines[7]->index()));
+            subcells[0]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[0]->index(),
+               new_lines[8]->index(),
+               new_lines[4]->index(),
+               new_lines[10]->index()}));
+            subcells[1]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[8]->index(),
+               new_lines[2]->index(),
+               new_lines[5]->index(),
+               new_lines[11]->index()}));
+            subcells[2]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[1]->index(),
+               new_lines[9]->index(),
+               new_lines[10]->index(),
+               new_lines[6]->index()}));
+            subcells[3]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[9]->index(),
+               new_lines[3]->index(),
+               new_lines[11]->index(),
+               new_lines[7]->index()}));
           }
         else if (ref_case == RefinementCase<dim>::cut_x)
           {
@@ -4549,18 +4546,16 @@ namespace internal
             //   0   6   1
             //   |   |   |
             //   .-2-.-3-.
-            subcells[0]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[0]->index(),
-                new_lines[6]->index(),
-                new_lines[2]->index(),
-                new_lines[4]->index()));
-            subcells[1]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[6]->index(),
-                new_lines[1]->index(),
-                new_lines[3]->index(),
-                new_lines[5]->index()));
+            subcells[0]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[0]->index(),
+               new_lines[6]->index(),
+               new_lines[2]->index(),
+               new_lines[4]->index()}));
+            subcells[1]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[6]->index(),
+               new_lines[1]->index(),
+               new_lines[3]->index(),
+               new_lines[5]->index()}));
           }
         else
           {
@@ -4577,18 +4572,16 @@ namespace internal
             //   .---6---.
             //   0       2
             //   .---4---.
-            subcells[0]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[0]->index(),
-                new_lines[2]->index(),
-                new_lines[4]->index(),
-                new_lines[6]->index()));
-            subcells[1]->set(
-              internal::TriangulationImplementation::TriaObject<2>(
-                new_lines[1]->index(),
-                new_lines[3]->index(),
-                new_lines[6]->index(),
-                new_lines[5]->index()));
+            subcells[0]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[0]->index(),
+               new_lines[2]->index(),
+               new_lines[4]->index(),
+               new_lines[6]->index()}));
+            subcells[1]->set(internal::TriangulationImplementation::TriaObject(
+              {new_lines[1]->index(),
+               new_lines[3]->index(),
+               new_lines[6]->index(),
+               new_lines[5]->index()}));
           }
 
         types::subdomain_id subdomainid = cell->subdomain_id();
@@ -4781,8 +4774,8 @@ namespace internal
                   cell->set_children(0, first_child->index());
                   first_child->clear_children();
                   first_child->set(
-                    internal::TriangulationImplementation::TriaObject<1>(
-                      cell->vertex_index(0), next_unused_vertex));
+                    internal::TriangulationImplementation::TriaObject(
+                      {cell->vertex_index(0), next_unused_vertex}));
                   first_child->set_material_id(cell->material_id());
                   first_child->set_manifold_id(cell->manifold_id());
                   first_child->set_subdomain_id(subdomainid);
@@ -4832,8 +4825,8 @@ namespace internal
                   // insert second child
                   second_child->clear_children();
                   second_child->set(
-                    internal::TriangulationImplementation::TriaObject<1>(
-                      next_unused_vertex, cell->vertex_index(1)));
+                    internal::TriangulationImplementation::TriaObject(
+                      {next_unused_vertex, cell->vertex_index(1)}));
                   second_child->set_neighbor(0, first_child);
                   second_child->set_material_id(cell->material_id());
                   second_child->set_manifold_id(cell->manifold_id());
@@ -5109,11 +5102,11 @@ namespace internal
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                 children[0]->set(
-                  internal::TriangulationImplementation::TriaObject<1>(
-                    line->vertex_index(0), next_unused_vertex));
+                  internal::TriangulationImplementation::TriaObject(
+                    {line->vertex_index(0), next_unused_vertex}));
                 children[1]->set(
-                  internal::TriangulationImplementation::TriaObject<1>(
-                    next_unused_vertex, line->vertex_index(1)));
+                  internal::TriangulationImplementation::TriaObject(
+                    {next_unused_vertex, line->vertex_index(1)}));
 
                 children[0]->set_used_flag();
                 children[1]->set_used_flag();
@@ -5580,11 +5573,11 @@ namespace internal
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                 children[0]->set(
-                  internal::TriangulationImplementation::TriaObject<1>(
-                    line->vertex_index(0), next_unused_vertex));
+                  internal::TriangulationImplementation::TriaObject(
+                    {line->vertex_index(0), next_unused_vertex}));
                 children[1]->set(
-                  internal::TriangulationImplementation::TriaObject<1>(
-                    next_unused_vertex, line->vertex_index(1)));
+                  internal::TriangulationImplementation::TriaObject(
+                    {next_unused_vertex, line->vertex_index(1)}));
 
                 children[0]->set_used_flag();
                 children[1]->set_used_flag();
@@ -5719,8 +5712,8 @@ namespace internal
                       }
 
                     new_line->set(
-                      internal::TriangulationImplementation::TriaObject<1>(
-                        vertex_indices[0], vertex_indices[1]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {vertex_indices[0], vertex_indices[1]}));
                     new_line->set_used_flag();
                     new_line->clear_user_flag();
                     new_line->clear_user_data();
@@ -5763,48 +5756,48 @@ namespace internal
                     if (aniso_quad_ref_case == RefinementCase<dim - 1>::cut_x)
                       {
                         new_quads[0]->set(
-                          internal::TriangulationImplementation::TriaObject<2>(
-                            quad->line_index(0),
-                            new_line->index(),
-                            quad->line(2)
-                              ->child(index[0][quad->line_orientation(2)])
-                              ->index(),
-                            quad->line(3)
-                              ->child(index[0][quad->line_orientation(3)])
-                              ->index()));
+                          internal::TriangulationImplementation::TriaObject(
+                            {static_cast<int>(quad->line_index(0)),
+                             new_line->index(),
+                             quad->line(2)
+                               ->child(index[0][quad->line_orientation(2)])
+                               ->index(),
+                             quad->line(3)
+                               ->child(index[0][quad->line_orientation(3)])
+                               ->index()}));
                         new_quads[1]->set(
-                          internal::TriangulationImplementation::TriaObject<2>(
-                            new_line->index(),
-                            quad->line_index(1),
-                            quad->line(2)
-                              ->child(index[1][quad->line_orientation(2)])
-                              ->index(),
-                            quad->line(3)
-                              ->child(index[1][quad->line_orientation(3)])
-                              ->index()));
+                          internal::TriangulationImplementation::TriaObject(
+                            {new_line->index(),
+                             static_cast<int>(quad->line_index(1)),
+                             quad->line(2)
+                               ->child(index[1][quad->line_orientation(2)])
+                               ->index(),
+                             quad->line(3)
+                               ->child(index[1][quad->line_orientation(3)])
+                               ->index()}));
                       }
                     else
                       {
                         new_quads[0]->set(
-                          internal::TriangulationImplementation::TriaObject<2>(
-                            quad->line(0)
-                              ->child(index[0][quad->line_orientation(0)])
-                              ->index(),
-                            quad->line(1)
-                              ->child(index[0][quad->line_orientation(1)])
-                              ->index(),
-                            quad->line_index(2),
-                            new_line->index()));
+                          internal::TriangulationImplementation::TriaObject(
+                            {quad->line(0)
+                               ->child(index[0][quad->line_orientation(0)])
+                               ->index(),
+                             quad->line(1)
+                               ->child(index[0][quad->line_orientation(1)])
+                               ->index(),
+                             static_cast<int>(quad->line_index(2)),
+                             new_line->index()}));
                         new_quads[1]->set(
-                          internal::TriangulationImplementation::TriaObject<2>(
-                            quad->line(0)
-                              ->child(index[1][quad->line_orientation(0)])
-                              ->index(),
-                            quad->line(1)
-                              ->child(index[1][quad->line_orientation(1)])
-                              ->index(),
-                            new_line->index(),
-                            quad->line_index(3)));
+                          internal::TriangulationImplementation::TriaObject(
+                            {quad->line(0)
+                               ->child(index[1][quad->line_orientation(0)])
+                               ->index(),
+                             quad->line(1)
+                               ->child(index[1][quad->line_orientation(1)])
+                               ->index(),
+                             new_line->index(),
+                             static_cast<int>(quad->line_index(3))}));
                       }
 
                     for (const auto &new_quad : new_quads)
@@ -5943,9 +5936,9 @@ namespace internal
 
                                 new_child[i]->set(
                                   internal::TriangulationImplementation::
-                                    TriaObject<1>(old_child[i]->vertex_index(0),
-                                                  old_child[i]->vertex_index(
-                                                    1)));
+                                    TriaObject(
+                                      {old_child[i]->vertex_index(0),
+                                       old_child[i]->vertex_index(1)}));
                                 new_child[i]->set_boundary_id_internal(
                                   old_child[i]->boundary_id());
                                 new_child[i]->set_manifold_id(
@@ -6069,11 +6062,11 @@ namespace internal
                                  -1);
 
                             switch_1->set(
-                              internal::TriangulationImplementation::TriaObject<
-                                2>(switch_2->line_index(0),
-                                   switch_2->line_index(1),
-                                   switch_2->line_index(2),
-                                   switch_2->line_index(3)));
+                              internal::TriangulationImplementation::TriaObject(
+                                {switch_2->line_index(0),
+                                 switch_2->line_index(1),
+                                 switch_2->line_index(2),
+                                 switch_2->line_index(3)}));
                             switch_1->set_line_orientation(
                               0, switch_2->line_orientation(0));
                             switch_1->set_line_orientation(
@@ -6103,11 +6096,11 @@ namespace internal
                                                      switch_2->child_index(2));
 
                             switch_2->set(
-                              internal::TriangulationImplementation::TriaObject<
-                                2>(switch_1_lines[0],
-                                   switch_1_lines[1],
-                                   switch_1_lines[2],
-                                   switch_1_lines[3]));
+                              internal::TriangulationImplementation::TriaObject(
+                                {switch_1_lines[0],
+                                 switch_1_lines[1],
+                                 switch_1_lines[2],
+                                 switch_1_lines[3]}));
                             switch_2->set_line_orientation(
                               0, switch_1_line_orientations[0]);
                             switch_2->set_line_orientation(
@@ -6256,13 +6249,13 @@ namespace internal
                                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                             children[0]->set(
-                              internal::TriangulationImplementation::TriaObject<
-                                1>(middle_line->vertex_index(0),
-                                   next_unused_vertex));
+                              internal::TriangulationImplementation::TriaObject(
+                                {middle_line->vertex_index(0),
+                                 next_unused_vertex}));
                             children[1]->set(
-                              internal::TriangulationImplementation::TriaObject<
-                                1>(next_unused_vertex,
-                                   middle_line->vertex_index(1)));
+                              internal::TriangulationImplementation::TriaObject(
+                                {next_unused_vertex,
+                                 middle_line->vertex_index(1)}));
 
                             children[0]->set_used_flag();
                             children[1]->set_used_flag();
@@ -6373,17 +6366,17 @@ namespace internal
                       next_unused_vertex};
 
                     new_lines[0]->set(
-                      internal::TriangulationImplementation::TriaObject<1>(
-                        vertex_indices[2], vertex_indices[4]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {vertex_indices[2], vertex_indices[4]}));
                     new_lines[1]->set(
-                      internal::TriangulationImplementation::TriaObject<1>(
-                        vertex_indices[4], vertex_indices[3]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {vertex_indices[4], vertex_indices[3]}));
                     new_lines[2]->set(
-                      internal::TriangulationImplementation::TriaObject<1>(
-                        vertex_indices[0], vertex_indices[4]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {vertex_indices[0], vertex_indices[4]}));
                     new_lines[3]->set(
-                      internal::TriangulationImplementation::TriaObject<1>(
-                        vertex_indices[4], vertex_indices[1]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {vertex_indices[4], vertex_indices[1]}));
 
                     for (const auto &new_line : new_lines)
                       {
@@ -6488,38 +6481,38 @@ namespace internal
                     quad->set_children(0, new_quads[0]->index());
                     quad->set_children(2, new_quads[2]->index());
                     new_quads[0]->set(
-                      internal::TriangulationImplementation::TriaObject<2>(
-                        line_indices[0],
-                        line_indices[8],
-                        line_indices[4],
-                        line_indices[10]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {line_indices[0],
+                         line_indices[8],
+                         line_indices[4],
+                         line_indices[10]}));
 
                     quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
                     new_quads[0]->set(
-                      internal::TriangulationImplementation::TriaObject<2>(
-                        line_indices[0],
-                        line_indices[8],
-                        line_indices[4],
-                        line_indices[10]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {line_indices[0],
+                         line_indices[8],
+                         line_indices[4],
+                         line_indices[10]}));
                     new_quads[1]->set(
-                      internal::TriangulationImplementation::TriaObject<2>(
-                        line_indices[8],
-                        line_indices[2],
-                        line_indices[5],
-                        line_indices[11]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {line_indices[8],
+                         line_indices[2],
+                         line_indices[5],
+                         line_indices[11]}));
                     new_quads[2]->set(
-                      internal::TriangulationImplementation::TriaObject<2>(
-                        line_indices[1],
-                        line_indices[9],
-                        line_indices[10],
-                        line_indices[6]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {line_indices[1],
+                         line_indices[9],
+                         line_indices[10],
+                         line_indices[6]}));
                     new_quads[3]->set(
-                      internal::TriangulationImplementation::TriaObject<2>(
-                        line_indices[9],
-                        line_indices[3],
-                        line_indices[11],
-                        line_indices[7]));
+                      internal::TriangulationImplementation::TriaObject(
+                        {line_indices[9],
+                         line_indices[3],
+                         line_indices[11],
+                         line_indices[7]}));
                     for (const auto &new_quad : new_quads)
                       {
                         new_quad->set_used_flag();
@@ -6933,11 +6926,11 @@ namespace internal
                           // set up the new quad, line numbering is as
                           // indicated above
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[0],
-                                 line_indices[1],
-                                 line_indices[2],
-                                 line_indices[3]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[0],
+                               line_indices[1],
+                               line_indices[2],
+                               line_indices[3]}));
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[0]);
@@ -7021,21 +7014,21 @@ namespace internal
                           };
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[1],
-                                 quad_indices[0],
-                                 quad_indices[3],
-                                 quad_indices[5],
-                                 quad_indices[7],
-                                 quad_indices[9]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[1],
+                               quad_indices[0],
+                               quad_indices[3],
+                               quad_indices[5],
+                               quad_indices[7],
+                               quad_indices[9]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[0],
-                                 quad_indices[2],
-                                 quad_indices[4],
-                                 quad_indices[6],
-                                 quad_indices[8],
-                                 quad_indices[10]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[0],
+                               quad_indices[2],
+                               quad_indices[4],
+                               quad_indices[6],
+                               quad_indices[8],
+                               quad_indices[10]}));
                           break;
                         }
 
@@ -7162,11 +7155,11 @@ namespace internal
                           // set up the new quad, line numbering is as
                           // indicated above
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[2],
-                                 line_indices[3],
-                                 line_indices[0],
-                                 line_indices[1]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[2],
+                               line_indices[3],
+                               line_indices[0],
+                               line_indices[1]}));
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[2]);
@@ -7250,21 +7243,21 @@ namespace internal
                           };
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[1],
-                                 quad_indices[3],
-                                 quad_indices[5],
-                                 quad_indices[0],
-                                 quad_indices[7],
-                                 quad_indices[9]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[1],
+                               quad_indices[3],
+                               quad_indices[5],
+                               quad_indices[0],
+                               quad_indices[7],
+                               quad_indices[9]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[2],
-                                 quad_indices[4],
-                                 quad_indices[0],
-                                 quad_indices[6],
-                                 quad_indices[8],
-                                 quad_indices[10]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[2],
+                               quad_indices[4],
+                               quad_indices[0],
+                               quad_indices[6],
+                               quad_indices[8],
+                               quad_indices[10]}));
                           break;
                         }
 
@@ -7393,11 +7386,11 @@ namespace internal
                           // set up the new quad, line numbering is as
                           // indicated above
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[0],
-                                 line_indices[1],
-                                 line_indices[2],
-                                 line_indices[3]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[0],
+                               line_indices[1],
+                               line_indices[2],
+                               line_indices[3]}));
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[0]);
@@ -7481,21 +7474,21 @@ namespace internal
                           };
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[1],
-                                 quad_indices[3],
-                                 quad_indices[5],
-                                 quad_indices[7],
-                                 quad_indices[9],
-                                 quad_indices[0]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[1],
+                               quad_indices[3],
+                               quad_indices[5],
+                               quad_indices[7],
+                               quad_indices[9],
+                               quad_indices[0]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[2],
-                                 quad_indices[4],
-                                 quad_indices[6],
-                                 quad_indices[8],
-                                 quad_indices[0],
-                                 quad_indices[10]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[2],
+                               quad_indices[4],
+                               quad_indices[6],
+                               quad_indices[8],
+                               quad_indices[0],
+                               quad_indices[10]}));
                           break;
                         }
 
@@ -7522,11 +7515,10 @@ namespace internal
 
                           // first, create the new internal line
                           new_lines[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(middle_vertex_index<dim, spacedim>(
-                                   hex->face(4)),
-                                 middle_vertex_index<dim, spacedim>(
-                                   hex->face(5))));
+                            internal::TriangulationImplementation::TriaObject(
+                              {middle_vertex_index<dim, spacedim>(hex->face(4)),
+                               middle_vertex_index<dim, spacedim>(
+                                 hex->face(5))}));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -7762,29 +7754,29 @@ namespace internal
                           //  *---*---*y     *-6-*-7-*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[2],
-                                 line_indices[12],
-                                 line_indices[4],
-                                 line_indices[8]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[2],
+                               line_indices[12],
+                               line_indices[4],
+                               line_indices[8]}));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[12],
-                                 line_indices[3],
-                                 line_indices[5],
-                                 line_indices[9]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[12],
+                               line_indices[3],
+                               line_indices[5],
+                               line_indices[9]}));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[6],
-                                 line_indices[10],
-                                 line_indices[0],
-                                 line_indices[12]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[6],
+                               line_indices[10],
+                               line_indices[0],
+                               line_indices[12]}));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[7],
-                                 line_indices[11],
-                                 line_indices[12],
-                                 line_indices[1]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[7],
+                               line_indices[11],
+                               line_indices[12],
+                               line_indices[1]}));
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[2]);
@@ -7910,37 +7902,37 @@ namespace internal
                                 3, f_or[5], f_fl[5], f_ro[5]))};
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[4],
-                                 quad_indices[0],
-                                 quad_indices[8],
-                                 quad_indices[2],
-                                 quad_indices[12],
-                                 quad_indices[16]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[4],
+                               quad_indices[0],
+                               quad_indices[8],
+                               quad_indices[2],
+                               quad_indices[12],
+                               quad_indices[16]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[0],
-                                 quad_indices[6],
-                                 quad_indices[9],
-                                 quad_indices[3],
-                                 quad_indices[13],
-                                 quad_indices[17]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[0],
+                               quad_indices[6],
+                               quad_indices[9],
+                               quad_indices[3],
+                               quad_indices[13],
+                               quad_indices[17]}));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[5],
-                                 quad_indices[1],
-                                 quad_indices[2],
-                                 quad_indices[10],
-                                 quad_indices[14],
-                                 quad_indices[18]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[5],
+                               quad_indices[1],
+                               quad_indices[2],
+                               quad_indices[10],
+                               quad_indices[14],
+                               quad_indices[18]}));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[1],
-                                 quad_indices[7],
-                                 quad_indices[3],
-                                 quad_indices[11],
-                                 quad_indices[15],
-                                 quad_indices[19]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[1],
+                               quad_indices[7],
+                               quad_indices[3],
+                               quad_indices[11],
+                               quad_indices[15],
+                               quad_indices[19]}));
                           break;
                         }
 
@@ -7967,11 +7959,10 @@ namespace internal
 
                           // first, create the new internal line
                           new_lines[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(middle_vertex_index<dim, spacedim>(
-                                   hex->face(2)),
-                                 middle_vertex_index<dim, spacedim>(
-                                   hex->face(3))));
+                            internal::TriangulationImplementation::TriaObject(
+                              {middle_vertex_index<dim, spacedim>(hex->face(2)),
+                               middle_vertex_index<dim, spacedim>(
+                                 hex->face(3))}));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -8207,29 +8198,29 @@ namespace internal
                           //  *----*----*x     *--6-*--7-*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[0],
-                                 line_indices[12],
-                                 line_indices[6],
-                                 line_indices[10]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[0],
+                               line_indices[12],
+                               line_indices[6],
+                               line_indices[10]}));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[12],
-                                 line_indices[1],
-                                 line_indices[7],
-                                 line_indices[11]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[12],
+                               line_indices[1],
+                               line_indices[7],
+                               line_indices[11]}));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[4],
-                                 line_indices[8],
-                                 line_indices[2],
-                                 line_indices[12]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[4],
+                               line_indices[8],
+                               line_indices[2],
+                               line_indices[12]}));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[5],
-                                 line_indices[9],
-                                 line_indices[12],
-                                 line_indices[3]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[5],
+                               line_indices[9],
+                               line_indices[12],
+                               line_indices[3]}));
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[0]);
@@ -8365,37 +8356,37 @@ namespace internal
                           // | 0 | 2 |
                           // *---*---*
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[4],
-                                 quad_indices[2],
-                                 quad_indices[8],
-                                 quad_indices[12],
-                                 quad_indices[16],
-                                 quad_indices[0]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[4],
+                               quad_indices[2],
+                               quad_indices[8],
+                               quad_indices[12],
+                               quad_indices[16],
+                               quad_indices[0]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[5],
-                                 quad_indices[3],
-                                 quad_indices[9],
-                                 quad_indices[13],
-                                 quad_indices[0],
-                                 quad_indices[18]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[5],
+                               quad_indices[3],
+                               quad_indices[9],
+                               quad_indices[13],
+                               quad_indices[0],
+                               quad_indices[18]}));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[2],
-                                 quad_indices[6],
-                                 quad_indices[10],
-                                 quad_indices[14],
-                                 quad_indices[17],
-                                 quad_indices[1]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[2],
+                               quad_indices[6],
+                               quad_indices[10],
+                               quad_indices[14],
+                               quad_indices[17],
+                               quad_indices[1]}));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[3],
-                                 quad_indices[7],
-                                 quad_indices[11],
-                                 quad_indices[15],
-                                 quad_indices[1],
-                                 quad_indices[19]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[3],
+                               quad_indices[7],
+                               quad_indices[11],
+                               quad_indices[15],
+                               quad_indices[1],
+                               quad_indices[19]}));
                           break;
                         }
 
@@ -8423,11 +8414,10 @@ namespace internal
                           // first, create the new
                           // internal line
                           new_lines[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(middle_vertex_index<dim, spacedim>(
-                                   hex->face(0)),
-                                 middle_vertex_index<dim, spacedim>(
-                                   hex->face(1))));
+                            internal::TriangulationImplementation::TriaObject(
+                              {middle_vertex_index<dim, spacedim>(hex->face(0)),
+                               middle_vertex_index<dim, spacedim>(
+                                 hex->face(1))}));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -8659,29 +8649,29 @@ namespace internal
                           //  *---------*x     *----0----*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[6],
-                                 line_indices[10],
-                                 line_indices[0],
-                                 line_indices[12]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[6],
+                               line_indices[10],
+                               line_indices[0],
+                               line_indices[12]}));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[7],
-                                 line_indices[11],
-                                 line_indices[12],
-                                 line_indices[1]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[7],
+                               line_indices[11],
+                               line_indices[12],
+                               line_indices[1]}));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[2],
-                                 line_indices[12],
-                                 line_indices[4],
-                                 line_indices[8]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[2],
+                               line_indices[12],
+                               line_indices[4],
+                               line_indices[8]}));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[12],
-                                 line_indices[3],
-                                 line_indices[5],
-                                 line_indices[9]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[12],
+                               line_indices[3],
+                               line_indices[5],
+                               line_indices[9]}));
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[6]);
@@ -8808,37 +8798,37 @@ namespace internal
                                               1][f_fl[5]][f_ro[5]])};
 
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[4],
-                                 quad_indices[8],
-                                 quad_indices[12],
-                                 quad_indices[2],
-                                 quad_indices[16],
-                                 quad_indices[0]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[4],
+                               quad_indices[8],
+                               quad_indices[12],
+                               quad_indices[2],
+                               quad_indices[16],
+                               quad_indices[0]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[5],
-                                 quad_indices[9],
-                                 quad_indices[2],
-                                 quad_indices[14],
-                                 quad_indices[17],
-                                 quad_indices[1]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[5],
+                               quad_indices[9],
+                               quad_indices[2],
+                               quad_indices[14],
+                               quad_indices[17],
+                               quad_indices[1]}));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[6],
-                                 quad_indices[10],
-                                 quad_indices[13],
-                                 quad_indices[3],
-                                 quad_indices[0],
-                                 quad_indices[18]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[6],
+                               quad_indices[10],
+                               quad_indices[13],
+                               quad_indices[3],
+                               quad_indices[0],
+                               quad_indices[18]}));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[7],
-                                 quad_indices[11],
-                                 quad_indices[3],
-                                 quad_indices[15],
-                                 quad_indices[1],
-                                 quad_indices[19]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[7],
+                               quad_indices[11],
+                               quad_indices[3],
+                               quad_indices[15],
+                               quad_indices[1],
+                               quad_indices[19]}));
                           break;
                         }
 
@@ -8916,23 +8906,23 @@ namespace internal
                             next_unused_vertex};
 
                           new_lines[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(vertex_indices[2], vertex_indices[6]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {vertex_indices[2], vertex_indices[6]}));
                           new_lines[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(vertex_indices[6], vertex_indices[3]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {vertex_indices[6], vertex_indices[3]}));
                           new_lines[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(vertex_indices[0], vertex_indices[6]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {vertex_indices[0], vertex_indices[6]}));
                           new_lines[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(vertex_indices[6], vertex_indices[1]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {vertex_indices[6], vertex_indices[1]}));
                           new_lines[4]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(vertex_indices[4], vertex_indices[6]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {vertex_indices[4], vertex_indices[6]}));
                           new_lines[5]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              1>(vertex_indices[6], vertex_indices[5]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {vertex_indices[6], vertex_indices[5]}));
 
                           // again, first collect some data about the
                           // indices of the lines, with the following
@@ -9251,77 +9241,77 @@ namespace internal
                           //  *----*----*x     *--8-*--9-*
 
                           new_quads[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[10],
-                                 line_indices[28],
-                                 line_indices[16],
-                                 line_indices[24]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[10],
+                               line_indices[28],
+                               line_indices[16],
+                               line_indices[24]}));
                           new_quads[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[28],
-                                 line_indices[14],
-                                 line_indices[17],
-                                 line_indices[25]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[28],
+                               line_indices[14],
+                               line_indices[17],
+                               line_indices[25]}));
                           new_quads[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[11],
-                                 line_indices[29],
-                                 line_indices[24],
-                                 line_indices[20]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[11],
+                               line_indices[29],
+                               line_indices[24],
+                               line_indices[20]}));
                           new_quads[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[29],
-                                 line_indices[15],
-                                 line_indices[25],
-                                 line_indices[21]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[29],
+                               line_indices[15],
+                               line_indices[25],
+                               line_indices[21]}));
                           new_quads[4]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[18],
-                                 line_indices[26],
-                                 line_indices[0],
-                                 line_indices[28]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[18],
+                               line_indices[26],
+                               line_indices[0],
+                               line_indices[28]}));
                           new_quads[5]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[26],
-                                 line_indices[22],
-                                 line_indices[1],
-                                 line_indices[29]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[26],
+                               line_indices[22],
+                               line_indices[1],
+                               line_indices[29]}));
                           new_quads[6]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[19],
-                                 line_indices[27],
-                                 line_indices[28],
-                                 line_indices[4]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[19],
+                               line_indices[27],
+                               line_indices[28],
+                               line_indices[4]}));
                           new_quads[7]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[27],
-                                 line_indices[23],
-                                 line_indices[29],
-                                 line_indices[5]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[27],
+                               line_indices[23],
+                               line_indices[29],
+                               line_indices[5]}));
                           new_quads[8]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[2],
-                                 line_indices[24],
-                                 line_indices[8],
-                                 line_indices[26]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[2],
+                               line_indices[24],
+                               line_indices[8],
+                               line_indices[26]}));
                           new_quads[9]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[24],
-                                 line_indices[6],
-                                 line_indices[9],
-                                 line_indices[27]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[24],
+                               line_indices[6],
+                               line_indices[9],
+                               line_indices[27]}));
                           new_quads[10]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[3],
-                                 line_indices[25],
-                                 line_indices[26],
-                                 line_indices[12]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[3],
+                               line_indices[25],
+                               line_indices[26],
+                               line_indices[12]}));
                           new_quads[11]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              2>(line_indices[25],
-                                 line_indices[7],
-                                 line_indices[27],
-                                 line_indices[13]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {line_indices[25],
+                               line_indices[7],
+                               line_indices[27],
+                               line_indices[13]}));
 
                           // now reset the line_orientation flags of outer
                           // lines as they cannot be set in a loop (at
@@ -9519,71 +9509,71 @@ namespace internal
 
                           // bottom children
                           new_hexes[0]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[12],
-                                 quad_indices[0],
-                                 quad_indices[20],
-                                 quad_indices[4],
-                                 quad_indices[28],
-                                 quad_indices[8]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[12],
+                               quad_indices[0],
+                               quad_indices[20],
+                               quad_indices[4],
+                               quad_indices[28],
+                               quad_indices[8]}));
                           new_hexes[1]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[0],
-                                 quad_indices[16],
-                                 quad_indices[22],
-                                 quad_indices[6],
-                                 quad_indices[29],
-                                 quad_indices[9]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[0],
+                               quad_indices[16],
+                               quad_indices[22],
+                               quad_indices[6],
+                               quad_indices[29],
+                               quad_indices[9]}));
                           new_hexes[2]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[13],
-                                 quad_indices[1],
-                                 quad_indices[4],
-                                 quad_indices[24],
-                                 quad_indices[30],
-                                 quad_indices[10]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[13],
+                               quad_indices[1],
+                               quad_indices[4],
+                               quad_indices[24],
+                               quad_indices[30],
+                               quad_indices[10]}));
                           new_hexes[3]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[1],
-                                 quad_indices[17],
-                                 quad_indices[6],
-                                 quad_indices[26],
-                                 quad_indices[31],
-                                 quad_indices[11]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[1],
+                               quad_indices[17],
+                               quad_indices[6],
+                               quad_indices[26],
+                               quad_indices[31],
+                               quad_indices[11]}));
 
                           // top children
                           new_hexes[4]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[14],
-                                 quad_indices[2],
-                                 quad_indices[21],
-                                 quad_indices[5],
-                                 quad_indices[8],
-                                 quad_indices[32]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[14],
+                               quad_indices[2],
+                               quad_indices[21],
+                               quad_indices[5],
+                               quad_indices[8],
+                               quad_indices[32]}));
                           new_hexes[5]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[2],
-                                 quad_indices[18],
-                                 quad_indices[23],
-                                 quad_indices[7],
-                                 quad_indices[9],
-                                 quad_indices[33]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[2],
+                               quad_indices[18],
+                               quad_indices[23],
+                               quad_indices[7],
+                               quad_indices[9],
+                               quad_indices[33]}));
                           new_hexes[6]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[15],
-                                 quad_indices[3],
-                                 quad_indices[5],
-                                 quad_indices[25],
-                                 quad_indices[10],
-                                 quad_indices[34]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[15],
+                               quad_indices[3],
+                               quad_indices[5],
+                               quad_indices[25],
+                               quad_indices[10],
+                               quad_indices[34]}));
                           new_hexes[7]->set(
-                            internal::TriangulationImplementation::TriaObject<
-                              3>(quad_indices[3],
-                                 quad_indices[19],
-                                 quad_indices[7],
-                                 quad_indices[27],
-                                 quad_indices[11],
-                                 quad_indices[35]));
+                            internal::TriangulationImplementation::TriaObject(
+                              {quad_indices[3],
+                               quad_indices[19],
+                               quad_indices[7],
+                               quad_indices[27],
+                               quad_indices[11],
+                               quad_indices[35]}));
                           break;
                         }
                       default:

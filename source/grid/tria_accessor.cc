@@ -1489,8 +1489,7 @@ const unsigned int
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::set(
-  const internal::TriangulationImplementation::TriaObject<structdim> &object)
-  const
+  const internal::TriangulationImplementation::TriaObject &object) const
 {
   this->objects().get_object(this->present_index) = object;
 }

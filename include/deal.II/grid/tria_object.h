@@ -51,45 +51,18 @@ namespace internal
      *
      * @author Guido Kanschat, 2007
      */
-    template <int structdim>
     class TriaObject
     {
     public:
-      static const unsigned int dimension = structdim;
+      /**
+       * Constructor.
+       */
+      TriaObject(const std::initializer_list<int> &faces);
 
       /**
-       * Default constructor, setting all face indices to invalid values.
+       * Constructor.
        */
-      TriaObject();
-
-      /**
-       * Constructor for a line object with the numbers of its two end points.
-       *
-       * Throws an exception if dimension is not one.
-       */
-      TriaObject(const int i0, const int i1);
-
-      /**
-       * Constructor for a quadrilateral object with the numbers of its four
-       * lines.
-       *
-       * Throws an exception if dimension is not two.
-       */
-      TriaObject(const int i0, const int i1, const int i2, const int i3);
-
-      /**
-       * Constructor for a hexahedron object with the numbers of its six
-       * quadrilaterals.
-       *
-       * Throws an exception if dimension is not two.
-       */
-      TriaObject(const int i0,
-                 const int i1,
-                 const int i2,
-                 const int i3,
-                 const int i4,
-                 const int i5);
-
+      TriaObject(const std::initializer_list<unsigned int> &faces);
 
       /**
        * Return the index of the ith face object.
@@ -107,7 +80,7 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      static std::size_t
+      std::size_t
       memory_consumption();
 
       /**
@@ -123,7 +96,7 @@ namespace internal
        * Global indices of the face iterators bounding this cell if dim@>1,
        * and the two vertex indices in 1d.
        */
-      int faces[GeometryInfo<structdim>::faces_per_cell];
+      std::vector<int> faces;
 
       friend TriaObjectView;
     };
@@ -149,10 +122,11 @@ namespace internal
       /**
        * Store the content of @p other in the vector of TriaObjects.
        */
-      template <int structdim>
       TriaObjectView &
-      operator=(const TriaObject<structdim> &other)
+      operator=(const TriaObject &other)
       {
+        AssertDimension(faces.size(), other.faces.size());
+
         for (unsigned int i = 0; i < faces.size(); ++i)
           faces[i] = other.faces[i];
 
@@ -186,87 +160,52 @@ namespace internal
 
     //----------------------------------------------------------------------//
 
-    template <int structdim>
-    inline TriaObject<structdim>::TriaObject()
+
+    inline TriaObject::TriaObject(const std::initializer_list<int> &faces)
     {
-      for (const unsigned int i : GeometryInfo<structdim>::face_indices())
-        faces[i] = -1;
+      this->faces = faces;
     }
 
 
-    template <int structdim>
-    inline TriaObject<structdim>::TriaObject(const int i0, const int i1)
+
+    inline TriaObject::TriaObject(
+      const std::initializer_list<unsigned int> &faces_in)
     {
-      Assert(structdim == 1, ExcImpossibleInDim(structdim));
-      faces[0] = i0;
-      faces[1] = i1;
+      this->faces.reserve(faces_in.size());
+      for (const auto face : faces_in)
+        this->faces.push_back(face);
     }
 
 
-    template <int structdim>
-    inline TriaObject<structdim>::TriaObject(const int i0,
-                                             const int i1,
-                                             const int i2,
-                                             const int i3)
-    {
-      Assert(structdim == 2, ExcImpossibleInDim(structdim));
-      faces[0] = i0;
-      faces[1] = i1;
-      faces[2] = i2;
-      faces[3] = i3;
-    }
 
-
-    template <int structdim>
-    inline TriaObject<structdim>::TriaObject(const int i0,
-                                             const int i1,
-                                             const int i2,
-                                             const int i3,
-                                             const int i4,
-                                             const int i5)
-    {
-      Assert(structdim == 3, ExcImpossibleInDim(structdim));
-      faces[0] = i0;
-      faces[1] = i1;
-      faces[2] = i2;
-      faces[3] = i3;
-      faces[4] = i4;
-      faces[5] = i5;
-    }
-
-
-    template <int structdim>
     inline int
-    TriaObject<structdim>::face(const unsigned int i) const
+    TriaObject::face(const unsigned int i) const
     {
-      AssertIndexRange(i, GeometryInfo<structdim>::faces_per_cell);
+      AssertIndexRange(i, faces.size());
       return faces[i];
     }
 
 
 
-    template <int structdim>
     inline void
-    TriaObject<structdim>::set_face(const unsigned int i, const int index)
+    TriaObject::set_face(const unsigned int i, const int index)
     {
-      AssertIndexRange(i, GeometryInfo<structdim>::faces_per_cell);
+      AssertIndexRange(i, faces.size());
       faces[i] = index;
     }
 
 
 
-    template <int structdim>
     inline std::size_t
-    TriaObject<structdim>::memory_consumption()
+    TriaObject::memory_consumption()
     {
-      return sizeof(TriaObject<structdim>);
+      return MemoryConsumption::memory_consumption(this->faces);
     }
 
 
-    template <int structdim>
     template <class Archive>
     void
-    TriaObject<structdim>::serialize(Archive &ar, const unsigned int)
+    TriaObject::serialize(Archive &ar, const unsigned int)
     {
       ar &faces;
     }
