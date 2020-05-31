@@ -206,7 +206,6 @@ extern "C"
  * <code>pdseupd</code>, <code>pdnaupd</code>, <code>pdsaupd</code> work and
  * also how to set the parameters appropriately please take a look into the
  * PARPACK manual.
- *
  */
 template <typename VectorType>
 class PArpackSolver : public Subscriptor

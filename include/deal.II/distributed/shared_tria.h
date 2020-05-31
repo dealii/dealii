@@ -96,7 +96,6 @@ namespace parallel
      * appropriate for the partitioned mesh.
      *
      * @ingroup distributed
-     *
      */
     template <int dim, int spacedim = dim>
     class Triangulation

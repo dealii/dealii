@@ -192,7 +192,6 @@ namespace FEValuesExtractors
    * module.
    *
    * @ingroup feaccess vector_valued
-   *
    */
   template <int rank>
   struct SymmetricTensor
@@ -240,7 +239,6 @@ namespace FEValuesExtractors
    * module.
    *
    * @ingroup feaccess vector_valued
-   *
    */
   template <int rank>
   struct Tensor

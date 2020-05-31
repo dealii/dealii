@@ -394,7 +394,6 @@ private:
  *
  * This class is an example of the "static" type of
  * @ref Sparsity.
- *
  */
 class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 {
@@ -512,7 +511,6 @@ public:
  * BlockSparsityPattern sparsity;
  * sparsity.copy_from(dsp);
  * @endcode
- *
  */
 
 class BlockDynamicSparsityPattern
@@ -629,7 +627,6 @@ namespace TrilinosWrappers
    * pattern can be used).
    *
    * This class is used in step-32.
-   *
    */
   class BlockSparsityPattern
     : public dealii::BlockSparsityPatternBase<SparsityPattern>

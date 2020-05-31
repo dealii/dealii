@@ -203,7 +203,6 @@ namespace internal
      * between two tensors or ranks rank1 and rank2. In general, this is a
      * tensor of rank <tt>rank1+rank2-4</tt>, but if this is zero it is a
      * single scalar Number. For this case, we have a specialization.
-     *
      */
     template <int rank1,
               int rank2,
@@ -223,7 +222,6 @@ namespace internal
      * between two tensors or ranks rank1 and rank2. In general, this is a
      * tensor of rank <tt>rank1+rank2-4</tt>, but if this is zero it is a
      * single scalar Number. For this case, we have a specialization.
-     *
      */
     template <int dim, typename Number, typename OtherNumber>
     struct double_contraction_result<2, 2, dim, Number, OtherNumber>
@@ -367,7 +365,6 @@ namespace internal
      *
      * This class is an adaptation of a similar class used for the Table
      * class.
-     *
      */
     template <int rank, int dim, bool constness, int P, typename Number>
     class Accessor
@@ -447,7 +444,6 @@ namespace internal
      * elements of the table, rather than recursively returning access objects
      * for further subsets. The same holds for this specialization as for the
      * general template; see there for more information.
-     *
      */
     template <int rank, int dim, bool constness, typename Number>
     class Accessor<rank, dim, constness, 1, Number>
@@ -2891,7 +2887,6 @@ namespace internal
      * @param[out] Q The orthogonal matrix effecting the transformation
      * @param[out] d The diagonal elements of the tridiagonal matrix
      * @param[out] e The off-diagonal elements of the tridiagonal matrix
-     *
      */
     template <int dim, typename Number>
     void
@@ -2940,7 +2935,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
      */
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
@@ -2986,7 +2980,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
      */
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
@@ -3006,7 +2999,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
      */
     template <typename Number>
     std::array<std::pair<Number, Tensor<1, 2, Number>>, 2>
@@ -3045,7 +3037,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
      */
     template <typename Number>
     std::array<std::pair<Number, Tensor<1, 3, Number>>, 3>

@@ -225,7 +225,6 @@ namespace MeshWorker
    * 	Volume  = {7},
    * 	Year    = {2018}}
    * @endcode
-   *
    */
   template <int dim, int spacedim = dim>
   class ScratchData

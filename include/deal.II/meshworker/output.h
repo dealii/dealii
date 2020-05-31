@@ -53,7 +53,6 @@ namespace MeshWorker
      * completely different.
      *
      * @note In the current implementation, only cell data can be written.
-     *
      */
     class GnuplotPatch
     {

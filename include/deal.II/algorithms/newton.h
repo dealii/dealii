@@ -67,7 +67,6 @@ namespace Algorithms
    *
    * For the call to (*#inverse_derivative), the vector <tt>"Newton
    * residual"</tt> is inserted before <tt>"Newton iterate"</tt>.
-   *
    */
   template <typename VectorType>
   class Newton : public OperatorBase

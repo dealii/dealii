@@ -27,7 +27,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- *
  */
 namespace MemorySpace
 {

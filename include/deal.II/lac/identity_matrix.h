@@ -64,8 +64,6 @@ DEAL_II_NAMESPACE_OPEN
  * cg.solve (system_matrix, solution, system_rhs,
  *           IdentityMatrix(solution.size()));
  * @endcode
- *
- *
  */
 class IdentityMatrix
 {

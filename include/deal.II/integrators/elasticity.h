@@ -251,7 +251,6 @@ namespace LocalIntegrators
      * respectively. <i>g</i> is the inhomogeneous boundary value in the
      * argument <tt>data</tt>. $n$ is the outer normal vector and $\gamma$ is
      * the usual penalty parameter.
-     *
      */
     template <int dim, typename number>
     void
@@ -382,7 +381,6 @@ namespace LocalIntegrators
      * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
      * respectively. $n$ is the outer normal vector and $\gamma$ is the usual
      * penalty parameter.
-     *
      */
     template <int dim, typename number>
     void
@@ -536,7 +534,6 @@ namespace LocalIntegrators
     }
     /**
      * Elasticity residual term for the symmetric interior penalty method.
-     *
      */
     template <int dim, typename number>
     void

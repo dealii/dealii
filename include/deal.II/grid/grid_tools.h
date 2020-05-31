@@ -255,7 +255,6 @@ namespace GridTools
    * n_active_cells but the aspect ratio is only computed for the cells that
    * are locally owned and placed at index CellAccessor::active_cell_index(),
    * respectively. All other values are set to 0.
-   *
    */
   template <int dim>
   Vector<double>
@@ -269,7 +268,6 @@ namespace GridTools
    * @note When running in parallel with a Triangulation that supports MPI,
    * this is a collective call and the return value is the maximum over all
    * processors.
-   *
    */
   template <int dim>
   double
@@ -310,7 +308,6 @@ namespace GridTools
    * the given @p object) but may only provide a few correct digits if the
    * object has high curvature. If your manifold supports it then the
    * specialized function Manifold::project_to_manifold() may perform better.
-   *
    */
   template <typename Iterator>
   Point<Iterator::AccessorType::space_dimension>
@@ -627,7 +624,6 @@ namespace GridTools
    *
    * @note In the case of parallel codes, this function should be combined
    * with GridGenerator::flatten_triangulation.
-   *
    */
   template <int dim, int spacedim>
   void
@@ -658,7 +654,6 @@ namespace GridTools
    * @note In the case of parallel codes, this function should be combined
    * with GridGenerator::flatten_triangulation and
    * GridTools::remove_hanging_nodes.
-   *
    */
   template <int dim, int spacedim>
   void
@@ -754,7 +749,6 @@ namespace GridTools
    *
    * @param[in] limit_angle_fraction Maximum ratio of angle or solid
    * angle that is allowed for a corner element in the mesh.
-   *
    */
   template <int dim, int spacedim>
   void
@@ -815,7 +809,6 @@ namespace GridTools
    * GridTools::Cache::get_cell_bounding_boxes_rtree(), which either returns
    * a cached rtree or builds and stores one. Building an rtree might hinder
    * the performance if the function is called only once on few points.
-   *
    */
   template <int dim, int spacedim>
 #  ifndef DOXYGEN
@@ -938,7 +931,6 @@ namespace GridTools
    * @endcode
    * The type is abbreviated in the online documentation to improve readability
    * of this page.
-   *
    */
   template <int dim, int spacedim>
 #  ifndef DOXYGEN
@@ -991,7 +983,6 @@ namespace GridTools
    * @ref ConceptMeshType "MeshType concept".
    * @param container The container to extract vertices from.
    * @param mapping The mapping to use to compute the points locations.
-   *
    */
   template <int dim, int spacedim>
   std::map<unsigned int, Point<spacedim>>
@@ -1007,7 +998,6 @@ namespace GridTools
    *        GridTools::extract_used_vertices().
    * @param p The target point.
    * @return The index of the vertex that is closest to the target point `p`.
-   *
    */
   template <int spacedim>
   unsigned int
@@ -1036,8 +1026,6 @@ namespace GridTools
    * Triangulation::n_vertices() for the triangulation underlying the given mesh
    * (as opposed to the value returned by Triangulation::n_used_vertices()).
    * @return The index of the closest vertex found.
-   *
-   *
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
@@ -1067,7 +1055,6 @@ namespace GridTools
    * Triangulation::n_vertices() for the triangulation underlying the given mesh
    * (as opposed to the value returned by Triangulation::n_used_vertices()).
    * @return The index of the closest vertex found.
-   *
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
@@ -1257,7 +1244,6 @@ namespace GridTools
    * `cell_hint`, and optionally an RTree constructed from the used
    * vertices of the Triangulation. All of these structures can be queried
    * from a GridTools::Cache object.
-   *
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
@@ -1313,7 +1299,6 @@ namespace GridTools
   /**
    * A version of the previous function that exploits an already existing
    * GridTools::Cache<dim,spacedim> object.
-   *
    */
   template <int dim, int spacedim>
   std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
@@ -1339,7 +1324,6 @@ namespace GridTools
    * the case the given point `p` coincides with a vertex or an edge, several
    * cells might hold independent values of the solution that get combined in
    * some way in a user code.
-   *
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
@@ -1462,7 +1446,6 @@ namespace GridTools
    * is a function that takes in an active cell and returns a boolean.
    * @return A list of active cells sharing at least one common vertex with
    * the predicated subdomain.
-   *
    */
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -1500,7 +1483,6 @@ namespace GridTools
    * @param[in] mesh A mesh (i.e. objects of type Triangulation, DoFHandler,
    * or hp::DoFHandler).
    * @return A list of ghost cells
-   *
    */
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -1554,7 +1536,6 @@ namespace GridTools
    * returns @p true.
    *
    * See compute_active_cell_halo_layer().
-   *
    */
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -1586,7 +1567,6 @@ namespace GridTools
    *
    * Also see compute_ghost_cell_halo_layer() and
    * compute_active_cell_layer_within_distance().
-   *
    */
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -1703,7 +1683,6 @@ namespace GridTools
    * @endcode
    * The type is abbreviated in the online documentation to improve readability
    * of this page.
-   *
    */
   template <int spacedim>
 #  ifndef DOXYGEN
@@ -1789,7 +1768,6 @@ namespace GridTools
    *
    * result[v][c] is a unit Tensor for vertex index v, indicating the direction
    * of the center of the c-th cell with respect to the vertex v.
-   *
    */
   template <int dim, int spacedim>
   std::vector<std::vector<Tensor<1, spacedim>>>
@@ -1806,7 +1784,6 @@ namespace GridTools
    * from the (optional) @p mapping argument, to guarantee that the correct
    * answer is returned when the underlying mapping modifies the position of the
    * vertices.
-   *
    */
   template <int dim, int spacedim>
   unsigned int
@@ -1842,7 +1819,6 @@ namespace GridTools
    * @return  A std::pair<unsigned int, double> such that the @p first value
    * is the dimension of the highest elongation and the @p second value is the
    * ratio among the dimensions of the @p cell.
-   *
    */
   template <int dim, int spacedim>
   std::pair<unsigned int, double>
@@ -2266,7 +2242,6 @@ namespace GridTools
    * ghost cells. For both, we know that these are in fact the real cells of
    * the complete, parallel triangulation. We can also query the degrees of
    * freedom on these.
-   *
    */
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
@@ -2293,7 +2268,6 @@ namespace GridTools
    * GridTools::get_patch_around_cell().
    * @return A list of cells with the coarsest common level of refinement of
    * the input cells.
-   *
    */
   template <class Container>
   std::vector<typename Container::cell_iterator>
@@ -2365,7 +2339,6 @@ namespace GridTools
    * @param[out] patch_to_global_tria_map A map between the local
    * triangulation which is built as explained above, and the cell iterators
    * in the input list.
-   *
    */
   template <class Container>
   void
@@ -2410,8 +2383,6 @@ namespace GridTools
    * degrees of freedom on locally relevant cells to vectors containing
    * DoFHandlerType::active_cell_iterators of cells in the support of the basis
    * function at that degree of freedom.
-   *
-   *
    */
   template <class DoFHandlerType>
   std::map<types::global_dof_index,
@@ -2530,7 +2501,6 @@ namespace GridTools
    * in the
    * @ref GlossFaceOrientation "glossary"
    * article.
-   *
    */
   template <typename FaceIterator>
   bool orthogonal_equality(
@@ -2612,7 +2582,6 @@ namespace GridTools
    * boundary indicators set. In general, this means that one must first set
    * all boundary indicators on the coarse grid before performing any global
    * or local grid refinement.
-   *
    */
   template <typename MeshType>
   void
@@ -2649,7 +2618,6 @@ namespace GridTools
    * @note This version of collect_periodic_faces() will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
-   *
    */
   template <typename MeshType>
   void
@@ -2688,7 +2656,6 @@ namespace GridTools
    *
    * @ingroup manifold
    * @relatesalso boundary
-   *
    */
   template <int dim, int spacedim>
   void
@@ -2715,7 +2682,6 @@ namespace GridTools
    *
    * @ingroup manifold
    * @relatesalso boundary
-   *
    */
   template <int dim, int spacedim>
   void
@@ -2753,7 +2719,6 @@ namespace GridTools
    * Triangulation. By default, face manifold_ids are not computed.
    *
    * @ingroup manifold
-   *
    */
   template <int dim, int spacedim>
   void
@@ -2783,7 +2748,6 @@ namespace GridTools
    * or face will maintain its original manifold indicator.
    * If it is @p false, then also the manifold indicator of these faces and edges
    * is set according to the return value of the @p disambiguation_function.
-   *
    */
   template <int dim, int spacedim>
   void
@@ -2939,7 +2903,6 @@ namespace GridTools
    * contains the bounding box.
    *
    * @note This function is a collective operation.
-   *
    */
   template <int spacedim>
   RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
@@ -2963,7 +2926,6 @@ namespace GridTools
    * @param[out] vertex_to_coinciding_vertex_group Map of a vertex to the label
    *             of a group of coinciding vertices. Vertices not contained in
    *             this vector are not coinciding with any other vertex.
-   *
    */
   template <int dim, int spacedim>
   void

@@ -40,7 +40,6 @@
  * usual cells meet in one vertex and local refinement exceeds one
  * level</td></tr>
  * </table>
- *
  */
 namespace TestGrids
 {

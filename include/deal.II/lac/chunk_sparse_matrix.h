@@ -416,7 +416,6 @@ namespace ChunkSparseMatrixIterators
  * section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename number>
 class ChunkSparseMatrix : public virtual Subscriptor

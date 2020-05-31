@@ -414,7 +414,6 @@ operator<<(LogStream &log, const T &t)
 
 /**
  * The standard log object of deal.II:
- *
  */
 extern LogStream deallog;
 

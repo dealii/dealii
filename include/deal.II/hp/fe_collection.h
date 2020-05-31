@@ -47,7 +47,6 @@ namespace hp
    * one case (<tt>spacedim != dim </tt>).
    *
    * @ingroup hp hpcollection
-   *
    */
   template <int dim, int spacedim = dim>
   class FECollection : public Subscriptor

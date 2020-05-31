@@ -43,7 +43,6 @@ namespace MeshWorker
    * - @tparam n_matrices: Size of the array of matrices
    * - @tparam n_vectors: size of the array of vectors
    * - @tparam n_dof_indices: size of the array of local dof indices
-   *
    */
   template <int n_matrices    = 1,
             int n_vectors     = n_matrices,

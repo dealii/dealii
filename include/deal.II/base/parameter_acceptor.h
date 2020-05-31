@@ -344,7 +344,6 @@ DEAL_II_NAMESPACE_OPEN
  * itself.
  *
  * See the tutorial program step-60 for an example on how to use this class.
- *
  */
 class ParameterAcceptor : public Subscriptor
 {
@@ -600,7 +599,6 @@ protected:
  * files.
  *
  * See the tutorial program step-60 for an example on how to use this class.
- *
  */
 template <class SourceClass>
 class ParameterAcceptorProxy : public SourceClass, public ParameterAcceptor

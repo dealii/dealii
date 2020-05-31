@@ -547,7 +547,6 @@ namespace internal
 
 /**
  * Declare dealii::PETScWrappers::MPI::BlockVector as distributed vector.
- *
  */
 template <>
 struct is_serial_vector<PETScWrappers::MPI::BlockVector> : std::false_type

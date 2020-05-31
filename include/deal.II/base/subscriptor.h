@@ -205,7 +205,6 @@ private:
    * This counter may be read from and written to concurrently in
    * multithreaded code: hence we use the <code>std::atomic</code> class
    * template.
-   *
    */
   mutable std::atomic<unsigned int> counter;
 

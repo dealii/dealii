@@ -81,7 +81,6 @@ namespace CUDAWrappers
    * double.
    *
    * @ingroup CUDAWrappers
-   *
    */
   template <int dim,
             int fe_degree,

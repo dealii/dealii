@@ -141,7 +141,6 @@ main(int argc, char **argv)
    * set_cellwise_color_set_and_fe_index. Now using material id,
    * each cell is associated with a map which assigns a color to a
    * particular enrichment function id.
-   *
    */
   auto cell = dof_handler.begin_active();
   auto endc = dof_handler.end();

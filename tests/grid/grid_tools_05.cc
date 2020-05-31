@@ -30,7 +30,6 @@
  * Generate a grid consisting of two disjoint cells, colorize the two
  * outermost faces. They will be matched via collect_periodic_faces.
  * Only default orientation is available for this function.
- *
  */
 
 /* The 2D case */

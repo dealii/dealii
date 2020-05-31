@@ -872,7 +872,6 @@ private:
  *     custom_function({&first_component, &second_component},
  *                     {&zero_gradient, &zero_gradient});
  * @endcode
- *
  */
 template <int dim, typename RangeNumberType = double>
 class FunctionFromFunctionObjects : public Function<dim, RangeNumberType>

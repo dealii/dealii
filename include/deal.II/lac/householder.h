@@ -74,7 +74,6 @@ class Vector;
  * section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename number>
 class Householder

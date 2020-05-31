@@ -97,7 +97,6 @@ DEAL_II_NAMESPACE_OPEN
  * If you wish to use these tools when the dimension of the space is two, then
  * make sure your CAD files are actually flat and that all z coordinates are
  * equal to zero, as otherwise you will get many exceptions.
- *
  */
 namespace OpenCASCADE
 {
@@ -288,7 +287,6 @@ namespace OpenCASCADE
    * @param[in] mapping Optional input mapping
    * @return An std::vector of TopoDS_Edge objects representing the smooth
    *  interpolation of the boundary of the `triangulation`
-   *
    */
   template <int spacedim>
   std::vector<TopoDS_Edge>

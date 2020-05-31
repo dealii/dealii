@@ -306,7 +306,6 @@ namespace SUNDIALS
    *
    * ode.solve_ode(y);
    * @endcode
-   *
    */
   template <typename VectorType = Vector<double>>
   class ARKode

@@ -57,7 +57,6 @@ namespace Utilities
        * 1) deliver only references to empty vectors (of size 0) the data to be
        * sent can be inserted to or read from, and 2) communicate these vectors
        * blindly.
-       *
        */
       template <typename T1, typename T2>
       class Process
@@ -162,7 +161,6 @@ namespace Utilities
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
-       *
        */
       template <typename T1, typename T2>
       class Interface
@@ -219,7 +217,6 @@ namespace Utilities
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
-       *
        */
       template <typename T1, typename T2>
       class NBX : public Interface<T1, T2>
@@ -357,7 +354,6 @@ namespace Utilities
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
-       *
        */
       template <typename T1, typename T2>
       class PEX : public Interface<T1, T2>
@@ -453,7 +449,6 @@ namespace Utilities
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
-       *
        */
       template <typename T1, typename T2>
       class Selector : public Interface<T1, T2>

@@ -41,7 +41,6 @@ DEAL_II_NAMESPACE_OPEN
  * class inherits most of its functionality from TensorProductPolynomials. It
  * works similarly to that class but adds a constant function for the last
  * index.
- *
  */
 template <int dim>
 class TensorProductPolynomialsConst : public ScalarPolynomialsBase<dim>

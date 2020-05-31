@@ -107,7 +107,6 @@ namespace internal
      * with several data fields for the individual quadrature formulas.
      *
      * @ingroup matrixfree
-     *
      */
     template <int structdim,
               int spacedim,
@@ -308,7 +307,6 @@ namespace internal
      * interiors for use in the matrix-free class.
      *
      * @ingroup matrixfree
-     *
      */
     template <int dim, typename Number, typename VectorizedArrayType>
     struct MappingInfo
@@ -515,7 +513,6 @@ namespace internal
     /**
      * A helper class to extract either cell or face data from mapping info
      * for use in FEEvaluationBase.
-     *
      */
     template <int, typename, bool, typename>
     struct MappingInfoCellsOrFaces;

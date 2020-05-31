@@ -674,7 +674,6 @@ public:
  * FlatManifold<dim,spacedim>::project_to_manifold() is the identity function.
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim>
 class FlatManifold : public Manifold<dim, spacedim>
@@ -942,7 +941,6 @@ private:
  * chartdim is 2.
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim, int chartdim = dim>
 class ChartManifold : public Manifold<dim, spacedim>

@@ -101,7 +101,6 @@ namespace SmoothnessEstimator
    * The rate of the decay $\sigma$ can be used to estimate the smoothness. For
    * example, one strategy to implement hp-refinement criteria is to perform
    * p-refinement if $\sigma>1$ (see @cite mavriplis1994hp).
-   *
    */
   namespace Legendre
   {

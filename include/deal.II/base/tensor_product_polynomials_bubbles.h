@@ -40,7 +40,6 @@ DEAL_II_NAMESPACE_OPEN
  * $(2*x_j-1)^{degree-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. This class inherits
  * most of its functionality from TensorProductPolynomials. The bubble
  * enrichments are added for the last indices. index.
- *
  */
 template <int dim>
 class TensorProductPolynomialsBubbles : public ScalarPolynomialsBase<dim>

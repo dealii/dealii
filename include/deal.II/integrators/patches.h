@@ -33,7 +33,6 @@ namespace LocalIntegrators
 {
   /**
    * @brief Integrators writing patches with values in quadrature points
-   *
    */
   namespace Patches
   {

@@ -48,7 +48,6 @@
  *
  * y[0](t) = sin(k t)
  * y[1](t) = k cos(k t)
- *
  */
 int
 main(int argc, char **argv)

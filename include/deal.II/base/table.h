@@ -69,7 +69,6 @@ namespace internal
    * should use explicitly in your programs (except, of course, through access
    * to the elements of tables with <tt>operator[]</tt>, which generates
    * temporary objects of the types of this namespace).
-   *
    */
   namespace TableBaseAccessors
   {
@@ -156,7 +155,6 @@ namespace internal
      * objects of this class, as they are only thought as temporaries for
      * access to elements of the table class, not for passing them around as
      * arguments of functions, etc.
-     *
      */
     template <int N, typename T, bool C, unsigned int P>
     class Accessor
@@ -234,7 +232,6 @@ namespace internal
      * rather than recursively returning access objects for further subsets.
      * The same holds for this specialization as for the general template; see
      * there for more information.
-     *
      */
     template <int N, typename T, bool C>
     class Accessor<N, T, C, 1>
@@ -3750,7 +3747,6 @@ Table<7, T>::operator()(const TableIndices<7> &indices)
  * Global function @p swap which overloads the default implementation of the
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two tables.
- *
  */
 template <int N, typename T>
 inline void

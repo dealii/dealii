@@ -57,7 +57,6 @@ namespace Utilities
      *
      * Currently the only place where one would use a ProcessGrid object is
      * in connection with a ScaLAPACKMatrix object.
-     *
      */
     class ProcessGrid
     {

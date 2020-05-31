@@ -170,8 +170,6 @@ namespace internal
  * can be obtained by connecting a function as a slot using @p
  * connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
  * will then be called from the solver with the estimates as argument.
- *
- *
  */
 template <class VectorType = Vector<double>>
 class SolverGMRES : public SolverBase<VectorType>
@@ -456,7 +454,6 @@ protected:
  * preconditioner less at each restart and at the end of solve().
  *
  * For more details see @cite Saad1991.
- *
  */
 template <class VectorType = Vector<double>>
 class SolverFGMRES : public SolverBase<VectorType>

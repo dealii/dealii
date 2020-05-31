@@ -108,7 +108,6 @@ namespace parallel
      * @note Currently only simple periodicity conditions (i.e. without offsets
      *       and rotation matrices - see also the documentation of
      *       GridTools::collect_periodic_faces()) are supported.
-     *
      */
     template <int dim, int spacedim = dim>
     class Triangulation

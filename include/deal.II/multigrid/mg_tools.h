@@ -45,7 +45,6 @@ class MGConstrainedDoFs;
  * in purpose and function to the @p DoFTools namespace, but operates on
  * levels of DoFHandler objects. See there and the documentation of the member
  * functions for more information.
- *
  */
 namespace MGTools
 {

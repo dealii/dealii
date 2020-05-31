@@ -104,7 +104,6 @@ public:
    * The parameter @p block_size is used for the block-cyclic distribution of the matrix.
    * An identical block size is used for the rows and columns of the matrix.
    * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
-   *
    */
   ScaLAPACKMatrix(
     const size_type                                           size,

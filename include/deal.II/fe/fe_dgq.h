@@ -105,7 +105,6 @@ class Quadrature;
  * The Gauss-Lobatto points in 1D include the end points 0 and +1 of the unit
  * interval. The interior points are shifted towards the end points, which
  * gives a denser point distribution close to the element boundary.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_DGQ : public FE_Poly<dim, spacedim>
@@ -392,7 +391,6 @@ private:
  * Gauss-Lobatto quadrature (provided through the base class).
  *
  * See the base class documentation in FE_DGQ for details.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_DGQArbitraryNodes : public FE_DGQ<dim, spacedim>
@@ -438,7 +436,6 @@ public:
  * elements are not interpolatory and no support points are defined.
  *
  * See the base class documentation in FE_DGQ for details.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_DGQLegendre : public FE_DGQ<dim, spacedim>
@@ -488,7 +485,6 @@ public:
  * usual Lagrange basis is constructed by this class.
  *
  * See the base class documentation in FE_DGQ for details.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_DGQHermite : public FE_DGQ<dim, spacedim>

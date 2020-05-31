@@ -146,7 +146,6 @@ namespace DataPostprocessorInputs
    *       }
    *   };
    * @endcode
-   *
    */
   template <int spacedim>
   struct CommonInputs
@@ -230,7 +229,6 @@ namespace DataPostprocessorInputs
    * makes available access to the locations of evaluations points,
    * normal vectors (if appropriate), and which cell data is currently
    * being evaluated on (also if appropriate).
-   *
    */
   template <int spacedim>
   struct Scalar : public CommonInputs<spacedim>
@@ -309,7 +307,6 @@ namespace DataPostprocessorInputs
    * makes available access to the locations of evaluations points,
    * normal vectors (if appropriate), and which cell data is currently
    * being evaluated on (also if appropriate).
-   *
    */
   template <int spacedim>
   struct Vector : public CommonInputs<spacedim>

@@ -78,7 +78,6 @@ DEAL_II_NAMESPACE_OPEN
  * @note Instantiations for this template are provided for dimensions 0, 1, 2,
  * and 3 (see the section on
  * @ref Instantiations).
- *
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -312,7 +311,6 @@ protected:
  *
  * @note Each constructor can only be used in the dimension matching the
  * number of arguments.
- *
  */
 template <int dim>
 class QAnisotropic : public Quadrature<dim>
@@ -360,7 +358,6 @@ public:
  * The aim of this class is to provide a low order formula, where the error
  * constant can be tuned by increasing the number of quadrature points. This
  * is useful in integrating non-differentiable functions on cells.
- *
  */
 template <int dim>
 class QIterated : public Quadrature<dim>

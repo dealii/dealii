@@ -253,7 +253,6 @@ DEAL_II_NAMESPACE_OPEN
  * The original paper for the P1 nonconforming element  by Park and Sheen
  * is accessible at https://doi.org/10.1137/S0036142902404923 ,
  * see @cite park2003p .
- *
  */
 class FE_P1NC : public FiniteElement<2, 2>
 {

@@ -548,7 +548,6 @@ namespace internal
     /**
      * Class that stores a pointer to a vector of type equal to the template
      * argument, and provides the functions to extract data from it.
-     *
      */
     template <typename DoFHandlerType, typename VectorType>
     class DataEntry : public DataEntryBase<DoFHandlerType>

@@ -38,13 +38,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A collection of %Gmsh related utilities and classes.
- *
  */
 namespace Gmsh
 {
   /**
    * A parameter class used to pass options to the %Gmsh executable.
-   *
    */
   class AdditionalParameters
   {
@@ -84,7 +82,6 @@ namespace Gmsh
    * %Gmsh.
    *
    * The input curve @p boundary should be closed.
-   *
    */
   template <int spacedim>
   void

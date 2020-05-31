@@ -89,7 +89,6 @@ namespace NonMatching
    *
    * See the tutorial program step-60 for an example on how to use this
    * function.
-   *
    */
   template <int dim0,
             int dim1,
@@ -115,7 +114,6 @@ namespace NonMatching
    * creating one internally. In this version of the function, the parameter @p
    * space_mapping cannot be specified, since it is taken from the @p cache
    * parameter.
-   *
    */
   template <int dim0,
             int dim1,
@@ -179,7 +177,6 @@ namespace NonMatching
    *
    * See the tutorial program step-60 for an example on how to use this
    * function.
-   *
    */
   template <int dim0, int dim1, int spacedim, typename Matrix>
   void
@@ -202,7 +199,6 @@ namespace NonMatching
    * creating one internally. In this version of the function, the parameter @p
    * space_mapping cannot specified, since it is taken from the @p cache
    * parameter.
-   *
    */
   template <int dim0, int dim1, int spacedim, typename Matrix>
   void
@@ -264,7 +260,6 @@ namespace NonMatching
    * as input (but a quadrature formula @p quad is required). In this case, more
    * restrictive conditions are required on the two spaces. See the
    * documentation of the other create_coupling_sparsity_pattern() function.
-   *
    */
   template <int dim0,
             int dim1,
@@ -329,7 +324,6 @@ namespace NonMatching
    * that the kernel is the Dirac delta distribution, and the call is forwarded
    * to the method in this namespace with the same name, that does not take an
    * epsilon as input.
-   *
    */
   template <int dim0, int dim1, int spacedim, typename Matrix>
   void

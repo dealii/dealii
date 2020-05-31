@@ -534,9 +534,6 @@ DEAL_II_NAMESPACE_OPEN
  * shape function 24 </td>
  *
  * <td align="center"> </td> </tr> </table>
- *
- *
- *
  */
 template <int dim>
 class FE_Q_Hierarchical : public FE_Poly<dim>

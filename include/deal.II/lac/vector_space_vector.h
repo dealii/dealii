@@ -50,7 +50,6 @@ namespace LinearAlgebra
    * implement global operations. This class is complementary of
    * ReadWriteVector which allows the access of individual elements but does
    * not allow global operations.
-   *
    */
   template <typename Number>
   class VectorSpaceVector

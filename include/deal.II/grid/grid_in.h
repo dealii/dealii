@@ -396,7 +396,6 @@ public:
    *
    * The companion GridOut::write_vtk function can be used to write VTK files
    * compatible with this method.
-   *
    */
   void
   read_vtk(std::istream &in);
@@ -414,7 +413,6 @@ public:
    * When this flag is set to true, the generated vtu file contains the
    * triangulation in a xml section which is ignored by vtu general vtu readers.
    * If this section is absent, an exception is thrown.
-   *
    */
   void
   read_vtu(std::istream &in);

@@ -99,7 +99,6 @@ class FullMatrix;
  *
  * @note The name of the class makes sense by pronouncing it the American way,
  *   where "EZ" is pronounced the same way as the word "easy".
- *
  */
 template <typename number>
 class SparseMatrixEZ : public Subscriptor

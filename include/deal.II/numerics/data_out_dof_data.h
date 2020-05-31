@@ -215,7 +215,6 @@ namespace internal
      * @note This class is an example of the
      * <a href="https://www.artima.com/cppsource/type_erasure.html">type
      * erasure</a> design pattern.
-     *
      */
     template <typename DoFHandlerType>
     class DataEntryBase

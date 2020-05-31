@@ -39,7 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  * In this namespace, we offer a few strategies that cope with this
  * problem. Such strategies can be passed to the CellDataTransfer and
  * parallel::distributed::CellDataTransfer constructors.
- *
  */
 namespace AdaptationStrategies
 {

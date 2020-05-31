@@ -264,7 +264,6 @@ DEAL_II_NAMESPACE_OPEN
  * can thus simply use the members already provided by
  * FiniteElement::InternalDataBase without adding anything in a derived class
  * in this class.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_DGPNonparametric : public FiniteElement<dim, spacedim>

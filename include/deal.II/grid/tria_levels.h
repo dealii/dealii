@@ -51,7 +51,6 @@ namespace internal
      * Likewise, in 3d, we need boundary indicators for lines and quads (we
      * need to know how to refine a line if the two adjacent faces have
      * different boundary indicators), and material data for cells.
-     *
      */
     class TriaLevel
     {

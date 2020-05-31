@@ -143,7 +143,6 @@ namespace Threads
    * A namespace in which helper functions and the like for the threading
    * subsystem are implemented. The members of this namespace are not meant
    * for public use.
-   *
    */
   namespace internal
   {

@@ -271,7 +271,6 @@ namespace internal
 /**
  * Implementation of transfer between the global vectors and the multigrid
  * levels for use in the derived class MGTransferPrebuilt and other classes.
- *
  */
 template <typename VectorType>
 class MGLevelGlobalTransfer : public MGTransferBase<VectorType>
@@ -434,7 +433,6 @@ private:
  * LinearAlgebra::distributed::Vector that requires a few different calling
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.
- *
  */
 template <typename Number>
 class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
@@ -659,7 +657,6 @@ private:
  *
  * See MGTransferBase to find out which of the transfer classes is best for
  * your needs.
- *
  */
 template <typename VectorType>
 class MGTransferPrebuilt : public MGLevelGlobalTransfer<VectorType>

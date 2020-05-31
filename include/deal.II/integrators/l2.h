@@ -52,7 +52,6 @@ namespace LocalIntegrators
      * @param fe The FEValues object describing the local trial function
      * space. #update_values and #update_JxW_values must be set.
      * @param factor A constant that multiplies the mass matrix.
-     *
      */
     template <int dim>
     void
@@ -104,7 +103,6 @@ namespace LocalIntegrators
      * @param weights The weights, $\omega(x)$, evaluated at the quadrature
      * points in the finite element (size must be equal to the number of
      * quadrature points in the element).
-     *
      */
     template <int dim>
     void
@@ -156,7 +154,6 @@ namespace LocalIntegrators
      * points in the finite element (size must be equal to the number of
      * quadrature points in the element).
      * @param factor A constant that multiplies the result.
-     *
      */
     template <int dim, typename number>
     void
@@ -187,7 +184,6 @@ namespace LocalIntegrators
      * at the quadrature points in the finite element (size of each component
      * must be equal to the number of quadrature points in the element).
      * @param factor A constant that multiplies the result.
-     *
      */
     template <int dim, typename number>
     void
@@ -236,7 +232,6 @@ namespace LocalIntegrators
      * first cell.
      * @param factor2 A constant that multiplies the shape functions for the
      * second cell.
-     *
      */
     template <int dim>
     void

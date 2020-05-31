@@ -1158,7 +1158,6 @@ LaplaceProblem<dim>::initialize()
    * set up basic grid which is a hyper cube or hyper ball based on
    * parameter file. Refine as per the global refinement value in the
    * parameter file.
-   *
    */
   if (prm.shape == 1)
     GridGenerator::hyper_cube(triangulation, -prm.size / 2.0, prm.size / 2.0);

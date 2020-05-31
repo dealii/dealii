@@ -432,7 +432,6 @@ namespace TrilinosWrappers
   /**
    * An implementation of the solver interface using the Trilinos GMRES
    * solver.
-   *
    */
   class SolverGMRES : public SolverBase
   {

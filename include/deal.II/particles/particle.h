@@ -139,7 +139,6 @@ namespace Particles
    * difficult to write either.
    *
    * @ingroup Particle
-   *
    */
   template <int dim, int spacedim = dim>
   class Particle

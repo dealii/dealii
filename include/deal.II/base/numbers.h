@@ -55,7 +55,6 @@ namespace internal
    *
    * @tparam Number The underlying data type for which one wants to find out
    *   the maximal length of hardware supported vectors.
-   *
    */
   template <typename Number>
   struct VectorizedArrayWidthSpecifier
@@ -71,7 +70,6 @@ namespace internal
    * for the data type `double` for the given processor architecture and
    * optimization level. For a detailed description of supported maximal vector
    * lengths, see the documentation of VectorizedArray.
-   *
    */
   template <>
   struct VectorizedArrayWidthSpecifier<double>
@@ -96,7 +94,6 @@ namespace internal
    * for the data type `float` for the given processor architecture and
    * optimization level. For a detailed description of supported maximal vector
    * lengths, see the documentation of VectorizedArray.
-   *
    */
   template <>
   struct VectorizedArrayWidthSpecifier<float>
@@ -412,7 +409,6 @@ namespace numbers
    * types and complex number types. This template is mostly used to implement
    * linear algebra classes such as vectors and matrices that work for both
    * real and complex numbers.
-   *
    */
   template <typename number>
   struct NumberTraits
@@ -475,7 +471,6 @@ namespace numbers
   /**
    * Specialization of the general NumberTraits class that provides the
    * relevant information if the underlying data type is std::complex<T>.
-   *
    */
   template <typename number>
   struct NumberTraits<std::complex<number>>

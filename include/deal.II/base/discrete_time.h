@@ -227,7 +227,6 @@ DEAL_II_NAMESPACE_OPEN
  *   // } end snapshot stage
  * }
  * @endcode
- *
  */
 class DiscreteTime
 {

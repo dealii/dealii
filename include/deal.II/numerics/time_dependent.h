@@ -357,8 +357,6 @@ class Triangulation;
  *         timesteps[step-look_back]->sleep(look_back);
  *   }
  * @endcode
- *
- *
  */
 class TimeDependent
 {
@@ -663,7 +661,6 @@ private:
  * functions (namely @p sleep and @p wake_up), the interface to previous and
  * following grids, and some functions to be called before a new loop over all
  * time steps is started.
- *
  */
 class TimeStepBase : public Subscriptor
 {
@@ -954,7 +951,6 @@ private:
  * TimeStepBase_Tria() class. These used to be local data types of that class,
  * but some compilers choked on some aspects, so we put them into a namespace
  * of their own.
- *
  */
 namespace TimeStepBase_Tria_Flags
 {

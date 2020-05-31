@@ -532,7 +532,6 @@ namespace internal
 
 /**
  * Declare dealii::BlockVector as serial vector.
- *
  */
 template <typename Number>
 struct is_serial_vector<BlockVector<Number>> : std::true_type

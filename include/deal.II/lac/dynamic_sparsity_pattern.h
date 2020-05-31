@@ -61,7 +61,6 @@ namespace DynamicSparsityPatternIterators
    * row and column number (or alternatively the index within the complete
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
-   *
    */
   class Accessor
   {
@@ -315,7 +314,6 @@ namespace DynamicSparsityPatternIterators
  * SparsityPattern sp;
  * sp.copy_from (dynamic_pattern);
  * @endcode
- *
  */
 class DynamicSparsityPattern : public Subscriptor
 {

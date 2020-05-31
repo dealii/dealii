@@ -253,7 +253,6 @@ namespace VectorTools
      * @f[
      *   E = \| \nabla e \|_{L^\infty}.
      * @f]
-     *
      */
     W1infty_seminorm,
 

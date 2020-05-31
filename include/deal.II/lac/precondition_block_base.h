@@ -53,7 +53,6 @@ class Vector;
  * Additionally, it allows the storage of the original diagonal blocks, not
  * only the inverses. These are for instance used in the intermediate step of
  * the SSOR preconditioner.
- *
  */
 template <typename number>
 class PreconditionBlockBase

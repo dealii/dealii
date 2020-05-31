@@ -33,7 +33,6 @@ DEAL_II_NAMESPACE_OPEN
  * described in <a
  * href="http://en.wikipedia.org/wiki/Numerical_Recipes">Numerical
  * Recipes</a>.
- *
  */
 template <int dim>
 class QGauss : public Quadrature<dim>
@@ -68,7 +67,6 @@ public:
  * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions @sa
  * Karniadakis, G.E. and Sherwin, S.J.: Spectral/hp element methods for
  * computational fluid dynamics. Oxford: Oxford University Press, 2005
- *
  */
 template <int dim>
 class QGaussLobatto : public Quadrature<dim>
@@ -117,7 +115,6 @@ public:
  * misnomer results from the fact that its original authors' poor English
  * language skills led them to translate the name incorrectly from the German
  * "Trapezregel".
- *
  */
 template <int dim>
 class QTrapez : public Quadrature<dim>
@@ -457,7 +454,6 @@ private:
  *
  * The weights and functions for Gauss Legendre formula have been tabulated up
  * to order 12.
- *
  */
 template <int dim>
 class QTelles : public Quadrature<dim>
@@ -488,7 +484,6 @@ public:
  * the integral $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) =
  * 1/\sqrt{x(1-x)}$. For details see: M. Abramowitz & I.A. Stegun: Handbook of
  * Mathematical Functions, par. 25.4.38
- *
  */
 template <int dim>
 class QGaussChebyshev : public Quadrature<dim>
@@ -512,7 +507,6 @@ public:
  * with the left endpoint as quadrature node, but the quadrature node can be
  * imposed at the right endpoint through the variable ep that can assume the
  * values left or right.
- *
  */
 template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
@@ -558,7 +552,6 @@ private:
  * $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) = 1/\sqrt{x(1-x)}$. For
  * details see: M. Abramowitz & I.A. Stegun: Handbook of Mathematical
  * Functions, par. 25.4.40
- *
  */
 template <int dim>
 class QGaussLobattoChebyshev : public Quadrature<dim>
@@ -597,7 +590,6 @@ public:
  * singularities at certain points, or functions that present jumps along a
  * co-dimension one surface inside the reference element, like in the extended
  * finite element method (XFEM).
- *
  */
 template <int dim>
 class QSimplex : public Quadrature<dim>
@@ -656,7 +648,6 @@ public:
  *  \end{pmatrix}
  *  \qquad \theta \dealcoloneq \frac\pi 2 \hat y
  * \f]
- *
  */
 class QTrianglePolar : public QSimplex<2>
 {
@@ -711,7 +702,6 @@ public:
  *
  * When $\beta = 1$, this transformation is also known as the Lachat-Watson
  * transformation.
- *
  */
 class QDuffy : public QSimplex<2>
 {
@@ -747,7 +737,6 @@ public:
 /**
  * A quadrature to use when the cell should be split into subregions to
  * integrate using one or more base quadratures.
- *
  */
 template <int dim>
 class QSplit : public Quadrature<dim>

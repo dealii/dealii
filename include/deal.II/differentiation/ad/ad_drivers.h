@@ -143,7 +143,6 @@ namespace Differentiation
      *         from, operations performed with auto-differentiable numbers.
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
-     *
      */
     template <typename ADNumberType, typename ScalarType, typename T = void>
     struct TapedDrivers
@@ -514,7 +513,6 @@ namespace Differentiation
      *         from, operations performed with auto-differentiable numbers.
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
-     *
      */
     template <typename ADNumberType, typename ScalarType, typename T = void>
     struct TapelessDrivers

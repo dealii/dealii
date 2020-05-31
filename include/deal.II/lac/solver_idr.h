@@ -111,7 +111,6 @@ namespace internal
  * iteration. If the user enables the history data, the residual at each of
  * these steps is stored and therefore there will be multiple values per
  * iteration.
- *
  */
 template <class VectorType = Vector<double>>
 class SolverIDR : public SolverBase<VectorType>

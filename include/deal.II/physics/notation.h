@@ -281,7 +281,6 @@ namespace Physics
      * wikipedia page</a> and <a
      * href="https://github.com/dealii/dealii/tree/master/tests/physics/notation-kelvin_02.cc">the
      * unit tests</a>.
-     *
      */
     namespace Kelvin
     {

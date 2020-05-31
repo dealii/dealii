@@ -107,7 +107,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ref matrixfree "matrix-free module".
  *
  * @ingroup matrixfree
- *
  */
 
 template <int dim,

@@ -419,7 +419,6 @@ public:
    * Consequently, the derived DoFCellAccessor class has an overloaded version
    * of this function that calls the present function with
    * <code>cell-@>active_fe_index</code> as last argument.
-   *
    */
   void
   get_dof_indices(
@@ -759,7 +758,6 @@ private:
  * cell in spacedim space dimensions. Since vertices function differently than
  * general faces, this class does a few things differently than the general
  * template, but the interface should look the same.
- *
  */
 template <template <int, int> class DoFHandlerType,
           int  spacedim,

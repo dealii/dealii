@@ -326,7 +326,6 @@ namespace LinearAlgebra
        * i.e., whenever a non-zero ghost element is found, it is compared to
        * the value on the owning processor and an exception is thrown if these
        * elements do not agree.
-       *
        */
       virtual void
       compress(::dealii::VectorOperation::values operation) override;
@@ -721,7 +720,6 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
 /**
  * Declare dealii::LinearAlgebra::distributed::BlockVector as distributed
  * vector.
- *
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>>

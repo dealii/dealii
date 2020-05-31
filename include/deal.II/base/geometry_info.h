@@ -412,7 +412,6 @@ namespace internal
  * Since the ability to identify such objects with the integral dimension of
  * the object represented, this class provides conversion operators to and
  * from unsigned integers.
- *
  */
 class GeometryPrimitive
 {

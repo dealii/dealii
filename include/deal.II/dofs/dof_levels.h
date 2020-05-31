@@ -64,7 +64,6 @@ namespace internal
      * setter functions. Knowledge of the actual data format is therefore
      * encapsulated to the present hierarchy of classes as well as the
      * dealii::DoFHandler class.
-     *
      */
     template <int dim>
     class DoFLevel

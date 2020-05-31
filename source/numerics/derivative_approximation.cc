@@ -73,7 +73,6 @@ namespace DerivativeApproximation
      * finite difference approximation to the gradient on a cell. See the
      * general documentation of this class for more information on
      * implementation details.
-     *
      */
     template <int dim>
     class Gradient
@@ -185,7 +184,6 @@ namespace DerivativeApproximation
      * finite difference approximation to the second derivatives on a cell. See
      * the general documentation of this class for more information on
      * implementational details.
-     *
      */
     template <int dim>
     class SecondDerivative

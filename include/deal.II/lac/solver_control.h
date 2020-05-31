@@ -61,7 +61,6 @@ class ParameterHandler;
  * not be achieved or at least was not achieved within the given maximal
  * number of iterations.
  * </ul>
- *
  */
 class SolverControl : public Subscriptor
 {
@@ -420,7 +419,6 @@ protected:
  * is 1% and the tolerance is 0.1%. The initial residual is 2.5. The process
  * will break if 20 iteration are completed or the new residual is less then
  * 2.5*1% or if it is less then 0.1%.
- *
  */
 class ReductionControl : public SolverControl
 {
@@ -509,7 +507,6 @@ protected:
  * class and the solver terminates similarly when one of the given tolerance
  * or the maximum iteration count were reached. The only difference to
  * SolverControl is that the solver returns success in the latter case.
- *
  */
 class IterationNumberControl : public SolverControl
 {
@@ -563,7 +560,6 @@ public:
  * the tolerance is 0.2. The ConsecutiveControl will return
  * SolverControl::State::success only at the last step in the sequence 0.5,
  * 0.0005, 1.0, 0.05, 0.01.
- *
  */
 class ConsecutiveControl : public SolverControl
 {

@@ -63,7 +63,6 @@ namespace internal
      * setter functions. Knowledge of the actual data format is therefore
      * encapsulated to the present hierarchy of classes as well as the
      * dealii::DoFHandler class.
-     *
      */
     template <int dim>
     class DoFFaces
@@ -79,7 +78,6 @@ namespace internal
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would
      * be vertices, which are treated separately, don't do anything.
-     *
      */
     template <>
     class DoFFaces<1>
@@ -104,7 +102,6 @@ namespace internal
     /**
      * Store the indices of degrees of freedom on faces in 2D, which are
      * lines.
-     *
      */
     template <>
     class DoFFaces<2>
@@ -134,7 +131,6 @@ namespace internal
     /**
      * Store the indices of degrees of freedom on faces in 3D, which are
      * quads, additionally also on lines.
-     *
      */
     template <>
     class DoFFaces<3>

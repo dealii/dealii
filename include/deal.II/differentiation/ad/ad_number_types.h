@@ -30,7 +30,6 @@ namespace Differentiation
      * An enumeration to indicate which type of auto-differentiable number
      * is to be used for computations. If a type that is selected for use
      * is not available in the library, a run-time error will be thrown.
-     *
      */
     enum class NumberTypes
     {

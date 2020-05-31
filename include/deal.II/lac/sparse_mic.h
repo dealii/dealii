@@ -113,7 +113,6 @@ public:
    * Call @p initialize before calling this function.
    *
    * @note This function has not yet been implemented
-   *
    */
   template <typename somenumber>
   void

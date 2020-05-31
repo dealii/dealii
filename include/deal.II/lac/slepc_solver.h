@@ -374,7 +374,6 @@ namespace SLEPcWrappers
    * solver. Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverKrylovSchur : public SolverBase
   {
@@ -407,7 +406,6 @@ namespace SLEPcWrappers
    * Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverArnoldi : public SolverBase
   {
@@ -451,7 +449,6 @@ namespace SLEPcWrappers
    * Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverLanczos : public SolverBase
   {
@@ -496,7 +493,6 @@ namespace SLEPcWrappers
    * Usage: Largest values of spectrum only, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverPower : public SolverBase
   {
@@ -529,7 +525,6 @@ namespace SLEPcWrappers
    * solver. Usage: All problem types.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverGeneralizedDavidson : public SolverBase
   {
@@ -573,7 +568,6 @@ namespace SLEPcWrappers
    * solver. Usage: All problem types.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverJacobiDavidson : public SolverBase
   {
@@ -607,7 +601,6 @@ namespace SLEPcWrappers
    * solver.
    *
    * @ingroup SLEPcWrappers
-   *
    */
   class SolverLAPACK : public SolverBase
   {

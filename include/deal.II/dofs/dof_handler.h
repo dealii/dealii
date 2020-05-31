@@ -876,7 +876,6 @@ public:
    * @pre level must be less than this->n_levels().
    *
    * @ingroup CPP11
-   *
    */
   IteratorRange<level_cell_iterator>
   mg_cell_iterators_on_level(const unsigned int level) const;

@@ -767,7 +767,6 @@ namespace Patterns
    *
    * The default separator is a colon, owing to the fact that a pair is in fact
    * a tuple with two elements.
-   *
    */
   class Tuple : public PatternBase
   {
@@ -1295,7 +1294,6 @@ namespace Patterns
      * The second template parameter is used internally to allow for advanced
      * SFINAE (substitution failure is not an error) tricks used to specialise
      * this class for arbitrary STL containers and maps.
-     *
      */
     template <class T, class Enable = void>
     struct Convert
@@ -1359,7 +1357,6 @@ namespace Patterns
      * See the documentation of the class Patterns::Tools::Convert, and of the
      * helper class Patterns::Tools::RankInfo for details on the way separators
      * are selected when outputting STL container types.
-     *
      */
     template <typename T>
     std::string
@@ -1389,7 +1386,6 @@ namespace Patterns
      * Notice that the current content of variable @p t is ignored. Its type is
      * used to infer how to interpret the string. If the string is successfully
      * parsed, then @p t will be set to the parsed content of @p s.
-     *
      */
     template <typename T>
     void
@@ -1475,7 +1471,6 @@ namespace Patterns
        * elementary types, like Point(), or std::complex<double>, are compatible
        * with the List type. Adding more compatible types is a matter of adding
        * a specialization of this struct for the given type.
-       *
        */
       template <class T, class Enable = void>
       struct RankInfo

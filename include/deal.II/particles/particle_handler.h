@@ -294,7 +294,6 @@ namespace Particles
      * of the points that were passed to this function on the calling mpi
      * process, and that falls within the part of triangulation owned by this
      * mpi process.
-     *
      */
     std::map<unsigned int, IndexSet>
     insert_global_particles(
@@ -345,7 +344,6 @@ namespace Particles
      * @param[in] displace_particles Control if the @p input_vector should
      * be interpreted as a displacement vector, or a vector of absolute
      * positions.
-     *
      */
     template <class VectorType>
     typename std::enable_if<
@@ -373,7 +371,6 @@ namespace Particles
      * current position of the particle, thus displacing them by the
      * amount given by the function. When false, the position of the
      * particle is replaced by the value in the vector.
-     *
      */
     void
     set_particle_positions(const std::vector<Point<spacedim>> &new_positions,
@@ -397,7 +394,6 @@ namespace Particles
      * of the function to the current position of the particle, thus displacing
      * them by the amount given by the function. When false, the position of the
      * particle is replaced by the value of the function.
-     *
      */
     void
     set_particle_positions(const Function<spacedim> &function,
@@ -429,7 +425,6 @@ namespace Particles
      *
      * @param[in] add_to_output_vector Control if the function should set the
      * entries of the @p output_vector or if should add to them.
-     *
      */
     template <class VectorType>
     void
@@ -449,8 +444,6 @@ namespace Particles
      * the particles is added to the positions vector. When false,
      * the value of the points in the positions vector are replaced by the
      * position of the particles.
-     *
-     *
      */
     void
     get_particle_positions(std::vector<Point<spacedim>> &positions,
@@ -540,7 +533,6 @@ namespace Particles
      *
      * @return An IndexSet of size get_next_free_particle_index(), containing
      * n_locally_owned_particle() indices.
-     *
      */
     IndexSet
     locally_relevant_ids() const;

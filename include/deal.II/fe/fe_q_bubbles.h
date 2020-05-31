@@ -78,7 +78,6 @@ DEAL_II_NAMESPACE_OPEN
  * whose support points are at the vertices, then on the line, on the quads,
  * and finally (for 3d) on the hexes. Finally, there are support points for
  * the bubble enrichments in the middle of the cell.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_Q_Bubbles
@@ -88,7 +87,6 @@ public:
   /**
    * Constructor for tensor product polynomials of degree @p p plus bubble
    * enrichments
-   *
    */
   FE_Q_Bubbles(const unsigned int p);
 

@@ -34,7 +34,6 @@ DEAL_II_NAMESPACE_OPEN
  * or OutputOperator, depending on whether they return a value or not. See the
  * documentation of those classes for more detailed information on how to use
  * them.
- *
  */
 namespace Algorithms
 {
@@ -63,7 +62,6 @@ namespace Algorithms
    * the solution when the function returns. The object <tt>in</tt> is
    * providing additional information and forwarded to the inner Operator
    * objects of the nested iteration.
-   *
    */
   class OperatorBase : public Subscriptor
   {
@@ -102,7 +100,6 @@ namespace Algorithms
   /**
    * An unary operator base class, intended to output the vectors in AnyData
    * in each step of an iteration.
-   *
    */
   template <typename VectorType>
   class OutputOperator : public Subscriptor

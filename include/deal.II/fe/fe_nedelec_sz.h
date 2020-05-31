@@ -68,7 +68,6 @@ DEAL_II_NAMESPACE_OPEN
  * problem for hp-hexahedral N&eacute;d&eacute;lec elements with application to
  * eddy current problems</b>, Computers & Structures 181, 41-54, 2017 (see
  * https://doi.org/10.1016/j.compstruc.2016.05.021).
- *
  */
 template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
@@ -311,7 +310,6 @@ protected:
      *
      * These values change with the orientation of the edges of a physical cell
      * and so must take the "sign" into account when used for computation.
-     *
      */
     std::vector<std::vector<double>> edge_sigma_grads;
 

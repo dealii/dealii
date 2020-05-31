@@ -122,8 +122,6 @@ DEAL_II_NAMESPACE_OPEN
  * The points needed are those of QGauss<sub>k+1</sub> on each face as well as
  * QGauss<sub>k+1</sub> in the interior of the cell (or none for
  * RT<sub>0</sub>).
- *
- *
  */
 template <int dim>
 class FE_RaviartThomas : public FE_PolyTensor<dim>
@@ -263,7 +261,6 @@ private:
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the constructor
  * argument!
- *
  */
 template <int dim>
 class FE_RaviartThomasNodal : public FE_PolyTensor<dim>

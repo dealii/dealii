@@ -239,7 +239,6 @@ namespace DataOutBase
    * <tt>2<sup>dim</sup></tt>.
    *
    * @ingroup output
-   *
    */
   template <int dim, int spacedim = dim>
   struct Patch
@@ -387,7 +386,6 @@ namespace DataOutBase
    * member variable that make no sense for zero-dimensional patches because
    * points have no natural neighbors across their non-existent faces, nor
    * can they reasonably be subdivided.
-   *
    */
   template <int spacedim>
   struct Patch<0, spacedim>
@@ -2160,7 +2158,6 @@ namespace DataOutBase
    * references other files. For example, it could be the name for a
    * <code>.pvtu</code> file that references multiple parts of a parallel
    * computation.
-   *
    */
   void
   write_pvd_record(
@@ -2798,7 +2795,6 @@ public:
    *
    * @note Use an empty string "" for the first argument if output is to be
    * written in the current working directory.
-   *
    */
   std::string
   write_vtu_with_pvtu_record(
@@ -3445,7 +3441,6 @@ namespace DataOutBase
    * operator dumps the intermediate graphics format represented by the patch
    * data structure. It may later be converted into regular formats for a
    * number of graphics programs.
-   *
    */
   template <int dim, int spacedim>
   std::ostream &
@@ -3458,7 +3453,6 @@ namespace DataOutBase
    * operator reads the intermediate graphics format represented by the patch
    * data structure, using the format in which it was written using the
    * operator<<.
-   *
    */
   template <int dim, int spacedim>
   std::istream &

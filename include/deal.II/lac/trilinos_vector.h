@@ -2245,7 +2245,6 @@ namespace internal
 
 /**
  * Declare dealii::TrilinosWrappers::MPI::Vector as distributed vector.
- *
  */
 template <>
 struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type

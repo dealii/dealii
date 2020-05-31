@@ -54,7 +54,6 @@ DEAL_II_NAMESPACE_OPEN
  * section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>

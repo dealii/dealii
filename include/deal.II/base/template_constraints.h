@@ -194,7 +194,6 @@ struct constraint_and_return_value;
  * the second type in the template.
  *
  * @deprecated Use std::enable_if instead.
- *
  */
 template <typename T>
 struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
@@ -260,7 +259,6 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
  *   forward_call(&h, 1);
  * }
  * @endcode
- *
  */
 template <typename T>
 struct identity
@@ -285,7 +283,6 @@ struct identity
  * This class implements a comparison function that always returns @p false if
  * the types of its two arguments are different, and returns <tt>p1 == p2</tt>
  * otherwise.
- *
  */
 struct PointerComparison
 {
@@ -354,7 +351,6 @@ namespace internal
    * that specialization of this class is only made for unqualified (fully
    * stripped) types and that the ProductType class be used to determine the
    * result of operating with (potentially) qualified types.
-   *
    */
   template <typename T, typename U>
   struct ProductTypeImpl
@@ -411,7 +407,6 @@ namespace internal
  * In all of these cases, this type is used to identify which type needs to be
  * used for the result of computing the product of unknowns and the values,
  * gradients, or other properties of shape functions.
- *
  */
 template <typename T, typename U>
 struct ProductType
@@ -522,7 +517,6 @@ namespace internal
  * It also allows the declaration of overloads of a function such as @p
  * multiply for different types of arguments, without resulting in ambiguous
  * call errors by the compiler.
- *
  */
 template <typename T>
 struct EnableIfScalar;

@@ -194,7 +194,6 @@ namespace hp
    *
    * @ingroup dofs
    * @ingroup hp
-   *
    */
   template <int dim, int spacedim = dim>
   class DoFHandler : public Subscriptor

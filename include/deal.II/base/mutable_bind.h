@@ -77,7 +77,6 @@ namespace Utilities
    *  exp.parse_arguments("3.0 : 4");
    *  exp(); // calls example_function(p, 3.0, 4);
    * @endcode
-   *
    */
   template <typename ReturnType, class... FunctionArgs>
   class MutableBind
@@ -183,7 +182,6 @@ namespace Utilities
    * bound.parse_arguments("3: 4.0");
    * bound(); // will execute my_function(3, 4.0);
    * @endcode
-   *
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>

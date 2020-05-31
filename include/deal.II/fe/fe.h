@@ -673,7 +673,6 @@ public:
    * derived class that wants to store information computed once at the
    * beginning, needs to derive its own InternalData class from this class,
    * and return an object of the derived type through its get_data() function.
-   *
    */
   class InternalDataBase
   {

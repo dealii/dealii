@@ -1292,7 +1292,6 @@ public:
    *
    * The companion GridIn::read_vtk function can be used to read VTK files
    * generated with this method.
-   *
    */
   template <int dim, int spacedim>
   void

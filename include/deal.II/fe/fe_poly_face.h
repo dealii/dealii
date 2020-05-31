@@ -52,7 +52,6 @@ DEAL_II_NAMESPACE_OPEN
  * are several pure virtual functions declared in the FiniteElement class
  * which cannot be implemented by this class but are left for implementation
  * in derived classes.
- *
  */
 template <class PolynomialType,
           int dim      = PolynomialType::dimension + 1,

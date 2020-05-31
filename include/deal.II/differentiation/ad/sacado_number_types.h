@@ -32,7 +32,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a
      * Sacado number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
-     *
      */
     template <typename NumberType, typename = void>
     struct is_sacado_number : std::false_type
@@ -43,7 +42,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a supported Sacado::Fad
      * number or not. By default, numbers are not considered to have the
      * necessary characteristics to fulfill this condition.
-     *
      */
     template <typename NumberType, typename = void>
     struct is_sacado_dfad_number : std::false_type
@@ -54,7 +52,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a supported Sacado::Rad
      * number or not. By default, numbers are not considered to have the
      * necessary characteristics to fulfill this condition.
-     *
      */
     template <typename NumberType, typename = void>
     struct is_sacado_rad_number : std::false_type
@@ -103,7 +100,6 @@ namespace Differentiation
        * implementation details of a @p SacadoNumber. It defines
        * various number types, and records how many levels of
        * differentiation the number is able to support.
-       *
        */
       template <typename SacadoNumber, typename = void>
       struct SacadoNumberInfo;
@@ -376,7 +372,6 @@ namespace Differentiation
        * A struct to help extract certain information associated with
        * Sacado dynamic reverse auto-differentiable numbers. The @p NumberType
        * can be either a floating point number or another Sacado type.
-       *
        */
       template <typename NumberType>
       struct ExtractData<Sacado::Fad::DFad<NumberType>>
@@ -427,7 +422,6 @@ namespace Differentiation
        * A struct to help extract certain information associated with
        * Sacado dynamic reverse auto-differentiable numbers. The @p NumberType
        * can be either a floating point number or another Sacado type.
-       *
        */
       template <typename NumberType>
       struct ExtractData<Sacado::Rad::ADvar<NumberType>>

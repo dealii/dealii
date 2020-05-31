@@ -31,7 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * An alias for boost::geometry::model::segment that uses the deal.II
  * Point class.
- *
  */
 template <int dim>
 using Segment = boost::geometry::model::segment<Point<dim>>;

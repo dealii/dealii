@@ -121,7 +121,6 @@ enum class NeighborType
  *
  * This is according to the convention set by the function
  * <code>coordinate_to_one_dim_higher</code>.
- *
  */
 template <int spacedim, typename Number = double>
 class BoundingBox

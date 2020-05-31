@@ -107,7 +107,6 @@ namespace TrilinosWrappers
      * For a regular dealii::SparseMatrix, we would use an accessor for the
      * sparsity pattern. For Trilinos matrices, this does not seem so simple,
      * therefore, we write a little base class here.
-     *
      */
     class AccessorBase
     {
@@ -1789,7 +1788,6 @@ namespace TrilinosWrappers
     //@}
     /**
      * @addtogroup Exceptions
-     *
      */
     //@{
     /**

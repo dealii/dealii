@@ -57,7 +57,6 @@ namespace internal
      * would otherwise occur if trying to directly implement
      * these as specializations of the ProductTypeImpl class
      * itself.
-     *
      */
     template <typename T, typename U, typename V = void>
     struct GeneralProductTypeImpl;

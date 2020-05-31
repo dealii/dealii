@@ -118,7 +118,6 @@ namespace internal
  * The solve() function of this class uses the mechanism described in the
  * Solver base class to determine convergence. This mechanism can also be used
  * to observe the progress of the iteration.
- *
  */
 template <typename VectorType = Vector<double>>
 class SolverBicgstab : public SolverBase<VectorType>,

@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * adding to the abstract interface in MGSmootherBase, this class stores
  * information on the number and type of smoothing steps, which in turn can be
  * used by a derived class.
- *
  */
 template <typename VectorType>
 class MGSmoother : public MGSmootherBase<VectorType>
@@ -134,7 +133,6 @@ protected:
  * other than for testing some multigrid procedures. Also some applications
  * might get convergence without smoothing and then this class brings you the
  * cheapest possible multigrid.
- *
  */
 template <typename VectorType>
 class MGSmootherIdentity : public MGSmootherBase<VectorType>
@@ -180,7 +178,6 @@ namespace mg
    * the possibility to extract a single block for smoothing. In this case,
    * the multigrid method must be used only with the vector associated to that
    * single block.
-   *
    */
   template <class RelaxationType, typename VectorType>
   class SmootherRelaxation : public MGLevelObject<RelaxationType>,
@@ -292,7 +289,6 @@ namespace mg
  * <tt>Vector<.></tt>, where the template arguments are all combinations of @p
  * float and @p double. Additional instantiations may be created by including
  * the file mg_smoother.templates.h.
- *
  */
 template <typename MatrixType, class RelaxationType, typename VectorType>
 class MGSmootherRelaxation : public MGSmoother<VectorType>
@@ -443,7 +439,6 @@ private:
  * <tt>Vector<.></tt>, where the template arguments are all combinations of @p
  * float and @p double. Additional instantiations may be created by including
  * the file mg_smoother.templates.h.
- *
  */
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
 class MGSmootherPrecondition : public MGSmoother<VectorType>

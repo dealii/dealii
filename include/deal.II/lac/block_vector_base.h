@@ -60,7 +60,6 @@ class BlockVectorBase;
  * is true. This is sometimes useful in template contexts where we may want to
  * do things differently depending on whether a template type denotes a
  * regular or a block vector type.
- *
  */
 template <typename VectorType>
 struct IsBlockVector
@@ -112,7 +111,6 @@ namespace internal
 {
   /**
    * Namespace in which iterators in block vectors are implemented.
-   *
    */
   namespace BlockVectorIterators
   {
@@ -130,7 +128,6 @@ namespace internal
      * does rarely change dynamically within an application, this is a
      * constant and we again have that the iterator satisfies the requirements
      * of a random access iterator.
-     *
      */
     template <class BlockVectorType, bool Constness>
     class Iterator

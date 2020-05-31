@@ -956,7 +956,6 @@ namespace Utilities
      *
      * @return A map from the rank (unsigned int) of the process
      *  which sent the data and object received.
-     *
      */
     template <typename T>
     std::map<unsigned int, T>
@@ -975,7 +974,6 @@ namespace Utilities
      *  processes in the MPI communicator. Each entry contains the object
      *  received from the processor with the corresponding rank within the
      *  communicator.
-     *
      */
     template <typename T>
     std::vector<T>
@@ -995,7 +993,6 @@ namespace Utilities
      *  processes in the MPI communicator. Each entry contains the object
      *  received from the processor with the corresponding rank within the
      *  communicator. All other processes receive an empty vector.
-     *
      */
     template <typename T>
     std::vector<T>
@@ -1044,7 +1041,6 @@ namespace Utilities
      * @return List containing the MPI process rank for each entry in the index
      *         set @p indices_to_look_up. The order coincides with the order
      *         within the ElementIterator.
-     *
      */
     std::vector<unsigned int>
     compute_index_owner(const IndexSet &owned_indices,

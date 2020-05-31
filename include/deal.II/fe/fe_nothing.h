@@ -76,7 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * The distinction lies in the mixed nature of the child faces, a case we have
  * not implemented as of yet.
- *
  */
 template <int dim, int spacedim = dim>
 class FE_Nothing : public FiniteElement<dim, spacedim>

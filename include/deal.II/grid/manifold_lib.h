@@ -56,7 +56,6 @@ DEAL_II_NAMESPACE_OPEN
  * make any sense.
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim>
 class PolarManifold : public ChartManifold<dim, spacedim, spacedim>
@@ -223,7 +222,6 @@ private:
  * ball. (See also the extensive discussion in step-65.)
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim>
 class SphericalManifold : public Manifold<dim, spacedim>
@@ -378,7 +376,6 @@ private:
  * run time exception whenever spacedim is not equal to three.
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim>
 class CylindricalManifold : public ChartManifold<dim, spacedim, 3>
@@ -498,7 +495,6 @@ private:
  * @image html elliptical_hyper_shell.png
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim>
 class EllipticalManifold : public ChartManifold<dim, spacedim, spacedim>
@@ -514,7 +510,6 @@ public:
    * manifold.
    * @param eccentricity Eccentricity of the
    * manifold $e\in\left]0,1\right[$.
-   *
    */
   EllipticalManifold(const Point<spacedim> &    center,
                      const Tensor<1, spacedim> &major_axis_direction,
@@ -582,7 +577,6 @@ private:
  * actually one the inverse of the other.
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim, int chartdim = dim>
 class FunctionManifold : public ChartManifold<dim, spacedim, chartdim>
@@ -776,7 +770,6 @@ private:
  * GridGenerator::torus.
  *
  * @ingroup manifold
- *
  */
 template <int dim>
 class TorusManifold : public ChartManifold<dim, 3, 3>
@@ -958,7 +951,6 @@ private:
  * axis-aligned bounding boxes.
  *
  * @ingroup manifold
- *
  */
 template <int dim, int spacedim = dim>
 class TransfiniteInterpolationManifold : public Manifold<dim, spacedim>

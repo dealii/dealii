@@ -1253,7 +1253,6 @@ namespace FEValuesViews
    * FESubfaceValues object.
    *
    * @ingroup feaccess vector_valued
-   *
    */
   template <int dim, int spacedim>
   class SymmetricTensor<2, dim, spacedim>
@@ -1541,7 +1540,6 @@ namespace FEValuesViews
    * to an FEValues, FEFaceValues or FESubfaceValues object.
    *
    * @ingroup feaccess vector_valued
-   *
    */
   template <int dim, int spacedim>
   class Tensor<2, dim, spacedim>
@@ -1876,7 +1874,6 @@ namespace internal
     /**
      * A class whose specialization is used to define what FEValuesViews
      * object corresponds to the given FEValuesExtractors object.
-     *
      */
     template <int dim, int spacedim, typename Extractor>
     struct ViewType
@@ -1969,7 +1966,6 @@ namespace FEValuesViews
   /**
    * A templated alias that associates to a given Extractor class
    * the corresponding view in FEValuesViews.
-   *
    */
   template <int dim, int spacedim, typename Extractor>
   using View = typename dealii::internal::FEValuesViews::
@@ -3439,7 +3435,6 @@ protected:
    * @note This class is an example of the
    * <a href="https://www.artima.com/cppsource/type_erasure.html">type
    * erasure</a> design pattern.
-   *
    */
   class CellIteratorBase;
 

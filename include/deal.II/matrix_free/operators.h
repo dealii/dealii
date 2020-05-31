@@ -181,7 +181,6 @@ namespace MatrixFreeOperators
    * system_rhs *= -1.;
    * // proceed with other terms from right hand side...
    * @endcode
-   *
    */
   template <int dim,
             typename VectorType = LinearAlgebra::distributed::Vector<double>,
@@ -531,7 +530,6 @@ namespace MatrixFreeOperators
    * Note that the vmult_interface_down is used during the restriction phase of
    * the multigrid V-cycle, whereas vmult_interface_up is used during the
    * prolongation phase.
-   *
    */
   template <typename OperatorType>
   class MGInterfaceOperator : public Subscriptor
@@ -611,7 +609,6 @@ namespace MatrixFreeOperators
    * to provide an array for the inverse of the local coefficient (this class
    * provide a helper method 'fill_inverse_JxW_values' to get the inverse of a
    * constant-coefficient operator).
-   *
    */
   template <int dim,
             int fe_degree,
@@ -731,7 +728,6 @@ namespace MatrixFreeOperators
    * Note that this class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
-   *
    */
   template <int dim,
             int fe_degree,
@@ -798,7 +794,6 @@ namespace MatrixFreeOperators
    * Note that this class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
-   *
    */
   template <int dim,
             int fe_degree,

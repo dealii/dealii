@@ -104,7 +104,6 @@ namespace parallel
  * others can be generated in application programs (see the section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename Number>
 class Vector : public Subscriptor

@@ -55,7 +55,6 @@ namespace Polynomials
    * form, the constructor with the roots in form of a Lagrange polynomial
    * must be used. In case a manipulation is done that changes the roots, the
    * representation is switched to the coefficient form.
-   *
    */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -291,7 +290,6 @@ namespace Polynomials
   /**
    * Class generates Polynomial objects representing a monomial of degree n,
    * that is, the function $x^n$.
-   *
    */
   template <typename number>
   class Monomial : public Polynomial<number>
@@ -335,7 +333,6 @@ namespace Polynomials
    * entire space of polynomials of degree less than or equal <tt>degree</tt>.
    *
    * The Lagrange polynomials are implemented up to degree 10.
-   *
    */
   class LagrangeEquidistant : public Polynomial<double>
   {
@@ -394,7 +391,6 @@ namespace Polynomials
    * interval $[-1,1]$. (ii) The polynomials have been scaled in such a way
    * that they are orthonormal, not just orthogonal; consequently, the
    * polynomials do not necessarily have boundary values equal to one.
-   *
    */
   class Legendre : public Polynomial<double>
   {
@@ -432,7 +428,6 @@ namespace Polynomials
    *
    * These polynomials are used for the construction of the shape functions of
    * N&eacute;d&eacute;lec elements of arbitrary order.
-   *
    */
   class Lobatto : public Polynomial<double>
   {
@@ -496,7 +491,6 @@ namespace Polynomials
    * concept of a polynomial degree, if the given argument is zero, it does
    * <b>not</b> return the linear polynomial described above, but rather a
    * constant polynomial.
-   *
    */
   class Hierarchical : public Polynomial<double>
   {
@@ -574,7 +568,6 @@ namespace Polynomials
    * \ldots & \ldots \\
    * p_k(x) &= x^2(x-1)^2 L_{k-4}(x)
    * @f}
-   *
    */
   class HermiteInterpolation : public Polynomial<double>
   {
@@ -696,7 +689,6 @@ namespace Polynomials
    * but gives better condition numbers of interpolation, which improves the
    * performance of some iterative schemes like conjugate gradients with
    * point-Jacobi. This polynomial is used in FE_DGQHermite.
-   *
    */
   class HermiteLikeInterpolation : public Polynomial<double>
   {

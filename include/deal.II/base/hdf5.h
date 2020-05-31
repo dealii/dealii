@@ -324,14 +324,12 @@ DEAL_II_NAMESPACE_OPEN
  * thread-safe HDF5 version serializes the API but does not provide any level of
  * concurrency. To achieve high parallel performance with HDF5, we advice to use
  * HDF5 with MPI.
- *
  */
 // clang-format on
 namespace HDF5
 {
   /**
    * Base class for the HDF5 objects.
-   *
    */
   class HDF5Object
   {
@@ -408,7 +406,6 @@ namespace HDF5
 
   /**
    * This class implements an HDF5 DataSet.
-   *
    */
   class DataSet : public HDF5Object
   {
@@ -959,7 +956,6 @@ namespace HDF5
 
   /**
    * This class implements an HDF5 Group
-   *
    */
   class Group : public HDF5Object
   {
@@ -1057,7 +1053,6 @@ namespace HDF5
 
   /**
    * This class implements an HDF5 File
-   *
    */
   class File : public Group
   {

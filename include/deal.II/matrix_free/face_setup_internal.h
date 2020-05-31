@@ -43,7 +43,6 @@ namespace internal
     /**
      * A struct that is used to represent a collection of faces of a process
      * with one of its neighbor within the setup done in struct FaceInfo.
-     *
      */
     struct FaceIdentifier
     {
@@ -66,7 +65,6 @@ namespace internal
      * sides). This data structure is used for the setup of the connectivity
      * between faces and cells and for identification of the dof indices to be
      * used for face integrals.
-     *
      */
     template <int dim>
     struct FaceSetup

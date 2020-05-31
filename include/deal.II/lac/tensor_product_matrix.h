@@ -69,7 +69,6 @@ class FullMatrix;
  * dimension). By default at -1, which means that the number of rows
  * is determined at run-time by means of the matrices passed to the
  * reinit() function.
- *
  */
 template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSumBase
@@ -234,7 +233,6 @@ private:
  * dimension). By default at -1, which means that the number of rows
  * is determined at run-time by means of the matrices passed to the
  * reinit() function.
- *
  */
 template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSum
@@ -327,7 +325,6 @@ private:
  * being the arithmetic template. For a detailed description see
  * the main documentation of the generic
  * TensorProductMatrixSymmetricSum class.
- *
  */
 template <int dim, typename Number, int n_rows_1d>
 class TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>

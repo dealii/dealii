@@ -474,7 +474,6 @@ namespace internal
 
 /**
  * Declare dealii::TrilinosWrappers::MPI::BlockVector as distributed vector.
- *
  */
 template <>
 struct is_serial_vector<TrilinosWrappers::MPI::BlockVector> : std::false_type

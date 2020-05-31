@@ -46,7 +46,6 @@ namespace LocalIntegrators
      *
      * The FiniteElement in <tt>fe</tt> may be scalar or vector valued. In the
      * latter case, the Laplacian is applied to each component separately.
-     *
      */
     template <int dim>
     void
@@ -152,7 +151,6 @@ namespace LocalIntegrators
      *
      * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
      * compute_penalty().
-     *
      */
     template <int dim>
     void
@@ -194,7 +192,6 @@ namespace LocalIntegrators
      *
      * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
      * compute_penalty().
-     *
      */
     template <int dim>
     void
@@ -258,7 +255,6 @@ namespace LocalIntegrators
      * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
      * respectively. <i>g</i> is the inhomogeneous boundary value in the
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
-     *
      */
     template <int dim>
     void
@@ -306,7 +302,6 @@ namespace LocalIntegrators
      * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
      * respectively. <i>g</i> is the inhomogeneous boundary value in the
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
-     *
      */
     template <int dim>
     void
@@ -358,7 +353,6 @@ namespace LocalIntegrators
      * If <tt>factor2</tt> is missing or negative, the factor is assumed the
      * same on both sides. If factors differ, note that the penalty parameter
      * has to be computed accordingly.
-     *
      */
     template <int dim>
     void
@@ -432,7 +426,6 @@ namespace LocalIntegrators
      * @f]
      *
      * @warning This function is still under development!
-     *
      */
     template <int dim>
     void
@@ -545,7 +538,6 @@ namespace LocalIntegrators
      * \int_F \Bigl( \gamma [u][v] - \{\nabla u\}[v\mathbf n] - [u\mathbf
      * n]\{\nabla v\} \Bigr) \; ds.
      * @f]
-     *
      */
     template <int dim>
     void
@@ -613,7 +605,6 @@ namespace LocalIntegrators
      * - \{\nabla \mathbf u\}[\mathbf v\otimes \mathbf n]
      * - [\mathbf u\otimes \mathbf n]\{\nabla \mathbf v\} \Bigr) \; ds.
      * @f]
-     *
      */
     template <int dim>
     void
@@ -688,7 +679,6 @@ namespace LocalIntegrators
      * <i>p<sub>i</sub></i> is the polynomial degree on cell
      * <i>Z<sub>i</sub></i> and <i>h<sub>i</sub></i> is the length of
      * <i>Z<sub>i</sub></i> orthogonal to the current face.
-     *
      */
     template <int dim, int spacedim, typename number>
     double

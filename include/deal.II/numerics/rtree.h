@@ -136,7 +136,6 @@ DEAL_II_NAMESPACE_OPEN
  * and only create a tree of the indices within the container, using the
  * IndexableGetterFromIndices class defined below, and the function
  * pack_rtree_of_indices().
- *
  */
 template <typename LeafType,
           typename IndexType = boost::geometry::index::linear<16>,
@@ -151,7 +150,6 @@ using RTree =
  * Notice that the order of the parameters is the opposite with respect to the
  * RTree class, since we can automatically infer the @p LeafType from the
  * arguments.
- *
  */
 template <typename IndexType = boost::geometry::index::linear<16>,
           typename LeafTypeIterator,
@@ -169,7 +167,6 @@ pack_rtree(const LeafTypeIterator &begin, const LeafTypeIterator &end);
  * RTree class, since we can automatically infer the @p LeafType from the
  * arguments, and we only need to specify the @p IndexType if the default is not
  * adequate.
- *
  */
 template <typename IndexType = boost::geometry::index::linear<16>,
           typename ContainerType,
@@ -195,7 +192,6 @@ pack_rtree(const ContainerType &container);
  * This class is used by the pack_rtree_of_indices() function to construct an
  * RTree where the leaves are indices pointing to the entries of the container
  * passed to this class.
- *
  */
 template <typename Container>
 class IndexableGetterFromIndices
@@ -276,7 +272,6 @@ private:
  * the container. A reference to the external container is stored internally,
  * but keep in mind that if you change the container, you should rebuild the
  * tree.
- *
  */
 template <typename IndexType = boost::geometry::index::linear<16>,
           typename ContainerType>
@@ -296,7 +291,6 @@ pack_rtree_of_indices(const ContainerType &container);
  * Although possible, direct usage of this structure is cumbersome. The
  * suggested usage of this class is through the helper function
  * extract_rtree_level().
- *
  */
 template <typename Value,
           typename Options,
@@ -426,7 +420,6 @@ struct ExtractLevelVisitor
  * @image html rtree-process-0.png
  * @image html rtree-process-1.png
  * @image html rtree-process-2.png
- *
  */
 template <typename Rtree>
 inline std::vector<BoundingBox<

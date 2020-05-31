@@ -305,7 +305,6 @@ protected:
  * $P^x_2(x)P^y_1(y)$, $P^x_3(x)P^y_1(y)$, ...,
  * $P^x_1(x)P^y_2(y)$, $P^x_2(x)P^y_2(y)$,
  * $P^x_3(x)P^y_2(y)$, etc.
- *
  */
 template <int dim>
 class AnisotropicPolynomials : public ScalarPolynomialsBase<dim>

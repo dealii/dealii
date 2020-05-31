@@ -351,7 +351,6 @@ private:
  *   PreconditionUseMatrix<>(
  *     matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
- *
  */
 template <typename MatrixType = SparseMatrix<double>,
           class VectorType    = Vector<double>>
@@ -491,7 +490,6 @@ protected:
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
- *
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionJacobi : public PreconditionRelaxation<MatrixType>
@@ -578,7 +576,6 @@ public:
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
- *
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionSOR : public PreconditionRelaxation<MatrixType>
@@ -646,7 +643,6 @@ public:
  *
  * solver.solve (A, x, b, precondition);
  * @endcode
- *
  */
 template <typename MatrixType = SparseMatrix<double>>
 class PreconditionSSOR : public PreconditionRelaxation<MatrixType>

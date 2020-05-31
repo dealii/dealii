@@ -131,7 +131,6 @@ DEAL_II_NAMESPACE_OPEN
  *  Volume = {7},
  *  Year = {2018}}
  * @endcode
- *
  */
 class ParsedConvergenceTable
 {

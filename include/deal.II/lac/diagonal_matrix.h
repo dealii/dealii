@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  *                        locally_relevant_dofs,
  *                        mpi_communicator);
  * @endcode
- *
  */
 template <typename VectorType = Vector<double>>
 class DiagonalMatrix : public Subscriptor

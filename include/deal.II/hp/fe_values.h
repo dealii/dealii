@@ -59,7 +59,6 @@ namespace hp
    * ::FEValues, ::FEFaceValues, or ::FESubfaceValues.
    *
    * @ingroup hp
-   *
    */
   template <int dim, int q_dim, class FEValuesType>
   class FEValuesBase

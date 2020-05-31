@@ -45,7 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This type, and the helper functions associated with it, are used as the
  * Value concept for the blocked_range type of the Threading Building Blocks.
- *
  */
 template <typename Iterators>
 struct SynchronousIterators

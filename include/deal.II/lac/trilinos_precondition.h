@@ -214,7 +214,6 @@ namespace TrilinosWrappers
 
     /**
      * @addtogroup Exceptions
-     *
      */
     //@{
     /**

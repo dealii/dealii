@@ -84,7 +84,6 @@ DEAL_II_NAMESPACE_OPEN
  * the calling of this solver has to be added and each user with program lines
  * quoted above only needs to 'set solver = xyz' in their parameter file to get
  * access to that new solver.
- *
  */
 template <typename VectorType = Vector<double>>
 class SolverSelector : public Subscriptor
@@ -114,7 +113,6 @@ public:
   /**
    * Solver procedure. Calls the @p solve function of the @p solver whose @p
    * SolverName was specified in the constructor.
-   *
    */
   template <class Matrix, class Preconditioner>
   void

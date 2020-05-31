@@ -69,7 +69,6 @@ namespace NonMatching
    * @f]
    *
    * @image html immersed_surface_quadrature.svg
-   *
    */
   template <int dim>
   class ImmersedSurfaceQuadrature : public Quadrature<dim>

@@ -164,7 +164,6 @@ namespace Differentiation
      *
      * @todo Make this class thread safe for Sacado number and ADOL-C tapeless
      * numbers (if supported).
-     *
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -831,7 +830,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -1214,7 +1212,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -1528,7 +1525,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -2627,7 +2623,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -3073,7 +3068,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -3465,7 +3459,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,

@@ -39,7 +39,6 @@ namespace internal
      * want to enable anisotropic refinement. Therefore the TriaFaces classes
      * store the information belonging to the faces of a triangulation
      * separately from the TriaLevel classes.
-     *
      */
     class TriaFaces
     {

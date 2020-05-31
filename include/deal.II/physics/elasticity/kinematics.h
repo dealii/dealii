@@ -42,8 +42,7 @@ namespace Physics
 
      * @note These hold specifically for the codimension
      * 0 case, where the metric tensor is the identity tensor.
-     *
-     */
+*/
     namespace Kinematics
     {
       /**

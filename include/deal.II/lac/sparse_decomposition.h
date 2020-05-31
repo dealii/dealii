@@ -239,7 +239,6 @@ public:
    * <i>M</i> being this matrix.
    *
    * Source and destination must not be the same vector.
-   *
    */
   template <class OutVector, class InVector>
   void

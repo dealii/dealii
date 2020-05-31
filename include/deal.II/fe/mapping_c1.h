@@ -33,7 +33,6 @@ DEAL_II_NAMESPACE_OPEN
  * MappingQ chooses them such that they interpolate the boundary, while this
  * class chooses them such that the discretized boundary is globally
  * continuously differentiable.
- *
  */
 template <int dim, int spacedim = dim>
 class MappingC1 : public MappingQ<dim, spacedim>

@@ -60,7 +60,6 @@
  * Additional Information: 2534: Attempted to write into off-processor matrix
  * row that has not be specified as being writable upon initialization 2534:
  * --------------------------------------------------------
- *
  */
 
 #include <deal.II/base/geometry_info.h>

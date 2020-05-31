@@ -126,7 +126,6 @@ namespace internal
      * until we hit the end iterator. This is time consuming and since access
      * to the number of lines etc is a rather frequent operation, this was not
      * an optimal solution.
-     *
      */
     template <int dim>
     struct NumberCache
@@ -142,7 +141,6 @@ namespace internal
      * until we hit the end iterator. This is time consuming and since access
      * to the number of lines etc is a rather frequent operation, this was not
      * an optimal solution.
-     *
      */
     template <>
     struct NumberCache<1>
@@ -205,7 +203,6 @@ namespace internal
      * until we hit the end iterator. This is time consuming and since access
      * to the number of lines etc is a rather frequent operation, this was not
      * an optimal solution.
-     *
      */
     template <>
     struct NumberCache<2> : public NumberCache<1>
@@ -264,7 +261,6 @@ namespace internal
      * until we hit the end . This is time consuming and since access to the
      * number of lines etc is a rather frequent operation, this was not an
      * optimal solution.
-     *
      */
     template <>
     struct NumberCache<3> : public NumberCache<2>

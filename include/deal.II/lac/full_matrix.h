@@ -64,7 +64,6 @@ class LAPACKFullMatrix;
  * programs, see
  * @ref Instantiations
  * for details.
- *
  */
 template <typename number>
 class FullMatrix : public Table<2, number>

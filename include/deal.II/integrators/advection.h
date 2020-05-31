@@ -69,7 +69,6 @@ namespace LocalIntegrators
      * in which case a constant velocity is assumed, or a vector with as many
      * entries as quadrature points if the velocity is not constant.
      * @param factor is an optional multiplication factor for the result.
-     *
      */
     template <int dim>
     void

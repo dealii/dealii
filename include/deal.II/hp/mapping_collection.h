@@ -49,7 +49,6 @@ namespace hp
    * for the rules which mapping will be selected for a given cell.
    *
    * @ingroup hp hpcollection
-   *
    */
   template <int dim, int spacedim = dim>
   class MappingCollection : public Subscriptor

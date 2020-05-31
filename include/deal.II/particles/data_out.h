@@ -39,7 +39,6 @@ namespace Particles
    * to write the properties attached to the particles
    *
    * @ingroup Particle
-   *
    */
   template <int dim, int spacedim = dim>
   class DataOut : public dealii::DataOutInterface<0, spacedim>
@@ -70,7 +69,6 @@ namespace Particles
      * @param [in] data_component_interpretations An optional vector that
      * controls if the particle properties are interpreted as scalars, vectors,
      * or tensors. Has to be of the same length as @p data_component_names.
-     *
      */
     void
     build_patches(const Particles::ParticleHandler<dim, spacedim> &particles,

@@ -36,7 +36,6 @@ namespace LinearAlgebra
    * from the data that needs to be communicated. The goal is to reuse the same
    * communication pattern for different containers.
    * This is similar to the way SparseMatrix and SparsityPattern works.
-   *
    */
   class CommunicationPatternBase
   {

@@ -29,7 +29,6 @@ namespace GridTools
    *
    * You can select more than one flag by concatenation using the bitwise or
    * <code>operator|(CacheUpdateFlags,CacheUpdateFlags)</code>.
-   *
    */
   enum CacheUpdateFlags
   {
@@ -72,7 +71,6 @@ namespace GridTools
      * boxes are used to describe approximately which portion
      * of the mesh contains locally owned cells by the
      * process of rank the second element of the pair.
-     *
      */
     update_covering_rtree = 0x040,
 

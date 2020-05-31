@@ -28,7 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Namespace containing the time stepping methods.
- *
  */
 
 namespace TimeStepping
@@ -136,7 +135,6 @@ namespace TimeStepping
 
   /**
    * Base class for the Runge-Kutta method
-   *
    */
   template <typename VectorType>
   class RungeKutta : public TimeStepping<VectorType>

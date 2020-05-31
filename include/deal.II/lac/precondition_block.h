@@ -372,7 +372,6 @@ protected:
  * section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -648,7 +647,6 @@ private:
  * section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -812,7 +810,6 @@ protected:
  * section on
  * @ref Instantiations
  * in the manual).
- *
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>

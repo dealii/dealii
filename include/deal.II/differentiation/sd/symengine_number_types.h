@@ -173,7 +173,6 @@ namespace Differentiation
      *   // We can expect the above to evaluate to "2*10" which is,
      *   // of course, the numeric value 20.
      * @endcode
-     *
      */
     class Expression
     {
@@ -878,7 +877,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a supported
      * symbolically differentiable number or not.
      * This is a specialization for the deal.II Expression class.
-     *
      */
     template <>
     struct is_symengine_number<Expression> : std::true_type
@@ -889,7 +887,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a supported
      * SymEngine number or not.
      * This is a specialization for the deal.II Expression class.
-     *
      */
     template <>
     struct is_sd_number<Expression> : std::true_type

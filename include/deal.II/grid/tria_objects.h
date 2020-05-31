@@ -50,7 +50,6 @@ namespace internal
      *
      * Objects of these classes are included in the TriaLevel and TriaFaces
      * classes.
-     *
      */
     class TriaObjects
     {

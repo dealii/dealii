@@ -1425,7 +1425,6 @@ namespace Differentiation
      * @warning The LLVM optimizer does not yet support complex numbers. If this
      * incompatible combination of @p ReturnType and optimization method are
      * selected, then an error will be thrown at run time.
-     *
      */
     template <typename ReturnType>
     class BatchOptimizer

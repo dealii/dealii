@@ -81,7 +81,6 @@ namespace FETools
    *
    * This class is used in the FETools::get_fe_by_name() and
    * FETools::add_fe_name() functions.
-   *
    */
   template <int dim, int spacedim = dim>
   class FEFactoryBase : public Subscriptor
@@ -115,7 +114,6 @@ namespace FETools
    * given as template argument, and with the degree (however the finite
    * element class wishes to interpret this number) given as argument to
    * get().
-   *
    */
   template <class FE>
   class FEFactory : public FEFactoryBase<FE::dimension, FE::space_dimension>

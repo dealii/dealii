@@ -494,7 +494,6 @@ private:
  * iterations (at most by one in each step) and they also do not change when
  * the degrees of freedom are sorted by component, while the first strategy
  * significantly deteriorated.
- *
  */
 template <typename number>
 class SparseBlockVanka : public SparseVanka<number>

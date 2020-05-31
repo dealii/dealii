@@ -50,7 +50,6 @@ class MatrixIterator;
 
 /**
  * Namespace in which iterators in block matrices are implemented.
- *
  */
 namespace BlockMatrixIterators
 {

@@ -93,7 +93,6 @@ namespace internal
      * combination will be handled in the MatrixFree class.
      *
      * @ingroup matrixfree
-     *
      */
     struct DoFInfo
     {

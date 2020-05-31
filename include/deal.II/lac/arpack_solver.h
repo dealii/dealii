@@ -163,7 +163,6 @@ dseupd_(int *         rvec,
  * of eigenvalue problems) values. See also
  * @ref step_36 "step-36"
  * for an example.
- *
  */
 class ArpackSolver : public Subscriptor
 {

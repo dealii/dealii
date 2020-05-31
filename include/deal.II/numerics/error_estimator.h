@@ -579,7 +579,6 @@ public:
  * to compute the jump terms differently. However, this class offers exactly
  * the same public functions as the general template, so that a user will not
  * see any difference.
- *
  */
 template <int spacedim>
 class KellyErrorEstimator<1, spacedim>

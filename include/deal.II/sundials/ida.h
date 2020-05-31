@@ -228,7 +228,6 @@ namespace SUNDIALS
    * y_dot[0] = kappa;
    * time_stepper.solve_dae(y,y_dot);
    * @endcode
-   *
    */
   template <typename VectorType = Vector<double>>
   class IDA

@@ -104,7 +104,6 @@ namespace Functions
      *  set Variable names      = x,y,t
      *
      *  @endcode
-     *
      */
     static void
     declare_parameters(ParameterHandler & prm,
