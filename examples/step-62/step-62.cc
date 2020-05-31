@@ -877,6 +877,24 @@ namespace step62
                       s[component]     = pml_values[q][component];
                       xi *= s[component];
                     }
+
+                  // Here we calculate the $\alpha_{mnkl}$ and $\beta_{mnkl}$
+                  // tensors.
+                  Tensor<4, dim, std::complex<double>> alpha;
+                  Tensor<4, dim, std::complex<double>> beta;
+                  for (unsigned int m = 0; m < dim; ++m)
+                    for (unsigned int n = 0; n < dim; ++n)
+                      for (unsigned int k = 0; k < dim; ++k)
+                        for (unsigned int l = 0; l < dim; ++l)
+                          {
+                            alpha[m][n][k][l] = xi *
+                                                stiffness_tensor[m][n][k][l] /
+                                                (2.0 * s[n] * s[k]);
+                            beta[m][n][k][l] = xi *
+                                               stiffness_tensor[m][n][k][l] /
+                                               (2.0 * s[n] * s[l]);
+                          }
+
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       const Tensor<1, dim> phi_i =
@@ -903,15 +921,6 @@ namespace step62
                               for (unsigned int k = 0; k < dim; ++k)
                                 for (unsigned int l = 0; l < dim; ++l)
                                   {
-                                    // Here we calculate the tensors
-                                    // $\alpha_{mnkl}$ and $\beta_{mnkl}$
-                                    const std::complex<double> alpha =
-                                      xi * stiffness_tensor[m][n][k][l] /
-                                      (2.0 * s[n] * s[k]);
-                                    const std::complex<double> beta =
-                                      xi * stiffness_tensor[m][n][k][l] /
-                                      (2.0 * s[n] * s[l]);
-
                                     // Here we calculate the stiffness matrix.
                                     // Note that the stiffness matrix is not
                                     // symmetric because of the PMLs. We use the
@@ -931,8 +940,8 @@ namespace step62
                                     // very easy to make a mistake.
                                     stiffness_coefficient +=
                                       grad_phi_i[m][n] *
-                                      (alpha * grad_phi_j[l][k] +
-                                       beta * grad_phi_j[k][l]);
+                                      (alpha[m][n][k][l] * grad_phi_j[l][k] +
+                                       beta[m][n][k][l] * grad_phi_j[k][l]);
                                   }
 
                           // We save the value of the stiffness matrix in
