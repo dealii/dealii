@@ -52,7 +52,6 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    template <int dim>
     class TriaObject;
     class TriaObjects;
     struct Implementation;
@@ -1628,8 +1627,7 @@ private:
    * triangulation.
    */
   void
-  set(const dealii::internal::TriangulationImplementation::TriaObject<structdim>
-        &o) const;
+  set(const dealii::internal::TriangulationImplementation::TriaObject &o) const;
 
   /**
    * Set the flag indicating, what <code>line_orientation()</code> will
