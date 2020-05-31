@@ -1258,10 +1258,7 @@ namespace Step69
         0, n_locally_relevant);
 
       const auto on_subranges = //
-        [&](
-          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
-          const std_cxx20::ranges::iota_view<unsigned int,
-                                             unsigned int>::iterator i2) {
+        [&](const auto i1, const auto i2) {
           for (const auto row_index :
                std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
                                                                         *i2))
@@ -1923,10 +1920,7 @@ namespace Step69
                                "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = //
-        [&](
-          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
-          const std_cxx20::ranges::iota_view<unsigned int,
-                                             unsigned int>::iterator i2) {
+        [&](const auto i1, const auto i2) {
           for (const auto i :
                std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
                                                                         *i2))
@@ -2022,10 +2016,7 @@ namespace Step69
       // locally.
 
       const auto on_subranges = //
-        [&](
-          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
-          const std_cxx20::ranges::iota_view<unsigned int,
-                                             unsigned int>::iterator i2) {
+        [&](const auto i1, const auto i2) {
           double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
           for (const auto i :
@@ -2110,11 +2101,8 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "time_stepping - 3 perform update");
 
-      const auto on_subranges =
-        [&](
-          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
-          const std_cxx20::ranges::iota_view<unsigned int,
-                                             unsigned int>::iterator i2) {
+      const auto on_subranges = //
+        [&](const auto i1, const auto i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
@@ -2364,10 +2352,7 @@ namespace Step69
     // global maxima and minima of the gradients.
     {
       const auto on_subranges = //
-        [&](
-          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
-          const std_cxx20::ranges::iota_view<unsigned int,
-                                             unsigned int>::iterator i2) {
+        [&](const auto i1, const auto i2) {
           double r_i_max_on_subrange = 0.;
           double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
@@ -2451,10 +2436,7 @@ namespace Step69
 
     {
       const auto on_subranges = //
-        [&](
-          std_cxx20::ranges::iota_view<unsigned int, unsigned int>::iterator i1,
-          const std_cxx20::ranges::iota_view<unsigned int,
-                                             unsigned int>::iterator i2) {
+        [&](const auto i1, const auto i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
