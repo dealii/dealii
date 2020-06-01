@@ -2243,8 +2243,7 @@ namespace internal
       struct QuadComparator
       {
         inline bool
-        operator()(const std::vector<int> &q1,
-                   const std::vector<int> &q2) const
+        operator()(const std::vector<int> &q1, const std::vector<int> &q2) const
         {
           Assert(q1.size() == 4, ExcInternalError());
           Assert(q2.size() == 4, ExcInternalError());
@@ -2256,12 +2255,10 @@ namespace internal
           // compiler will probably
           // take care of most of
           // it anyway
-          if ((q1[0] < q2[0]) ||
-              ((q1[0] == q2[0]) && (q1[1] < q2[1])) ||
-              ((q1[0] == q2[0]) && (q1[1] == q2[1]) &&
-               (q1[2] < q2[2])) ||
-              ((q1[0] == q2[0]) && (q1[1] == q2[1]) &&
-               (q1[2] == q2[2]) && (q1[3] < q2[3])))
+          if ((q1[0] < q2[0]) || ((q1[0] == q2[0]) && (q1[1] < q2[1])) ||
+              ((q1[0] == q2[0]) && (q1[1] == q2[1]) && (q1[2] < q2[2])) ||
+              ((q1[0] == q2[0]) && (q1[1] == q2[1]) && (q1[2] == q2[2]) &&
+               (q1[3] < q2[3])))
             return true;
           else
             return false;
@@ -2540,10 +2537,10 @@ namespace internal
 
 
                 const std::vector<int> quad(
-                  {face_line_list[0],
-                   face_line_list[1],
-                   face_line_list[2],
-                   face_line_list[3]});
+                  {static_cast<int>(face_line_list[0]),
+                   static_cast<int>(face_line_list[1]),
+                   static_cast<int>(face_line_list[2]),
+                   static_cast<int>(face_line_list[3])});
 
                 // insert quad, with
                 // invalid iterator
@@ -2588,43 +2585,37 @@ namespace internal
                    quad[3],
                    quad[0],
                    quad[1]}), // face_orientation=false, face_flip=false,
-                                   // face_rotation=false
-                  test_quad_2(
-                    {quad[0],
-                     quad[1],
-                     quad[3],
-                     quad[2]}), // face_orientation=false, face_flip=false,
-                                     // face_rotation=true
-                  test_quad_3(
-                    {quad[3],
-                     quad[2],
-                     quad[1],
-                     quad[0]}), // face_orientation=false, face_flip=true,
-                                     // face_rotation=false
-                  test_quad_4(
-                    {quad[1],
-                     quad[0],
-                     quad[2],
-                     quad[3]}), // face_orientation=false, face_flip=true,
-                                     // face_rotation=true
-                  test_quad_5(
-                    {quad[2],
-                     quad[3],
-                     quad[1],
-                     quad[0]}), // face_orientation=true,  face_flip=false,
-                                     // face_rotation=true
-                  test_quad_6(
-                    {quad[1],
-                     quad[0],
-                     quad[3],
-                     quad[2]}), // face_orientation=true,  face_flip=true,
-                                     // face_rotation=false
-                  test_quad_7(
-                    {quad[3],
-                     quad[2],
-                     quad[0],
-                     quad[1]}); // face_orientation=true,  face_flip=true,
-                                     // face_rotation=true
+                              // face_rotation=false
+                  test_quad_2({quad[0],
+                               quad[1],
+                               quad[3],
+                               quad[2]}), // face_orientation=false,
+                                          // face_flip=false, face_rotation=true
+                  test_quad_3({quad[3],
+                               quad[2],
+                               quad[1],
+                               quad[0]}), // face_orientation=false,
+                                          // face_flip=true, face_rotation=false
+                  test_quad_4({quad[1],
+                               quad[0],
+                               quad[2],
+                               quad[3]}), // face_orientation=false,
+                                          // face_flip=true, face_rotation=true
+                  test_quad_5({quad[2],
+                               quad[3],
+                               quad[1],
+                               quad[0]}), // face_orientation=true,
+                                          // face_flip=false, face_rotation=true
+                  test_quad_6({quad[1],
+                               quad[0],
+                               quad[3],
+                               quad[2]}), // face_orientation=true,
+                                          // face_flip=true, face_rotation=false
+                  test_quad_7({quad[3],
+                               quad[2],
+                               quad[0],
+                               quad[1]}); // face_orientation=true,
+                                          // face_flip=true, face_rotation=true
                 if (needed_quads.find(test_quad_1) == needed_quads.end() &&
                     needed_quads.find(test_quad_2) == needed_quads.end() &&
                     needed_quads.find(test_quad_3) == needed_quads.end() &&
@@ -2657,7 +2648,7 @@ namespace internal
           for (q = needed_quads.begin(); quad != triangulation.end_quad();
                ++quad, ++q)
             {
-              quad->set(q->first);
+              quad->set({q->first[0], q->first[1], q->first[2], q->first[3]});
               quad->set_used_flag();
               quad->clear_user_flag();
               quad->clear_user_data();
@@ -2750,10 +2741,10 @@ namespace internal
                           ->index();
 
                   const std::vector<int> quad(
-                    {face_line_list[0],
-                     face_line_list[1],
-                     face_line_list[2],
-                     face_line_list[3]});
+                    {static_cast<int>(face_line_list[0]),
+                     static_cast<int>(face_line_list[1]),
+                     static_cast<int>(face_line_list[2]),
+                     static_cast<int>(face_line_list[3])});
 
                   if (needed_quads.find(quad) != needed_quads.end())
                     {
@@ -2783,43 +2774,43 @@ namespace internal
                          quad[3],
                          quad[0],
                          quad[1]}), // face_orientation=false,
-                                         // face_flip=false, face_rotation=false
+                                    // face_flip=false, face_rotation=false
                         test_quad_2(
                           {quad[0],
                            quad[1],
                            quad[3],
                            quad[2]}), // face_orientation=false,
-                                   // face_flip=false, face_rotation=true
+                                      // face_flip=false, face_rotation=true
                         test_quad_3(
                           {quad[3],
                            quad[2],
                            quad[1],
                            quad[0]}), // face_orientation=false,
-                                   // face_flip=true,  face_rotation=false
+                                      // face_flip=true,  face_rotation=false
                         test_quad_4(
                           {quad[1],
                            quad[0],
                            quad[2],
                            quad[3]}), // face_orientation=false,
-                                           // face_flip=true, face_rotation=true
+                                      // face_flip=true, face_rotation=true
                         test_quad_5(
                           {quad[2],
                            quad[3],
                            quad[1],
                            quad[0]}), // face_orientation=true,
-                                   // face_flip=false, face_rotation=true
+                                      // face_flip=false, face_rotation=true
                         test_quad_6(
                           {quad[1],
                            quad[0],
                            quad[3],
                            quad[2]}), // face_orientation=true,
-                                   // face_flip=true,  face_rotation=false
+                                      // face_flip=true,  face_rotation=false
                         test_quad_7(
                           {quad[3],
                            quad[2],
                            quad[0],
                            quad[1]}); // face_orientation=true,
-                                           // face_flip=true, face_rotation=true
+                                      // face_flip=true, face_rotation=true
                       if (needed_quads.find(test_quad_1) != needed_quads.end())
                         {
                           face_iterator[face] = needed_quads[test_quad_1].first;
@@ -3169,16 +3160,14 @@ namespace internal
             // and because boundary quad
             // orientation does not carry
             // any information.
-            std::vector<int> quad_compare_1(
-              {line[0]->index(),
-               line[1]->index(),
-               line[2]->index(),
-               line[3]->index()});
-            std::vector<int> quad_compare_2(
-              {line[2]->index(),
-               line[3]->index(),
-               line[0]->index(),
-               line[1]->index()});
+            std::vector<int> quad_compare_1({line[0]->index(),
+                                             line[1]->index(),
+                                             line[2]->index(),
+                                             line[3]->index()});
+            std::vector<int> quad_compare_2({line[2]->index(),
+                                             line[3]->index(),
+                                             line[0]->index(),
+                                             line[1]->index()});
 
             // try to find the quad with
             // lines situated as
@@ -3218,8 +3207,10 @@ namespace internal
                 // lexicographic ordering)
                 for (unsigned int i = 0; i < 4; ++i)
                   {
-                    quad_compare_1[i] = line_counterclock[lex2cclock[i]]->index();
-                    quad_compare_2[(i + 2) % 4] = line_counterclock[lex2cclock[i]]->index();
+                    quad_compare_1[i] =
+                      line_counterclock[lex2cclock[i]]->index();
+                    quad_compare_2[(i + 2) % 4] =
+                      line_counterclock[lex2cclock[i]]->index();
                   }
 
                 ++n_rotations;

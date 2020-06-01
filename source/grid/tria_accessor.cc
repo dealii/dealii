@@ -1497,6 +1497,16 @@ TriaAccessor<structdim, dim, spacedim>::set(
 
 
 template <int structdim, int dim, int spacedim>
+void
+TriaAccessor<structdim, dim, spacedim>::set(
+  const std::initializer_list<unsigned int> &object) const
+{
+  this->objects().get_object(this->present_index) = object;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::barycenter() const
 {

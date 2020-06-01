@@ -25,16 +25,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifndef DOXYGEN
-namespace internal
-{
-  namespace TriangulationImplementation
-  {
-    class TriaObjectView;
-  }
-} // namespace internal
-#endif
-
 namespace internal
 {
   namespace TriangulationImplementation
@@ -66,6 +56,22 @@ namespace internal
         AssertDimension(faces.size(), other.size());
 
         const std::vector<int> other_v = other;
+
+        for (unsigned int i = 0; i < faces.size(); ++i)
+          faces[i] = other_v[i];
+
+        return *this;
+      }
+
+      /**
+       * The same as above but for `unsigned int`.
+       */
+      TriaObjectView &
+      operator=(const std::initializer_list<unsigned int> &other)
+      {
+        AssertDimension(faces.size(), other.size());
+
+        const std::vector<unsigned int> other_v = other;
 
         for (unsigned int i = 0; i < faces.size(); ++i)
           faces[i] = other_v[i];

@@ -1629,6 +1629,12 @@ private:
   set(const std::initializer_list<int> &o) const;
 
   /**
+   * The same as above but for `unsigned int`.
+   */
+  void
+  set(const std::initializer_list<unsigned int> &o) const;
+
+  /**
    * Set the flag indicating, what <code>line_orientation()</code> will
    * return.
    *
