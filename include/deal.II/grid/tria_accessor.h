@@ -1622,17 +1622,21 @@ private:
   set_boundary_id_internal(const types::boundary_id id) const;
 
   /**
-   * Copy the data of the given object into the internal data structures of a
-   * triangulation.
+   * Set the indices of those objects that bound the current
+   * object. For example, if the current object represents a cell,
+   * then the argument denotes the indices of the faces that bound the
+   * cell. If the current object represents a line, the argument
+   * denotes the indices of the vertices that bound it. And so on.
    */
   void
-  set(const std::initializer_list<int> &o) const;
+  set_bounding_object_indices(const std::initializer_list<int> &o) const;
 
   /**
    * The same as above but for `unsigned int`.
    */
   void
-  set(const std::initializer_list<unsigned int> &o) const;
+  set_bounding_object_indices(
+    const std::initializer_list<unsigned int> &o) const;
 
   /**
    * Set the flag indicating, what <code>line_orientation()</code> will
