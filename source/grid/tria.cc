@@ -1734,9 +1734,16 @@ namespace internal
                 // throw an exception if no such cells should exist.
                 if (!triangulation.check_for_distorted_cells)
                   {
+                    unsigned int vertices[GeometryInfo<1>::vertices_per_cell];
+
+                    for (unsigned int i = 0;
+                         i < GeometryInfo<1>::vertices_per_cell;
+                         ++i)
+                      vertices[i] = cells[cell_no].vertices[i];
+
                     const double cell_measure =
                       GridTools::cell_measure<1>(triangulation.vertices,
-                                                 cells[cell_no].vertices);
+                                                 vertices);
                     AssertThrow(cell_measure > 0,
                                 ExcGridHasInvalidCell(cell_no));
                   }
@@ -1916,9 +1923,16 @@ namespace internal
                 // See the note in the 1D function on this if statement.
                 if (!triangulation.check_for_distorted_cells)
                   {
+                    unsigned int vertices[GeometryInfo<2>::vertices_per_cell];
+
+                    for (unsigned int i = 0;
+                         i < GeometryInfo<2>::vertices_per_cell;
+                         ++i)
+                      vertices[i] = cells[cell_no].vertices[i];
+
                     const double cell_measure =
                       GridTools::cell_measure<2>(triangulation.vertices,
-                                                 cells[cell_no].vertices);
+                                                 vertices);
                     AssertThrow(cell_measure > 0,
                                 ExcGridHasInvalidCell(cell_no));
                   }
@@ -2282,9 +2296,14 @@ namespace internal
             // See the note in the 1D function on this if statement.
             if (!triangulation.check_for_distorted_cells)
               {
+                unsigned int vertices[GeometryInfo<3>::vertices_per_cell];
+
+                for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell;
+                     ++i)
+                  vertices[i] = cells[cell_no].vertices[i];
+
                 const double cell_measure =
-                  GridTools::cell_measure<3>(triangulation.vertices,
-                                             cells[cell_no].vertices);
+                  GridTools::cell_measure<3>(triangulation.vertices, vertices);
                 AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
               }
           }
@@ -10291,8 +10310,23 @@ Triangulation<dim, spacedim>::create_triangulation(
   // because sometimes other objects are already attached to it:
   try
     {
-      internal::TriangulationImplementation::Implementation::
-        create_triangulation(v, cells, subcelldata, *this);
+      const bool arbitray_mesh_provided =
+        std::any_of(cells.begin(), cells.end(), [](const auto &cell) {
+          return cell.vertices.size() != GeometryInfo<dim>::vertices_per_cell;
+        });
+
+      if (arbitray_mesh_provided == false)
+        {
+          internal::TriangulationImplementation::Implementation::
+            create_triangulation(v, cells, subcelldata, *this);
+        }
+      else
+        {
+          AssertThrow(
+            false,
+            ExcMessage(
+              "A cell with invalid number of vertices has been provided."));
+        }
     }
   catch (...)
     {

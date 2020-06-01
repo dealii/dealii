@@ -71,7 +71,7 @@ struct CellData
    * to entries in the vector of vertex locations passed to
    * Triangulation::create_triangulation().
    */
-  unsigned int vertices[GeometryInfo<structdim>::vertices_per_cell];
+  std::vector<unsigned int> vertices;
 
   /**
    * Material or boundary indicator of this cell.
