@@ -210,30 +210,6 @@ namespace internal
       std::vector<unsigned char> face_orientations;
 
       /**
-       * Reserve enough space to accommodate @p total_cells cells on this
-       * level. Since there are no @p used flags on this level, you have to
-       * give the total number of cells, not only the number of newly to
-       * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
-       * functions, with <tt>N>0</tt>.
-       *
-       * Since the number of neighbors per cell depends on the dimensions, you
-       * have to pass that additionally.
-       */
-
-      void
-      reserve_space(const unsigned int total_cells,
-                    const unsigned int dimension,
-                    const unsigned int space_dimension);
-
-      /**
-       * Check the memory consistency of the different containers. Should only
-       * be called with the preprocessor flag @p DEBUG set. The function
-       * should be called from the functions of the higher TriaLevel classes.
-       */
-      void
-      monitor_memory(const unsigned int true_dimension) const;
-
-      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
@@ -247,15 +223,6 @@ namespace internal
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int version);
-
-      /**
-       * Exception
-       */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
     };
 
 

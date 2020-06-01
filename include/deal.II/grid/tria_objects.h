@@ -67,7 +67,6 @@ namespace internal
        */
       TriaObjects(unsigned int structdim);
 
-    private:
       unsigned int structdim;
 
       /**
@@ -76,7 +75,6 @@ namespace internal
        */
       std::vector<int> cells;
 
-    public:
       /**
        * Return number of geometric objects stored by this class.
        */
@@ -187,20 +185,6 @@ namespace internal
       std::vector<types::manifold_id> manifold_id;
 
       /**
-       * Assert that enough space is allocated to accommodate
-       * <code>new_objs_in_pairs</code> new objects, stored in pairs, plus
-       * <code>new_obj_single</code> stored individually. This function does
-       * not only call <code>vector::reserve()</code>, but does really append
-       * the needed elements.
-       *
-       * In 2D e.g. refined lines have to be stored in pairs, whereas new
-       * lines in the interior of refined cells can be stored as single lines.
-       */
-      void
-      reserve_space(const unsigned int new_objs_in_pairs,
-                    const unsigned int new_objs_single = 0);
-
-      /**
        * Return an iterator to the next free slot for a single object. This
        * function is only used by Triangulation::execute_refinement()
        * in 3D.
@@ -283,14 +267,6 @@ namespace internal
       clear_user_flags();
 
       /**
-       * Check the memory consistency of the different containers. Should only
-       * be called with the preprocessor flag @p DEBUG set. The function
-       * should be called from the functions of the higher TriaLevel classes.
-       */
-      void
-      monitor_memory(const unsigned int true_dimension) const;
-
-      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
@@ -306,16 +282,6 @@ namespace internal
       serialize(Archive &ar, const unsigned int version);
 
       /**
-       * Exception
-       * @ingroup Exceptions
-       */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
-
-      /**
        * Triangulation objects can either access a user pointer or a
        * user index. What you tried to do is trying to access one of those
        * after using the other.
@@ -324,7 +290,6 @@ namespace internal
        */
       DeclException0(ExcPointerIndexClash);
 
-    protected:
       /**
        * Counter for next_free_single_* functions
        */
