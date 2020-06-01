@@ -421,10 +421,7 @@ namespace
       {
         std::vector<unsigned int> line_cell_count(triangulation.n_raw_lines(),
                                                   0);
-        typename Triangulation<dim, spacedim>::cell_iterator
-          cell = triangulation.begin(),
-          endc = triangulation.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
             ++line_cell_count[cell->line_index(l)];
         return line_cell_count;
@@ -449,10 +446,7 @@ namespace
       {
         std::vector<unsigned int> quad_cell_count(triangulation.n_raw_quads(),
                                                   0);
-        typename Triangulation<dim, spacedim>::cell_iterator
-          cell = triangulation.begin(),
-          endc = triangulation.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int q : GeometryInfo<dim>::face_indices())
             ++quad_cell_count[cell->quad_index(q)];
         return quad_cell_count;
@@ -634,10 +628,7 @@ namespace
   collect_distorted_coarse_cells(const Triangulation<dim, dim> &triangulation)
   {
     typename Triangulation<dim, dim>::DistortedCellList distorted_cells;
-    for (typename Triangulation<dim, dim>::cell_iterator cell =
-           triangulation.begin(0);
-         cell != triangulation.end(0);
-         ++cell)
+    for (const auto &cell : triangulation.cell_iterators_on_level(0))
       {
         Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
         for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -798,11 +789,7 @@ namespace
     std::vector<typename Triangulation<dim, spacedim>::cell_iterator>
       adjacent_cells(2 * triangulation.n_raw_faces(), dummy);
 
-    typename Triangulation<dim, spacedim>::cell_iterator cell = triangulation
-                                                                  .begin(),
-                                                         endc =
-                                                           triangulation.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.cell_iterators())
       for (auto f : GeometryInfo<dim>::face_indices())
         {
           const typename Triangulation<dim, spacedim>::face_iterator face =
@@ -882,7 +869,7 @@ namespace
     // have to use the opposite of the
     // left_right_offset in this case as we want
     // the offset of the neighbor, not our own.
-    for (cell = triangulation.begin(); cell != endc; ++cell)
+    for (const auto &cell : triangulation.cell_iterators())
       for (auto f : GeometryInfo<dim>::face_indices())
         {
           const unsigned int offset =
@@ -2209,10 +2196,7 @@ namespace internal
 
 
         // finally update neighborship info
-        for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-               triangulation.begin();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int side = 0; side < 4; ++side)
             if (adjacent_cells[cell->line(side)->index()][0] == cell)
               // first adjacent cell is
@@ -3263,10 +3247,7 @@ namespace internal
 
         /////////////////////////////////////////
         // finally update neighborship info
-        for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-               triangulation.begin();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int face = 0; face < 6; ++face)
             if (adjacent_cells[cell->quad(face)->index()][0] == cell)
               // first adjacent cell is
@@ -4178,8 +4159,8 @@ namespace internal
         typename Triangulation<2, spacedim>::raw_line_iterator
           &next_unused_line,
         typename Triangulation<2, spacedim>::raw_cell_iterator
-          &                                                 next_unused_cell,
-        typename Triangulation<2, spacedim>::cell_iterator &cell)
+          &next_unused_cell,
+        const typename Triangulation<2, spacedim>::cell_iterator &cell)
       {
         const unsigned int dim = 2;
         // clear refinement flag
@@ -4621,10 +4602,9 @@ namespace internal
             // count number of flagged
             // cells on this level
             unsigned int flagged_cells = 0;
-            typename Triangulation<dim, spacedim>::active_cell_iterator
-              acell = triangulation.begin_active(level),
-              aendc = triangulation.begin_active(level + 1);
-            for (; acell != aendc; ++acell)
+
+            for (const auto &acell :
+                 triangulation.active_cell_iterators_on_level(level))
               if (acell->refine_flag_set())
                 ++flagged_cells;
 
@@ -4674,14 +4654,11 @@ namespace internal
 
         for (int level = triangulation.levels.size() - 2; level >= 0; --level)
           {
-            typename Triangulation<dim, spacedim>::active_cell_iterator
-              cell = triangulation.begin_active(level),
-              endc = triangulation.begin_active(level + 1);
-
             typename Triangulation<dim, spacedim>::raw_cell_iterator
               next_unused_cell = triangulation.begin_raw(level + 1);
 
-            for (; (cell != endc) && (cell->level() == level); ++cell)
+            for (const auto &cell :
+                 triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
                   // clear refinement flag
@@ -4881,10 +4858,8 @@ namespace internal
             // how many new vertices and new lines will be needed
             unsigned int needed_cells = 0;
 
-            typename Triangulation<dim, spacedim>::active_cell_iterator
-              cell = triangulation.begin_active(level),
-              endc = triangulation.begin_active(level + 1);
-            for (; cell != endc; ++cell)
+            for (const auto &cell :
+                 triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
                   if (cell->refine_flag_set() == RefinementCase<dim>::cut_xy)
@@ -5098,16 +5073,11 @@ namespace internal
              level < static_cast<int>(triangulation.levels.size()) - 1;
              ++level)
           {
-            // Remember: as we don't operate on the finest level,
-            // begin_*(level+1) is allowed
-            typename Triangulation<dim, spacedim>::active_cell_iterator
-              cell = triangulation.begin_active(level),
-              endc = triangulation.begin_active(level + 1);
-
             typename Triangulation<dim, spacedim>::raw_cell_iterator
               next_unused_cell = triangulation.begin_raw(level + 1);
 
-            for (; cell != endc; ++cell)
+            for (const auto &cell :
+                 triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
                   // set the user flag to indicate, that at least one
@@ -5226,10 +5196,8 @@ namespace internal
             // how many new vertices and new lines will be needed
             unsigned int new_cells = 0;
 
-            typename Triangulation<dim, spacedim>::active_cell_iterator
-              acell = triangulation.begin_active(level),
-              aendc = triangulation.begin_active(level + 1);
-            for (; acell != aendc; ++acell)
+            for (const auto &acell :
+                 triangulation.active_cell_iterators_on_level(level))
               if (acell->refine_flag_set())
                 {
                   RefinementCase<dim> ref_case = acell->refine_flag_set();
@@ -9543,10 +9511,7 @@ namespace internal
         if (spacedim > dim)
           return;
 
-        for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-               triangulation.begin();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.cell_iterators())
           if (cell->at_boundary() && cell->refine_flag_set() &&
               cell->refine_flag_set() !=
                 RefinementCase<dim>::isotropic_refinement)
@@ -9655,10 +9620,7 @@ namespace internal
 
             // flag those lines that are refined and will not be
             // coarsened and those that will be refined
-            for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-                   triangulation.begin();
-                 cell != triangulation.end();
-                 ++cell)
+            for (const auto &cell : triangulation.cell_iterators())
               if (cell->refine_flag_set())
                 {
                   for (unsigned int line = 0;
@@ -10088,11 +10050,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids(
     ExcMessage(
       "Error: set_all_manifold_ids() can not be called on an empty Triangulation."));
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = this->begin_active(),
-    endc = this->end();
-
-  for (; cell != endc; ++cell)
+  for (const auto &cell : this->active_cell_iterators())
     cell->set_all_manifold_ids(m_number);
 }
 
@@ -10107,11 +10065,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
     ExcMessage(
       "Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = this->begin_active(),
-    endc = this->end();
-
-  for (; cell != endc; ++cell)
+  for (const auto &cell : this->active_cell_iterators())
     for (auto f : GeometryInfo<dim>::face_indices())
       if (cell->face(f)->at_boundary())
         cell->face(f)->set_all_manifold_ids(m_number);
@@ -10130,11 +10084,8 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
       "Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
 
   bool boundary_found = false;
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = this->begin_active(),
-    endc = this->end();
 
-  for (; cell != endc; ++cell)
+  for (const auto &cell : this->active_cell_iterators())
     {
       // loop on faces
       for (auto f : GeometryInfo<dim>::face_indices())
@@ -10641,9 +10592,8 @@ Triangulation<dim, spacedim>::set_all_refine_flags()
 {
   Assert(n_cells() > 0,
          ExcMessage("Error: An empty Triangulation can not be refined."));
-  active_cell_iterator cell = begin_active(), endc = end();
 
-  for (; cell != endc; ++cell)
+  for (const auto &cell : this->active_cell_iterators())
     {
       cell->clear_coarsen_flag();
       cell->set_refine_flag();
@@ -10674,9 +10624,9 @@ void
 Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
 {
   v.resize(dim * n_active_cells(), false);
-  std::vector<bool>::iterator i    = v.begin();
-  active_cell_iterator        cell = begin_active(), endc = end();
-  for (; cell != endc; ++cell)
+  std::vector<bool>::iterator i = v.begin();
+
+  for (const auto &cell : this->active_cell_iterators())
     for (unsigned int j = 0; j < dim; ++j, ++i)
       if (cell->refine_flag_set() & (1 << j))
         *i = true;
@@ -10717,9 +10667,8 @@ Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
 {
   AssertThrow(v.size() == dim * n_active_cells(), ExcGridReadError());
 
-  active_cell_iterator              cell = begin_active(), endc = end();
   std::vector<bool>::const_iterator i = v.begin();
-  for (; cell != endc; ++cell)
+  for (const auto &cell : this->active_cell_iterators())
     {
       unsigned int ref_case = 0;
 
@@ -10744,10 +10693,12 @@ void
 Triangulation<dim, spacedim>::save_coarsen_flags(std::vector<bool> &v) const
 {
   v.resize(n_active_cells(), false);
-  std::vector<bool>::iterator i    = v.begin();
-  active_cell_iterator        cell = begin_active(), endc = end();
-  for (; cell != endc; ++cell, ++i)
-    *i = cell->coarsen_flag_set();
+  std::vector<bool>::iterator i = v.begin();
+  for (const auto &cell : this->active_cell_iterators())
+    {
+      *i = cell->coarsen_flag_set();
+      ++i;
+    }
 
   Assert(i == v.end(), ExcInternalError());
 }
@@ -10788,13 +10739,15 @@ Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
 {
   Assert(v.size() == n_active_cells(), ExcGridReadError());
 
-  active_cell_iterator              cell = begin_active(), endc = end();
   std::vector<bool>::const_iterator i = v.begin();
-  for (; cell != endc; ++cell, ++i)
-    if (*i == true)
-      cell->set_coarsen_flag();
-    else
-      cell->clear_coarsen_flag();
+  for (const auto &cell : this->active_cell_iterators())
+    {
+      if (*i == true)
+        cell->set_coarsen_flag();
+      else
+        cell->clear_coarsen_flag();
+      ++i;
+    }
 
   Assert(i == v.end(), ExcInternalError());
 }
@@ -13341,9 +13294,8 @@ Triangulation<dim, spacedim>::execute_refinement()
   // previously non-active cells which we may not have touched. If the
   // refinement flag of a non-active cell is set, something went wrong
   // since the cell-accessors should have caught this)
-  cell_iterator cell = begin(), endc = end();
-  while (cell != endc)
-    Assert(!(cell++)->refine_flag_set(), ExcInternalError());
+  for (const auto &cell : this->cell_iterators())
+    Assert(!cell->refine_flag_set(), ExcInternalError());
 #endif
 
   return cells_with_distorted_children;
@@ -13376,8 +13328,7 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // child
   clear_user_flags();
 
-  cell_iterator cell = begin(), endc = end();
-  for (; cell != endc; ++cell)
+  for (const auto &cell : this->cell_iterators())
     if (!cell->is_active())
       if (cell->child(0)->coarsen_flag_set())
         {
@@ -13401,6 +13352,7 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // since we delete the *children* of cells, we can ignore cells
   // on the highest level, i.e., level must be less than or equal
   // to n_levels()-2.
+  cell_iterator cell = begin(), endc = end();
   if (levels.size() >= 2)
     for (cell = last(); cell != endc; --cell)
       if (cell->level() <= static_cast<int>(levels.size() - 2) &&
@@ -13462,8 +13414,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           // store highest level one of the cells adjacent to a vertex
           // belongs to
           std::fill(vertex_level.begin(), vertex_level.end(), 0);
-          active_cell_iterator cell = begin_active(), endc = end();
-          for (; cell != endc; ++cell)
+          for (const auto &cell : this->active_cell_iterators())
             {
               if (cell->refine_flag_set())
                 for (const unsigned int vertex :
@@ -13504,6 +13455,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           // refinement flags, but we will also have to remove
           // coarsening flags on cells adjacent to vertices that will
           // see refinement
+          active_cell_iterator cell = begin_active(), endc = end();
           for (cell = last_active(); cell != endc; --cell)
             if (cell->refine_flag_set() == false)
               {
@@ -13552,12 +13504,10 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
       clear_user_flags();
       // Coarsen flags of cells with no mother cell, i.e. on the
       // coarsest level are deleted explicitly.
-      active_cell_iterator acell = begin_active(0), end_ac = end_active(0);
-      for (; acell != end_ac; ++acell)
+      for (const auto &acell : this->active_cell_iterators_on_level(0))
         acell->clear_coarsen_flag();
 
-      cell_iterator cell = begin(), endc = end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : this->cell_iterators())
         {
           // nothing to do if we are already on the finest level
           if (cell->is_active())
@@ -13583,7 +13533,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
         // in principle no coarsen flags should be set any more at this
         // point
 #if DEBUG
-      for (cell = begin(); cell != endc; ++cell)
+      for (auto &cell : this->cell_iterators())
         Assert(cell->coarsen_flag_set() == false, ExcInternalError());
 #endif
 
@@ -13604,6 +13554,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
       // have to work from the finest level to the coarsest one, since
       // we occasionally inspect user flags of cells on finer levels
       // and need to be sure that these flags are final
+      cell_iterator cell = begin(), endc = end();
       for (cell = last(); cell != endc; --cell)
         if (cell->user_flag_set())
           // if allowed: flag the
