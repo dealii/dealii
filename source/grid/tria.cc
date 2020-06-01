@@ -421,7 +421,7 @@ namespace
       {
         std::vector<unsigned int> line_cell_count(triangulation.n_raw_lines(),
                                                   0);
-        for (auto &cell : triangulation.cell_iterators())
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
             ++line_cell_count[cell->line_index(l)];
         return line_cell_count;
@@ -446,7 +446,7 @@ namespace
       {
         std::vector<unsigned int> quad_cell_count(triangulation.n_raw_quads(),
                                                   0);
-        for (auto &cell : triangulation.cell_iterators())
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int q : GeometryInfo<dim>::face_indices())
             ++quad_cell_count[cell->quad_index(q)];
         return quad_cell_count;
@@ -628,7 +628,7 @@ namespace
   collect_distorted_coarse_cells(const Triangulation<dim, dim> &triangulation)
   {
     typename Triangulation<dim, dim>::DistortedCellList distorted_cells;
-    for (auto &cell : triangulation.cell_iterators_on_level(0))
+    for (const auto &cell : triangulation.cell_iterators_on_level(0))
       {
         Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
         for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -789,7 +789,7 @@ namespace
     std::vector<typename Triangulation<dim, spacedim>::cell_iterator>
       adjacent_cells(2 * triangulation.n_raw_faces(), dummy);
 
-    for (auto &cell : triangulation.cell_iterators())
+    for (const auto &cell : triangulation.cell_iterators())
       for (auto f : GeometryInfo<dim>::face_indices())
         {
           const typename Triangulation<dim, spacedim>::face_iterator face =
@@ -869,7 +869,7 @@ namespace
     // have to use the opposite of the
     // left_right_offset in this case as we want
     // the offset of the neighbor, not our own.
-    for (auto &cell : triangulation.cell_iterators())
+    for (const auto &cell : triangulation.cell_iterators())
       for (auto f : GeometryInfo<dim>::face_indices())
         {
           const unsigned int offset =
@@ -2199,7 +2199,7 @@ namespace internal
 
 
         // finally update neighborship info
-        for (auto &cell : triangulation.cell_iterators())
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int side = 0; side < 4; ++side)
             if (adjacent_cells[cell->line(side)->index()][0] == cell)
               // first adjacent cell is
@@ -3271,7 +3271,7 @@ namespace internal
 
         /////////////////////////////////////////
         // finally update neighborship info
-        for (auto &cell : triangulation.cell_iterators())
+        for (const auto &cell : triangulation.cell_iterators())
           for (unsigned int face = 0; face < 6; ++face)
             if (adjacent_cells[cell->quad(face)->index()][0] == cell)
               // first adjacent cell is
@@ -4647,7 +4647,7 @@ namespace internal
             // cells on this level
             unsigned int flagged_cells = 0;
 
-            for (auto &acell :
+            for (const auto &acell :
                  triangulation.active_cell_iterators_on_level(level))
               if (acell->refine_flag_set())
                 ++flagged_cells;
@@ -4701,7 +4701,7 @@ namespace internal
             typename Triangulation<dim, spacedim>::raw_cell_iterator
               next_unused_cell = triangulation.begin_raw(level + 1);
 
-            for (auto &cell :
+            for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
@@ -4905,7 +4905,7 @@ namespace internal
             // how many new vertices and new lines will be needed
             unsigned int needed_cells = 0;
 
-            for (auto &cell :
+            for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
@@ -5127,7 +5127,7 @@ namespace internal
             typename Triangulation<dim, spacedim>::raw_cell_iterator
               next_unused_cell = triangulation.begin_raw(level + 1);
 
-            for (auto &cell :
+            for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
@@ -5247,7 +5247,7 @@ namespace internal
             // how many new vertices and new lines will be needed
             unsigned int new_cells = 0;
 
-            for (auto &acell :
+            for (const auto &acell :
                  triangulation.active_cell_iterators_on_level(level))
               if (acell->refine_flag_set())
                 {
@@ -9655,7 +9655,7 @@ namespace internal
         if (spacedim > dim)
           return;
 
-        for (auto &cell : triangulation.cell_iterators())
+        for (const auto &cell : triangulation.cell_iterators())
           if (cell->at_boundary() && cell->refine_flag_set() &&
               cell->refine_flag_set() !=
                 RefinementCase<dim>::isotropic_refinement)
@@ -9764,7 +9764,7 @@ namespace internal
 
             // flag those lines that are refined and will not be
             // coarsened and those that will be refined
-            for (auto &cell : triangulation.cell_iterators())
+            for (const auto &cell : triangulation.cell_iterators())
               if (cell->refine_flag_set())
                 {
                   for (unsigned int line = 0;
@@ -10194,7 +10194,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids(
     ExcMessage(
       "Error: set_all_manifold_ids() can not be called on an empty Triangulation."));
 
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     cell->set_all_manifold_ids(m_number);
 }
 
@@ -10209,7 +10209,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
     ExcMessage(
       "Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
 
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     for (auto f : GeometryInfo<dim>::face_indices())
       if (cell->face(f)->at_boundary())
         cell->face(f)->set_all_manifold_ids(m_number);
@@ -10229,7 +10229,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
 
   bool boundary_found = false;
 
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     {
       // loop on faces
       for (auto f : GeometryInfo<dim>::face_indices())
@@ -10737,7 +10737,7 @@ Triangulation<dim, spacedim>::set_all_refine_flags()
   Assert(n_cells() > 0,
          ExcMessage("Error: An empty Triangulation can not be refined."));
 
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     {
       cell->clear_coarsen_flag();
       cell->set_refine_flag();
@@ -10770,7 +10770,7 @@ Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
   v.resize(dim * n_active_cells(), false);
   std::vector<bool>::iterator i = v.begin();
 
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     for (unsigned int j = 0; j < dim; ++j, ++i)
       if (cell->refine_flag_set() & (1 << j))
         *i = true;
@@ -10812,7 +10812,7 @@ Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
   AssertThrow(v.size() == dim * n_active_cells(), ExcGridReadError());
 
   std::vector<bool>::const_iterator i = v.begin();
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     {
       unsigned int ref_case = 0;
 
@@ -10838,7 +10838,7 @@ Triangulation<dim, spacedim>::save_coarsen_flags(std::vector<bool> &v) const
 {
   v.resize(n_active_cells(), false);
   std::vector<bool>::iterator i = v.begin();
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     {
       *i = cell->coarsen_flag_set();
       ++i;
@@ -10884,7 +10884,7 @@ Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
   Assert(v.size() == n_active_cells(), ExcGridReadError());
 
   std::vector<bool>::const_iterator i = v.begin();
-  for (auto &cell : this->active_cell_iterators())
+  for (const auto &cell : this->active_cell_iterators())
     {
       if (*i == true)
         cell->set_coarsen_flag();
@@ -13438,7 +13438,7 @@ Triangulation<dim, spacedim>::execute_refinement()
   // previously non-active cells which we may not have touched. If the
   // refinement flag of a non-active cell is set, something went wrong
   // since the cell-accessors should have caught this)
-  for (auto &cell : this->cell_iterators())
+  for (const auto &cell : this->cell_iterators())
     Assert(!cell->refine_flag_set(), ExcInternalError());
 #endif
 
@@ -13472,7 +13472,7 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // child
   clear_user_flags();
 
-  for (auto &cell : this->cell_iterators())
+  for (const auto &cell : this->cell_iterators())
     if (!cell->is_active())
       if (cell->child(0)->coarsen_flag_set())
         {
@@ -13558,7 +13558,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           // store highest level one of the cells adjacent to a vertex
           // belongs to
           std::fill(vertex_level.begin(), vertex_level.end(), 0);
-          for (auto &cell : this->active_cell_iterators())
+          for (const auto &cell : this->active_cell_iterators())
             {
               if (cell->refine_flag_set())
                 for (const unsigned int vertex :
@@ -13648,10 +13648,10 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
       clear_user_flags();
       // Coarsen flags of cells with no mother cell, i.e. on the
       // coarsest level are deleted explicitly.
-      for (auto &acell : this->active_cell_iterators_on_level(0))
+      for (const auto &acell : this->active_cell_iterators_on_level(0))
         acell->clear_coarsen_flag();
 
-      for (auto &cell : this->cell_iterators())
+      for (const auto &cell : this->cell_iterators())
         {
           // nothing to do if we are already on the finest level
           if (cell->is_active())
