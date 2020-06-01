@@ -35,7 +35,7 @@ namespace internal
      * @note The geometric objects are not saved as separate instances of
      * TriaObject but in a single vector in TriaObjects.
      */
-    class TriaObjectView
+    class TriaObject
     {
     public:
       /**
@@ -43,14 +43,14 @@ namespace internal
        *
        * @param faces ArrayView inside of the vector in TriaObjects.
        */
-      TriaObjectView(const ArrayView<int> &faces)
+      TriaObject(const ArrayView<int> &faces)
         : faces(faces)
       {}
 
       /**
        * Store the content of @p other in the vector of TriaObjects.
        */
-      TriaObjectView &
+      TriaObject &
       operator=(const std::initializer_list<int> &other)
       {
         AssertDimension(faces.size(), other.size());
@@ -66,7 +66,7 @@ namespace internal
       /**
        * The same as above but for `unsigned int`.
        */
-      TriaObjectView &
+      TriaObject &
       operator=(const std::initializer_list<unsigned int> &other)
       {
         AssertDimension(faces.size(), other.size());
