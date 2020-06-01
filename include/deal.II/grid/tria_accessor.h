@@ -52,7 +52,6 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    class TriaObject;
     class TriaObjects;
     struct Implementation;
   } // namespace TriangulationImplementation
@@ -1627,7 +1626,13 @@ private:
    * triangulation.
    */
   void
-  set(const dealii::internal::TriangulationImplementation::TriaObject &o) const;
+  set(const std::initializer_list<int> &o) const;
+
+  /**
+   * The same as above but for `unsigned int`.
+   */
+  void
+  set(const std::initializer_list<unsigned int> &o) const;
 
   /**
    * Set the flag indicating, what <code>line_orientation()</code> will

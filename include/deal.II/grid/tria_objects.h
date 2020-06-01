@@ -86,7 +86,7 @@ namespace internal
       /**
        * Return a view on the @p index-th geometric object.
        */
-      TriaObjectView
+      TriaObject
       get_object(const unsigned int index);
 
       /**
@@ -424,7 +424,7 @@ namespace internal
 
 
 
-    inline TriaObjectView
+    inline TriaObject
     TriaObjects::get_object(const unsigned int index)
     {
       // assume that each cell has the same number of faces
