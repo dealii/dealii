@@ -409,7 +409,8 @@ namespace Particles
                          &                             global_bounding_boxes,
                        ParticleHandler<dim, spacedim> &particle_handler,
                        const Mapping<dim, spacedim> &  mapping,
-                       const ComponentMask &           components)
+                       const ComponentMask &           components,
+                       const std::vector<std::vector<double>> &properties)
     {
       const auto &fe = dof_handler.get_fe();
 
@@ -433,7 +434,8 @@ namespace Particles
         support_points_vec.push_back(element.second);
 
       particle_handler.insert_global_particles(support_points_vec,
-                                               global_bounding_boxes);
+                                               global_bounding_boxes,
+                                               properties);
     }
 
 
@@ -444,9 +446,10 @@ namespace Particles
       const Quadrature<dim> &             quadrature,
       // const std::vector<Point<dim>> &     particle_reference_locations,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                             global_bounding_boxes,
-      ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping)
+        &                                     global_bounding_boxes,
+      ParticleHandler<dim, spacedim> &        particle_handler,
+      const Mapping<dim, spacedim> &          mapping,
+      const std::vector<std::vector<double>> &properties)
     {
       const std::vector<Point<dim>> &particle_reference_locations =
         quadrature.get_points();
@@ -468,7 +471,8 @@ namespace Particles
             }
         }
       particle_handler.insert_global_particles(points_to_generate,
-                                               global_bounding_boxes);
+                                               global_bounding_boxes,
+                                               properties);
     }
   } // namespace Generators
 } // namespace Particles
