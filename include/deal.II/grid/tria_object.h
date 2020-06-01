@@ -40,68 +40,6 @@ namespace internal
   namespace TriangulationImplementation
   {
     /**
-     * Class template for the <tt>structdim</tt>-dimensional cells
-     * constituting a dealii::Triangulation of dimension <tt>structdim</tt> or
-     * lower dimensional objects of higher dimensions.  They are characterized
-     * by the (global) indices of their faces, which are cells of dimension
-     * <tt>structdim-1</tt> or vertices if <tt>structdim=1</tt>.
-     *
-     * @note This class is only used during setup of the Triangulation and its
-     *   content is saved into a single long vector inside of `TriaObjects`.
-     *
-     * @author Guido Kanschat, 2007
-     */
-    class TriaObject
-    {
-    public:
-      /**
-       * Constructor.
-       */
-      TriaObject(const std::initializer_list<int> &faces);
-
-      /**
-       * Constructor.
-       */
-      TriaObject(const std::initializer_list<unsigned int> &faces);
-
-      /**
-       * Return the index of the ith face object.
-       */
-      int
-      face(const unsigned int i) const;
-
-      /**
-       * Set the index of the ith face object.
-       */
-      void
-      set_face(const unsigned int i, const int index);
-
-      /**
-       * Determine an estimate for the memory consumption (in bytes) of this
-       * object.
-       */
-      std::size_t
-      memory_consumption();
-
-      /**
-       * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
-       */
-      template <class Archive>
-      void
-      serialize(Archive &ar, const unsigned int version);
-
-    private:
-      /**
-       * Global indices of the face iterators bounding this cell if dim@>1,
-       * and the two vertex indices in 1d.
-       */
-      std::vector<int> faces;
-
-      friend TriaObjectView;
-    };
-
-    /**
      * View onto the current geometric object and its faces.
      *
      * @note The geometric objects are not saved as separate instances of
@@ -123,12 +61,14 @@ namespace internal
        * Store the content of @p other in the vector of TriaObjects.
        */
       TriaObjectView &
-      operator=(const TriaObject &other)
+      operator=(const std::initializer_list<int> &other)
       {
-        AssertDimension(faces.size(), other.faces.size());
+        AssertDimension(faces.size(), other.size());
+
+        const std::vector<int> other_v = other;
 
         for (unsigned int i = 0; i < faces.size(); ++i)
-          faces[i] = other.faces[i];
+          faces[i] = other_v[i];
 
         return *this;
       }
@@ -157,60 +97,6 @@ namespace internal
        */
       const ArrayView<int> faces;
     };
-
-    //----------------------------------------------------------------------//
-
-
-    inline TriaObject::TriaObject(const std::initializer_list<int> &faces)
-    {
-      this->faces = faces;
-    }
-
-
-
-    inline TriaObject::TriaObject(
-      const std::initializer_list<unsigned int> &faces_in)
-    {
-      this->faces.reserve(faces_in.size());
-      for (const auto face : faces_in)
-        this->faces.push_back(face);
-    }
-
-
-
-    inline int
-    TriaObject::face(const unsigned int i) const
-    {
-      AssertIndexRange(i, faces.size());
-      return faces[i];
-    }
-
-
-
-    inline void
-    TriaObject::set_face(const unsigned int i, const int index)
-    {
-      AssertIndexRange(i, faces.size());
-      faces[i] = index;
-    }
-
-
-
-    inline std::size_t
-    TriaObject::memory_consumption()
-    {
-      return MemoryConsumption::memory_consumption(this->faces);
-    }
-
-
-    template <class Archive>
-    void
-    TriaObject::serialize(Archive &ar, const unsigned int)
-    {
-      ar &faces;
-    }
-
-
   } // namespace TriangulationImplementation
 } // namespace internal
 
