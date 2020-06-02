@@ -4365,17 +4365,18 @@ namespace internal
                                   for (const unsigned int q :
                                        GeometryInfo<dim>::face_indices())
                                     {
-                                      const int index = triangulation.levels[l]
-                                                          ->cells.get_object(h)
-                                                          .face(q);
+                                      const int index =
+                                        triangulation.levels[l]
+                                          ->cells.get_bounding_object_indices(
+                                            h)[q];
                                       if (index == switch_1_index)
                                         triangulation.levels[l]
-                                          ->cells.get_object(h)
-                                          .set_face(q, switch_2_index);
+                                          ->cells.get_bounding_object_indices(
+                                            h)[q] = switch_2_index;
                                       else if (index == switch_2_index)
                                         triangulation.levels[l]
-                                          ->cells.get_object(h)
-                                          .set_face(q, switch_1_index);
+                                          ->cells.get_bounding_object_indices(
+                                            h)[q] = switch_1_index;
                                     }
                               // now we have to copy
                               // all information of the
@@ -6338,14 +6339,16 @@ namespace internal
                                    ++l)
                                 {
                                   const int this_index =
-                                    triangulation.faces->quads.get_object(q)
-                                      .face(l);
+                                    triangulation.faces->quads
+                                      .get_bounding_object_indices(q)[l];
                                   if (this_index == old_index_0)
-                                    triangulation.faces->quads.get_object(q)
-                                      .set_face(l, new_index_0);
+                                    triangulation.faces->quads
+                                      .get_bounding_object_indices(q)[l] =
+                                      new_index_0;
                                   else if (this_index == old_index_1)
-                                    triangulation.faces->quads.get_object(q)
-                                      .set_face(l, new_index_1);
+                                    triangulation.faces->quads
+                                      .get_bounding_object_indices(q)[l] =
+                                      new_index_1;
                                 }
                             // now we have to copy all information of
                             // the two lines
@@ -6437,16 +6440,16 @@ namespace internal
                                   {
                                     const int face_index =
                                       triangulation.levels[l]
-                                        ->cells.get_object(h)
-                                        .face(q);
+                                        ->cells.get_bounding_object_indices(
+                                          h)[q];
                                     if (face_index == switch_1_index)
                                       triangulation.levels[l]
-                                        ->cells.get_object(h)
-                                        .set_face(q, switch_2_index);
+                                        ->cells.get_bounding_object_indices(
+                                          h)[q] = switch_2_index;
                                     else if (face_index == switch_2_index)
                                       triangulation.levels[l]
-                                        ->cells.get_object(h)
-                                        .set_face(q, switch_1_index);
+                                        ->cells.get_bounding_object_indices(
+                                          h)[q] = switch_1_index;
                                   }
                             // now we have to copy all information of
                             // the two quads

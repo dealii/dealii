@@ -22,8 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
 
-#include <deal.II/grid/tria_object.h>
-
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -82,10 +80,14 @@ namespace internal
       n_objects() const;
 
       /**
-       * Return a view on the @p index-th geometric object.
+       * Return a view on the indices of the objects that bound the @p
+       * index-th object stored by the current object. For example, if
+       * the current object stores cells, then this function returns
+       * the equivalent of an array containing the indices of the
+       * faces that bound the @p index-th cell.
        */
-      TriaObject
-      get_object(const unsigned int index);
+      ArrayView<int>
+      get_bounding_object_indices(const unsigned int index);
 
       /**
        * Index of the even children of an object. Since when objects are
@@ -389,8 +391,8 @@ namespace internal
 
 
 
-    inline TriaObject
-    TriaObjects::get_object(const unsigned int index)
+    inline ArrayView<int>
+    TriaObjects::get_bounding_object_indices(const unsigned int index)
     {
       // assume that each cell has the same number of faces
 
@@ -405,8 +407,8 @@ namespace internal
       else
         AssertThrow(false, ExcNotImplemented());
 
-      return {
-        ArrayView<int>(cells.data() + index * faces_per_cell, faces_per_cell)};
+      return ArrayView<int>(cells.data() + index * faces_per_cell,
+                            faces_per_cell);
     }
 
 

@@ -21,7 +21,6 @@
 
 #include <deal.II/base/point.h>
 
-#include <deal.II/grid/tria_object.h>
 #include <deal.II/grid/tria_objects.h>
 
 #include <boost/serialization/utility.hpp>

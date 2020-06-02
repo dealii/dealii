@@ -1629,14 +1629,15 @@ private:
    * denotes the indices of the vertices that bound it. And so on.
    */
   void
-  set_bounding_object_indices(const std::initializer_list<int> &o) const;
+  set_bounding_object_indices(
+    const std::initializer_list<int> &new_indices) const;
 
   /**
    * The same as above but for `unsigned int`.
    */
   void
   set_bounding_object_indices(
-    const std::initializer_list<unsigned int> &o) const;
+    const std::initializer_list<unsigned int> &new_indices) const;
 
   /**
    * Set the flag indicating, what <code>line_orientation()</code> will
