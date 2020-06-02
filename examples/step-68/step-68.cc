@@ -560,7 +560,7 @@ namespace Step68
         // Compute the velocity at the particle locations by evaluating
         // the finite element solution at the position of the particles.
         // This is essentially an optimized version of the particle advection
-        // functionality in step-19, but instead of creating quadrature
+        // functionality in step 19, but instead of creating quadrature
         // objects and FEValues objects for each cell, we do the
         // evaluation by hand, which is somewhat more efficient and only
         // matters for this tutorial, because the particle work is the
