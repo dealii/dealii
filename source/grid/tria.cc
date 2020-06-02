@@ -6890,12 +6890,6 @@ namespace internal
                     // note these quads as children to the present one
                     quad->set_children(0, new_quads[0]->index());
                     quad->set_children(2, new_quads[2]->index());
-                    new_quads[0]->set_bounding_object_indices(
-                      {line_indices[0],
-                       line_indices[8],
-                       line_indices[4],
-                       line_indices[10]});
-
                     quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
                     new_quads[0]->set_bounding_object_indices(
