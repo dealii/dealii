@@ -2239,7 +2239,7 @@ namespace internal
             while (next_free_line->used())
               ++next_free_line;
 
-            next_free_line->set(
+            next_free_line->set_bounding_object_indices(
               {cells[cell].vertices[0], cells[cell].vertices[1]});
             next_free_line->set_used_flag();
             next_free_line->set_material_id(cells[cell].material_id);
@@ -2521,7 +2521,8 @@ namespace internal
           for (i = needed_lines.begin(); line != triangulation.end_line();
                ++line, ++i)
             {
-              line->set({i->first.first, i->first.second});
+              line->set_bounding_object_indices(
+                {i->first.first, i->first.second});
               line->set_used_flag();
               line->clear_user_flag();
               line->clear_user_data();
@@ -2554,10 +2555,10 @@ namespace internal
                   cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
                     line, 1)])];
 
-              cell->set({lines[0]->index(),
-                         lines[1]->index(),
-                         lines[2]->index(),
-                         lines[3]->index()});
+              cell->set_bounding_object_indices({lines[0]->index(),
+                                                 lines[1]->index(),
+                                                 lines[2]->index(),
+                                                 lines[3]->index()});
 
               cell->set_used_flag();
               cell->set_material_id(cells[c].material_id);
@@ -2897,7 +2898,8 @@ namespace internal
           for (i = needed_lines.begin(); line != triangulation.end_line();
                ++line, ++i)
             {
-              line->set({i->first.first, i->first.second});
+              line->set_bounding_object_indices(
+                {i->first.first, i->first.second});
               line->set_used_flag();
               line->clear_user_flag();
               line->clear_user_data();
@@ -3118,7 +3120,8 @@ namespace internal
           for (q = needed_quads.begin(); quad != triangulation.end_quad();
                ++quad, ++q)
             {
-              quad->set({q->first[0], q->first[1], q->first[2], q->first[3]});
+              quad->set_bounding_object_indices(
+                {q->first[0], q->first[1], q->first[2], q->first[3]});
               quad->set_used_flag();
               quad->clear_user_flag();
               quad->clear_user_data();
@@ -3348,12 +3351,12 @@ namespace internal
 
               // make the cell out of
               // these iterators
-              cell->set({face_iterator[0]->index(),
-                         face_iterator[1]->index(),
-                         face_iterator[2]->index(),
-                         face_iterator[3]->index(),
-                         face_iterator[4]->index(),
-                         face_iterator[5]->index()});
+              cell->set_bounding_object_indices({face_iterator[0]->index(),
+                                                 face_iterator[1]->index(),
+                                                 face_iterator[2]->index(),
+                                                 face_iterator[3]->index(),
+                                                 face_iterator[4]->index(),
+                                                 face_iterator[5]->index()});
 
               cell->set_used_flag();
               cell->set_material_id(cells[c].material_id);
@@ -4398,10 +4401,11 @@ namespace internal
                               const bool switch_1_user_flag =
                                 switch_1->user_flag_set();
 
-                              switch_1->set({switch_2->line_index(0),
-                                             switch_2->line_index(1),
-                                             switch_2->line_index(2),
-                                             switch_2->line_index(3)});
+                              switch_1->set_bounding_object_indices(
+                                {switch_2->line_index(0),
+                                 switch_2->line_index(1),
+                                 switch_2->line_index(2),
+                                 switch_2->line_index(3)});
                               switch_1->set_line_orientation(
                                 0, switch_2->line_orientation(0));
                               switch_1->set_line_orientation(
@@ -4420,10 +4424,11 @@ namespace internal
                               else
                                 switch_1->clear_user_flag();
 
-                              switch_2->set({switch_1_lines[0],
-                                             switch_1_lines[1],
-                                             switch_1_lines[2],
-                                             switch_1_lines[3]});
+                              switch_2->set_bounding_object_indices(
+                                {switch_1_lines[0],
+                                 switch_1_lines[1],
+                                 switch_1_lines[2],
+                                 switch_1_lines[3]});
                               switch_2->set_line_orientation(
                                 0, switch_1_line_orientations[0]);
                               switch_2->set_line_orientation(
@@ -4858,10 +4863,14 @@ namespace internal
                 new_lines[l] = cell->line(face_no)->child(c);
             Assert(l == 8, ExcInternalError());
 
-            new_lines[8]->set({new_vertices[6], new_vertices[8]});
-            new_lines[9]->set({new_vertices[8], new_vertices[7]});
-            new_lines[10]->set({new_vertices[4], new_vertices[8]});
-            new_lines[11]->set({new_vertices[8], new_vertices[5]});
+            new_lines[8]->set_bounding_object_indices(
+              {new_vertices[6], new_vertices[8]});
+            new_lines[9]->set_bounding_object_indices(
+              {new_vertices[8], new_vertices[7]});
+            new_lines[10]->set_bounding_object_indices(
+              {new_vertices[4], new_vertices[8]});
+            new_lines[11]->set_bounding_object_indices(
+              {new_vertices[8], new_vertices[5]});
           }
         else if (ref_case == RefinementCase<dim>::cut_x)
           {
@@ -4876,7 +4885,8 @@ namespace internal
             new_lines[3] = cell->line(2)->child(1);
             new_lines[4] = cell->line(3)->child(0);
             new_lines[5] = cell->line(3)->child(1);
-            new_lines[6]->set({new_vertices[6], new_vertices[7]});
+            new_lines[6]->set_bounding_object_indices(
+              {new_vertices[6], new_vertices[7]});
           }
         else
           {
@@ -4892,7 +4902,8 @@ namespace internal
             new_lines[3] = cell->line(1)->child(1);
             new_lines[4] = cell->line(2);
             new_lines[5] = cell->line(3);
-            new_lines[6]->set({new_vertices[4], new_vertices[5]});
+            new_lines[6]->set_bounding_object_indices(
+              {new_vertices[4], new_vertices[5]});
           }
 
         for (unsigned int l = lmin; l < lmax; ++l)
@@ -4942,22 +4953,22 @@ namespace internal
             //   .-10.11-.
             //   0   8   2
             //   .-4-.-5-.
-            subcells[0]->set({new_lines[0]->index(),
-                              new_lines[8]->index(),
-                              new_lines[4]->index(),
-                              new_lines[10]->index()});
-            subcells[1]->set({new_lines[8]->index(),
-                              new_lines[2]->index(),
-                              new_lines[5]->index(),
-                              new_lines[11]->index()});
-            subcells[2]->set({new_lines[1]->index(),
-                              new_lines[9]->index(),
-                              new_lines[10]->index(),
-                              new_lines[6]->index()});
-            subcells[3]->set({new_lines[9]->index(),
-                              new_lines[3]->index(),
-                              new_lines[11]->index(),
-                              new_lines[7]->index()});
+            subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
+                                                      new_lines[8]->index(),
+                                                      new_lines[4]->index(),
+                                                      new_lines[10]->index()});
+            subcells[1]->set_bounding_object_indices({new_lines[8]->index(),
+                                                      new_lines[2]->index(),
+                                                      new_lines[5]->index(),
+                                                      new_lines[11]->index()});
+            subcells[2]->set_bounding_object_indices({new_lines[1]->index(),
+                                                      new_lines[9]->index(),
+                                                      new_lines[10]->index(),
+                                                      new_lines[6]->index()});
+            subcells[3]->set_bounding_object_indices({new_lines[9]->index(),
+                                                      new_lines[3]->index(),
+                                                      new_lines[11]->index(),
+                                                      new_lines[7]->index()});
           }
         else if (ref_case == RefinementCase<dim>::cut_x)
           {
@@ -4973,14 +4984,14 @@ namespace internal
             //   0   6   1
             //   |   |   |
             //   .-2-.-3-.
-            subcells[0]->set({new_lines[0]->index(),
-                              new_lines[6]->index(),
-                              new_lines[2]->index(),
-                              new_lines[4]->index()});
-            subcells[1]->set({new_lines[6]->index(),
-                              new_lines[1]->index(),
-                              new_lines[3]->index(),
-                              new_lines[5]->index()});
+            subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
+                                                      new_lines[6]->index(),
+                                                      new_lines[2]->index(),
+                                                      new_lines[4]->index()});
+            subcells[1]->set_bounding_object_indices({new_lines[6]->index(),
+                                                      new_lines[1]->index(),
+                                                      new_lines[3]->index(),
+                                                      new_lines[5]->index()});
           }
         else
           {
@@ -4997,14 +5008,14 @@ namespace internal
             //   .---6---.
             //   0       2
             //   .---4---.
-            subcells[0]->set({new_lines[0]->index(),
-                              new_lines[2]->index(),
-                              new_lines[4]->index(),
-                              new_lines[6]->index()});
-            subcells[1]->set({new_lines[1]->index(),
-                              new_lines[3]->index(),
-                              new_lines[6]->index(),
-                              new_lines[5]->index()});
+            subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
+                                                      new_lines[2]->index(),
+                                                      new_lines[4]->index(),
+                                                      new_lines[6]->index()});
+            subcells[1]->set_bounding_object_indices({new_lines[1]->index(),
+                                                      new_lines[3]->index(),
+                                                      new_lines[6]->index(),
+                                                      new_lines[5]->index()});
           }
 
         types::subdomain_id subdomainid = cell->subdomain_id();
@@ -5194,7 +5205,8 @@ namespace internal
                   // insert first child
                   cell->set_children(0, first_child->index());
                   first_child->clear_children();
-                  first_child->set({cell->vertex_index(0), next_unused_vertex});
+                  first_child->set_bounding_object_indices(
+                    {cell->vertex_index(0), next_unused_vertex});
                   first_child->set_material_id(cell->material_id());
                   first_child->set_manifold_id(cell->manifold_id());
                   first_child->set_subdomain_id(subdomainid);
@@ -5243,7 +5255,7 @@ namespace internal
 
                   // insert second child
                   second_child->clear_children();
-                  second_child->set(
+                  second_child->set_bounding_object_indices(
                     {next_unused_vertex, cell->vertex_index(1)});
                   second_child->set_neighbor(0, first_child);
                   second_child->set_material_id(cell->material_id());
@@ -5520,8 +5532,10 @@ namespace internal
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
-                children[0]->set({line->vertex_index(0), next_unused_vertex});
-                children[1]->set({next_unused_vertex, line->vertex_index(1)});
+                children[0]->set_bounding_object_indices(
+                  {line->vertex_index(0), next_unused_vertex});
+                children[1]->set_bounding_object_indices(
+                  {next_unused_vertex, line->vertex_index(1)});
 
                 children[0]->set_used_flag();
                 children[1]->set_used_flag();
@@ -5985,8 +5999,10 @@ namespace internal
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
-                children[0]->set({line->vertex_index(0), next_unused_vertex});
-                children[1]->set({next_unused_vertex, line->vertex_index(1)});
+                children[0]->set_bounding_object_indices(
+                  {line->vertex_index(0), next_unused_vertex});
+                children[1]->set_bounding_object_indices(
+                  {next_unused_vertex, line->vertex_index(1)});
 
                 children[0]->set_used_flag();
                 children[1]->set_used_flag();
@@ -6120,7 +6136,8 @@ namespace internal
                           quad->line(1)->child(0)->vertex_index(1);
                       }
 
-                    new_line->set({vertex_indices[0], vertex_indices[1]});
+                    new_line->set_bounding_object_indices(
+                      {vertex_indices[0], vertex_indices[1]});
                     new_line->set_used_flag();
                     new_line->clear_user_flag();
                     new_line->clear_user_data();
@@ -6162,7 +6179,7 @@ namespace internal
 
                     if (aniso_quad_ref_case == RefinementCase<dim - 1>::cut_x)
                       {
-                        new_quads[0]->set(
+                        new_quads[0]->set_bounding_object_indices(
                           {static_cast<int>(quad->line_index(0)),
                            new_line->index(),
                            quad->line(2)
@@ -6171,7 +6188,7 @@ namespace internal
                            quad->line(3)
                              ->child(index[0][quad->line_orientation(3)])
                              ->index()});
-                        new_quads[1]->set(
+                        new_quads[1]->set_bounding_object_indices(
                           {new_line->index(),
                            static_cast<int>(quad->line_index(1)),
                            quad->line(2)
@@ -6183,7 +6200,7 @@ namespace internal
                       }
                     else
                       {
-                        new_quads[0]->set(
+                        new_quads[0]->set_bounding_object_indices(
                           {quad->line(0)
                              ->child(index[0][quad->line_orientation(0)])
                              ->index(),
@@ -6192,7 +6209,7 @@ namespace internal
                              ->index(),
                            static_cast<int>(quad->line_index(2)),
                            new_line->index()});
-                        new_quads[1]->set(
+                        new_quads[1]->set_bounding_object_indices(
                           {quad->line(0)
                              ->child(index[1][quad->line_orientation(0)])
                              ->index(),
@@ -6337,7 +6354,7 @@ namespace internal
                                 Assert(!old_child[i]->has_children(),
                                        ExcInternalError());
 
-                                new_child[i]->set(
+                                new_child[i]->set_bounding_object_indices(
                                   {old_child[i]->vertex_index(0),
                                    old_child[i]->vertex_index(1)});
                                 new_child[i]->set_boundary_id_internal(
@@ -6462,10 +6479,11 @@ namespace internal
                                  switch_1->child_index(2) :
                                  -1);
 
-                            switch_1->set({switch_2->line_index(0),
-                                           switch_2->line_index(1),
-                                           switch_2->line_index(2),
-                                           switch_2->line_index(3)});
+                            switch_1->set_bounding_object_indices(
+                              {switch_2->line_index(0),
+                               switch_2->line_index(1),
+                               switch_2->line_index(2),
+                               switch_2->line_index(3)});
                             switch_1->set_line_orientation(
                               0, switch_2->line_orientation(0));
                             switch_1->set_line_orientation(
@@ -6494,10 +6512,11 @@ namespace internal
                               switch_1->set_children(2,
                                                      switch_2->child_index(2));
 
-                            switch_2->set({switch_1_lines[0],
-                                           switch_1_lines[1],
-                                           switch_1_lines[2],
-                                           switch_1_lines[3]});
+                            switch_2->set_bounding_object_indices(
+                              {switch_1_lines[0],
+                               switch_1_lines[1],
+                               switch_1_lines[2],
+                               switch_1_lines[3]});
                             switch_2->set_line_orientation(
                               0, switch_1_line_orientations[0]);
                             switch_2->set_line_orientation(
@@ -6645,10 +6664,12 @@ namespace internal
                               ExcMessage(
                                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
-                            children[0]->set({middle_line->vertex_index(0),
-                                              next_unused_vertex});
-                            children[1]->set({next_unused_vertex,
-                                              middle_line->vertex_index(1)});
+                            children[0]->set_bounding_object_indices(
+                              {middle_line->vertex_index(0),
+                               next_unused_vertex});
+                            children[1]->set_bounding_object_indices(
+                              {next_unused_vertex,
+                               middle_line->vertex_index(1)});
 
                             children[0]->set_used_flag();
                             children[1]->set_used_flag();
@@ -6758,10 +6779,14 @@ namespace internal
                       quad->line(3)->child(0)->vertex_index(1),
                       next_unused_vertex};
 
-                    new_lines[0]->set({vertex_indices[2], vertex_indices[4]});
-                    new_lines[1]->set({vertex_indices[4], vertex_indices[3]});
-                    new_lines[2]->set({vertex_indices[0], vertex_indices[4]});
-                    new_lines[3]->set({vertex_indices[4], vertex_indices[1]});
+                    new_lines[0]->set_bounding_object_indices(
+                      {vertex_indices[2], vertex_indices[4]});
+                    new_lines[1]->set_bounding_object_indices(
+                      {vertex_indices[4], vertex_indices[3]});
+                    new_lines[2]->set_bounding_object_indices(
+                      {vertex_indices[0], vertex_indices[4]});
+                    new_lines[3]->set_bounding_object_indices(
+                      {vertex_indices[4], vertex_indices[1]});
 
                     for (const auto &new_line : new_lines)
                       {
@@ -6865,29 +6890,34 @@ namespace internal
                     // note these quads as children to the present one
                     quad->set_children(0, new_quads[0]->index());
                     quad->set_children(2, new_quads[2]->index());
-                    new_quads[0]->set({line_indices[0],
-                                       line_indices[8],
-                                       line_indices[4],
-                                       line_indices[10]});
+                    new_quads[0]->set_bounding_object_indices(
+                      {line_indices[0],
+                       line_indices[8],
+                       line_indices[4],
+                       line_indices[10]});
 
                     quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
-                    new_quads[0]->set({line_indices[0],
-                                       line_indices[8],
-                                       line_indices[4],
-                                       line_indices[10]});
-                    new_quads[1]->set({line_indices[8],
-                                       line_indices[2],
-                                       line_indices[5],
-                                       line_indices[11]});
-                    new_quads[2]->set({line_indices[1],
-                                       line_indices[9],
-                                       line_indices[10],
-                                       line_indices[6]});
-                    new_quads[3]->set({line_indices[9],
-                                       line_indices[3],
-                                       line_indices[11],
-                                       line_indices[7]});
+                    new_quads[0]->set_bounding_object_indices(
+                      {line_indices[0],
+                       line_indices[8],
+                       line_indices[4],
+                       line_indices[10]});
+                    new_quads[1]->set_bounding_object_indices(
+                      {line_indices[8],
+                       line_indices[2],
+                       line_indices[5],
+                       line_indices[11]});
+                    new_quads[2]->set_bounding_object_indices(
+                      {line_indices[1],
+                       line_indices[9],
+                       line_indices[10],
+                       line_indices[6]});
+                    new_quads[3]->set_bounding_object_indices(
+                      {line_indices[9],
+                       line_indices[3],
+                       line_indices[11],
+                       line_indices[7]});
                     for (const auto &new_quad : new_quads)
                       {
                         new_quad->set_used_flag();
@@ -7300,10 +7330,11 @@ namespace internal
 
                           // set up the new quad, line numbering is as
                           // indicated above
-                          new_quads[0]->set({line_indices[0],
-                                             line_indices[1],
-                                             line_indices[2],
-                                             line_indices[3]});
+                          new_quads[0]->set_bounding_object_indices(
+                            {line_indices[0],
+                             line_indices[1],
+                             line_indices[2],
+                             line_indices[3]});
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[0]);
@@ -7386,18 +7417,20 @@ namespace internal
 
                           };
 
-                          new_hexes[0]->set({quad_indices[1],
-                                             quad_indices[0],
-                                             quad_indices[3],
-                                             quad_indices[5],
-                                             quad_indices[7],
-                                             quad_indices[9]});
-                          new_hexes[1]->set({quad_indices[0],
-                                             quad_indices[2],
-                                             quad_indices[4],
-                                             quad_indices[6],
-                                             quad_indices[8],
-                                             quad_indices[10]});
+                          new_hexes[0]->set_bounding_object_indices(
+                            {quad_indices[1],
+                             quad_indices[0],
+                             quad_indices[3],
+                             quad_indices[5],
+                             quad_indices[7],
+                             quad_indices[9]});
+                          new_hexes[1]->set_bounding_object_indices(
+                            {quad_indices[0],
+                             quad_indices[2],
+                             quad_indices[4],
+                             quad_indices[6],
+                             quad_indices[8],
+                             quad_indices[10]});
                           break;
                         }
 
@@ -7523,10 +7556,11 @@ namespace internal
 
                           // set up the new quad, line numbering is as
                           // indicated above
-                          new_quads[0]->set({line_indices[2],
-                                             line_indices[3],
-                                             line_indices[0],
-                                             line_indices[1]});
+                          new_quads[0]->set_bounding_object_indices(
+                            {line_indices[2],
+                             line_indices[3],
+                             line_indices[0],
+                             line_indices[1]});
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[2]);
@@ -7609,18 +7643,20 @@ namespace internal
 
                           };
 
-                          new_hexes[0]->set({quad_indices[1],
-                                             quad_indices[3],
-                                             quad_indices[5],
-                                             quad_indices[0],
-                                             quad_indices[7],
-                                             quad_indices[9]});
-                          new_hexes[1]->set({quad_indices[2],
-                                             quad_indices[4],
-                                             quad_indices[0],
-                                             quad_indices[6],
-                                             quad_indices[8],
-                                             quad_indices[10]});
+                          new_hexes[0]->set_bounding_object_indices(
+                            {quad_indices[1],
+                             quad_indices[3],
+                             quad_indices[5],
+                             quad_indices[0],
+                             quad_indices[7],
+                             quad_indices[9]});
+                          new_hexes[1]->set_bounding_object_indices(
+                            {quad_indices[2],
+                             quad_indices[4],
+                             quad_indices[0],
+                             quad_indices[6],
+                             quad_indices[8],
+                             quad_indices[10]});
                           break;
                         }
 
@@ -7748,10 +7784,11 @@ namespace internal
 
                           // set up the new quad, line numbering is as
                           // indicated above
-                          new_quads[0]->set({line_indices[0],
-                                             line_indices[1],
-                                             line_indices[2],
-                                             line_indices[3]});
+                          new_quads[0]->set_bounding_object_indices(
+                            {line_indices[0],
+                             line_indices[1],
+                             line_indices[2],
+                             line_indices[3]});
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[0]);
@@ -7834,18 +7871,20 @@ namespace internal
                             hex->face(5)->index() // 10
                           };
 
-                          new_hexes[0]->set({quad_indices[1],
-                                             quad_indices[3],
-                                             quad_indices[5],
-                                             quad_indices[7],
-                                             quad_indices[9],
-                                             quad_indices[0]});
-                          new_hexes[1]->set({quad_indices[2],
-                                             quad_indices[4],
-                                             quad_indices[6],
-                                             quad_indices[8],
-                                             quad_indices[0],
-                                             quad_indices[10]});
+                          new_hexes[0]->set_bounding_object_indices(
+                            {quad_indices[1],
+                             quad_indices[3],
+                             quad_indices[5],
+                             quad_indices[7],
+                             quad_indices[9],
+                             quad_indices[0]});
+                          new_hexes[1]->set_bounding_object_indices(
+                            {quad_indices[2],
+                             quad_indices[4],
+                             quad_indices[6],
+                             quad_indices[8],
+                             quad_indices[0],
+                             quad_indices[10]});
                           break;
                         }
 
@@ -7871,7 +7910,7 @@ namespace internal
                           //
 
                           // first, create the new internal line
-                          new_lines[0]->set(
+                          new_lines[0]->set_bounding_object_indices(
                             {middle_vertex_index<dim, spacedim>(hex->face(4)),
                              middle_vertex_index<dim, spacedim>(hex->face(5))});
 
@@ -8108,22 +8147,26 @@ namespace internal
                           //  |   |   |      |   |   |
                           //  *---*---*y     *-6-*-7-*
 
-                          new_quads[0]->set({line_indices[2],
-                                             line_indices[12],
-                                             line_indices[4],
-                                             line_indices[8]});
-                          new_quads[1]->set({line_indices[12],
-                                             line_indices[3],
-                                             line_indices[5],
-                                             line_indices[9]});
-                          new_quads[2]->set({line_indices[6],
-                                             line_indices[10],
-                                             line_indices[0],
-                                             line_indices[12]});
-                          new_quads[3]->set({line_indices[7],
-                                             line_indices[11],
-                                             line_indices[12],
-                                             line_indices[1]});
+                          new_quads[0]->set_bounding_object_indices(
+                            {line_indices[2],
+                             line_indices[12],
+                             line_indices[4],
+                             line_indices[8]});
+                          new_quads[1]->set_bounding_object_indices(
+                            {line_indices[12],
+                             line_indices[3],
+                             line_indices[5],
+                             line_indices[9]});
+                          new_quads[2]->set_bounding_object_indices(
+                            {line_indices[6],
+                             line_indices[10],
+                             line_indices[0],
+                             line_indices[12]});
+                          new_quads[3]->set_bounding_object_indices(
+                            {line_indices[7],
+                             line_indices[11],
+                             line_indices[12],
+                             line_indices[1]});
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[2]);
@@ -8248,30 +8291,34 @@ namespace internal
                               GeometryInfo<dim>::standard_to_real_face_vertex(
                                 3, f_or[5], f_fl[5], f_ro[5]))};
 
-                          new_hexes[0]->set({quad_indices[4],
-                                             quad_indices[0],
-                                             quad_indices[8],
-                                             quad_indices[2],
-                                             quad_indices[12],
-                                             quad_indices[16]});
-                          new_hexes[1]->set({quad_indices[0],
-                                             quad_indices[6],
-                                             quad_indices[9],
-                                             quad_indices[3],
-                                             quad_indices[13],
-                                             quad_indices[17]});
-                          new_hexes[2]->set({quad_indices[5],
-                                             quad_indices[1],
-                                             quad_indices[2],
-                                             quad_indices[10],
-                                             quad_indices[14],
-                                             quad_indices[18]});
-                          new_hexes[3]->set({quad_indices[1],
-                                             quad_indices[7],
-                                             quad_indices[3],
-                                             quad_indices[11],
-                                             quad_indices[15],
-                                             quad_indices[19]});
+                          new_hexes[0]->set_bounding_object_indices(
+                            {quad_indices[4],
+                             quad_indices[0],
+                             quad_indices[8],
+                             quad_indices[2],
+                             quad_indices[12],
+                             quad_indices[16]});
+                          new_hexes[1]->set_bounding_object_indices(
+                            {quad_indices[0],
+                             quad_indices[6],
+                             quad_indices[9],
+                             quad_indices[3],
+                             quad_indices[13],
+                             quad_indices[17]});
+                          new_hexes[2]->set_bounding_object_indices(
+                            {quad_indices[5],
+                             quad_indices[1],
+                             quad_indices[2],
+                             quad_indices[10],
+                             quad_indices[14],
+                             quad_indices[18]});
+                          new_hexes[3]->set_bounding_object_indices(
+                            {quad_indices[1],
+                             quad_indices[7],
+                             quad_indices[3],
+                             quad_indices[11],
+                             quad_indices[15],
+                             quad_indices[19]});
                           break;
                         }
 
@@ -8297,7 +8344,7 @@ namespace internal
                           //
 
                           // first, create the new internal line
-                          new_lines[0]->set(
+                          new_lines[0]->set_bounding_object_indices(
                             {middle_vertex_index<dim, spacedim>(hex->face(2)),
                              middle_vertex_index<dim, spacedim>(hex->face(3))});
 
@@ -8534,22 +8581,26 @@ namespace internal
                           //   /    /    /      /    /    /
                           //  *----*----*x     *--6-*--7-*
 
-                          new_quads[0]->set({line_indices[0],
-                                             line_indices[12],
-                                             line_indices[6],
-                                             line_indices[10]});
-                          new_quads[1]->set({line_indices[12],
-                                             line_indices[1],
-                                             line_indices[7],
-                                             line_indices[11]});
-                          new_quads[2]->set({line_indices[4],
-                                             line_indices[8],
-                                             line_indices[2],
-                                             line_indices[12]});
-                          new_quads[3]->set({line_indices[5],
-                                             line_indices[9],
-                                             line_indices[12],
-                                             line_indices[3]});
+                          new_quads[0]->set_bounding_object_indices(
+                            {line_indices[0],
+                             line_indices[12],
+                             line_indices[6],
+                             line_indices[10]});
+                          new_quads[1]->set_bounding_object_indices(
+                            {line_indices[12],
+                             line_indices[1],
+                             line_indices[7],
+                             line_indices[11]});
+                          new_quads[2]->set_bounding_object_indices(
+                            {line_indices[4],
+                             line_indices[8],
+                             line_indices[2],
+                             line_indices[12]});
+                          new_quads[3]->set_bounding_object_indices(
+                            {line_indices[5],
+                             line_indices[9],
+                             line_indices[12],
+                             line_indices[3]});
 
                           new_quads[0]->set_line_orientation(
                             0, line_orientation[0]);
@@ -8684,30 +8735,34 @@ namespace internal
                           // *---*---*
                           // | 0 | 2 |
                           // *---*---*
-                          new_hexes[0]->set({quad_indices[4],
-                                             quad_indices[2],
-                                             quad_indices[8],
-                                             quad_indices[12],
-                                             quad_indices[16],
-                                             quad_indices[0]});
-                          new_hexes[1]->set({quad_indices[5],
-                                             quad_indices[3],
-                                             quad_indices[9],
-                                             quad_indices[13],
-                                             quad_indices[0],
-                                             quad_indices[18]});
-                          new_hexes[2]->set({quad_indices[2],
-                                             quad_indices[6],
-                                             quad_indices[10],
-                                             quad_indices[14],
-                                             quad_indices[17],
-                                             quad_indices[1]});
-                          new_hexes[3]->set({quad_indices[3],
-                                             quad_indices[7],
-                                             quad_indices[11],
-                                             quad_indices[15],
-                                             quad_indices[1],
-                                             quad_indices[19]});
+                          new_hexes[0]->set_bounding_object_indices(
+                            {quad_indices[4],
+                             quad_indices[2],
+                             quad_indices[8],
+                             quad_indices[12],
+                             quad_indices[16],
+                             quad_indices[0]});
+                          new_hexes[1]->set_bounding_object_indices(
+                            {quad_indices[5],
+                             quad_indices[3],
+                             quad_indices[9],
+                             quad_indices[13],
+                             quad_indices[0],
+                             quad_indices[18]});
+                          new_hexes[2]->set_bounding_object_indices(
+                            {quad_indices[2],
+                             quad_indices[6],
+                             quad_indices[10],
+                             quad_indices[14],
+                             quad_indices[17],
+                             quad_indices[1]});
+                          new_hexes[3]->set_bounding_object_indices(
+                            {quad_indices[3],
+                             quad_indices[7],
+                             quad_indices[11],
+                             quad_indices[15],
+                             quad_indices[1],
+                             quad_indices[19]});
                           break;
                         }
 
@@ -8734,7 +8789,7 @@ namespace internal
 
                           // first, create the new
                           // internal line
-                          new_lines[0]->set(
+                          new_lines[0]->set_bounding_object_indices(
 
                             {middle_vertex_index<dim, spacedim>(hex->face(0)),
                              middle_vertex_index<dim, spacedim>(hex->face(1))});
@@ -8968,26 +9023,22 @@ namespace internal
                           //   /    0    /      6         10
                           //  *---------*x     *----0----*
 
-                          new_quads[0]->set(
-
+                          new_quads[0]->set_bounding_object_indices(
                             {line_indices[6],
                              line_indices[10],
                              line_indices[0],
                              line_indices[12]});
-                          new_quads[1]->set(
-
+                          new_quads[1]->set_bounding_object_indices(
                             {line_indices[7],
                              line_indices[11],
                              line_indices[12],
                              line_indices[1]});
-                          new_quads[2]->set(
-
+                          new_quads[2]->set_bounding_object_indices(
                             {line_indices[2],
                              line_indices[12],
                              line_indices[4],
                              line_indices[8]});
-                          new_quads[3]->set(
-
+                          new_quads[3]->set_bounding_object_indices(
                             {line_indices[12],
                              line_indices[3],
                              line_indices[5],
@@ -9117,32 +9168,28 @@ namespace internal
                               child_at_origin[hex->face(5)->refinement_case() -
                                               1][f_fl[5]][f_ro[5]])};
 
-                          new_hexes[0]->set(
-
+                          new_hexes[0]->set_bounding_object_indices(
                             {quad_indices[4],
                              quad_indices[8],
                              quad_indices[12],
                              quad_indices[2],
                              quad_indices[16],
                              quad_indices[0]});
-                          new_hexes[1]->set(
-
+                          new_hexes[1]->set_bounding_object_indices(
                             {quad_indices[5],
                              quad_indices[9],
                              quad_indices[2],
                              quad_indices[14],
                              quad_indices[17],
                              quad_indices[1]});
-                          new_hexes[2]->set(
-
+                          new_hexes[2]->set_bounding_object_indices(
                             {quad_indices[6],
                              quad_indices[10],
                              quad_indices[13],
                              quad_indices[3],
                              quad_indices[0],
                              quad_indices[18]});
-                          new_hexes[3]->set(
-
+                          new_hexes[3]->set_bounding_object_indices(
                             {quad_indices[7],
                              quad_indices[11],
                              quad_indices[3],
@@ -9225,23 +9272,17 @@ namespace internal
                             middle_vertex_index<dim, spacedim>(hex->face(5)),
                             next_unused_vertex};
 
-                          new_lines[0]->set(
-
+                          new_lines[0]->set_bounding_object_indices(
                             {vertex_indices[2], vertex_indices[6]});
-                          new_lines[1]->set(
-
+                          new_lines[1]->set_bounding_object_indices(
                             {vertex_indices[6], vertex_indices[3]});
-                          new_lines[2]->set(
-
+                          new_lines[2]->set_bounding_object_indices(
                             {vertex_indices[0], vertex_indices[6]});
-                          new_lines[3]->set(
-
+                          new_lines[3]->set_bounding_object_indices(
                             {vertex_indices[6], vertex_indices[1]});
-                          new_lines[4]->set(
-
+                          new_lines[4]->set_bounding_object_indices(
                             {vertex_indices[4], vertex_indices[6]});
-                          new_lines[5]->set(
-
+                          new_lines[5]->set_bounding_object_indices(
                             {vertex_indices[6], vertex_indices[5]});
 
                           // again, first collect some data about the
@@ -9560,74 +9601,62 @@ namespace internal
                           //   / 8  / 9  /      2   24    6
                           //  *----*----*x     *--8-*--9-*
 
-                          new_quads[0]->set(
-
+                          new_quads[0]->set_bounding_object_indices(
                             {line_indices[10],
                              line_indices[28],
                              line_indices[16],
                              line_indices[24]});
-                          new_quads[1]->set(
-
+                          new_quads[1]->set_bounding_object_indices(
                             {line_indices[28],
                              line_indices[14],
                              line_indices[17],
                              line_indices[25]});
-                          new_quads[2]->set(
-
+                          new_quads[2]->set_bounding_object_indices(
                             {line_indices[11],
                              line_indices[29],
                              line_indices[24],
                              line_indices[20]});
-                          new_quads[3]->set(
-
+                          new_quads[3]->set_bounding_object_indices(
                             {line_indices[29],
                              line_indices[15],
                              line_indices[25],
                              line_indices[21]});
-                          new_quads[4]->set(
-
+                          new_quads[4]->set_bounding_object_indices(
                             {line_indices[18],
                              line_indices[26],
                              line_indices[0],
                              line_indices[28]});
-                          new_quads[5]->set(
-
+                          new_quads[5]->set_bounding_object_indices(
                             {line_indices[26],
                              line_indices[22],
                              line_indices[1],
                              line_indices[29]});
-                          new_quads[6]->set(
-
+                          new_quads[6]->set_bounding_object_indices(
                             {line_indices[19],
                              line_indices[27],
                              line_indices[28],
                              line_indices[4]});
-                          new_quads[7]->set(
-
+                          new_quads[7]->set_bounding_object_indices(
                             {line_indices[27],
                              line_indices[23],
                              line_indices[29],
                              line_indices[5]});
-                          new_quads[8]->set(
-
+                          new_quads[8]->set_bounding_object_indices(
                             {line_indices[2],
                              line_indices[24],
                              line_indices[8],
                              line_indices[26]});
-                          new_quads[9]->set(
-
+                          new_quads[9]->set_bounding_object_indices(
                             {line_indices[24],
                              line_indices[6],
                              line_indices[9],
                              line_indices[27]});
-                          new_quads[10]->set(
-
+                          new_quads[10]->set_bounding_object_indices(
                             {line_indices[3],
                              line_indices[25],
                              line_indices[26],
                              line_indices[12]});
-                          new_quads[11]->set(
-
+                          new_quads[11]->set_bounding_object_indices(
                             {line_indices[25],
                              line_indices[7],
                              line_indices[27],
@@ -9828,32 +9857,28 @@ namespace internal
                                 3, f_or[5], f_fl[5], f_ro[5]))};
 
                           // bottom children
-                          new_hexes[0]->set(
-
+                          new_hexes[0]->set_bounding_object_indices(
                             {quad_indices[12],
                              quad_indices[0],
                              quad_indices[20],
                              quad_indices[4],
                              quad_indices[28],
                              quad_indices[8]});
-                          new_hexes[1]->set(
-
+                          new_hexes[1]->set_bounding_object_indices(
                             {quad_indices[0],
                              quad_indices[16],
                              quad_indices[22],
                              quad_indices[6],
                              quad_indices[29],
                              quad_indices[9]});
-                          new_hexes[2]->set(
-
+                          new_hexes[2]->set_bounding_object_indices(
                             {quad_indices[13],
                              quad_indices[1],
                              quad_indices[4],
                              quad_indices[24],
                              quad_indices[30],
                              quad_indices[10]});
-                          new_hexes[3]->set(
-
+                          new_hexes[3]->set_bounding_object_indices(
                             {quad_indices[1],
                              quad_indices[17],
                              quad_indices[6],
@@ -9862,32 +9887,28 @@ namespace internal
                              quad_indices[11]});
 
                           // top children
-                          new_hexes[4]->set(
-
+                          new_hexes[4]->set_bounding_object_indices(
                             {quad_indices[14],
                              quad_indices[2],
                              quad_indices[21],
                              quad_indices[5],
                              quad_indices[8],
                              quad_indices[32]});
-                          new_hexes[5]->set(
-
+                          new_hexes[5]->set_bounding_object_indices(
                             {quad_indices[2],
                              quad_indices[18],
                              quad_indices[23],
                              quad_indices[7],
                              quad_indices[9],
                              quad_indices[33]});
-                          new_hexes[6]->set(
-
+                          new_hexes[6]->set_bounding_object_indices(
                             {quad_indices[15],
                              quad_indices[3],
                              quad_indices[5],
                              quad_indices[25],
                              quad_indices[10],
                              quad_indices[34]});
-                          new_hexes[7]->set(
-
+                          new_hexes[7]->set_bounding_object_indices(
                             {quad_indices[3],
                              quad_indices[19],
                              quad_indices[7],

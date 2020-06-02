@@ -1488,7 +1488,7 @@ const unsigned int
 
 template <int structdim, int dim, int spacedim>
 void
-TriaAccessor<structdim, dim, spacedim>::set(
+TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
   const std::initializer_list<int> &object) const
 {
   this->objects().get_object(this->present_index) = object;
@@ -1498,7 +1498,7 @@ TriaAccessor<structdim, dim, spacedim>::set(
 
 template <int structdim, int dim, int spacedim>
 void
-TriaAccessor<structdim, dim, spacedim>::set(
+TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
   const std::initializer_list<unsigned int> &object) const
 {
   this->objects().get_object(this->present_index) = object;
