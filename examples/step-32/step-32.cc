@@ -2692,9 +2692,10 @@ namespace Step32
       FilteredIterator<typename DoFHandler<2>::active_cell_iterator>;
 
     auto worker =
-      [=](const typename DoFHandler<dim>::active_cell_iterator &cell,
-          Assembly::Scratch::TemperatureRHS<dim> &              scratch,
-          Assembly::CopyData::TemperatureRHS<dim> &             data) {
+      [this, global_T_range, maximal_velocity, global_entropy_variation](
+        const typename DoFHandler<dim>::active_cell_iterator &cell,
+        Assembly::Scratch::TemperatureRHS<dim> &              scratch,
+        Assembly::CopyData::TemperatureRHS<dim> &             data) {
         this->local_assemble_temperature_rhs(global_T_range,
                                              maximal_velocity,
                                              global_entropy_variation,
