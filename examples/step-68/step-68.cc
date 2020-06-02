@@ -17,7 +17,6 @@
  * Authors: Bruno Blais, Toni El Geitani Nehme, Rene Gassmoeller, Peter Munch
  */
 
-
 // @sect3{Include files}
 
 // The majority of the include files are generic
@@ -71,7 +70,6 @@
 // own specific DataOut class which will enable us to write them
 // to commonly used parallel vtu format
 #include <deal.II/particles/data_out.h>
-
 
 // This step uses parallel vector to interpolate the velocity field
 // at the position of the particles. This step supports the use of both
@@ -142,8 +140,6 @@ namespace Step68
     unsigned int particle_insertion_refinement = 3;
   };
 
-
-
   // There remains the task of declaring what run-time parameters we can accept
   // in input files. Since we have a very limited number of parameters, all
   // parameters are declared in the same section.
@@ -176,7 +172,6 @@ namespace Step68
       particle_insertion_refinement,
       "Refinement of the volumetric mesh used to insert the particles");
   }
-
 
   // @sect3{Velocity profile}
 
@@ -435,14 +430,11 @@ namespace Step68
     // Establish the background triangulation where the particles are living
     // and the number of properties of the particles
     particle_handler.initialize(background_triangulation, mapping, 1 + dim);
-    // pcout << "Number of properties "
-    //      << particle_handler.n_properties_per_particle() << std::endl;
 
     // We create a particle triangulation which is solely used to generate
     // the points which will be used to insert the particles. This
     // triangulation is an hyper_shell which is off-set from the
     // center of the simulation domain.
-
     Point<dim> center;
     center[0] = 0.5;
     center[1] = 0.75;
@@ -461,11 +453,6 @@ namespace Step68
       particle_triangulation, center, inner_radius, outer_radius, 6);
     particle_triangulation.refine_global(par.particle_insertion_refinement);
 
-    DoFHandler<dim> particles_dof_handler(particle_triangulation);
-    FE_Q<dim>       particles_fe(1);
-
-    particles_dof_handler.distribute_dofs(particles_fe);
-
     // We generate the necessary bounding boxes for the particles generator
     // These bounding boxes are required to quickly identify in which
     // processors and which cell the inserted particle lies.
@@ -474,38 +461,25 @@ namespace Step68
     const auto global_bounding_boxes =
       Utilities::MPI::all_gather(MPI_COMM_WORLD, my_bounding_box);
 
+    unsigned int n_locally_owned_cells = 0;
+    for (const auto &cell : particle_triangulation.active_cell_iterators())
+      if (cell->is_locally_owned())
+        n_locally_owned_cells++;
+
     // We generate an empty vector of properties. We will fix the properties
     // of the particles once they are generated.
-    std::vector<std::vector<double>> properties(particles_dof_handler.n_dofs(),
+    std::vector<std::vector<double>> properties(n_locally_owned_cells,
                                                 std::vector<double>(dim + 1,
                                                                     0.));
 
-    // We generate the particles at the position of the degree of
-    // freedom of the dummy particle triangulation
-    Particles::Generators::dof_support_points(particles_dof_handler,
-                                              global_bounding_boxes,
-                                              particle_handler,
-                                              mapping,
-                                              properties);
-
-    //    std::map<types::global_dof_index, Point<dim>> support_points_map;
-
-    //    DoFTools::map_dofs_to_support_points(mapping,
-    //                                         particles_dof_handler,
-    //                                         support_points_map);
-
-    //    // Generate the vector of points from the map
-    //    // Memory is reserved for efficiency reasons
-    //    std::vector<Point<dim>> support_points_vec;
-    //    support_points_vec.reserve(support_points_map.size());
-    //    for (auto const &element : support_points_map)
-    //      support_points_vec.push_back(element.second);
-
-
-
-    //    particle_handler.insert_global_particles(support_points_vec,
-    //                                             global_bounding_boxes,
-    //                                             properties);
+    // We generate the particles at the position of a single
+    // points quadrature
+    Particles::Generators::quadrature_points(particle_triangulation,
+                                             QGauss<dim>(1),
+                                             global_bounding_boxes,
+                                             particle_handler,
+                                             mapping,
+                                             properties);
 
     // Displaying the total number of generated particles in the domain
     pcout << "Number of particles inserted: "
@@ -573,12 +547,11 @@ namespace Step68
         // Store the processor id and the particle velocity in the particle
         // properties
         ArrayView<double> properties = particle->get_properties();
-        properties[0] = Utilities::MPI::this_mpi_process(mpi_communicator);
         for (int d = 0; d < dim; ++d)
-          properties[1 + d] += particle_velocity[d];
+          properties[d] = particle_velocity[d];
+        properties[dim] = Utilities::MPI::this_mpi_process(mpi_communicator);
       }
   }
-
 
   // We integrate the particle trajectories by interpolating the value of the
   // velocity field at the degrees of freedom to the position of the particles.
@@ -647,13 +620,14 @@ namespace Step68
             // Store the particle velocity and the processor id in the particle
             // properties
             ArrayView<double> properties = particle->get_properties();
-            properties[0] = Utilities::MPI::this_mpi_process(mpi_communicator);
             for (int d = 0; d < dim; ++d)
-              properties[1 + d] += particle_velocity[d];
+              properties[d] = particle_velocity[d];
+
+            properties[dim] =
+              Utilities::MPI::this_mpi_process(mpi_communicator);
           }
       }
   }
-
 
   // @sect4{Data output}
 
@@ -665,7 +639,23 @@ namespace Step68
   ParticleTracking<dim>::output_particles(unsigned int it)
   {
     Particles::DataOut<dim, dim> particle_output;
+
+    std::vector<std::string> solution_names(dim, "velocity");
+    solution_names.push_back("process_id");
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      data_interpretations;
+
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+      data_component_interpretation(
+        dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar);
+
     particle_output.build_patches(particle_handler);
+
+    //    particle_output.build_patches(particle_handler,
+    //                                  solution_names,
+    //                                  data_component_interpretation);
     std::string output_folder(par.output_directory);
     std::string file_name(interpolated_velocity ? "interpolated-particles" :
                                                   "analytical-particles");
@@ -733,7 +723,16 @@ namespace Step68
     background_triangulation.repartition();
 
     setup_background_dofs();
-    interpolate_function_to_field();
+
+    // Set the initial property of the particles by doing an
+    // explicit Euler iteration with a time-step of 0.
+    if (interpolated_velocity)
+      {
+        interpolate_function_to_field();
+        euler_interpolated(0.);
+      }
+    else
+      euler_analytical(0.);
 
     output_particles(discrete_time.get_step_number());
     output_background(discrete_time.get_step_number());
@@ -750,10 +749,11 @@ namespace Step68
             setup_background_dofs();
           }
 
-        interpolate_function_to_field();
-
         if (interpolated_velocity)
-          euler_interpolated(discrete_time.get_previous_step_size());
+          {
+            interpolate_function_to_field();
+            euler_interpolated(discrete_time.get_previous_step_size());
+          }
         else
           euler_analytical(discrete_time.get_previous_step_size());
 
