@@ -474,30 +474,38 @@ namespace Step68
     const auto global_bounding_boxes =
       Utilities::MPI::all_gather(MPI_COMM_WORLD, my_bounding_box);
 
+    // We generate an empty vector of properties. We will fix the properties
+    // of the particles once they are generated.
+    std::vector<std::vector<double>> properties(particles_dof_handler.n_dofs(),
+                                                std::vector<double>(dim + 1,
+                                                                    0.));
+
     // We generate the particles at the position of the degree of
     // freedom of the dummy particle triangulation
-    // Particles::Generators::dof_support_points(particles_dof_handler,
-    //                                          global_bounding_boxes,
-    //                                          particle_handler);
-    std::map<types::global_dof_index, Point<dim>> support_points_map;
+    Particles::Generators::dof_support_points(particles_dof_handler,
+                                              global_bounding_boxes,
+                                              particle_handler,
+                                              mapping,
+                                              properties);
 
-    DoFTools::map_dofs_to_support_points(mapping,
-                                         particles_dof_handler,
-                                         support_points_map);
+    //    std::map<types::global_dof_index, Point<dim>> support_points_map;
 
-    // Generate the vector of points from the map
-    // Memory is reserved for efficiency reasons
-    std::vector<Point<dim>> support_points_vec;
-    support_points_vec.reserve(support_points_map.size());
-    for (auto const &element : support_points_map)
-      support_points_vec.push_back(element.second);
+    //    DoFTools::map_dofs_to_support_points(mapping,
+    //                                         particles_dof_handler,
+    //                                         support_points_map);
 
-    std::vector<std::vector<double>> properties(particles_dof_handler.n_dofs(),
-                                                {0., 0., 0.});
+    //    // Generate the vector of points from the map
+    //    // Memory is reserved for efficiency reasons
+    //    std::vector<Point<dim>> support_points_vec;
+    //    support_points_vec.reserve(support_points_map.size());
+    //    for (auto const &element : support_points_map)
+    //      support_points_vec.push_back(element.second);
 
-    particle_handler.insert_global_particles(support_points_vec,
-                                             global_bounding_boxes,
-                                             properties);
+
+
+    //    particle_handler.insert_global_particles(support_points_vec,
+    //                                             global_bounding_boxes,
+    //                                             properties);
 
     // Displaying the total number of generated particles in the domain
     pcout << "Number of particles inserted: "
