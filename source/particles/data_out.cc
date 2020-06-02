@@ -39,8 +39,16 @@ namespace Particles
         "names as interpretations. Provide the same name for components that "
         "belong to a single vector or tensor."));
 
-    if (data_component_names.size() > 0)
+    if ((data_component_names.size() > 0) &&
+        (particles.n_locally_owned_particles() > 0))
       {
+        Assert(
+          particles.begin()->has_properties(),
+          ExcMessage(
+            "You called Particles::DataOut::build_patches with data component "
+            "names and interpretations, but the particles do not seem to own "
+            "any properties."));
+
         Assert(
           data_component_names.size() ==
             particles.begin()->get_properties().size(),
