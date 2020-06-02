@@ -47,7 +47,7 @@ public:
     Number *                                                    dst) const
   {
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
-      fe_eval(cell, gpu_data, shared_data);
+      fe_eval(0, cell, gpu_data, shared_data);
 
     // set to unit vector
     fe_eval.submit_dof_value(1.);

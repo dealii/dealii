@@ -316,6 +316,7 @@ namespace CUDAWrappers
     types::global_dof_index *local_to_global;
     unsigned int             n_cells;
     unsigned int             padding_length;
+    const unsigned int       mf_object_id;
 
     const unsigned int constraint_mask;
 
@@ -343,6 +344,7 @@ namespace CUDAWrappers
                  SharedData<dim, Number> *shdata)
     : n_cells(data->n_cells)
     , padding_length(data->padding_length)
+    , mf_object_id(data->id)
     , constraint_mask(data->constraint_mask[cell_id])
     , use_coloring(data->use_coloring)
     , values(shdata->values)
@@ -426,7 +428,7 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product;
+      evaluator_tensor_product(mf_object_id);
     if (evaluate_val == true && evaluate_grad == true)
       {
         evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
@@ -463,7 +465,7 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product;
+      evaluator_tensor_product(mf_object_id);
     if (integrate_val == true && integrate_grad == true)
       {
         evaluator_tensor_product.integrate_value_and_gradient(values,

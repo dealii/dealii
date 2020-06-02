@@ -48,80 +48,85 @@ namespace CUDAWrappers
 {
   namespace internal
   {
-    // These variables are stored in the device constant memory.
-    constexpr unsigned int max_elem_degree = 10;
+    constexpr unsigned int data_array_size =
+      (mf_max_elem_degree + 1) * (mf_max_elem_degree + 1);
+
+    // Default initialized to false
+    std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
 
     template <typename NumberType>
-    using DataArray = NumberType[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    using DataArray = NumberType[data_array_size];
 
-    __constant__ double
-      global_shape_values_d[(max_elem_degree + 1) * (max_elem_degree + 1)];
-    __constant__ float
-      global_shape_values_f[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    // These variables are stored in the device constant memory.
+    // Shape values
+    __constant__ double global_shape_values_d[mf_n_concurrent_objects]
+                                             [data_array_size];
+    __constant__ float global_shape_values_f[mf_n_concurrent_objects]
+                                            [data_array_size];
+    // Shape gradients
+    __constant__ double global_shape_gradients_d[mf_n_concurrent_objects]
+                                                [data_array_size];
+    __constant__ float global_shape_gradients_f[mf_n_concurrent_objects]
+                                               [data_array_size];
+    // for collocation methods
+    __constant__ double global_co_shape_gradients_d[mf_n_concurrent_objects]
+                                                   [data_array_size];
+    __constant__ float global_co_shape_gradients_f[mf_n_concurrent_objects]
+                                                  [data_array_size];
 
     template <typename Number>
     __host__ __device__ inline DataArray<Number> &
-             get_global_shape_values();
+             get_global_shape_values(unsigned int i);
 
     template <>
     __host__ __device__ inline DataArray<double> &
-             get_global_shape_values<double>()
+             get_global_shape_values<double>(unsigned int i)
     {
-      return global_shape_values_d;
+      return global_shape_values_d[i];
     }
 
     template <>
     __host__ __device__ inline DataArray<float> &
-             get_global_shape_values<float>()
+             get_global_shape_values<float>(unsigned int i)
     {
-      return global_shape_values_f;
+      return global_shape_values_f[i];
     }
-
-    __constant__ double
-      global_shape_gradients_d[(max_elem_degree + 1) * (max_elem_degree + 1)];
-    __constant__ float
-      global_shape_gradients_f[(max_elem_degree + 1) * (max_elem_degree + 1)];
 
     template <typename Number>
     __host__ __device__ inline DataArray<Number> &
-             get_global_shape_gradients();
+             get_global_shape_gradients(unsigned int i);
 
     template <>
     __host__ __device__ inline DataArray<double> &
-             get_global_shape_gradients<double>()
+             get_global_shape_gradients<double>(unsigned int i)
     {
-      return global_shape_gradients_d;
+      return global_shape_gradients_d[i];
     }
 
     template <>
     __host__ __device__ inline DataArray<float> &
-             get_global_shape_gradients<float>()
+             get_global_shape_gradients<float>(unsigned int i)
     {
-      return global_shape_gradients_f;
+      return global_shape_gradients_f[i];
     }
 
     // for collocation methods
-    __constant__ double global_co_shape_gradients_d[(max_elem_degree + 1) *
-                                                    (max_elem_degree + 1)];
-    __constant__ float  global_co_shape_gradients_f[(max_elem_degree + 1) *
-                                                   (max_elem_degree + 1)];
-
     template <typename Number>
     __host__ __device__ inline DataArray<Number> &
-             get_global_co_shape_gradients();
+             get_global_co_shape_gradients(unsigned int i);
 
     template <>
     __host__ __device__ inline DataArray<double> &
-             get_global_co_shape_gradients<double>()
+             get_global_co_shape_gradients<double>(unsigned int i)
     {
-      return global_co_shape_gradients_d;
+      return global_co_shape_gradients_d[i];
     }
 
     template <>
     __host__ __device__ inline DataArray<float> &
-             get_global_co_shape_gradients<float>()
+             get_global_co_shape_gradients<float>(unsigned int i)
     {
-      return global_co_shape_gradients_f;
+      return global_co_shape_gradients_f[i];
     }
 
     template <typename Number>
@@ -606,7 +611,16 @@ namespace CUDAWrappers
     : n_dofs(0)
     , constrained_dofs(nullptr)
     , padding_length(0)
+    , my_id(-1)
   {}
+
+
+
+  template <int dim, typename Number>
+  MatrixFree<dim, Number>::~MatrixFree()
+  {
+    free();
+  }
 
 
 
@@ -661,11 +675,12 @@ namespace CUDAWrappers
     data_copy.local_to_global = local_to_global[color];
     data_copy.inv_jacobian    = inv_jacobian[color];
     data_copy.JxW             = JxW[color];
-    data_copy.constraint_mask = constraint_mask[color];
+    data_copy.id              = my_id;
     data_copy.n_cells         = n_cells[color];
     data_copy.padding_length  = padding_length;
     data_copy.row_start       = row_start[color];
     data_copy.use_coloring    = use_coloring;
+    data_copy.constraint_mask = constraint_mask[color];
 
     return data_copy;
   }
@@ -697,6 +712,9 @@ namespace CUDAWrappers
     constraint_mask.clear();
 
     Utilities::CUDA::free(constrained_dofs);
+
+    internal::used_objects[my_id].store(false);
+    my_id = -1;
   }
 
 
@@ -882,29 +900,44 @@ namespace CUDAWrappers
     unsigned int size_co_shape_values =
       n_q_points_1d * n_q_points_1d * sizeof(Number);
 
+    // Check if we already a part of the constant memory allocated to us. If
+    // not, we try to get a block of memory.
+    bool found_id = false;
+    while (!found_id)
+      {
+        ++my_id;
+        Assert(
+          my_id < mf_n_concurrent_objects,
+          ExcMessage(
+            "Maximum number of concurrents MatrixFree objects reached. Increase mf_n_concurrent_objects"));
+        bool f = false;
+        found_id =
+          internal::used_objects[my_id].compare_exchange_strong(f, true);
+      }
+
     cudaError_t cuda_error =
-      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(),
+      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(0),
                          shape_info.data.front().shape_values.data(),
                          size_shape_values,
-                         0,
+                         my_id * internal::data_array_size * sizeof(Number),
                          cudaMemcpyHostToDevice);
     AssertCuda(cuda_error);
 
     if (update_flags & update_gradients)
       {
         cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(),
+          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(0),
                              shape_info.data.front().shape_gradients.data(),
                              size_shape_values,
-                             0,
+                             my_id * internal::data_array_size * sizeof(Number),
                              cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
 
         cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(),
+          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(0),
                              shape_info_co.data.front().shape_gradients.data(),
                              size_co_shape_values,
-                             0,
+                             my_id * internal::data_array_size * sizeof(Number),
                              cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
       }
