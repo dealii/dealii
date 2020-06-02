@@ -66,7 +66,7 @@ class BlockIndices;
  * <h4>ITERATOR</h4>
  *
  * Any object that has an <tt>operator++()</tt> and points to a
- * TriaObjectAccessor.
+ * TriaAccessor or derived class.
  *
  * <h4>DOFINFO</h4>
  *
