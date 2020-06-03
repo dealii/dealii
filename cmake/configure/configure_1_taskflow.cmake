@@ -14,30 +14,30 @@
 ## ---------------------------------------------------------------------
 
 #
-# Configuration for thread support in deal.II with the help of the CPP
-# Taskflow library:
+# Configuration for thread support in deal.II with the help of the Taskflow
+# library:
 #
 
 
-MACRO(FEATURE_CPP_TASKFLOW_FIND_EXTERNAL var)
-  FIND_PACKAGE(CPP_TASKFLOW)
+MACRO(FEATURE_TASKFLOW_FIND_EXTERNAL var)
+  FIND_PACKAGE(TASKFLOW)
 
-  IF(CPP_TASKFLOW_FOUND)
+  IF(TASKFLOW_FOUND)
     SET(${var} TRUE)
   ENDIF()
 
-  IF(CPP_TASKFLOW_VERSION VERSION_LESS "2.4")
+  IF(TASKFLOW_VERSION VERSION_LESS "2.4")
     # Clear the previously determined version numbers to avoid confusion
-    SET(CPP_TASKFLOW_VERSION "bundled")
-    SET(CPP_TASKFLOW_VERSION_MAJOR "")
-    SET(CPP_TASKFLOW_VERSION_MINOR "")
+    SET(TASKFLOW_VERSION "bundled")
+    SET(TASKFLOW_VERSION_MAJOR "")
+    SET(TASKFLOW_VERSION_MINOR "")
 
     MESSAGE(STATUS
-      "The externally provided Cpp Taskflow library is older than version 2.4, "
+      "The externally provided Taskflow library is older than version 2.4, "
       "which cannot be used with deal.II."
       )
-    SET(CPP_TASKFLOW_ADDITIONAL_ERROR_STRING
-      "The externally provided Cpp Taskflow library is older than version\n"
+    SET(TASKFLOW_ADDITIONAL_ERROR_STRING
+      "The externally provided Taskflow library is older than version\n"
       "2.4, which is the oldest version compatible with deal.II."
       )
     SET(${var} FALSE)
@@ -45,10 +45,10 @@ MACRO(FEATURE_CPP_TASKFLOW_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(FEATURE_CPP_TASKFLOW_CONFIGURE_BUNDLED)
-  LIST(APPEND CPP_TASKFLOW_BUNDLED_INCLUDE_DIRS ${CPP_TASKFLOW_FOLDER}/include)
+MACRO(FEATURE_TASKFLOW_CONFIGURE_BUNDLED)
+  LIST(APPEND TASKFLOW_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
 ENDMACRO()
 
 
-CONFIGURE_FEATURE(CPP_TASKFLOW)
+CONFIGURE_FEATURE(TASKFLOW)
 
