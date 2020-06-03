@@ -227,6 +227,10 @@ namespace TriangulationDescription
       construction_data.smoothing = tria.get_mesh_smoothing();
       construction_data.settings  = settings;
 
+      const bool construct_multigrid =
+        settings &
+        TriangulationDescription::Settings::construct_multigrid_hierarchy;
+
       Assert(
         !(settings &
           TriangulationDescription::Settings::construct_multigrid_hierarchy) ||
@@ -254,7 +258,8 @@ namespace TriangulationDescription
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
           for (auto cell : tria.cell_iterators_on_level(level))
-            if (cell->level_subdomain_id() == my_rank ||
+            if ((construct_multigrid &&
+                 (cell->level_subdomain_id() == my_rank)) ||
                 (cell->active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
@@ -358,7 +363,8 @@ namespace TriangulationDescription
           std::vector<bool> vertices_owned_by_locally_owned_cells_on_level(
             tria.n_vertices());
           for (auto cell : tria.cell_iterators_on_level(level))
-            if (cell->level_subdomain_id() == my_rank ||
+            if ((construct_multigrid &&
+                 (cell->level_subdomain_id() == my_rank)) ||
                 (cell->active() && cell->subdomain_id() == my_rank))
               add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells(
                 cell, vertices_owned_by_locally_owned_cells_on_level);
