@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// test cpp-taskflow
+// test taskflow
 
 #include <deal.II/base/thread_management.h>
 
@@ -72,7 +72,7 @@ main()
 {
   MultithreadInfo::set_thread_limit();
 
-  std::cout << "cpp-taskflow will use "
+  std::cout << "taskflow will use "
             << MultithreadInfo::get_taskflow_executor().num_workers()
             << " out of " << MultithreadInfo::n_cores() << " cores."
             << std::endl
