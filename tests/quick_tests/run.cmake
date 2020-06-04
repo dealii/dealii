@@ -30,7 +30,7 @@ ENDIF()
 # "obj_boost_system_debug.dir\Debug\obj_boos.4A356C5C.tlog\obj_boost_system_debug.lastbuildstate". The
 # process cannot access the file '...' because it is being used by another
 # process.
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+IF(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
   SET(_n_processors "1")
 ENDIF()
 
