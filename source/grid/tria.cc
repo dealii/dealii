@@ -2700,10 +2700,9 @@ namespace internal
 
 
       /**
-       * Invent an object which compares two
-       * std::initializer_list objects against each
-       * other. This comparison is needed in order to establish a map of
-       * vertex index tuples to iterators in the
+       * Invent an object which compares two std::vector objects against each
+       * other. This comparison is needed in order to establish a map of vertex
+       * index tuples to iterators in the
        * Triangulation<3,3>::create_triangulation function.
        */
       struct QuadComparator
@@ -3014,80 +3013,38 @@ namespace internal
                    static_cast<int>(face_line_list[2]),
                    static_cast<int>(face_line_list[3])});
 
-                // insert quad, with
-                // invalid iterator
+                // insert quad, with invalid iterator
                 //
-                // if quad already exists,
-                // then nothing bad happens
-                // here, as this will then
-                // simply become an
-                // interior face of the
-                // triangulation. however,
-                // we will run into major
-                // trouble if the face was
-                // already inserted in the
-                // opposite
-                // direction. there are
-                // really only two
-                // orientations for a face
-                // to be in, since the edge
-                // directions are already
-                // set. thus, vertex 0 is
-                // the one from which two
-                // edges originate, and
-                // vertex 3 is the one to
-                // which they converge. we
-                // are then left with
-                // orientations 0-1-2-3 and
-                // 2-3-0-1 for the order of
-                // lines. the
-                // corresponding quad can
-                // be easily constructed by
-                // exchanging lines. we do
-                // so here, just to check
-                // that that flipped quad
-                // isn't already in the
-                // triangulation. if it is,
-                // then don't insert the
-                // new one and instead
-                // later set the
-                // face_orientation flag
-                const std::initializer_list<int> test_quad_1(
-                  {quad[2],
-                   quad[3],
-                   quad[0],
-                   quad[1]}), // face_orientation=false, face_flip=false,
-                              // face_rotation=false
-                  test_quad_2({quad[0],
-                               quad[1],
-                               quad[3],
-                               quad[2]}), // face_orientation=false,
-                                          // face_flip=false, face_rotation=true
-                  test_quad_3({quad[3],
-                               quad[2],
-                               quad[1],
-                               quad[0]}), // face_orientation=false,
-                                          // face_flip=true, face_rotation=false
-                  test_quad_4({quad[1],
-                               quad[0],
-                               quad[2],
-                               quad[3]}), // face_orientation=false,
-                                          // face_flip=true, face_rotation=true
-                  test_quad_5({quad[2],
-                               quad[3],
-                               quad[1],
-                               quad[0]}), // face_orientation=true,
-                                          // face_flip=false, face_rotation=true
-                  test_quad_6({quad[1],
-                               quad[0],
-                               quad[3],
-                               quad[2]}), // face_orientation=true,
-                                          // face_flip=true, face_rotation=false
-                  test_quad_7({quad[3],
-                               quad[2],
-                               quad[0],
-                               quad[1]}); // face_orientation=true,
-                                          // face_flip=true, face_rotation=true
+                // if quad already exists, then nothing bad happens here, as
+                // this will then simply become an interior face of the
+                // triangulation. however, we will run into major trouble if the
+                // face was already inserted in the opposite direction. there
+                // are really only two orientations for a face to be in, since
+                // the edge directions are already set. thus, vertex 0 is the
+                // one from which two edges originate, and vertex 3 is the one
+                // to which they converge. we are then left with orientations
+                // 0-1-2-3 and 2-3-0-1 for the order of lines. the corresponding
+                // quad can be easily constructed by exchanging lines. we do so
+                // here, just to check that that flipped quad isn't already in
+                // the triangulation. if it is, then don't insert the new one
+                // and instead later set the face_orientation flag
+
+                // face_orientation=false, face_flip=false, face_rotation=false
+                const std::vector<int> test_quad_1(
+                  {quad[2], quad[3], quad[0], quad[1]}),
+                  // face_orientation=false, face_flip=false, face_rotation=true
+                  test_quad_2({quad[0], quad[1], quad[3], quad[2]}),
+                  // face_orientation=false, face_flip=true, face_rotation=false
+                  test_quad_3({quad[3], quad[2], quad[1], quad[0]}),
+                  // face_orientation=false, face_flip=true, face_rotation=true
+                  test_quad_4({quad[1], quad[0], quad[2], quad[3]}),
+                  // face_orientation=true, face_flip=false, face_rotation=true
+                  test_quad_5({quad[2], quad[3], quad[1], quad[0]}),
+                  // face_orientation=true, face_flip=true, face_rotation=false
+                  test_quad_6({quad[1], quad[0], quad[3], quad[2]}),
+                  // face_orientation=true, face_flip=true, face_rotation=true
+                  test_quad_7({quad[3], quad[2], quad[0], quad[1]});
+
                 if (needed_quads.find(test_quad_1) == needed_quads.end() &&
                     needed_quads.find(test_quad_2) == needed_quads.end() &&
                     needed_quads.find(test_quad_3) == needed_quads.end() &&
@@ -3237,53 +3194,32 @@ namespace internal
                     }
                   else
                     {
-                      // face must be available in
-                      // reverse order
-                      // then. construct all
-                      // possibilities and check
-                      // them one after the other
-                      const std::initializer_list<int> test_quad_1(
-                        {quad[2],
-                         quad[3],
-                         quad[0],
-                         quad[1]}), // face_orientation=false,
-                                    // face_flip=false, face_rotation=false
-                        test_quad_2(
-                          {quad[0],
-                           quad[1],
-                           quad[3],
-                           quad[2]}), // face_orientation=false,
-                                      // face_flip=false, face_rotation=true
-                        test_quad_3(
-                          {quad[3],
-                           quad[2],
-                           quad[1],
-                           quad[0]}), // face_orientation=false,
-                                      // face_flip=true,  face_rotation=false
-                        test_quad_4(
-                          {quad[1],
-                           quad[0],
-                           quad[2],
-                           quad[3]}), // face_orientation=false,
-                                      // face_flip=true, face_rotation=true
-                        test_quad_5(
-                          {quad[2],
-                           quad[3],
-                           quad[1],
-                           quad[0]}), // face_orientation=true,
-                                      // face_flip=false, face_rotation=true
-                        test_quad_6(
-                          {quad[1],
-                           quad[0],
-                           quad[3],
-                           quad[2]}), // face_orientation=true,
-                                      // face_flip=true,  face_rotation=false
-                        test_quad_7(
-                          {quad[3],
-                           quad[2],
-                           quad[0],
-                           quad[1]}); // face_orientation=true,
-                                      // face_flip=true, face_rotation=true
+                      // face must be available in reverse order then. construct
+                      // all possibilities and check them one after the other
+
+                      // face_orientation=false, face_flip=false,
+                      // face_rotation=false
+                      const std::vector<int> test_quad_1(
+                        {quad[2], quad[3], quad[0], quad[1]}),
+                        // face_orientation=false, face_flip=false,
+                        // face_rotation=true
+                        test_quad_2({quad[0], quad[1], quad[3], quad[2]}),
+                        // face_orientation=false, face_flip=true,
+                        // face_rotation=false
+                        test_quad_3({quad[3], quad[2], quad[1], quad[0]}),
+                        // face_orientation=false, face_flip=true,
+                        // face_rotation=true
+                        test_quad_4({quad[1], quad[0], quad[2], quad[3]}),
+                        // face_orientation=true, face_flip=false,
+                        // face_rotation=true
+                        test_quad_5({quad[2], quad[3], quad[1], quad[0]}),
+                        // face_orientation=true, face_flip=true,
+                        // face_rotation=false
+                        test_quad_6({quad[1], quad[0], quad[3], quad[2]}),
+                        // face_orientation=true, face_flip=true,
+                        // face_rotation=true
+                        test_quad_7({quad[3], quad[2], quad[0], quad[1]});
+
                       if (needed_quads.find(test_quad_1) != needed_quads.end())
                         {
                           face_iterator[face] = needed_quads[test_quad_1].first;
