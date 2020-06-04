@@ -2701,7 +2701,7 @@ namespace internal
 
       /**
        * Invent an object which compares two
-       * std::initializer_list objects against each
+       * std::vector objects against each
        * other. This comparison is needed in order to establish a map of
        * vertex index tuples to iterators in the
        * Triangulation<3,3>::create_triangulation function.
@@ -3052,7 +3052,7 @@ namespace internal
                 // new one and instead
                 // later set the
                 // face_orientation flag
-                const std::initializer_list<int> test_quad_1(
+                const std::vector<int> test_quad_1(
                   {quad[2],
                    quad[3],
                    quad[0],
@@ -3242,7 +3242,7 @@ namespace internal
                       // then. construct all
                       // possibilities and check
                       // them one after the other
-                      const std::initializer_list<int> test_quad_1(
+                      const std::vector<int> test_quad_1(
                         {quad[2],
                          quad[3],
                          quad[0],
