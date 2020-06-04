@@ -1253,6 +1253,8 @@ constexpr DEAL_II_ALWAYS_INLINE
     DEAL_II_CUDA_HOST_DEV const typename Tensor<rank_, dim, Number>::value_type &
     Tensor<rank_, dim, Number>::operator[](const unsigned int i) const
 {
+  AssertIndexRange(i, dim);
+
   return values[i];
 }
 
