@@ -122,9 +122,9 @@ public:
   initialize_multithreading();
 
 
-#  ifdef DEAL_II_WITH_CPP_TASKFLOW
+#  ifdef DEAL_II_WITH_TASKFLOW
   /**
-   * Return a reference to the global Executor from cpp-taskflow.
+   * Return a reference to the global Executor from taskflow.
    *
    * The Executor is set to use n_threads() worker threads that you can
    * control using set_thread_limit() and the DEAL_II_NUM_THREADS environment
@@ -140,9 +140,9 @@ private:
    */
   static unsigned int n_max_threads;
 
-#  ifdef DEAL_II_WITH_CPP_TASKFLOW
+#  ifdef DEAL_II_WITH_TASKFLOW
   /**
-   * Store a cpp-taskflow Executor that is constructed with N workers (from
+   * Store a taskflow Executor that is constructed with N workers (from
    * set_thread_limit).
    */
   static std::unique_ptr<tf::Executor> executor;

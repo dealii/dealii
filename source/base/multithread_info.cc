@@ -27,7 +27,7 @@
 #endif
 
 
-#ifdef DEAL_II_WITH_CPP_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <taskflow/taskflow.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -101,7 +101,7 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   dummy.initialize(n_max_threads);
 #endif
 
-#ifdef DEAL_II_WITH_CPP_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
   executor = std::make_unique<tf::Executor>(n_max_threads);
 #endif
 }
@@ -145,7 +145,7 @@ MultithreadInfo::initialize_multithreading()
   done = true;
 }
 
-#ifdef DEAL_II_WITH_CPP_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
 tf::Executor &
 MultithreadInfo::get_taskflow_executor()
 {
