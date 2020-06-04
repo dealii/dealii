@@ -1131,23 +1131,7 @@ namespace GridTools
    * MappingQ1 for the mapping argument. See the following function for
    * a more thorough discussion.
    *
-   * @param mesh A variable of a type that satisfies the requirements of the
-   * @ref ConceptMeshType "MeshType concept".
-   * @param p The point for which we want to find the surrounding cell.
-   * @param marked_vertices An array of bools indicating whether an
-   * entry in the vertex array should be considered
-   * (and the others must be ignored) as the potentially
-   * closest vertex to the specified point. On specifying a non-default
-   * @p marked_vertices, find_closest_vertex() would
-   * only search among @p marked_vertices for the closest vertex.
-   * The size of this array should be equal to n_vertices() of the
-   * triangulation (as opposed to n_used_vertices() ).
    * @return An iterator into the mesh that points to the surrounding cell.
-   *
-   * @note If the point requested does not lie in any of the cells of the mesh
-   * given, then this function throws an exception of type
-   * GridTools::ExcPointNotFound. You can catch this exception and decide what
-   * to do in that case.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
@@ -1299,21 +1283,6 @@ namespace GridTools
    * cell that corresponds to the active finite element index of that cell.
    * This is obviously only useful for hp problems, since the active finite
    * element index for all other DoF handlers is always zero.
-   *
-   * @note If the point requested does not lie in any of the cells of the mesh
-   * given, then this function throws an exception of type
-   * GridTools::ExcPointNotFound. You can catch this exception and decide what
-   * to do in that case.
-   *
-   * @note When applied to a triangulation or DoF handler object based on a
-   * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell
-   * and
-   * @ref GlossGhostCell).
-   * If so, many of the operations one may want to do on this cell (e.g.,
-   * evaluating the solution) may not be possible and you will have to decide
-   * what to do in that case.
    */
   template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
