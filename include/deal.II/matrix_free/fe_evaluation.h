@@ -2615,7 +2615,6 @@ public:
    * Like above but with separate bool flags.
    * @deprecated use evaluate() with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   evaluate(const bool evaluate_values,
            const bool evaluate_gradients,
@@ -2641,7 +2640,6 @@ public:
    * Like above but using separate bool flags.
    * @deprecated use evaluate() with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   evaluate(const VectorizedArrayType *values_array,
            const bool                 evaluate_values,
@@ -2670,7 +2668,7 @@ public:
    * @deprecated Please use the gather_evaluate() function with the EvaluationFlags argument.
    */
   template <typename VectorType>
-  DEAL_II_DEPRECATED void
+  void
   gather_evaluate(const VectorType &input_vector,
                   const bool        evaluate_values,
                   const bool        evaluate_gradients,
@@ -2693,7 +2691,7 @@ public:
   /**
    * @deprecated Please use the integrate() function with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED void
+  void
   integrate(const bool integrate_values, const bool integrate_gradients);
 
   /**
@@ -2714,7 +2712,6 @@ public:
   /**
    * @deprecated Please use the integrate() function with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   integrate(const bool           integrate_values,
             const bool           integrate_gradients,
@@ -2742,7 +2739,7 @@ public:
    * @deprecated Please use the integrate_scatter() function with the EvaluationFlags argument.
    */
   template <typename VectorType>
-  DEAL_II_DEPRECATED void
+  void
   integrate_scatter(const bool  integrate_values,
                     const bool  integrate_gradients,
                     VectorType &output_vector);
@@ -3002,7 +2999,6 @@ public:
   /**
    * @deprecated Please use the evaluate() function with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   evaluate(const bool evaluate_values, const bool evaluate_gradients);
 
@@ -3025,7 +3021,6 @@ public:
   /**
    * @deprecated Please use the evaluate() function with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   evaluate(const VectorizedArrayType *values_array,
            const bool                 evaluate_values,
@@ -3051,7 +3046,7 @@ public:
    * @deprecated Please use the gather_evaluate() function with the EvaluationFlags argument.
    */
   template <typename VectorType>
-  DEAL_II_DEPRECATED void
+  void
   gather_evaluate(const VectorType &input_vector,
                   const bool        evaluate_values,
                   const bool        evaluate_gradients);
@@ -3071,7 +3066,6 @@ public:
   /**
    * @deprecated Please use the integrate() function with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   integrate(const bool integrate_values, const bool integrate_gradients);
 
@@ -3090,7 +3084,6 @@ public:
   /**
    * @deprecated Please use the integrate() function with the EvaluationFlags argument.
    */
-  DEAL_II_DEPRECATED
   void
   integrate(const bool           integrate_values,
             const bool           integrate_gradients,
@@ -3116,7 +3109,7 @@ public:
    * @deprecated Please use the integrate_scatter() function with the EvaluationFlags argument.
    */
   template <typename VectorType>
-  DEAL_II_DEPRECATED void
+  void
   integrate_scatter(const bool  integrate_values,
                     const bool  integrate_gradients,
                     VectorType &output_vector);
