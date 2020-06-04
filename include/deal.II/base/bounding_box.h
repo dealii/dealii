@@ -185,7 +185,9 @@ public:
    * Return true if the point is inside the Bounding Box, false otherwise.
    */
   bool
-  point_inside(const Point<spacedim, Number> &p) const;
+  point_inside(
+    const Point<spacedim, Number> &p,
+    const double tolerance = std::numeric_limits<Number>::epsilon()) const;
 
   /**
    * Increase (or decrease) the size of the bounding box by the given amount.
