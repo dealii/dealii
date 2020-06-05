@@ -182,7 +182,10 @@ public:
   merge_with(const BoundingBox<spacedim, Number> &other_bbox);
 
   /**
-   * Return true if the point is inside the Bounding Box, false otherwise.
+   * Return true if the point is inside the Bounding Box, false otherwise. The
+   * parameter @p tolerance is a factor by which the bounding box is enlarged
+   * relative to the dimensions of the bounding box in order to determine in a
+   * numerically robust way whether the point is inside.
    */
   bool
   point_inside(

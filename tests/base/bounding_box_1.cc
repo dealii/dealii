@@ -116,6 +116,20 @@ test_unitary()
           << b.point_inside(p3) << " " << b.point_inside(p1 + p2) << " "
           << b.point_inside(p2 + p3) << " " << b.point_inside(p1 + p3) << " "
           << std::endl;
+
+  double eps = std::numeric_limits<double>::epsilon();
+  AssertThrow(b.point_inside(Point<3>(0.0, 0.0, 1.0 + 1.0 * eps), 10. * eps) ==
+                true,
+              ExcMessage("failed."));
+  AssertThrow(b.point_inside(Point<3>(0.0, 0.0, 1.0 + 10. * eps), 1.0 * eps) ==
+                false,
+              ExcMessage("failed."));
+  AssertThrow(b.point_inside(Point<3>(0.0 - 1.0 * eps, 0.0, 0.0), 10. * eps) ==
+                true,
+              ExcMessage("failed."));
+  AssertThrow(b.point_inside(Point<3>(0.0 - 10. * eps, 0.0, 0.0), 1.0 * eps) ==
+                false,
+              ExcMessage("failed."));
 }
 
 int
