@@ -1146,8 +1146,7 @@ namespace TrilinosWrappers
           if (diag_index != j || new_diag_value == 0)
             values[j] = 0.;
 
-        if (diag_index != num_entries && std::fabs(values[diag_index]) == 0.0 &&
-            new_diag_value != 0.0)
+        if (diag_index != num_entries)
           values[diag_index] = new_diag_value;
       }
   }
