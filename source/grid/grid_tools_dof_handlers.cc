@@ -465,7 +465,7 @@ namespace GridTools
             endc = adjacent_cells.end();
           for (; cell != endc; ++cell)
             {
-              if ((*cell)->is_locally_owned())
+              if ((*cell)->is_artificial() == false)
                 {
                   try
                     {
