@@ -2266,7 +2266,7 @@ namespace GridTools
 
     // Make indices global by getting the number of vertices owned by each
     // processors and shifting the indices accordingly
-    types::global_dof_index shift = 0;
+    types::global_vertex_index shift = 0;
     int ierr = MPI_Exscan(&next_index,
                           &shift,
                           1,
