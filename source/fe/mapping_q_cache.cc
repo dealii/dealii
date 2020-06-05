@@ -94,6 +94,7 @@ MappingQCache<dim, spacedim>::initialize(
     const typename Triangulation<dim, spacedim>::cell_iterator &)>
     &compute_points_on_cell)
 {
+  clear_signal.disconnect();
   clear_signal = triangulation.signals.any_change.connect(
     [&]() -> void { this->support_point_cache.reset(); });
 
