@@ -12,16 +12,9 @@ namespace tf {
 */
 class FlowBuilder {
 
-  friend class Task;
+  friend class Executor;
 
   public:
-    
-    /**
-    @brief constructs a flow builder object
-
-    @param graph a task dependency graph to manipulate
-    */
-    FlowBuilder(Graph& graph);
     
     /**
     @brief creates a static task from a given callable object
@@ -96,9 +89,13 @@ class FlowBuilder {
     /**
     @brief constructs a task dependency graph of range-based parallel_for
     
-    The task dependency graph applies a callable object 
-    to the dereferencing of every iterator 
-    in the range [beg, end) chunk by chunk.
+    The task dependency graph applies the callable object
+    @p callable to each object obtained by dereferencing
+    every iterator in the range [beg, end). The range
+    is split into chunks of size @p chunk, where each of them
+    is processed by one Task.
+
+    The callable needs to accept a single argument, the object in the range.
 
     @tparam I input iterator type
     @tparam C callable type
@@ -335,9 +332,19 @@ class FlowBuilder {
     */
     void succeed(std::initializer_list<Task> others, Task A);
     
-  private:
-
+  protected:
+    
+    /**
+    @brief constructs a flow builder with a graph
+    */
+    FlowBuilder(Graph& graph);
+    
+    /**
+    @brief associated graph object
+    */
     Graph& _graph;
+
+  private:
 
     template <typename L>
     void _linearize(L&);
@@ -856,24 +863,29 @@ std::pair<Task, Task> FlowBuilder::reduce(I beg, I end, T& result, B&& op) {
 
 @brief building methods of a subflow graph in dynamic tasking
 
+By default, a subflow automatically joins its parent node. You may explicitly
+join or detach a subflow by calling Subflow::join or Subflow::detach.
+
 */ 
 class Subflow : public FlowBuilder {
+
+  friend class Executor;
 
   public:
     
     /**
-    @brief constructs a subflow builder object
-    */
-    template <typename... Args>
-    Subflow(Args&&... args);
-    
-    /**
     @brief enables the subflow to join its parent task
+
+    Performs an immediate action to join the subflow. Once the subflow is joined,
+    it is considered finished and you may not apply any other actions to it.
     */
     void join();
 
     /**
     @brief enables the subflow to detach from its parent task
+
+    A joined subflow cannot be detached. The subflow will be detached upon leaving
+    its execution context.
     */
     void detach();
     
@@ -883,39 +895,46 @@ class Subflow : public FlowBuilder {
     bool detached() const;
 
     /**
-    @brief queries if the subflow will join its parent task
+    @brief queries if the subflow is joinable
+
+    When a subflow is joined, it becomes not joinable.
     */
-    bool joined() const;
+    bool joinable() const;
 
   private:
+    
+    Subflow(Executor&, Node*, Graph&);
 
-    bool _detached {false};
+    Executor& _executor;
+    Node* _parent;
+
+    bool _joined {false};
+    bool _detach {false};
 };
 
 // Constructor
-template <typename... Args>
-Subflow::Subflow(Args&&... args) :
-  FlowBuilder {std::forward<Args>(args)...} {
-}
-
-// Procedure: join
-inline void Subflow::join() {
-  _detached = false;
+Subflow::Subflow(Executor& executor, Node* parent, Graph& graph) :
+  FlowBuilder {graph},
+  _executor   {executor},
+  _parent     {parent} {
 }
 
 // Procedure: detach
 inline void Subflow::detach() {
-  _detached = true;
+  if(_joined) {
+    TF_THROW("subflow already joined");
+  }
+  _detach = true;
 }
 
 // Function: detached
 inline bool Subflow::detached() const {
-  return _detached;
+  return _detach;
 }
 
 // Function: joined
-inline bool Subflow::joined() const {
-  return !_detached;
+inline bool Subflow::joinable() const {
+  return !_joined;
 }
 
 
