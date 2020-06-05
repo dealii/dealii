@@ -19,20 +19,20 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int spacedim, typename Number>
 bool
-BoundingBox<spacedim, Number>::point_inside(
-  const Point<spacedim, Number> &p) const
+BoundingBox<spacedim, Number>::point_inside(const Point<spacedim, Number> &p,
+                                            const double tolerance) const
 {
   for (unsigned int i = 0; i < spacedim; ++i)
     {
       // Bottom left-top right convention: the point is outside if it's smaller
       // than the first or bigger than the second boundary point The bounding
       // box is defined as a closed set
-      if (std::numeric_limits<Number>::epsilon() *
-              (std::abs(this->boundary_points.first[i] + p[i])) <
-            this->boundary_points.first[i] - p[i] ||
-          std::numeric_limits<Number>::epsilon() *
-              (std::abs(this->boundary_points.second[i] + p[i])) <
-            p[i] - this->boundary_points.second[i])
+      if ((p[i] < this->boundary_points.first[i] -
+                    tolerance * std::abs(this->boundary_points.second[i] -
+                                         this->boundary_points.first[i])) ||
+          (p[i] > this->boundary_points.second[i] +
+                    tolerance * std::abs(this->boundary_points.second[i] -
+                                         this->boundary_points.first[i])))
         return false;
     }
   return true;
