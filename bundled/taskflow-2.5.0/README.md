@@ -1,32 +1,33 @@
-# Cpp-Taskflow <img align="right" width="10%" src="image/cpp-taskflow_logo.png">
+# Taskflow <img align="right" width="10%" src="image/taskflow_logo.png">
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bb04cb8e4aca401b8206c054e79fd5e3)](https://app.codacy.com/app/tsung-wei-huang/cpp-taskflow?utm_source=github.com&utm_medium=referral&utm_content=cpp-taskflow/cpp-taskflow&utm_campaign=Badge_Grade_Dashboard)
-[![Linux Build Status](https://travis-ci.com/cpp-taskflow/cpp-taskflow.svg?branch=master)](https://travis-ci.com/cpp-taskflow/cpp-taskflow)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/te9bjp4yfhq7f8hq?svg=true)](https://ci.appveyor.com/project/TsungWeiHuang/cpp-taskflow)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3bbdc89f9a7a41eaa17559fab8a64cde)](https://app.codacy.com/gh/taskflow/taskflow?utm_source=github.com&utm_medium=referral&utm_content=taskflow/taskflow&utm_campaign=Badge_Grade_Dashboard)
+[![Linux Build Status](https://travis-ci.com/taskflow/taskflow.svg?branch=master)](https://travis-ci.com/taskflow/taskflow)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/rbjl16i6c9ahxr16?svg=true)](https://ci.appveyor.com/project/tsung-wei-huang/taskflow)
 [![Wiki](image/api-doc.svg)][wiki]
-[![TFProf](image/tfprof.svg)](https://cpp-taskflow.github.io/tfprof/)
+[![TFProf](image/tfprof.svg)](https://taskflow.github.io/tfprof/)
 [![Cite](image/cite-arXiv.svg)](https://arxiv.org/abs/2004.10908v2)
 
-Cpp-Taskflow helps you quickly write parallel programs with high performance scalability
-and simultaneous high productivity.
+Taskflow helps you quickly write parallel tasks programs in modern C++
 
-# Why Cpp-Taskflow?
+:exclamation: Starting from [v2.5.0](https://github.com/taskflow/taskflow/releases/tag/2.5.0), we have renamed cpp-taskflow to ***taskflow*** to broaden its support and future application scopes. The core codebase remains *unchanged*. You may only need to [change the remote URL](https://help.github.com/en/github/using-git/changing-a-remotes-url) to this new repository. Thank your for the support!
 
-Cpp-Taskflow is faster, more expressive, and easier for drop-in integration
+# Why Taskflow?
+
+Taskflow is faster, more expressive, and easier for drop-in integration
 than many of existing task programming frameworks
 in handling complex parallel workloads.
 
 ![](image/performance.png)
 
-Cpp-Taskflow lets you quickly implement task decomposition strategies
+Taskflow lets you quickly implement task decomposition strategies
 that incorporate both regular and irregular compute patterns,
 together with an efficient *work-stealing* scheduler to optimize your multithreaded performance.
 
-| [Static Tasking](#get-started-with-cpp-taskflow) | [Dynamic Tasking](#dynamic-tasking) |
+| [Static Tasking](#get-started-with-taskflow) | [Dynamic Tasking](#dynamic-tasking) |
 | :------------: | :-------------: |
 | ![](image/static_graph.svg) | <img align="right" src="image/dynamic_graph.svg" width="100%"> |
 
-Cpp-Taskflow supports conditional tasking for you to make rapid control-flow decisions
+Taskflow supports conditional tasking for you to make rapid control-flow decisions
 across dependent tasks to implement cycles and conditions that were otherwise difficult to do
 with existing tools.
 
@@ -34,7 +35,7 @@ with existing tools.
 | :-----------------: |
 | ![](image/condition.svg) |
 
-Cpp-Taskflow is composable. You can create large parallel graphs through
+Taskflow is composable. You can create large parallel graphs through
 composition of modular and reusable blocks that are easier to optimize
 at an individual scope.
 
@@ -42,7 +43,7 @@ at an individual scope.
 | :---------------: |
 |![](image/framework.svg)|
 
-Cpp-Taskflow supports heterogeneous tasking for you to 
+Taskflow supports heterogeneous tasking for you to 
 accelerate a wide range of scientific computing applications
 by harnessing the power of CPU-GPU collaborative computing.
 
@@ -50,50 +51,54 @@ by harnessing the power of CPU-GPU collaborative computing.
 | :-----------------: |
 | ![](image/cudaflow.svg) |
 
-We are committed to support trustworthy developments for both academic and industrial research projects 
-in parallel computing. Check out [Who is Using Cpp-Taskflow](#who-is-using-cpp-taskflow) and what our users say:
 
-+ *"Cpp-Taskflow is the cleanest Task API I've ever seen." [Damien Hocking @Corelium Inc](http://coreliuminc.com)*
-+ *"Cpp-Taskflow has a very simple and elegant tasking interface. The performance also scales very well." [Glen Fraser][totalgee]*
-+ *"Cpp-Taskflow lets me handle parallel processing in a smart way." [Hayabusa @Cpp-Learning](https://cpp-learning.com/cpp-taskflow/)*
-+ *"Cpp-Taskflow improves the throughput of our graph engine in just a few hours of coding." [Jean-Michaël @KDAB](https://ossia.io/)*
+Taskflow provides visualization and tooling needed for profiling Taskflow programs.
+
+| [Taskflow Profiler](https://taskflow.github.io/tfprof) |
+| :-----------------: |
+| ![](image/tfprof.png) |
+
+We are committed to support trustworthy developments for both academic and industrial research projects 
+in parallel computing. Check out [Who is Using Taskflow](#who-is-using-taskflow) and what our users say:
+
++ *"Taskflow is the cleanest Task API I've ever seen." [Damien Hocking @Corelium Inc](http://coreliuminc.com)*
++ *"Taskflow has a very simple and elegant tasking interface. The performance also scales very well." [Glen Fraser][totalgee]*
++ *"Taskflow lets me handle parallel processing in a smart way." [Hayabusa @Learning](https://cpp-learning.com/cpp-taskflow/)*
++ *"Taskflow improves the throughput of our graph engine in just a few hours of coding." [Jean-Michaël @KDAB](https://ossia.io/)*
 + *"Best poster award for open-source parallel programming library." [Cpp Conference 2018][Cpp Conference 2018]*
 + *"Second Prize of Open-source Software Competition." [ACM Multimedia Conference 2019](https://tsung-wei-huang.github.io/img/mm19-ossc-award.jpg)*
 
 See a quick [presentation][Presentation] and 
-visit the [documentation][wiki] to learn more about Cpp-Taskflow.
+visit the [documentation][wiki] to learn more about Taskflow.
 Technical details can be referred to our [arXiv paper](https://arxiv.org/abs/2004.10908v2).
 
 # Table of Contents
 
-* [Get Started with Cpp-Taskflow](#get-started-with-cpp-taskflow)
+* [Get Started with Taskflow](#get-started-with-taskflow)
 * [Create a Taskflow Application](#create-a-taskflow-application)
    * [Step 1: Create a Taskflow](#step-1-create-a-taskflow)
    * [Step 2: Define Task Dependencies](#step-2-define-task-dependencies)
    * [Step 3: Execute a Taskflow](#step-3-execute-a-taskflow)
 * [Dynamic Tasking](#dynamic-tasking)
 * [Conditional Tasking](#conditional-tasking)
-   * [Step 1: Create a Condition Task](#step-1-create-a-condition-task)
-   * [Step 2: Scheduling Rules for Condition Tasks](#step-2-scheduling-rules-for-condition-tasks)
 * [Composable Tasking](#composable-tasking)
 * [Concurrent CPU-GPU Tasking](#concurrent-cpu-gpu-tasking)
    * [Step 1: Create a cudaFlow](#step-1-create-a-cudaflow)
    * [Step 2: Compile and Execute a cudaFlow](#step-2-compile-and-execute-a-cudaflow)
 * [Visualize a Taskflow Graph](#visualize-a-taskflow-graph)
-* [Monitor Thread Activities](#monitor-thread-activities)
 * [API Reference](#api-reference)
 * [System Requirements](#system-requirements)
 * [Compile Unit Tests, Examples, and Benchmarks](#compile-unit-tests-examples-and-benchmarks)
-* [Who is Using Cpp-Taskflow?](#who-is-using-cpp-taskflow)
+* [Who is Using Taskflow?](#who-is-using-taskflow)
 
 
-# Get Started with Cpp-Taskflow
+# Get Started with Taskflow
 
-The following example [simple.cpp](./examples/simple.cpp) shows the basic Cpp-Taskflow API
+The following example [simple.cpp](./examples/simple.cpp) shows the basic Taskflow API
 you need in most applications.
 
 ```cpp
-#include <taskflow/taskflow.hpp>  // Cpp-Taskflow is header-only
+#include <taskflow/taskflow.hpp>  // Taskflow is header-only
 
 int main(){
   
@@ -131,7 +136,7 @@ TaskD
 
 # Create a Taskflow Application
 
-Cpp-Taskflow defines a very expressive API to create task dependency graphs.
+Taskflow defines a very expressive API to create task dependency graphs.
 Most applications are developed through the following three steps:
 
 ## Step 1: Create a Taskflow
@@ -258,11 +263,7 @@ the execution of a subflow and so on.
 
 # Conditional Tasking
 
-Taskflow supports *conditional tasking* for users to implement *dynamic* and *cyclic* control flows.
-You can create highly versatile and efficient parallel patterns through condition tasks.
-
-## Step 1: Create a Condition Task
-
+Taskflow supports *conditional tasking* for users to implement *general* control flow with cycles and conditionals.
 A *condition task* evalutes a set of instructions and returns an integer index
 of the next immediate successor to execute.
 The index is defined with respect to the order of its successor construction.
@@ -285,35 +286,6 @@ cond.precede(cond, stop);  // cond--0-->cond, cond--1-->stop
 
 executor.run(tf).wait();
 ```
-
-If the return value from `cond` is 0, it loops back to itself, or otherwise to `stop`.
-Cpp-Taskflow terms the preceding link from a condition task a *weak dependency*
-(dashed lines above).
-Others are *strong depedency* (solid lines above).
-
-
-## Step 2: Scheduling Rules for Condition Tasks
-
-When you submit a taskflow to an executor,
-the scheduler starts with tasks of *zero dependency* (both weak and strong dependencies)
-and continues to execute successive tasks whenever *strong dependencies* are met.
-However, 
-the scheduler skips this rule for a condition task and jumps directly to its successor
-indexed by the return value.
-
-![](image/conditional-tasking-rules.svg)
-
-It is users' responsibility to ensure a taskflow is properly conditioned. 
-Top things to avoid include no source tasks to start with and task race.
-The figure shows common pitfalls and their remedies.
-In the risky scenario, task X may not be raced if P and M is exclusively
-branching to X.
-
-![](image/conditional-tasking-pitfalls.svg)
-
-
-A good practice for avoiding mistakes of conditional tasking is to infer the execution flow of your graphs based on our scheduling rules.
-Make sure there is no task race.
 
 <div align="right"><b><a href="#table-of-contents">[↑]</a></b></div>
 
@@ -355,7 +327,7 @@ to compose a larger taskflow and so on.
 
 # Concurrent CPU-GPU Tasking
 
-Cpp-Taskflow enables concurrent CPU-GPU tasking by leveraging
+Taskflow enables concurrent CPU-GPU tasking by leveraging
 [Nvidia CUDA Toolkit][cuda-toolkit].
 You can harness the power of CPU-GPU collaborative computing 
 to implement heterogeneous decomposition algorithms.
@@ -484,52 +456,29 @@ tf.dump(std::cout);       // dump the graph including dynamic tasks
 
 
 
-# Monitor Thread Activities 
-
-Cpp-Taskflow Profiler ([TFProf](https://github.com/cpp-taskflow/tfprof)) 
-provides the visualization and tooling needed for profiling cpp-taskflow programs.
-
-<p align="center">
-   <a href="https://cpp-taskflow.github.io/tfprof/">
-     <img width="100%" src="image/tfprof.png">
-   </a>
-</p>
-
-<div align="right"><b><a href="#table-of-contents">[↑]</a></b></div>
-
 # API Reference
 
 The official [documentation][wiki] explains a complete list of 
-Cpp-Taskflow API. 
+Taskflow API. 
 Here, we highlight commonly used methods.
 
 ## Taskflow API
 
 The class `tf::Taskflow` is the main place to create a task dependency graph.
-The table below summarizes a list of commonly used methods.
-
-| Method   | Argument  | Return  | Description |
-| -------- | --------- | ------- | ----------- |
-| emplace  | callables | tasks   | creates a task with a given callable(s) |
-| placeholder     | none        | task         | inserts a node without any work; work can be assigned later |
-| parallel_for    | beg, end, callable, chunk | task pair | concurrently applies the callable chunk by chunk to the result of dereferencing every iterator in the range | 
-| parallel_for    | beg, end, step, callable, chunk | task pair | concurrently applies the callable chunk by chunk to an index-based range with a step size | 
-| num_workers     | none        | size | queries the number of working threads in the pool |  
-| dump            | ostream     | none | dumps the taskflow to an output stream in GraphViz format |
 
 ### *emplace/placeholder*
 
 You can use `emplace` to create a task from a target callable.
 
 ```cpp
-tf::Task task = tf.emplace([] () { std::cout << "my task\n"; });
+tf::Task task = taskflow.emplace([] () { std::cout << "my task\n"; });
 ```
 
 When a task cannot be determined beforehand, you can create a placeholder and assign the callable later.
 
 ```cpp
-tf::Task A = tf.emplace([](){});
-tf::Task B = tf.placeholder();
+tf::Task A = taskflow.emplace([](){});
+tf::Task B = taskflow.placeholder();
 A.precede(B);
 B.work([](){ /* do something */ });
 ```
@@ -542,7 +491,7 @@ The method `parallel_for` creates a subgraph that applies the callable to each i
 
 ```cpp
 auto v = {'A', 'B', 'C', 'D'};
-auto [S, T] = tf.parallel_for(
+auto [S, T] = taskflow.parallel_for(
   v.begin(),    // iterator to the beginning
   v.end(),      // iterator to the end
   [] (int i) { 
@@ -558,7 +507,7 @@ You can specify a *chunk* size (default one) in the last argument to force a tas
 
 ```cpp
 auto v = {'A', 'B', 'C', 'D'};
-auto [S, T] = tf.parallel_for(
+auto [S, T] = taskflow.parallel_for(
   v.begin(),    // iterator to the beginning
   v.end(),      // iterator to the end
   [] (int i) { 
@@ -575,7 +524,7 @@ starting index, ending index (exclusive), and step size.
 
 ```cpp
 // [0, 11) with a step size of 2
-auto [S, T] = tf.parallel_for(
+auto [S, T] = taskflow.parallel_for(
   0, 11, 2, 
   [] (int i) {
     std::cout << "parallel_for on index " << i << std::endl;
@@ -589,20 +538,7 @@ auto [S, T] = tf.parallel_for(
 
 Each time you create a task, the taskflow object adds a node to the present task dependency graph
 and return a *task handle* to you.
-A task handle is a lightweight object that defines a set of methods for users to
-access and modify the attributes of the associated task.
-The table below summarizes a list of commonly used methods.
-
-| Method         | Argument    | Return | Description |
-| -------------- | ----------- | ------ | ----------- |
-| name           | string      | self   | assigns a human-readable name to the task |
-| work           | callable    | self   | assigns a work of a callable object to the task |
-| precede        | task list   | self   | enables this task to run *before* the given tasks |
-| succeed        | task list   | self   | enables this task to run *after* the given tasks |
-| num_dependents | none        | size   | returns the number of dependents (inputs) of this task |
-| num_successors | none        | size   | returns the number of successors (outputs) of this task |
-| empty          | none        | bool   | returns true if the task points to a graph node or false otherwise |
-| has_work       | none        | bool   | returns true if the task points to a graph node with a callable assigned |
+You can access or modify the attributes of the associated task node.
 
 ### *name*
 
@@ -620,9 +556,9 @@ The method `work` lets you assign a callable to a task.
 A.work([] () { std::cout << "hello world!"; });
 ```
 
-### *precede*
+### *precede/succeed*
 
-The method `precede` lets you add a preceding link from self to other tasks.
+The method `precede/succedd` lets you add a preceding/succeeding link between tasks.
 
 <img align="right" width="30%" src="image/broadcast.svg">
 
@@ -635,7 +571,7 @@ The method `succeed` is similar to `precede` but operates in the opposite direct
 
 ### *empty/has_work*
 
-A task is empty is it is not associated with any graph node.
+A task is empty if it is not associated with any graph node.
 
 ```cpp
 tf::Task task;  // assert(task.empty());
@@ -649,20 +585,11 @@ tf::Task task = taskflow.placeholder();  // assert(!task.has_work());
 
 ## Executor API
 
-The class `tf::Executor` is used for execution of one or multiple taskflow objects.
-The table below summarizes a list of commonly used methods. 
-
-| Method    | Argument       | Return        | Description              |
-| --------- | -------------- | ------------- | ------------------------ |
-| run       | taskflow       | future | runs the taskflow once    |
-| run_n     | taskflow, N    | future | runs the taskflow N times |
-| run_until | taskflow, binary predicate | future | keeps running the taskflow until the predicate becomes true |
-| wait_for_all | none | none | blocks until all running tasks finish |
-| make_observer | arguments to forward to user-derived constructor | pointer to the observer | creates an observer to monitor the thread activities of the executor |
+The class `tf::Executor` is used for executing one or multiple taskflow objects.
 
 ### *run/run_n/run_until*
 
-The run series are non-blocking call to execute a taskflow graph.
+The run series are *thread-safe* and *non-blocking* calls to execute a taskflow.
 Issuing multiple runs on the same taskflow will automatically synchronize 
 to a sequential chain of executions.
 
@@ -678,21 +605,21 @@ The first run finishes before the second run, and the second run finishes before
 
 # System Requirements
 
-To use the latest [Cpp-Taskflow](https://github.com/cpp-taskflow/cpp-taskflow/archive/master.zip), you only need a [C++14][C++14] compiler.
+To use the latest [Taskflow](https://github.com/taskflow/taskflow/archive/master.zip), you only need a [C++14][C++14] compiler.
 
 + GNU C++ Compiler at least v5.0 with -std=c++14
 + Clang C++ Compiler at least v4.0 with -std=c++14
-+ Microsoft Visual Studio at least v15.7 (MSVC++ 19.14); see [vcpkg guide](https://github.com/cpp-taskflow/cpp-taskflow/issues/143)
++ Microsoft Visual Studio at least v15.7 (MSVC++ 19.14); see [vcpkg guide](https://github.com/taskflow/taskflow/issues/143)
 + AppleClang Xode Version at least v8
 + Nvidia CUDA Toolkit and Compiler ([nvcc][nvcc]) at least v10.0 with -std=c++14
 
-Cpp-Taskflow works on Linux, Windows, and Mac OS X. See the [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support) status.
+Taskflow works on Linux, Windows, and Mac OS X. See the [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support) status.
 
 <div align="right"><b><a href="#table-of-contents">[↑]</a></b></div>
 
 # Compile Unit Tests, Examples, and Benchmarks
 
-Cpp-Taskflow uses [CMake](https://cmake.org/) to build examples and unit tests.
+Taskflow uses [CMake](https://cmake.org/) to build examples and unit tests.
 We recommend using out-of-source build.
 
 ```bash
@@ -705,7 +632,7 @@ We recommend using out-of-source build.
 
 ## Examples
 
-The folder `examples/` contains several examples and is a great place to learn to use Cpp-Taskflow.
+The folder `examples/` contains several examples and is a great place to learn to use Taskflow.
 
 | Example |  Description |
 | ------- |  ----------- | 
@@ -727,9 +654,9 @@ compile the benchmarks.
 
 <div align="right"><b><a href="#table-of-contents">[↑]</a></b></div>
 
-# Who is Using Cpp-Taskflow?
+# Who is Using Taskflow?
 
-Cpp-Taskflow is being used in both industry and academic projects to scale up existing workloads 
+Taskflow is being used in both industry and academic projects to scale up existing workloads 
 that incorporate complex task dependencies. 
 
 - [OpenTimer][OpenTimer]: A High-performance Timing Analysis Tool for Very Large Scale Integration (VLSI) Systems
@@ -743,15 +670,16 @@ that incorporate complex task dependencies.
 - [Heteroflow](https://github.com/Heteroflow/Heteroflow): A Modern C++ Parallel CPU-GPU Task Programming Library
 - [OpenPhySyn](https://github.com/The-OpenROAD-Project/OpenPhySyn): A plugin-based physical synthesis optimization kit as part of the OpenRoad flow
 - [OSSIA](https://ossia.io/): Open-source Software System for Interactive Applications
+- [deal.II](https://github.com/dealii/dealii): A C++ software library to support the creation of finite element code
 
-[More...](https://github.com/search?q=cpp-taskflow&type=Code)
+[More...](https://github.com/search?q=taskflow&type=Code)
 
 <div align="right"><b><a href="#table-of-contents">[↑]</a></b></div>
 
 # Contributors
 
-Cpp-Taskflow is being actively developed and contributed by the 
-[these people](https://github.com/cpp-taskflow/cpp-taskflow/graphs/contributors).
+Taskflow is being actively developed and contributed by the 
+[these people](https://github.com/taskflow/taskflow/graphs/contributors).
 Meanwhile, we appreciate the support from many organizations for our developments.
 
 
@@ -760,21 +688,19 @@ Meanwhile, we appreciate the support from many organizations for our development
 
 # License
 
-Cpp-Taskflow is licensed under the [MIT License](./LICENSE).
+Taskflow is licensed under the [MIT License](./LICENSE).
 
 * * *
 
 [Tsung-Wei Huang]:       https://tsung-wei-huang.github.io/
 [Chun-Xun Lin]:          https://github.com/clin99
 [Martin Wong]:           https://ece.illinois.edu/directory/profile/mdfwong
-[Andreas Olofsson]:      https://github.com/aolofsson
-[Gitter]:                https://gitter.im/cpp-taskflow/Lobby
 [Gitter badge]:          ./image/gitter_badge.svg
-[GitHub releases]:       https://github.com/coo-taskflow/cpp-taskflow/releases
-[GitHub issues]:         https://github.com/cpp-taskflow/cpp-taskflow/issues
-[GitHub insights]:       https://github.com/cpp-taskflow/cpp-taskflow/pulse
-[GitHub pull requests]:  https://github.com/cpp-taskflow/cpp-taskflow/pulls
-[GitHub contributors]:   https://github.com/cpp-taskflow/cpp-taskflow/graphs/contributors
+[GitHub releases]:       https://github.com/taskflow/taskflow/releases
+[GitHub issues]:         https://github.com/taskflow/taskflow/issues
+[GitHub insights]:       https://github.com/taskflow/taskflow/pulse
+[GitHub pull requests]:  https://github.com/taskflow/taskflow/pulls
+[GitHub contributors]:   https://github.com/taskflow/taskflow/graphs/contributors
 [GraphViz]:              https://www.graphviz.org/
 [AwesomeGraphViz]:       https://dreampuf.github.io/GraphvizOnline/
 [OpenMP Tasking]:        https://www.openmp.org/spec-html/5.0/openmpsu99.html 
@@ -791,8 +717,8 @@ Cpp-Taskflow is licensed under the [MIT License](./LICENSE).
 [UIUC]:                  https://illinois.edu/
 [CSL]:                   https://csl.illinois.edu/
 [UofU]:                  https://www.utah.edu/
-[wiki]:                  https://cpp-taskflow.github.io/cpp-taskflow/index.html
-[release notes]:         https://cpp-taskflow.github.io/cpp-taskflow/Releases.html
+[wiki]:                  https://taskflow.github.io/taskflow/index.html
+[release notes]:         https://taskflow.github.io/taskflow/Releases.html
 [PayMe]:                 https://www.paypal.me/twhuang/10
 [C++17]:                 https://en.wikipedia.org/wiki/C%2B%2B17
 [C++14]:                 https://en.wikipedia.org/wiki/C%2B%2B14
@@ -816,6 +742,6 @@ Cpp-Taskflow is licensed under the [MIT License](./LICENSE).
 [NovusCore]:             https://github.com/novuscore/NovusCore
 [SA-PCB]:                https://github.com/choltz95/SA-PCB
 
-[Presentation]:          https://cpp-taskflow.github.io/
+[Presentation]:          https://taskflow.github.io/
 [chrome://tracing]:      chrome://tracing
 
