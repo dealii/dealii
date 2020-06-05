@@ -512,7 +512,6 @@ using ConstraintMatrix DEAL_II_DEPRECATED = AffineConstraints<double>;
  *
  * @ingroup dofs
  * @ingroup constraints
- * @author Wolfgang Bangerth, Martin Kronbichler, 1998, 2004, 2008, 2009
  */
 template <typename number = double>
 class AffineConstraints : public Subscriptor
@@ -2260,7 +2259,6 @@ class BlockSparseMatrixEZ;
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, 2009
  */
 template <typename MatrixType>
 struct IsBlockMatrix

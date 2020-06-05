@@ -51,7 +51,6 @@ namespace OpenCASCADE
    * face would be collapsed to the edge, and your surrounding points would
    * not be lying on the given shape, raising an exception.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    *
    * @deprecated Use NormalProjectionManifold instead, which is identical to
    * this class but satisfies the modern Manifold-based naming convention.
@@ -92,7 +91,6 @@ namespace OpenCASCADE
    * TopoDS_Shape, or when the direction you use at construction time does not
    * intersect the shape. An exception is thrown when this happens.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    *
    * @deprecated Use DirectionalProjectionManifold instead, which is identical to
    * this class but satisfies the modern Manifold-based naming convention.
@@ -158,7 +156,6 @@ namespace OpenCASCADE
    * points does not intersect the shape.  An exception is thrown when this
    * happens.
    *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    *
    * @deprecated Use NormalToMeshProjectionManifold instead, which is identical to
    * this class but satisfies the modern Manifold-based naming convention.

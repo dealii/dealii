@@ -148,7 +148,6 @@ namespace Functions
    * this class may be slower than the FunctionParser class.
    *
    * @ingroup functions
-   * @author Luca Heltai 2019
    */
   template <int dim, typename RangeNumberType = double>
   class SymbolicFunction : public Function<dim, RangeNumberType>

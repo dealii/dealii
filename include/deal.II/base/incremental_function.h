@@ -44,7 +44,6 @@ namespace Functions
    * required by some implementations of non-linear solution schemes.
    *
    * @ingroup functions
-   * @author Denis Davydov, Jean-Paul Pelteret, 2018
    */
   template <int dim, typename RangeNumberType = double>
   class IncrementalFunction : public Function<dim, RangeNumberType>

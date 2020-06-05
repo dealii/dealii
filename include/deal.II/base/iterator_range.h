@@ -123,7 +123,6 @@ class IteratorOverIterators;
  * class.
  *
  * @ingroup CPP11
- * @author Wolfgang Bangerth, 2014
  */
 template <typename Iterator>
 class IteratorRange
@@ -288,8 +287,6 @@ private:
 /**
  * Create an object of type IteratorRange given the beginning and
  * end iterator.
- *
- * @author Jean-Paul Pelteret, 2019
  */
 template <typename BaseIterator>
 IteratorRange<BaseIterator>

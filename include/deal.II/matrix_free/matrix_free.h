@@ -107,8 +107,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ref matrixfree "matrix-free module".
  *
  * @ingroup matrixfree
- *
- * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
 
 template <int dim,

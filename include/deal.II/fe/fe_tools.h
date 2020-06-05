@@ -71,9 +71,6 @@ class AffineConstraints;
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
- *
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat; 2000, 2003, 2004,
- * 2005, 2006
  */
 namespace FETools
 {
@@ -84,8 +81,6 @@ namespace FETools
    *
    * This class is used in the FETools::get_fe_by_name() and
    * FETools::add_fe_name() functions.
-   *
-   * @author Guido Kanschat, 2006
    */
   template <int dim, int spacedim = dim>
   class FEFactoryBase : public Subscriptor
@@ -119,8 +114,6 @@ namespace FETools
    * given as template argument, and with the degree (however the finite
    * element class wishes to interpret this number) given as argument to
    * get().
-   *
-   * @author Guido Kanschat, 2006
    */
   template <class FE>
   class FEFactory : public FEFactoryBase<FE::dimension, FE::space_dimension>

@@ -47,7 +47,6 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, 2004
    */
   class SparseMatrix : public MatrixBase
   {
@@ -362,7 +361,6 @@ namespace PETScWrappers
      *
      * @ingroup PETScWrappers
      * @ingroup Matrix1
-     * @author Wolfgang Bangerth, 2004
      */
     class SparseMatrix : public MatrixBase
     {

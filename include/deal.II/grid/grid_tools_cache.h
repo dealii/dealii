@@ -60,8 +60,6 @@ namespace GridTools
    * some vertex locations, then some of the structures in this class become
    * obsolete, and you will have to mark them as outdated, by calling the
    * method mark_for_update() manually.
-   *
-   * @author Luca Heltai, 2017.
    */
   template <int dim, int spacedim = dim>
   class Cache : public Subscriptor

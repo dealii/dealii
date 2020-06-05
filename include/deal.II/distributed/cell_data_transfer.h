@@ -122,7 +122,6 @@ namespace parallel
      * matching code snippets for both transfer and serialization.
      *
      * @ingroup distributed
-     * @author Marc Fehling, 2018 - 2020
      */
     template <int dim, int spacedim = dim, typename VectorType = Vector<double>>
     class CellDataTransfer

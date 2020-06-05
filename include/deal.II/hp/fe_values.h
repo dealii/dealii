@@ -59,8 +59,6 @@ namespace hp
    * ::FEValues, ::FEFaceValues, or ::FESubfaceValues.
    *
    * @ingroup hp
-   *
-   * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int q_dim, class FEValuesType>
   class FEValuesBase
@@ -275,7 +273,6 @@ namespace hp
    * one case (<tt>spacedim != dim </tt>).
    *
    * @ingroup hp hpcollection
-   * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim = dim>
   class FEValues
@@ -402,7 +399,6 @@ namespace hp
    * <em>both</em> finite elements.
    *
    * @ingroup hp hpcollection
-   * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim = dim>
   class FEFaceValues
@@ -509,7 +505,6 @@ namespace hp
    * See there for further documentation.
    *
    * @ingroup hp hpcollection
-   * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim = dim>
   class FESubfaceValues

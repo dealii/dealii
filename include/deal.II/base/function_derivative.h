@@ -39,7 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  * obtain sufficient results.
  *
  * @ingroup functions
- * @author Guido Kanschat, 2000
  */
 template <int dim>
 class FunctionDerivative : public AutoDerivativeFunction<dim>

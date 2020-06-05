@@ -70,7 +70,6 @@ namespace MeshWorker
    * class will automatically use the new structures.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim, typename number = double>
   class DoFInfo : public LocalResults<number>
@@ -217,7 +216,6 @@ namespace MeshWorker
    * cleanliness.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2010
    */
   template <int dim, class DOFINFO>
   class DoFInfoBox

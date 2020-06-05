@@ -127,9 +127,6 @@ namespace SparsityPatternIterators
    * row and column number (or alternatively the index within the complete
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Wolfgang Bangerth
-   * @date 2004
    */
   class Accessor
   {
@@ -323,8 +320,6 @@ namespace SparsityPatternIterators
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
  * The ordering of non-zero elements within each row (i.e. increasing
  * column index order) depends on the derived classes.
- *
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPatternBase : public Subscriptor
 {
@@ -859,8 +854,6 @@ protected:
  * first, see for example the step-2 tutorial program as well as the
  * documentation module
  * @ref Sparsity.
- *
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPattern : public SparsityPatternBase
 {

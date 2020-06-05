@@ -50,8 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  * that correspond to FE_FaceQ will have the invalid values mentioned above.
  *
  * @ingroup fe
- * @author Guido Kanschat, Martin Kronbichler
- * @date 2009, 2011, 2013
  */
 template <int dim, int spacedim = dim>
 class FE_FaceQ
@@ -211,8 +209,6 @@ private:
  * 1D (even though there is no computational benefit at all from it in 1D).
  *
  * @ingroup fe
- * @author Guido Kanschat, Martin Kronbichler
- * @date 2014
  */
 template <int spacedim>
 class FE_FaceQ<1, spacedim> : public FiniteElement<1, spacedim>
@@ -464,8 +460,6 @@ private:
  * that correspond to FE_FaceP will have the invalid values mentioned above.
  *
  * @ingroup fe
- * @author Martin Kronbichler
- * @date 2013
  */
 template <int dim, int spacedim = dim>
 class FE_FaceP : public FE_PolyFace<PolynomialSpace<dim - 1>, dim, spacedim>

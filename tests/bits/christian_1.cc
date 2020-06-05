@@ -54,7 +54,6 @@ namespace DoFToolsEx
  * one Vector be enough?
  *
  * @param
- *
  */
 template <int dim, class InVector, class OutVector>
 void

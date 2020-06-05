@@ -282,7 +282,6 @@ namespace TriaAccessorExceptions
  *
  * @ingroup grid
  * @ingroup Accessors
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2010
  */
 template <int structdim, int dim, int spacedim = dim>
 class TriaAccessorBase
@@ -548,7 +547,6 @@ private:
  * correctness, none of the functions do anything but generate errors.
  *
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 2008
  */
 template <int structdim, int dim, int spacedim = dim>
 class InvalidAccessor : public TriaAccessorBase<structdim, dim, spacedim>
@@ -689,7 +687,6 @@ public:
  * @p structdim equals zero, i.e., for vertices of a triangulation.
  *
  * @ingroup Accessors
- * @author Wolfgang Bangerth and others, 1998, 2000, 2008
  */
 template <int structdim, int dim, int spacedim>
 class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
@@ -1755,7 +1752,6 @@ private:
  * since in that case vertices are also faces.
  *
  * @ingroup Accessors
- * @author Bruno Turcksin, 2015
  */
 template <int dim, int spacedim>
 class TriaAccessor<0, dim, spacedim>
@@ -2160,7 +2156,6 @@ private:
  * since in the @p dim == 1 case vertices are also faces.
  *
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 2010
  */
 template <int spacedim>
 class TriaAccessor<0, 1, spacedim>
@@ -2666,7 +2661,6 @@ protected:
  *
  * @ingroup grid
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim, int spacedim = dim>
 class CellAccessor : public TriaAccessor<dim, dim, spacedim>

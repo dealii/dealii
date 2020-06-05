@@ -67,7 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup textoutput
- * @author Wolfgang Bangerth, 1999
  */
 class Histogram
 {

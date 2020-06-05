@@ -543,12 +543,6 @@ DEAL_II_NAMESPACE_OPEN
  * shape function 24 </td>
  *
  * <td align="center"> </td> </tr> </table>
- *
- *
- *
- * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann,
- * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
- * Martin Kronbichler, 2008
  */
 template <int dim, int spacedim = dim>
 class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>

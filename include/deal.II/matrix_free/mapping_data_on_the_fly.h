@@ -55,8 +55,6 @@ namespace internal
      * the geometry, but it rather provides the evaluated geometry from a
      * given deal.II mapping (as passed to the constructor of this class) in a
      * form accessible to FEEvaluation.
-     *
-     * @author Martin Kronbichler, 2014
      */
     template <int dim, typename Number, typename VectorizedArrayType>
     class MappingDataOnTheFly

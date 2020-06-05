@@ -92,8 +92,6 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
 
 /**
  * An iterator for VectorizedArray.
- *
- * @author Peter Munch, 2019
  */
 template <typename T>
 class VectorizedArrayIterator
@@ -247,8 +245,6 @@ private:
  *   Couriously Recurring Template Pattern (see
  *   https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in this
  *   class to avoid having to resort to `virtual` member functions.
- *
- * @author Peter Munch, 2019
  */
 template <typename T, std::size_t width>
 class VectorizedArrayBase
@@ -388,8 +384,6 @@ public:
  * @tparam Number underlying data type
  * @tparam width  vector length (optional; if not set, the maximal width of the
  *                architecture is used)
- *
- * @author Katharina Kormann, Martin Kronbichler, Peter Munch, 2010, 2011, 2019
  */
 template <typename Number, std::size_t width>
 class VectorizedArray

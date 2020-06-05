@@ -48,8 +48,6 @@ DEAL_II_NAMESPACE_OPEN
  * compute the smallest eigenvalue, too.
  *
  * Convergence of this method is known to be slow.
- *
- * @author Guido Kanschat, 2000
  */
 template <typename VectorType = Vector<double>>
 class EigenPower : private SolverBase<VectorType>
@@ -123,8 +121,6 @@ protected:
  * converges to the eigenvalue closest to the initial guess. This can be aided
  * by the parameter AdditionalData::start_adaption, which indicates the first
  * iteration step in which the shift value should be adapted.
- *
- * @author Guido Kanschat, 2000, 2003
  */
 template <typename VectorType = Vector<double>>
 class EigenInverse : private SolverBase<VectorType>

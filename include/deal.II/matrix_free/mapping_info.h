@@ -107,8 +107,6 @@ namespace internal
      * with several data fields for the individual quadrature formulas.
      *
      * @ingroup matrixfree
-     *
-     * @author Katharina Kormann, Martin Kronbichler, 2018
      */
     template <int structdim,
               int spacedim,
@@ -309,8 +307,6 @@ namespace internal
      * interiors for use in the matrix-free class.
      *
      * @ingroup matrixfree
-     *
-     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, 2017
      */
     template <int dim, typename Number, typename VectorizedArrayType>
     struct MappingInfo
@@ -517,8 +513,6 @@ namespace internal
     /**
      * A helper class to extract either cell or face data from mapping info
      * for use in FEEvaluationBase.
-     *
-     * @author Katharina Kormann, Martin Kronbichler, 2018
      */
     template <int, typename, bool, typename>
     struct MappingInfoCellsOrFaces;

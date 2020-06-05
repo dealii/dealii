@@ -104,8 +104,6 @@ namespace parallel
  * others can be generated in application programs (see the section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
 class Vector : public Subscriptor
@@ -1354,7 +1352,6 @@ Vector<Number>::load(Archive &ar, const unsigned int)
  * exchanges the data of the two vectors.
  *
  * @relatesalso Vector
- * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
 inline void
@@ -1394,7 +1391,6 @@ operator<<(std::ostream &out, const Vector<number> &v)
  * Declare dealii::Vector< Number > as serial vector.
  *
  * @relatesalso Vector
- * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<Vector<Number>> : std::true_type

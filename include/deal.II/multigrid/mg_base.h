@@ -42,8 +42,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Usually, the derived class mg::Matrix, which operates on an MGLevelObject
  * of matrices, will be sufficient for applications.
- *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGMatrixBase : public Subscriptor
@@ -104,8 +102,6 @@ public:
  * Base class for coarse grid solvers.  This defines the virtual parenthesis
  * operator, being the interface used by multigrid methods. Any implementation
  * will be done by derived classes.
- *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGCoarseGridBase : public Subscriptor
@@ -170,8 +166,6 @@ public:
  * on block structures, it is not clear whether this case is really useful.
  * Therefore, a tested implementation of this case will be supplied when
  * needed.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
 template <typename VectorType>
 class MGTransferBase : public Subscriptor
@@ -210,7 +204,6 @@ public:
    *
    * @arg dst has as many elements as there are degrees of freedom on the
    * coarser level.
-   *
    */
   virtual void
   restrict_and_add(const unsigned int from_level,
@@ -238,8 +231,6 @@ public:
  * vector needs to be overwritten for a new incoming residual. On the other
  * hand, all subsequent operations need to smooth the content already present
  * in the vector @p u given the right hand side, which is done by smooth().
- *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGSmootherBase : public Subscriptor

@@ -46,8 +46,6 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k+1,k+1,k</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
- * @author Markus Bürg
- * @date 2009, 2010
  */
 template <int dim>
 class PolynomialsNedelec : public TensorPolynomialsBase<dim>

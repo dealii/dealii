@@ -146,8 +146,6 @@ namespace DataPostprocessorInputs
    *       }
    *   };
    * @endcode
-   *
-   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
   struct CommonInputs
@@ -231,8 +229,6 @@ namespace DataPostprocessorInputs
    * makes available access to the locations of evaluations points,
    * normal vectors (if appropriate), and which cell data is currently
    * being evaluated on (also if appropriate).
-   *
-   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
   struct Scalar : public CommonInputs<spacedim>
@@ -311,8 +307,6 @@ namespace DataPostprocessorInputs
    * makes available access to the locations of evaluations points,
    * normal vectors (if appropriate), and which cell data is currently
    * being evaluated on (also if appropriate).
-   *
-   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
   struct Vector : public CommonInputs<spacedim>
@@ -496,7 +490,6 @@ namespace DataPostprocessorInputs
  * DataPostprocessorScalar class) is used in a complex-valued situation.
  *
  * @ingroup output
- * @author Tobias Leicht, 2007; Wolfgang Bangerth, 2016, 2019
  */
 template <int dim>
 class DataPostprocessor : public Subscriptor
@@ -622,7 +615,6 @@ public:
  * The same is true for the DataPostprocessorTensor class.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2011
  */
 template <int dim>
 class DataPostprocessorScalar : public DataPostprocessor<dim>
@@ -865,7 +857,6 @@ private:
  *
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2011, 2017
  */
 template <int dim>
 class DataPostprocessorVector : public DataPostprocessor<dim>
@@ -1114,7 +1105,6 @@ private:
  * in simple cases, the Lam&eacute; constants.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2017
  */
 template <int dim>
 class DataPostprocessorTensor : public DataPostprocessor<dim>

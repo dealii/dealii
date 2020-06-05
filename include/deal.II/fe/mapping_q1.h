@@ -49,9 +49,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note This class is, in all reality, nothing more than a different name for
  * calling MappingQGeneric with a polynomial degree of one as argument.
- *
- * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005,
- * Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim = dim>
 class MappingQ1 : public MappingQGeneric<dim, spacedim>

@@ -94,8 +94,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup Polynomials
- * @author Guido Kanschat
- * @date 2003, 2005, 2009
  */
 template <int dim>
 class PolynomialsBDM : public TensorPolynomialsBase<dim>

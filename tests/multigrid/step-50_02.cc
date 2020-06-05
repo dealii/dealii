@@ -14,7 +14,6 @@
  * ---------------------------------------------------------------------
 
  *
- *
  */
 
 // Working version of step-50 with a parallel::shared::Triangulation

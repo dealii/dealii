@@ -130,8 +130,6 @@ namespace mg
  * will have to set up quite a few auxiliary objects before you can use it.
  * Unfortunately, it seems that this can be avoided only be restricting the
  * flexibility of this class in an unacceptable way.
- *
- * @author Guido Kanschat, 1999 - 2005
  */
 template <typename VectorType>
 class Multigrid : public Subscriptor
@@ -447,8 +445,6 @@ private:
  * If VectorType is in fact a block vector and the TRANSFER object supports
  * use of a separate DoFHandler for each block, this class also allows
  * to be initialized with a separate DoFHandler for each block.
- *
- * @author Guido Kanschat, Daniel Arndt, 1999, 2000, 2001, 2002, 2017
  */
 template <int dim, typename VectorType, class TRANSFER>
 class PreconditionMG : public Subscriptor

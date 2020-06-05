@@ -209,7 +209,6 @@ namespace DoFTools
  *
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 namespace DoFTools
 {
@@ -1211,8 +1210,6 @@ namespace DoFTools
    *
    * Detailed information can be found in the see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
-   *
-   * @author Matthias Maier, Daniel Garcia-Sanchez 2012 - 2019
    */
   template <typename FaceIterator, typename number>
   void
@@ -1249,8 +1246,6 @@ namespace DoFTools
    * @see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
    * and step-45 for further information.
-   *
-   * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
   template <typename DoFHandlerType, typename number>
   void
@@ -1294,8 +1289,6 @@ namespace DoFTools
    * @see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
    * for further information.
-   *
-   * @author Matthias Maier, 2012
    */
   template <typename DoFHandlerType, typename number>
   void
@@ -1830,8 +1823,6 @@ namespace DoFTools
    * IndexSet with all DoF indices. If the mask contains all components (which
    * also corresponds to the default value), then the union of the returned
    * index sets equlas what DoFHandler::locally_owned_dofs() returns.
-   *
-   * @authors Bruno Blais, Luca Heltai, 2019
    */
   template <typename DoFHandlerType>
   std::vector<IndexSet>
@@ -1851,8 +1842,6 @@ namespace DoFTools
    * not have information about all cells of the triangulation available
    * locally, and consequently can not say anything definitive about the
    * degrees of freedom active on other processors' locally owned cells.
-   *
-   * @author Denis Davydov, 2015
    */
   template <typename DoFHandlerType>
   std::vector<IndexSet>
@@ -1871,8 +1860,6 @@ namespace DoFTools
    * not have information about all cells of the triangulation available
    * locally, and consequently can not say anything definitive about the
    * degrees of freedom active on other processors' locally owned cells.
-   *
-   * @author Jean-Paul Pelteret, 2015
    */
   template <typename DoFHandlerType>
   std::vector<IndexSet>
@@ -2065,8 +2052,6 @@ namespace DoFTools
    * real cells of the complete, parallel triangulation. We can also query the
    * degrees of freedom on these. In other words, this function can only work
    * if all cells in the patch are either locally owned or ghost cells.
-   *
-   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
    */
   template <typename DoFHandlerType>
   std::vector<types::global_dof_index>
@@ -2399,8 +2384,6 @@ namespace DoFTools
    * real cells of the complete, parallel triangulation. We can also query the
    * degrees of freedom on these. In other words, this function can only work
    * if all cells in the patch are either locally owned or ghost cells.
-   *
-   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
    */
   template <typename DoFHandlerType>
   unsigned int

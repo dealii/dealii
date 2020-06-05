@@ -41,8 +41,6 @@ namespace hp
    * module described in the doxygen documentation.
    *
    * @ingroup hp hpcollection
-   *
-   * @author Oliver Kayser-Herold, 2005
    */
   template <int dim>
   class QCollection : public Subscriptor

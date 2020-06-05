@@ -199,8 +199,6 @@ namespace Particles
      *
      * @param[in] properties An optional vector of vector of properties
      * for each particle to be inserted.
-     *
-     * @author Bruno Blais, Luca Heltai, 2019
      */
     template <int dim, int spacedim = dim>
     void
@@ -243,8 +241,6 @@ namespace Particles
      *
      * @param[in] properties An optional vector of vector of properties
      * for each particle to be inserted.
-     *
-     * @author Bruno Blais, Luca Heltai, 2019
      */
     template <int dim, int spacedim = dim>
     void

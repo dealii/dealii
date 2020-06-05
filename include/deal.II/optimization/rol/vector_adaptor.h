@@ -105,8 +105,6 @@ namespace Rol
    * the largest value of int type. Some of the vectors in deal.II (see
    * @ref Vector)
    * may not satisfy the above requirements.
-   *
-   * @author Vishal Boddu, 2017
    */
   template <typename VectorType>
   class VectorAdaptor : public ROL::Vector<typename VectorType::value_type>

@@ -132,9 +132,6 @@ class SparseBlockVanka;
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000; extension for full
- * compatibility with LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename number>
 class SparseVanka
@@ -497,8 +494,6 @@ private:
  * iterations (at most by one in each step) and they also do not change when
  * the degrees of freedom are sorted by component, while the first strategy
  * significantly deteriorated.
- *
- * @author Wolfgang Bangerth, 2000
  */
 template <typename number>
 class SparseBlockVanka : public SparseVanka<number>

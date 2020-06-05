@@ -189,8 +189,6 @@ namespace Utilities
      * export_to_ghosted_array_start() and import_from_ghosted_array_start()
      * detect this case and only send the selected indices, taken from the
      * full array of ghost entries.
-     *
-     * @author Katharina Kormann, Martin Kronbichler, 2010, 2011, 2017
      */
     class Partitioner : public ::dealii::LinearAlgebra::CommunicationPatternBase
     {

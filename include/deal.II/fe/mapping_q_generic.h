@@ -128,8 +128,6 @@ class MappingQCache;
  * qualities if the transition between curved boundaries and flat interior
  * domains is spread over a larger range as the mesh is refined. This is
  * provided by the special manifold TransfiniteInterpolationManifold.
- *
- * @author Wolfgang Bangerth, 2015, Martin Kronbichler, 2017
  */
 template <int dim, int spacedim = dim>
 class MappingQGeneric : public Mapping<dim, spacedim>

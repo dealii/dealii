@@ -39,7 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  * @tparam N The number of indices stored in each object.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Matthias Maier, 2002, 2015
  */
 template <int N>
 class TableIndices

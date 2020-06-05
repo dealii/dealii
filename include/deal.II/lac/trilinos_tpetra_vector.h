@@ -78,7 +78,6 @@ namespace LinearAlgebra
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Daniel Arndt, 2019
      */
     template <typename Number>
     class Vector : public VectorSpaceVector<Number>, public Subscriptor

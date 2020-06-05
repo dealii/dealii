@@ -640,9 +640,6 @@ class FESystem;
  * discussion above for details of this numbering.
  *
  * @ingroup febase fe
- *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001,
- * 2005, 2015
  */
 template <int dim, int spacedim = dim>
 class FiniteElement : public Subscriptor, public FiniteElementData<dim>
@@ -676,8 +673,6 @@ public:
    * derived class that wants to store information computed once at the
    * beginning, needs to derive its own InternalData class from this class,
    * and return an object of the derived type through its get_data() function.
-   *
-   * @author Guido Kanschat, 2001; Wolfgang Bangerth, 2015.
    */
   class InternalDataBase
   {

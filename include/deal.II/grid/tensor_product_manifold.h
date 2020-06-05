@@ -59,8 +59,6 @@ DEAL_II_NAMESPACE_OPEN
  * @tparam dim_B Dimension of ChartManifold B.
  * @tparam spacedim_B Spacial dimension of ChartManifold B.
  * @tparam chartdim_B Chart dimension of ChartManifold B.
- *
- * @author Luca Heltai, Timo Heister, 2016
  */
 template <int dim,
           int dim_A,

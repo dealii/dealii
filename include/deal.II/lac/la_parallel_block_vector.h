@@ -79,7 +79,6 @@ namespace LinearAlgebra
      *
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Katharina Kormann, Martin Kronbichler, 2011
      */
     template <typename Number>
     class BlockVector : public BlockVectorBase<Vector<Number>>,
@@ -327,7 +326,6 @@ namespace LinearAlgebra
        * i.e., whenever a non-zero ghost element is found, it is compared to
        * the value on the owning processor and an exception is thrown if these
        * elements do not agree.
-       *
        */
       virtual void
       compress(::dealii::VectorOperation::values operation) override;
@@ -709,7 +707,6 @@ namespace LinearAlgebra
  * exchanges the data of the two vectors.
  *
  * @relatesalso BlockVector
- * @author Katharina Kormann, Martin Kronbichler, 2011
  */
 template <typename Number>
 inline void
@@ -723,8 +720,6 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
 /**
  * Declare dealii::LinearAlgebra::distributed::BlockVector as distributed
  * vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>>

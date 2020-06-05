@@ -185,8 +185,6 @@ namespace MeshWorker
    * performed.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat
-   * @date 2010
    */
   template <class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
   void
@@ -431,7 +429,6 @@ namespace MeshWorker
    * arguments.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim,
             int spacedim,
@@ -491,7 +488,6 @@ namespace MeshWorker
    * virtual functions in LocalIntegrator.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void

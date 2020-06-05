@@ -111,7 +111,6 @@ namespace internal
  * MeshWorker.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
 class DataOutFaces : public DataOut_DoFData<DoFHandlerType,

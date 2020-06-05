@@ -95,9 +95,7 @@ namespace parallel
      * hp::DoFHandler classes know how to enumerate degrees of freedom in ways
      * appropriate for the partitioned mesh.
      *
-     * @author Denis Davydov, 2015
      * @ingroup distributed
-     *
      */
     template <int dim, int spacedim = dim>
     class Triangulation

@@ -36,9 +36,6 @@ namespace mg
   /**
    * Handler and storage for all five SparseMatrix object involved in using
    * multigrid with local refinement.
-   *
-   * @author Baerbel Janssen, Guido Kanschat
-   * @date 2013
    */
   template <typename number>
   class SparseMatrixCollection : public Subscriptor

@@ -233,7 +233,6 @@ DEAL_II_NAMESPACE_OPEN
  *   @endverbatim
  * Index 21 has the same coordinates as index 20
  * </ul>
- *
  */
 template <int dim, int spacedim = dim>
 class FE_Q_DG0

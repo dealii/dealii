@@ -76,7 +76,6 @@ namespace internal
   // compile the library with Apple Clang 8 and older. We should remove
   // these overloads again when we bump the minimal required version to
   // something later than clang-3.6 / Apple Clang 6.3.
-  // - Jean-Paul Pelteret, Matthias Maier, Daniel Arndt 2020
   template <int rank, int dim, typename T, typename U>
   struct ProductTypeImpl<SymmetricTensor<rank, dim, T>, std::complex<U>>
   {
@@ -204,8 +203,6 @@ namespace internal
      * between two tensors or ranks rank1 and rank2. In general, this is a
      * tensor of rank <tt>rank1+rank2-4</tt>, but if this is zero it is a
      * single scalar Number. For this case, we have a specialization.
-     *
-     * @author Wolfgang Bangerth, 2005, Jean-Paul Pelteret, 2017
      */
     template <int rank1,
               int rank2,
@@ -225,8 +222,6 @@ namespace internal
      * between two tensors or ranks rank1 and rank2. In general, this is a
      * tensor of rank <tt>rank1+rank2-4</tt>, but if this is zero it is a
      * single scalar Number. For this case, we have a specialization.
-     *
-     * @author Wolfgang Bangerth, 2005, Jean-Paul Pelteret, 2017
      */
     template <int dim, typename Number, typename OtherNumber>
     struct double_contraction_result<2, 2, dim, Number, OtherNumber>
@@ -370,8 +365,6 @@ namespace internal
      *
      * This class is an adaptation of a similar class used for the Table
      * class.
-     *
-     * @author Wolfgang Bangerth, 2002, 2005
      */
     template <int rank, int dim, bool constness, int P, typename Number>
     class Accessor
@@ -451,8 +444,6 @@ namespace internal
      * elements of the table, rather than recursively returning access objects
      * for further subsets. The same holds for this specialization as for the
      * general template; see there for more information.
-     *
-     * @author Wolfgang Bangerth, 2002, 2005
      */
     template <int rank, int dim, bool constness, typename Number>
     class Accessor<rank, dim, constness, 1, Number>
@@ -601,7 +592,6 @@ namespace internal
  * simple reads or writes.
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, 2005
  */
 template <int rank_, int dim, typename Number>
 class SymmetricTensor
@@ -2634,7 +2624,6 @@ constexpr DEAL_II_ALWAYS_INLINE
  * function that returns the determinant of a tensor.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
@@ -2675,7 +2664,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
  * \f]
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2694,7 +2682,6 @@ constexpr DEAL_II_ALWAYS_INLINE Number
  * \f]
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
@@ -2717,7 +2704,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
  * \f]
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 constexpr Number
@@ -2737,7 +2723,6 @@ first_invariant(const SymmetricTensor<2, dim, Number> &t)
  * size 1, the result is simply zero.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2765,7 +2750,6 @@ constexpr DEAL_II_ALWAYS_INLINE Number
  * invariant are the same; the determinant is the third invariant.)
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2783,7 +2767,6 @@ constexpr DEAL_II_ALWAYS_INLINE Number
  * \left[ (\text{tr} \mathbf A)^2 - \text{tr} (\mathbf{A}^2) \right]$.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2801,7 +2784,6 @@ constexpr DEAL_II_ALWAYS_INLINE Number
  * eigenvalue.
  *
  * @relatesalso SymmetricTensor
- * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
 std::array<Number, 1>
@@ -2830,7 +2812,6 @@ eigenvalues(const SymmetricTensor<2, 1, Number> &T);
  * eigenvalues of a symmetric tensor.
  *
  * @relatesalso SymmetricTensor
- * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
 std::array<Number, 2>
@@ -2859,7 +2840,6 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T);
  * eigenvalues of a symmetric tensor.
  *
  * @relatesalso SymmetricTensor
- * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
 std::array<Number, 3>
@@ -2907,8 +2887,6 @@ namespace internal
      * @param[out] Q The orthogonal matrix effecting the transformation
      * @param[out] d The diagonal elements of the tridiagonal matrix
      * @param[out] e The off-diagonal elements of the tridiagonal matrix
-     *
-     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
     template <int dim, typename Number>
     void
@@ -2957,8 +2935,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
-     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
@@ -3004,8 +2980,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
-     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
@@ -3025,8 +2999,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
-     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
     template <typename Number>
     std::array<std::pair<Number, Tensor<1, 2, Number>>, 2>
@@ -3065,8 +3037,6 @@ namespace internal
      *
      * @return An array containing the eigenvectors and the associated eigenvalues.
      * The array is not sorted in any particular order.
-     *
-     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
      */
     template <typename Number>
     std::array<std::pair<Number, Tensor<1, 3, Number>>, 3>
@@ -3185,7 +3155,6 @@ enum struct SymmetricTensorEigenvectorMethod
  * @endcode
  *
  * @relatesalso SymmetricTensor
- * @author Joachim Kopp, Jean-Paul Pelteret, 2017
  */
 template <int dim, typename Number>
 std::array<std::pair<Number, Tensor<1, dim, Number>>,
@@ -3203,7 +3172,6 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
  * class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>
@@ -3223,7 +3191,6 @@ constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>
  * component and refers to the shear in, for example, elasticity.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
@@ -3246,7 +3213,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
  * $\text{dim}\times\text{dim}$ identity matrix $\mathbf I$.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
@@ -3282,7 +3248,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
  * uses <code>double</code> as the data type for the elements.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim>
@@ -3320,7 +3285,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim>
  * \f]
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
@@ -3356,7 +3320,6 @@ deviator_tensor()
  * data type for the elements of the tensor.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
@@ -3403,7 +3366,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
  * This issue is also explained in the introduction to step-44.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
@@ -3437,7 +3399,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
  * data type for the elements of the tensor.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
@@ -3456,7 +3417,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim>
  * the very least.
  *
  * @relatesalso SymmetricTensor
- * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
@@ -3477,7 +3437,6 @@ constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
  * the very least.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 constexpr SymmetricTensor<4, dim, Number>
@@ -3509,7 +3468,6 @@ invert(const SymmetricTensor<4, dim, Number> &t)
  * of a symmetric tensor ($\mathbf I : \mathbf B = \text{tr} \mathbf B$).
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
@@ -3536,7 +3494,6 @@ outer_product(const SymmetricTensor<2, dim, Number> &t1,
  * as a symmetric rank-2 tensor. This is the version for general dimensions.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
@@ -3812,7 +3769,6 @@ scalar_product(const Tensor<2, dim, Number> &              t1,
  * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE void double_contract(
@@ -3838,7 +3794,6 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE void double_contract(
  * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline void double_contract(
@@ -3864,7 +3819,6 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline void double_contract(
@@ -3895,7 +3849,6 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline void double_contract(
@@ -3926,7 +3879,6 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline void double_contract(
@@ -3958,7 +3910,6 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * with the general Tensor class.
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR inline void double_contract(
@@ -3982,7 +3933,6 @@ DEAL_II_CONSTEXPR inline void double_contract(
  * (i.e., a vector). The result is a rank-1 tensor (i.e., a vector).
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_CONSTEXPR
@@ -4003,7 +3953,6 @@ DEAL_II_CONSTEXPR
  * (i.e., a matrix). The result is a rank-1 tensor (i.e., a vector).
  *
  * @relatesalso SymmetricTensor
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
@@ -4034,7 +3983,6 @@ operator*(const Tensor<1, dim, Number> &              src1,
  * contraction.
  *
  * @relatesalso SymmetricTensor
- * @author Matthias Maier, Jean-Paul Pelteret, 2017
  */
 template <int rank_1,
           int rank_2,
@@ -4071,7 +4019,6 @@ constexpr DEAL_II_ALWAYS_INLINE
  * contraction.
  *
  * @relatesalso SymmetricTensor
- * @author Matthias Maier, Jean-Paul Pelteret, 2017
  */
 template <int rank_1,
           int rank_2,

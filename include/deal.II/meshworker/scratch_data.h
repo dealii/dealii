@@ -225,8 +225,6 @@ namespace MeshWorker
    * 	Volume  = {7},
    * 	Year    = {2018}}
    * @endcode
-   *
-   * @author Luca Heltai, 2019.
    */
   template <int dim, int spacedim = dim>
   class ScratchData

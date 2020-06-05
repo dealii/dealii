@@ -32,8 +32,6 @@ namespace Physics
     /**
      * Transformation functions and tensors that are defined in terms of
      * rotation angles and axes of rotation.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     namespace Rotations
     {
@@ -113,8 +111,6 @@ namespace Physics
      * reference and spatial configurations, and their surfaces $\partial
      * V_{0}$ and $\partial V_{t}$ have the outwards facing normals
      * $\mathbf{N}$ and $\mathbf{n}$.
-     *
-     * @author Jean-Paul Pelteret, Andrew McBride, 2016
      */
     namespace Contravariant
     {
@@ -340,8 +336,6 @@ namespace Physics
      * the curves $\partial A_{0}$ and $\partial A_{t}$ that are,
      * respectively, associated with the line directors $\mathbf{L}$ and
      * $\mathbf{l}$.
-     *
-     * @author Jean-Paul Pelteret, Andrew McBride, 2016
      */
     namespace Covariant
     {
@@ -554,8 +548,6 @@ namespace Physics
      * Transformation of tensors that are defined in terms of a set of
      * contravariant basis vectors and scale with the inverse of the volume
      * change associated with the mapping.
-     *
-     * @author Jean-Paul Pelteret, Andrew McBride, 2016
      */
     namespace Piola
     {

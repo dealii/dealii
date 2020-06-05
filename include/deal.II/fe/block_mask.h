@@ -67,8 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  * would result in a mask <code>[true, false]</code> in both 2d and 3d.
  *
  * @ingroup fe
- * @author Wolfgang Bangerth
- * @date 2012
  * @ingroup vector_valued
  */
 class BlockMask

@@ -95,7 +95,6 @@ namespace internal
      *
      * @ingroup dofs
      * @ingroup Accessors
-     * @author Wolfgang Bangerth, 1999
      */
     template <int structdim, int dim, int spacedim>
     struct Inheritance
@@ -200,8 +199,6 @@ namespace internal
  *
  * @ingroup dofs
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 2006, 2008, Timo Heister, Guido Kanschat,
- * 2012, 2013
  */
 template <int structdim, typename DoFHandlerType, bool level_dof_access>
 class DoFAccessor
@@ -418,7 +415,6 @@ public:
    * Consequently, the derived DoFCellAccessor class has an overloaded version
    * of this function that calls the present function with
    * <code>cell-@>active_fe_index</code> as last argument.
-   *
    */
   void
   get_dof_indices(
@@ -761,8 +757,6 @@ private:
  * cell in spacedim space dimensions. Since vertices function differently than
  * general faces, this class does a few things differently than the general
  * template, but the interface should look the same.
- *
- * @author Wolfgang Bangerth, 2010
  */
 template <template <int, int> class DoFHandlerType,
           int  spacedim,
@@ -1254,7 +1248,6 @@ protected:
  * correctness, none of the functions do anything but generate errors.
  *
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 2017
  */
 template <int structdim, int dim, int spacedim = dim>
 class DoFInvalidAccessor : public InvalidAccessor<structdim, dim, spacedim>
@@ -1331,7 +1324,6 @@ public:
  *
  * @ingroup dofs
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, Timo Heister, Guido Kanschat, 2012
  */
 template <typename DoFHandlerType, bool level_dof_access>
 class DoFCellAccessor : public DoFAccessor<DoFHandlerType::dimension,

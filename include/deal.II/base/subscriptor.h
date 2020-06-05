@@ -57,7 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * list_subscribers().
  *
  * @ingroup memory
- * @author Guido Kanschat, Daniel Arndt, 1998 - 2005, 2018
  */
 class Subscriptor
 {
@@ -206,7 +205,6 @@ private:
    * This counter may be read from and written to concurrently in
    * multithreaded code: hence we use the <code>std::atomic</code> class
    * template.
-   *
    */
   mutable std::atomic<unsigned int> counter;
 

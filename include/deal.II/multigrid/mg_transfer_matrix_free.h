@@ -49,9 +49,6 @@ DEAL_II_NAMESPACE_OPEN
  * FE_Q and FE_DGQ elements, including systems involving multiple components
  * of one of these elements. Systems with different elements or other elements
  * are currently not implemented.
- *
- * @author Martin Kronbichler
- * @date 2016
  */
 template <int dim, typename Number>
 class MGTransferMatrixFree
@@ -305,9 +302,6 @@ private:
  * MGTransferMatrixFree.
  * Both the cases that the same DoFHandler is used for all the blocks
  * and that each block uses its own DoFHandler are supported.
- *
- * @author Denis Davydov, Daniel Arndt
- * @date 2017
  */
 template <int dim, typename Number>
 class MGTransferBlockMatrixFree

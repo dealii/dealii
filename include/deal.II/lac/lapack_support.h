@@ -51,8 +51,6 @@ namespace LAPACKSupport
    * columns represent the eigenvectors of the original content of the matrix.
    * The elements of this enumeration are therefore used to track what is
    * currently being stored by this object.
-   *
-   * @author Guido Kanschat, 2005
    */
   enum State
   {

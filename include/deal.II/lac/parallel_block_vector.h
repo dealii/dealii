@@ -52,7 +52,6 @@ namespace parallel
      *
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Katharina Kormann, Martin Kronbichler, 2011
      *
      * @deprecated Use LinearAlgebra::distributed::BlockVector instead.
      */

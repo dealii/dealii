@@ -51,7 +51,6 @@ namespace PETScWrappers
  *
  * @ingroup PETScWrappers
  * @ingroup Vectors
- * @author Wolfgang Bangerth, 2004
  */
 namespace PETScWrappers
 {
@@ -239,7 +238,6 @@ namespace PETScWrappers
    * before you actually use the vector.
    *
    * @ingroup PETScWrappers
-   * @author Wolfgang Bangerth, 2004
    */
   class VectorBase : public Subscriptor
   {
@@ -831,7 +829,6 @@ namespace PETScWrappers
    * exchanges the data of the two vectors.
    *
    * @relatesalso PETScWrappers::VectorBase
-   * @author Wolfgang Bangerth, 2004
    */
   inline void
   swap(VectorBase &u, VectorBase &v)

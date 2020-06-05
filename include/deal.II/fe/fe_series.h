@@ -51,8 +51,6 @@ DEAL_II_NAMESPACE_OPEN
  * solution on the reference element. Coefficients of expansion are often used
  * to estimate local smoothness of the underlying FiniteElement field to decide
  * on h- or p-adaptive refinement strategy.
- *
- * @author Denis Davydov, 2016;
  */
 namespace FESeries
 {
@@ -84,8 +82,6 @@ namespace FESeries
    * Consequently $ c_{\bf k} \equiv c_{-\bf k}^\ast $ and
    * we only need to compute $ c_{\bf k} $ for positive indices
    * $ \bf k $ .
-   *
-   * @author Denis Davydov, 2016.
    */
   template <int dim, int spacedim = dim>
   class Fourier : public Subscriptor
@@ -252,8 +248,6 @@ namespace FESeries
    * This class calculates coefficients $ c_{\bf k} $ using
    * $ dim $-dimensional Legendre polynomials constructed from
    * $ \widetilde P_m(x) $ using tensor product rule.
-   *
-   * @author Denis Davydov, 2016.
    */
   template <int dim, int spacedim = dim>
   class Legendre : public Subscriptor

@@ -100,7 +100,6 @@ namespace parallel
      * meshes, i.e., objects of type parallel::distributed::Triangulation.
      *
      * @ingroup grid
-     * @author Wolfgang Bangerth, 2009
      */
     namespace GridRefinement
     {

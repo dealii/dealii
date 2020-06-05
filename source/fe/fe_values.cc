@@ -2676,8 +2676,6 @@ public:
 /**
  * Implementation of derived classes of the CellIteratorBase
  * interface. See there for a description of the use of these classes.
- *
- * @author Wolfgang Bangerth, 2003
  */
 template <int dim, int spacedim>
 template <typename CI>
@@ -2741,8 +2739,6 @@ private:
  * reminding the user that if they want to use these features, then the FEValues
  * object has to be reinitialized with a cell iterator that allows to extract
  * degree of freedom information.
- *
- * @author Wolfgang Bangerth, 2003
  */
 template <int dim, int spacedim>
 class FEValuesBase<dim, spacedim>::TriaCellIterator

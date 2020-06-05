@@ -159,7 +159,6 @@ block_diagonal_operator(
  * sizes, and small block structure (as a rule of thumb, matrix blocks greater
  * than $1000\times1000$).
  *
- * @author Matthias Maier, 2015
  *
  * @ingroup LAOperators
  */
@@ -533,7 +532,6 @@ namespace internal
      * PETScWrappers::BlockSparseMatrix one must initialize a
      * BlockLinearOperator with their associated BlockPayload.
      *
-     * @author Jean-Paul Pelteret, Matthias Maier, 2016
      *
      * @ingroup LAOperators
      */

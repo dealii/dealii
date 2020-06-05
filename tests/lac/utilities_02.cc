@@ -25,7 +25,6 @@
  * DEAL::1018.29
  * DEAL::1020.72
  * DEAL::1020.72
- *
  */
 
 #include <deal.II/base/index_set.h>

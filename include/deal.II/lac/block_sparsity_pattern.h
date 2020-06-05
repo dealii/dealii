@@ -73,7 +73,6 @@ class BlockDynamicSparsityPattern;
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, 2000, 2001
  */
 template <typename SparsityPatternType>
 class BlockSparsityPatternBase : public Subscriptor
@@ -395,8 +394,6 @@ private:
  *
  * This class is an example of the "static" type of
  * @ref Sparsity.
- *
- * @author Wolfgang Bangerth, 2000, 2001
  */
 class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 {
@@ -514,8 +511,6 @@ public:
  * BlockSparsityPattern sparsity;
  * sparsity.copy_from(dsp);
  * @endcode
- *
- * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
  */
 
 class BlockDynamicSparsityPattern
@@ -632,8 +627,6 @@ namespace TrilinosWrappers
    * pattern can be used).
    *
    * This class is used in step-32.
-   *
-   * @author Martin Kronbichler, 2008, 2009
    */
   class BlockSparsityPattern
     : public dealii::BlockSparsityPatternBase<SparsityPattern>

@@ -72,7 +72,6 @@ namespace MeshWorker
    * initialize() in this class.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim>
   class IntegrationInfo
@@ -293,7 +292,6 @@ namespace MeshWorker
    * correctly, typically in an IntegrationInfoBox.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim>
   class IntegrationInfoBox

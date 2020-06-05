@@ -226,7 +226,6 @@ namespace MeshWorker
    * WorkStream namespace and its members.
    *
    * @ingroup MeshWorker
-   * @author Luca Heltai and Timo Heister, 2017
    */
   template <class CellIteratorType,
             class ScratchData,
@@ -702,7 +701,6 @@ namespace MeshWorker
    * @endcode
    *
    * @ingroup MeshWorker
-   * @author Luca Heltai, 2019
    */
   template <class CellIteratorType,
             class ScratchData,

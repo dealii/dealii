@@ -198,8 +198,6 @@ namespace internal
  * serialization archive.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, Markus Buerg, Timo Heister, Guido Kanschat,
- * @date 1998, 1999, 2000, 2012
  */
 template <int dim, int spacedim = dim>
 class DoFHandler : public Subscriptor
@@ -878,7 +876,6 @@ public:
    * @pre level must be less than this->n_levels().
    *
    * @ingroup CPP11
-   *
    */
   IteratorRange<level_cell_iterator>
   mg_cell_iterators_on_level(const unsigned int level) const;

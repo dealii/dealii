@@ -54,7 +54,6 @@ class SparseMatrix;
  * usually the names chosen for the arguments in the LAPACK documentation.
  *
  * @ingroup Matrix1
- * @author Guido Kanschat, 2005, Denis Davydov, 2017, 2018
  */
 template <typename number>
 class LAPACKFullMatrix : public TransposeTable<number>
@@ -982,7 +981,6 @@ private:
  * A preconditioner based on the LU-factorization of LAPACKFullMatrix.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat, 2006
  */
 template <typename number>
 class PreconditionLU : public Subscriptor

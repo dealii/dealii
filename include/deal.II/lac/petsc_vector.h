@@ -43,7 +43,6 @@ namespace PETScWrappers
    * distributed vectors and matrices.
    *
    * @ingroup PETScWrappers
-   * @author Wolfgang Bangerth, 2004
    */
   namespace MPI
   {
@@ -153,7 +152,6 @@ namespace PETScWrappers
      *
      * @ingroup PETScWrappers
      * @ingroup Vectors
-     * @author Wolfgang Bangerth, 2004
      */
     class Vector : public VectorBase
     {
@@ -432,7 +430,6 @@ namespace PETScWrappers
      * simply exchanges the data of the two vectors.
      *
      * @relatesalso PETScWrappers::MPI::Vector
-     * @author Wolfgang Bangerth, 2004
      */
     inline void
     swap(Vector &u, Vector &v)
@@ -562,8 +559,6 @@ namespace internal
 
 /**
  * Declare dealii::PETScWrappers::MPI::Vector as distributed vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <>
 struct is_serial_vector<PETScWrappers::MPI::Vector> : std::false_type

@@ -215,8 +215,6 @@ class XDMFEntry;
  * </ul>
  *
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005,
- * 2006.
  */
 namespace DataOutBase
 {
@@ -241,8 +239,6 @@ namespace DataOutBase
    * <tt>2<sup>dim</sup></tt>.
    *
    * @ingroup output
-   *
-   * @author Wolfgang Bangerth, Guido Kanschat
    */
   template <int dim, int spacedim = dim>
   struct Patch
@@ -390,8 +386,6 @@ namespace DataOutBase
    * member variable that make no sense for zero-dimensional patches because
    * points have no natural neighbors across their non-existent faces, nor
    * can they reasonably be subdivided.
-   *
-   * @author Wolfgang Bangerth, 2017.
    */
   template <int spacedim>
   struct Patch<0, spacedim>
@@ -2164,8 +2158,6 @@ namespace DataOutBase
    * references other files. For example, it could be the name for a
    * <code>.pvtu</code> file that references multiple parts of a parallel
    * computation.
-   *
-   * @author Marco Engelhard, 2012
    */
   void
   write_pvd_record(
@@ -2592,7 +2584,6 @@ namespace DataOutBase
  * name can be obtained by <tt>default_suffix</tt> without arguments.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 1999, Denis Davydov, 2018
  */
 template <int dim, int spacedim = dim>
 class DataOutInterface
@@ -2804,8 +2795,6 @@ public:
    *
    * @note Use an empty string "" for the first argument if output is to be
    * written in the current working directory.
-   *
-   * @author Niklas Fehn, Martin Kronbichler, 2019
    */
   std::string
   write_vtu_with_pvtu_record(
@@ -3182,7 +3171,6 @@ private:
  * was used for writing.
  *
  * @ingroup input output
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, int spacedim = dim>
 class DataOutReader : public DataOutInterface<dim, spacedim>
@@ -3453,8 +3441,6 @@ namespace DataOutBase
    * operator dumps the intermediate graphics format represented by the patch
    * data structure. It may later be converted into regular formats for a
    * number of graphics programs.
-   *
-   * @author Wolfgang Bangerth, 2005
    */
   template <int dim, int spacedim>
   std::ostream &
@@ -3467,8 +3453,6 @@ namespace DataOutBase
    * operator reads the intermediate graphics format represented by the patch
    * data structure, using the format in which it was written using the
    * operator<<.
-   *
-   * @author Wolfgang Bangerth, 2005
    */
   template <int dim, int spacedim>
   std::istream &

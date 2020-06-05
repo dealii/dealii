@@ -84,8 +84,6 @@ DEAL_II_NAMESPACE_OPEN
  * <a href="http://onlinelibrary.wiley.com/doi/10.1002/pamm.201110246/full">
  * Energy-Minimization in Atomic-to-Continuum Scale-Bridging Methods </a> by
  * Eidel et al. 2011.
- *
- * @author Vishal Boddu, Denis Davydov, 2017
  */
 template <typename VectorType = Vector<double>>
 class SolverFIRE : public SolverBase<VectorType>

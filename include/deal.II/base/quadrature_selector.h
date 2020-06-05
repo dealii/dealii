@@ -36,7 +36,6 @@ DEAL_II_NAMESPACE_OPEN
  * read from a parameter file (see ParameterHandler for this).
  *
  * @ingroup Quadrature
- * @author Ralf Schulz, 2003
  */
 template <int dim>
 class QuadratureSelector : public Quadrature<dim>

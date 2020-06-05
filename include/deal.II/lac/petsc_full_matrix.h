@@ -44,7 +44,6 @@ namespace PETScWrappers
    * specific type differ, and are implemented in this particular class.
    *
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, 2004
    */
   class FullMatrix : public MatrixBase
   {

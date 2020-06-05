@@ -56,8 +56,6 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  *
  * @ingroup Polynomials
- * @author Graham Harper
- * @date 2019
  */
 template <int dim>
 class ScalarPolynomialsBase

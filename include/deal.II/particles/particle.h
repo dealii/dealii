@@ -139,8 +139,6 @@ namespace Particles
    * difficult to write either.
    *
    * @ingroup Particle
-   * @author Rene Gassmoeller, 2017
-   *
    */
   template <int dim, int spacedim = dim>
   class Particle

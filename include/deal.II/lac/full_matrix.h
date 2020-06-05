@@ -64,8 +64,6 @@ class LAPACKFullMatrix;
  * programs, see
  * @ref Instantiations
  * for details.
- *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
 template <typename number>
 class FullMatrix : public Table<2, number>

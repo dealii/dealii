@@ -139,7 +139,6 @@ namespace parallel
      * fail in some circumstances. Therefore, it is strongly recommended to
      * not rely on this class to automatically detect the unsupported case.
      *
-     * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      *
      * @deprecated Use LinearAlgebra::distributed::Vector instead.
      */

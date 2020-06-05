@@ -136,8 +136,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see TensorPolynomialsBase
  * @ingroup febase
- * @author Guido Kanschat
- * @date 2005
  */
 template <int dim, int spacedim = dim>
 class FE_PolyTensor : public FiniteElement<dim, spacedim>

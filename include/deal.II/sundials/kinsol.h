@@ -191,8 +191,6 @@ namespace SUNDIALS
    * convergence checks:
    *  - get_solution_scaling;
    *  - get_function_scaling;
-   *
-   * @author Luca Heltai, 2017.
    */
   template <typename VectorType = Vector<double>>
   class KINSOL

@@ -134,8 +134,6 @@ DEAL_II_NAMESPACE_OPEN
  * <code>size_type</code> type.
  *
  * @note TransposeTable uses this template to implement its iterators.
- *
- * @author David Wells, 2018
  */
 template <class DerivedIterator, class AccessorType>
 class LinearIndexIterator

@@ -103,8 +103,6 @@ namespace internal
      * coordinates. This data structure also includes the evaluation of
      * quantities at the cell boundary and on the sub-interval $(0, 0.5)$ and
      * $(0.5, 1)$ for face integrals.
-     *
-     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
      */
     template <typename Number>
     struct UnivariateShapeData
@@ -283,8 +281,6 @@ namespace internal
      * case such as the hierarchical -> lexicographic ordering of FE_Q.
      *
      * @ingroup matrixfree
-     *
-     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
      */
     template <typename Number>
     struct ShapeInfo

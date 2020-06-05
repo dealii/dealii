@@ -50,8 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  *  Volume = {7},
  *  Year = {2018}}
  * @endcode
- *
- * @author Luca Heltai, Jean-Paul Pelteret, 2019
  */
 class GeneralDataStorage : public Subscriptor
 {

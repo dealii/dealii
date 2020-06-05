@@ -81,7 +81,6 @@ DEAL_II_NAMESPACE_OPEN
  * Some numerical experiments have shown that this element may converge with
  * first-order accuracy when using the BR1-Q0 pair for the mixed Laplace
  * equation in step-20.
- *
  */
 template <int dim>
 class FE_BernardiRaugel : public FE_PolyTensor<dim>

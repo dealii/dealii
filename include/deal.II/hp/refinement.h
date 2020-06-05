@@ -125,7 +125,6 @@ namespace hp
    * @endcode
    *
    * @ingroup hp
-   * @author Marc Fehling 2019
    */
   namespace Refinement
   {

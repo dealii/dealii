@@ -186,8 +186,6 @@ namespace EvaluationFlags
  *
  *
  * @ingroup matrixfree
- *
- * @author Katharina Kormann and Martin Kronbichler, 2010-2018
  */
 template <int dim,
           int n_components_,
@@ -394,7 +392,6 @@ public:
    * MatrixFree object and lead to a structure that does not effectively use
    * vectorization in the evaluate routines based on these values (instead,
    * VectorizedArray::size() same copies are worked on).
-   *
    */
   template <typename VectorType>
   void
@@ -1284,8 +1281,6 @@ private:
  * scalar and vector-valued elements are defined separately.
  *
  * @ingroup matrixfree
- *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim,
           int n_components_,
@@ -1366,8 +1361,6 @@ protected:
  * gradients.
  *
  * @ingroup matrixfree
- *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 class FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>
@@ -1507,8 +1500,6 @@ protected:
  * symmetric gradient and divergence.
  *
  * @ingroup matrixfree
- *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 class FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>
@@ -1670,7 +1661,6 @@ protected:
  *
  * @ingroup matrixfree
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, Shiva
  * Rudraraju, 2014
  */
 template <typename Number, bool is_face, typename VectorizedArrayType>
@@ -2355,8 +2345,6 @@ protected:
  * double
  *
  * @ingroup matrixfree
- *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim,
           int fe_degree,
@@ -2822,8 +2810,6 @@ private:
  *
  * @note Currently only VectorizedArray<Number, width> is supported as
  *       VectorizedArrayType.
- *
- * @author Katharina Kormann and Martin Kronbichler, 2018
  */
 template <int dim,
           int fe_degree,

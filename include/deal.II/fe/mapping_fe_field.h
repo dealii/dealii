@@ -73,8 +73,6 @@ DEAL_II_NAMESPACE_OPEN
  *    VectorTools::get_position_vector(dhq, eulerq, mask);
  *    MappingFEField<dim,spacedim> map(dhq, eulerq, mask);
  * @endcode
- *
- * @author Luca Heltai, Marco Tezzele 2013, 2015
  */
 template <int dim,
           int spacedim            = dim,

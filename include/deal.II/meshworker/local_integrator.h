@@ -51,8 +51,6 @@ namespace MeshWorker
    * true, the function will cause an exception ExcPureFunction.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat
-   * @date 2012
    */
   template <int dim, int spacedim = dim, typename number = double>
   class LocalIntegrator : public Subscriptor

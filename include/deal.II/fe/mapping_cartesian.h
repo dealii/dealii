@@ -72,8 +72,6 @@ DEAL_II_NAMESPACE_OPEN
  * The class is intended for efficiency, and it does not do a whole lot of
  * error checking. If you apply this mapping to a cell that does not conform
  * to the requirements above, you will get strange results.
- *
- * @author Guido Kanschat, 2001; Ralf Hartmann, 2005
  */
 template <int dim, int spacedim = dim>
 class MappingCartesian : public Mapping<dim, spacedim>

@@ -42,8 +42,6 @@ DEAL_II_NAMESPACE_OPEN
  * dimensions: ${1,x,y,xy,x^2,y^2,x^2y,xy^2,x^3,y^3,...}$. The ordering of the
  * monomials in $P_k1$ matches the ordering of the monomials in $P_k2$ for
  * $k2>k1$.
- *
- * @author Ralf Hartmann, 2004
  */
 template <int dim>
 class PolynomialsP : public PolynomialSpace<dim>

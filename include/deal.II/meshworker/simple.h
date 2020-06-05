@@ -54,7 +54,6 @@ namespace MeshWorker
      * (unsigned int)</tt>
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename VectorType>
     class ResidualSimple
@@ -164,7 +163,6 @@ namespace MeshWorker
      * and so on.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType>
     class MatrixSimple
@@ -267,7 +265,6 @@ namespace MeshWorker
      * local refinement and continuous elements are missing.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType>
     class MGMatrixSimple
@@ -451,7 +448,6 @@ namespace MeshWorker
      * objects.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType, typename VectorType>
     class SystemSimple : private MatrixSimple<MatrixType>,

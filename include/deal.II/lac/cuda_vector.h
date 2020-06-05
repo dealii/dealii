@@ -50,7 +50,6 @@ namespace LinearAlgebra
      *
      * @see CUDAWrappers
      * @ingroup Vectors
-     * @author Karl Ljungkvist, Bruno Turcksin, Daniel Arndt, 2016, 2018
      */
     template <typename Number>
     class Vector : public VectorSpaceVector<Number>
@@ -356,7 +355,6 @@ namespace LinearAlgebra
  * exchanges the data of the two vectors.
  *
  * @relatesalso Vector
- * @author Daniel Arndt, 2018
  */
 template <typename Number>
 inline void

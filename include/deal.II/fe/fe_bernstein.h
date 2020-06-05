@@ -57,10 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * support points are at the vertices, then on the line, on the quads, and
  * finally (for 3d) on the hexes. See the documentation of FE_Q for more
  * details.
- *
- *
- * @author Marco Tezzele, Luca Heltai
- * @date 2013, 2015
  */
 
 template <int dim, int spacedim = dim>

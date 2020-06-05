@@ -72,8 +72,6 @@ namespace LinearAlgebra
    * ::dealii::LinearAlgebra::VectorSpaceVector. As opposed to the array of
    * the C++ standard library, this class implements an element of a vector
    * space suitable for numerical computations.
-   *
-   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class Vector : public ReadWriteVector<Number>,
@@ -510,8 +508,6 @@ namespace LinearAlgebra
 
 /**
  * Declare dealii::LinearAlgebra::Vector as serial vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::Vector<Number>> : std::true_type

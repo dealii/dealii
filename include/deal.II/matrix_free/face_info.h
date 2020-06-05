@@ -49,8 +49,6 @@ namespace internal
      * computation. In order to avoid gaps in the memory representation, the
      * four 'char' variables are put next to each other which occupies the
      * same size as the unsigned integers on most architectures.
-     *
-     * @author Katharina Kormann, Martin Kronbichler, 2018
      */
     template <int vectorization_width>
     struct FaceToCellTopology

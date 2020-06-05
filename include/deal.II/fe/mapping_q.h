@@ -75,9 +75,6 @@ DEAL_II_NAMESPACE_OPEN
  * For the behavior of the mapping and convergence rates in case of mixing
  * different manifolds, please consult the respective section of
  * MappingQGeneric.
- *
- * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001,
- * Wolfgang Bangerth, 2015
  */
 template <int dim, int spacedim = dim>
 class MappingQ : public Mapping<dim, spacedim>

@@ -37,8 +37,6 @@ DEAL_II_NAMESPACE_OPEN
  * numbering can be found in GeometryInfo.
  *
  * @ingroup Polynomials
- * @author Patrick Esser
- * @date 2015
  */
 template <int dim>
 class PolynomialsRannacherTurek : public ScalarPolynomialsBase<dim>

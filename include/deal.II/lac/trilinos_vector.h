@@ -220,7 +220,6 @@ namespace TrilinosWrappers
    * Namespace for Trilinos vector classes that work in parallel over MPI.
    *
    * @ingroup TrilinosWrappers
-   * @author Martin Kronbichler, Wolfgang Bangerth, Daniel Arndt, 2008, 2017
    */
   namespace MPI
   {
@@ -399,7 +398,6 @@ namespace TrilinosWrappers
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Martin Kronbichler, Wolfgang Bangerth, Daniel Arndt,
      *         2008, 2009, 2017
      */
     class Vector : public Subscriptor
@@ -1346,7 +1344,6 @@ namespace TrilinosWrappers
      * simply exchanges the data of the two vectors.
      *
      * @relatesalso TrilinosWrappers::MPI::Vector
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     inline void
     swap(Vector &u, Vector &v)
@@ -2248,8 +2245,6 @@ namespace internal
 
 /**
  * Declare dealii::TrilinosWrappers::MPI::Vector as distributed vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <>
 struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type

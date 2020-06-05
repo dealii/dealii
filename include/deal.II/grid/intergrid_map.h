@@ -109,7 +109,6 @@ DEAL_II_NAMESPACE_OPEN
  * equally well be Triangulation, PersistentTriangulation, or hp::DoFHandler).
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1999
  */
 template <class MeshType>
 class InterGridMap : public Subscriptor

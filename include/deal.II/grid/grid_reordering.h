@@ -627,7 +627,6 @@ DeclExceptionMsg(ExcMeshNotOrientable,
  * Triangulation::create_triangulation() function.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 2000, 2016, Michael Anderson 2003
  */
 template <int dim, int spacedim = dim>
 class GridReordering

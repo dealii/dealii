@@ -236,7 +236,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -288,7 +287,6 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -327,7 +325,6 @@ condense_schur_rhs(const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, 2015, 2017
  *
  * @ingroup LAOperators
  */

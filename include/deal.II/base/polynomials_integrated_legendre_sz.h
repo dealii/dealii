@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * polynomials:
  *
  * $L_{n} = \frac{l_{n} - l_{n-2}}{2n-1)}$
- *
  */
 class IntegratedLegendreSZ : public Polynomials::Polynomial<double>
 {

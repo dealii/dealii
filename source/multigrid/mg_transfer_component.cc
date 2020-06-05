@@ -75,8 +75,6 @@ namespace
    * re-sort and group components
    * as in
    * DoFRenumbering::component_wise.
-   *
-   *
    */
   template <int dim, typename number, int spacedim>
   void

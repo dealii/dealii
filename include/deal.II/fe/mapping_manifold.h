@@ -53,8 +53,6 @@ class MappingQ;
  * @warning It is not possible, for mathematical reasons, for one to use this
  * class with a geometry described by a SphericalManifold: see the note in
  * that class for more information.
- *
- * @author Luca Heltai, Wolfgang Bangerth, Alberto Sartori 2016
  */
 template <int dim, int spacedim = dim>
 class MappingManifold : public Mapping<dim, spacedim>

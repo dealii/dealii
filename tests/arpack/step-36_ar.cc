@@ -23,7 +23,6 @@
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_j*B*x_i = \delta_{i,j}
- *
  */
 
 #include <deal.II/base/function.h>

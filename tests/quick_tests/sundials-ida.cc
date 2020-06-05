@@ -52,7 +52,6 @@ using namespace dealii;
  * The Jacobian to assemble is the following:
  *
  * J = alpha I + A
- *
  */
 class HarmonicOscillator
 {

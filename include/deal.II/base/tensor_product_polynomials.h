@@ -66,9 +66,6 @@ class TensorProductPolynomialsConst;
  * indices i,j,k of the one-dimensional polynomials in x,y and z direction.
  * The ordering of the dim-dimensional polynomials can be changed by using the
  * set_numbering() function.
- *
- * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth
- * 2003
  */
 template <int dim, typename PolynomialType = Polynomials::Polynomial<double>>
 class TensorProductPolynomials : public ScalarPolynomialsBase<dim>
@@ -308,8 +305,6 @@ protected:
  * $P^x_2(x)P^y_1(y)$, $P^x_3(x)P^y_1(y)$, ...,
  * $P^x_1(x)P^y_2(y)$, $P^x_2(x)P^y_2(y)$,
  * $P^x_3(x)P^y_2(y)$, etc.
- *
- * @author Wolfgang Bangerth 2003
  */
 template <int dim>
 class AnisotropicPolynomials : public ScalarPolynomialsBase<dim>

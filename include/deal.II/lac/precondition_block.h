@@ -76,8 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Ralf Hartmann, Guido Kanschat
- * @date 1999, 2000, 2010
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -374,8 +372,6 @@ protected:
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -651,8 +647,6 @@ private:
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
@@ -816,8 +810,6 @@ protected:
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>

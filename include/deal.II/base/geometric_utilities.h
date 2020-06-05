@@ -32,7 +32,6 @@ DEAL_II_NAMESPACE_OPEN
  * are needed in various contexts when writing applications.
  *
  * @ingroup utilities
- * @author Denis Davydov, 2016
  */
 namespace GeometricUtilities
 {

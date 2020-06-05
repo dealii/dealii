@@ -228,8 +228,6 @@ namespace SUNDIALS
    * y_dot[0] = kappa;
    * time_stepper.solve_dae(y,y_dot);
    * @endcode
-   *
-   * @author Luca Heltai, Alberto Sartori, 2017.
    */
   template <typename VectorType = Vector<double>>
   class IDA

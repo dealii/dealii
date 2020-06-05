@@ -58,7 +58,6 @@ DEAL_II_NAMESPACE_OPEN
  * step-13 example programs.
  *
  * @ingroup textoutput
- * @author Ralf Hartmann, 1999
  */
 class ConvergenceTable : public TableHandler
 {

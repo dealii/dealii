@@ -90,9 +90,6 @@ class PreconditionIdentity;
  * The solve() function of this class uses the mechanism described in the
  * Solver base class to determine convergence. This mechanism can also be used
  * to observe the progress of the iteration.
- *
- *
- * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
 template <typename VectorType = Vector<double>>
 class SolverCG : public SolverBase<VectorType>

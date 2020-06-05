@@ -72,7 +72,6 @@ class Point;
  * in various contexts when writing applications.
  *
  * @ingroup utilities
- * @author Wolfgang Bangerth, 2005
  */
 namespace Utilities
 {
@@ -147,8 +146,6 @@ namespace Utilities
    * @param[in] input The string to compress
    *
    * @return A compressed version of the input string
-   *
-   * @authors Luca Heltai, Nicola Giuliani, 2020
    */
   std::string
   compress(const std::string &input);
@@ -165,8 +162,6 @@ namespace Utilities
    * function compress()
    *
    * @return The original uncompressed string.
-   *
-   * @authors Luca Heltai, Nicola Giuliani, 2020
    */
   std::string
   decompress(const std::string &compressed_input);
@@ -183,8 +178,6 @@ namespace Utilities
    * @param binary_input A vector of characters, representing your input as
    * binary data.
    * @return A string containing the binary input as a base64 string.
-   *
-   * @author Luca Heltai, 2020.
    */
   std::string
   encode_base64(const std::vector<unsigned char> &binary_input);
@@ -196,8 +189,6 @@ namespace Utilities
    *
    * @param base64_input A string that contains the input in base64 format.
    * @return A vector of characters that represents your input as binary data.
-   *
-   * @author Luca Heltai, 2020.
    */
   std::vector<unsigned char>
   decode_base64(const std::string &base64_input);
@@ -246,8 +237,6 @@ namespace Utilities
   /**
    * Determine how many digits are needed to represent numbers at most as
    * large as the given number.
-   *
-   * @author Niklas Fehn, 2019
    */
   unsigned int
   needed_digits(const unsigned int max_number);
@@ -259,8 +248,6 @@ namespace Utilities
    * operation, this function reduces the absolute value of a floating point
    * number and always rounds towards zero, since decimal places are simply
    * cut off.
-   *
-   * @author Niklas Fehn, 2019
    */
   template <typename Number>
   Number
@@ -447,8 +434,6 @@ namespace Utilities
    * In general, C++ uses mangled names to identify types. This function
    * uses boost::core::demangle to return a human readable string describing
    * the type of the variable passed as argument.
-   *
-   * @author Luca Heltai, 2019.
    */
   template <class T>
   std::string
@@ -585,8 +570,6 @@ namespace Utilities
    * If many consecutive calls with the same buffer are considered, it is
    * recommended for reasons of performance to ensure that its capacity is
    * sufficient.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   size_t
@@ -601,8 +584,6 @@ namespace Utilities
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * can be compressed. This can be triggered with the parameter
    * @p allow_compression, and is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   std::vector<char>
@@ -637,8 +618,6 @@ namespace Utilities
    *  This is because C++ does not allow functions to return arrays.
    *  Consequently, there is a separate unpack() function for arrays, see
    *  below.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   T
@@ -651,8 +630,6 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   T
@@ -691,8 +668,6 @@ namespace Utilities
    *  Note that unlike the other unpack() function, it is not necessary
    *  to explicitly specify the template arguments since they can be
    *  deduced from the second argument.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
   void
@@ -707,8 +682,6 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
   void

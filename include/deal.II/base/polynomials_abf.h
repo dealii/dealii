@@ -48,8 +48,6 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k,k+2,k</sub>, Q<sub>k,k,k+2</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
- * @author Oliver Kayser-Herold, based on code from Guido Kanschat
- * @date 2006
  */
 template <int dim>
 class PolynomialsABF : public TensorPolynomialsBase<dim>

@@ -83,8 +83,6 @@ DEAL_II_NAMESPACE_OPEN
  * right - $3D,\,k=2$.</td></tr> </table>
  *
  * @todo Implement restriction matrices
- *
- * @author Eldar Khattatov, 2018
  */
 template <int dim>
 class FE_RT_Bubbles : public FE_PolyTensor<dim>

@@ -76,7 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * @ingroup textoutput
- * @author Ralf Hartmann, Wolfgang Bangerth, 2004
  */
 class ConditionalOStream
 {

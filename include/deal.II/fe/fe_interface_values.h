@@ -46,8 +46,6 @@ DEAL_II_NAMESPACE_OPEN
  * The class is made to be used inside MeshWorker::mesh_loop(). It is intended
  * to be a low level replacement for MeshWorker and LocalIntegrators and a
  * higher level abstraction compared to assembling face terms manually.
- *
- * @author Timo Heister, 2019.
  */
 template <int dim, int spacedim = dim>
 class FEInterfaceValues

@@ -55,7 +55,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup data
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007, 2011
  */
 class BlockIndices : public Subscriptor
 {
@@ -234,8 +233,6 @@ private:
  * each block and the total size of the index field.
  *
  * @ref BlockIndices
- * @author Guido Kanschat
- * @date 2011
  */
 inline LogStream &
 operator<<(LogStream &s, const BlockIndices &bi)
@@ -469,7 +466,6 @@ BlockIndices::memory_consumption() const
  * exchanges the data of the two objects.
  *
  * @relatesalso BlockIndices
- * @author Wolfgang Bangerth, 2000
  */
 inline void
 swap(BlockIndices &u, BlockIndices &v)

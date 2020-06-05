@@ -142,7 +142,6 @@ namespace internal
  * values on these cells children for output).
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 1999
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
 class DataOut : public DataOut_DoFData<DoFHandlerType,

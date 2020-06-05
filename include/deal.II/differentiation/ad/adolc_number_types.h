@@ -31,8 +31,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is an
      * ADOL-C number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_adolc_number : std::false_type
@@ -43,8 +41,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a taped
      * ADOL-C number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_adolc_taped_number : std::false_type
@@ -55,8 +51,6 @@ namespace Differentiation
      * A struct to indicate whether a given @p NumberType is a tapeless
      * ADOL-C number or not. By default, numbers are not considered to
      * have the necessary characteristics to fulfill this condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_adolc_tapeless_number : std::false_type
@@ -232,8 +226,6 @@ namespace Differentiation
       /**
        * A struct to help extract certain information associated with
        * taped ADOL-C auto-differentiable numbers.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <>
       struct ExtractData<adouble>
@@ -283,8 +275,6 @@ namespace Differentiation
       /**
        * A struct to help extract certain information associated with
        * tapeless ADOL-C auto-differentiable numbers.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <>
       struct ExtractData<adtl::adouble>
@@ -337,8 +327,6 @@ namespace Differentiation
      * taped ADOL-C (real) double.
      *
      * @note In this case the number traits are the same as those for a taped double.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType>
     struct ADNumberTraits<
@@ -361,8 +349,6 @@ namespace Differentiation
      *
      * @note In this case the number traits are the same as those for a taped complex
      * double.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType>
     struct ADNumberTraits<
@@ -385,8 +371,6 @@ namespace Differentiation
      * tapeless ADOL-C (real) double.
      *
      * @note In this case the number traits are the same as those for a tapeless double.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType>
     struct ADNumberTraits<
@@ -410,8 +394,6 @@ namespace Differentiation
      *
      * @note In this case the number traits are the same as those for a tapeless
      * complex double.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType>
     struct ADNumberTraits<

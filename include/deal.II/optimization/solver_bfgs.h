@@ -51,8 +51,6 @@ DEAL_II_NAMESPACE_OPEN
  * @f}
  * for a symmetric positive definite $H$. Limited memory variant is
  * implemented via the two-loop recursion.
- *
- * @author Denis Davydov, 2018
  */
 template <typename VectorType>
 class SolverBFGS : public SolverBase<VectorType>

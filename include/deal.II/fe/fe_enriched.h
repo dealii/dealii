@@ -209,8 +209,6 @@ DEAL_II_NAMESPACE_OPEN
  * and the @p restriction matrices are taken from the FESystem class.
  *
  * @ingroup fe
- *
- * @author Denis Davydov, 2016.
  */
 template <int dim, int spacedim = dim>
 class FE_Enriched : public FiniteElement<dim, spacedim>
@@ -1093,8 +1091,6 @@ namespace ColorEnriched
    * const hp::FECollection<dim>&
    * fe_collection(FE_helper.build_fe_collection(dof_handler));
    * @endcode
-   *
-   * @authors Nivesh Dommaraju, Denis Davydov, 2018
    */
   template <int dim, int spacedim = dim>
   struct Helper
