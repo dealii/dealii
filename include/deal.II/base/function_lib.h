@@ -1427,15 +1427,19 @@ namespace Functions
   {
   public:
     /**
-     * Constructor.
+     * Constructor to initialize this class instance with the data given in @p
+     * data_values.
+     *
      * @param coordinate_values An array of dim arrays. Each of the inner
      * arrays contains the coordinate values $x_0,\ldots, x_{K-1}$ and
      * similarly for the other coordinate directions. These arrays need not
      * have the same size. Obviously, we need dim such arrays for a dim-
      * dimensional function object. The coordinate values within this array
      * are assumed to be strictly ascending to allow for efficient lookup.
+     *
      * @param data_values A dim-dimensional table of data at each of the mesh
-     * points defined by the coordinate arrays above. Note that the Table
+     * points defined by the coordinate arrays above. The data passed in is
+     * copied into internal data structures. Note that the Table
      * class has a number of conversion constructors that allow converting
      * other data types into a table where you specify this argument.
      */
