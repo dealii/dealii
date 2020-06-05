@@ -1830,6 +1830,10 @@ private:
    */
   bool sorted;
 
+  mutable Threads::ThreadLocalStorage<
+    internal::AffineConstraints::ScratchData<number>>
+    scratch_data;
+
   /**
    * Internal function to calculate the index of line @p line_n in the vector
    * lines_cache using local_lines.

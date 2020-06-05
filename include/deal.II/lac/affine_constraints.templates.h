@@ -2796,11 +2796,6 @@ namespace internal
       private:
         ScratchData<number> *my_scratch_data;
       };
-
-      /**
-       * The actual data object that contains a scratch data for each thread.
-       */
-      static Threads::ThreadLocalStorage<ScratchData<number>> scratch_data;
     };
 
 
@@ -3560,9 +3555,8 @@ AffineConstraints<number>::distribute_local_to_global(
 
   const size_type n_local_dofs = local_dof_indices.size();
 
-  typename internal::AffineConstraints::AffineConstraintsData<number>::
-    ScratchDataAccessor scratch_data(
-      internal::AffineConstraints::AffineConstraintsData<number>::scratch_data);
+  typename internal::AffineConstraints::AffineConstraintsData<
+    number>::ScratchDataAccessor scratch_data(this->scratch_data);
 
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows =
     scratch_data->global_rows;
@@ -3712,9 +3706,8 @@ AffineConstraints<number>::distribute_local_to_global(
     }
   Assert(sorted == true, ExcMatrixNotClosed());
 
-  typename internal::AffineConstraints::AffineConstraintsData<number>::
-    ScratchDataAccessor scratch_data(
-      internal::AffineConstraints::AffineConstraintsData<number>::scratch_data);
+  typename internal::AffineConstraints::AffineConstraintsData<
+    number>::ScratchDataAccessor scratch_data(this->scratch_data);
 
   const size_type n_local_dofs = local_dof_indices.size();
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows =
@@ -3851,8 +3844,7 @@ AffineConstraints<number>::distribute_local_to_global(
 
   typename internal::AffineConstraints::AffineConstraintsData<
     typename MatrixType::value_type>::ScratchDataAccessor
-    scratch_data(
-      internal::AffineConstraints::AffineConstraintsData<number>::scratch_data);
+    scratch_data(this->scratch_data);
 
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows =
     scratch_data->global_rows;
@@ -3911,9 +3903,8 @@ AffineConstraints<number>::add_entries_local_to_global(
          ExcNotQuadratic());
 
   const size_type n_local_dofs = local_dof_indices.size();
-  typename internal::AffineConstraints::AffineConstraintsData<number>::
-    ScratchDataAccessor scratch_data(
-      internal::AffineConstraints::AffineConstraintsData<number>::scratch_data);
+  typename internal::AffineConstraints::AffineConstraintsData<
+    number>::ScratchDataAccessor scratch_data(this->scratch_data);
 
   const bool dof_mask_is_active = (dof_mask.n_rows() == n_local_dofs);
   if (dof_mask_is_active == true)
@@ -4068,9 +4059,8 @@ AffineConstraints<number>::add_entries_local_to_global(
   const size_type n_local_dofs = local_dof_indices.size();
   const size_type num_blocks   = sparsity_pattern.n_block_rows();
 
-  typename internal::AffineConstraints::AffineConstraintsData<number>::
-    ScratchDataAccessor scratch_data(
-      internal::AffineConstraints::AffineConstraintsData<number>::scratch_data);
+  typename internal::AffineConstraints::AffineConstraintsData<
+    number>::ScratchDataAccessor scratch_data(this->scratch_data);
 
   const bool dof_mask_is_active = (dof_mask.n_rows() == n_local_dofs);
   if (dof_mask_is_active == true)
