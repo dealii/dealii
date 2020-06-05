@@ -68,7 +68,7 @@ check(parallel::distributed::Triangulation<dim> &tria)
     dealii::VectorTools::interpolate_boundary_values(
       dof_handler,
       id,
-      ConstantFunction<dim>(static_cast<double>(id) + 42.0, dim),
+      Functions::ConstantFunction<dim>(static_cast<double>(id) + 42.0, dim),
       constraints);
 
   VectorTools::compute_no_normal_flux_constraints(dof_handler,

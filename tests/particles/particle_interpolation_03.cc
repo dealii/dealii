@@ -64,7 +64,7 @@ test()
 
   Particles::Generators::probabilistic_locations<dim, spacedim>(
     space_tria,
-    ConstantFunction<spacedim, double>(1.),
+    Functions::ConstantFunction<spacedim, double>(1.),
     true,
     Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) *
       estimated_n_particles_per_processor,

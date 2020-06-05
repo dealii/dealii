@@ -1267,7 +1267,7 @@ namespace VectorTools
     AffineConstraints<double> &          constraints,
     const Mapping<dim, spacedim> &       mapping)
   {
-    ZeroFunction<dim>                                        zero_function(dim);
+    Functions::ZeroFunction<dim>                             zero_function(dim);
     std::map<types::boundary_id, const Function<spacedim> *> function_map;
     for (const types::boundary_id boundary_id : boundary_ids)
       function_map[boundary_id] = &zero_function;
@@ -1288,7 +1288,7 @@ namespace VectorTools
     AffineConstraints<double> &          constraints,
     const Mapping<dim, spacedim> &       mapping)
   {
-    ZeroFunction<dim>                                        zero_function(dim);
+    Functions::ZeroFunction<dim>                             zero_function(dim);
     std::map<types::boundary_id, const Function<spacedim> *> function_map;
     for (const types::boundary_id boundary_id : boundary_ids)
       function_map[boundary_id] = &zero_function;

@@ -1304,7 +1304,7 @@ LaplaceProblem<dim>::make_enrichment_functions()
       else
         {
           pcout << "Dummy function added at " << i << std::endl;
-          ConstantFunction<dim> func(0);
+          Functions::ConstantFunction<dim> func(0);
           vec_enrichments.push_back(
             std::make_shared<ConstantFunction<dim>>(func));
         }
@@ -1778,7 +1778,7 @@ LaplaceProblem<dim>::run()
           Vector<float> difference_per_cell(triangulation.n_active_cells());
           VectorTools::integrate_difference(dof_handler,
                                             localized_solution,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             difference_per_cell,
                                             q_collection,
                                             VectorTools::H1_norm);

@@ -381,7 +381,7 @@ namespace nedelec_singularity
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
       first_vector_component,
-      ZeroFunction<dim>(dim),
+      Functions::ZeroFunction<dim>(dim),
       0,
       constraints);
 

@@ -130,7 +130,7 @@ main(int argc, char **argv)
   for (unsigned int i = 0; i < vec_predicates.size(); ++i)
     {
       // constant function is chosen as enrichment function
-      ConstantFunction<dim> func(i);
+      Functions::ConstantFunction<dim> func(i);
       vec_enrichments.push_back(std::make_shared<ConstantFunction<dim>>(func));
     }
 

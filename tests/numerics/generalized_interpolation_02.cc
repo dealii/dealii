@@ -30,31 +30,73 @@ main()
 {
   initlog();
 
-  test<2>(FE_Q<2>(1), ConstantFunction<2>(1.0, 1), 1, false, true);
-  test<2>(FE_Q<2>(2), ConstantFunction<2>(1.0, 1), 2, false, true);
-  test<3>(FE_Q<3>(3), ConstantFunction<3>(1.0, 1), 3, false, true);
+  test<2>(FE_Q<2>(1), Functions::ConstantFunction<2>(1.0, 1), 1, false, true);
+  test<2>(FE_Q<2>(2), Functions::ConstantFunction<2>(1.0, 1), 2, false, true);
+  test<3>(FE_Q<3>(3), Functions::ConstantFunction<3>(1.0, 1), 3, false, true);
 
-  test<2>(FE_Q<2>(1), ConstantFunction<2>(1.0, 1), 1, true, true);
-  test<2>(FE_Q<2>(2), ConstantFunction<2>(1.0, 1), 2, true, true);
-  test<3>(FE_Q<3>(3), ConstantFunction<3>(1.0, 1), 3, true, true);
+  test<2>(FE_Q<2>(1), Functions::ConstantFunction<2>(1.0, 1), 1, true, true);
+  test<2>(FE_Q<2>(2), Functions::ConstantFunction<2>(1.0, 1), 2, true, true);
+  test<3>(FE_Q<3>(3), Functions::ConstantFunction<3>(1.0, 1), 3, true, true);
 
-  test<2>(FE_RaviartThomas<2>(0), ConstantFunction<2>(1.0, 2), 1, false, true);
-  test<2>(FE_RaviartThomas<2>(1), ConstantFunction<2>(1.0, 2), 2, false, true);
-  test<2>(FE_RaviartThomas<2>(2), ConstantFunction<2>(1.0, 2), 3, false, true);
-  test<3>(FE_RaviartThomas<3>(0), ConstantFunction<3>(1.0, 3), 1, false, true);
-  test<3>(FE_RaviartThomas<3>(1), ConstantFunction<3>(1.0, 3), 2, false, true);
+  test<2>(FE_RaviartThomas<2>(0),
+          Functions::ConstantFunction<2>(1.0, 2),
+          1,
+          false,
+          true);
+  test<2>(FE_RaviartThomas<2>(1),
+          Functions::ConstantFunction<2>(1.0, 2),
+          2,
+          false,
+          true);
+  test<2>(FE_RaviartThomas<2>(2),
+          Functions::ConstantFunction<2>(1.0, 2),
+          3,
+          false,
+          true);
+  test<3>(FE_RaviartThomas<3>(0),
+          Functions::ConstantFunction<3>(1.0, 3),
+          1,
+          false,
+          true);
+  test<3>(FE_RaviartThomas<3>(1),
+          Functions::ConstantFunction<3>(1.0, 3),
+          2,
+          false,
+          true);
 
-  test<2>(FE_RaviartThomas<2>(0), ConstantFunction<2>(1.0, 2), 1, true, true);
-  test<2>(FE_RaviartThomas<2>(1), ConstantFunction<2>(1.0, 2), 2, true, true);
-  test<2>(FE_RaviartThomas<2>(2), ConstantFunction<2>(1.0, 2), 3, true, true);
+  test<2>(FE_RaviartThomas<2>(0),
+          Functions::ConstantFunction<2>(1.0, 2),
+          1,
+          true,
+          true);
+  test<2>(FE_RaviartThomas<2>(1),
+          Functions::ConstantFunction<2>(1.0, 2),
+          2,
+          true,
+          true);
+  test<2>(FE_RaviartThomas<2>(2),
+          Functions::ConstantFunction<2>(1.0, 2),
+          3,
+          true,
+          true);
   // lowest order RT in 3D does not contain constant 1 function on a
   // distorted mesh.
-  test<3>(FE_RaviartThomas<3>(1), ConstantFunction<3>(1.0, 3), 2, true, true);
+  test<3>(FE_RaviartThomas<3>(1),
+          Functions::ConstantFunction<3>(1.0, 3),
+          2,
+          true,
+          true);
 
-  test<2>(FE_Nedelec<2>(0), ConstantFunction<2>(1.0, 2), 1, false, true);
-  test<2>(FE_Nedelec<2>(1), ConstantFunction<2>(1.0, 2), 2, false, true);
-  test<2>(FE_Nedelec<2>(2), ConstantFunction<2>(1.0, 2), 3, false, true);
-  test<2>(FE_Nedelec<2>(0), ConstantFunction<2>(1.0, 2), 1, true, true);
-  test<2>(FE_Nedelec<2>(1), ConstantFunction<2>(1.0, 2), 2, true, true);
-  test<2>(FE_Nedelec<2>(2), ConstantFunction<2>(1.0, 2), 3, true, true);
+  test<2>(
+    FE_Nedelec<2>(0), Functions::ConstantFunction<2>(1.0, 2), 1, false, true);
+  test<2>(
+    FE_Nedelec<2>(1), Functions::ConstantFunction<2>(1.0, 2), 2, false, true);
+  test<2>(
+    FE_Nedelec<2>(2), Functions::ConstantFunction<2>(1.0, 2), 3, false, true);
+  test<2>(
+    FE_Nedelec<2>(0), Functions::ConstantFunction<2>(1.0, 2), 1, true, true);
+  test<2>(
+    FE_Nedelec<2>(1), Functions::ConstantFunction<2>(1.0, 2), 2, true, true);
+  test<2>(
+    FE_Nedelec<2>(2), Functions::ConstantFunction<2>(1.0, 2), 3, true, true);
 }
