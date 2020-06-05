@@ -728,12 +728,13 @@ public:
 
     /**
      * The loop does only involve FEFaceEvaluation access into neighbors by
-     * function values, such as `FEFaceEvaluation::gather_evaluate(src, true,
-     * false)`, but no access to shape function derivatives (which typically
-     * need to access more data). For FiniteElement types where only some of
-     * the shape functions have support on a face, such as an FE_DGQ element
-     * with Lagrange polynomials with nodes on the element surface, the data
-     * exchange is reduced from `(k+1)^dim` to `(k+1)^(dim-1)`.
+     * function values, such as FEFaceEvaluation::gather_evaluate() with
+     * argument EvaluationFlags::values, but no access to shape function
+     * derivatives (which typically need to access more data). For FiniteElement
+     * types where only some of the shape functions have support on a face, such
+     * as an FE_DGQ element with Lagrange polynomials with nodes on the element
+     * surface, the data exchange is reduced from `(k+1)^dim` to
+     * `(k+1)^(dim-1)`.
      */
     values,
 
@@ -750,12 +751,12 @@ public:
     /**
      * The loop does involve FEFaceEvaluation access into neighbors by
      * function values and gradients, but no second derivatives, such as
-     * `FEFaceEvaluation::gather_evaluate(src, true, true)`. For
-     * FiniteElement types where only some of the shape functions have
-     * non-zero value and first derivative on a face, such as an FE_DGQHermite
-     * element, the data exchange is reduced, e.g. from `(k+1)^dim` to
-     * `2(k+1)^(dim-1)`. Note that for bases that do not have this special
-     * property, the full neighboring data is sent anyway.
+     * FEFaceEvaluation::gather_evaluate() with EvaluationFlags::values and
+     * EvaluationFlags::gradients set. For FiniteElement types where only some
+     * of the shape functions have non-zero value and first derivative on a
+     * face, such as an FE_DGQHermite element, the data exchange is reduced,
+     * e.g. from `(k+1)^dim` to `2(k+1)^(dim-1)`. Note that for bases that do
+     * not have this special property, the full neighboring data is sent anyway.
      */
     gradients,
 

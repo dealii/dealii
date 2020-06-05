@@ -951,7 +951,7 @@ void LaplaceProblem<dim, degree>::assemble_rhs()
     {
       phi.reinit(cell);
       phi.read_dof_values_plain(solution_copy);
-      phi.evaluate(false, true, false);
+      phi.evaluate(EvaluationFlags::gradients);
 
       for (unsigned int q = 0; q < phi.n_q_points; ++q)
         {
@@ -962,7 +962,9 @@ void LaplaceProblem<dim, degree>::assemble_rhs()
             right_hand_side_function.value(phi.quadrature_point(q)), q);
         }
 
-      phi.integrate_scatter(true, true, right_hand_side_copy);
+      phi.integrate_scatter(EvaluationFlags::values |
+                              EvaluationFlags::gradients,
+                            right_hand_side_copy);
     }
 
   right_hand_side_copy.compress(VectorOperation::add);

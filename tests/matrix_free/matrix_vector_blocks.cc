@@ -75,13 +75,17 @@ private:
         phi.reinit(cell);
         for (unsigned int block = 0; block < src.n_blocks(); ++block)
           {
-            phi.gather_evaluate(src.block(block), true, true, false);
+            phi.gather_evaluate(src.block(block),
+                                EvaluationFlags::values |
+                                  EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
                 phi.submit_value(Number(10) * phi.get_value(q), q);
                 phi.submit_gradient(phi.get_gradient(q), q);
               }
-            phi.integrate_scatter(true, true, dst.block(block));
+            phi.integrate_scatter(EvaluationFlags::values |
+                                    EvaluationFlags::gradients,
+                                  dst.block(block));
           }
       }
   }

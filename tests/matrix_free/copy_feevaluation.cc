@@ -84,10 +84,10 @@ public:
       {
         velocity[0].reinit(cell);
         velocity[0].read_dof_values(src.block(0));
-        velocity[0].evaluate(false, true, false);
+        velocity[0].evaluate(EvaluationFlags::gradients);
         pressure2.reinit(cell);
         pressure2.read_dof_values(src.block(1));
-        pressure2.evaluate(true, false, false);
+        pressure2.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < velocity[0].n_q_points; ++q)
           {
@@ -104,9 +104,9 @@ public:
             velocity[0].submit_symmetric_gradient(sym_grad_u, q);
           }
 
-        velocity[0].integrate(false, true);
+        velocity[0].integrate(EvaluationFlags::gradients);
         velocity[0].distribute_local_to_global(dst.block(0));
-        pressure2.integrate(true, false);
+        pressure2.integrate(EvaluationFlags::values);
         pressure2.distribute_local_to_global(dst.block(1));
       }
   }

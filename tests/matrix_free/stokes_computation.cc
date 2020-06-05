@@ -514,10 +514,10 @@ namespace StokesClass
       {
         velocity.reinit(cell);
         velocity.read_dof_values(src.block(0));
-        velocity.evaluate(false, true, false);
+        velocity.evaluate(EvaluationFlags::gradients);
         pressure.reinit(cell);
         pressure.read_dof_values(src.block(1));
-        pressure.evaluate(true, false, false);
+        pressure.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < velocity.n_q_points; ++q)
           {
@@ -535,9 +535,9 @@ namespace StokesClass
             velocity.submit_symmetric_gradient(sym_grad_u, q);
           }
 
-        velocity.integrate(false, true);
+        velocity.integrate(EvaluationFlags::gradients);
         velocity.distribute_local_to_global(dst.block(0));
-        pressure.integrate(true, false);
+        pressure.integrate(EvaluationFlags::values);
         pressure.distribute_local_to_global(dst.block(1));
       }
   }
@@ -648,12 +648,12 @@ namespace StokesClass
 
         pressure.reinit(cell);
         pressure.read_dof_values(src);
-        pressure.evaluate(true, false);
+        pressure.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < pressure.n_q_points; ++q)
           pressure.submit_value(one_over_viscosity(cell, q) *
                                   pressure.get_value(q),
                                 q);
-        pressure.integrate(true, false);
+        pressure.integrate(EvaluationFlags::values);
         pressure.distribute_local_to_global(dst);
       }
   }
@@ -721,12 +721,12 @@ namespace StokesClass
               pressure.begin_dof_values()[j] = VectorizedArray<number>();
             pressure.begin_dof_values()[i] = make_vectorized_array<number>(1.);
 
-            pressure.evaluate(true, false, false);
+            pressure.evaluate(EvaluationFlags::values);
             for (unsigned int q = 0; q < pressure.n_q_points; ++q)
               pressure.submit_value(one_over_viscosity(cell, q) *
                                       pressure.get_value(q),
                                     q);
-            pressure.integrate(true, false);
+            pressure.integrate(EvaluationFlags::values);
 
             diagonal[i] = pressure.begin_dof_values()[i];
           }
@@ -828,13 +828,13 @@ namespace StokesClass
 
         velocity.reinit(cell);
         velocity.read_dof_values(src);
-        velocity.evaluate(false, true, false);
+        velocity.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < velocity.n_q_points; ++q)
           {
             velocity.submit_symmetric_gradient(
               viscosity_x_2(cell, q) * velocity.get_symmetric_gradient(q), q);
           }
-        velocity.integrate(false, true);
+        velocity.integrate(EvaluationFlags::gradients);
         velocity.distribute_local_to_global(dst);
       }
   }
@@ -893,14 +893,14 @@ namespace StokesClass
               velocity.begin_dof_values()[j] = VectorizedArray<number>();
             velocity.begin_dof_values()[i] = make_vectorized_array<number>(1.);
 
-            velocity.evaluate(false, true, false);
+            velocity.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < velocity.n_q_points; ++q)
               {
                 velocity.submit_symmetric_gradient(
                   viscosity_x_2(cell, q) * velocity.get_symmetric_gradient(q),
                   q);
               }
-            velocity.integrate(false, true);
+            velocity.integrate(EvaluationFlags::gradients);
 
             diagonal[i] = velocity.begin_dof_values()[i];
           }
@@ -1237,9 +1237,9 @@ namespace StokesClass
             velocity.submit_value(rhs_u, q);
             pressure.submit_value(rhs_p, q);
           }
-        velocity.integrate(true, false);
+        velocity.integrate(EvaluationFlags::values);
         velocity.distribute_local_to_global(system_rhs.block(0));
-        pressure.integrate(true, false);
+        pressure.integrate(EvaluationFlags::values);
         pressure.distribute_local_to_global(system_rhs.block(1));
       }
     system_rhs.compress(VectorOperation::add);

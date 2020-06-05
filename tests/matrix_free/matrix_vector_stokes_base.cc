@@ -71,10 +71,10 @@ protected:
       {
         velocity.reinit(cell);
         velocity.read_dof_values(src.block(0));
-        velocity.evaluate(false, true, false);
+        velocity.evaluate(EvaluationFlags::gradients);
         pressure.reinit(cell);
         pressure.read_dof_values(src.block(1));
-        pressure.evaluate(true, false, false);
+        pressure.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < velocity.n_q_points; ++q)
           {
@@ -91,9 +91,9 @@ protected:
             velocity.submit_symmetric_gradient(sym_grad_u, q);
           }
 
-        velocity.integrate(false, true);
+        velocity.integrate(EvaluationFlags::gradients);
         velocity.distribute_local_to_global(dst.block(0));
-        pressure.integrate(true, false);
+        pressure.integrate(EvaluationFlags::values);
         pressure.distribute_local_to_global(dst.block(1));
       }
   }

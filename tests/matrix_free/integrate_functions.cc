@@ -140,7 +140,7 @@ operator()(const MatrixFree<dim, Number> &data,
             submit[d] = gradients[q * dim + d];
           fe_eval.submit_gradient(submit, q);
         }
-      fe_eval.integrate(true, true);
+      fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval.distribute_local_to_global(*dst[0]);
     }
 }

@@ -403,10 +403,10 @@ namespace Step37
 
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -630,11 +630,11 @@ namespace Step37
               phi.submit_dof_value(VectorizedArray<number>(), j);
             phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
-            phi.evaluate(false, true);
+            phi.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
                                   q);
-            phi.integrate(false, true);
+            phi.integrate(EvaluationFlags::gradients);
             diagonal[i] = phi.get_dof_value(i);
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -911,7 +911,7 @@ namespace Step37
         phi.reinit(cell);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_value(make_vectorized_array<double>(1.0), q);
-        phi.integrate(true, false);
+        phi.integrate(EvaluationFlags::values);
         phi.distribute_local_to_global(system_rhs);
       }
     system_rhs.compress(VectorOperation::add);

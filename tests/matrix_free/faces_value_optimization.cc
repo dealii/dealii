@@ -81,8 +81,8 @@ private:
         check.reinit(face);
 
         ref.read_dof_values(src);
-        ref.evaluate(true, false);
-        check.gather_evaluate(src, true, false);
+        ref.evaluate(EvaluationFlags::values);
+        check.gather_evaluate(src, EvaluationFlags::values);
 
         for (unsigned int q = 0; q < ref.n_q_points; ++q)
           {
@@ -129,8 +129,8 @@ private:
         checkr.reinit(face);
 
         refr.read_dof_values(src);
-        refr.evaluate(true, false);
-        checkr.gather_evaluate(src, true, false);
+        refr.evaluate(EvaluationFlags::values);
+        checkr.gather_evaluate(src, EvaluationFlags::values);
 
         for (unsigned int q = 0; q < ref.n_q_points; ++q)
           {

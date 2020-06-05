@@ -63,7 +63,7 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
       fe_eval.reinit(cell);
 
       fe_eval.read_dof_values(src);
-      fe_eval.evaluate(true, true, false);
+      fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
           fe_eval.submit_value(make_vectorized_array(Number(10)) *
@@ -71,7 +71,7 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
                                q);
           fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
         }
-      fe_eval.integrate(true, true);
+      fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval.distribute_local_to_global(dst);
     }
 }

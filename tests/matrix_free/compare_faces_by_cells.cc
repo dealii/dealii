@@ -149,13 +149,14 @@ private:
         // Compute phi part
         for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
           phi_outer.begin_dof_values()[j] = VectorizedArray<number>();
-        phi_outer.evaluate(true, true);
+        phi_outer.evaluate(EvaluationFlags::values |
+                           EvaluationFlags::gradients);
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(true, true);
+            phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -169,7 +170,7 @@ private:
                 phi.submit_normal_derivative(-average_value, q);
                 phi.submit_value(average_valgrad, q);
               }
-            phi.integrate(true, true);
+            phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -182,13 +183,14 @@ private:
                  (number)(std::max(fe_degree, 1) * (fe_degree + 1.0)) * 2.0;
         for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
           phi.begin_dof_values()[j] = VectorizedArray<number>();
-        phi.evaluate(true, true);
+        phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi_outer.begin_dof_values()[j] = VectorizedArray<number>();
             phi_outer.begin_dof_values()[i] = 1.;
-            phi_outer.evaluate(true, true);
+            phi_outer.evaluate(EvaluationFlags::values |
+                               EvaluationFlags::gradients);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -202,7 +204,8 @@ private:
                 phi_outer.submit_normal_derivative(-average_value, q);
                 phi_outer.submit_value(-average_valgrad, q);
               }
-            phi_outer.integrate(true, true);
+            phi_outer.integrate(EvaluationFlags::values |
+                                EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi_outer.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -235,7 +238,7 @@ private:
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(true, true);
+            phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -246,7 +249,7 @@ private:
                 phi.submit_normal_derivative(-average_value, q);
                 phi.submit_value(average_valgrad, q);
               }
-            phi.integrate(true, true);
+            phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -293,7 +296,8 @@ private:
                 for (unsigned int j = 0; j < phif.dofs_per_cell; ++j)
                   phif.begin_dof_values()[j] = VectorizedArray<number>();
                 phif.begin_dof_values()[i] = 1.;
-                phif.evaluate(true, true);
+                phif.evaluate(EvaluationFlags::values |
+                              EvaluationFlags::gradients);
                 for (unsigned int q = 0; q < phif.n_q_points; ++q)
                   {
                     VectorizedArray<number> average_value =
@@ -305,7 +309,8 @@ private:
                     phif.submit_normal_derivative(-average_value, q);
                     phif.submit_value(average_valgrad, q);
                   }
-                phif.integrate(true, true);
+                phif.integrate(EvaluationFlags::values |
+                               EvaluationFlags::gradients);
                 local_diagonal_vector[i] += phif.begin_dof_values()[i];
               }
           }

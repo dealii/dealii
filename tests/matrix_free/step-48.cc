@@ -102,7 +102,7 @@ namespace Step48
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(one, q);
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
 
@@ -135,8 +135,8 @@ namespace Step48
         current.read_dof_values(*src[0]);
         old.read_dof_values(*src[1]);
 
-        current.evaluate(true, true, false);
-        old.evaluate(true, false, false);
+        current.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+        old.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < current.n_q_points; ++q)
           {
@@ -149,7 +149,7 @@ namespace Step48
             current.submit_gradient(-delta_t_sqr * current.get_gradient(q), q);
           }
 
-        current.integrate(true, true);
+        current.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         current.distribute_local_to_global(dst);
       }
   }

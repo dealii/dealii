@@ -356,14 +356,14 @@ namespace Step37
       {
         phi.reinit(cell);
         phi.read_dof_values_plain(solution);
-        phi.evaluate(false, true);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             phi.submit_gradient(-phi.get_gradient(q), q);
             // phi.submit_value(make_vectorized_array<double>(1.0), q);
           }
-        // phi.integrate(true, true);
-        phi.integrate(false, true);
+        // phi.integrate(EvaluationFlags::values|EvaluationFlags::gradients);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(system_rhs);
       }
     system_rhs.compress(VectorOperation::add);

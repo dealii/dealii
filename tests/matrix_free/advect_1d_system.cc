@@ -112,7 +112,7 @@ private:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(true, false);
+        phi.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             Tensor<1, n_components, Tensor<1, dim, VectorizedArray<number>>>
@@ -122,7 +122,7 @@ private:
                 grad[c][d] = advection[d] * phi.get_value(q)[c];
             phi.submit_gradient(grad, q);
           }
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -148,10 +148,10 @@ private:
       {
         phi_m.reinit(face);
         phi_m.read_dof_values(src);
-        phi_m.evaluate(true, false);
+        phi_m.evaluate(EvaluationFlags::values);
         phi_p.reinit(face);
         phi_p.read_dof_values(src);
-        phi_p.evaluate(true, false);
+        phi_p.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
@@ -167,9 +167,9 @@ private:
             phi_p.submit_value(flux_times_normal, q);
           }
 
-        phi_m.integrate(true, false);
+        phi_m.integrate(EvaluationFlags::values);
         phi_m.distribute_local_to_global(dst);
-        phi_p.integrate(true, false);
+        phi_p.integrate(EvaluationFlags::values);
         phi_p.distribute_local_to_global(dst);
       }
   }
@@ -193,7 +193,7 @@ private:
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, false);
+        fe_eval.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
@@ -208,7 +208,7 @@ private:
             fe_eval.submit_value(-flux_times_normal, q);
           }
 
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(dst);
       }
   }

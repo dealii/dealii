@@ -66,10 +66,10 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, false);
+        fe_eval.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(fe_eval.get_value(q), q);
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.set_dof_values(dst);
       }
   }
