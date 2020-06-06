@@ -36,6 +36,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
 {
   for (const auto validity_ptr : subscriptor.validity_pointers)
     *validity_ptr = false;
+  subscriptor.validity_pointers.clear();
 }
 
 
@@ -124,6 +125,7 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 {
   for (const auto validity_ptr : s.validity_pointers)
     *validity_ptr = false;
+  s.validity_pointers.clear();
   object_info = s.object_info;
   return *this;
 }
