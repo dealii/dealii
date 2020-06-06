@@ -85,14 +85,20 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
   Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
-  VectorType copy_src(src);
   if (this->mg_constrained_dofs != nullptr &&
       this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
           .get_local_lines()
           .size() > 0)
-    this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
-      .distribute(copy_src);
-  prolongation_matrices[to_level - 1]->vmult(dst, copy_src);
+    {
+      VectorType copy_src(src);
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+        .distribute(copy_src);
+      prolongation_matrices[to_level - 1]->vmult(dst, copy_src);
+    }
+  else
+    {
+      prolongation_matrices[to_level - 1]->vmult(dst, src);
+    }
 }
 
 
