@@ -1489,9 +1489,19 @@ const unsigned int
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
-  const std::initializer_list<int> &object) const
+  const std::initializer_list<int> &new_indices) const
 {
-  this->objects().get_object(this->present_index) = object;
+  const ArrayView<int> bounding_object_index_ref =
+    this->objects().get_bounding_object_indices(this->present_index);
+
+  AssertDimension(bounding_object_index_ref.size(), new_indices.size());
+
+  unsigned int i = 0;
+  for (const auto &new_index : new_indices)
+    {
+      bounding_object_index_ref[i] = new_index;
+      ++i;
+    }
 }
 
 
@@ -1499,9 +1509,19 @@ TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
-  const std::initializer_list<unsigned int> &object) const
+  const std::initializer_list<unsigned int> &new_indices) const
 {
-  this->objects().get_object(this->present_index) = object;
+  const ArrayView<int> bounding_object_index_ref =
+    this->objects().get_bounding_object_indices(this->present_index);
+
+  AssertDimension(bounding_object_index_ref.size(), new_indices.size());
+
+  unsigned int i = 0;
+  for (const auto &new_index : new_indices)
+    {
+      bounding_object_index_ref[i] = new_index;
+      ++i;
+    }
 }
 
 

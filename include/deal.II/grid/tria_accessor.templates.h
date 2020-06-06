@@ -525,7 +525,8 @@ namespace internal
       line_index(const TriaAccessor<2, dim, spacedim> &accessor,
                  const unsigned int                    i)
       {
-        return accessor.objects().get_object(accessor.present_index).face(i);
+        return accessor.objects().get_bounding_object_indices(
+          accessor.present_index)[i];
       }
 
 
@@ -570,8 +571,7 @@ namespace internal
                  const unsigned int                    i)
       {
         return accessor.tria->levels[accessor.present_level]
-          ->cells.get_object(accessor.present_index)
-          .face(i);
+          ->cells.get_bounding_object_indices(accessor.present_index)[i];
       }
 
 
@@ -975,9 +975,8 @@ namespace internal
       vertex_index(const TriaAccessor<1, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        return accessor.objects()
-          .get_object(accessor.present_index)
-          .face(corner);
+        return accessor.objects().get_bounding_object_indices(
+          accessor.present_index)[corner];
       }
 
 
