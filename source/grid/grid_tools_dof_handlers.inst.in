@@ -66,6 +66,19 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
         const X &,
         const Point<deal_II_space_dimension> &,
         const double,
+        const std::pair<typename X::active_cell_iterator,
+                        Point<deal_II_dimension>> &);
+
+      template std::vector<
+        std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension,
+                                                       deal_II_space_dimension,
+                                                       X>::type,
+                  Point<deal_II_dimension>>>
+      find_all_active_cells_around_point(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const X &,
+        const Point<deal_II_space_dimension> &,
+        const double,
         const std::vector<bool> &);
 
       template std::vector<
