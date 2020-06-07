@@ -381,8 +381,11 @@ LaplaceProblem<dim>::solve()
   SolverCG<LinearAlgebra::distributed::Vector<double>> coarse_solver(
     coarse_solver_control);
   PreconditionIdentity id;
-  MGCoarseGridLACIteration<SolverCG<LinearAlgebra::distributed::Vector<double>>,
-                           LinearAlgebra::distributed::Vector<double>>
+  MGCoarseGridIterativeSolver<
+    LinearAlgebra::distributed::Vector<double>,
+    SolverCG<LinearAlgebra::distributed::Vector<double>>,
+    SparseMatrix<double>,
+    PreconditionIdentity>
     coarse_grid_solver(coarse_solver, mg_matrices[min_level], id);
   deallog << "   Size of coarse grid matrix: " << mg_matrices[min_level].m()
           << std::endl;

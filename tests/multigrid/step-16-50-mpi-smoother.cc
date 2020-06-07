@@ -16,7 +16,7 @@
 
 // Same as step-16-50, but use Jacobi smoother at the coarsest grid via
 // MGCoarseGridApplySmoother. In this particular case, the number of iterations
-// until convergence is exactly the same as for MGCoarseGridLACIteration.
+// until convergence is exactly the same as for MGCoarseGridIterativeSolver.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>

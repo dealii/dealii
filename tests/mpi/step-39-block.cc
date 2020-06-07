@@ -635,8 +635,10 @@ namespace Step39
       coarse_solver_control);
     PreconditionIdentity            identity;
     TrilinosWrappers::SparseMatrix &coarse_matrix = mg_matrix[0];
-    MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,
-                             TrilinosWrappers::MPI::Vector>
+    MGCoarseGridIterativeSolver<TrilinosWrappers::MPI::Vector,
+                                SolverCG<TrilinosWrappers::MPI::Vector>,
+                                TrilinosWrappers::SparseMatrix,
+                                PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
     typedef RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
