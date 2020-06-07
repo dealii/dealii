@@ -37,7 +37,8 @@ for (X : TRIANGULATIONS; deal_II_dimension : DIMENSIONS;
                                                    deal_II_space_dimension,
                                                    X>::type &,
         const std::vector<bool> &,
-        const RTree<std::pair<Point<deal_II_space_dimension>, unsigned int>> &);
+        const RTree<std::pair<Point<deal_II_space_dimension>, unsigned int>> &,
+        const double);
 
       template std::vector<BoundingBox<deal_II_space_dimension>>
       compute_mesh_predicate_bounding_box<X>(
@@ -92,7 +93,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const typename Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::active_cell_iterator &,
-        const std::vector<bool> &);
+        const std::vector<bool> &,
+        const double);
 
       template std::tuple<std::vector<typename Triangulation<
                             deal_II_dimension,
