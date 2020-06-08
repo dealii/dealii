@@ -388,7 +388,7 @@ MGConstrainedDoFs::make_no_normal_flux_constraints(
 {
   // For a given boundary id, find which vector component is on the boundary
   // and set a zero boundary constraint for those degrees of freedom.
-  const unsigned int n_components = DoFTools::n_components(dof);
+  const unsigned int n_components = dof.get_fe_collection().n_components();
   AssertIndexRange(first_vector_component + dim - 1, n_components);
 
   ComponentMask comp_mask(n_components, false);

@@ -3360,17 +3360,17 @@ namespace DoFTools
                       "zero or equal to the number of components in the finite "
                       "element."));
 
-    const unsigned int n_components = DoFTools::n_components(dof);
+    const unsigned int n_components = dof.get_fe_collection().n_components();
 
     Assert(component_mask.n_selected_components(n_components) > 0,
            ComponentMask::ExcNoComponentSelected());
 
     // a field to store the indices on the face
     std::vector<types::global_dof_index> face_dofs;
-    face_dofs.reserve(max_dofs_per_face(dof));
+    face_dofs.reserve(dof.get_fe_collection().max_dofs_per_face());
     // a field to store the indices on the cell
     std::vector<types::global_dof_index> cell_dofs;
-    cell_dofs.reserve(max_dofs_per_cell(dof));
+    cell_dofs.reserve(dof.get_fe_collection().max_dofs_per_cell());
 
     typename DoFHandlerType<dim, spacedim>::active_cell_iterator
       cell = dof.begin_active(),
