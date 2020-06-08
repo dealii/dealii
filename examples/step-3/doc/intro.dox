@@ -14,7 +14,7 @@ values, but a nonzero right hand side:
   \\
   u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
 @f}
-We will solve this equation on the unit square, $\Omega=[0,1]^2$, for which
+We will solve this equation on the square, $\Omega=[-1,1]^2$, for which
 you've already learned how to generate a mesh in step-1 and step-2. In
 this program, we will also only consider the particular case
 $f(\mathbf x)=1$ and come back to how to implement the more general
