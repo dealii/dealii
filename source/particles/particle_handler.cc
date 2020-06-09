@@ -521,7 +521,8 @@ namespace Particles
     // Calculate all starting points locally
     std::vector<unsigned int> particle_start_indices(n_mpi_processes);
 
-    unsigned int particle_start_index = 0;
+    // For multiple insertions, the ID of particles should start from the number of particles in the system
+    unsigned int particle_start_index = this->n_global_particles();
     for (unsigned int process = 0; process < particle_start_indices.size();
          ++process)
       {
