@@ -522,7 +522,7 @@ namespace Particles
     std::vector<unsigned int> particle_start_indices(n_mpi_processes);
 
     // For multiple insertions, the ID of particles should start from the number of particles in the system
-    unsigned int particle_start_index = this->n_global_particles();
+    unsigned int particle_start_index = n_global_particles();
     for (unsigned int process = 0; process < particle_start_indices.size();
          ++process)
       {
