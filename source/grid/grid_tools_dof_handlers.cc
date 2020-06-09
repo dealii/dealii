@@ -465,45 +465,47 @@ namespace GridTools
             endc = adjacent_cells.end();
           for (; cell != endc; ++cell)
             {
-              try
+              if ((*cell)->is_artificial() == false)
                 {
-                  const Point<dim> p_cell =
-                    mapping.transform_real_to_unit_cell(*cell, p);
-
-                  // calculate the infinity norm of
-                  // the distance vector to the unit cell.
-                  const double dist =
-                    GeometryInfo<dim>::distance_to_unit_cell(p_cell);
-
-                  // We compare if the point is inside the
-                  // unit cell (or at least not too far
-                  // outside). If it is, it is also checked
-                  // that the cell has a more refined state
-                  if ((dist < best_distance) ||
-                      ((dist == best_distance) &&
-                       ((*cell)->level() > best_level)))
+                  try
                     {
-                      found         = true;
-                      best_distance = dist;
-                      best_level    = (*cell)->level();
-                      best_cell     = std::make_pair(*cell, p_cell);
+                      const Point<dim> p_cell =
+                        mapping.transform_real_to_unit_cell(*cell, p);
+
+                      // calculate the infinity norm of
+                      // the distance vector to the unit cell.
+                      const double dist =
+                        GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+                      // We compare if the point is inside the
+                      // unit cell (or at least not too far
+                      // outside). If it is, it is also checked
+                      // that the cell has a more refined state
+                      if ((dist < best_distance) ||
+                          ((dist == best_distance) &&
+                           ((*cell)->level() > best_level)))
+                        {
+                          found         = true;
+                          best_distance = dist;
+                          best_level    = (*cell)->level();
+                          best_cell     = std::make_pair(*cell, p_cell);
+                        }
                     }
-                }
-              catch (
-                typename MappingQGeneric<dim, spacedim>::ExcTransformationFailed
-                  &)
-                {
-                  // ok, the transformation
-                  // failed presumably
-                  // because the point we
-                  // are looking for lies
-                  // outside the current
-                  // cell. this means that
-                  // the current cell can't
-                  // be the cell around the
-                  // point, so just ignore
-                  // this cell and move on
-                  // to the next
+                  catch (typename MappingQGeneric<dim, spacedim>::
+                           ExcTransformationFailed &)
+                    {
+                      // ok, the transformation
+                      // failed presumably
+                      // because the point we
+                      // are looking for lies
+                      // outside the current
+                      // cell. this means that
+                      // the current cell can't
+                      // be the cell around the
+                      // point, so just ignore
+                      // this cell and move on
+                      // to the next
+                    }
                 }
             }
 
