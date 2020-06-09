@@ -35,6 +35,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include "utilities.h"
+
 using namespace dealii;
 namespace SD = Differentiation::SD;
 
@@ -266,65 +268,6 @@ struct CoupledFunction
 template <int dim, typename NumberType>
 const double CoupledFunction<dim, NumberType>::sf(2.2);
 
-template <typename Stream, typename NumberType>
-void
-print(Stream &stream, const std::string &name, const NumberType &val)
-{
-  stream << name << ": " << val << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<0, dim, NumberType> &val)
-{
-  stream << name << ": " << val << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<1, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    stream << name << "[" << i << "]: " << t[i] << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<2, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      stream << name << "[" << i << "][" << j << "]: " << t[i][j] << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<3, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int k = 0; k < dim; ++k)
-        stream << name << "[" << i << "][" << j << "][" << k
-               << "]: " << t[i][j][k] << std::endl;
-}
-template <typename Stream, int dim, typename NumberType>
-void
-print(Stream &                          stream,
-      const std::string &               name,
-      const Tensor<4, dim, NumberType> &t)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int k = 0; k < dim; ++k)
-        for (unsigned int l = 0; l < dim; ++l)
-          stream << name << "[" << i << "][" << j << "][" << k << "][" << l
-                 << "]: " << t[i][j][k][l] << std::endl;
-}
-
 template <int dim,
           typename number_t,
           enum SD::OptimizerType     opt_method,
@@ -334,8 +277,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
                                            const Tensor<1, dim> &v,
                                            const double &        s)
 {
-  typedef SD::Expression SDNumberType; // This can automatically initialise
-                                       // itself from an ADNumberType
+  using SDNumberType = SD::Expression;
 
   // Compute the symbolic (derivative) tensors once off
   // ahead of time, and store them for each run of the function
@@ -368,15 +310,16 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
   if (symbols_initialised == false)
     {
       // Function and its derivatives
-      typedef CoupledFunction<dim, SDNumberType> func_sd;
+      using func_sd = CoupledFunction<dim, SDNumberType>;
 
       symb_psi = func_sd::psi(symb_t, symb_v, symb_s);
-#if DEBUG
-      deallog << "symb_t: " << symb_t << std::endl;
-      deallog << "symb_v: " << symb_v << std::endl;
-      deallog << "symb_s: " << symb_s << std::endl;
-      deallog << "symb_psi: " << symb_psi << std::endl;
-#endif
+
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "Dim: " << dim << std::endl;
+      print(std::cout, "symb_t", symb_t);
+      print(std::cout, "symb_v", symb_v);
+      print(std::cout, "symb_s", symb_s);
+      print(std::cout, "symb_psi", symb_psi);
 
       // First derivative
       symb_dpsi_dt = SD::differentiate(symb_psi, symb_t);
@@ -392,21 +335,20 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       symb_d2psi_dt_ds = SD::differentiate(symb_dpsi_ds, symb_t);
       symb_d2psi_dv_ds = SD::differentiate(symb_dpsi_ds, symb_v);
       symb_d2psi_ds_ds = SD::differentiate(symb_dpsi_ds, symb_s);
-#if DEBUG
-      print(deallog, "symb_psi", symb_psi);
-      print(deallog, "symb_dpsi_dt", symb_dpsi_dt);
-      print(deallog, "symb_dpsi_dv", symb_dpsi_dv);
-      print(deallog, "symb_dpsi_ds", symb_dpsi_ds);
-      print(deallog, "symb_d2psi_dt_dt", symb_d2psi_dt_dt);
-      print(deallog, "symb_d2psi_dv_dt", symb_d2psi_dv_dt);
-      print(deallog, "symb_d2psi_ds_dt", symb_d2psi_ds_dt);
-      print(deallog, "symb_d2psi_dt_dv", symb_d2psi_dt_dv);
-      print(deallog, "symb_d2psi_dv_dv", symb_d2psi_dv_dv);
-      print(deallog, "symb_d2psi_ds_dv", symb_d2psi_ds_dv);
-      print(deallog, "symb_d2psi_dt_ds", symb_d2psi_dt_ds);
-      print(deallog, "symb_d2psi_dv_ds", symb_d2psi_dv_ds);
-      print(deallog, "symb_d2psi_ds_ds", symb_d2psi_ds_ds);
-#endif
+
+      print(std::cout, "symb_psi", symb_psi);
+      print(std::cout, "symb_dpsi_dt", symb_dpsi_dt);
+      print(std::cout, "symb_dpsi_dv", symb_dpsi_dv);
+      print(std::cout, "symb_dpsi_ds", symb_dpsi_ds);
+      print(std::cout, "symb_d2psi_dt_dt", symb_d2psi_dt_dt);
+      print(std::cout, "symb_d2psi_dv_dt", symb_d2psi_dv_dt);
+      print(std::cout, "symb_d2psi_ds_dt", symb_d2psi_ds_dt);
+      print(std::cout, "symb_d2psi_dt_dv", symb_d2psi_dt_dv);
+      print(std::cout, "symb_d2psi_dv_dv", symb_d2psi_dv_dv);
+      print(std::cout, "symb_d2psi_ds_dv", symb_d2psi_ds_dv);
+      print(std::cout, "symb_d2psi_dt_ds", symb_d2psi_dt_ds);
+      print(std::cout, "symb_d2psi_dv_ds", symb_d2psi_dv_ds);
+      print(std::cout, "symb_d2psi_ds_ds", symb_d2psi_ds_ds);
 
       const SD::types::substitution_map sub_vals_optim =
         SD::make_symbol_map(symb_t, symb_v, symb_s);
@@ -438,7 +380,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       // parameters and compiler being used. MM '20
       //
       // deallog << "Optimizer" << std::endl;
-      // optimizer.print(deallog.get_file_stream());
+      // optimizer.print(std::cout.get_file_stream());
     }
 
   SD::types::substitution_map sub_vals;
@@ -473,51 +415,37 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
     optimizer.evaluate(symb_d2psi_dv_ds);
   const double d2psi_ds_ds = optimizer.evaluate(symb_d2psi_ds_ds);
 
-#ifdef DEBUG
   // Verify the result
-  typedef CoupledFunction<dim, double> func;
-  static const double                  tol = 1e-12;
-  Assert(std::abs(psi - func::psi(t, v, s)) < tol,
-         ExcMessage("No match for function value."));
-  Assert(std::abs((dpsi_dt - func::dpsi_dt(t, v, s)).norm()) < tol,
-         ExcMessage("No match for first derivative."));
-  Assert(std::abs((dpsi_dv - func::dpsi_dv(t, v, s)).norm()) < tol,
-         ExcMessage("No match for first derivative."));
-  Assert(std::abs(dpsi_ds - func::dpsi_ds(t, v, s)) < tol,
-         ExcMessage("No match for first derivative."));
-  Assert(std::abs((d2psi_dt_dt - func::d2psi_dt_dt(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_dv_dt - func::d2psi_dv_dt(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_ds_dt - func::d2psi_ds_dt(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_dt_dv - func::d2psi_dt_dv(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_dv_dv - func::d2psi_dv_dv(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_ds_dv - func::d2psi_ds_dv(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_dt_ds - func::d2psi_dt_ds(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs((d2psi_dv_ds - func::d2psi_dv_ds(t, v, s)).norm()) < tol,
-         ExcMessage("No match for second derivative."));
-  Assert(std::abs(d2psi_ds_ds - func::d2psi_ds_ds(t, v, s)) < tol,
-         ExcMessage("No match for second derivative."));
-#else
-  (void)psi;
-  (void)dpsi_dt;
-  (void)dpsi_dv;
-  (void)dpsi_ds;
-  (void)d2psi_dt_dt;
-  (void)d2psi_dv_dt;
-  (void)d2psi_dt_dv;
-  (void)d2psi_ds_dt;
-  (void)d2psi_dv_dv;
-  (void)d2psi_ds_dv;
-  (void)d2psi_dt_ds;
-  (void)d2psi_dv_ds;
-  (void)d2psi_ds_ds;
-#endif
+  using func              = CoupledFunction<dim, double>;
+  static const double tol = 1e-12;
+  AssertThrow(std::abs(psi - func::psi(t, v, s)) < tol,
+              ExcMessage("No match for function value."));
+  AssertThrow(std::abs((dpsi_dt - func::dpsi_dt(t, v, s)).norm()) < tol,
+              ExcMessage("No match for first derivative."));
+  AssertThrow(std::abs((dpsi_dv - func::dpsi_dv(t, v, s)).norm()) < tol,
+              ExcMessage("No match for first derivative."));
+  AssertThrow(std::abs(dpsi_ds - func::dpsi_ds(t, v, s)) < tol,
+              ExcMessage("No match for first derivative."));
+  AssertThrow(std::abs((d2psi_dt_dt - func::d2psi_dt_dt(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_dv_dt - func::d2psi_dv_dt(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_ds_dt - func::d2psi_ds_dt(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_dt_dv - func::d2psi_dt_dv(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_dv_dv - func::d2psi_dv_dv(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_ds_dv - func::d2psi_ds_dv(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_dt_ds - func::d2psi_dt_ds(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs((d2psi_dv_ds - func::d2psi_dv_ds(t, v, s)).norm()) < tol,
+              ExcMessage("No match for second derivative."));
+  AssertThrow(std::abs(d2psi_ds_ds - func::d2psi_ds_ds(t, v, s)) < tol,
+              ExcMessage("No match for second derivative."));
+
+  deallog << "OK" << std::endl;
 }
 
 template <int                        dim,
@@ -526,7 +454,7 @@ template <int                        dim,
 void
 run(const unsigned int n_runs)
 {
-  deallog.push("dim " + Utilities::to_string(dim));
+  deallog.push("Dim " + Utilities::to_string(dim));
 
   Tensor<2, dim> t = unit_symmetric_tensor<dim>();
   Tensor<1, dim> v;
@@ -548,4 +476,6 @@ run(const unsigned int n_runs)
                                                opt_flags>(t, v, s);
 
   deallog.pop();
+
+  deallog << "OK" << std::endl;
 }

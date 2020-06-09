@@ -25,34 +25,10 @@
 
 #include "../../tests.h"
 
+#include "utilities.h"
+
 using namespace dealii;
 namespace SD = Differentiation::SD;
-
-template <int dim, typename NumberType>
-Tensor<2, dim, NumberType>
-make_tensor(const NumberType &val)
-{
-  Tensor<2, dim, NumberType> out;
-  for (unsigned int i = 0; i < dim; ++i)
-    out[i][i] = 1.0;
-
-  for (unsigned int i = 0; i < out.n_independent_components; ++i)
-    out[out.unrolled_to_component_indices(i)] += i + val;
-  return out;
-}
-
-template <int dim, typename NumberType>
-SymmetricTensor<2, dim, NumberType>
-make_symm_tensor(const NumberType &val)
-{
-  SymmetricTensor<2, dim, NumberType> out;
-  for (unsigned int i = 0; i < dim; ++i)
-    out[i][i] = 1.0;
-
-  for (unsigned int i = 0; i < out.n_independent_components; ++i)
-    out[out.unrolled_to_component_indices(i)] += i + val;
-  return out;
-}
 
 template <typename NumberType,
           enum SD::OptimizerType     opt_method,
@@ -60,6 +36,9 @@ template <typename NumberType,
 void
 test_scalar(const int n_runs, TimerOutput &timer)
 {
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Scalar" << std::endl;
+
   typedef SD::Expression SD_number_t;
 
   const NumberType  a = NumberType(1.5);
@@ -68,12 +47,12 @@ test_scalar(const int n_runs, TimerOutput &timer)
   timer.enter_subsection("Value calculation");
   const SD_number_t symb_s = a + NumberType(2.0) * std::pow(x, y) +
                              a * y / std::log(x) + std::sin(x * y * y / a);
-  deallog << "symb_s: " << symb_s << std::endl;
+  std::cout << "symb_s: " << symb_s << std::endl;
   timer.leave_subsection("Value calculation");
 
   timer.enter_subsection("Differentiation");
   const SD_number_t symb_ds_dx = SD::differentiate(symb_s, x);
-  deallog << "symb_ds_dx: " << symb_ds_dx << std::endl;
+  std::cout << "symb_ds_dx: " << symb_ds_dx << std::endl;
   timer.leave_subsection("Differentiation");
 
   SD::types::substitution_map sub_vals;
@@ -88,15 +67,16 @@ test_scalar(const int n_runs, TimerOutput &timer)
         const SD_number_t subs_s     = SD::substitute(symb_s, sub_vals);
         const SD_number_t subs_ds_dx = SD::substitute(symb_ds_dx, sub_vals);
         if (i == 0)
-          deallog << "substitute: "
-                  << "  s: " << subs_s << "  ds_dx: " << subs_ds_dx
-                  << std::endl;
+          std::cout << "substitute: "
+                    << "  s: " << subs_s << "  ds_dx: " << subs_ds_dx
+                    << std::endl;
 
         const NumberType val_s     = static_cast<NumberType>(subs_s);
         const NumberType val_ds_dx = static_cast<NumberType>(subs_ds_dx);
         if (i == 0)
-          deallog << "evaluation: "
-                  << "  s: " << val_s << "  ds_dx: " << val_ds_dx << std::endl;
+          std::cout << "evaluation: "
+                    << "  s: " << val_s << "  ds_dx: " << val_ds_dx
+                    << std::endl;
       }
   }
   deallog.pop();
@@ -123,11 +103,29 @@ test_scalar(const int n_runs, TimerOutput &timer)
         const NumberType val_s     = optimizer.evaluate(symb_s);
         const NumberType val_ds_dx = optimizer.evaluate(symb_ds_dx);
         if (i == 0)
-          deallog << "evaluation: "
-                  << "  s: " << val_s << "  ds_dx: " << val_ds_dx << std::endl;
+          std::cout << "evaluation: "
+                    << "  s: " << val_s << "  ds_dx: " << val_ds_dx
+                    << std::endl;
+
+        // The result is not stable and depends on standard library, number
+        // type, optimization parameters and compiler being used. However, we
+        // also don't want to maintain a whole bunch of blesses output
+        // variants. So we set a loose tolerance here.
+        static const double tol = 1e-3;
+        {
+          const NumberType blessed_val_s     = 11.2896853345;
+          const NumberType blessed_val_ds_dx = 2.44062401526;
+
+          AssertThrow(std::abs(val_s - blessed_val_s) < tol,
+                      ExcMessage("No match for function value."));
+          AssertThrow(std::abs(val_ds_dx - blessed_val_ds_dx) < tol,
+                      ExcMessage("No match for first derivative."));
+        }
       }
   }
   deallog.pop();
+
+  deallog << "OK" << std::endl;
 }
 
 template <int dim,
@@ -137,10 +135,13 @@ template <int dim,
 void
 test_tensor(const int n_runs, TimerOutput &timer)
 {
-  namespace SD = Differentiation::SD;
-  typedef SD::Expression                       SD_number_t;
-  typedef Tensor<2, dim, SD_number_t>          SD_tensor_t;
-  typedef SymmetricTensor<2, dim, SD_number_t> SD_symm_tensor_t;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Tensor: Dim: " << dim << std::endl;
+
+  namespace SD           = Differentiation::SD;
+  using SD_number_t      = SD::Expression;
+  using SD_tensor_t      = Tensor<2, dim, SD_number_t>;
+  using SD_symm_tensor_t = SymmetricTensor<2, dim, SD_number_t>;
 
   const NumberType       a = NumberType(1.5);
   const SD_number_t      x("x");
@@ -152,14 +153,14 @@ test_tensor(const int n_runs, TimerOutput &timer)
     a + NumberType(2.0) * std::pow(x, determinant(y)) +
     a * determinant(y) * std::log((z * z) / determinant(y)) +
     std::sin((z * symmetrize(y)) / a);
-  deallog << "symb_s: " << symb_s << std::endl;
+  std::cout << "symb_s: " << symb_s << std::endl;
   timer.leave_subsection("Value calculation");
 
   timer.enter_subsection("Differentiation");
   const SD_number_t      symb_ds_dx = SD::differentiate(symb_s, x);
   const SD_tensor_t      symb_ds_dy = SD::differentiate(symb_s, y);
   const SD_symm_tensor_t symb_ds_dz = SD::differentiate(symb_s, z);
-  deallog << "symb_ds_dy: " << symb_ds_dy << std::endl;
+  std::cout << "symb_ds_dy: " << symb_ds_dy << std::endl;
   timer.leave_subsection("Differentiation");
 
   SD::types::substitution_map sub_vals;
@@ -181,10 +182,10 @@ test_tensor(const int n_runs, TimerOutput &timer)
         const SD_symm_tensor_t subs_ds_dz =
           SD::substitute(symb_ds_dz, sub_vals);
         if (i == 0)
-          deallog << "substitute: "
-                  << "  s: " << subs_s << "  ds_dx: " << subs_ds_dx
-                  << "  ds_dy: " << subs_ds_dy << "  ds_dz: " << subs_ds_dz
-                  << std::endl;
+          std::cout << "substitute: "
+                    << "  s: " << subs_s << "  ds_dx: " << subs_ds_dx
+                    << "  ds_dy: " << subs_ds_dy << "  ds_dz: " << subs_ds_dz
+                    << std::endl;
 
         const NumberType val_s     = static_cast<NumberType>(subs_s);
         const NumberType val_ds_dx = static_cast<NumberType>(subs_ds_dx);
@@ -193,10 +194,41 @@ test_tensor(const int n_runs, TimerOutput &timer)
         const SymmetricTensor<2, dim, NumberType> val_ds_dz =
           static_cast<SymmetricTensor<2, dim, NumberType>>(subs_ds_dz);
         if (i == 0)
-          deallog << "evaluation: "
-                  << "  s: " << val_s << "  ds_dx: " << val_ds_dx
-                  << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
-                  << std::endl;
+          std::cout << "evaluation: "
+                    << "  s: " << val_s << "  ds_dx: " << val_ds_dx
+                    << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
+                    << std::endl;
+
+        // The result is not stable and depends on standard library, number
+        // type, optimization parameters and compiler being used. However, we
+        // also don't want to maintain a whole bunch of blesses output
+        // variants. So we set a loose tolerance here.
+        static const double tol = 1e-3;
+        if (dim == 2)
+          {
+            const NumberType                 blessed_val_s     = 733.145160811;
+            const NumberType                 blessed_val_ds_dx = 1803.37488238;
+            const Tensor<2, dim, NumberType> blessed_val_ds_dy(
+              {{4021.22068318, -2721.50003932},
+               {-2073.13387957, 2076.40954282}});
+            const SymmetricTensor<2, dim, NumberType> blessed_val_ds_dz =
+              symmetrize(
+                Tensor<2, dim, NumberType>({{1.67425190103, 1.97851016739},
+                                            {1.97851016739, 2.69685737073}}));
+
+            AssertThrow(std::abs(val_s - blessed_val_s) < tol,
+                        ExcMessage("No match for function value."));
+            AssertThrow(std::abs(val_ds_dx - blessed_val_ds_dx) < tol,
+                        ExcMessage("No match for first derivative."));
+            AssertThrow((val_ds_dy - blessed_val_ds_dy).norm() < tol,
+                        ExcMessage("No match for first derivative."));
+            AssertThrow((val_ds_dz - blessed_val_ds_dz).norm() < tol,
+                        ExcMessage("No match for first derivative."));
+          }
+        else
+          {
+            AssertThrow(false, ExcNotImplemented());
+          }
       }
   }
   deallog.pop();
@@ -234,13 +266,15 @@ test_tensor(const int n_runs, TimerOutput &timer)
           optimizer.evaluate(symb_ds_dz);
 
         if (i == 0)
-          deallog << "evaluation: "
-                  << "  s: " << val_s << "  ds_dx: " << val_ds_dx
-                  << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
-                  << std::endl;
+          std::cout << "evaluation: "
+                    << "  s: " << val_s << "  ds_dx: " << val_ds_dx
+                    << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
+                    << std::endl;
       }
   }
   deallog.pop();
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -252,7 +286,7 @@ run_tests(const int n_runs)
 {
   // Show the difference between a SymEngine "value" and
   // an evaluated, floating point number
-  // deallog << std::setprecision(3);
+  // deallog << std::setprecision(12);
 
   deallog.push("Scalar");
   {
