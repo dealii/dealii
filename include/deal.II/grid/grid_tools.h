@@ -1280,19 +1280,48 @@ namespace GridTools
     const std::vector<bool> &marked_vertices = {});
 
   /**
-   * A variant of the previous find_active_cell_around_point() function that,
-   * instead of returning only the first matching cell, identifies all cells
+   * As compared to the functions above, this function identifies all cells
    * around a point for a given tolerance level `tolerance` in terms of unit
-   * coordinates. More precisely, whenever the point returned by
-   * find_active_cell_around_point() is within the given tolerance from the
-   * surface of the unit cell, all corresponding neighbors are also
-   * identified, including the location of the point in unit coordinates on
-   * any of these cells.
+   * coordinates. Given a first cell with reference coordinates as parameter
+   * @p first_cell, e.g. obtained by one of the functions above, all
+   * corresponding neighboring cells with points in unit coordinates are also
+   * identified.
    *
    * This function is useful e.g. for discontinuous function spaces where, for
-   * the case the given point `p` coincides with a vertex or an edge, several
+   * the case the given point `p` lies on a vertex, edge or face, several
    * cells might hold independent values of the solution that get combined in
    * some way in a user code.
+   *
+   * This function is used as follows
+   * @code
+   *   auto first_cell = GridTools::find_active_cell_around_point(...);
+   *   auto all_cells = GridTools::find_all_active_cells_around_point(mapping,
+   * mesh, p, tolerance, first_cell);
+   * @endcode
+   */
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#  ifndef _MSC_VER
+  std::vector<std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                        Point<dim>>>
+#  else
+  std::vector<std::pair<
+    typename dealii::internal::
+      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
+    Point<dim>>>
+#  endif
+  find_all_active_cells_around_point(
+    const Mapping<dim, spacedim> & mapping,
+    const MeshType<dim, spacedim> &mesh,
+    const Point<spacedim> &        p,
+    const double                   tolerance,
+    const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                    Point<dim>> &  first_cell);
+
+  /**
+   * A variant of the previous function that internally calls one of the
+   * functions find_active_cell_around_point() to obtain a first cell, and
+   * subsequently adds all other cells by calling the function
+   * find_all_active_cells_around_point() above.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER

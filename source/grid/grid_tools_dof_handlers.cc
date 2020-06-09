@@ -594,133 +594,156 @@ namespace GridTools
                                      const double                   tolerance,
                                      const std::vector<bool> &marked_vertices)
   {
-    // first use the result of the single point function as a guess. In order
-    // not to make the other find_all_active_cells_around_point more expensive
-    // and avoid some additional logic there, we first start with one cell as
-    // given by that other function (that possibly goes through a larger set
-    // of cells) and later add a list of more cells as appropriate.
-    std::vector<
-      std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
-                Point<dim>>>
-      cells_and_points;
     try
       {
-        cells_and_points.push_back(find_active_cell_around_point_tolerance(
-          mapping, mesh, p, marked_vertices, tolerance));
+        const auto cell_and_point = find_active_cell_around_point_tolerance(
+          mapping, mesh, p, marked_vertices, tolerance);
+
+        return find_all_active_cells_around_point(
+          mapping, mesh, p, tolerance, cell_and_point);
       }
     catch (ExcPointNotFound<spacedim> &)
       {}
 
-    if (!cells_and_points.empty())
+    return {};
+  }
+
+
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  std::vector<std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                        Point<dim>>>
+#else
+  std::vector<std::pair<
+    typename dealii::internal::
+      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
+    Point<dim>>>
+#endif
+  find_all_active_cells_around_point(
+    const Mapping<dim, spacedim> & mapping,
+    const MeshType<dim, spacedim> &mesh,
+    const Point<spacedim> &        p,
+    const double                   tolerance,
+    const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                    Point<dim>> &  first_cell)
+  {
+    std::vector<
+      std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                Point<dim>>>
+      cells_and_points;
+
+    // insert the fist cell and point into the vector
+    cells_and_points.push_back(first_cell);
+
+    // check if the given point is on the surface of the unit cell. if yes,
+    // need to find all neighbors
+    const Point<dim> unit_point = cells_and_points.front().second;
+    const auto       my_cell    = cells_and_points.front().first;
+    Tensor<1, dim>   distance_to_center;
+    unsigned int     n_dirs_at_threshold     = 0;
+    unsigned int     last_point_at_threshold = numbers::invalid_unsigned_int;
+    for (unsigned int d = 0; d < dim; ++d)
       {
-        // check if the given point is on the surface of the unit cell. if yes,
-        // need to find all neighbors
-        const Point<dim> unit_point = cells_and_points.front().second;
-        const auto       my_cell    = cells_and_points.front().first;
-        Tensor<1, dim>   distance_to_center;
-        unsigned int     n_dirs_at_threshold = 0;
-        unsigned int last_point_at_threshold = numbers::invalid_unsigned_int;
-        for (unsigned int d = 0; d < dim; ++d)
+        distance_to_center[d] = std::abs(unit_point[d] - 0.5);
+        if (distance_to_center[d] > 0.5 - tolerance)
           {
-            distance_to_center[d] = std::abs(unit_point[d] - 0.5);
-            if (distance_to_center[d] > 0.5 - tolerance)
-              {
-                ++n_dirs_at_threshold;
-                last_point_at_threshold = d;
-              }
-          }
-
-        std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
-          cells_to_add;
-        // point is within face -> only need neighbor
-        if (n_dirs_at_threshold == 1)
-          {
-            unsigned int neighbor_index =
-              2 * last_point_at_threshold +
-              (unit_point[last_point_at_threshold] > 0.5 ? 1 : 0);
-            if (!my_cell->at_boundary(neighbor_index))
-              cells_to_add.push_back(my_cell->neighbor(neighbor_index));
-          }
-        // corner point -> use all neighbors
-        else if (n_dirs_at_threshold == dim)
-          {
-            unsigned int local_vertex_index = 0;
-            for (unsigned int d = 0; d < dim; ++d)
-              local_vertex_index += (unit_point[d] > 0.5 ? 1 : 0) << d;
-            std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
-              cells = find_cells_adjacent_to_vertex(
-                mesh, my_cell->vertex_index(local_vertex_index));
-            for (const auto &cell : cells)
-              if (cell != my_cell)
-                cells_to_add.push_back(cell);
-          }
-        // point on line in 3D: We cannot simply take the intersection between
-        // the two vertices of cels because of hanging nodes. So instead we
-        // list the vertices around both points and then select the
-        // appropriate cells according to the result of read_to_unit_cell
-        // below.
-        else if (n_dirs_at_threshold == 2)
-          {
-            std::pair<unsigned int, unsigned int> vertex_indices[3];
-            unsigned int                          count_vertex_indices = 0;
-            unsigned int free_direction = numbers::invalid_unsigned_int;
-            for (unsigned int d = 0; d < dim; ++d)
-              {
-                if (distance_to_center[d] > 0.5 - tolerance)
-                  {
-                    vertex_indices[count_vertex_indices].first = d;
-                    vertex_indices[count_vertex_indices].second =
-                      unit_point[d] > 0.5 ? 1 : 0;
-                    count_vertex_indices++;
-                  }
-                else
-                  free_direction = d;
-              }
-
-            AssertDimension(count_vertex_indices, 2);
-            Assert(free_direction != numbers::invalid_unsigned_int,
-                   ExcInternalError());
-
-            const unsigned int first_vertex =
-              (vertex_indices[0].second << vertex_indices[0].first) +
-              (vertex_indices[1].second << vertex_indices[1].first);
-            for (unsigned int d = 0; d < 2; ++d)
-              {
-                auto tentative_cells = find_cells_adjacent_to_vertex(
-                  mesh,
-                  my_cell->vertex_index(first_vertex + (d << free_direction)));
-                for (const auto &cell : tentative_cells)
-                  {
-                    bool cell_not_yet_present = true;
-                    for (const auto &other_cell : cells_to_add)
-                      if (cell == other_cell)
-                        {
-                          cell_not_yet_present = false;
-                          break;
-                        }
-                    if (cell_not_yet_present)
-                      cells_to_add.push_back(cell);
-                  }
-              }
-          }
-
-        const double original_distance_to_unit_cell =
-          GeometryInfo<dim>::distance_to_unit_cell(unit_point);
-        for (const auto &cell : cells_to_add)
-          {
-            if (cell != my_cell)
-              try
-                {
-                  const Point<dim> p_unit =
-                    mapping.transform_real_to_unit_cell(cell, p);
-                  if (GeometryInfo<dim>::distance_to_unit_cell(p_unit) <
-                      original_distance_to_unit_cell + tolerance)
-                    cells_and_points.emplace_back(cell, p_unit);
-                }
-              catch (typename Mapping<dim>::ExcTransformationFailed &)
-                {}
+            ++n_dirs_at_threshold;
+            last_point_at_threshold = d;
           }
       }
+
+    std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
+      cells_to_add;
+    // point is within face -> only need neighbor
+    if (n_dirs_at_threshold == 1)
+      {
+        unsigned int neighbor_index =
+          2 * last_point_at_threshold +
+          (unit_point[last_point_at_threshold] > 0.5 ? 1 : 0);
+        if (!my_cell->at_boundary(neighbor_index))
+          cells_to_add.push_back(my_cell->neighbor(neighbor_index));
+      }
+    // corner point -> use all neighbors
+    else if (n_dirs_at_threshold == dim)
+      {
+        unsigned int local_vertex_index = 0;
+        for (unsigned int d = 0; d < dim; ++d)
+          local_vertex_index += (unit_point[d] > 0.5 ? 1 : 0) << d;
+        std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
+          cells = find_cells_adjacent_to_vertex(
+            mesh, my_cell->vertex_index(local_vertex_index));
+        for (const auto &cell : cells)
+          if (cell != my_cell)
+            cells_to_add.push_back(cell);
+      }
+    // point on line in 3D: We cannot simply take the intersection between
+    // the two vertices of cells because of hanging nodes. So instead we
+    // list the vertices around both points and then select the
+    // appropriate cells according to the result of read_to_unit_cell
+    // below.
+    else if (n_dirs_at_threshold == 2)
+      {
+        std::pair<unsigned int, unsigned int> vertex_indices[3];
+        unsigned int                          count_vertex_indices = 0;
+        unsigned int free_direction = numbers::invalid_unsigned_int;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            if (distance_to_center[d] > 0.5 - tolerance)
+              {
+                vertex_indices[count_vertex_indices].first = d;
+                vertex_indices[count_vertex_indices].second =
+                  unit_point[d] > 0.5 ? 1 : 0;
+                count_vertex_indices++;
+              }
+            else
+              free_direction = d;
+          }
+
+        AssertDimension(count_vertex_indices, 2);
+        Assert(free_direction != numbers::invalid_unsigned_int,
+               ExcInternalError());
+
+        const unsigned int first_vertex =
+          (vertex_indices[0].second << vertex_indices[0].first) +
+          (vertex_indices[1].second << vertex_indices[1].first);
+        for (unsigned int d = 0; d < 2; ++d)
+          {
+            auto tentative_cells = find_cells_adjacent_to_vertex(
+              mesh,
+              my_cell->vertex_index(first_vertex + (d << free_direction)));
+            for (const auto &cell : tentative_cells)
+              {
+                bool cell_not_yet_present = true;
+                for (const auto &other_cell : cells_to_add)
+                  if (cell == other_cell)
+                    {
+                      cell_not_yet_present = false;
+                      break;
+                    }
+                if (cell_not_yet_present)
+                  cells_to_add.push_back(cell);
+              }
+          }
+      }
+
+    const double original_distance_to_unit_cell =
+      GeometryInfo<dim>::distance_to_unit_cell(unit_point);
+    for (const auto &cell : cells_to_add)
+      {
+        if (cell != my_cell)
+          try
+            {
+              const Point<dim> p_unit =
+                mapping.transform_real_to_unit_cell(cell, p);
+              if (GeometryInfo<dim>::distance_to_unit_cell(p_unit) <
+                  original_distance_to_unit_cell + tolerance)
+                cells_and_points.emplace_back(cell, p_unit);
+            }
+          catch (typename Mapping<dim>::ExcTransformationFailed &)
+            {}
+      }
+
     std::sort(
       cells_and_points.begin(),
       cells_and_points.end(),
