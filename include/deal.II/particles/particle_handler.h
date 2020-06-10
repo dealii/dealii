@@ -557,6 +557,12 @@ namespace Particles
      * After this function call every particle is either on its current
      * process and in its current cell, or deleted (if it could not find
      * its new process or cell).
+     *
+     * The user may attach a function to the signal
+     * Particles::ParticleHandler::Signals::particle_lost(). The signal is
+     * triggered whenever a particle is deleted, and the connected functions
+     * are called passing an iterator to the particle in question, and its last
+     * known cell association.
      */
     void
     sort_particles_into_subdomains_and_cells();
