@@ -3570,151 +3570,6 @@ namespace internal
 
       namespace
       {
-        template <int dim, int spacedim>
-        void
-        get_mg_dofindices_recursively(
-          const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-            &tria,
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &                                           dealii_cell,
-          const typename CellId::binary_type &          quadrant,
-          std::vector<dealii::types::global_dof_index> &dof_numbers_and_indices)
-        {
-          if (dealii_cell->id() == CellId(quadrant))
-            {
-              // why would somebody request a cell that is not ours?
-              Assert(dealii_cell->level_subdomain_id() ==
-                       tria.locally_owned_subdomain(),
-                     ExcInternalError());
-
-              std::vector<dealii::types::global_dof_index> local_dof_indices(
-                dealii_cell->get_fe().dofs_per_cell);
-              dealii_cell->get_mg_dof_indices(local_dof_indices);
-
-              dof_numbers_and_indices.push_back(
-                dealii_cell->get_fe().dofs_per_cell);
-              dof_numbers_and_indices.insert(dof_numbers_and_indices.end(),
-                                             local_dof_indices.begin(),
-                                             local_dof_indices.end());
-              return; // we are done
-            }
-
-          if (dealii_cell->is_active())
-            return;
-
-          if (!dealii_cell->id().is_ancestor_of(CellId(quadrant)))
-            return;
-
-          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-               ++c)
-            get_mg_dofindices_recursively<dim, spacedim>(
-              tria, dealii_cell->child(c), quadrant, dof_numbers_and_indices);
-        }
-
-
-
-        template <int dim, int spacedim>
-        void
-        find_marked_mg_ghost_cells_recursively(
-          const typename dealii::parallel::
-            DistributedTriangulationBase<dim, spacedim> &tria,
-          const unsigned int                             tree_index,
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &dealii_cell,
-          std::map<
-            dealii::types::subdomain_id,
-            std::vector<std::pair<unsigned int, typename CellId::binary_type>>>
-            &neighbor_cell_list)
-        {
-          // recurse...
-          if (dealii_cell->has_children())
-            {
-              for (unsigned int c = 0;
-                   c < GeometryInfo<dim>::max_children_per_cell;
-                   ++c)
-                find_marked_mg_ghost_cells_recursively<dim, spacedim>(
-                  tria, tree_index, dealii_cell->child(c), neighbor_cell_list);
-            }
-
-          if (dealii_cell->user_flag_set() &&
-              dealii_cell->level_subdomain_id() !=
-                tria.locally_owned_subdomain())
-            {
-              neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .emplace_back(tree_index,
-                              dealii_cell->id().template to_binary<spacedim>());
-            }
-        }
-
-
-
-        template <int dim, int spacedim>
-        void
-        set_mg_dofindices_recursively(
-          const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-            &tria,
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &                                 dealii_cell,
-          const typename CellId::binary_type &quadrant,
-          dealii::types::global_dof_index *   dofs)
-        {
-          if (dealii_cell->id() == CellId(quadrant))
-            {
-              Assert(dealii_cell->level_subdomain_id() !=
-                       dealii::numbers::artificial_subdomain_id,
-                     ExcInternalError());
-
-              // update dof indices of cell
-              std::vector<dealii::types::global_dof_index> dof_indices(
-                dealii_cell->get_fe().dofs_per_cell);
-              dealii_cell->get_mg_dof_indices(dof_indices);
-
-              bool complete = true;
-              for (unsigned int i = 0; i < dof_indices.size(); ++i)
-                if (dofs[i] != numbers::invalid_dof_index)
-                  {
-                    Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                             (dof_indices[i] == dofs[i]),
-                           ExcInternalError());
-                    dof_indices[i] = dofs[i];
-                  }
-                else
-                  complete = false;
-
-              if (!complete)
-                const_cast<
-                  typename DoFHandler<dim, spacedim>::level_cell_iterator &>(
-                  dealii_cell)
-                  ->set_user_flag();
-              else
-                const_cast<
-                  typename DoFHandler<dim, spacedim>::level_cell_iterator &>(
-                  dealii_cell)
-                  ->clear_user_flag();
-
-              const_cast<
-                typename DoFHandler<dim, spacedim>::level_cell_iterator &>(
-                dealii_cell)
-                ->set_mg_dof_indices(dof_indices);
-              return;
-            }
-
-          if (dealii_cell->is_active())
-            return;
-
-          if (!dealii_cell->id().is_ancestor_of(CellId(quadrant)))
-            return;
-
-          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-               ++c)
-            set_mg_dofindices_recursively<dim, spacedim>(tria,
-                                                         dealii_cell->child(c),
-                                                         quadrant,
-                                                         dofs);
-        }
-
-
-
         template <int dim, int spacedim, class DoFHandlerType>
         void
         communicate_mg_ghost_cells(
@@ -3722,208 +3577,60 @@ namespace internal
             DistributedTriangulationBase<dim, spacedim> &tria,
           DoFHandlerType &                               dof_handler)
         {
-          using QuadrantBufferType =
-            std::vector<std::pair<unsigned int, typename CellId::binary_type>>;
-          // build list of cells to request for each neighbor
-          std::set<dealii::types::subdomain_id> level_ghost_owners =
-            tria.level_ghost_owners();
-          std::map<dealii::types::subdomain_id, QuadrantBufferType>
-            neighbor_cell_list;
-          for (const auto level_ghost_owner : level_ghost_owners)
-            neighbor_cell_list[level_ghost_owner] = {};
+          const auto pack = [&](const auto &cell) {
+            // why would somebody request a cell that is not ours?
+            Assert(cell->level_subdomain_id() == tria.locally_owned_subdomain(),
+                   ExcInternalError());
 
-          for (typename DoFHandlerType::level_cell_iterator cell =
-                 dof_handler.begin(0);
-               cell != dof_handler.end(0);
-               ++cell)
-            {
-              types::coarse_cell_id coarse_cell_id = 0;
-              try
+            std::vector<dealii::types::global_dof_index> data(
+              cell->get_fe().dofs_per_cell);
+            cell->get_mg_dof_indices(data);
+
+            return data;
+          };
+
+          const auto unpack = [](const auto &cell, const auto &dofs) {
+            Assert(cell->get_fe().dofs_per_cell == dofs.size(),
+                   ExcInternalError());
+
+            Assert(cell->level_subdomain_id() !=
+                     dealii::numbers::artificial_subdomain_id,
+                   ExcInternalError());
+
+            std::vector<dealii::types::global_dof_index> dof_indices(
+              cell->get_fe().dofs_per_cell);
+            cell->get_mg_dof_indices(dof_indices);
+
+            bool complete = true;
+            for (unsigned int i = 0; i < dof_indices.size(); ++i)
+              if (dofs[i] != numbers::invalid_dof_index)
                 {
-                  coarse_cell_id = cell->id().get_coarse_cell_id();
-                }
-              catch (...)
-                {
-                  // In the case of parallel::fullydistributed::Triangulation,
-                  // a dummy cell throws an exception which is caught here.
-                  // We ignore this cell here.
-                  continue;
-                };
-
-              find_marked_mg_ghost_cells_recursively<dim, spacedim>(
-                tria, coarse_cell_id, cell, neighbor_cell_list);
-            }
-          Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
-                 ExcInternalError());
-
-
-          // Before sending & receiving, make sure we protect this section with
-          // a mutex:
-          static Utilities::MPI::CollectiveMutex      mutex;
-          Utilities::MPI::CollectiveMutex::ScopedLock lock(
-            mutex, tria.get_communicator());
-
-          const int mpi_tag = Utilities::MPI::internal::Tags::
-            dofhandler_communicate_mg_ghost_cells;
-          const int mpi_tag_reply = Utilities::MPI::internal::Tags::
-            dofhandler_communicate_mg_ghost_cells_reply;
-
-          //* send our requests:
-          std::vector<MPI_Request> requests(level_ghost_owners.size());
-          {
-            unsigned int idx = 0;
-            for (const auto &it : neighbor_cell_list)
-              {
-                // send the data about the relevant cells
-                const int ierr =
-                  MPI_Isend(it.second.data(),
-                            it.second.size() * sizeof(it.second[0]),
-                            MPI_BYTE,
-                            it.first,
-                            mpi_tag,
-                            tria.get_communicator(),
-                            &requests[idx]);
-                AssertThrowMPI(ierr);
-                ++idx;
-              }
-          }
-
-          //* receive requests and reply with the ghost indices
-          std::vector<QuadrantBufferType> quadrant_data_to_send(
-            level_ghost_owners.size());
-          std::vector<std::vector<types::global_dof_index>>
-                                   send_dof_numbers_and_indices(level_ghost_owners.size());
-          std::vector<MPI_Request> reply_requests(level_ghost_owners.size());
-
-          for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
-            {
-              MPI_Status status;
-              int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                                   mpi_tag,
-                                   tria.get_communicator(),
-                                   &status);
-              AssertThrowMPI(ierr);
-
-              int len;
-              ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-              AssertThrowMPI(ierr);
-              Assert(len % sizeof(quadrant_data_to_send[idx][0]) == 0,
-                     ExcInternalError());
-
-              const unsigned int n_cells =
-                len / sizeof(quadrant_data_to_send[idx][0]);
-              quadrant_data_to_send[idx].resize(n_cells);
-
-              ierr = MPI_Recv(quadrant_data_to_send[idx].data(),
-                              len,
-                              MPI_BYTE,
-                              status.MPI_SOURCE,
-                              status.MPI_TAG,
-                              tria.get_communicator(),
-                              &status);
-              AssertThrowMPI(ierr);
-
-              // store the dof indices for each cell
-              for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells);
-                   ++c)
-                {
-                  const auto temp =
-                    CellId(quadrant_data_to_send[idx][c].first, 0, nullptr)
-                      .to_cell(tria);
-
-                  typename DoFHandlerType::level_cell_iterator cell(
-                    &dof_handler.get_triangulation(),
-                    0,
-                    temp->index(),
-                    &dof_handler);
-
-                  get_mg_dofindices_recursively<dim, spacedim>(
-                    tria,
-                    cell,
-                    quadrant_data_to_send[idx][c].second,
-                    send_dof_numbers_and_indices[idx]);
-                }
-
-              // send reply
-              ierr = MPI_Isend(send_dof_numbers_and_indices[idx].data(),
-                               send_dof_numbers_and_indices[idx].size(),
-                               DEAL_II_DOF_INDEX_MPI_TYPE,
-                               status.MPI_SOURCE,
-                               mpi_tag_reply,
-                               tria.get_communicator(),
-                               &reply_requests[idx]);
-              AssertThrowMPI(ierr);
-            }
-
-          //* finally receive the replies
-          for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
-            {
-              MPI_Status status;
-              int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                                   mpi_tag_reply,
-                                   tria.get_communicator(),
-                                   &status);
-              AssertThrowMPI(ierr);
-              int len;
-              ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
-              const QuadrantBufferType &quadrants =
-                neighbor_cell_list[status.MPI_SOURCE];
-              AssertThrowMPI(ierr);
-              Assert((len > 0 && !quadrants.empty()) ||
-                       (len == 0 && quadrants.empty()),
-                     ExcInternalError());
-              std::vector<types::global_dof_index>
-                receive_dof_numbers_and_indices(len);
-
-              ierr = MPI_Recv(receive_dof_numbers_and_indices.data(),
-                              len,
-                              DEAL_II_DOF_INDEX_MPI_TYPE,
-                              status.MPI_SOURCE,
-                              status.MPI_TAG,
-                              tria.get_communicator(),
-                              &status);
-              AssertThrowMPI(ierr);
-
-              // set the dof indices for each cell
-              dealii::types::global_dof_index *dofs =
-                receive_dof_numbers_and_indices.data();
-              for (const auto &it : quadrants)
-                {
-                  const auto temp = CellId(it.first, 0, nullptr).to_cell(tria);
-
-                  typename DoFHandlerType::level_cell_iterator cell(
-                    &tria, 0, temp->index(), &dof_handler);
-
-                  Assert(cell->get_fe().dofs_per_cell == dofs[0],
+                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
+                           (dof_indices[i] == dofs[i]),
                          ExcInternalError());
-
-                  set_mg_dofindices_recursively<dim, spacedim>(tria,
-                                                               cell,
-                                                               it.second,
-                                                               dofs + 1);
-                  dofs += 1 + dofs[0];
+                  dof_indices[i] = dofs[i];
                 }
-              Assert(dofs == receive_dof_numbers_and_indices.data() +
-                               receive_dof_numbers_and_indices.size(),
-                     ExcInternalError());
-            }
+              else
+                complete = false;
 
-          // complete all sends, so that we can safely destroy the
-          // buffers.
-          if (requests.size() > 0)
-            {
-              const int ierr = MPI_Waitall(requests.size(),
-                                           requests.data(),
-                                           MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-            }
-          if (reply_requests.size() > 0)
-            {
-              const int ierr = MPI_Waitall(reply_requests.size(),
-                                           reply_requests.data(),
-                                           MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-            }
+            if (!complete)
+              const_cast<typename DoFHandlerType::level_cell_iterator &>(cell)
+                ->set_user_flag();
+            else
+              const_cast<typename DoFHandlerType::level_cell_iterator &>(cell)
+                ->clear_user_flag();
+
+            const_cast<typename DoFHandlerType::level_cell_iterator &>(cell)
+              ->set_mg_dof_indices(dof_indices);
+          };
+
+          const auto filter = [](const auto &cell) {
+            return cell->user_flag_set();
+          };
+
+          GridTools::exchange_cell_data_to_level_ghosts<
+            std::vector<types::global_dof_index>,
+            DoFHandlerType>(dof_handler, pack, unpack, filter);
         }
 
 
