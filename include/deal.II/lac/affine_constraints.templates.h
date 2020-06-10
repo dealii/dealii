@@ -2727,11 +2727,12 @@ namespace internal
 
 
     /**
-     * Scratch data that is used during calls to distribute_local_to_global and
+     * This class is an accessor class to scratch data that is used
+     * during calls to distribute_local_to_global and
      * add_entries_local_to_global. In order to avoid frequent memory
-     * allocation, we keep the data alive from one call to the next in a static
-     * variable. Since we want to allow for different number types in matrices,
-     * this is a template.
+     * allocation, we keep the data alive from one call to the next in
+     * a static variable. Since we want to allow for different number
+     * types in matrices, this is a template.
      *
      * Since each thread gets its private version of scratch data out of the
      * ThreadLocalStorage, no conflicting access can occur. For this to be
@@ -2739,63 +2740,52 @@ namespace internal
      * distribute_local_to_global is made that by itself can spawn tasks.
      * Otherwise, we might end up in a situation where several threads fight for
      * the data.
-     *
-     * Access to the scratch data is only through the accessor class which
-     * handles the access as well as marking the data as used.
      */
     template <typename number>
-    class AffineConstraintsData
+    class ScratchDataAccessor
     {
     public:
       /**
-       * Accessor class to guard access to scratch_data
+       * Constructor. Takes the scratch data object for the current
+       * thread out of the provided object and marks it as used.
        */
-      class ScratchDataAccessor
+      ScratchDataAccessor(
+        Threads::ThreadLocalStorage<ScratchData<number>> &tls_scratch_data)
+        : my_scratch_data(&tls_scratch_data.get())
       {
-      public:
-        /**
-         * Constructor. Takes the scratch data object for the current
-         * thread out of the provided object and marks it as used.
-         */
-        ScratchDataAccessor(
-          Threads::ThreadLocalStorage<ScratchData<number>> &tls_scratch_data)
-          : my_scratch_data(&tls_scratch_data.get())
-        {
-          Assert(
-            my_scratch_data->in_use == false,
-            ExcMessage(
-              "Access to thread-local scratch data tried, but it is already "
-              "in use"));
-          my_scratch_data->in_use = true;
-        }
+        Assert(my_scratch_data->in_use == false,
+               ExcMessage(
+                 "Access to thread-local scratch data tried, but it is already "
+                 "in use"));
+        my_scratch_data->in_use = true;
+      }
 
-        /**
-         * Destructor. Mark scratch data as available again.
-         */
-        ~ScratchDataAccessor()
-        {
-          my_scratch_data->in_use = false;
-        }
+      /**
+       * Destructor. Mark scratch data as available again.
+       */
+      ~ScratchDataAccessor()
+      {
+        my_scratch_data->in_use = false;
+      }
 
-        /**
-         * Dereferencing operator.
-         */
-        ScratchData<number> &operator*()
-        {
-          return *my_scratch_data;
-        }
+      /**
+       * Dereferencing operator.
+       */
+      ScratchData<number> &operator*()
+      {
+        return *my_scratch_data;
+      }
 
-        /**
-         * Dereferencing operator.
-         */
-        ScratchData<number> *operator->()
-        {
-          return my_scratch_data;
-        }
+      /**
+       * Dereferencing operator.
+       */
+      ScratchData<number> *operator->()
+      {
+        return my_scratch_data;
+      }
 
-      private:
-        ScratchData<number> *my_scratch_data;
-      };
+    private:
+      ScratchData<number> *my_scratch_data;
     };
 
 
@@ -3555,8 +3545,8 @@ AffineConstraints<number>::distribute_local_to_global(
 
   const size_type n_local_dofs = local_dof_indices.size();
 
-  typename internal::AffineConstraints::AffineConstraintsData<
-    number>::ScratchDataAccessor scratch_data(this->scratch_data);
+  typename internal::AffineConstraints::ScratchDataAccessor<number>
+    scratch_data(this->scratch_data);
 
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows =
     scratch_data->global_rows;
@@ -3706,8 +3696,8 @@ AffineConstraints<number>::distribute_local_to_global(
     }
   Assert(sorted == true, ExcMatrixNotClosed());
 
-  typename internal::AffineConstraints::AffineConstraintsData<
-    number>::ScratchDataAccessor scratch_data(this->scratch_data);
+  typename internal::AffineConstraints::ScratchDataAccessor<number>
+    scratch_data(this->scratch_data);
 
   const size_type n_local_dofs = local_dof_indices.size();
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows =
@@ -3842,8 +3832,8 @@ AffineConstraints<number>::distribute_local_to_global(
   const size_type n_local_row_dofs = row_indices.size();
   const size_type n_local_col_dofs = col_indices.size();
 
-  typename internal::AffineConstraints::AffineConstraintsData<
-    typename MatrixType::value_type>::ScratchDataAccessor
+  typename internal::AffineConstraints::ScratchDataAccessor<
+    typename MatrixType::value_type>
     scratch_data(this->scratch_data);
 
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows =
@@ -3903,8 +3893,8 @@ AffineConstraints<number>::add_entries_local_to_global(
          ExcNotQuadratic());
 
   const size_type n_local_dofs = local_dof_indices.size();
-  typename internal::AffineConstraints::AffineConstraintsData<
-    number>::ScratchDataAccessor scratch_data(this->scratch_data);
+  typename internal::AffineConstraints::ScratchDataAccessor<number>
+    scratch_data(this->scratch_data);
 
   const bool dof_mask_is_active = (dof_mask.n_rows() == n_local_dofs);
   if (dof_mask_is_active == true)
@@ -4059,8 +4049,8 @@ AffineConstraints<number>::add_entries_local_to_global(
   const size_type n_local_dofs = local_dof_indices.size();
   const size_type num_blocks   = sparsity_pattern.n_block_rows();
 
-  typename internal::AffineConstraints::AffineConstraintsData<
-    number>::ScratchDataAccessor scratch_data(this->scratch_data);
+  typename internal::AffineConstraints::ScratchDataAccessor<number>
+    scratch_data(this->scratch_data);
 
   const bool dof_mask_is_active = (dof_mask.n_rows() == n_local_dofs);
   if (dof_mask_is_active == true)
