@@ -56,7 +56,8 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
       deallog << "  index " << idx << " global_dof_index:" << v << ":\n";
 
       const auto pair = fiv.interface_dof_to_dof_indices(idx);
-      deallog << "    dof indices: " << pair[0] << " | " << pair[1] << "\n";
+      deallog << "    dof indices: " << static_cast<int>(pair[0]) << " | "
+              << static_cast<int>(pair[1]) << "\n";
 
       ++idx;
     }
@@ -65,13 +66,7 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
   deallog << std::endl;
 }
 
-
-template <int dim>
-void
-make_2_cells(Triangulation<dim> &tria);
-
-template <>
-void make_2_cells<2>(Triangulation<2> &tria)
+void make_2_cells(Triangulation<2> &tria)
 {
   const unsigned int        dim         = 2;
   std::vector<unsigned int> repetitions = {2, 1};
@@ -81,8 +76,7 @@ void make_2_cells<2>(Triangulation<2> &tria)
   GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
 }
 
-template <>
-void make_2_cells<3>(Triangulation<3> &tria)
+void make_2_cells(Triangulation<3> &tria)
 {
   const unsigned int        dim         = 3;
   std::vector<unsigned int> repetitions = {2, 1, 1};
