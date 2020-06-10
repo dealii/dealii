@@ -707,7 +707,7 @@ namespace Step57
   //
   // This function will provide us with an initial guess by using a
   // continuation method as we discussed in the introduction. The Reynolds
-  // number is increased \step-by-step until we reach the target value. By
+  // number is increased step-by-step until we reach the target value. By
   // experiment, the solution to Stokes is good enough to be the initial guess
   // of NSE with Reynolds number 1000 so we start there.  To make sure the
   // solution from previous problem is close enough to the next one, the step

@@ -217,7 +217,7 @@ inconvenience this causes.
 
   <li> <p>
        New: If there are references to other example programs in any of the
-       \step-XX programs, then they will now show up as crosslinks in the HTML
+       step-XX programs, then they will now show up as crosslinks in the HTML
        version for simpler navigation of the tutorial.
        <br>
        (WB, 2005/04/04)
