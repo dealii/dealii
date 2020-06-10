@@ -39,7 +39,7 @@ jobs:
     - name: test library
       shell: bash
       run: |
-        cmake --build build  --target test -- -m
+        cmake --build build  --target test -- -m:1
     - name: archive library
       uses: actions/upload-artifact@v1
       with:
