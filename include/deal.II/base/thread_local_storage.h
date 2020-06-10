@@ -285,7 +285,7 @@ namespace Threads
 
   template <typename T>
   ThreadLocalStorage<T>::ThreadLocalStorage(ThreadLocalStorage<T> &&t) noexcept
-    : exemplar(t.exemplar)
+    : exemplar(std::move(t.exemplar))
   {
     // We are nice and raise the writer lock before copying over internal
     // data structures from the argument.
