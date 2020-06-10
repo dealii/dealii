@@ -1,21 +1,21 @@
 
 DEAL:0:1d::n_levels:                  5
-DEAL:0:1d::n_cells:                   248
-DEAL:0:1d::n_active_cells:            128
+DEAL:0:1d::n_cells:                   80
+DEAL:0:1d::n_active_cells:            42
 DEAL:0:1d::
 DEAL:0:1d::n_dofs:                             257
 DEAL:0:1d::n_locally_owned_dofs:               65
 DEAL:0:1d::
 DEAL:0:2d::n_levels:                  4
-DEAL:0:2d::n_cells:                   5440
-DEAL:0:2d::n_active_cells:            4096
+DEAL:0:2d::n_cells:                   1876
+DEAL:0:2d::n_active_cells:            1416
 DEAL:0:2d::
 DEAL:0:2d::n_dofs:                             16641
 DEAL:0:2d::n_locally_owned_dofs:               4225
 DEAL:0:2d::
 DEAL:0:3d::n_levels:                  4
-DEAL:0:3d::n_cells:                   37440
-DEAL:0:3d::n_active_cells:            32768
+DEAL:0:3d::n_cells:                   15680
+DEAL:0:3d::n_active_cells:            13728
 DEAL:0:3d::
 DEAL:0:3d::n_dofs:                             274625
 DEAL:0:3d::n_locally_owned_dofs:               70785
