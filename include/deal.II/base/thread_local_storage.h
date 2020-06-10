@@ -113,6 +113,17 @@ namespace Threads
     ThreadLocalStorage() = default;
 
     /**
+     * Copy constructor.
+     */
+    ThreadLocalStorage(const ThreadLocalStorage &);
+
+    /**
+     * Move constructor. The constructor moves all internal data structures
+     * from the argument.
+     */
+    ThreadLocalStorage(ThreadLocalStorage &&);
+
+    /**
      * A kind of copy constructor. Initializes an internal exemplar by the
      * given object. The exemplar is in turn used to initialize each thread
      * local object instead of invoking the default constructor.
@@ -127,10 +138,16 @@ namespace Threads
     explicit ThreadLocalStorage(T &&t);
 
     /**
-     * The copy constructor is deleted. Copying instances of this class is not
-     * allowed.
+     * Copy assignment operator.
      */
-    ThreadLocalStorage(const ThreadLocalStorage<T> &t) = delete;
+    ThreadLocalStorage &
+    operator=(const ThreadLocalStorage &t);
+
+    /**
+     * Move assignment operator.
+     */
+    ThreadLocalStorage &
+    operator=(ThreadLocalStorage &&t);
 
     /**
      * Return a reference to the data stored by this object for the current
@@ -253,6 +270,32 @@ namespace Threads
 {
   // ----------------- inline and template functions --------------------------
 
+
+  template <typename T>
+  ThreadLocalStorage<T>::ThreadLocalStorage(const ThreadLocalStorage<T> &t)
+    : exemplar(t.exemplar)
+  {
+    /*
+     * Raise a reader lock while we are populating our own data in order to
+     * avoid copying over an invalid state.
+     */
+    std::shared_lock<decltype(insertion_mutex)> lock(t.insertion_mutex);
+    data = t.data;
+  }
+
+
+  template <typename T>
+  ThreadLocalStorage<T>::ThreadLocalStorage(ThreadLocalStorage<T> &&t)
+    : exemplar(t.exemplar)
+  {
+    /*
+     * We are nice and raise the writer lock before copying over internal
+     * data structures from the argument.
+     */
+    std::unique_lock<decltype(insertion_mutex)> lock(t.insertion_mutex);
+    data = std::move(t.data);
+  }
+
   template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(const T &t)
     : exemplar(std::make_shared<const T>(t))
@@ -263,6 +306,36 @@ namespace Threads
   inline ThreadLocalStorage<T>::ThreadLocalStorage(T &&t)
     : exemplar(std::make_shared<T>(std::forward<T>(t)))
   {}
+
+
+  template <typename T>
+  inline ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator=(const ThreadLocalStorage<T> &t)
+  {
+    /*
+     * We need to raise the reader lock of the argument and our writer lock
+     * while copying internal data structures.
+     */
+    std::shared_lock<decltype(insertion_mutex)> reader_lock(t.insertion_mutex);
+    std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
+
+    data = t.data;
+  }
+
+
+  template <typename T>
+  inline ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator=(ThreadLocalStorage<T> &&t)
+  {
+    /*
+     * We need to raise the reader lock of the argument and our writer lock
+     * while copying internal data structures.
+     */
+    std::shared_lock<decltype(insertion_mutex)> reader_lock(t.insertion_mutex);
+    std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
+
+    data = std::move(t.data);
+  }
 
 
 #    ifndef DOXYGEN
