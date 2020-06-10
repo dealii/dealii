@@ -63,6 +63,6 @@ Continuous Integration Status:
 | Linux | [![Build Status](https://jenkins.tjhei.info/job/dealii/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii/job/master/) | See https://jenkins.tjhei.info |
 | MacOS | [![Build Status](https://jenkins.tjhei.info/job/dealii-OSX/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii-OSX/job/master/) | See https://jenkins.tjhei.info |
 | MacOS | [![Build Status](https://github.com/dealii/dealii/workflows/github-CI/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-CI) | See https://github.com/dealii/dealii/actions |
-| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/e1kltrbje54ikah8/branch/master?svg=true)](https://ci.appveyor.com/project/tjhei/dealii-8th3t/branch/master) | See https://appveyor.com |
+| MSVC | [![Build status](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows) | See https://github.com/dealii/dealii/actions |
 | CDash | [![cdash](https://img.shields.io/website?down_color=lightgrey&down_message=offline&label=CDash&up_color=green&up_message=up&url=https%3A%2F%2Fcdash.43-1.org%2Findex.php%3Fproject%3Ddeal.II)](https://cdash.43-1.org/index.php?project=deal.II) | Various builds and configurations on https://cdash.43-1.org/index.php?project=deal.II |
 
