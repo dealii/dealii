@@ -248,7 +248,7 @@ namespace Step8
 
   // The big changes in this program are in the creation of matrix and right
   // hand side, since they are problem-dependent. We will go through that
-  // process \step-by-step, since it is a bit more complicated than in previous
+  // process step-by-step, since it is a bit more complicated than in previous
   // examples.
   //
   // The first parts of this function are the same as before, however: setting

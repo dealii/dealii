@@ -367,7 +367,7 @@ namespace Step69
   // <code>U</code> and a time point <code>t</code> (as input arguments)
   // computes the updated solution, stores it in the vector
   // <code>temp</code>, swaps its contents with the vector <code>U</code>,
-  // and returns the chosen \step-size $\tau$.
+  // and returns the chosen step-size $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary

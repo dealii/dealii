@@ -87,12 +87,12 @@ while (<>)
     # - things like step-12.solution.png that typically appear in
     #   @image commands.
     # - things in headings
-    s/(?<![\"\\\/])step-(\w+)(?!\")/\@ref step_\1 \"step-\1\"/gi
+    s/(?<![\"\\\/])step-(\d\w*)(?!\")/\@ref step_\1 \"step-\1\"/gi
         if !m/(\@page|\<img|\@image|<h\d>)/i;
 
     # If step-xx was explicitly escaped with a backslash, remove the
     # latter
-    s/\\(step-\w+)/\1/g;
+    s/\\(step-\d\w*)/\1/g;
 
     # doxygen version 1.7.1 and later have the habit of thinking that
     # everything that starts with "file:" is the beginning of a link,
