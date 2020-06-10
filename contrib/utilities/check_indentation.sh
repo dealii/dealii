@@ -25,12 +25,6 @@
 # script is important.
 #
 
-if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then 
-	echo "Running indentation test on master merge."
-else 
-	echo "Running indentation test on Pull Request #${TRAVIS_PULL_REQUEST}"
-fi
-
 # Run indent-all and fail if script fails:
 ./contrib/utilities/indent-all || exit $?
 
