@@ -530,10 +530,8 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static unsigned int
-      line_index(const TriaAccessor<3, dim, spacedim> &accessor,
-                 const unsigned int                    i)
+      line_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
       {
         const auto pair =
           GeometryInfo<3>::standard_hex_line_to_quad_line_index(i);
@@ -565,10 +563,8 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static unsigned int
-      quad_index(const TriaAccessor<3, dim, spacedim> &accessor,
-                 const unsigned int                    i)
+      quad_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
       {
         return accessor.tria->levels[accessor.present_level]
           ->cells.get_bounding_object_indices(accessor.present_index)[i];
@@ -594,10 +590,9 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static bool
-      face_orientation(const TriaAccessor<3, dim, spacedim> &accessor,
-                       const unsigned int                    face)
+      face_orientation(const TriaAccessor<3, 3, 3> &accessor,
+                       const unsigned int           face)
       {
         return get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
@@ -662,10 +657,8 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
       inline static bool
-      face_flip(const TriaAccessor<3, dim, spacedim> &accessor,
-                const unsigned int                    face)
+      face_flip(const TriaAccessor<3, 3, 3> &accessor, const unsigned int face)
       {
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
@@ -699,10 +692,9 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static bool
-      face_rotation(const TriaAccessor<3, dim, spacedim> &accessor,
-                    const unsigned int                    face)
+      face_rotation(const TriaAccessor<3, 3, 3> &accessor,
+                    const unsigned int           face)
       {
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
@@ -753,10 +745,9 @@ namespace internal
       }
 
 
-      template <int spacedim>
       inline static bool
-      line_orientation(const TriaAccessor<3, 3, spacedim> &accessor,
-                       const unsigned int                  line)
+      line_orientation(const TriaAccessor<3, 3, 3> &accessor,
+                       const unsigned int           line)
       {
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
         AssertIndexRange(line, GeometryInfo<3>::lines_per_cell);
@@ -824,11 +815,10 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static void
-      set_face_orientation(const TriaAccessor<3, dim, spacedim> &accessor,
-                           const unsigned int                    face,
-                           const bool                            value)
+      set_face_orientation(const TriaAccessor<3, 3, 3> &accessor,
+                           const unsigned int           face,
+                           const bool                   value)
       {
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
@@ -858,11 +848,10 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static void
-      set_face_flip(const TriaAccessor<3, dim, spacedim> &accessor,
-                    const unsigned int                    face,
-                    const bool                            value)
+      set_face_flip(const TriaAccessor<3, 3, 3> &accessor,
+                    const unsigned int           face,
+                    const bool                   value)
       {
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
@@ -892,11 +881,10 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static void
-      set_face_rotation(const TriaAccessor<3, dim, spacedim> &accessor,
-                        const unsigned int                    face,
-                        const bool                            value)
+      set_face_rotation(const TriaAccessor<3, 3, 3> &accessor,
+                        const unsigned int           face,
+                        const bool                   value)
       {
         AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
@@ -955,9 +943,8 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
       inline static void
-      set_line_orientation(const TriaAccessor<3, dim, spacedim> &,
+      set_line_orientation(const TriaAccessor<3, 3, 3> &,
                            const unsigned int,
                            const bool)
       {
@@ -996,10 +983,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
       inline static unsigned int
-      vertex_index(const TriaAccessor<3, dim, spacedim> &accessor,
-                   const unsigned int                    corner)
+      vertex_index(const TriaAccessor<3, 3, 3> &accessor,
+                   const unsigned int           corner)
       {
         const auto pair =
           GeometryInfo<3>::standard_hex_vertex_to_quad_vertex_index(corner);
