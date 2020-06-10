@@ -25,9 +25,9 @@ To build from the repository, execute the following commands first:
 
 Then continue as before.
 
-A detailed *ReadME* can be found at [./doc/readme.html](https://dealii.org/developer/readme.html)
-and [./doc/users/cmake.html](https://dealii.org/developer/users/cmake.html) or at
-https://www.dealii.org/.
+A detailed *ReadME* can be found at [./doc/readme.html](https://dealii.org/developer/readme.html),
+[./doc/users/cmake_user.html](https://dealii.org/developer/users/cmake_user.html),
+or at https://www.dealii.org/.
 
 Getting started:
 ----------------
