@@ -56,7 +56,8 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
       deallog << "  index " << idx << " global_dof_index:" << v << ":\n";
 
       const auto pair = fiv.interface_dof_to_dof_indices(idx);
-      deallog << "    dof indices: " << pair[0] << " | " << pair[1] << "\n";
+      deallog << "    dof indices: " << static_cast<int>(pair[0]) << " | "
+              << static_cast<int>(pair[1]) << "\n";
 
       ++idx;
     }
