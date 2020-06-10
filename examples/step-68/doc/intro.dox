@@ -77,6 +77,39 @@ particle solver and attribute the desired properties to the particles (e.g. mass
   store the value of the fluid velocity and the process id to which the particles
   belong.
 
+<h3>Challenges related to distributed particle simulations</h3>
+
+Although the present step is not computationnaly intensive, simulations that
+include particles can be computationnaly demanding and require parallelization.
+The present step showcases the distributed parallel capabilities of deal.II for particles.
+In general, there are three main challenges
+that arise in parallel distributed simulations that include particle:
+- Generating the particles on the distributed triangulation;
+- Exchanging the particles that leave local domains between the processors;
+- Load balancing the simulation so that every processor has a similar computational load.
+
+Generating the particles is not straightforward since the processor to which they belong
+must first be identified before the cell in which they are located is found.
+Deal.II provides numerous capabilities to generate particles through the Particles::Generator namespace.
+Some of these particle generator generate particles on the locally own subdomain. For example,
+Particles::Generators::regular_reference_locations uses a regular reference location within each cell of
+the subdomain or Particles::Generators::probabilistic_locations uses
+a probability density function to generate the particles.
+
+In some situations, such as the present step, particles must be generated at specific locations
+on cells that are owned only by a subset of the processors. In  most of these situations,
+the insertion of the particle is done for a very limited number of time-steps and, consequently,
+does not constitute a large portion of the computational cost. For these occasions, deal.II provides
+convenient Particles::Generators that can globally insert the particles even if they are not located
+on the subdomain from which they are created. The generators first locate on which subdomain the particles
+are situated, identify is which cell they are located and exchange the necessary information amongst the processors
+to ensure that the particle is generated with the right properties. Consequently, this type of particle generation
+is communication intensive. The Particles::Generators::dof_support_points and the Particles::Generators::quadrature_points
+generate particles using a, possible non-matching, triangulation and the points of an associated dof_handler or quadrature respectively.
+Furthermore, the Particles::ParticleHandler class provides the Particles::ParticleHandler::insert_global_particles function
+which enables the global insertion of particles from a vector of points and a global vector of bounding boxes. In the present step,
+we use the Particles::Generators::quadrature_points to insert the particle in the shape of a circle.
+
 
 <h3>The testcase</h3>
 
