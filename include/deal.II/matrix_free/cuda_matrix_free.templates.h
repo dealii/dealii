@@ -1230,6 +1230,7 @@ namespace CUDAWrappers
         LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
           ghosted_dst(ghosted_src);
         ghosted_src = src;
+        ghosted_dst = dst;
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
