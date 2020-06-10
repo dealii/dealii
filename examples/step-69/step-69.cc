@@ -2304,7 +2304,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximum $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>%TimeStepping%<dim%>::%step()</code> we define $\max_j |\nabla r_j|$
+  // <code>%TimeStepping\<dim>::%step()</code> we define $\max_j |\nabla r_j|$
   // and $\min_j |\nabla r_j|$ as atomic doubles in order to resolve any
   // conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max()</code> and
@@ -2461,7 +2461,7 @@ namespace Step69
   //
   // With all classes implemented it is time to create an instance of
   // <code>Discretization<dim></code>, <code>OfflineData<dim></code>,
-  // <code>InitialValues<dim></code>, <code>TimeStepping<dim></code>, and
+  // <code>InitialValues<dim></code>, <code>%TimeStepping\<dim></code>, and
   // <code>SchlierenPostprocessor<dim></code>, and run the forward Euler
   // step in a loop.
   //
