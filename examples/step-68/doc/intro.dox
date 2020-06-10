@@ -8,24 +8,21 @@ Rene Gassmöller (University of California Davis),
 and Peter Munch (Technical University of Munich and Helmholtz-Zentrum Geesthacht)
 </i>
 
-@dealiiTutorialDOI{10.5281/zenodo.3829064,https://zenodo.org/badge/DOI/10.5281/zenodo.3829064.svg}
-
-
 <h1>Introduction</h1>
 
 <h3>Simulation of the motion of massless tracer particles in a vortical flow</h3>
 
 Particles play an important part in numerical models for a large
  number of applications. Particles are routinely used
- as massless tracer to visualize the dynamic of a transient flow. They
+ as massless tracers to visualize the dynamic of a transient flow. They
  can also play an intrinsic role as part of a more complex finite element
- model, as is the case of the Particle-In-Cell (PIC) method (Gassmöller et al. 2018)
- or they can even be used to simulate the motion of granular matter, as is
- the case with the Discrete Element Method (DEM) (Blais et al. 2019). In the case
+ model, as is the case for the Particle-In-Cell (PIC) method (Gassmöller et al. 2018)
+ or they can even be used to simulate the motion of granular matter, as in
+ the Discrete Element Method (DEM) (Blais et al. 2019). In the case
  of DEM, the resulting model is not related to the finite element method anymore,
  but just leads to a system of ordinary differential equation which describes
  the motion of the particles and the dynamic of their collisions. All of
- these models can be built using deal.II particle handling capabilities.
+ these models can be built using deal.II's particle handling capabilities.
 
 In the present step, we use particles as massless tracer to illustrate
 the dynamic of a vortical flows. Since the particles are massless tracers,
@@ -35,21 +32,21 @@ following ordinary differential equation (ODE):
 \frac{d \textbf{x}_i}{dt} =\textbf{u}(\textbf{x}_i)
 @f]
 
-where $\textbf{x}_i$ is the postion of particle $i$ and $\textbf{u}_i$ its velocity.
+where $\textbf{x}_i$ is the postion of particle $i$ and $\textbf{u}(\textbf{x}_i)$ the flow velocity at its position.
 In the present step, this ODE is solved using the explicit Euler method. The resulting scheme is:
 @f[
-\textbf{x}_{i}^{t+\Delta t} = \textbf{x}_{i}^{t} + \Delta t \; \textbf{u}(\textbf{x}_{i}^{t})
+\textbf{x}_{i}^{n+1} = \textbf{x}_{i}^{n} + \Delta t \; \textbf{u}(\textbf{x}_{i}^{n})
 @f]
 
-where $\textbf{x}_{i}^{t+\Delta t}$ and $\textbf{x}_{i}^{t}$ are the position
+where $\textbf{x}_{i}^{n+1}$ and $\textbf{x}_{i}^{n}$ are the position
 of particle $i$ at time $t+\Delta t$ and $t$, respectively and where $\Delta t$
 is the time step. In the present step, the velocity at the location of particles
-is obtainedin two different fashions:
+is obtained in two different fashions:
 - By evaluating the velocity function at the location of the particles.
 - By evaluating the velocity function on a background triangulation and, using
 a  finite element support, interpolating at the position of the particle.
 
-The first approach is not really practical, since in general, the velocity profile
+The first approach is generally not practical, since the velocity profile
 is not known analytically. The second approach, based on interpolating a solution
 at the position of the particles, mimics exactly what would be done in a
 realistic computational fluid dynamic simulation. In this step, we illustrate both strategies.
@@ -57,7 +54,8 @@ realistic computational fluid dynamic simulation. In this step, we illustrate bo
 
 We note that much greater accuracy could be obtained by using a fourth
 order Runge-Kutta method or another appropriate scheme for the time integration
-of the motion of the particles.
+of the motion of the particles.  Implementing a more advanced advection scheme
+would be a straightforward extension of this example.
 
 <h3>Particles in deal.II</h3>
 
@@ -72,9 +70,9 @@ In deal.II, this is achieved through the use of the Particles::ParticleHandler c
 By default, particles do not have a diameter,
 a mass or any other physical properties which we would generally expect of physical particles. Howevever, through
 a ParticleHandler, particles have access to a Particles::PropertyPool. This PropertyPool is
-an array which can be used to store any  arbitrary number of properties
+an array which can be used to store any arbitrary number of properties
 associated with the particles. Consequently, users can build their own
-particle solver and attribute the desired properties to the particles (e.g. mass,
+particle solver and attribute the desired properties to the particles (e.g. mass, charge
   diameter, temperature, etc.). In the present tutorial, this is used to
   store the value of the fluid velocity and the process id to which the particles
   belong.
@@ -82,22 +80,21 @@ particle solver and attribute the desired properties to the particles (e.g. mass
 
 <h3>The testcase</h3>
 
-In the present step, we use particles as massless tracer to illustrate
-the dynamic of a vortical flow : the Rayleigh-Kotte Vortex. This flow pattern
-is generally used as a complex test case for interface tracking methods (e.g.
-  volume-of-fluid and level set approches) since
-it leads to strong rotation and elongation of the fluid (Blais 2014).
+In the present step, we use particles as massless tracers to illustrate
+the dynamics of a particular vortical flow : the Rayleigh-Kotte Vortex. This flow pattern
+is generally used as a complex test case for interface tracking methods
+(e.g. volume-of-fluid and level set approches) since
+it leads to strong rotation and elongation of the fluid (Blais 2013).
 
-The
-stream function $\Psi$ of this Rayleigh-Kotte vortex is defined as:
+The stream function $\Psi$ of this Rayleigh-Kotte vortex is defined as:
 
 @f[
 \Psi = \frac{1}{\pi} sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
 @f]
 where $T$ is the period of the flow. The velocity profile in 2D ($\textbf{u}=[u,v]^T$) is :
 @f{eqnarray*}
-   u &=&  - \frac{\partial\Psi}{\partial y} = \frac{1}{\pi} \sin^2 (\pi x) \sin (\pi y) \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\
-   v &=&  \frac{\partial\Psi}{\partial x} = \frac{1}{\pi} \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
+   u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y) \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\
+   v &=&  \frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
 @f}
 
 

@@ -724,7 +724,8 @@ namespace Step68
         if ((discrete_time.get_step_number() % par.output_frequency) == 0)
           {
             output_particles(discrete_time.get_step_number());
-            output_background(discrete_time.get_step_number());
+            if (interpolated_velocity)
+              output_background(discrete_time.get_step_number());
           }
       }
   }
