@@ -1580,7 +1580,8 @@ namespace GridTools
     const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
     const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
     const std::vector<bool> &                              marked_vertices,
-    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree)
+    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree,
+    const double                                           tolerance)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
@@ -1670,9 +1671,8 @@ namespace GridTools
                   comp);
         // It is possible the vertex is close
         // to an edge, thus we add a tolerance
-        // setting it initially to 1e-10
         // to keep also the "best" cell
-        double best_distance = 1e-10;
+        double best_distance = tolerance;
 
         // Search all of the cells adjacent to the closest vertex of the cell
         // hint Most likely we will find the point in them.
@@ -1684,7 +1684,7 @@ namespace GridTools
                 std::advance(cell, neighbor_permutation[i]);
                 const Point<dim> p_unit =
                   mapping.transform_real_to_unit_cell(*cell, p);
-                if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+                if (GeometryInfo<dim>::is_inside_unit_cell(p_unit, tolerance))
                   {
                     cell_and_position.first  = *cell;
                     cell_and_position.second = p_unit;
@@ -1727,10 +1727,8 @@ namespace GridTools
         // domain, or that we've had problems with the algorithm above. Try as a
         // last resort the other (simpler) algorithm.
         if (current_cell.state() != IteratorState::valid)
-          return find_active_cell_around_point(mapping,
-                                               mesh,
-                                               p,
-                                               marked_vertices);
+          return find_active_cell_around_point(
+            mapping, mesh, p, marked_vertices, tolerance);
 
         current_cell = typename MeshType<dim, spacedim>::active_cell_iterator();
       }
@@ -5225,7 +5223,8 @@ namespace GridTools
     const Point<spacedim> &     p,
     const typename Triangulation<dim, spacedim>::active_cell_iterator
       &                      cell_hint,
-    const std::vector<bool> &marked_vertices)
+    const std::vector<bool> &marked_vertices,
+    const double             tolerance)
   {
     const auto &mesh            = cache.get_triangulation();
     const auto &mapping         = cache.get_mapping();
@@ -5241,7 +5240,8 @@ namespace GridTools
                                          vertex_to_cell_centers,
                                          cell_hint,
                                          marked_vertices,
-                                         used_vertices_rtree);
+                                         used_vertices_rtree,
+                                         tolerance);
   }
 
   template <int spacedim>

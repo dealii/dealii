@@ -43,7 +43,8 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
         ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type
         find_active_cell_around_point(const X &,
                                       const Point<deal_II_space_dimension> &,
-                                      const std::vector<bool> &);
+                                      const std::vector<bool> &,
+                                      const double);
 
       template std::pair<
         dealii::internal::ActiveCellIterator<deal_II_dimension,
@@ -54,7 +55,8 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const X &,
         const Point<deal_II_space_dimension> &,
-        const std::vector<bool> &);
+        const std::vector<bool> &,
+        const double);
 
       template std::vector<
         std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension,
@@ -159,7 +161,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const Point<deal_II_space_dimension> &);
+        const Point<deal_II_space_dimension> &,
+        const double);
 
     \}
 #endif

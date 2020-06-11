@@ -1112,17 +1112,18 @@ namespace GridTools
 #  ifndef _MSC_VER
   typename MeshType<dim, spacedim>::active_cell_iterator
 #  else
-  typename dealii::internal::ActiveCellIterator<dim,
-                                                spacedim,
-                                                MeshType<dim, spacedim>>::type
+  typename dealii::internal::
+    ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
 #  endif
   find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
                                 const Point<spacedim> &        p,
-                                const std::vector<bool> &marked_vertices = {});
+                                const std::vector<bool> &marked_vertices = {},
+                                const double             tolerance = 1.e-10);
 
   /**
-   * Find and return an iterator to the active cell that surrounds a given
-   * point @p p.
+   * Find an active cell that surrounds a given point @p p. The return type
+   * is a pair of an iterator to the active cell along with the unit cell
+   * coordinates of the point.
    *
    * The algorithm used in this function proceeds by first looking for the
    * vertex located closest to the given point, see
@@ -1150,6 +1151,14 @@ namespace GridTools
    * only search among @p marked_vertices for the closest vertex.
    * The size of this array should be equal to n_vertices() of the
    * triangulation (as opposed to n_used_vertices() ).
+   * @param tolerance Tolerance in terms of unit cell coordinates. Depending
+   * on the problem, it might be necessary to adjust the tolerance in order
+   * to be able to identify a cell. Floating
+   * point arithmetic implies that a point will, in general, not lie exactly
+   * on a vertex, edge, or face. In either case, it is not predictable which
+   * of the cells adjacent to a vertex or an edge/face this function returns.
+   * Consequently, algorithms that call this function need to take into
+   * account that the returned cell will only contain the point approximately.
    *
    * @return A pair of an iterators into the mesh that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
@@ -1185,27 +1194,15 @@ namespace GridTools
    * @ref GlossGhostCell).
    * If so, many of the operations one may want to do on this cell (e.g.,
    * evaluating the solution) may not be possible and you will have to decide
-   * what to do in that case.
-   *
-   * @note Floating point arithmetic implies that a point will, in general,
-   * never lie <i>exactly</i> on an edge or a face. It may, however, lie
-   * on a vertex of a cell. In either case, it is not predictable which
-   * of the cells adjacent to a vertex or an edge/face this function returns
-   * when given a point that lies on a vertex or within floating point
-   * precision of an edge or face. Consequently, algorithms that call
-   * this function need to take into account that the returned cell
-   * will only contain the point approximately (to within round-off error)
-   * and that these cells may also be ghost cells or artificial cells
-   * if the triangulation is a parallel one. The latter may even be true
-   * if the given point is in fact a vertex of a locally owned cell: the
-   * returned cell may still be a ghost cell that happens to share this
-   * vertex with a locally owned one. The reason for this behavior is that
-   * it is the only way to guarantee that all processors that participate
-   * in a parallel triangulation will agree which cell contains a point.
-   * In other words, two processors that own two cells that come together
-   * at one vertex will return the same cell when called with this vertex.
-   * One of them will then return a locally owned cell and the other one
-   * a ghost cell.
+   * what to do in that case. This might even be the case if the given point is
+   * a vertex of a locally owned cell: the returned cell may still be a ghost
+   * cell that happens to share this vertex with a locally owned one. The
+   * reason for this behavior is that it is the only way to guarantee that all
+   * processors that participate in a parallel triangulation will agree which
+   * cell contains a point. In other words, two processors that own two cells
+   * that come together at one vertex will return the same cell when called
+   * with this vertex. One of them will then return a locally owned cell and
+   * the other one a ghost cell.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
@@ -1218,7 +1215,8 @@ namespace GridTools
   find_active_cell_around_point(const Mapping<dim, spacedim> & mapping,
                                 const MeshType<dim, spacedim> &mesh,
                                 const Point<spacedim> &        p,
-                                const std::vector<bool> &marked_vertices = {});
+                                const std::vector<bool> &marked_vertices = {},
+                                const double             tolerance = 1.e-10);
 
   /**
    * A version of the previous function that exploits an already existing
@@ -1249,7 +1247,8 @@ namespace GridTools
       typename MeshType<dim, spacedim>::active_cell_iterator(),
     const std::vector<bool> &                              marked_vertices = {},
     const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree =
-      RTree<std::pair<Point<spacedim>, unsigned int>>{});
+      RTree<std::pair<Point<spacedim>, unsigned int>>{},
+    const double tolerance = 1.e-10);
 
   /**
    * A version of the previous function where we use that mapping on a given
@@ -1263,7 +1262,8 @@ namespace GridTools
   find_active_cell_around_point(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const hp::DoFHandler<dim, spacedim> &       mesh,
-    const Point<spacedim> &                     p);
+    const Point<spacedim> &                     p,
+    const double                                tolerance = 1.e-10);
 
   /**
    * A version of the previous function that exploits an already existing
@@ -1277,7 +1277,8 @@ namespace GridTools
     const Point<spacedim> &     p,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &
                              cell_hint = typename Triangulation<dim, spacedim>::active_cell_iterator(),
-    const std::vector<bool> &marked_vertices = {});
+    const std::vector<bool> &marked_vertices = {},
+    const double             tolerance       = 1.e-10);
 
   /**
    * As compared to the functions above, this function identifies all cells
