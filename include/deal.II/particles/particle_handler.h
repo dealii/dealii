@@ -290,6 +290,10 @@ namespace Particles
      * process that will own each of the particles, and it may therefore be
      * communication intensive.
      *
+     * @param[in] ids (Optional) A vector of ids to associate to each particle.
+     * If the vector is empty, the ids are computed automatically, by assigning
+     * them as a continuous range starting from first available index.
+     *
      * @return A map from owner to IndexSet, that contains the local indices
      * of the points that were passed to this function on the calling mpi
      * process, and that falls within the part of triangulation owned by this
@@ -299,8 +303,9 @@ namespace Particles
     insert_global_particles(
       const std::vector<Point<spacedim>> &positions,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                                     global_bounding_boxes,
-      const std::vector<std::vector<double>> &properties = {});
+        &                                       global_bounding_boxes,
+      const std::vector<std::vector<double>> &  properties = {},
+      const std::vector<types::particle_index> &ids        = {});
 
     /**
      * Set the position of the particles by using the values contained in the
