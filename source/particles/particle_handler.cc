@@ -451,8 +451,8 @@ namespace Particles
 
     local_start_index += local_next_particle_index;
 
-    GridTools::Cache<dim, spacedim> cache(*triangulation, *mapping);
-    auto point_locations = GridTools::compute_point_locations(cache, positions);
+    auto point_locations =
+      GridTools::compute_point_locations(*triangulation_cache, positions);
 
     auto &cells           = std::get<0>(point_locations);
     auto &local_positions = std::get<1>(point_locations);
@@ -531,7 +531,7 @@ namespace Particles
 
     // Get all local information
     const auto cells_positions_and_index_maps =
-      GridTools::distributed_compute_point_locations(cache,
+      GridTools::distributed_compute_point_locations(*triangulation_cache,
                                                      positions,
                                                      global_bounding_boxes);
 
