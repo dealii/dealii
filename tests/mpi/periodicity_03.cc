@@ -519,7 +519,8 @@ namespace Step22
       }
     catch (GridTools::ExcPointNotFound<dim> &p)
       {
-        pcout << "Point: " << point << " is not inside a cell!" << std::endl;
+        pcout << "Point: " << point << " is not inside a non-artificial cell!"
+              << std::endl;
       }
 
 

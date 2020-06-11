@@ -93,7 +93,7 @@ test()
           if (std::abs(value[0] - 1.) > 1e-8)
             ExcInternalError();
         }
-      catch (const VectorTools::ExcPointNotAvailableHere &)
+      catch (...)
         {}
 
       MPI_Barrier(MPI_COMM_WORLD);

@@ -325,14 +325,19 @@ namespace Step40
                                        const int            proc,
                                        Vector<PetscScalar> &value) const
   {
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      GridTools::find_active_cell_around_point(dof_handler, point);
+    try
+      {
+        typename DoFHandler<dim>::active_cell_iterator cell =
+          GridTools::find_active_cell_around_point(dof_handler, point);
 
-    if (cell->is_locally_owned())
-      VectorTools::point_value(dof_handler,
-                               locally_relevant_solution,
-                               point,
-                               value);
+        if (cell->is_locally_owned())
+          VectorTools::point_value(dof_handler,
+                                   locally_relevant_solution,
+                                   point,
+                                   value);
+      }
+    catch (GridTools::ExcPointNotFound<dim> &p)
+      {}
 
     std::vector<double> tmp(value.size());
     std::vector<double> tmp2(value.size());

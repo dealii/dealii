@@ -43,8 +43,13 @@ main(int argc, char **argv)
 
   Point<2> p(0.239367, 0.341747);
 
-  auto res1 = GridTools::find_active_cell_around_point(cache, p).first;
-  auto res2 = GridTools::find_active_cell_around_point(tria, p);
-
-  Assert(res1 == res2, ExcInternalError());
+  try
+    {
+      auto res1 = GridTools::find_active_cell_around_point(cache, p).first;
+      auto res2 = GridTools::find_active_cell_around_point(tria, p);
+      Assert(res1 == res2, ExcInternalError());
+      deallog << "found on one processor" << std::endl;
+    }
+  catch (...)
+    {}
 }
