@@ -1331,6 +1331,12 @@ public:
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
 
   /**
+   * The same as above to allow the usage of the "MeshType concept" also
+   * on the refinement levels.
+   */
+  using level_cell_iterator = cell_iterator;
+
+  /**
    * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
