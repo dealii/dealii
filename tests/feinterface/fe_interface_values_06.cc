@@ -113,8 +113,8 @@ test(unsigned int fe_degree)
             const auto pair = fiv.interface_dof_to_dof_indices(idx);
             deallog << "  idx: " << idx
                     << " global: " << fiv.get_interface_dof_indices()[idx]
-                    << " dof indices: " << pair[0] << " | " << pair[1]
-                    << std::endl;
+                    << " dof indices: " << static_cast<int>(pair[0]) << " | "
+                    << static_cast<int>(pair[1]) << std::endl;
           }
 
         cell_vector = 0.0;
