@@ -308,6 +308,42 @@ namespace Particles
       const std::vector<types::particle_index> &ids        = {});
 
     /**
+     * Insert a number of particles into the collection of particles. This
+     * function takes a list of particles for which we don't know the associated
+     * cell iterator, and distributes them to the correct local particle
+     * collection of a procesor, by unpacking the locations, figuring out where
+     * to send the particles by calling
+     * GridTools::distributed_compute_point_locations(), and sending the
+     * particles to the corresponding process.
+     *
+     * In order to keep track of what mpi process received what particles, a map
+     * from mpi process to IndexSet is returned by the function. This IndexSet
+     * contains the local indices of the particles that were passed to this
+     * function on the calling mpi process, and that falls within the part of
+     * the triangulation owned by this mpi process.
+     *
+     * @param[in] particles A vector of particles that do not need to be on the
+     * local processor
+     *
+     * @param[in] global_bounding_boxes A vector of vectors of bounding boxes.
+     * The bounding boxes `global_bboxes[rk]` describe which part of the mesh is
+     * locally owned by the mpi process with rank `rk`. The local description
+     * can be obtained from GridTools::compute_mesh_predicate_bounding_box(),
+     * and the global one can be obtained by passing the local ones to
+     * Utilities::MPI::all_gather().
+     *
+     * @return A map from owner to IndexSet, that contains the local indices
+     * of the points that were passed to this function on the calling mpi
+     * process, and that falls within the part of triangulation owned by this
+     * mpi process.
+     */
+    std::map<unsigned int, IndexSet>
+    insert_global_particles(
+      const std::vector<Particle<dim, spacedim>> &particles,
+      const std::vector<std::vector<BoundingBox<spacedim>>>
+        &global_bounding_boxes);
+
+    /**
      * Set the position of the particles by using the values contained in the
      * vector @p input_vector.
      *

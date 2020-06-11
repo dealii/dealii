@@ -725,6 +725,43 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  std::map<unsigned int, IndexSet>
+  ParticleHandler<dim, spacedim>::insert_global_particles(
+    const std::vector<Particle<dim, spacedim>> &particles,
+    const std::vector<std::vector<BoundingBox<spacedim>>>
+      &global_bounding_boxes)
+  {
+    // Store the positions in a vector of points, the ids in a vector of ids,
+    // and the properties, if any, in a vector of vector of properties.
+    std::vector<Point<spacedim>>       positions;
+    std::vector<std::vector<double>>   properties;
+    std::vector<types::particle_index> ids;
+    positions.resize(particles.size());
+    ids.resize(particles.size());
+    if (n_properties_per_particle() > 0)
+      properties.resize(properties.size(),
+                        std::vector<double>(n_properties_per_particle()));
+
+    unsigned int i = 0;
+    for (const auto &p : particles)
+      {
+        positions[i] = p.get_location();
+        ids[i]       = p.get_id();
+        if (p.has_properties())
+          properties[i] = {p.get_properties().begin(),
+                           p.get_properties().end()};
+        ++i;
+      }
+
+    return insert_global_particles(positions,
+                                   global_bounding_boxes,
+                                   properties,
+                                   ids);
+  }
+
+
+
+  template <int dim, int spacedim>
   types::particle_index
   ParticleHandler<dim, spacedim>::n_global_particles() const
   {
