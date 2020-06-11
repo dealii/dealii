@@ -907,7 +907,7 @@ namespace CUDAWrappers
       {
         ++my_id;
         Assert(
-          my_id < mf_n_concurrent_objects,
+          my_id < static_cast<int>(mf_n_concurrent_objects),
           ExcMessage(
             "Maximum number of concurrents MatrixFree objects reached. Increase mf_n_concurrent_objects"));
         bool f = false;
@@ -1230,6 +1230,7 @@ namespace CUDAWrappers
         LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
           ghosted_dst(ghosted_src);
         ghosted_src = src;
+        ghosted_dst = dst;
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
