@@ -59,7 +59,7 @@ Continuous Integration Status:
 
 | System | Status | More information |
 | --- | --- | --- |
-| Indent | [![Build Status](https://travis-ci.org/dealii/dealii.png)](https://travis-ci.org/dealii/dealii) | See https://travis-ci.org |
+| Indent | ![indent](https://github.com/dealii/dealii/workflows/indent/badge.svg) | using GitHub actions |
 | Linux | [![Build Status](https://jenkins.tjhei.info/job/dealii/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii/job/master/) | See https://jenkins.tjhei.info |
 | MacOS | [![Build Status](https://jenkins.tjhei.info/job/dealii-OSX/job/master/badge/icon)](https://jenkins.tjhei.info/job/dealii-OSX/job/master/) | See https://jenkins.tjhei.info |
 | MacOS | [![Build Status](https://github.com/dealii/dealii/workflows/github-CI/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-CI) | See https://github.com/dealii/dealii/actions |
