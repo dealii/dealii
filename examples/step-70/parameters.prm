@@ -1,3 +1,5 @@
+# This is a parameter file that can be used to reproduce the two dimensional
+# results of the tutorial program step-70.
 subsection Stokes Immersed Problem
   set Final time                         = 1
   set Homogeneous Dirichlet boundary ids = 0
@@ -8,7 +10,7 @@ subsection Stokes Immersed Problem
   set Number of time steps               = 501
   set Velocity degree                    = 2
   set Viscosity                          = 1
-  set Output directory                   = results
+  set Output directory                   = .
   subsection Angular velocity
     set Function constants  = 
     set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
