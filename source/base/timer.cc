@@ -434,7 +434,7 @@ TimerOutput::enter_subsection(const std::string &section_name)
 
   sections[section_name].timer.reset();
   sections[section_name].timer.start();
-  sections[section_name].n_calls++;
+  ++sections[section_name].n_calls;
 
   active_sections.push_back(section_name);
 }
