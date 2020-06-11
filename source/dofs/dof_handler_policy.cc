@@ -3577,6 +3577,7 @@ namespace internal
             DistributedTriangulationBase<dim, spacedim> &tria,
           DoFHandlerType &                               dof_handler)
         {
+          (void)tria;
           const auto pack = [&](const auto &cell) {
             // why would somebody request a cell that is not ours?
             Assert(cell->level_subdomain_id() == tria.locally_owned_subdomain(),
