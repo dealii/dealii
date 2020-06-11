@@ -907,7 +907,7 @@ namespace CUDAWrappers
       {
         ++my_id;
         Assert(
-          my_id < mf_n_concurrent_objects,
+          my_id < static_cast<int>(mf_n_concurrent_objects),
           ExcMessage(
             "Maximum number of concurrents MatrixFree objects reached. Increase mf_n_concurrent_objects"));
         bool f = false;
