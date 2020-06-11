@@ -739,7 +739,7 @@ namespace Particles
     positions.resize(particles.size());
     ids.resize(particles.size());
     if (n_properties_per_particle() > 0)
-      properties.resize(properties.size(),
+      properties.resize(particles.size(),
                         std::vector<double>(n_properties_per_particle()));
 
     unsigned int i = 0;
