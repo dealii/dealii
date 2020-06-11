@@ -113,7 +113,7 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       ENDIF()
     ENDFOREACH()
 
-    MESSAGE(STATUS "    Setting up ${_relative_src_files}")
+    MESSAGE(STATUS "    Source files: ${_relative_src_files}")
 
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
