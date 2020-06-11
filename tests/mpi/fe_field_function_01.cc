@@ -103,7 +103,7 @@ test()
                    1e-8 * std::fabs(value + (p[0] + 2)),
                  ExcInternalError());
         }
-      catch (typename VectorTools::ExcPointNotAvailableHere &)
+      catch (...)
         {
           point_found = false;
         }
