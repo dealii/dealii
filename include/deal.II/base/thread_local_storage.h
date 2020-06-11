@@ -113,6 +113,17 @@ namespace Threads
     ThreadLocalStorage() = default;
 
     /**
+     * Copy constructor.
+     */
+    ThreadLocalStorage(const ThreadLocalStorage &);
+
+    /**
+     * Move constructor. The constructor moves all internal data structures
+     * from the argument.
+     */
+    ThreadLocalStorage(ThreadLocalStorage &&t) noexcept;
+
+    /**
      * A kind of copy constructor. Initializes an internal exemplar by the
      * given object. The exemplar is in turn used to initialize each thread
      * local object instead of invoking the default constructor.
@@ -127,10 +138,16 @@ namespace Threads
     explicit ThreadLocalStorage(T &&t);
 
     /**
-     * The copy constructor is deleted. Copying instances of this class is not
-     * allowed.
+     * Copy assignment operator.
      */
-    ThreadLocalStorage(const ThreadLocalStorage<T> &t) = delete;
+    ThreadLocalStorage &
+    operator=(const ThreadLocalStorage &t);
+
+    /**
+     * Move assignment operator.
+     */
+    ThreadLocalStorage &
+    operator=(ThreadLocalStorage &&t) noexcept;
 
     /**
      * Return a reference to the data stored by this object for the current
@@ -253,16 +270,90 @@ namespace Threads
 {
   // ----------------- inline and template functions --------------------------
 
+
+  template <typename T>
+  ThreadLocalStorage<T>::ThreadLocalStorage(const ThreadLocalStorage<T> &t)
+    : exemplar(t.exemplar)
+  {
+    // Raise a reader lock while we are populating our own data in order to
+    // avoid copying over an invalid state.
+    std::shared_lock<decltype(insertion_mutex)> lock(t.insertion_mutex);
+    data = t.data;
+  }
+
+
+
+  template <typename T>
+  ThreadLocalStorage<T>::ThreadLocalStorage(ThreadLocalStorage<T> &&t) noexcept
+    : exemplar(std::move(t.exemplar))
+  {
+    // We are nice and raise the writer lock before copying over internal
+    // data structures from the argument.
+    //
+    // The point is a bit moot, though: Users of ThreadLocalStorage
+    // typically obtain their thread's thread-local object through the
+    // get() function. That function also acquires the lock, but
+    // whether or not we do that here really doesn't make any
+    // difference in terms of correctness: If another thread manages
+    // to call get() just before we get here, then the result of that
+    // get() function immediately becomes invalid; if it manages to
+    // call get() at the same time as this function if there were no
+    // locking here, it might access undefined state; and if it
+    // manages to call get() just after we moved away the state --
+    // well, then it just got lucky to escape the race condition, but
+    // the race condition is still there.
+    //
+    // On the other hand, there is no harm in doing at least
+    // conceptually the right thing, so ask for that lock:
+    std::unique_lock<decltype(insertion_mutex)> lock(t.insertion_mutex);
+    data = std::move(t.data);
+  }
+
+
+
   template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(const T &t)
     : exemplar(std::make_shared<const T>(t))
   {}
 
 
+
   template <typename T>
   inline ThreadLocalStorage<T>::ThreadLocalStorage(T &&t)
     : exemplar(std::make_shared<T>(std::forward<T>(t)))
   {}
+
+
+
+  template <typename T>
+  inline ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator=(const ThreadLocalStorage<T> &t)
+  {
+    // We need to raise the reader lock of the argument and our writer lock
+    // while copying internal data structures.
+    std::shared_lock<decltype(insertion_mutex)> reader_lock(t.insertion_mutex);
+    std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
+
+    data = t.data;
+  }
+
+
+
+  template <typename T>
+  inline ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator=(ThreadLocalStorage<T> &&t) noexcept
+  {
+    // We need to raise the writer lock of the argument (because we're
+    // moving information *away* from that object) and the writer lock
+    // of our object while copying internal data structures.
+    //
+    // That said, the same issue with acquiring the source lock as
+    // with the move constructor above applies here as well.
+    std::unique_lock<decltype(insertion_mutex)> reader_lock(t.insertion_mutex);
+    std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
+
+    data = std::move(t.data);
+  }
 
 
 #    ifndef DOXYGEN

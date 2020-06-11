@@ -145,35 +145,4 @@ dealii::AffineConstraints<double>::distribute<
 #  endif
 #endif
 
-/*
- * Allocate scratch data.
- *
- * We cannot use the generic template instantiation because we need to
- * provide an initializer object of type
- * internals::AffineConstraintsData<Number> that can be passed to the
- * constructor of scratch_data (it won't allow one to be constructed in
- * place).
- */
-
-namespace internal
-{
-  namespace AffineConstraints
-  {
-#define SCRATCH_INITIALIZER(number, Name)              \
-  ScratchData<number> scratch_data_initializer_##Name; \
-  template <>                                          \
-  Threads::ThreadLocalStorage<ScratchData<number>>     \
-    AffineConstraintsData<number>::scratch_data(       \
-      scratch_data_initializer_##Name)
-
-    SCRATCH_INITIALIZER(double, d);
-    SCRATCH_INITIALIZER(float, f);
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
-    SCRATCH_INITIALIZER(std::complex<double>, cd);
-    SCRATCH_INITIALIZER(std::complex<float>, cf);
-#endif
-#undef SCRATCH_INITIALIZER
-  } // namespace AffineConstraints
-} // namespace internal
-
 DEAL_II_NAMESPACE_CLOSE

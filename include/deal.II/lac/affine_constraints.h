@@ -23,6 +23,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
@@ -1829,6 +1830,10 @@ private:
    * Store whether the arrays are sorted.  If so, no new entries can be added.
    */
   bool sorted;
+
+  mutable Threads::ThreadLocalStorage<
+    internal::AffineConstraints::ScratchData<number>>
+    scratch_data;
 
   /**
    * Internal function to calculate the index of line @p line_n in the vector
