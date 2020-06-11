@@ -109,6 +109,14 @@ INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(PETScWrappers::MPI::BlockSparseMatrix,
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::BlockSparseMatrix);
+#  ifndef DOXYGEN
+#    ifdef DEAL_II_PETSC_WITH_COMPLEX
+template void
+dealii::AffineConstraints<double>::distribute<
+  dealii::PETScWrappers::MPI::Vector>(
+  dealii::PETScWrappers::MPI::Vector &) const;
+#    endif
+#  endif
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
