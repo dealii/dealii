@@ -3839,7 +3839,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto cells = this->get_cell_ids();
 
   // 2) actually gather values
-  VectorizedArrayType out = make_vectorized_array<Number>(Number(1.));
+  VectorizedArrayType out =
+    make_vectorized_array<VectorizedArrayType>(Number(1.));
   for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     if (cells[i] != numbers::invalid_unsigned_int)
       out[i] = array[cells[i] / VectorizedArrayType::size()]
