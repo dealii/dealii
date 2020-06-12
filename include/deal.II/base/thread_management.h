@@ -460,11 +460,11 @@ namespace Threads
        * more.  Consequently, we can in fact join from different threads and
        * we test this in base/thread_validity_07.
        *
-       * @note The reason why we need to use an std::atomic_bool is
+       * @note The reason why we need to use a std::atomic<bool> is
        * discussed in detail in the documentation of
        * Task::task_has_finished.
        */
-      std::atomic_bool thread_is_active;
+      std::atomic<bool> thread_is_active;
 
       /**
        * Mutex guarding access to the previous variable.
@@ -1276,7 +1276,7 @@ namespace Threads
        * [3]
        * https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/
        */
-      std::atomic_bool task_has_finished;
+      std::atomic<bool> task_has_finished;
 
       /**
        * The place where the returned value is moved to once the std::future
