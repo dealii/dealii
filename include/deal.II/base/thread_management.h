@@ -24,6 +24,7 @@
 #  include <deal.II/base/std_cxx17/tuple.h>
 #  include <deal.II/base/template_constraints.h>
 
+#  include <atomic>
 #  include <condition_variable>
 #  include <functional>
 #  include <future>
@@ -429,9 +430,9 @@ namespace Threads
       std::shared_ptr<return_value<RT>> ret_val;
 
       /**
-       * A bool variable that is initially false, is set to true when a new
-       * thread is started, and is set back to false once join() has been
-       * called.
+       * An atomic  bool variable that is initially false, is set to true
+       * when a new thread is started, and is set back to false once join()
+       * has been called.
        *
        * We use this variable to make sure we can call join() twice on the
        * same thread. For some reason, the C++ standard library throws a
@@ -458,8 +459,12 @@ namespace Threads
        * thread. Neither does `pthread_join` appear to have this requirement any
        * more.  Consequently, we can in fact join from different threads and
        * we test this in base/thread_validity_07.
+       *
+       * @note The reason why we need to use an std::atomic_bool is
+       * discussed in detail in the documentation of
+       * Task::task_has_finished.
        */
-      bool thread_is_active;
+      std::atomic_bool thread_is_active;
 
       /**
        * Mutex guarding access to the previous variable.
@@ -1255,8 +1260,23 @@ namespace Threads
 
       /**
        * A boolean indicating whether the task in question has finished.
+       *
+       * @note We are using a `std::atomic_bool` here because we have
+       * to make sure that concurrent reads and stores between threads are
+       * properly synchronized, and that sequential reads on a given thread
+       * are not reordered or optimized away. A std::atomic [1] achieves
+       * this because (if not otherwise annotated) reads and stores to the
+       * boolean are subject to the std::memory_order_seq_cst memory
+       * ordering [2]. This ensures that Schmidt's double checking does
+       * indeed work. For additional information (and a potentially more
+       * efficient implementation) see [3].
+       *
+       * [1] https://en.cppreference.com/w/cpp/atomic/atomic
+       * [2] https://en.cppreference.com/w/cpp/atomic/memory_order
+       * [3]
+       * https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/
        */
-      bool task_has_finished;
+      std::atomic_bool task_has_finished;
 
       /**
        * The place where the returned value is moved to once the std::future
