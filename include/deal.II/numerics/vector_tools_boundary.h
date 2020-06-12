@@ -33,8 +33,6 @@ template <int dim, typename Number>
 class Function;
 namespace hp
 {
-  template <int dim, int spacedim>
-  class DoFHandler;
   template <int dim>
   class QCollection;
 } // namespace hp
@@ -117,7 +115,7 @@ namespace VectorTools
   void
   interpolate_boundary_values(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        function_map,
     std::map<types::global_dof_index, number> &boundary_values,
@@ -425,7 +423,7 @@ namespace VectorTools
   void
   project_boundary_values(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        boundary_functions,
     const hp::QCollection<dim - 1> &           q,
@@ -439,7 +437,7 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const hp::DoFHandler<dim, spacedim> &dof,
+    const DoFHandler<dim, spacedim> &dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        boundary_function,
     const hp::QCollection<dim - 1> &           q,
@@ -593,7 +591,7 @@ namespace VectorTools
   template <int dim>
   DEAL_II_DEPRECATED void
   project_boundary_values_curl_conforming(
-    const hp::DoFHandler<dim, dim> &       dof_handler,
+    const DoFHandler<dim, dim> &           dof_handler,
     const unsigned int                     first_vector_component,
     const Function<dim, double> &          boundary_function,
     const types::boundary_id               boundary_component,
@@ -704,7 +702,7 @@ namespace VectorTools
     const Function<dim, number> &boundary_function,
     const types::boundary_id     boundary_component,
     AffineConstraints<number> &  constraints,
-    const Mapping<dim> &         mapping = StaticMappingQ1<dim>::mapping);
+    const Mapping<dim> &         mapping);
 
 
   /**
@@ -716,13 +714,12 @@ namespace VectorTools
   template <int dim, typename number>
   void
   project_boundary_values_curl_conforming_l2(
-    const hp::DoFHandler<dim, dim> &       dof_handler,
+    const DoFHandler<dim, dim> &           dof_handler,
     const unsigned int                     first_vector_component,
     const Function<dim, number> &          boundary_function,
     const types::boundary_id               boundary_component,
     AffineConstraints<number> &            constraints,
-    const hp::MappingCollection<dim, dim> &mapping_collection =
-      hp::StaticMappingQ1<dim>::mapping_collection);
+    const hp::MappingCollection<dim, dim> &mapping_collection);
 
 
   /**
@@ -779,7 +776,7 @@ namespace VectorTools
     const Function<dim, double> &boundary_function,
     const types::boundary_id     boundary_component,
     AffineConstraints<double> &  constraints,
-    const Mapping<dim> &         mapping = StaticMappingQ1<dim>::mapping);
+    const Mapping<dim> &         mapping);
 
   /**
    * Same as above for the hp-namespace.
@@ -792,13 +789,12 @@ namespace VectorTools
   template <int dim>
   void
   project_boundary_values_div_conforming(
-    const hp::DoFHandler<dim, dim> &       dof_handler,
+    const DoFHandler<dim, dim> &           dof_handler,
     const unsigned int                     first_vector_component,
     const Function<dim, double> &          boundary_function,
     const types::boundary_id               boundary_component,
     AffineConstraints<double> &            constraints,
-    const hp::MappingCollection<dim, dim> &mapping_collection =
-      hp::StaticMappingQ1<dim>::mapping_collection);
+    const hp::MappingCollection<dim, dim> &mapping_collection);
 
   // @}
 } // namespace VectorTools

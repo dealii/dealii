@@ -176,7 +176,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   void
   project(const hp::MappingCollection<dim, spacedim> &              mapping,
-          const hp::DoFHandler<dim, spacedim> &                     dof,
+          const DoFHandler<dim, spacedim> &                         dof,
           const AffineConstraints<typename VectorType::value_type> &constraints,
           const hp::QCollection<dim> &                              quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
@@ -192,7 +192,7 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const hp::DoFHandler<dim, spacedim> &                     dof,
+  project(const DoFHandler<dim, spacedim> &                         dof,
           const AffineConstraints<typename VectorType::value_type> &constraints,
           const hp::QCollection<dim> &                              quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,

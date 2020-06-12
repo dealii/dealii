@@ -48,21 +48,25 @@ void
 DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
   const InputVector &values,
   Vector<number> &   interpolated_values,
-  const unsigned int fe_index) const
+  const unsigned int fe_index_) const
 {
+  const unsigned int fe_index =
+    (this->dof_handler->hp_capability_enabled == false &&
+     fe_index_ == DoFHandlerType::invalid_fe_index) ?
+      DoFHandlerType::default_fe_index :
+      fe_index_;
+
   if (this->is_active())
     // If this cell is active: simply return the exact values on this
     // cell unless the finite element we need to interpolate to is different
     // than the one we have on the current cell
     {
-      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension> *>(
-             this->dof_handler) != nullptr) ||
+      if ((this->dof_handler->hp_capability_enabled == false) ||
           // for hp-DoFHandlers, we need to require that on
           // active cells, you either don't specify an fe_index,
           // or that you specify the correct one
           (fe_index == this->active_fe_index()) ||
-          (fe_index == DoFHandlerType::default_fe_index))
+          (fe_index == DoFHandlerType::invalid_fe_index))
         this->get_dof_values(values, interpolated_values);
       else
         {
@@ -99,10 +103,8 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
       // mesh). consequently, we cannot interpolate from children's FE
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
-      Assert((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                      DoFHandlerType::space_dimension> *>(
-                this->dof_handler) != nullptr) ||
-               (fe_index != DoFHandlerType::default_fe_index),
+      Assert((this->dof_handler->hp_capability_enabled == false) ||
+               (fe_index != DoFHandlerType::invalid_fe_index),
              ExcMessage(
                "You cannot call this function on non-active cells "
                "of hp::DoFHandler objects unless you provide an explicit "

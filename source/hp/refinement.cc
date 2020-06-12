@@ -41,7 +41,7 @@ namespace hp
      */
     template <int dim, int spacedim>
     void
-    full_p_adaptivity(const hp::DoFHandler<dim, spacedim> &dof_handler)
+    full_p_adaptivity(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
       std::vector<bool> p_flags(
         dof_handler.get_triangulation().n_active_cells(), true);
@@ -53,8 +53,9 @@ namespace hp
 
     template <int dim, int spacedim>
     void
-    p_adaptivity_from_flags(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                            const std::vector<bool> &            p_flags)
+    p_adaptivity_from_flags(
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const std::vector<bool> &                p_flags)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       p_flags.size());
@@ -90,10 +91,10 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_absolute_threshold(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               criteria,
-      const Number                         p_refine_threshold,
-      const Number                         p_coarsen_threshold,
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &                   criteria,
+      const Number                             p_refine_threshold,
+      const Number                             p_coarsen_threshold,
       const ComparisonFunction<typename identity<Number>::type> &compare_refine,
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
@@ -122,10 +123,10 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_relative_threshold(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               criteria,
-      const double                         p_refine_fraction,
-      const double                         p_coarsen_fraction,
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &                   criteria,
+      const double                             p_refine_fraction,
+      const double                             p_coarsen_fraction,
       const ComparisonFunction<typename identity<Number>::type> &compare_refine,
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
@@ -212,10 +213,10 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_fixed_number(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               criteria,
-      const double                         p_refine_fraction,
-      const double                         p_coarsen_fraction,
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &                   criteria,
+      const double                             p_refine_fraction,
+      const double                             p_coarsen_fraction,
       const ComparisonFunction<typename identity<Number>::type> &compare_refine,
       const ComparisonFunction<typename identity<Number>::type>
         &compare_coarsen)
@@ -406,8 +407,8 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_regularity(
-      const hp::DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &               sobolev_indices)
+      const dealii::DoFHandler<dim, spacedim> &dof_handler,
+      const Vector<Number> &                   sobolev_indices)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       sobolev_indices.size());
@@ -457,7 +458,7 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     p_adaptivity_from_reference(
-      const hp::DoFHandler<dim, spacedim> &                      dof_handler,
+      const dealii::DoFHandler<dim, spacedim> &                  dof_handler,
       const Vector<Number> &                                     criteria,
       const Vector<Number> &                                     references,
       const ComparisonFunction<typename identity<Number>::type> &compare_refine,
@@ -492,12 +493,12 @@ namespace hp
      */
     template <int dim, typename Number, int spacedim>
     void
-    predict_error(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                  const Vector<Number> &               error_indicators,
-                  Vector<Number> &                     predicted_errors,
-                  const double                         gamma_p,
-                  const double                         gamma_h,
-                  const double                         gamma_n)
+    predict_error(const dealii::DoFHandler<dim, spacedim> &dof_handler,
+                  const Vector<Number> &                   error_indicators,
+                  Vector<Number> &                         predicted_errors,
+                  const double                             gamma_p,
+                  const double                             gamma_h,
+                  const double                             gamma_n)
     {
       AssertDimension(dof_handler.get_triangulation().n_active_cells(),
                       error_indicators.size());
@@ -620,7 +621,7 @@ namespace hp
      */
     template <int dim, int spacedim>
     void
-    force_p_over_h(const hp::DoFHandler<dim, spacedim> &dof_handler)
+    force_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() && cell->future_fe_index_set())
@@ -634,7 +635,7 @@ namespace hp
 
     template <int dim, int spacedim>
     void
-    choose_p_over_h(const hp::DoFHandler<dim, spacedim> &dof_handler)
+    choose_p_over_h(const dealii::DoFHandler<dim, spacedim> &dof_handler)
     {
       // Siblings of cells to be coarsened may not be owned by the same
       // processor. We will exchange coarsening flags on ghost cells and
@@ -659,7 +660,7 @@ namespace hp
 
           GridTools::exchange_cell_data_to_ghosts<
             std::pair<bool, bool>,
-            dealii::hp::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
+            dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
         }
 
 

@@ -701,16 +701,12 @@ namespace FETools
    * space corresponding to @p fe1 is a subset of the finite element space
    * corresponding to @p fe2, this function is simply an identity mapping.
    */
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InVector,
-            class OutVector,
-            int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandlerType<dim, spacedim> &dof1,
-                   const InVector &                     u1,
-                   const FiniteElement<dim, spacedim> & fe2,
-                   OutVector &                          u1_interpolated);
+  back_interpolate(const DoFHandler<dim, spacedim> &   dof1,
+                   const InVector &                    u1,
+                   const FiniteElement<dim, spacedim> &fe2,
+                   OutVector &                         u1_interpolated);
 
   /**
    * Compute the interpolation of the @p dof1-function @p u1 to a @p

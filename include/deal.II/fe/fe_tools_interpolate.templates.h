@@ -267,16 +267,12 @@ namespace FETools
 
 
 
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InVector,
-            class OutVector,
-            int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandlerType<dim, spacedim> &dof1,
-                   const InVector &                     u1,
-                   const FiniteElement<dim, spacedim> & fe2,
-                   OutVector &                          u1_interpolated)
+  back_interpolate(const DoFHandler<dim, spacedim> &   dof1,
+                   const InVector &                    u1,
+                   const FiniteElement<dim, spacedim> &fe2,
+                   OutVector &                         u1_interpolated)
   {
     Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
@@ -307,7 +303,7 @@ namespace FETools
     const types::subdomain_id subdomain_id =
       dof1.get_triangulation().locally_owned_subdomain();
 
-    typename DoFHandlerType<dim, spacedim>::active_cell_iterator
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
       cell = dof1.begin_active(),
       endc = dof1.end();
 

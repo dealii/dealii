@@ -785,7 +785,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     bool
     find_connection_between_subdomains(
-      const hp::DoFHandler<dim, spacedim> &    dof_handler,
+      const DoFHandler<dim, spacedim> &        dof_handler,
       const predicate_function<dim, spacedim> &predicate_1,
       const predicate_function<dim, spacedim> &predicate_2);
 
@@ -804,7 +804,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     unsigned int
     color_predicates(
-      const hp::DoFHandler<dim, spacedim> &                 dof_handler,
+      const DoFHandler<dim, spacedim> &                     dof_handler,
       const std::vector<predicate_function<dim, spacedim>> &predicates,
       std::vector<unsigned int> &                           predicate_colors);
 
@@ -851,7 +851,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     set_cellwise_color_set_and_fe_index(
-      hp::DoFHandler<dim, spacedim> &                       dof_handler,
+      DoFHandler<dim, spacedim> &                           dof_handler,
       const std::vector<predicate_function<dim, spacedim>> &predicates,
       const std::vector<unsigned int> &                     predicate_colors,
       std::map<unsigned int, std::map<unsigned int, unsigned int>>
@@ -1120,7 +1120,7 @@ namespace ColorEnriched
      * finite elements needed by @p dof_handler.
      */
     const hp::FECollection<dim, spacedim> &
-    build_fe_collection(hp::DoFHandler<dim, spacedim> &dof_handler);
+    build_fe_collection(DoFHandler<dim, spacedim> &dof_handler);
 
   private:
     /**

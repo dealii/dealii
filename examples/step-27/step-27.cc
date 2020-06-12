@@ -105,7 +105,7 @@ namespace Step27
 
     Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>          dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
@@ -186,7 +186,7 @@ namespace Step27
 
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem()
-    : dof_handler(triangulation)
+    : dof_handler(triangulation, /*enable_hp_capability */ true)
     , max_degree(dim <= 2 ? 7 : 5)
   {
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
@@ -447,7 +447,7 @@ namespace Step27
       // DoFHandler@<dim@>, which is why we have never seen it in previous
       // tutorial programs) that indicates the type of DoF handler to be
       // used. Here, we have to use the hp::DoFHandler class:
-      DataOut<dim, hp::DoFHandler<dim>> data_out;
+      DataOut<dim, DoFHandler<dim>> data_out;
 
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(solution, "solution");

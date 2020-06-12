@@ -110,9 +110,9 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   void
   point_gradient(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const VectorType &                   fe_function,
-    const Point<spacedim, double> &      point,
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point,
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
 
   /**
@@ -171,9 +171,9 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const hp::DoFHandler<dim, spacedim> &dof,
-                 const VectorType &                   fe_function,
-                 const Point<spacedim, double> &      point);
+  point_gradient(const DoFHandler<dim, spacedim> &dof,
+                 const VectorType &               fe_function,
+                 const Point<spacedim, double> &  point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -236,7 +236,7 @@ namespace VectorTools
   void
   point_gradient(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const VectorType &                          fe_function,
     const Point<spacedim, double> &             point,
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
@@ -299,7 +299,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient(const hp::MappingCollection<dim, spacedim> &mapping,
-                 const hp::DoFHandler<dim, spacedim> &       dof,
+                 const DoFHandler<dim, spacedim> &           dof,
                  const VectorType &                          fe_function,
                  const Point<spacedim, double> &             point);
 

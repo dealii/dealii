@@ -1062,10 +1062,10 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   void
-  extract_hanging_node_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-                            std::vector<bool> &              selected_dofs)
+  extract_hanging_node_dofs(const DoFHandlerType &dof_handler,
+                            std::vector<bool> &   selected_dofs)
   {
     const IndexSet selected_dofs_as_index_set =
       extract_hanging_node_dofs(dof_handler);
@@ -1079,9 +1079,9 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   IndexSet
-  extract_hanging_node_dofs(const DoFHandler<dim, spacedim> &dof_handler)
+  extract_hanging_node_dofs(const DoFHandlerType &dof_handler)
   {
     return internal::extract_hanging_node_dofs(dof_handler);
   }
@@ -2329,7 +2329,7 @@ namespace DoFTools
   void
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
+    const DoFHandler<dim, spacedim> &           dof_handler,
     std::vector<Point<spacedim>> &              support_points,
     const ComponentMask &                       mask)
   {
@@ -2375,7 +2375,7 @@ namespace DoFTools
   void
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &        mapping,
-    const hp::DoFHandler<dim, spacedim> &               dof_handler,
+    const DoFHandler<dim, spacedim> &                   dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
     const ComponentMask &                               mask)
   {
@@ -2441,49 +2441,46 @@ namespace DoFTools
                               const Table<2, Coupling> &       table,
                               std::vector<Table<2, Coupling>> &tables_by_block)
   {
-    const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
-    const unsigned int                  nb = fe.n_blocks();
-
-    tables_by_block.resize(1);
-    tables_by_block[0].reinit(nb, nb);
-    tables_by_block[0].fill(none);
-
-    for (unsigned int i = 0; i < fe.n_components(); ++i)
+    if (dof_handler.hp_capability_enabled == false)
       {
-        const unsigned int ib = fe.component_to_block_index(i);
-        for (unsigned int j = 0; j < fe.n_components(); ++j)
-          {
-            const unsigned int jb = fe.component_to_block_index(j);
-            tables_by_block[0](ib, jb) |= table(i, j);
-          }
-      }
-  }
+        const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
+        const unsigned int                  nb = fe.n_blocks();
 
+        tables_by_block.resize(1);
+        tables_by_block[0].reinit(nb, nb);
+        tables_by_block[0].fill(none);
 
-  template <int dim, int spacedim>
-  void
-  convert_couplings_to_blocks(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                              const Table<2, Coupling> &           table,
-                              std::vector<Table<2, Coupling>> &tables_by_block)
-  {
-    const hp::FECollection<dim> &fe_collection =
-      dof_handler.get_fe_collection();
-    tables_by_block.resize(fe_collection.size());
-
-    for (unsigned int f = 0; f < fe_collection.size(); ++f)
-      {
-        const FiniteElement<dim, spacedim> &fe = fe_collection[f];
-
-        const unsigned int nb = fe.n_blocks();
-        tables_by_block[f].reinit(nb, nb);
-        tables_by_block[f].fill(none);
         for (unsigned int i = 0; i < fe.n_components(); ++i)
           {
             const unsigned int ib = fe.component_to_block_index(i);
             for (unsigned int j = 0; j < fe.n_components(); ++j)
               {
                 const unsigned int jb = fe.component_to_block_index(j);
-                tables_by_block[f](ib, jb) |= table(i, j);
+                tables_by_block[0](ib, jb) |= table(i, j);
+              }
+          }
+      }
+    else
+      {
+        const hp::FECollection<dim> &fe_collection =
+          dof_handler.get_fe_collection();
+        tables_by_block.resize(fe_collection.size());
+
+        for (unsigned int f = 0; f < fe_collection.size(); ++f)
+          {
+            const FiniteElement<dim, spacedim> &fe = fe_collection[f];
+
+            const unsigned int nb = fe.n_blocks();
+            tables_by_block[f].reinit(nb, nb);
+            tables_by_block[f].fill(none);
+            for (unsigned int i = 0; i < fe.n_components(); ++i)
+              {
+                const unsigned int ib = fe.component_to_block_index(i);
+                for (unsigned int j = 0; j < fe.n_components(); ++j)
+                  {
+                    const unsigned int jb = fe.component_to_block_index(j);
+                    tables_by_block[f](ib, jb) |= table(i, j);
+                  }
               }
           }
       }

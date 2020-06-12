@@ -48,28 +48,18 @@ namespace VectorTools
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>>
       &gradients)
   {
-    point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
-                   dof,
-                   fe_function,
-                   point,
-                   gradients);
-  }
-
-
-  template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const VectorType &                   fe_function,
-    const Point<spacedim> &              point,
-    std::vector<Tensor<1, spacedim, typename VectorType::value_type>>
-      &gradients)
-  {
-    point_gradient(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
-                   dof,
-                   fe_function,
-                   point,
-                   gradients);
+    if (dof.hp_capability_enabled == false)
+      point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
+                     dof,
+                     fe_function,
+                     point,
+                     gradients);
+    else
+      point_gradient(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+                     dof,
+                     fe_function,
+                     point,
+                     gradients);
   }
 
 
@@ -79,24 +69,17 @@ namespace VectorTools
                  const VectorType &               fe_function,
                  const Point<spacedim> &          point)
   {
-    return point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
-                          dof,
-                          fe_function,
-                          point);
-  }
-
-
-  template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const hp::DoFHandler<dim, spacedim> &dof,
-                 const VectorType &                   fe_function,
-                 const Point<spacedim> &              point)
-  {
-    return point_gradient(
-      hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
-      dof,
-      fe_function,
-      point);
+    if (dof.hp_capability_enabled == false)
+      return point_gradient(StaticMappingQ1<dim, spacedim>::mapping,
+                            dof,
+                            fe_function,
+                            point);
+    else
+      return point_gradient(
+        hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+        dof,
+        fe_function,
+        point);
   }
 
 
@@ -148,7 +131,7 @@ namespace VectorTools
   void
   point_gradient(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
+    const DoFHandler<dim, spacedim> &           dof,
     const VectorType &                          fe_function,
     const Point<spacedim> &                     point,
     std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &gradient)
@@ -162,9 +145,8 @@ namespace VectorTools
     // first find the cell in which this point
     // is, initialize a quadrature rule with
     // it, and then a FEValues object
-    const std::pair<
-      typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
-      Point<spacedim>>
+    const std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                    Point<spacedim>>
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
@@ -213,7 +195,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, spacedim, typename VectorType::value_type>
   point_gradient(const hp::MappingCollection<dim, spacedim> &mapping,
-                 const hp::DoFHandler<dim, spacedim> &       dof,
+                 const DoFHandler<dim, spacedim> &           dof,
                  const VectorType &                          fe_function,
                  const Point<spacedim> &                     point)
   {

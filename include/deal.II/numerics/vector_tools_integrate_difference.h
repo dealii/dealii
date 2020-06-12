@@ -174,7 +174,7 @@ namespace VectorTools
   void
   integrate_difference(
     const hp::MappingCollection<dim, spacedim> &             mapping,
-    const hp::DoFHandler<dim, spacedim> &                    dof,
+    const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -190,7 +190,7 @@ namespace VectorTools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   integrate_difference(
-    const hp::DoFHandler<dim, spacedim> &                    dof,
+    const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -253,7 +253,7 @@ namespace VectorTools
   DEAL_II_DEPRECATED typename std::enable_if<
     !std::is_same<typename InVector::value_type, double>::value>::type
   integrate_difference(const hp::MappingCollection<dim, spacedim> &mapping,
-                       const hp::DoFHandler<dim, spacedim> &       dof,
+                       const DoFHandler<dim, spacedim> &           dof,
                        const InVector &                            fe_function,
                        const Function<spacedim, double> &exact_solution,
                        OutVector &                       difference,
@@ -271,14 +271,14 @@ namespace VectorTools
   template <int dim, class InVector, class OutVector, int spacedim>
   DEAL_II_DEPRECATED typename std::enable_if<
     !std::is_same<typename InVector::value_type, double>::value>::type
-  integrate_difference(const hp::DoFHandler<dim, spacedim> &dof,
-                       const InVector &                     fe_function,
-                       const Function<spacedim, double> &   exact_solution,
-                       OutVector &                          difference,
-                       const hp::QCollection<dim> &         q,
-                       const NormType &                     norm,
-                       const Function<spacedim, double> *   weight   = nullptr,
-                       const double                         exponent = 2.);
+  integrate_difference(const DoFHandler<dim, spacedim> & dof,
+                       const InVector &                  fe_function,
+                       const Function<spacedim, double> &exact_solution,
+                       OutVector &                       difference,
+                       const hp::QCollection<dim> &      q,
+                       const NormType &                  norm,
+                       const Function<spacedim, double> *weight   = nullptr,
+                       const double                      exponent = 2.);
 
   /**
    * Take a Vector @p cellwise_error of errors on each cell with

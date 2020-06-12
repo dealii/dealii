@@ -86,7 +86,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         const Function<deal_II_space_dimension, typename VEC::value_type> &,
         Vector<double> &,
@@ -100,7 +100,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                            VEC,
                            Vector<double>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         const Function<deal_II_space_dimension, typename VEC::value_type> &,
         Vector<double> &,
@@ -116,7 +116,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         const Function<deal_II_space_dimension, typename VEC::value_type> &,
         Vector<float> &,
@@ -130,7 +130,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                            VEC,
                            Vector<float>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         const Function<deal_II_space_dimension, typename VEC::value_type> &,
         Vector<float> &,
@@ -485,7 +485,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -501,7 +501,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -517,7 +517,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -533,7 +533,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -550,7 +550,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::TpetraWrappers::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -565,7 +565,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            BlockVector<float>,
                            Vector<double>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -579,7 +579,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::Vector<float>,
                            Vector<double>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -593,7 +593,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::distributed::Vector<float>,
                            Vector<double>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -607,7 +607,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::distributed::BlockVector<float>,
                            Vector<double>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -622,7 +622,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::TpetraWrappers::Vector<float>,
                            Vector<double>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::TpetraWrappers::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<double> &,
@@ -639,7 +639,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -655,7 +655,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -671,7 +671,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -687,7 +687,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -704,7 +704,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            deal_II_space_dimension>(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::TpetraWrappers::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -719,7 +719,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            BlockVector<float>,
                            Vector<float>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -733,7 +733,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::Vector<float>,
                            Vector<float>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -747,7 +747,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::distributed::Vector<float>,
                            Vector<float>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -761,7 +761,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::distributed::BlockVector<float>,
                            Vector<float>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::distributed::BlockVector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,
@@ -776,7 +776,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                            LinearAlgebra::TpetraWrappers::Vector<float>,
                            Vector<float>,
                            deal_II_space_dimension>(
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const LinearAlgebra::TpetraWrappers::Vector<float> &,
         const Function<deal_II_space_dimension> &,
         Vector<float> &,

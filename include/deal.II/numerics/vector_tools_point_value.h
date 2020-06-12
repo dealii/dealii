@@ -154,7 +154,7 @@ namespace VectorTools
   void
   create_point_source_vector(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
+    const DoFHandler<dim, spacedim> &           dof_handler,
     const Point<spacedim, double> &             p,
     Vector<double> &                            rhs_vector);
 
@@ -166,9 +166,9 @@ namespace VectorTools
    */
   template <int dim, int spacedim>
   void
-  create_point_source_vector(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                             const Point<spacedim, double> &      p,
-                             Vector<double> &                     rhs_vector);
+  create_point_source_vector(const DoFHandler<dim, spacedim> &dof_handler,
+                             const Point<spacedim, double> &  p,
+                             Vector<double> &                 rhs_vector);
 
   /**
    * Create a right hand side vector for a point source at point @p p. This
@@ -214,7 +214,7 @@ namespace VectorTools
   void
   create_point_source_vector(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
+    const DoFHandler<dim, spacedim> &           dof_handler,
     const Point<spacedim, double> &             p,
     const Point<dim, double> &                  direction,
     Vector<double> &                            rhs_vector);
@@ -227,10 +227,10 @@ namespace VectorTools
    */
   template <int dim, int spacedim>
   void
-  create_point_source_vector(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                             const Point<spacedim, double> &      p,
-                             const Point<dim, double> &           direction,
-                             Vector<double> &                     rhs_vector);
+  create_point_source_vector(const DoFHandler<dim, spacedim> &dof_handler,
+                             const Point<spacedim, double> &  p,
+                             const Point<dim, double> &       direction,
+                             Vector<double> &                 rhs_vector);
 
   // @}
 
@@ -344,7 +344,7 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_value(const hp::DoFHandler<dim, spacedim> &    dof,
+  point_value(const DoFHandler<dim, spacedim> &        dof,
               const VectorType &                       fe_function,
               const Point<spacedim, double> &          point,
               Vector<typename VectorType::value_type> &value);
@@ -413,9 +413,9 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
-  point_value(const hp::DoFHandler<dim, spacedim> &dof,
-              const VectorType &                   fe_function,
-              const Point<spacedim, double> &      point);
+  point_value(const DoFHandler<dim, spacedim> &dof,
+              const VectorType &               fe_function,
+              const Point<spacedim, double> &  point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -479,7 +479,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   void
   point_value(const hp::MappingCollection<dim, spacedim> &mapping,
-              const hp::DoFHandler<dim, spacedim> &       dof,
+              const DoFHandler<dim, spacedim> &           dof,
               const VectorType &                          fe_function,
               const Point<spacedim, double> &             point,
               Vector<typename VectorType::value_type> &   value);
@@ -544,7 +544,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
   point_value(const hp::MappingCollection<dim, spacedim> &mapping,
-              const hp::DoFHandler<dim, spacedim> &       dof,
+              const DoFHandler<dim, spacedim> &           dof,
               const VectorType &                          fe_function,
               const Point<spacedim, double> &             point);
   //@}

@@ -31,6 +31,9 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
                       bool                             levels_only,
                       bool                             active_only)
 {
+  Assert(dof.hp_capability_enabled == false,
+         (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
+
   if (!levels_only && dof.has_active_dofs())
     {
       const std::vector<types::global_dof_index> sizes =
@@ -56,22 +59,11 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize(const hp::DoFHandler<dim, spacedim> &dof,
-                      bool                                 levels_only,
-                      bool                                 active_only)
-{
-  AssertThrow(false, ExcNotImplemented());
-  (void)dof;
-  (void)levels_only;
-  (void)active_only;
-}
-
-
-
-template <int dim, int spacedim>
-void
 BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 {
+  Assert(dof.hp_capability_enabled == false,
+         (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
+
   const FiniteElement<dim, spacedim> & fe = dof.get_fe();
   std::vector<types::global_dof_index> sizes(fe.n_blocks());
 
@@ -83,16 +75,6 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
   local_renumbering.resize(fe.n_dofs_per_cell());
   FETools::compute_block_renumbering(fe, local_renumbering, sizes, false);
   bi_local.reinit(sizes);
-}
-
-
-
-template <int dim, int spacedim>
-void
-BlockInfo::initialize_local(const hp::DoFHandler<dim, spacedim> &dof)
-{
-  AssertThrow(false, ExcNotImplemented());
-  (void)dof;
 }
 
 // explicit instantiations

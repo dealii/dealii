@@ -16,8 +16,6 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
-  dof_faces.cc
-  dof_level.cc
   fe_collection.cc
   fe_values.cc
   mapping_collection.cc

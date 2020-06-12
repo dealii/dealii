@@ -47,23 +47,18 @@ namespace VectorTools
               const Point<spacedim> &                  point,
               Vector<typename VectorType::value_type> &value)
   {
-    point_value(
-      StaticMappingQ1<dim, spacedim>::mapping, dof, fe_function, point, value);
-  }
-
-
-  template <int dim, typename VectorType, int spacedim>
-  void
-  point_value(const hp::DoFHandler<dim, spacedim> &    dof,
-              const VectorType &                       fe_function,
-              const Point<spacedim> &                  point,
-              Vector<typename VectorType::value_type> &value)
-  {
-    point_value(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
-                dof,
-                fe_function,
-                point,
-                value);
+    if (dof.hp_capability_enabled == false)
+      point_value(StaticMappingQ1<dim, spacedim>::mapping,
+                  dof,
+                  fe_function,
+                  point,
+                  value);
+    else
+      point_value(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+                  dof,
+                  fe_function,
+                  point,
+                  value);
   }
 
 
@@ -73,23 +68,16 @@ namespace VectorTools
               const VectorType &               fe_function,
               const Point<spacedim> &          point)
   {
-    return point_value(StaticMappingQ1<dim, spacedim>::mapping,
-                       dof,
-                       fe_function,
-                       point);
-  }
-
-
-  template <int dim, typename VectorType, int spacedim>
-  typename VectorType::value_type
-  point_value(const hp::DoFHandler<dim, spacedim> &dof,
-              const VectorType &                   fe_function,
-              const Point<spacedim> &              point)
-  {
-    return point_value(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
-                       dof,
-                       fe_function,
-                       point);
+    if (dof.hp_capability_enabled == false)
+      return point_value(StaticMappingQ1<dim, spacedim>::mapping,
+                         dof,
+                         fe_function,
+                         point);
+    else
+      return point_value(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
+                         dof,
+                         fe_function,
+                         point);
   }
 
 
@@ -138,7 +126,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   void
   point_value(const hp::MappingCollection<dim, spacedim> &mapping,
-              const hp::DoFHandler<dim, spacedim> &       dof,
+              const DoFHandler<dim, spacedim> &           dof,
               const VectorType &                          fe_function,
               const Point<spacedim> &                     point,
               Vector<typename VectorType::value_type> &   value)
@@ -152,9 +140,8 @@ namespace VectorTools
     // first find the cell in which this point
     // is, initialize a quadrature rule with
     // it, and then a FEValues object
-    const std::pair<
-      typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
-      Point<spacedim>>
+    const std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                    Point<spacedim>>
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
@@ -203,7 +190,7 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
   point_value(const hp::MappingCollection<dim, spacedim> &mapping,
-              const hp::DoFHandler<dim, spacedim> &       dof,
+              const DoFHandler<dim, spacedim> &           dof,
               const VectorType &                          fe_function,
               const Point<spacedim> &                     point)
   {
@@ -216,6 +203,7 @@ namespace VectorTools
 
     return value(0);
   }
+
 
   template <int dim, typename VectorType, int spacedim>
   void
@@ -328,10 +316,16 @@ namespace VectorTools
                              const Point<spacedim> &          p,
                              Vector<double> &                 rhs_vector)
   {
-    create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
-                               dof_handler,
-                               p,
-                               rhs_vector);
+    if (dof_handler.hp_capability_enabled)
+      create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
+                                 dof_handler,
+                                 p,
+                                 rhs_vector);
+    else
+      create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
+                                 dof_handler,
+                                 p,
+                                 rhs_vector);
   }
 
 
@@ -339,7 +333,7 @@ namespace VectorTools
   void
   create_point_source_vector(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
+    const DoFHandler<dim, spacedim> &           dof_handler,
     const Point<spacedim> &                     p,
     Vector<double> &                            rhs_vector)
   {
@@ -350,7 +344,7 @@ namespace VectorTools
 
     rhs_vector = 0;
 
-    std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
+    std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
               Point<spacedim>>
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof_handler, p);
@@ -371,20 +365,6 @@ namespace VectorTools
 
     for (unsigned int i = 0; i < dofs_per_cell; i++)
       rhs_vector(local_dof_indices[i]) = fe_values.shape_value(i, 0);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  create_point_source_vector(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                             const Point<spacedim> &              p,
-                             Vector<double> &                     rhs_vector)
-  {
-    create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
-                               dof_handler,
-                               p,
-                               rhs_vector);
   }
 
 
@@ -439,11 +419,18 @@ namespace VectorTools
                              const Point<dim> &               orientation,
                              Vector<double> &                 rhs_vector)
   {
-    create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
-                               dof_handler,
-                               p,
-                               orientation,
-                               rhs_vector);
+    if (dof_handler.hp_capability_enabled)
+      create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
+                                 dof_handler,
+                                 p,
+                                 orientation,
+                                 rhs_vector);
+    else
+      create_point_source_vector(StaticMappingQ1<dim, spacedim>::mapping,
+                                 dof_handler,
+                                 p,
+                                 orientation,
+                                 rhs_vector);
   }
 
 
@@ -451,7 +438,7 @@ namespace VectorTools
   void
   create_point_source_vector(
     const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
+    const DoFHandler<dim, spacedim> &           dof_handler,
     const Point<spacedim> &                     p,
     const Point<dim> &                          orientation,
     Vector<double> &                            rhs_vector)
@@ -464,7 +451,7 @@ namespace VectorTools
 
     rhs_vector = 0;
 
-    std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
+    std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
               Point<spacedim>>
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof_handler, p);
@@ -487,22 +474,6 @@ namespace VectorTools
     for (unsigned int i = 0; i < dofs_per_cell; i++)
       rhs_vector(local_dof_indices[i]) =
         orientation * fe_values[vec].value(i, 0);
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  create_point_source_vector(const hp::DoFHandler<dim, spacedim> &dof_handler,
-                             const Point<spacedim> &              p,
-                             const Point<dim> &                   orientation,
-                             Vector<double> &                     rhs_vector)
-  {
-    create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
-                               dof_handler,
-                               p,
-                               orientation,
-                               rhs_vector);
   }
 } // namespace VectorTools
 

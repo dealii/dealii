@@ -77,7 +77,24 @@ namespace internal
   {
     struct Implementation;
   }
+
+  namespace hp
+  {
+    namespace DoFHandlerImplementation
+    {
+      struct Implementation;
+    }
+  } // namespace hp
 } // namespace internal
+
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int dim, int spacedim, typename VectorType>
+    class CellDataTransfer;
+  }
+} // namespace parallel
 #endif
 
 /**
@@ -403,32 +420,50 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Make the type of this DoFHandler available in function templates.
+   * Boolean indicating whether or not the current DoFHander has hp
+   * capabilities.
    */
-  static const bool is_hp_dof_handler = false;
+  const bool hp_capability_enabled;
 
   /**
-   * The default index of the finite element to be used on a given cell. Since
-   * the present class only supports the same finite element to be used on all
-   * cells, the index of the finite element needs to be the same on all cells
-   * anyway, and by convention we pick zero for this value. The situation is
-   * different for hp objects (i.e. the hp::DoFHandler class) where different
-   * finite element indices may be used on different cells, and the default
-   * index there corresponds to an invalid value.
+   * The default index of the finite element to be used on a given cell.
    */
   static const unsigned int default_fe_index = 0;
+
+  /**
+   * Invalid index of the finite element to be used on a given cell.
+   */
+  static const unsigned int invalid_fe_index = numbers::invalid_unsigned_int;
+
+  /**
+   * The type in which we store the active FE index.
+   */
+  using active_fe_index_type = unsigned short int;
+
+  /**
+   * The type in which we store the offsets in the CRS data structures.
+   */
+  using offset_type = unsigned int;
+
+  /**
+   * Invalid active_fe_index which will be used as a default value to determine
+   *  whether a future_fe_index has been set or not.
+   */
+  static const active_fe_index_type invalid_active_fe_index =
+    static_cast<active_fe_index_type>(-1);
 
   /**
    * Standard constructor, not initializing any data. After constructing an
    * object with this constructor, use initialize() to make a valid
    * DoFHandler.
    */
-  DoFHandler();
+  DoFHandler(const bool hp_capability_enabled = false);
 
   /**
    * Constructor. Take @p tria as the triangulation to work on.
    */
-  DoFHandler(const Triangulation<dim, spacedim> &tria);
+  DoFHandler(const Triangulation<dim, spacedim> &tria,
+             const bool                          hp_capability_enabled = false);
 
   /**
    * Copy constructor. DoFHandler objects are large and expensive.
@@ -461,6 +496,13 @@ public:
              const FiniteElement<dim, spacedim> &fe);
 
   /**
+   * Same as above but taking an hp::FECollection object.
+   */
+  void
+  initialize(const Triangulation<dim, spacedim> &   tria,
+             const hp::FECollection<dim, spacedim> &fe);
+
+  /**
    * Assign a FiniteElement @p fe to this object.
    *
    * @note This function makes a copy of the finite element given as
@@ -481,8 +523,29 @@ public:
    * element. In both cases, accessing degrees of freedom will lead to invalid
    * results. To restore consistency, call distribute_dofs().
    */
-  virtual void
+  void
   set_fe(const FiniteElement<dim, spacedim> &fe);
+
+  /**
+   * Same as above but taking an hp::FECollection object.
+   */
+  void
+  set_fe(const hp::FECollection<dim, spacedim> &fe);
+
+  /**
+   * Go through the triangulation and set the active FE indices of all
+   * active cells to the values given in @p active_fe_indices.
+   */
+  void
+  set_active_fe_indices(const std::vector<unsigned int> &active_fe_indices);
+
+  /**
+   * Go through the triangulation and store the active FE indices of all
+   * active cells to the vector @p active_fe_indices. This vector is
+   * resized, if necessary.
+   */
+  void
+  get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
 
   /**
    * Go through the triangulation and "distribute" the degrees of
@@ -513,15 +576,21 @@ public:
    * argument, and stores it as a member variable, similarly to the above
    * function set_fe().
    */
-  virtual void
+  void
   distribute_dofs(const FiniteElement<dim, spacedim> &fe);
+
+  /**
+   * Same as above but taking an hp::FECollection object.
+   */
+  void
+  distribute_dofs(const hp::FECollection<dim, spacedim> &fe);
 
   /**
    * Distribute level degrees of freedom on each level for geometric
    * multigrid. The active DoFs need to be distributed using distribute_dofs()
    * before calling this function.
    */
-  virtual void
+  void
   distribute_mg_dofs();
 
   /**
@@ -561,7 +630,7 @@ public:
   /**
    * Clear all data of this object.
    */
-  virtual void
+  void
   clear();
 
   /**
@@ -729,7 +798,6 @@ public:
    */
   active_cell_iterator
   end_active(const unsigned int level) const;
-
 
   /**
    * Iterator to the first used cell on level @p level. This returns a
@@ -973,7 +1041,6 @@ public:
   const BlockInfo &
   block_info() const;
 
-
   /**
    * Return the number of degrees of freedom that belong to this process.
    *
@@ -1086,6 +1153,43 @@ public:
   get_triangulation() const;
 
   /**
+   * Whenever serialization with a parallel::distributed::Triangulation as the
+   * underlying triangulation is considered, we also need to consider storing
+   * the active_fe_indices on all active cells as well.
+   *
+   * This function registers that these indices are to be stored whenever the
+   * parallel::distributed::Triangulation::save() function is called on the
+   * underlying triangulation.
+   *
+   * @note Currently only implemented for triangulations of type
+   *   parallel::distributed::Triangulation. An assertion will be triggered if
+   *   a different type is registered.
+   *
+   * @see The documentation of parallel::distributed::SolutionTransfer has further
+   *   information on serialization.
+   */
+  void
+  prepare_for_serialization_of_active_fe_indices();
+
+  /**
+   * Whenever serialization with a parallel::distributed::Triangulation as the
+   * underlying triangulation is considered, we also need to consider storing
+   * the active_fe_indices on all active cells as well.
+   *
+   * This function deserializes and distributes the previously stored
+   * active_fe_indices on all active cells.
+   *
+   * @note Currently only implemented for triangulations of type
+   *   parallel::distributed::Triangulation. An assertion will be triggered if
+   *   a different type is registered.
+   *
+   * @see The documentation of parallel::distributed::SolutionTransfer has further
+   *   information on serialization.
+   */
+  void
+  deserialize_active_fe_indices();
+
+  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    *
@@ -1128,22 +1232,13 @@ public:
 
   /**
    * Exception
-   * @ingroup Exceptions
    */
-  DeclException0(ExcGridsDoNotMatch);
+  DeclException0(ExcNoFESelected);
   /**
    * Exception
    * @ingroup Exceptions
    */
   DeclException0(ExcInvalidBoundaryIndicator);
-  /**
-   * Exception
-   * @ingroup Exceptions
-   */
-  DeclException1(ExcNewNumbersNotConsecutive,
-                 types::global_dof_index,
-                 << "The given list of new dof indices is not consecutive: "
-                 << "the index " << arg1 << " does not exist.");
   /**
    * Exception
    * @ingroup Exceptions
@@ -1156,59 +1251,37 @@ public:
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcFacesHaveNoLevel);
+  DeclException1(ExcNewNumbersNotConsecutive,
+                 types::global_dof_index,
+                 << "The given list of new dof indices is not consecutive: "
+                 << "the index " << arg1 << " does not exist.");
   /**
-   * The triangulation level you accessed is empty.
-   * @ingroup Exceptions
+   * Exception
    */
-  DeclException1(ExcEmptyLevel,
+  DeclException2(ExcInvalidFEIndex,
                  int,
-                 << "You tried to do something on level " << arg1
-                 << ", but this level is empty.");
+                 int,
+                 << "The mesh contains a cell with an active_fe_index of "
+                 << arg1 << ", but the finite element collection only has "
+                 << arg2 << " elements");
 
+  /**
+   * Exception used when a certain feature doesn't make sense when
+   * DoFHandler does not hp capabilities.
+   */
+  DeclExceptionMsg(ExcNotAvailableWithoutHP,
+                   "The current function doesn't make sense when used with a "
+                   "DoFHandler without hp capabilities.");
+
+  /**
+   * Exception used when a certain feature is not implemented when the
+   * DoFHandler has hp capabilities.
+   */
+  DeclExceptionMsg(ExcNotImplementedWithHP,
+                   "The current function has not yet been implemented for a "
+                   "DoFHandler with hp capabilities.");
 
 private:
-  /**
-   * An object containing information on the block structure.
-   */
-  BlockInfo block_info_object;
-
-  /**
-   * Address of the triangulation to work on.
-   */
-  SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
-    tria;
-
-
-  /**
-   * Store a hp::FECollection object containing the (one)
-   * FiniteElement this object is initialized with.
-   */
-  hp::FECollection<dim, spacedim> fe_collection;
-
-  /**
-   * An object that describes how degrees of freedom should be distributed and
-   * renumbered.
-   */
-  std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::
-                    PolicyBase<dim, spacedim>>
-    policy;
-
-  /**
-   * A structure that contains all sorts of numbers that characterize the
-   * degrees of freedom this object works on.
-   *
-   * For most members of this structure, there is an accessor function in this
-   * class that returns its value.
-   */
-  dealii::internal::DoFHandlerImplementation::NumberCache number_cache;
-
-  /**
-   * Data structure like number_cache, but for each multigrid level.
-   */
-  std::vector<dealii::internal::DoFHandlerImplementation::NumberCache>
-    mg_number_cache;
-
   /**
    * A data structure that is used to store the DoF indices associated with a
    * particular vertex. Unlike cells, vertices live on several levels of a
@@ -1288,6 +1361,182 @@ private:
   };
 
   /**
+   * Whenever the underlying triangulation changes by either
+   * h/p refinement/coarsening and serialization, the active_fe_index of cells
+   * needs to be transferred. This structure stores all temporary information
+   * required during that process.
+   */
+  struct ActiveFEIndexTransfer
+  {
+    /**
+     * Container to temporarily store the iterator and future active FE index
+     * of cells that persist.
+     */
+    std::map<const cell_iterator, const unsigned int> persisting_cells_fe_index;
+
+    /**
+     * Container to temporarily store the iterator and future active FE index
+     * of cells that will be refined.
+     */
+    std::map<const cell_iterator, const unsigned int> refined_cells_fe_index;
+
+    /**
+     * Container to temporarily store the iterator and future active FE index
+     * of parent cells that will remain after coarsening.
+     */
+    std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
+
+    /**
+     * Container to temporarily store the active_fe_index of every locally
+     * owned cell for transfer across parallel::distributed::Triangulation
+     * objects.
+     */
+    std::vector<unsigned int> active_fe_indices;
+
+    /**
+     * Helper object to transfer all active_fe_indices on
+     * parallel::distributed::Triangulation objects during
+     * refinement/coarsening and serialization.
+     */
+    std::unique_ptr<
+      parallel::distributed::
+        CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>
+      cell_data_transfer;
+  };
+
+  /**
+   * An object containing information on the block structure.
+   */
+  BlockInfo block_info_object;
+
+  /**
+   * Address of the triangulation to work on.
+   */
+  SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
+    tria;
+
+  /**
+   * Store a hp::FECollection object. If only a single FiniteElement is
+   * used during initialization of this object, it contains the (one)
+   * FiniteElement.
+   */
+  hp::FECollection<dim, spacedim> fe_collection;
+
+  /**
+   * An object that describes how degrees of freedom should be distributed and
+   * renumbered.
+   */
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::
+                    PolicyBase<dim, spacedim>>
+    policy;
+
+  /**
+   * A structure that contains all sorts of numbers that characterize the
+   * degrees of freedom this object works on.
+   *
+   * For most members of this structure, there is an accessor function in this
+   * class that returns its value.
+   */
+  dealii::internal::DoFHandlerImplementation::NumberCache number_cache;
+
+  /**
+   * Data structure like number_cache, but for each multigrid level.
+   */
+  std::vector<dealii::internal::DoFHandlerImplementation::NumberCache>
+    mg_number_cache;
+
+  /**
+   * Cached indices of the degrees of freedom of all active cell. Identification
+   * of the appropriate position of a cell in the vectors is done via
+   * cell_dof_cache_ptr (CRS scheme).
+   */
+  mutable std::vector<std::vector<types::global_dof_index>>
+    cell_dof_cache_indices;
+
+  /**
+   * Pointer to the first cached degree of freedom of an active cell
+   * (identified by level and level index) within cell_dof_cache_indices.
+   */
+  mutable std::vector<std::vector<offset_type>> cell_dof_cache_ptr;
+
+  /**
+   * Indices of degree of freedom of each d+1 geometric object (3D: vertex,
+   * line, quad, hex) for all relevant active finite elements. Identification
+   * of the appropriate position is done via object_dof_ptr (CRS scheme).
+   */
+  mutable std::vector<std::array<std::vector<types::global_dof_index>, dim + 1>>
+    object_dof_indices;
+
+  /**
+   * Pointer to the first cached degree of freedom of a geometric object for all
+   * relevant active finite elements.
+   *
+   * @note In normal mode it is possible to access this data strucutre directly.
+   *   In hp mode, an indirection via hp_object_fe_indices/hp_object_fe_ptr is
+   * necessary.
+   */
+  mutable std::vector<std::array<std::vector<offset_type>, dim + 1>>
+    object_dof_ptr;
+
+  /**
+   * Active fe indices of each geometric object. Identification
+   * of the appropriate position of a cell in the vectors is done via
+   * hp_object_fe_ptr (CRS scheme).
+   */
+  mutable std::array<std::vector<active_fe_index_type>, dim + 1>
+    hp_object_fe_indices;
+
+  /**
+   * Pointer to the first fe index of a geometric object.
+   */
+  mutable std::array<std::vector<offset_type>, dim + 1> hp_object_fe_ptr;
+
+  /**
+   * Active fe index of an active cell (identified by level and level index).
+   * This vector is only used in hp mode.
+   */
+  mutable std::vector<std::vector<active_fe_index_type>>
+    hp_cell_active_fe_indices;
+
+  /**
+   * Future fe index of an active cell (identified by level and level index).
+   * This vector is only used in hp mode.
+   */
+  mutable std::vector<std::vector<active_fe_index_type>>
+    hp_cell_future_fe_indices;
+
+  /**
+   * An array to store the indices for level degrees of freedom located at
+   * vertices.
+   */
+  std::vector<MGVertexDoFs> mg_vertex_dofs;
+
+  /**
+   * Space to store the DoF numbers for the different multigrid levels.
+   */
+  std::vector<
+    std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>>
+    mg_levels;
+
+  /**
+   * Space to store DoF numbers of faces in the multigrid context.
+   */
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>>
+    mg_faces;
+
+  /**
+   * We embed our data structure into a pointer to control that
+   * all transfer related data only exists during the actual transfer process.
+   */
+  std::unique_ptr<ActiveFEIndexTransfer> active_fe_index_transfer;
+
+  /**
+   * A list of connections with which this object connects to the
+   * triangulation to get information about when the triangulation changes.
+   */
+  std::vector<boost::signals2::connection> tria_listeners;
+
+  /**
    * Free all memory used for non-multigrid data structures.
    */
   void
@@ -1299,6 +1548,9 @@ private:
   void
   clear_mg_space();
 
+  /**
+   * Return dof index of specified object.
+   */
   template <int structdim>
   types::global_dof_index
   get_dof_index(const unsigned int obj_level,
@@ -1306,6 +1558,9 @@ private:
                 const unsigned int fe_index,
                 const unsigned int local_index) const;
 
+  /**
+   * Return dof index of specified object.
+   */
   template <int structdim>
   void
   set_dof_index(const unsigned int            obj_level,
@@ -1315,48 +1570,117 @@ private:
                 const types::global_dof_index global_index) const;
 
   /**
-   * Array to store the indices for degrees of freedom located at vertices.
+   * Setup DoFHandler policy.
    */
-  std::vector<types::global_dof_index> vertex_dofs;
+  void
+  setup_policy();
 
   /**
-   * An array to store the indices for level degrees of freedom located at
-   * vertices.
+   * Setup DoFHandler policy and listeners (in the hp-context).
    */
-  std::vector<MGVertexDoFs> mg_vertex_dofs;
+  void
+  setup_policy_and_listeners();
 
   /**
-   * Space to store the DoF numbers for the different levels. Analogous to the
-   * <tt>levels[]</tt> tree of the Triangulation objects.
+   * Create default tables for the active_fe_indices.
+   * They are initialized with a zero
+   * indicator, meaning that fe[0] is going to be used by default. This
+   * method is called before refinement and while setting the finite elements
+   * via set_fe(). It ensures each cell has a valid active_fe_index.
    */
-  std::vector<
-    std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>>
-    levels;
-
-  std::vector<
-    std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>>
-    mg_levels;
+  void
+  create_active_fe_table();
 
   /**
-   * Space to store DoF numbers of faces. They are not stored in
-   * <tt>levels</tt> since faces are not organized hierarchically, but in a
-   * flat array.
+   * A function that will be triggered through a triangulation
+   * signal just before the triangulation is modified.
+   *
+   * The function that stores the active_fe_flags of all cells that will
+   * be refined or coarsened before the refinement happens, so that
+   * they can be set again after refinement.
    */
-  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>>
-    faces;
+  void
+  pre_refinement_action();
 
-  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>>
-    mg_faces;
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just after the triangulation is modified.
+   *
+   * The function that restores the active_fe_flags of all cells that
+   * were refined.
+   */
+  void
+  post_refinement_action();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just before the associated Triangulation or
+   * parallel::shared::Triangulation is modified.
+   *
+   * The function that stores the active_fe_indices of all cells that will
+   * be refined or coarsened before the refinement happens, so that
+   * they can be set again after refinement.
+   */
+  void
+  pre_active_fe_index_transfer();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just before the associated parallel::distributed::Triangulation is
+   * modified.
+   *
+   * The function that stores all active_fe_indices on locally owned cells for
+   * distribution over all participating processors.
+   */
+  void
+  pre_distributed_active_fe_index_transfer();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just after the associated Triangulation or
+   * parallel::shared::Triangulation is modified.
+   *
+   * The function that restores the active_fe_indices of all cells that
+   * were refined or coarsened.
+   */
+  void
+  post_active_fe_index_transfer();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just after the associated parallel::distributed::Triangulation is
+   * modified.
+   *
+   * The function that restores all active_fe_indices on locally owned cells
+   * that have been communicated.
+   */
+  void
+  post_distributed_active_fe_index_transfer();
+
+  /**
+   * A function that will be triggered through a triangulation
+   * signal just after the associated parallel::distributed::Triangulation has
+   * been saved.
+   *
+   * The function frees all memory related to the transfer of
+   * active_fe_indices.
+   */
+  void
+  post_distributed_serialization_of_active_fe_indices();
+
 
   // Make accessor objects friends.
   template <int, class, bool>
-  friend class DoFAccessor;
+  friend class dealii::DoFAccessor;
   template <class, bool>
-  friend class DoFCellAccessor;
+  friend class dealii::DoFCellAccessor;
   friend struct dealii::internal::DoFAccessorImplementation::Implementation;
   friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 
+  // Likewise for DoFLevel objects since they need to access the vertex dofs
+  // in the functions that set and retrieve vertex dof indices.
   friend struct dealii::internal::DoFHandlerImplementation::Implementation;
+  friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;
 
@@ -1368,8 +1692,6 @@ private:
                 "equal to the space dimension <spacedim> in which it lives.");
 #endif
 };
-
-
 
 #ifndef DOXYGEN
 
@@ -1542,13 +1864,12 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
 
 template <int dim, int spacedim>
 inline const FiniteElement<dim, spacedim> &
-DoFHandler<dim, spacedim>::get_fe(const unsigned int index) const
+DoFHandler<dim, spacedim>::get_fe(const unsigned int number) const
 {
-  (void)index;
-  Assert(index == 0,
-         ExcMessage(
-           "There is only one FiniteElement stored. The index must be zero!"));
-  return get_fe_collection()[0];
+  Assert(fe_collection.size() > 0,
+         ExcMessage("No finite element collection is associated with "
+                    "this DoFHandler"));
+  return fe_collection[number];
 }
 
 
@@ -1557,10 +1878,9 @@ template <int dim, int spacedim>
 inline const hp::FECollection<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_fe_collection() const
 {
-  Assert(
-    fe_collection.size() > 0,
-    ExcMessage(
-      "You are trying to access the DoFHandler's FECollection object before it has been initialized."));
+  Assert(fe_collection.size() > 0,
+         ExcMessage("No finite element collection is associated with "
+                    "this DoFHandler"));
   return fe_collection;
 }
 
@@ -1582,6 +1902,8 @@ template <int dim, int spacedim>
 inline const BlockInfo &
 DoFHandler<dim, spacedim>::block_info() const
 {
+  Assert(this->hp_capability_enabled == false, ExcNotImplementedWithHP());
+
   return block_info_object;
 }
 
@@ -1594,6 +1916,9 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::map<types::boundary_id, const Function<spacedim, number> *>
     &boundary_ids) const
 {
+  Assert(!(dim == 2 && spacedim == 3) || this->hp_capability_enabled == false,
+         ExcNotImplementedWithHP());
+
   // extract the set of boundary ids and forget about the function object
   // pointers
   std::set<types::boundary_id> boundary_ids_only;
@@ -1632,34 +1957,53 @@ template <class Archive>
 void
 DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
 {
-  ar &block_info_object;
-  ar &vertex_dofs;
-  ar &number_cache;
+  if (this->hp_capability_enabled)
+    {
+      ar & this->object_dof_indices;
+      ar & this->object_dof_ptr;
 
-  // some versions of gcc have trouble with loading vectors of
-  // std::unique_ptr objects because std::unique_ptr does not
-  // have a copy constructor. do it one level at a time
-  unsigned int n_levels = levels.size();
-  ar &         n_levels;
-  for (unsigned int i = 0; i < levels.size(); ++i)
-    ar &levels[i];
+      ar & this->cell_dof_cache_indices;
+      ar & this->cell_dof_cache_ptr;
 
-  // boost dereferences a nullptr when serializing a nullptr
-  // at least up to 1.65.1. This causes problems with clang-5.
-  // Therefore, work around it.
-  bool faces_is_nullptr = (faces.get() == nullptr);
-  ar & faces_is_nullptr;
-  if (!faces_is_nullptr)
-    ar &faces;
+      ar & this->hp_cell_active_fe_indices;
+      ar & this->hp_cell_future_fe_indices;
 
-  // write out the number of triangulation cells and later check during
-  // loading that this number is indeed correct; same with something that
-  // identifies the FE and the policy
-  unsigned int n_cells     = tria->n_cells();
-  std::string  fe_name     = this->get_fe(0).get_name();
-  std::string  policy_name = internal::policy_to_string(*policy);
+      ar &hp_object_fe_ptr;
+      ar &hp_object_fe_indices;
 
-  ar &n_cells &fe_name &policy_name;
+      ar &number_cache;
+
+      ar &mg_number_cache;
+
+      // write out the number of triangulation cells and later check during
+      // loading that this number is indeed correct; same with something that
+      // identifies the policy
+      const unsigned int n_cells = this->tria->n_cells();
+      std::string        policy_name =
+        dealii::internal::policy_to_string(*this->policy);
+
+      ar &n_cells &policy_name;
+    }
+  else
+    {
+      ar & this->block_info_object;
+      ar &number_cache;
+
+      ar & this->object_dof_indices;
+      ar & this->object_dof_ptr;
+
+      ar & this->cell_dof_cache_indices;
+      ar & this->cell_dof_cache_ptr;
+
+      // write out the number of triangulation cells and later check during
+      // loading that this number is indeed correct; same with something that
+      // identifies the FE and the policy
+      unsigned int n_cells     = this->tria->n_cells();
+      std::string  fe_name     = this->get_fe(0).get_name();
+      std::string  policy_name = internal::policy_to_string(*this->policy);
+
+      ar &n_cells &fe_name &policy_name;
+    }
 }
 
 
@@ -1669,60 +2013,85 @@ template <class Archive>
 void
 DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 {
-  ar &block_info_object;
-  ar &vertex_dofs;
-  ar &number_cache;
-
-  // boost::serialization can restore pointers just fine, but if the
-  // pointer object still points to something useful, that object is not
-  // destroyed and we end up with a memory leak. consequently, first delete
-  // previous content before re-loading stuff
-  levels.clear();
-  faces.reset();
-
-  // some versions of gcc have trouble with loading vectors of
-  // std::unique_ptr objects because std::unique_ptr does not
-  // have a copy constructor. do it one level at a time
-  unsigned int size;
-  ar &         size;
-  levels.resize(size);
-  for (unsigned int i = 0; i < levels.size(); ++i)
+  if (this->hp_capability_enabled)
     {
-      std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<dim>> level;
-      ar &                                                               level;
-      levels[i] = std::move(level);
+      ar & this->object_dof_indices;
+      ar & this->object_dof_ptr;
+
+      ar & this->cell_dof_cache_indices;
+      ar & this->cell_dof_cache_ptr;
+
+      ar & this->hp_cell_active_fe_indices;
+      ar & this->hp_cell_future_fe_indices;
+
+      ar &hp_object_fe_ptr;
+      ar &hp_object_fe_indices;
+
+      ar &number_cache;
+
+      ar &mg_number_cache;
+
+      // these are the checks that correspond to the last block in the save()
+      // function
+      unsigned int n_cells;
+      std::string  policy_name;
+
+      ar &n_cells &policy_name;
+
+      AssertThrow(
+        n_cells == this->tria->n_cells(),
+        ExcMessage(
+          "The object being loaded into does not match the triangulation "
+          "that has been stored previously."));
+      AssertThrow(
+        policy_name == dealii::internal::policy_to_string(*this->policy),
+        ExcMessage("The policy currently associated with this DoFHandler (" +
+                   dealii::internal::policy_to_string(*this->policy) +
+                   ") does not match the one that was associated with the "
+                   "DoFHandler previously stored (" +
+                   policy_name + ")."));
     }
+  else
+    {
+      ar & this->block_info_object;
+      ar &number_cache;
 
-  // Workaround for nullptr, see in save().
-  bool faces_is_nullptr = true;
-  ar & faces_is_nullptr;
-  if (!faces_is_nullptr)
-    ar &faces;
+      object_dof_indices.clear();
 
-  // these are the checks that correspond to the last block in the save()
-  // function
-  unsigned int n_cells;
-  std::string  fe_name;
-  std::string  policy_name;
+      object_dof_ptr.clear();
 
-  ar &n_cells &fe_name &policy_name;
+      ar & this->object_dof_indices;
+      ar & this->object_dof_ptr;
 
-  AssertThrow(n_cells == tria->n_cells(),
-              ExcMessage(
-                "The object being loaded into does not match the triangulation "
-                "that has been stored previously."));
-  AssertThrow(
-    fe_name == this->get_fe(0).get_name(),
-    ExcMessage(
-      "The finite element associated with this DoFHandler does not match "
-      "the one that was associated with the DoFHandler previously stored."));
-  AssertThrow(policy_name == internal::policy_to_string(*policy),
-              ExcMessage(
-                "The policy currently associated with this DoFHandler (" +
-                internal::policy_to_string(*policy) +
-                ") does not match the one that was associated with the "
-                "DoFHandler previously stored (" +
-                policy_name + ")."));
+      ar & this->cell_dof_cache_indices;
+      ar & this->cell_dof_cache_ptr;
+
+      // these are the checks that correspond to the last block in the save()
+      // function
+      unsigned int n_cells;
+      std::string  fe_name;
+      std::string  policy_name;
+
+      ar &n_cells &fe_name &policy_name;
+
+      AssertThrow(
+        n_cells == this->tria->n_cells(),
+        ExcMessage(
+          "The object being loaded into does not match the triangulation "
+          "that has been stored previously."));
+      AssertThrow(
+        fe_name == this->get_fe(0).get_name(),
+        ExcMessage(
+          "The finite element associated with this DoFHandler does not match "
+          "the one that was associated with the DoFHandler previously stored."));
+      AssertThrow(policy_name == internal::policy_to_string(*this->policy),
+                  ExcMessage(
+                    "The policy currently associated with this DoFHandler (" +
+                    internal::policy_to_string(*this->policy) +
+                    ") does not match the one that was associated with the "
+                    "DoFHandler previously stored (" +
+                    policy_name + ")."));
+    }
 }
 
 

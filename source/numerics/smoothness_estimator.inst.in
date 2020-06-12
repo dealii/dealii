@@ -21,7 +21,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
     template void SmoothnessEstimator::Legendre::
       coefficient_decay<deal_II_dimension, deal_II_space_dimension, VEC>(
         FESeries::Legendre<deal_II_dimension, deal_II_space_dimension> &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         Vector<float> &,
         const VectorTools::NormType,
@@ -32,7 +32,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       deal_II_dimension,
       deal_II_space_dimension,
       VEC>(FESeries::Legendre<deal_II_dimension, deal_II_space_dimension> &,
-           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+           const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
            const VEC &,
            Vector<float> &,
            const ComponentMask &,
@@ -42,7 +42,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
     template void SmoothnessEstimator::Fourier::
       coefficient_decay<deal_II_dimension, deal_II_space_dimension, VEC>(
         FESeries::Fourier<deal_II_dimension, deal_II_space_dimension> &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         Vector<float> &,
         const VectorTools::NormType,
@@ -52,7 +52,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       deal_II_dimension,
       deal_II_space_dimension,
       VEC>(FESeries::Fourier<deal_II_dimension, deal_II_space_dimension> &,
-           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+           const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
            const VEC &,
            Vector<float> &,
            const ComponentMask &,

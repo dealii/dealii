@@ -104,10 +104,10 @@ namespace Step46
     };
 
     static bool cell_is_in_fluid_domain(
-      const typename hp::DoFHandler<dim>::cell_iterator &cell);
+      const typename DoFHandler<dim>::cell_iterator &cell);
 
     static bool cell_is_in_solid_domain(
-      const typename hp::DoFHandler<dim>::cell_iterator &cell);
+      const typename DoFHandler<dim>::cell_iterator &cell);
 
 
     void make_grid();
@@ -132,7 +132,7 @@ namespace Step46
     FESystem<dim>         stokes_fe;
     FESystem<dim>         elasticity_fe;
     hp::FECollection<dim> fe_collection;
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
 
     AffineConstraints<double> constraints;
 
@@ -236,7 +236,7 @@ namespace Step46
                     1,
                     FE_Q<dim>(elasticity_degree),
                     dim)
-    , dof_handler(triangulation)
+    , dof_handler(triangulation, /*enable_hp_capability */ true)
     , viscosity(2)
     , lambda(1)
     , mu(1)
@@ -249,7 +249,7 @@ namespace Step46
 
   template <int dim>
   bool FluidStructureProblem<dim>::cell_is_in_fluid_domain(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell)
+    const typename DoFHandler<dim>::cell_iterator &cell)
   {
     return (cell->material_id() == fluid_domain_id);
   }
@@ -257,7 +257,7 @@ namespace Step46
 
   template <int dim>
   bool FluidStructureProblem<dim>::cell_is_in_solid_domain(
-    const typename hp::DoFHandler<dim>::cell_iterator &cell)
+    const typename DoFHandler<dim>::cell_iterator &cell)
   {
     return (cell->material_id() == solid_domain_id);
   }
@@ -859,12 +859,12 @@ namespace Step46
       data_component_interpretation.push_back(
         DataComponentInterpretation::component_is_part_of_vector);
 
-    DataOut<dim, hp::DoFHandler<dim>> data_out;
+    DataOut<dim, DoFHandler<dim>> data_out;
     data_out.attach_dof_handler(dof_handler);
 
     data_out.add_data_vector(solution,
                              solution_names,
-                             DataOut<dim, hp::DoFHandler<dim>>::type_dof_data,
+                             DataOut<dim, DoFHandler<dim>>::type_dof_data,
                              data_component_interpretation);
     data_out.build_patches();
 
