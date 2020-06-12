@@ -84,3 +84,5 @@ this case the particles would need to have additional properties such as their m
 and their diameter.
 - Coupling to a flow solver. This step could be straightforwardly coupled to any parallel
 steps in which the Stokes (step-32, step-70) or the Navier-Stokes equations are solved (e.g. step-57).
+- Computing the difference in final particle positions between the two models
+would allow to quantify the influence of the interpolation error on particle motion.
