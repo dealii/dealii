@@ -2873,7 +2873,8 @@ namespace GridTools
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)> &       unpack,
     const std::function<bool(const typename MeshType::level_cell_iterator &)>
-      &filter = [](const auto &) { return true; });
+      &filter =
+        [](const typename MeshType::level_cell_iterator &) { return true; });
 
   /* Exchange with all processors of the MPI communicator @p mpi_communicator the vector of bounding
    * boxes @p local_bboxes.
