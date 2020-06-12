@@ -590,7 +590,7 @@ namespace Particles
 
 
     // A map from mpi process to properties, ordered as in the IndexSet.
-    // Notice that this ordering maybe different from the ordering in the
+    // Notice that this ordering may be different from the ordering in the
     // vectors above, since no local ordering is guaranteed by the
     // distribute_compute_point_locations() call.
     // This is only filled if n_global_properties is > 0
@@ -598,7 +598,7 @@ namespace Particles
       locally_owned_properties_from_other_processes;
 
     // A map from mpi process to ids, ordered as in the IndexSet.
-    // Notice that this ordering maybe different from the ordering in the
+    // Notice that this ordering may be different from the ordering in the
     // vectors above, since no local ordering is guaranteed by the
     // distribute_compute_point_locations() call.
     // This is only filled if ids.size() is > 0
