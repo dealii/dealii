@@ -353,6 +353,8 @@ namespace Threads
     std::unique_lock<decltype(insertion_mutex)> writer_lock(insertion_mutex);
 
     data = std::move(t.data);
+
+    return *this;
   }
 
 
