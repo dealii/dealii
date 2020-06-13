@@ -3839,8 +3839,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto cells = this->get_cell_ids();
 
   // 2) actually gather values
-  VectorizedArrayType out =
-    make_vectorized_array<VectorizedArrayType>(Number(1.));
+  VectorizedArrayType out = Number(1.);
   for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     if (cells[i] != numbers::invalid_unsigned_int)
       out[i] = array[cells[i] / VectorizedArrayType::size()]
@@ -6057,7 +6056,7 @@ inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, VectorizedArrayType>
   // copy from generic function into dim-specialization function
   const Tensor<2, dim, VectorizedArrayType> grad = get_gradient(q_point);
   VectorizedArrayType                       symmetrized[(dim * dim + dim) / 2];
-  VectorizedArrayType half = make_vectorized_array<Number>(0.5);
+  VectorizedArrayType                       half = Number(0.5);
   for (unsigned int d = 0; d < dim; ++d)
     symmetrized[d] = grad[d][d];
   switch (dim)
