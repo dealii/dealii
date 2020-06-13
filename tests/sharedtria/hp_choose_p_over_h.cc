@@ -44,7 +44,7 @@ test()
     ::Triangulation<dim>::none,
     false,
     parallel::shared::Triangulation<dim>::partition_custom_signal);
-  tr.signals.post_refinement.connect([&tr]() {
+  tr.signals.create.connect([&tr]() {
     // partition the triangulation by hand
     for (const auto &cell : tr.active_cell_iterators())
       cell->set_subdomain_id(cell->active_cell_index() %
