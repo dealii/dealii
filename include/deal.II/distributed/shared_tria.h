@@ -253,6 +253,14 @@ namespace parallel
       is_multilevel_hierarchy_constructed() const override;
 
       /**
+       * @copydoc dealii::Triangulation::add_periodicity()
+       */
+      void
+      add_periodicity(
+        const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
+          &periodicity_vector) override;
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -413,6 +421,11 @@ namespace parallel
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
     public:
+      using active_cell_iterator =
+        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator;
+      using cell_iterator =
+        typename dealii::Triangulation<dim, spacedim>::cell_iterator;
+
       /**
        * Constructor. Deleted to make sure that objects of this type cannot be
        * constructed (see also the class documentation).
@@ -424,6 +437,14 @@ namespace parallel
        */
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
+
+      /**
+       * @copydoc dealii::Triangulation::add_periodicity()
+       */
+      void
+      add_periodicity(
+        const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
+          &periodicity_vector) override;
 
       /**
        * A dummy function to return empty vector.

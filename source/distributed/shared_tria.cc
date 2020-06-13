@@ -80,6 +80,18 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
+    Triangulation<dim, spacedim>::add_periodicity(
+      const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
+        &periodicity_vector)
+    {
+      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
+      this->update_number_cache();
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     Triangulation<dim, spacedim>::partition()
     {
 #  ifdef DEBUG

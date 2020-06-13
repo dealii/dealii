@@ -231,6 +231,14 @@ namespace parallel
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
 
+      /**
+       * @copydoc dealii::Triangulation::add_periodicity()
+       */
+      void
+      add_periodicity(
+        const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
+          &periodicity_vector) override;
+
     private:
       virtual unsigned int
       coarse_cell_id_to_coarse_cell_index(

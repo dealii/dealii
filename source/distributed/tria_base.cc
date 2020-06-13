@@ -164,9 +164,14 @@ namespace parallel
 
     {
       // find ghost owners
-      for (const auto &cell : this->active_cell_iterators())
-        if (cell->is_ghost())
-          number_cache.ghost_owners.insert(cell->subdomain_id());
+      {
+        const auto vertices_with_ghost_neighbors =
+          GridTools::compute_vertices_with_ghost_neighbors(*this);
+        for (const auto &vertex_with_ghost_neighbors :
+             vertices_with_ghost_neighbors)
+          for (const auto &ghost_neigbor : vertex_with_ghost_neighbors.second)
+            number_cache.ghost_owners.insert(ghost_neigbor);
+      }
 
       Assert(number_cache.ghost_owners.size() <
                Utilities::MPI::n_mpi_processes(mpi_communicator),
