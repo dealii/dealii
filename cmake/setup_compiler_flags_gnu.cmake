@@ -36,6 +36,18 @@ IF( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
     )
 ENDIF()
 
+# Correspondence between AppleClang version and upstream Clang version:
+# https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)
+IF (POLICY CMP0025)
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0" )
+    MESSAGE(WARNING "\n"
+      "deal.II requires support for features of C++14 that are not present in\n"
+      "versions of AppleClang prior to 9.0."
+      )
+  ENDIF()
+ENDIF()
+
 
 ########################
 #                      #
