@@ -432,4 +432,39 @@ namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE
 
+
+namespace boost
+{
+  namespace geometry
+  {
+    namespace index
+    {
+      // Forward declaration of bgi::indexable
+      template <class T>
+      struct indexable;
+
+      /**
+       * Make sure we can construct an RTree of Particles::Particle objects.
+       */
+      template <int dim, int spacedim>
+      struct indexable<dealii::Particles::Particle<dim, spacedim>>
+      {
+        /**
+         * boost::rtree expects a const reference to an indexable object. For
+         * a Particles::Particle object, this is its reference location.
+         */
+        using result_type = const dealii::Point<spacedim> &;
+
+        result_type
+        operator()(
+          const dealii::Particles::Particle<dim, spacedim> &particle) const
+        {
+          return particle.get_location();
+        }
+      };
+
+    } // namespace index
+  }   // namespace geometry
+} // namespace boost
+
 #endif
