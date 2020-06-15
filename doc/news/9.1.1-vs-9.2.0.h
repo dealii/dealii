@@ -599,7 +599,7 @@ inconvenience this causes.
   rendering near-native evaluation performance at the cost of the compilation
   itself.
   <br>
-  (Jean-Paul Pelteret, 2020/05/02)
+  (Jean-Paul Pelteret, Isuru Fernando, 2020/05/02)
  </li>
 
  <li>
