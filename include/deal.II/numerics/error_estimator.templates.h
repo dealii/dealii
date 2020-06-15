@@ -1338,16 +1338,14 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
   // now walk over all cells and collect information from the faces. only do
   // something if this is a cell we care for based on the subdomain id
-  unsigned int present_cell = 0;
-  for (typename DoFHandlerType::active_cell_iterator cell =
-         dof_handler.begin_active();
-       cell != dof_handler.end();
-       ++cell, ++present_cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     if (((subdomain_id == numbers::invalid_subdomain_id) ||
          (cell->subdomain_id() == subdomain_id)) &&
         ((material_id == numbers::invalid_material_id) ||
          (cell->material_id() == material_id)))
       {
+        const unsigned int present_cell = cell->active_cell_index();
+
         // loop over all faces of this cell
         for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           {
