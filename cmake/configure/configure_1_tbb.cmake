@@ -40,7 +40,7 @@ MACRO(FEATURE_TBB_FIND_EXTERNAL var)
   #
   # TBB versions before 4.2 are missing some explicit calls to std::atomic::load
   # in ternary expressions; these cause compilation errors in some compilers
-  # (such as GCC 8.1 and newer). To fix this we simply blacklist all older
+  # (such as GCC 8.1 and newer). To fix this we simply disallow all older
   # versions:
   #
   IF(TBB_VERSION VERSION_LESS "4.2")
