@@ -22,8 +22,6 @@ SET(_src
   mapping_info_inst2.cc
   mapping_info_inst3.cc
   matrix_free.cc
-  matrix_free_inst2.cc
-  matrix_free_inst3.cc
   shape_info.cc
   task_info.cc
   )

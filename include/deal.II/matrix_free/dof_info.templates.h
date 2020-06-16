@@ -1161,6 +1161,309 @@ namespace internal
 
 
 
+    void
+    DoFInfo::compute_tight_partitioners(
+      const Table<2, ShapeInfo<double>> &       shape_info,
+      const unsigned int                        n_owned_cells,
+      const unsigned int                        n_lanes,
+      const std::vector<FaceToCellTopology<1>> &inner_faces,
+      const std::vector<FaceToCellTopology<1>> &ghosted_faces,
+      const bool                                fill_cell_centric)
+    {
+      const Utilities::MPI::Partitioner &part = *vector_partitioner;
+
+      // partitioner 0: no face integrals, simply use the indices present
+      // on the cells
+      std::vector<types::global_dof_index> ghost_indices;
+      {
+        const unsigned int n_components = start_components.back();
+        for (unsigned int cell = 0; cell < n_owned_cells; ++cell)
+          {
+            for (unsigned int i = row_starts[cell * n_components].first;
+                 i < row_starts[(cell + 1) * n_components].first;
+                 ++i)
+              if (dof_indices[i] >= part.local_size())
+                ghost_indices.push_back(part.local_to_global(dof_indices[i]));
+
+            const unsigned int fe_index =
+              dofs_per_cell.size() == 1 ? 0 :
+                                          cell_active_fe_index[cell / n_lanes];
+            const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
+
+            for (unsigned int i = row_starts_plain_indices[cell];
+                 i < row_starts_plain_indices[cell] + dofs_this_cell;
+                 ++i)
+              if (plain_dof_indices[i] >= part.local_size())
+                ghost_indices.push_back(
+                  part.local_to_global(plain_dof_indices[i]));
+          }
+        std::sort(ghost_indices.begin(), ghost_indices.end());
+        ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                        ghost_indices.end()),
+                            ghost_indices.end());
+        IndexSet compressed_set(part.size());
+        compressed_set.add_indices(ghost_indices.begin(), ghost_indices.end());
+        compressed_set.subtract_set(part.locally_owned_range());
+        const bool all_ghosts_equal =
+          Utilities::MPI::min<int>(compressed_set.n_elements() ==
+                                     part.ghost_indices().n_elements(),
+                                   part.get_mpi_communicator()) != 0;
+        if (all_ghosts_equal)
+          vector_partitioner_face_variants[0] = vector_partitioner;
+        else
+          {
+            vector_partitioner_face_variants[0] =
+              std::make_shared<Utilities::MPI::Partitioner>(
+                part.locally_owned_range(), part.get_mpi_communicator());
+            const_cast<Utilities::MPI::Partitioner *>(
+              vector_partitioner_face_variants[0].get())
+              ->set_ghost_indices(compressed_set, part.ghost_indices());
+          }
+      }
+
+      // construct a numbering of faces
+      std::vector<FaceToCellTopology<1>> all_faces(inner_faces);
+      all_faces.insert(all_faces.end(),
+                       ghosted_faces.begin(),
+                       ghosted_faces.end());
+      Table<2, unsigned int> cell_and_face_to_faces(
+        (row_starts.size() - 1) / start_components.back(),
+        2 * shape_info(0, 0).n_dimensions);
+      cell_and_face_to_faces.fill(numbers::invalid_unsigned_int);
+      for (unsigned int f = 0; f < all_faces.size(); ++f)
+        {
+          cell_and_face_to_faces(all_faces[f].cells_interior[0],
+                                 all_faces[f].interior_face_no) = f;
+          Assert(all_faces[f].cells_exterior[0] !=
+                   numbers::invalid_unsigned_int,
+                 ExcInternalError());
+          cell_and_face_to_faces(all_faces[f].cells_exterior[0],
+                                 all_faces[f].exterior_face_no) = f;
+        }
+
+      // lambda function to detect objects on face pairs
+      const auto loop_over_faces =
+        [&](const std::function<
+            void(const unsigned int, const unsigned int, const bool)> &fu) {
+          for (const auto &face : inner_faces)
+            {
+              AssertIndexRange(face.cells_interior[0], n_owned_cells);
+              fu(face.cells_exterior[0], face.exterior_face_no, false /*flag*/);
+            }
+        };
+
+      const auto loop_over_all_faces =
+        [&](const std::function<
+            void(const unsigned int, const unsigned int, const bool)> &fu) {
+          for (unsigned int c = 0; c < cell_and_face_to_faces.size(0); ++c)
+            for (unsigned int d = 0; d < cell_and_face_to_faces.size(1); ++d)
+              {
+                const unsigned int f = cell_and_face_to_faces(c, d);
+                if (f == numbers::invalid_unsigned_int)
+                  continue;
+
+                const unsigned int cell_m = all_faces[f].cells_interior[0];
+                const unsigned int cell_p = all_faces[f].cells_exterior[0];
+
+                const bool ext = c == cell_m;
+
+                if (ext && cell_p == numbers::invalid_unsigned_int)
+                  continue;
+
+                const unsigned int p       = ext ? cell_p : cell_m;
+                const unsigned int face_no = ext ?
+                                               all_faces[f].exterior_face_no :
+                                               all_faces[f].interior_face_no;
+
+                fu(p, face_no, true);
+              }
+        };
+
+      const auto process_values =
+        [&](
+          std::shared_ptr<const Utilities::MPI::Partitioner>
+            &vector_partitioner_values,
+          const std::function<void(
+            const std::function<void(
+              const unsigned int, const unsigned int, const bool)> &)> &loop) {
+          bool all_nodal = true;
+          for (unsigned int c = 0; c < n_base_elements; ++c)
+            if (!shape_info(global_base_element_offset + c, 0)
+                   .data.front()
+                   .nodal_at_cell_boundaries)
+              all_nodal = false;
+          if (all_nodal == false)
+            vector_partitioner_values = vector_partitioner;
+          else
+            {
+              bool has_noncontiguous_cell = false;
+
+              loop([&](const unsigned int cell_no,
+                       const unsigned int face_no,
+                       const bool         flag) {
+                const unsigned int index =
+                  dof_indices_contiguous[dof_access_cell][cell_no];
+                if (flag || (index != numbers::invalid_unsigned_int &&
+                             index >= part.local_size()))
+                  {
+                    const unsigned int stride =
+                      dof_indices_interleave_strides[dof_access_cell][cell_no];
+                    unsigned int i = 0;
+                    for (unsigned int e = 0; e < n_base_elements; ++e)
+                      for (unsigned int c = 0; c < n_components[e]; ++c)
+                        {
+                          const ShapeInfo<double> &shape =
+                            shape_info(global_base_element_offset + e, 0);
+                          for (unsigned int j = 0;
+                               j < shape.dofs_per_component_on_face;
+                               ++j)
+                            ghost_indices.push_back(part.local_to_global(
+                              index + i +
+                              shape.face_to_cell_index_nodal(face_no, j) *
+                                stride));
+                          i += shape.dofs_per_component_on_cell * stride;
+                        }
+                    AssertDimension(i, dofs_per_cell[0] * stride);
+                  }
+                else if (index == numbers::invalid_unsigned_int)
+                  has_noncontiguous_cell = true;
+              });
+              has_noncontiguous_cell =
+                Utilities::MPI::min<int>(has_noncontiguous_cell,
+                                         part.get_mpi_communicator()) != 0;
+
+              std::sort(ghost_indices.begin(), ghost_indices.end());
+              ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                              ghost_indices.end()),
+                                  ghost_indices.end());
+              IndexSet compressed_set(part.size());
+              compressed_set.add_indices(ghost_indices.begin(),
+                                         ghost_indices.end());
+              compressed_set.subtract_set(part.locally_owned_range());
+              const bool all_ghosts_equal =
+                Utilities::MPI::min<int>(compressed_set.n_elements() ==
+                                           part.ghost_indices().n_elements(),
+                                         part.get_mpi_communicator()) != 0;
+              if (all_ghosts_equal || has_noncontiguous_cell)
+                vector_partitioner_values = vector_partitioner;
+              else
+                {
+                  vector_partitioner_values =
+                    std::make_shared<Utilities::MPI::Partitioner>(
+                      part.locally_owned_range(), part.get_mpi_communicator());
+                  const_cast<Utilities::MPI::Partitioner *>(
+                    vector_partitioner_values.get())
+                    ->set_ghost_indices(compressed_set, part.ghost_indices());
+                }
+            }
+        };
+
+
+      const auto process_gradients =
+        [&](
+          const std::shared_ptr<const Utilities::MPI::Partitioner>
+            &vector_partitoner_values,
+          std::shared_ptr<const Utilities::MPI::Partitioner>
+            &vector_partitioner_gradients,
+          const std::function<void(
+            const std::function<void(
+              const unsigned int, const unsigned int, const bool)> &)> &loop) {
+          bool all_hermite = true;
+          for (unsigned int c = 0; c < n_base_elements; ++c)
+            if (shape_info(global_base_element_offset + c, 0).element_type !=
+                internal::MatrixFreeFunctions::tensor_symmetric_hermite)
+              all_hermite = false;
+          if (all_hermite == false ||
+              vector_partitoner_values.get() == vector_partitioner.get())
+            vector_partitioner_gradients = vector_partitioner;
+          else
+            {
+              loop([&](const unsigned int cell_no,
+                       const unsigned int face_no,
+                       const bool         flag) {
+                const unsigned int index =
+                  dof_indices_contiguous[dof_access_cell][cell_no];
+                if (flag || (index != numbers::invalid_unsigned_int &&
+                             index >= part.local_size()))
+                  {
+                    const unsigned int stride =
+                      dof_indices_interleave_strides[dof_access_cell][cell_no];
+                    unsigned int i = 0;
+                    for (unsigned int e = 0; e < n_base_elements; ++e)
+                      for (unsigned int c = 0; c < n_components[e]; ++c)
+                        {
+                          const ShapeInfo<double> &shape =
+                            shape_info(global_base_element_offset + e, 0);
+                          for (unsigned int j = 0;
+                               j < 2 * shape.dofs_per_component_on_face;
+                               ++j)
+                            ghost_indices.push_back(part.local_to_global(
+                              index + i +
+                              shape.face_to_cell_index_hermite(face_no, j) *
+                                stride));
+                          i += shape.dofs_per_component_on_cell * stride;
+                        }
+                    AssertDimension(i, dofs_per_cell[0] * stride);
+                  }
+              });
+              std::sort(ghost_indices.begin(), ghost_indices.end());
+              ghost_indices.erase(std::unique(ghost_indices.begin(),
+                                              ghost_indices.end()),
+                                  ghost_indices.end());
+              IndexSet compressed_set(part.size());
+              compressed_set.add_indices(ghost_indices.begin(),
+                                         ghost_indices.end());
+              compressed_set.subtract_set(part.locally_owned_range());
+              const bool all_ghosts_equal =
+                Utilities::MPI::min<int>(compressed_set.n_elements() ==
+                                           part.ghost_indices().n_elements(),
+                                         part.get_mpi_communicator()) != 0;
+              if (all_ghosts_equal)
+                vector_partitioner_gradients = vector_partitioner;
+              else
+                {
+                  vector_partitioner_gradients =
+                    std::make_shared<Utilities::MPI::Partitioner>(
+                      part.locally_owned_range(), part.get_mpi_communicator());
+                  const_cast<Utilities::MPI::Partitioner *>(
+                    vector_partitioner_gradients.get())
+                    ->set_ghost_indices(compressed_set, part.ghost_indices());
+                }
+            }
+        };
+
+      // partitioner 1: values on faces
+      process_values(vector_partitioner_face_variants[1], loop_over_faces);
+
+      // partitioner 2: values and gradients on faces
+      process_gradients(vector_partitioner_face_variants[1],
+                        vector_partitioner_face_variants[2],
+                        loop_over_faces);
+
+      if (fill_cell_centric)
+        {
+          ghost_indices.clear();
+          // partitioner 3: values on all faces
+          process_values(vector_partitioner_face_variants[3],
+                         loop_over_all_faces);
+          // partitioner 4: values and gradients on faces
+          process_gradients(vector_partitioner_face_variants[3],
+                            vector_partitioner_face_variants[4],
+                            loop_over_all_faces);
+        }
+      else
+        {
+          vector_partitioner_face_variants[3] =
+            std::make_shared<Utilities::MPI::Partitioner>(
+              part.locally_owned_range(), part.get_mpi_communicator());
+          vector_partitioner_face_variants[4] =
+            std::make_shared<Utilities::MPI::Partitioner>(
+              part.locally_owned_range(), part.get_mpi_communicator());
+        }
+    }
+
+
+
     template <int length>
     void
     DoFInfo::compute_vector_zero_access_pattern(
@@ -1733,7 +2036,7 @@ namespace internal
     }
 
 
-  } // end of namespace MatrixFreeFunctions
+  } // namespace MatrixFreeFunctions
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
