@@ -375,8 +375,11 @@ LaplaceProblem<dim>::solve()
   SolverControl        coarse_solver_control(1000, 1e-10, false, false);
   SolverCG<vector_t>   coarse_solver(coarse_solver_control);
   PreconditionIdentity id;
-  MGCoarseGridLACIteration<SolverCG<vector_t>, vector_t> coarse_grid_solver(
-    coarse_solver, coarse_matrix, id);
+  MGCoarseGridIterativeSolver<vector_t,
+                              SolverCG<vector_t>,
+                              matrix_t,
+                              PreconditionIdentity>
+    coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
   typedef PreconditionJacobi<matrix_t>                 Smoother;
   MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;

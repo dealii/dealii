@@ -396,7 +396,10 @@ namespace Step50
     SolverControl         coarse_solver_control(1000, 1e-10, false, false);
     SolverGMRES<vector_t> coarse_solver(coarse_solver_control);
     PreconditionIdentity  id;
-    MGCoarseGridLACIteration<SolverGMRES<vector_t>, vector_t>
+    MGCoarseGridIterativeSolver<vector_t,
+                                SolverGMRES<vector_t>,
+                                matrix_t,
+                                PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
     typedef TrilinosWrappers::PreconditionJacobi         Smoother;
