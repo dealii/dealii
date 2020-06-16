@@ -21,10 +21,10 @@
 #
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9" )
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0" )
   MESSAGE(FATAL_ERROR "\n"
     "deal.II requires support for features of C++14 that are not present in\n"
-    "versions of GCC prior to 4.9."
+    "versions of GCC prior to 5.0."
     )
 ENDIF()
 
