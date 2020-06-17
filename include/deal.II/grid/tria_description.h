@@ -121,7 +121,8 @@ struct CellData
    * - boundary or material id zero (the default for boundary or material ids)
    * - manifold id to numbers::flat_manifold_id
    */
-  CellData();
+  CellData(
+    const unsigned int n_vertices = GeometryInfo<structdim>::vertices_per_cell);
 
   /**
    * Comparison operator.
