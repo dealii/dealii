@@ -949,7 +949,7 @@ namespace GridOutFlags
  *
  * Usage is simple: either you use the direct form
  * @code
- *   ofstream output_file("some_filename");
+ *   std::ofstream output_file("some_filename");
  *   GridOut().write_gnuplot (tria, output_file);
  * @endcode
  * if you know which format you want to have, or if you want the format to be
@@ -957,8 +957,8 @@ namespace GridOutFlags
  * @code
  *   GridOut::OutputFormat grid_format =
  *     GridOut::parse_output_format(get_format_name_from_somewhere());
- *   ofstream output_file("some_filename"
- *                        + GridOut::default_suffix(output_format));
+ *   std::ofstream output_file("some_filename"
+ *                             + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
  * @endcode
  * The function <tt>get_output_format_names()</tt> provides a list of possible
