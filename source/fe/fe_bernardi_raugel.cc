@@ -206,8 +206,8 @@ FE_BernardiRaugel<dim>::fill_fe_values(
   std::cout << "Length of mapping_data.normal_vectors: " << mapping_data.normal_vectors.size() << std::endl;
 
   // Convert to the correct internal data class for this FE class.
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-      ExcInternalError());
+  //Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+  //    ExcInternalError());
   const typename FE_PolyTensor<dim>::InternalData &fe_data =
     static_cast<const typename FE_PolyTensor<dim>::InternalData &>(fe_internal);
 

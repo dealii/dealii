@@ -133,8 +133,8 @@ private:
 
   /**
    * Fill the values Bernardi-Raugel polynomials, but replace the normal
-   * vector from the PolynomialsBernardiRaugel class with the physical
-   * normal vector from @p cell.
+   * vector on the reference cell from the PolynomialsBernardiRaugel class
+   * with the normal vector on the physical cell.
    */
   virtual void
   fill_fe_values(
