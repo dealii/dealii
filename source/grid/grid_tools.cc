@@ -1682,27 +1682,32 @@ namespace GridTools
               {
                 auto cell = vertex_to_cells[closest_vertex_index].begin();
                 std::advance(cell, neighbor_permutation[i]);
-                const Point<dim> p_unit =
-                  mapping.transform_real_to_unit_cell(*cell, p);
-                if (GeometryInfo<dim>::is_inside_unit_cell(p_unit, tolerance))
+                if (!(*cell)->is_artificial())
                   {
-                    cell_and_position.first  = *cell;
-                    cell_and_position.second = p_unit;
-                    found_cell               = true;
-                    approx_cell              = false;
-                    break;
-                  }
-                // The point is not inside this cell: checking how far outside
-                // it is and whether we want to use this cell as a backup if we
-                // can't find a cell within which the point lies.
-                const double dist =
-                  GeometryInfo<dim>::distance_to_unit_cell(p_unit);
-                if (dist < best_distance)
-                  {
-                    best_distance                   = dist;
-                    cell_and_position_approx.first  = *cell;
-                    cell_and_position_approx.second = p_unit;
-                    approx_cell                     = true;
+                    const Point<dim> p_unit =
+                      mapping.transform_real_to_unit_cell(*cell, p);
+                    if (GeometryInfo<dim>::is_inside_unit_cell(p_unit,
+                                                               tolerance))
+                      {
+                        cell_and_position.first  = *cell;
+                        cell_and_position.second = p_unit;
+                        found_cell               = true;
+                        approx_cell              = false;
+                        break;
+                      }
+                    // The point is not inside this cell: checking how far
+                    // outside it is and whether we want to use this cell as a
+                    // backup if we can't find a cell within which the point
+                    // lies.
+                    const double dist =
+                      GeometryInfo<dim>::distance_to_unit_cell(p_unit);
+                    if (dist < best_distance)
+                      {
+                        best_distance                   = dist;
+                        cell_and_position_approx.first  = *cell;
+                        cell_and_position_approx.second = p_unit;
+                        approx_cell                     = true;
+                      }
                   }
               }
             catch (typename Mapping<dim>::ExcTransformationFailed &)
