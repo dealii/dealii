@@ -43,7 +43,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
       FiniteElementData<dim>(get_dpo_vector(),
                              dim,
                              2,
-                             FiniteElementData<dim>::H1),
+                             FiniteElementData<dim>::Hdiv),
       std::vector<bool>(PolynomialsBernardiRaugel<dim>::n_polynomials(p), true),
       std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::n_polynomials(
                                    p),
@@ -193,9 +193,6 @@ FE_BernardiRaugel<dim>::fill_fe_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     &output_data) const
 {
-  std::cout << "fill_fe_values called!" << std::endl;
-  std::cout << "Calling FE_PolyTensor<dim, dim>::fill_fe_values" << std::endl;
-
   // Call the base implementation then we'll touch up the data slightly
   FE_PolyTensor<dim, dim>::fill_fe_values(
      cell,
@@ -209,8 +206,8 @@ FE_BernardiRaugel<dim>::fill_fe_values(
   std::cout << "Length of mapping_data.normal_vectors: " << mapping_data.normal_vectors.size() << std::endl;
 
   // Convert to the correct internal data class for this FE class.
-  // Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-  //    ExcInternalError());
+  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+      ExcInternalError());
   const typename FE_PolyTensor<dim>::InternalData &fe_data =
     static_cast<const typename FE_PolyTensor<dim>::InternalData &>(fe_internal);
 
@@ -230,14 +227,10 @@ FE_BernardiRaugel<dim>::fill_fe_values(
 
     for (unsigned int k = 0; k < n_q_points; ++k)
     {
-      double psi = 0;
+      const double psi = std::sqrt(fe_data.shape_values[i][k] * fe_data.shape_values[i][k]);
+
       unsigned int f = i - dim*GeometryInfo<dim>::vertices_per_cell;
-      //Tensor<1,dim> normal = (*cell)->face(f)->normal_vector(k);
-
-      for (unsigned int d = 0; d < dim; ++d)
-        psi += fe_data.shape_values[i][k][d]*fe_data.shape_values[i][k][d];
-
-      psi = sqrt(psi);
+      //Tensor<1,dim> normal = cell->face(f);
 
       for (unsigned int d = 0; d < dim; ++d)
       {
