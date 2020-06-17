@@ -1102,27 +1102,6 @@ namespace GridTools
   find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &container,
                                 const unsigned int             vertex_index);
 
-
-  /**
-   * Find and return an iterator to the active cell that surrounds a given
-   * point. This function simply calls the following one with a
-   * MappingQ1 for the mapping argument. See the following function for
-   * a more thorough discussion.
-   *
-   * @return An iterator into the mesh that points to the surrounding cell.
-   */
-  template <int dim, template <int, int> class MeshType, int spacedim>
-#  ifndef _MSC_VER
-  typename MeshType<dim, spacedim>::active_cell_iterator
-#  else
-  typename dealii::internal::
-    ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
-#  endif
-  find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
-                                const Point<spacedim> &        p,
-                                const std::vector<bool> &marked_vertices = {},
-                                const double             tolerance = 1.e-10);
-
   /**
    * Find an active cell that surrounds a given point @p p. The return type
    * is a pair of an iterator to the active cell along with the unit cell
@@ -1134,12 +1113,16 @@ namespace GridTools
    * vertex are found in the mesh, see
    * GridTools::find_cells_adjacent_to_vertex(). Lastly, for each of these
    * cells, the function tests whether the point is inside. This check is
-   * performed using
-   * the given @p mapping argument to determine whether cells have straight
-   * or curved boundaries, and if the latter then how exactly they are curved.
+   * performed using the given @p mapping argument to determine whether cells
+   * have straight or curved boundaries.
    *
    * If a point lies on the boundary of two or more cells, then the algorithm
    * tries to identify the cell that is of highest refinement level.
+   *
+   * If the point requested does not lie in a locally-owned or ghost cell,
+   * then this function throws an exception of type GridTools::ExcPointNotFound.
+   * You can catch this exception and decide what to do in that case. Hence,
+   * this function should always be called inside a try-block.
    *
    * @param mapping The mapping used to determine whether the given point is
    * inside a given cell.
@@ -1153,7 +1136,10 @@ namespace GridTools
    * @p marked_vertices, find_closest_vertex() would
    * only search among @p marked_vertices for the closest vertex.
    * The size of this array should be equal to n_vertices() of the
-   * triangulation (as opposed to n_used_vertices() ).
+   * triangulation (as opposed to n_used_vertices() ). The motivation of using
+   * @p marked_vertices is to cut down the search space of vertices if one has
+   * a priori knowledge of a collection of vertices that the point of interest
+   * may be close to.
    * @param tolerance Tolerance in terms of unit cell coordinates. Depending
    * on the problem, it might be necessary to adjust the tolerance in order
    * to be able to identify a cell. Floating
@@ -1164,48 +1150,19 @@ namespace GridTools
    * account that the returned cell will only contain the point approximately.
    *
    * @return A pair of an iterators into the mesh that points to the
-   * surrounding cell, and of the coordinates of that point inside the cell in
-   * the reference coordinates of that cell. This local position might be
-   * located slightly outside an actual unit cell, due to numerical roundoff.
-   * Therefore, the point returned by this function should be projected onto
-   * the unit cell, using GeometryInfo::project_to_unit_cell().  This is not
-   * automatically performed by the algorithm.
-   *
-   * @note When @p marked_vertices is specified the function should always be
-   * called inside a try block to catch the exception that the function might
-   * throw in the case it couldn't find an active cell surrounding the point.
-   * The motivation of using @p marked_vertices is to cut down the search space
-   * of vertices if one has a priori knowledge of a collection of vertices that
-   * the point of interest may be close to. For instance, in the case when a
-   * parallel::shared::Triangulation is employed and we are looking for a point
-   * that we know is inside the locally owned part of the mesh, then it would
-   * make sense to pass an array for @p marked_vertices that flags only the
-   * vertices of all locally owned active cells. If, however, the function
-   * throws an exception, then that would imply that the point lies outside
-   * locally owned active cells.
-   *
-   * @note If the point requested does not lie in any of the cells of the mesh
-   * given, then this function throws an exception of type
-   * GridTools::ExcPointNotFound. You can catch this exception and decide what
-   * to do in that case.
-   *
-   * @note When applied to a triangulation or DoF handler object based on a
-   * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell
-   * and
-   * @ref GlossGhostCell).
-   * If so, many of the operations one may want to do on this cell (e.g.,
-   * evaluating the solution) may not be possible and you will have to decide
-   * what to do in that case. This might even be the case if the given point is
-   * a vertex of a locally owned cell: the returned cell may still be a ghost
-   * cell that happens to share this vertex with a locally owned one. The
-   * reason for this behavior is that it is the only way to guarantee that all
+   * surrounding cell, and of the unit cell coordinates of that point. This
+   * local position might be located slightly outside an actual unit cell,
+   * due to numerical roundoff. Therefore, the point returned by this function
+   * should be projected onto the unit cell, using
+   * GeometryInfo::project_to_unit_cell().  This is not automatically performed
+   * by the algorithm. The returned cell can be a locally-owned cell or a
+   * ghost cell (but not an artificial cell). The returned cell might be a
+   * ghost cell even if the given point is a vertex of a locally owned cell.
+   * The reason behind is that this is the only way to guarantee that all
    * processors that participate in a parallel triangulation will agree which
-   * cell contains a point. In other words, two processors that own two cells
-   * that come together at one vertex will return the same cell when called
-   * with this vertex. One of them will then return a locally owned cell and
-   * the other one a ghost cell.
+   * cell contains a point. For example, if two processors come together
+   * at one vertex and the function is called with this vertex, then one
+   * processor will return a locally owned cell and the other one a ghost cell.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
@@ -1222,13 +1179,110 @@ namespace GridTools
                                 const double             tolerance = 1.e-10);
 
   /**
+   * A version of the above function that assumes straight boundaries and
+   * as a consequence simply calls the above function using MappingQ1 for
+   * the mapping argument.
+   *
+   * @return An iterator into the mesh that points to the surrounding cell.
+   */
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#  ifndef _MSC_VER
+  typename MeshType<dim, spacedim>::active_cell_iterator
+#  else
+  typename dealii::internal::
+    ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
+#  endif
+  find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
+                                const Point<spacedim> &        p,
+                                const std::vector<bool> &marked_vertices = {},
+                                const double             tolerance = 1.e-10);
+
+  /**
+   * Another version where we use that mapping on a given
+   * cell that corresponds to the active finite element index of that cell.
+   * This is obviously only useful for hp problems, since the active finite
+   * element index for all other DoF handlers is always zero.
+   */
+  template <int dim, int spacedim>
+  std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
+            Point<dim>>
+  find_active_cell_around_point(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           mesh,
+    const Point<spacedim> &                     p,
+    const double                                tolerance = 1.e-10);
+
+  /**
+   * Finding an active cell around a point can be very expensive in terms
+   * of computational costs. This function aims at providing a fast version
+   * of the above functions by using a space-tree to speed up the geometry
+   * search.
+   *
+   * @param cache Object with information about the space-tree of a triangulation,
+   * see GridTools::Cache.
+   * @param p The point for which we want to find the surrounding cell.
+   * @param cell_hint Gives a hint for the geometry search, which is beneficial
+   * if a-priori knowledge is available regarding the cell on which the point
+   * may likely be located. A typical use case would be that this search has
+   * to be done for an array of points that are close to each other and where
+   * the adjacent cell of the previous point is a good hint for the next point
+   * in the array.
+   * @param marked_vertices See above.
+   * @param tolerance See above.
+   *
+   *
+   * The following code example shows how to use this function:
+   *
+   * @code
+   * GridTools::Cache<dim, dim> cache(triangulation, mapping);
+   * auto cell_hint = typename Triangulation<dim, dim>::active_cell_iterator();
+   * std::vector<bool> marked_vertices = {};
+   * double tolerance = 1.e-10;
+   *
+   * std::vector<Point<dim>> points; // a vector of many points
+   * ...
+   *
+   * for(auto p : points)
+   * {
+   *   try
+   *   {
+   *     auto cell_and_ref_point = GridTools::find_active_cell_around_point(
+   *       cache, p, cell_hint, marked_vertices, tolerance);
+   *
+   *     // use current cell as hint for the next point
+   *     cell_hint = cell_and_ref_point.first;
+   *   }
+   *   catch(...)
+   *   {
+   *   }
+   *
+   *   ...
+   * }
+   * @endcode
+   */
+  template <int dim, int spacedim>
+  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
+            Point<dim>>
+  find_active_cell_around_point(
+    const Cache<dim, spacedim> &cache,
+    const Point<spacedim> &     p,
+    const typename Triangulation<dim, spacedim>::active_cell_iterator &
+                             cell_hint = typename Triangulation<dim, spacedim>::active_cell_iterator(),
+    const std::vector<bool> &marked_vertices = {},
+    const double             tolerance       = 1.e-10);
+
+  /**
    * A version of the previous function that exploits an already existing
-   * map between vertices and cells, constructed using the function
-   * GridTools::vertex_to_cell_map, a map of vertex_to_cell_centers, obtained
-   * through GridTools::vertex_to_cell_centers_directions, a guess
-   * `cell_hint`, and optionally an RTree constructed from the used
-   * vertices of the Triangulation. All of these structures can be queried
-   * from a GridTools::Cache object.
+   * map between vertices and cells (constructed using the function
+   * GridTools::vertex_to_cell_map()), a map of vertex_to_cell_centers (obtained
+   * through GridTools::vertex_to_cell_centers_directions()), and
+   * optionally an RTree constructed from the used vertices of the
+   * Triangulation.
+   *
+   * @note All of these structures can be queried from a
+   * GridTools::Cache object. Note, however, that in this case MeshType
+   * has to be Triangulation, so that it might be more appropriate to directly
+   * call the function above with argument `cache` in this case.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #  ifndef _MSC_VER
@@ -1254,36 +1308,6 @@ namespace GridTools
     const double tolerance = 1.e-10);
 
   /**
-   * A version of the previous function where we use that mapping on a given
-   * cell that corresponds to the active finite element index of that cell.
-   * This is obviously only useful for hp problems, since the active finite
-   * element index for all other DoF handlers is always zero.
-   */
-  template <int dim, int spacedim>
-  std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
-            Point<dim>>
-  find_active_cell_around_point(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const DoFHandler<dim, spacedim> &           mesh,
-    const Point<spacedim> &                     p,
-    const double                                tolerance = 1.e-10);
-
-  /**
-   * A version of the previous function that exploits an already existing
-   * GridTools::Cache<dim,spacedim> object.
-   */
-  template <int dim, int spacedim>
-  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-            Point<dim>>
-  find_active_cell_around_point(
-    const Cache<dim, spacedim> &cache,
-    const Point<spacedim> &     p,
-    const typename Triangulation<dim, spacedim>::active_cell_iterator &
-                             cell_hint = typename Triangulation<dim, spacedim>::active_cell_iterator(),
-    const std::vector<bool> &marked_vertices = {},
-    const double             tolerance       = 1.e-10);
-
-  /**
    * As compared to the functions above, this function identifies all cells
    * around a point for a given tolerance level `tolerance` in terms of unit
    * coordinates. Given a first cell with reference coordinates as parameter
@@ -1299,8 +1323,8 @@ namespace GridTools
    * This function is used as follows
    * @code
    *   auto first_cell = GridTools::find_active_cell_around_point(...);
-   *   auto all_cells = GridTools::find_all_active_cells_around_point(mapping,
-   * mesh, p, tolerance, first_cell);
+   *   auto all_cells  = GridTools::find_all_active_cells_around_point(
+   *   			   mapping, mesh, p, tolerance, first_cell);
    * @endcode
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
