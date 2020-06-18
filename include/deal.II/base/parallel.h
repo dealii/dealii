@@ -30,10 +30,12 @@
 #include <tuple>
 
 #ifdef DEAL_II_WITH_TBB
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
 #  include <tbb/parallel_reduce.h>
 #  include <tbb/partitioner.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
