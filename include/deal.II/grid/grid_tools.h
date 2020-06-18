@@ -225,7 +225,21 @@ namespace GridTools
     const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
 
   /**
-   * A version of the last function that can accept input for nonzero
+   * A variant of cell_measure() accepting an ArrayView instead of a
+   * fixed-sized array for @p vertex_indices.
+   *
+   * The parameter @p vertex_indices is expected to have
+   * GeometryInfo<dim>::vertices_per_cell entries. A std::vector is implicitly
+   * convertible to an ArrayView, so it can be passed directly. See the
+   * ArrayView class for more information.
+   */
+  template <int dim>
+  double
+  cell_measure(const std::vector<Point<dim>> &      all_vertices,
+               const ArrayView<const unsigned int> &vertex_indices);
+
+  /**
+   * A version of the function above that can accept input for nonzero
    * codimension cases. This function only exists to aid generic programming
    * and calling it will just raise an exception.
    */
@@ -3128,23 +3142,17 @@ namespace GridTools
 
 namespace GridTools
 {
-  // declare specializations
-  template <>
+  template <int dim>
   double
-  cell_measure<1>(const std::vector<Point<1>> &,
-                  const unsigned int (&)[GeometryInfo<1>::vertices_per_cell]);
-
-  template <>
-  double
-  cell_measure<2>(const std::vector<Point<2>> &,
-                  const unsigned int (&)[GeometryInfo<2>::vertices_per_cell]);
-
-  template <>
-  double
-  cell_measure<3>(const std::vector<Point<3>> &,
-                  const unsigned int (&)[GeometryInfo<3>::vertices_per_cell]);
-
-
+  cell_measure(
+    const std::vector<Point<dim>> &all_vertices,
+    const unsigned int (&indices)[GeometryInfo<dim>::vertices_per_cell])
+  {
+    // We forward call to the ArrayView version:
+    const ArrayView<const unsigned int> view(
+      &indices[0], GeometryInfo<dim>::vertices_per_cell);
+    return cell_measure(all_vertices, view);
+  }
 
   template <int dim, typename T>
   double
