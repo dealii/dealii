@@ -29,9 +29,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int structdim>
-CellData<structdim>::CellData()
-  : vertices(GeometryInfo<structdim>::vertices_per_cell,
-             numbers::invalid_unsigned_int)
+CellData<structdim>::CellData(const unsigned int n_vertices)
+  : vertices(n_vertices, numbers::invalid_unsigned_int)
   , material_id(0)
   , manifold_id(numbers::flat_manifold_id)
 {}
