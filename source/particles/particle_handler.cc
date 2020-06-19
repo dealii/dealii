@@ -1134,7 +1134,7 @@ namespace Particles
 
     for (const auto &cell : triangulation->active_cell_iterators())
       {
-        if (!cell->is_ghost())
+        if (cell->is_locally_owned())
           {
             std::set<unsigned int> cell_to_neighbor_subdomain;
             for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
