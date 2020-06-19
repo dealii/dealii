@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -318,7 +320,7 @@ namespace hp
      * passed to the constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>. Consequently, the
      * hp::FECollection argument given to this object should really be the
-     * same as that used in the construction of the hp::DoFHandler associated
+     * same as that used in the construction of the DoFHandler associated
      * with the present cell. On the other hand, if a value is given for this
      * argument, it overrides the choice of
      * <code>cell-@>active_fe_index()</code>.
@@ -347,19 +349,18 @@ namespace hp
      * all finite elements in an hp discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
-    template <typename DoFHandlerType, bool lda>
+    template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+    reinit(const TriaIterator<
+             DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, lda>> cell,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
-     * Like the previous function, but for non-hp iterators. The reason this
-     * (and the other non-hp iterator) function exists is so that one can use
-     * hp::FEValues not only for hp::DoFhandler objects, but for all sorts of
-     * DoFHandler objects, and triangulations not associated with DoFHandlers
-     * in general.
+     * Like the previous function, but for non-DoFHandler iterators. The reason
+     * this function exists is so that one can use hp::FEValues for
+     * Triangulation objects too.
      *
      * Since <code>cell-@>active_fe_index()</code> doesn't make sense for
      * triangulation iterators, this function chooses the zero-th finite
@@ -439,7 +440,7 @@ namespace hp
      * passed to the constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>. Consequently, the
      * hp::FECollection argument given to this object should really be the
-     * same as that used in the construction of the hp::DoFHandler associated
+     * same as that used in the construction of the DoFHandler associated
      * with the present cell. On the other hand, if a value is given for this
      * argument, it overrides the choice of
      * <code>cell-@>active_fe_index()</code>.
@@ -468,20 +469,19 @@ namespace hp
      * all finite elements in an hp discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
-    template <typename DoFHandlerType, bool lda>
+    template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
-           const unsigned int                                       face_no,
+    reinit(const TriaIterator<
+             DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, lda>> cell,
+           const unsigned int                                         face_no,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
-     * Like the previous function, but for non-hp iterators. The reason this
-     * (and the other non-hp iterator) function exists is so that one can use
-     * hp::FEValues not only for hp::DoFhandler objects, but for all sorts of
-     * DoFHandler objects, and triangulations not associated with DoFHandlers
-     * in general.
+     * Like the previous function, but for non-DoFHandler iterators. The reason
+     * this function exists is so that one can use this class for
+     * Triangulation objects too.
      *
      * Since <code>cell-@>active_fe_index()</code> doesn't make sense for
      * triangulation iterators, this function chooses the zero-th finite
@@ -566,24 +566,23 @@ namespace hp
      * all finite elements in an hp discretization), then this single mapping
      * is used unless a different value for this argument is specified.
      */
-    template <typename DoFHandlerType, bool lda>
+    template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
-           const unsigned int                                       face_no,
-           const unsigned int                                       subface_no,
+    reinit(const TriaIterator<
+             DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, lda>> cell,
+           const unsigned int                                         face_no,
+           const unsigned int subface_no,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
-     * Like the previous function, but for non-hp iterators. The reason this
-     * (and the other non-hp iterator) function exists is so that one can use
-     * hp::FEValues not only for hp::DoFhandler objects, but for all sorts of
-     * DoFHandler objects, and triangulations not associated with DoFHandlers
-     * in general.
+     * Like the previous function, but for non-DoFHandler iterators. The reason
+     * this function exists is so that one can use this class for
+     * Triangulation objects too.
      *
      * Since <code>cell-@>active_fe_index()</code> doesn't make sense for
-     * triangulation iterators, this function chooses the zero-th finite
+     * Triangulation iterators, this function chooses the zero-th finite
      * element, mapping, and quadrature object from the relevant constructions
      * passed to the constructor of this object. The only exception is if you
      * specify a value different from the default value for any of these last
