@@ -62,11 +62,11 @@ namespace Utilities
           /// Triangulation<dim, spacedim>::communicate_locally_moved_vertices()
           triangulation_communicate_locally_moved_vertices,
 
-          /// grid_tools.h: exchange_cell_data_to_level_ghosts()
-          exchange_cell_data_to_level_ghosts_request,
+          /// grid_tools.h: exchange_cell_ghosts()
+          exchange_cell_data_request,
 
-          /// grid_tools.h: exchange_cell_data_to_level_ghosts()
-          exchange_cell_data_to_level_ghosts_reply,
+          /// grid_tools.h: exchange_cell_ghosts()
+          exchange_cell_data_reply,
 
           /// mg_transfer_internal.cc: fill_copy_indices()
           mg_transfer_fill_copy_indices,

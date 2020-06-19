@@ -49,17 +49,44 @@ test()
   DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(fe);
 
-  std::set<std::string> output;
+  std::set<std::string> input, output;
 
   typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
   typedef short                                          DT;
+  std::map<CellId, DT>                                   map;
   short                                                  counter = 0;
+
+  std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+    vertices_with_ghost_neighbors =
+      GridTools::compute_vertices_with_ghost_neighbors(tria);
+
+  for (const auto &cell : tria.active_cell_iterators())
+    if (cell->is_locally_owned())
+      {
+        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          {
+            const std::map<unsigned int,
+                           std::set<dealii::types::subdomain_id>>::
+              const_iterator neighbor_subdomains_of_vertex =
+                vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+
+            if (neighbor_subdomains_of_vertex !=
+                vertices_with_ghost_neighbors.end())
+              {
+                map[cell->id()] = ++counter;
+                break;
+              }
+          }
+      }
+
   GridTools::exchange_cell_data_to_ghosts<DT, DoFHandler<dim>>(
     dofhandler,
     [&](const cell_iterator &cell) {
-      DT value = ++counter;
+      DT                 value = map[cell->id()];
+      std::ostringstream oss;
+      oss << "pack " << cell->id() << " " << value;
+      input.insert(oss.str());
 
-      deallog << "pack " << cell->id() << " " << value << std::endl;
       return value;
     },
     [&](const cell_iterator &cell, const DT &data) {
@@ -71,6 +98,8 @@ test()
     });
 
   // sort the output because it will come in in random order
+  for (auto &it : input)
+    deallog << it << std::endl;
   for (auto &it : output)
     deallog << it << std::endl;
 }

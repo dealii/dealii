@@ -2828,7 +2828,9 @@ namespace GridTools
    *   on the sending side returned a non-empty std_cxx17::optional object.
    *   The @p unpack function is then called with the data sent by the
    *   processor that owns that cell.
-   *
+   * @param cell_filter Only cells are communicated where this filter function returns
+   *   the value `true`. In the default case, the function returns true on all
+   * cells and thus, all relevant cells are communicated.
    *
    * <h4> An example </h4>
    *
@@ -2879,7 +2881,10 @@ namespace GridTools
     const std::function<std_cxx17::optional<DataType>(
       const typename MeshType::active_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::active_cell_iterator &,
-                             const DataType &)> &        unpack);
+                             const DataType &)> &        unpack,
+    const std::function<bool(const typename MeshType::active_cell_iterator &)>
+      &cell_filter =
+        [](const typename MeshType::active_cell_iterator &) { return true; });
 
   /**
    * Exchange arbitrary data of type @p DataType provided by the function
@@ -2887,7 +2892,7 @@ namespace GridTools
    * processes.
    *
    * In addition to the parameters of exchange_cell_data_to_ghosts(), this
-   * function allows to provide a @p filter function, which can be used to only
+   * function allows to provide a @p cell_filter function, which can be used to only
    * communicate marked cells. In the default case, all relevant cells are
    * communicated.
    */
@@ -2900,7 +2905,7 @@ namespace GridTools
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)> &       unpack,
     const std::function<bool(const typename MeshType::level_cell_iterator &)>
-      &filter =
+      &cell_filter =
         [](const typename MeshType::level_cell_iterator &) { return true; });
 
   /* Exchange with all processors of the MPI communicator @p mpi_communicator the vector of bounding
@@ -3910,6 +3915,247 @@ namespace GridTools
   }
 
 
+  namespace internal
+  {
+    template <typename DataType,
+              typename MeshType,
+              typename MeshCellIteratorType>
+    void
+    exchange_cell_data(
+      const MeshType &mesh,
+      const std::function<
+        std_cxx17::optional<DataType>(const MeshCellIteratorType &)> &pack,
+      const std::function<void(const MeshCellIteratorType &, const DataType &)>
+        &                                                         unpack,
+      const std::function<bool(const MeshCellIteratorType &)> &   cell_filter,
+      const std::function<void(
+        const std::function<void(const MeshCellIteratorType &,
+                                 const types::subdomain_id)> &)> &process_cells,
+      const std::function<std::set<types::subdomain_id>(
+        const parallel::TriangulationBase<MeshType::dimension,
+                                          MeshType::space_dimension> &)>
+        &compute_ghost_owners)
+    {
+#    ifndef DEAL_II_WITH_MPI
+      (void)mesh;
+      (void)pack;
+      (void)unpack;
+      (void)cell_filter;
+      (void)process_cells;
+      (void)compute_ghost_owners;
+      Assert(false,
+             ExcMessage("GridTools::exchange_cell_data() requires MPI."));
+#    else
+      constexpr int dim      = MeshType::dimension;
+      constexpr int spacedim = MeshType::space_dimension;
+      auto          tria =
+        dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+          &mesh.get_triangulation());
+      Assert(
+        tria != nullptr,
+        ExcMessage(
+          "The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
+
+      // build list of cells to request for each neighbor
+      std::set<dealii::types::subdomain_id> ghost_owners =
+        compute_ghost_owners(*tria);
+      std::map<dealii::types::subdomain_id,
+               std::vector<typename CellId::binary_type>>
+        neighbor_cell_list;
+
+      for (const auto ghost_owner : ghost_owners)
+        neighbor_cell_list[ghost_owner] = {};
+
+      process_cells([&](const auto &cell, const auto key) {
+        if (cell_filter(cell))
+          neighbor_cell_list[key].emplace_back(
+            cell->id().template to_binary<spacedim>());
+      });
+
+      Assert(ghost_owners.size() == neighbor_cell_list.size(),
+             ExcInternalError());
+
+
+      // Before sending & receiving, make sure we protect this section with
+      // a mutex:
+      static Utilities::MPI::CollectiveMutex      mutex;
+      Utilities::MPI::CollectiveMutex::ScopedLock lock(
+        mutex, tria->get_communicator());
+
+      const int mpi_tag =
+        Utilities::MPI::internal::Tags::exchange_cell_data_request;
+      const int mpi_tag_reply =
+        Utilities::MPI::internal::Tags::exchange_cell_data_reply;
+
+      // send our requests:
+      std::vector<MPI_Request> requests(ghost_owners.size());
+      {
+        unsigned int idx = 0;
+        for (const auto &it : neighbor_cell_list)
+          {
+            // send the data about the relevant cells
+            const int ierr = MPI_Isend(it.second.data(),
+                                       it.second.size() * sizeof(it.second[0]),
+                                       MPI_BYTE,
+                                       it.first,
+                                       mpi_tag,
+                                       tria->get_communicator(),
+                                       &requests[idx]);
+            AssertThrowMPI(ierr);
+            ++idx;
+          }
+      }
+
+      using DestinationToBufferMap =
+        std::map<dealii::types::subdomain_id,
+                 GridTools::CellDataTransferBuffer<dim, DataType>>;
+      DestinationToBufferMap destination_to_data_buffer_map;
+
+      // receive requests and reply with the ghost indices
+      std::vector<std::vector<typename CellId::binary_type>> cell_data_to_send(
+        ghost_owners.size());
+      std::vector<std::vector<types::global_dof_index>>
+                                     send_dof_numbers_and_indices(ghost_owners.size());
+      std::vector<MPI_Request>       reply_requests(ghost_owners.size());
+      std::vector<std::vector<char>> sendbuffers(ghost_owners.size());
+
+      for (unsigned int idx = 0; idx < ghost_owners.size(); ++idx)
+        {
+          MPI_Status status;
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE,
+                               mpi_tag,
+                               tria->get_communicator(),
+                               &status);
+          AssertThrowMPI(ierr);
+
+          int len;
+          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+          AssertThrowMPI(ierr);
+          Assert(len % sizeof(cell_data_to_send[idx][0]) == 0,
+                 ExcInternalError());
+
+          const unsigned int n_cells =
+            len / sizeof(typename CellId::binary_type);
+          cell_data_to_send[idx].resize(n_cells);
+
+          ierr = MPI_Recv(cell_data_to_send[idx].data(),
+                          len,
+                          MPI_BYTE,
+                          status.MPI_SOURCE,
+                          status.MPI_TAG,
+                          tria->get_communicator(),
+                          &status);
+          AssertThrowMPI(ierr);
+
+          // store data for each cell
+          for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells); ++c)
+            {
+              const auto cell =
+                CellId(cell_data_to_send[idx][c]).to_cell(*tria);
+
+              MeshCellIteratorType                mesh_it(tria,
+                                           cell->level(),
+                                           cell->index(),
+                                           &mesh);
+              const std_cxx17::optional<DataType> data = pack(mesh_it);
+
+              if (data)
+                {
+                  typename DestinationToBufferMap::iterator p =
+                    destination_to_data_buffer_map
+                      .insert(std::make_pair(
+                        idx,
+                        GridTools::CellDataTransferBuffer<dim, DataType>()))
+                      .first;
+
+                  p->second.cell_ids.emplace_back(cell->id());
+                  p->second.data.emplace_back(*data);
+                }
+            }
+
+          // send reply
+          GridTools::CellDataTransferBuffer<dim, DataType> &data =
+            destination_to_data_buffer_map[idx];
+
+          sendbuffers[idx] =
+            Utilities::pack(data, /*enable_compression*/ false);
+          ierr = MPI_Isend(sendbuffers[idx].data(),
+                           sendbuffers[idx].size(),
+                           MPI_BYTE,
+                           status.MPI_SOURCE,
+                           mpi_tag_reply,
+                           tria->get_communicator(),
+                           &reply_requests[idx]);
+          AssertThrowMPI(ierr);
+        }
+
+      // finally receive the replies
+      std::vector<char> receive;
+      for (unsigned int idx = 0; idx < ghost_owners.size(); ++idx)
+        {
+          MPI_Status status;
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE,
+                               mpi_tag_reply,
+                               tria->get_communicator(),
+                               &status);
+          AssertThrowMPI(ierr);
+
+          int len;
+          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+          AssertThrowMPI(ierr);
+
+          receive.resize(len);
+
+          char *ptr = receive.data();
+          ierr      = MPI_Recv(ptr,
+                          len,
+                          MPI_BYTE,
+                          status.MPI_SOURCE,
+                          status.MPI_TAG,
+                          tria->get_communicator(),
+                          &status);
+          AssertThrowMPI(ierr);
+
+          auto cellinfo =
+            Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(
+              receive, /*enable_compression*/ false);
+
+          DataType *data = cellinfo.data.data();
+          for (unsigned int c = 0; c < cellinfo.cell_ids.size(); ++c, ++data)
+            {
+              const typename Triangulation<dim, spacedim>::cell_iterator
+                tria_cell = cellinfo.cell_ids[c].to_cell(*tria);
+
+              MeshCellIteratorType cell(tria,
+                                        tria_cell->level(),
+                                        tria_cell->index(),
+                                        &mesh);
+
+              unpack(cell, *data);
+            }
+        }
+
+      // make sure that all communication is finished
+      // when we leave this function.
+      if (requests.size() > 0)
+        {
+          const int ierr =
+            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+        }
+      if (reply_requests.size() > 0)
+        {
+          const int ierr = MPI_Waitall(reply_requests.size(),
+                                       reply_requests.data(),
+                                       MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+        }
+
+
+#    endif // DEAL_II_WITH_MPI
+    }
+
+  } // namespace internal
 
   template <typename DataType, typename MeshType>
   void
@@ -3918,174 +4164,33 @@ namespace GridTools
     const std::function<std_cxx17::optional<DataType>(
       const typename MeshType::active_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::active_cell_iterator &,
-                             const DataType &)> &        unpack)
+                             const DataType &)> &        unpack,
+    const std::function<bool(const typename MeshType::active_cell_iterator &)>
+      &cell_filter)
   {
 #    ifndef DEAL_II_WITH_MPI
     (void)mesh;
     (void)pack;
     (void)unpack;
+    (void)cell_filter;
     Assert(false,
            ExcMessage(
              "GridTools::exchange_cell_data_to_ghosts() requires MPI."));
 #    else
-    constexpr int dim      = MeshType::dimension;
-    constexpr int spacedim = MeshType::space_dimension;
-    auto          tria =
-      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &mesh.get_triangulation());
-    Assert(
-      tria != nullptr,
-      ExcMessage(
-        "The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
-
-    // map neighbor_id -> data_buffer where we accumulate the data to send
-    using DestinationToBufferMap =
-      std::map<dealii::types::subdomain_id,
-               CellDataTransferBuffer<dim, DataType>>;
-    DestinationToBufferMap destination_to_data_buffer_map;
-
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-      vertices_with_ghost_neighbors =
-        GridTools::compute_vertices_with_ghost_neighbors(*tria);
-
-    for (const auto &cell : tria->active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          std::set<dealii::types::subdomain_id> send_to;
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-            {
-              const std::map<unsigned int,
-                             std::set<dealii::types::subdomain_id>>::
-                const_iterator neighbor_subdomains_of_vertex =
-                  vertices_with_ghost_neighbors.find(cell->vertex_index(v));
-
-              if (neighbor_subdomains_of_vertex ==
-                  vertices_with_ghost_neighbors.end())
-                continue;
-
-              Assert(neighbor_subdomains_of_vertex->second.size() != 0,
-                     ExcInternalError());
-
-              send_to.insert(neighbor_subdomains_of_vertex->second.begin(),
-                             neighbor_subdomains_of_vertex->second.end());
-            }
-
-          if (send_to.size() > 0)
-            {
-              // this cell's data needs to be sent to someone
-              typename MeshType::active_cell_iterator mesh_it(tria,
-                                                              cell->level(),
-                                                              cell->index(),
-                                                              &mesh);
-
-              const std_cxx17::optional<DataType> data = pack(mesh_it);
-
-              if (data)
-                {
-                  const CellId cellid = cell->id();
-
-                  for (const auto subdomain : send_to)
-                    {
-                      // find the data buffer for proc "subdomain" if it exists
-                      // or create an empty one otherwise
-                      typename DestinationToBufferMap::iterator p =
-                        destination_to_data_buffer_map
-                          .insert(std::make_pair(
-                            subdomain, CellDataTransferBuffer<dim, DataType>()))
-                          .first;
-
-                      p->second.cell_ids.emplace_back(cellid);
-                      p->second.data.emplace_back(*data);
-                    }
-                }
-            }
-        }
-
-    // Protect the following communication:
-    static Utilities::MPI::CollectiveMutex      mutex;
-    Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex,
-                                                     tria->get_communicator());
-
-    const int mpi_tag =
-      Utilities::MPI::internal::Tags::exchange_cell_data_to_ghosts;
-
-    // 2. send our messages
-    std::set<dealii::types::subdomain_id> ghost_owners   = tria->ghost_owners();
-    const unsigned int                    n_ghost_owners = ghost_owners.size();
-    std::vector<std::vector<char>>        sendbuffers(n_ghost_owners);
-    std::vector<MPI_Request>              requests(n_ghost_owners);
-
-    unsigned int idx = 0;
-    for (auto it = ghost_owners.begin(); it != ghost_owners.end(); ++it, ++idx)
-      {
-        CellDataTransferBuffer<dim, DataType> &data =
-          destination_to_data_buffer_map[*it];
-
-        // pack all the data into the buffer for this recipient and send it.
-        // keep data around till we can make sure that the packet has been
-        // received
-        sendbuffers[idx] = Utilities::pack(data, /*enable_compression*/ false);
-        const int ierr   = MPI_Isend(sendbuffers[idx].data(),
-                                   sendbuffers[idx].size(),
-                                   MPI_BYTE,
-                                   *it,
-                                   mpi_tag,
-                                   tria->get_communicator(),
-                                   &requests[idx]);
-        AssertThrowMPI(ierr);
-      }
-
-    // 3. receive messages
-    std::vector<char> receive;
-    for (unsigned int idx = 0; idx < n_ghost_owners; ++idx)
-      {
-        MPI_Status status;
-        int        ierr =
-          MPI_Probe(MPI_ANY_SOURCE, mpi_tag, tria->get_communicator(), &status);
-        AssertThrowMPI(ierr);
-
-        int len;
-        ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-        AssertThrowMPI(ierr);
-
-        receive.resize(len);
-
-        char *ptr = receive.data();
-        ierr      = MPI_Recv(ptr,
-                        len,
-                        MPI_BYTE,
-                        status.MPI_SOURCE,
-                        status.MPI_TAG,
-                        tria->get_communicator(),
-                        &status);
-        AssertThrowMPI(ierr);
-
-        auto cellinfo =
-          Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(
-            receive, /*enable_compression*/ false);
-
-        DataType *data = cellinfo.data.data();
-        for (unsigned int c = 0; c < cellinfo.cell_ids.size(); ++c, ++data)
-          {
-            const typename Triangulation<dim, spacedim>::cell_iterator
-              tria_cell = cellinfo.cell_ids[c].to_cell(*tria);
-
-            const typename MeshType::active_cell_iterator cell(
-              tria, tria_cell->level(), tria_cell->index(), &mesh);
-
-            unpack(cell, *data);
-          }
-      }
-
-    // make sure that all communication is finished
-    // when we leave this function.
-    if (requests.size())
-      {
-        const int ierr =
-          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
-      }
-#    endif // DEAL_II_WITH_MPI
+    internal::exchange_cell_data<DataType,
+                                 MeshType,
+                                 typename MeshType::active_cell_iterator>(
+      mesh,
+      pack,
+      unpack,
+      cell_filter,
+      [&](const auto &process) {
+        for (const auto &cell : mesh.active_cell_iterators())
+          if (cell->is_ghost())
+            process(cell, cell->subdomain_id());
+      },
+      [](const auto &tria) { return tria.ghost_owners(); });
+#    endif
   }
 
 
@@ -4099,219 +4204,33 @@ namespace GridTools
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)> &       unpack,
     const std::function<bool(const typename MeshType::level_cell_iterator &)>
-      &filter)
+      &cell_filter)
   {
 #    ifndef DEAL_II_WITH_MPI
     (void)mesh;
     (void)pack;
     (void)unpack;
-    (void)filter;
+    (void)cell_filter;
     Assert(false,
            ExcMessage(
-             "GridTools::exchange_cell_data_to_ghosts() requires MPI."));
+             "GridTools::exchange_cell_data_to_level_ghosts() requires MPI."));
 #    else
-    constexpr int dim      = MeshType::dimension;
-    constexpr int spacedim = MeshType::space_dimension;
-    auto          tria =
-      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &mesh.get_triangulation());
-    Assert(
-      tria != nullptr,
-      ExcMessage(
-        "The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
-
-    // build list of cells to request for each neighbor
-    std::set<dealii::types::subdomain_id> level_ghost_owners =
-      tria->level_ghost_owners();
-    std::map<dealii::types::subdomain_id,
-             std::vector<typename CellId::binary_type>>
-      neighbor_cell_list;
-
-    for (const auto level_ghost_owner : level_ghost_owners)
-      neighbor_cell_list[level_ghost_owner] = {};
-
-    {
-      for (const auto &cell : mesh.cell_iterators())
-        if (cell->level_subdomain_id() !=
-              dealii::numbers::artificial_subdomain_id &&
-            !cell->is_locally_owned_on_level())
-          if (filter(cell))
-            neighbor_cell_list[cell->level_subdomain_id()].emplace_back(
-              cell->id().template to_binary<spacedim>());
-    }
-
-    Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
-           ExcInternalError());
-
-
-    // Before sending & receiving, make sure we protect this section with
-    // a mutex:
-    static Utilities::MPI::CollectiveMutex      mutex;
-    Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex,
-                                                     tria->get_communicator());
-
-    const int mpi_tag = Utilities::MPI::internal::Tags::
-      exchange_cell_data_to_level_ghosts_request;
-    const int mpi_tag_reply =
-      Utilities::MPI::internal::Tags::exchange_cell_data_to_level_ghosts_reply;
-
-    // send our requests:
-    std::vector<MPI_Request> requests(level_ghost_owners.size());
-    {
-      unsigned int idx = 0;
-      for (const auto &it : neighbor_cell_list)
-        {
-          // send the data about the relevant cells
-          const int ierr = MPI_Isend(it.second.data(),
-                                     it.second.size() * sizeof(it.second[0]),
-                                     MPI_BYTE,
-                                     it.first,
-                                     mpi_tag,
-                                     tria->get_communicator(),
-                                     &requests[idx]);
-          AssertThrowMPI(ierr);
-          ++idx;
-        }
-    }
-
-    using DestinationToBufferMap =
-      std::map<dealii::types::subdomain_id,
-               GridTools::CellDataTransferBuffer<dim, DataType>>;
-    DestinationToBufferMap destination_to_data_buffer_map;
-
-    // receive requests and reply with the ghost indices
-    std::vector<std::vector<typename CellId::binary_type>> cell_data_to_send(
-      level_ghost_owners.size());
-    std::vector<std::vector<types::global_dof_index>>
-                                   send_dof_numbers_and_indices(level_ghost_owners.size());
-    std::vector<MPI_Request>       reply_requests(level_ghost_owners.size());
-    std::vector<std::vector<char>> sendbuffers(level_ghost_owners.size());
-
-    for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
-      {
-        MPI_Status status;
-        int        ierr =
-          MPI_Probe(MPI_ANY_SOURCE, mpi_tag, tria->get_communicator(), &status);
-        AssertThrowMPI(ierr);
-
-        int len;
-        ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-        AssertThrowMPI(ierr);
-        Assert(len % sizeof(cell_data_to_send[idx][0]) == 0,
-               ExcInternalError());
-
-        const unsigned int n_cells = len / sizeof(typename CellId::binary_type);
-        cell_data_to_send[idx].resize(n_cells);
-
-        ierr = MPI_Recv(cell_data_to_send[idx].data(),
-                        len,
-                        MPI_BYTE,
-                        status.MPI_SOURCE,
-                        status.MPI_TAG,
-                        tria->get_communicator(),
-                        &status);
-        AssertThrowMPI(ierr);
-
-        // store data for each cell
-        for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells); ++c)
-          {
-            const auto cell = CellId(cell_data_to_send[idx][c]).to_cell(*tria);
-
-            typename MeshType::level_cell_iterator mesh_it(tria,
-                                                           cell->level(),
-                                                           cell->index(),
-                                                           &mesh);
-            const std_cxx17::optional<DataType>    data = pack(mesh_it);
-
-            {
-              typename DestinationToBufferMap::iterator p =
-                destination_to_data_buffer_map
-                  .insert(std::make_pair(
-                    idx, GridTools::CellDataTransferBuffer<dim, DataType>()))
-                  .first;
-
-              p->second.cell_ids.emplace_back(cell->id());
-              p->second.data.emplace_back(*data);
-            }
-          }
-
-        // send reply
-        GridTools::CellDataTransferBuffer<dim, DataType> &data =
-          destination_to_data_buffer_map[idx];
-
-        sendbuffers[idx] = Utilities::pack(data, /*enable_compression*/ false);
-        ierr             = MPI_Isend(sendbuffers[idx].data(),
-                         sendbuffers[idx].size(),
-                         MPI_BYTE,
-                         status.MPI_SOURCE,
-                         mpi_tag_reply,
-                         tria->get_communicator(),
-                         &reply_requests[idx]);
-        AssertThrowMPI(ierr);
-      }
-
-    // finally receive the replies
-    std::vector<char> receive;
-    for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
-      {
-        MPI_Status status;
-        int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                             mpi_tag_reply,
-                             tria->get_communicator(),
-                             &status);
-        AssertThrowMPI(ierr);
-
-        int len;
-        ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-        AssertThrowMPI(ierr);
-
-        receive.resize(len);
-
-        char *ptr = receive.data();
-        ierr      = MPI_Recv(ptr,
-                        len,
-                        MPI_BYTE,
-                        status.MPI_SOURCE,
-                        status.MPI_TAG,
-                        tria->get_communicator(),
-                        &status);
-        AssertThrowMPI(ierr);
-
-        auto cellinfo =
-          Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(
-            receive, /*enable_compression*/ false);
-
-        DataType *data = cellinfo.data.data();
-        for (unsigned int c = 0; c < cellinfo.cell_ids.size(); ++c, ++data)
-          {
-            const typename Triangulation<dim, spacedim>::cell_iterator
-              tria_cell = cellinfo.cell_ids[c].to_cell(*tria);
-
-            const typename MeshType::level_cell_iterator cell(
-              tria, tria_cell->level(), tria_cell->index(), &mesh);
-
-            unpack(cell, *data);
-          }
-      }
-
-    // make sure that all communication is finished
-    // when we leave this function.
-    if (requests.size() > 0)
-      {
-        const int ierr =
-          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
-      }
-    if (reply_requests.size() > 0)
-      {
-        const int ierr = MPI_Waitall(reply_requests.size(),
-                                     reply_requests.data(),
-                                     MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
-      }
-
-
-#    endif // DEAL_II_WITH_MPI
+    internal::exchange_cell_data<DataType,
+                                 MeshType,
+                                 typename MeshType::level_cell_iterator>(
+      mesh,
+      pack,
+      unpack,
+      cell_filter,
+      [&](const auto &process) {
+        for (const auto &cell : mesh.cell_iterators())
+          if (cell->level_subdomain_id() !=
+                dealii::numbers::artificial_subdomain_id &&
+              !cell->is_locally_owned_on_level())
+            process(cell, cell->level_subdomain_id());
+      },
+      [](const auto &tria) { return tria.level_ghost_owners(); });
+#    endif
   }
 } // namespace GridTools
 

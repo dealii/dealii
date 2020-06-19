@@ -3677,11 +3677,10 @@ namespace internal
         template <class DoFHandlerType>
         void
         communicate_dof_indices_on_marked_cells(
-          const DoFHandlerType &dof_handler,
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>> &)
+          const DoFHandlerType &dof_handler)
         {
 #  ifndef DEAL_II_WITH_MPI
-          (void)vertices_with_ghost_neighbors;
+          (void)dof_handler;
           Assert(false, ExcNotImplemented());
 #  else
           const unsigned int dim      = DoFHandlerType::dimension;
@@ -3690,124 +3689,57 @@ namespace internal
           // define functions that pack data on cells that are ghost cells
           // somewhere else, and unpack data on cells where we get information
           // from elsewhere
-          auto pack =
-            [](const typename DoFHandlerType::active_cell_iterator &cell)
-            -> std_cxx17::optional<std::vector<types::global_dof_index>> {
+          const auto pack = [](const auto &cell) {
             Assert(cell->is_locally_owned(), ExcInternalError());
 
-            // first see whether we need to do anything at all on this cell.
-            // this is determined by whether the user_flag is set on the
-            // cell that indicates that the *complete* set of DoF indices
-            // has not been sent
-            if (cell->user_flag_set())
-              {
-                // get dof indices for the current cell
-                std::vector<types::global_dof_index> local_dof_indices(
-                  cell->get_fe().dofs_per_cell);
-                cell->get_dof_indices(local_dof_indices);
+            std::vector<dealii::types::global_dof_index> data(
+              cell->get_fe().dofs_per_cell);
+            cell->get_dof_indices(data);
 
-                // now see if there are dof indices that were previously
-                // unknown. this can only happen in phase 1, and in
-                // that case we know that the user flag must have been set
-                //
-                // in any case, if the cell *is* complete, we do not
-                // need to send the data any more in the next phase. indicate
-                // this by removing the user flag
-                if (std::find(local_dof_indices.begin(),
-                              local_dof_indices.end(),
-                              numbers::invalid_dof_index) !=
-                    local_dof_indices.end())
-                  {
-                    Assert(cell->user_flag_set(), ExcInternalError());
-                  }
-                else
-                  cell->clear_user_flag();
-
-                return local_dof_indices;
-              }
-            else
-              {
-                // the fact that the user flag wasn't set means that there is
-                // nothing we need to send that hasn't been sent so far.
-                // so return an empty array, but also verify that indeed
-                // the cell is complete
-#    ifdef DEBUG
-                std::vector<types::global_dof_index> local_dof_indices(
-                  cell->get_fe().dofs_per_cell);
-                cell->get_dof_indices(local_dof_indices);
-
-                const bool is_complete =
-                  (std::find(local_dof_indices.begin(),
-                             local_dof_indices.end(),
-                             numbers::invalid_dof_index) ==
-                   local_dof_indices.end());
-                Assert(is_complete, ExcInternalError());
-#    endif
-                return std_cxx17::optional<
-                  std::vector<types::global_dof_index>>();
-              }
+            return data;
           };
 
-          auto unpack =
-            [](const typename DoFHandlerType::active_cell_iterator &cell,
-               const std::vector<types::global_dof_index> &received_dof_indices)
-            -> void {
-            // this function should only be called on ghost cells, and
-            // on top of that, only on cells that have not been
-            // completed -- which we indicate via the user flag.
-            // check both
+          const auto unpack = [](const auto &cell, const auto &dofs) {
+            Assert(cell->get_fe().dofs_per_cell == dofs.size(),
+                   ExcInternalError());
+
             Assert(cell->is_ghost(), ExcInternalError());
-            Assert(cell->user_flag_set(), ExcInternalError());
 
-            // if we just got an incomplete array of DoF indices, then we must
-            // be in the first ghost exchange and the user flag must have been
-            // set. we tested that already above.
-            //
-            // if we did get a complete array, then we may be in the first
-            // or second ghost exchange, but in any case we need not exchange
-            // another time. so delete the user flag
-            const bool is_complete = (std::find(received_dof_indices.begin(),
-                                                received_dof_indices.end(),
-                                                numbers::invalid_dof_index) ==
-                                      received_dof_indices.end());
-            if (is_complete)
-              cell->clear_user_flag();
-
-            // in any case, set the DoF indices on this cell. some
-            // of the ones we received may still be invalid because
-            // the sending processor did not know them yet, so we
-            // need to merge the ones we get with those that are
-            // already set here and may have already been known. for
-            // those that we already know *and* get, they must obviously
-            // agree
-            //
-            // before getting the local dof indices, we need to update the
-            // cell dof indices cache because we may have set dof indices
-            // on a neighboring ghost cell before this one, which may have
-            // affected the dof indices we know about the current cell
-            std::vector<types::global_dof_index> local_dof_indices(
+            std::vector<dealii::types::global_dof_index> dof_indices(
               cell->get_fe().dofs_per_cell);
             cell->update_cell_dof_indices_cache();
-            cell->get_dof_indices(local_dof_indices);
+            cell->get_dof_indices(dof_indices);
 
-            for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-              if (local_dof_indices[i] == numbers::invalid_dof_index)
-                local_dof_indices[i] = received_dof_indices[i];
+            bool complete = true;
+            for (unsigned int i = 0; i < dof_indices.size(); ++i)
+              if (dofs[i] != numbers::invalid_dof_index)
+                {
+                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
+                           (dof_indices[i] == dofs[i]),
+                         ExcInternalError());
+                  dof_indices[i] = dofs[i];
+                }
               else
-                // we already know the dof index. check that there
-                // is no conflict
-                Assert((received_dof_indices[i] ==
-                        numbers::invalid_dof_index) ||
-                         (received_dof_indices[i] == local_dof_indices[i]),
-                       ExcInternalError());
+                complete = false;
+
+            if (!complete)
+              const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
+                ->set_user_flag();
+            else
+              const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
+                ->clear_user_flag();
 
             const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
-              ->set_dof_indices(local_dof_indices);
+              ->set_dof_indices(dof_indices);
+          };
+
+          const auto filter = [](const auto &cell) {
+            return cell->user_flag_set();
           };
 
           GridTools::exchange_cell_data_to_ghosts<
             std::vector<types::global_dof_index>,
-            DoFHandlerType>(dof_handler, pack, unpack);
+            DoFHandlerType>(dof_handler, pack, unpack, filter);
 
           // finally update the cell DoF indices caches to make sure
           // our internal data structures are consistent
@@ -3997,30 +3929,12 @@ namespace internal
           triangulation->save_user_flags(user_flags);
           triangulation->clear_user_flags();
 
-          // figure out which cells are ghost cells on which we have
-          // to exchange DoF indices
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-            vertices_with_ghost_neighbors =
-              GridTools::compute_vertices_with_ghost_neighbors(*triangulation);
-
           // mark all cells that either have to send data (locally
           // owned cells that are adjacent to ghost neighbors in some
           // way) or receive data (all ghost cells) via the user flags
           for (const auto &cell : dof_handler->active_cell_iterators())
-            if (cell->is_locally_owned())
-              {
-                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-                  if (vertices_with_ghost_neighbors.find(cell->vertex_index(
-                        v)) != vertices_with_ghost_neighbors.end())
-                    {
-                      cell->set_user_flag();
-                      break;
-                    }
-              }
-            else if (cell->is_ghost())
+            if (cell->is_ghost())
               cell->set_user_flag();
-
-
 
           // Send and receive cells. After this, only the local cells
           // are marked, that received new data. This has to be
@@ -4028,8 +3942,7 @@ namespace internal
           //
           // as explained in the 'distributed' paper, this has to be
           // done twice
-          communicate_dof_indices_on_marked_cells(
-            *dof_handler, vertices_with_ghost_neighbors);
+          communicate_dof_indices_on_marked_cells(*dof_handler);
 
           // in case of hp::DoFHandlers, we may have received valid
           // indices of degrees of freedom that are dominated by a fe
@@ -4043,8 +3956,7 @@ namespace internal
           //                    DoF indices set. however, some ghost cells
           //                    may still have invalid ones. thus, exchange
           //                    one more time.
-          communicate_dof_indices_on_marked_cells(
-            *dof_handler, vertices_with_ghost_neighbors);
+          communicate_dof_indices_on_marked_cells(*dof_handler);
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
@@ -4545,16 +4457,8 @@ namespace internal
 
               // mark all own cells for transfer
               for (const auto &cell : dof_handler->active_cell_iterators())
-                if (!cell->is_artificial())
+                if (cell->is_ghost())
                   cell->set_user_flag();
-
-              // figure out which cells are ghost cells on which we have
-              // to exchange DoF indices
-              const std::map<unsigned int,
-                             std::set<dealii::types::subdomain_id>>
-                vertices_with_ghost_neighbors =
-                  GridTools::compute_vertices_with_ghost_neighbors(
-                    *triangulation);
 
 
               // Send and receive cells. After this, only the local cells
@@ -4563,8 +4467,7 @@ namespace internal
               //
               // as explained in the 'distributed' paper, this has to be
               // done twice
-              communicate_dof_indices_on_marked_cells(
-                *dof_handler, vertices_with_ghost_neighbors);
+              communicate_dof_indices_on_marked_cells(*dof_handler);
 
               // in case of hp::DoFHandlers, we may have received valid
               // indices of degrees of freedom that are dominated by a fe
@@ -4574,8 +4477,7 @@ namespace internal
               Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
                 *dof_handler);
 
-              communicate_dof_indices_on_marked_cells(
-                *dof_handler, vertices_with_ghost_neighbors);
+              communicate_dof_indices_on_marked_cells(*dof_handler);
 
               triangulation->load_user_flags(user_flags);
             }
