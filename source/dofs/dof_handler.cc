@@ -51,29 +51,23 @@ namespace internal
   {
     std::string policy_name;
     if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
-                       Policy::Sequential<dealii::DoFHandler<dim, spacedim>> *>(
-          &policy) ||
+                       Policy::Sequential<dim, spacedim> *>(&policy) ||
         dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
-                       Policy::Sequential<dealii::DoFHandler<dim, spacedim>> *>(
-          &policy))
+                       Policy::Sequential<dim, spacedim> *>(&policy))
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelDistributed<dealii::DoFHandler<dim, spacedim>>
-                   *>(&policy) ||
+                 Policy::ParallelDistributed<dim, spacedim> *>(&policy) ||
              dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelDistributed<dealii::DoFHandler<dim, spacedim>>
-                   *>(&policy))
+                 Policy::ParallelDistributed<dim, spacedim> *>(&policy))
       policy_name = "Policy::ParallelDistributed<";
     else if (dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelShared<dealii::DoFHandler<dim, spacedim>> *>(
-               &policy) ||
+                 Policy::ParallelShared<dim, spacedim> *>(&policy) ||
              dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelShared<dealii::DoFHandler<dim, spacedim>> *>(
-               &policy))
+                 Policy::ParallelShared<dim, spacedim> *>(&policy))
       policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
@@ -2606,19 +2600,18 @@ DoFHandler<dim, spacedim>::setup_policy()
   // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const dealii::parallel::shared::Triangulation<dim, spacedim>
                      *>(&this->get_triangulation()) != nullptr)
-    this->policy =
-      std::make_unique<internal::DoFHandlerImplementation::Policy::
-                         ParallelShared<DoFHandler<dim, spacedim>>>(*this);
+    this->policy = std::make_unique<internal::DoFHandlerImplementation::Policy::
+                                      ParallelShared<dim, spacedim>>(*this);
   else if (dynamic_cast<
              const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
                *>(&this->get_triangulation()) == nullptr)
-    this->policy =
-      std::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<
-        DoFHandler<dim, spacedim>>>(*this);
+    this->policy = std::make_unique<
+      internal::DoFHandlerImplementation::Policy::Sequential<dim, spacedim>>(
+      *this);
   else
     this->policy =
       std::make_unique<internal::DoFHandlerImplementation::Policy::
-                         ParallelDistributed<DoFHandler<dim, spacedim>>>(*this);
+                         ParallelDistributed<dim, spacedim>>(*this);
 }
 
 
@@ -3003,8 +2996,7 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
     {
       this->policy =
         std::make_unique<internal::DoFHandlerImplementation::Policy::
-                           ParallelDistributed<DoFHandler<dim, spacedim>>>(
-          *this);
+                           ParallelDistributed<dim, spacedim>>(*this);
 
       // repartitioning signals
       this->tria_listeners.push_back(
@@ -3039,7 +3031,7 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
     {
       this->policy =
         std::make_unique<internal::DoFHandlerImplementation::Policy::
-                           ParallelShared<DoFHandler<dim, spacedim>>>(*this);
+                           ParallelShared<dim, spacedim>>(*this);
 
       // partitioning signals
       this->tria_listeners.push_back(
@@ -3057,9 +3049,9 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
     }
   else
     {
-      this->policy =
-        std::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<
-          DoFHandler<dim, spacedim>>>(*this);
+      this->policy = std::make_unique<
+        internal::DoFHandlerImplementation::Policy::Sequential<dim, spacedim>>(
+        *this);
 
       // refinement signals
       this->tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
