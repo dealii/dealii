@@ -1606,6 +1606,49 @@ public:
     const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &o) const;
 
   /**
+   * Number of vertices.
+   */
+  inline unsigned int
+  n_vertices() const;
+
+  /**
+   * Number of lines.
+   */
+  inline unsigned int
+  n_lines() const;
+
+  /**
+   * Number of faces.
+   *
+   * @note Only implemented for cells (dim==spacedim).
+   */
+  inline unsigned int
+  n_faces() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to n_vertices().
+   */
+  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  vertex_indices() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to n_lines().
+   */
+  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  line_indices() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to n_faces().
+   *
+   * @note Only implemented for cells (dim==spacedim).
+   */
+  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  face_indices() const;
+
+  /**
    * @}
    */
 
@@ -2628,6 +2671,32 @@ public:
   bool
   used() const;
 
+  /**
+   * Number of vertices.
+   */
+  inline unsigned int
+  n_vertices() const;
+
+  /**
+   * Number of lines.
+   */
+  inline unsigned int
+  n_lines() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to n_vertices().
+   */
+  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  vertex_indices() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to n_lines().
+   */
+  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  line_indices() const;
+
 protected:
   /**
    * Pointer to the triangulation we operate on.
@@ -2766,8 +2835,9 @@ public:
   /**
    * Return an array of iterators to all faces of this cell.
    */
-  std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-             GeometryInfo<dim>::faces_per_cell>
+  boost::container::small_vector<
+    TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+    GeometryInfo<dim>::faces_per_cell>
   face_iterators() const;
 
   /**
