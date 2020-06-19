@@ -2023,20 +2023,11 @@ template <int dim, int spacedim>
 bool
 CellAccessor<dim, spacedim>::at_boundary() const
 {
-  switch (dim)
-    {
-      case 1:
-        return at_boundary(0) || at_boundary(1);
-      case 2:
-        return (at_boundary(0) || at_boundary(1) || at_boundary(2) ||
-                at_boundary(3));
-      case 3:
-        return (at_boundary(0) || at_boundary(1) || at_boundary(2) ||
-                at_boundary(3) || at_boundary(4) || at_boundary(5));
-      default:
-        Assert(false, ExcNotImplemented());
-        return false;
-    }
+  for (const auto face : GeometryInfo<dim>::face_indices())
+    if (at_boundary(face))
+      return true;
+
+  return false;
 }
 
 
