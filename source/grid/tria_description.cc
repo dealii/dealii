@@ -41,7 +41,10 @@ template <int structdim>
 bool
 CellData<structdim>::operator==(const CellData<structdim> &other) const
 {
-  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+  if (vertices.size() != other.vertices.size())
+    return false;
+
+  for (unsigned int i = 0; i < vertices.size(); ++i)
     if (vertices[i] != other.vertices[i])
       return false;
 
@@ -209,7 +212,7 @@ namespace TriangulationDescription
           TriaIterator<CellAccessor<dim, spacedim>> &cell,
           std::vector<bool> &vertices_owned_by_locally_owned_cells) {
           // add local vertices
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          for (const auto v : GeometryInfo<dim>::vertex_indices())
             {
               vertices_owned_by_locally_owned_cells[cell->vertex_index(v)] =
                 true;
@@ -273,7 +276,7 @@ namespace TriangulationDescription
           // owned cell)
           auto is_locally_relevant_on_level =
             [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+              for (const auto v : GeometryInfo<dim>::vertex_indices())
                 if (vertices_owned_by_locally_owned_cells_on_level
                       [cell->vertex_index(v)])
                   return true;
@@ -297,15 +300,16 @@ namespace TriangulationDescription
               continue;
 
             // extract cell definition (with old numbering of vertices)
-            dealii::CellData<dim> cell_data;
+            dealii::CellData<dim> cell_data(
+              GeometryInfo<dim>::vertices_per_cell);
             cell_data.material_id = cell->material_id();
             cell_data.manifold_id = cell->manifold_id();
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const auto v : GeometryInfo<dim>::vertex_indices())
               cell_data.vertices[v] = cell->vertex_index(v);
             construction_data.coarse_cells.push_back(cell_data);
 
             // save indices of each vertex of this cell
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const auto v : GeometryInfo<dim>::vertex_indices())
               vertices_locally_relevant[cell->vertex_index(v)] =
                 numbers::invalid_unsigned_int;
 
@@ -325,7 +329,7 @@ namespace TriangulationDescription
 
         // c) correct vertices of cells (make them local)
         for (auto &cell : construction_data.coarse_cells)
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          for (const auto v : GeometryInfo<dim>::vertex_indices())
             cell.vertices[v] = vertices_locally_relevant[cell.vertices[v]];
       }
 
@@ -347,7 +351,7 @@ namespace TriangulationDescription
       auto is_locally_relevant_on_active_level =
         [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
           if (cell->active())
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const auto v : GeometryInfo<dim>::vertex_indices())
               if (vertices_owned_by_locally_owned_active_cells
                     [cell->vertex_index(v)])
                 return true;
@@ -372,7 +376,7 @@ namespace TriangulationDescription
           // on level
           auto is_locally_relevant_on_level =
             [&](TriaIterator<CellAccessor<dim, spacedim>> &cell) {
-              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+              for (const auto v : GeometryInfo<dim>::vertex_indices())
                 if (vertices_owned_by_locally_owned_cells_on_level
                       [cell->vertex_index(v)])
                   return true;
@@ -392,7 +396,7 @@ namespace TriangulationDescription
               cell_info.id = cell->id().template to_binary<dim>();
 
               // save boundary_ids of each face of this cell
-              for (const unsigned int f : GeometryInfo<dim>::face_indices())
+              for (const auto f : GeometryInfo<dim>::face_indices())
                 {
                   types::boundary_id boundary_ind =
                     cell->face(f)->boundary_id();
@@ -415,11 +419,9 @@ namespace TriangulationDescription
 
                 // ... of quads
                 if (dim == 3)
-                  for (unsigned int quad = 0;
-                       quad < GeometryInfo<dim>::quads_per_cell;
-                       ++quad)
-                    cell_info.manifold_quad_ids[quad] =
-                      cell->quad(quad)->manifold_id();
+                  for (const auto f : GeometryInfo<dim>::face_indices())
+                    cell_info.manifold_quad_ids[f] =
+                      cell->quad(f)->manifold_id();
               }
 
               // subdomain and level subdomain id
