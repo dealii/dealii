@@ -88,7 +88,7 @@ namespace DoFTools
              "than the locally owned one does not make sense."));
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
-    dofs_on_this_cell.reserve(max_dofs_per_cell(dof));
+    dofs_on_this_cell.reserve(dof.get_fe_collection().max_dofs_per_cell());
     typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
                                                   endc = dof.end();
 
@@ -389,7 +389,7 @@ namespace DoFTools
 #endif
 
     std::vector<types::global_dof_index> dofs_on_this_face;
-    dofs_on_this_face.reserve(max_dofs_per_face(dof));
+    dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
 
     // loop over all faces to check whether they are at a boundary. note
     // that we need not take special care of single lines (using
@@ -489,7 +489,7 @@ namespace DoFTools
 #endif
 
     std::vector<types::global_dof_index> dofs_on_this_face;
-    dofs_on_this_face.reserve(max_dofs_per_face(dof));
+    dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
     typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
                                                   endc = dof.end();
     for (; cell != endc; ++cell)
@@ -547,8 +547,8 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     std::vector<types::global_dof_index> dofs_on_other_cell;
-    dofs_on_this_cell.reserve(max_dofs_per_cell(dof));
-    dofs_on_other_cell.reserve(max_dofs_per_cell(dof));
+    dofs_on_this_cell.reserve(dof.get_fe_collection().max_dofs_per_cell());
+    dofs_on_other_cell.reserve(dof.get_fe_collection().max_dofs_per_cell());
     typename DoFHandlerType::active_cell_iterator cell = dof.begin_active(),
                                                   endc = dof.end();
 
@@ -1100,9 +1100,9 @@ namespace DoFTools
               dof.get_fe_collection();
 
             std::vector<types::global_dof_index> dofs_on_this_cell(
-              DoFTools::max_dofs_per_cell(dof));
+              dof.get_fe_collection().max_dofs_per_cell());
             std::vector<types::global_dof_index> dofs_on_other_cell(
-              DoFTools::max_dofs_per_cell(dof));
+              dof.get_fe_collection().max_dofs_per_cell());
 
             const unsigned int n_components = fe.n_components();
             AssertDimension(int_mask.size(0), n_components);

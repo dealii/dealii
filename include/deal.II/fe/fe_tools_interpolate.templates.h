@@ -120,9 +120,9 @@ namespace FETools
     // this does not lead to
     // reallocation of memory
     Vector<typename OutVector::value_type> u1_local(
-      DoFTools::max_dofs_per_cell(dof1));
+      dof1.get_fe_collection().max_dofs_per_cell());
     Vector<typename OutVector::value_type> u2_local(
-      DoFTools::max_dofs_per_cell(dof2));
+      dof2.get_fe_collection().max_dofs_per_cell());
 
     // have a map for interpolation matrices.
     // Using a unique_ptr makes sure that the
@@ -141,7 +141,7 @@ namespace FETools
     (void)endc2;
 
     std::vector<types::global_dof_index> dofs;
-    dofs.reserve(DoFTools::max_dofs_per_cell(dof2));
+    dofs.reserve(dof2.get_fe_collection().max_dofs_per_cell());
 
     u2 = typename OutVector::value_type(0.);
     OutVector touch_count(u2);
@@ -296,9 +296,9 @@ namespace FETools
 #endif
 
     Vector<typename OutVector::value_type> u1_local(
-      DoFTools::max_dofs_per_cell(dof1));
+      dof1.get_fe_collection().max_dofs_per_cell());
     Vector<typename OutVector::value_type> u1_int_local(
-      DoFTools::max_dofs_per_cell(dof1));
+      dof1.get_fe_collection().max_dofs_per_cell());
 
     const types::subdomain_id subdomain_id =
       dof1.get_triangulation().locally_owned_subdomain();

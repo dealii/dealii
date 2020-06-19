@@ -2923,7 +2923,8 @@ namespace internal
           std::vector<types::subdomain_id> subdomain_association(
             n_dofs, numbers::invalid_subdomain_id);
           std::vector<types::global_dof_index> local_dof_indices;
-          local_dof_indices.reserve(DoFTools::max_dofs_per_cell(dof_handler));
+          local_dof_indices.reserve(
+            dof_handler.get_fe_collection().max_dofs_per_cell());
 
           // loop over all cells and record which subdomain a DoF belongs to.
           // give to the smaller subdomain_id in case it is on an interface
@@ -2986,7 +2987,8 @@ namespace internal
           std::vector<types::subdomain_id> level_subdomain_association(
             n_dofs_on_level, numbers::invalid_subdomain_id);
           std::vector<types::global_dof_index> local_dof_indices;
-          local_dof_indices.reserve(DoFTools::max_dofs_per_cell(dof_handler));
+          local_dof_indices.reserve(
+            dof_handler.get_fe_collection().max_dofs_per_cell());
 
           // loop over all cells and record which subdomain a DoF belongs to.
           // interface goes to proccessor with smaller subdomain id

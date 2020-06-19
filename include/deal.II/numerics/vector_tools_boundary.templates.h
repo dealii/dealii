@@ -80,7 +80,7 @@ namespace VectorTools
              ExcMessage("You cannot specify the special boundary indicator "
                         "for interior faces in your function map."));
 
-      const unsigned int n_components = DoFTools::n_components(dof);
+      const unsigned int n_components = dof.get_fe_collection().n_components();
       for (typename std::map<types::boundary_id,
                              const Function<spacedim, number> *>::const_iterator
              i = function_map.begin();
@@ -147,15 +147,17 @@ namespace VectorTools
 
           // field to store the indices
           std::vector<types::global_dof_index> face_dofs;
-          face_dofs.reserve(DoFTools::max_dofs_per_face(dof));
+          face_dofs.reserve(dof.get_fe_collection().max_dofs_per_face());
 
           // array to store the values of the boundary function at the boundary
           // points. have two arrays for scalar and vector functions to use the
           // more efficient one respectively
           std::vector<number>         dof_values_scalar;
           std::vector<Vector<number>> dof_values_system;
-          dof_values_scalar.reserve(DoFTools::max_dofs_per_face(dof));
-          dof_values_system.reserve(DoFTools::max_dofs_per_face(dof));
+          dof_values_scalar.reserve(
+            dof.get_fe_collection().max_dofs_per_face());
+          dof_values_system.reserve(
+            dof.get_fe_collection().max_dofs_per_face());
 
           // before we start with the loop over all cells create an hp::FEValues
           // object that holds the interpolation points of all finite elements

@@ -1301,11 +1301,11 @@ namespace MGTools
       if (boundary_indices[i].size() == 0)
         boundary_indices[i] = IndexSet(dof.n_dofs(i));
 
-    const unsigned int n_components = DoFTools::n_components(dof);
+    const unsigned int n_components = dof.get_fe_collection().n_components();
     const bool         fe_is_system = (n_components != 1);
 
     std::vector<types::global_dof_index> local_dofs;
-    local_dofs.reserve(DoFTools::max_dofs_per_face(dof));
+    local_dofs.reserve(dof.get_fe_collection().max_dofs_per_face());
     std::fill(local_dofs.begin(), local_dofs.end(), numbers::invalid_dof_index);
 
     std::vector<std::vector<types::global_dof_index>> dofs_by_level(

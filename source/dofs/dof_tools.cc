@@ -321,14 +321,19 @@ namespace DoFTools
 
     AssertDimension(cell_data.size(), tria.n_active_cells());
     AssertDimension(dof_data.size(), dof_handler.n_dofs());
-    AssertIndexRange(component, n_components(dof_handler));
-    Assert(fe_is_primitive(dof_handler) == true,
-           typename FiniteElement<dim>::ExcFENotPrimitive());
+    const auto &fe_collection = dof_handler.get_fe_collection();
+    AssertIndexRange(component, fe_collection.n_components());
+    for (unsigned int i = 0; i < fe_collection.size(); ++i)
+      {
+        Assert(fe_collection[i].is_primitive() == true,
+               typename FiniteElement<dim>::ExcFENotPrimitive());
+      }
 
     // store a flag whether we should care about different components. this
     // is just a simplification, we could ask for this at every single
     // place equally well
-    const bool consider_components = (n_components(dof_handler) != 1);
+    const bool consider_components =
+      (dof_handler.get_fe_collection().n_components() != 1);
 
     // zero out the components that we will touch
     if (consider_components == false)
@@ -339,8 +344,7 @@ namespace DoFTools
           dof_handler.n_locally_owned_dofs());
         internal::get_component_association(
           dof_handler,
-          dof_handler.get_fe_collection().component_mask(
-            FEValuesExtractors::Scalar(component)),
+          fe_collection.component_mask(FEValuesExtractors::Scalar(component)),
           component_dofs);
 
         for (unsigned int i = 0; i < dof_data.size(); ++i)
@@ -355,7 +359,7 @@ namespace DoFTools
                                                     dof_handler.begin_active(),
                                                   endc = dof_handler.end();
     std::vector<types::global_dof_index> dof_indices;
-    dof_indices.reserve(max_dofs_per_cell(dof_handler));
+    dof_indices.reserve(fe_collection.max_dofs_per_cell());
 
     for (unsigned int present_cell = 0; cell != endc; ++cell, ++present_cell)
       {
@@ -571,7 +575,8 @@ namespace DoFTools
     const FiniteElement<DoFHandlerType::dimension,
                         DoFHandlerType::space_dimension> &fe = dof.get_fe();
 
-    Assert(component_mask.represents_n_components(n_components(dof)),
+    Assert(component_mask.represents_n_components(
+             dof.get_fe_collection().n_components()),
            ExcMessage(
              "The given component mask is not sized correctly to represent the "
              "components of the given finite element."));
@@ -580,13 +585,15 @@ namespace DoFTools
 
     // two special cases: no component is selected, and all components are
     // selected, both rather stupid, but easy to catch
-    if (component_mask.n_selected_components(n_components(dof)) == 0)
+    if (component_mask.n_selected_components(
+          dof.get_fe_collection().n_components()) == 0)
       {
         std::fill_n(selected_dofs.begin(), dof.n_dofs(level), false);
         return;
       }
-    else if (component_mask.n_selected_components(n_components(dof)) ==
-             n_components(dof))
+    else if (component_mask.n_selected_components(
+               dof.get_fe_collection().n_components()) ==
+             dof.get_fe_collection().n_components())
       {
         std::fill_n(selected_dofs.begin(), dof.n_dofs(level), true);
         return;
@@ -666,7 +673,8 @@ namespace DoFTools
                         IndexSet &                          selected_dofs,
                         const std::set<types::boundary_id> &boundary_ids)
   {
-    Assert(component_mask.represents_n_components(n_components(dof_handler)),
+    Assert(component_mask.represents_n_components(
+             dof_handler.get_fe_collection().n_components()),
            ExcMessage("Component mask has invalid size."));
     Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
              boundary_ids.end(),
@@ -685,11 +693,13 @@ namespace DoFTools
     // is selected, or all
     const bool check_vector_component =
       ((component_mask.represents_the_all_selected_mask() == false) ||
-       (component_mask.n_selected_components(n_components(dof_handler)) !=
-        n_components(dof_handler)));
+       (component_mask.n_selected_components(
+          dof_handler.get_fe_collection().n_components()) !=
+        dof_handler.get_fe_collection().n_components()));
 
     std::vector<types::global_dof_index> face_dof_indices;
-    face_dof_indices.reserve(max_dofs_per_face(dof_handler));
+    face_dof_indices.reserve(
+      dof_handler.get_fe_collection().max_dofs_per_face());
 
     // now loop over all cells and check whether their faces are at the
     // boundary. note that we need not take special care of single lines
@@ -775,7 +785,8 @@ namespace DoFTools
     std::vector<bool> &                 selected_dofs,
     const std::set<types::boundary_id> &boundary_ids)
   {
-    Assert(component_mask.represents_n_components(n_components(dof_handler)),
+    Assert(component_mask.represents_n_components(
+             dof_handler.get_fe_collection().n_components()),
            ExcMessage("This component mask has the wrong size."));
     Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
              boundary_ids.end(),
@@ -794,7 +805,8 @@ namespace DoFTools
     selected_dofs.clear();
     selected_dofs.resize(dof_handler.n_dofs(), false);
     std::vector<types::global_dof_index> cell_dof_indices;
-    cell_dof_indices.reserve(max_dofs_per_cell(dof_handler));
+    cell_dof_indices.reserve(
+      dof_handler.get_fe_collection().max_dofs_per_cell());
 
     // now loop over all cells and check whether their faces are at the
     // boundary. note that we need not take special care of single lines
@@ -866,7 +878,8 @@ namespace DoFTools
     };
 
     std::vector<types::global_dof_index> local_dof_indices;
-    local_dof_indices.reserve(max_dofs_per_cell(dof_handler));
+    local_dof_indices.reserve(
+      dof_handler.get_fe_collection().max_dofs_per_cell());
 
     // Get all the dofs that live on the subdomain:
     std::set<types::global_dof_index> predicate_dofs;
@@ -1101,7 +1114,8 @@ namespace DoFTools
     std::fill_n(selected_dofs.begin(), dof_handler.n_dofs(), false);
 
     std::vector<types::global_dof_index> local_dof_indices;
-    local_dof_indices.reserve(max_dofs_per_cell(dof_handler));
+    local_dof_indices.reserve(
+      dof_handler.get_fe_collection().max_dofs_per_cell());
 
     // this function is similar to the make_sparsity_pattern function, see
     // there for more information
@@ -1606,7 +1620,8 @@ namespace DoFTools
                 numbers::invalid_subdomain_id);
 
     std::vector<types::global_dof_index> local_dof_indices;
-    local_dof_indices.reserve(max_dofs_per_cell(dof_handler));
+    local_dof_indices.reserve(
+      dof_handler.get_fe_collection().max_dofs_per_cell());
 
     // loop over all cells and record which subdomain a DoF belongs to.
     // give to the smaller subdomain_id in case it is on an interface
@@ -1679,7 +1694,8 @@ namespace DoFTools
     IndexSet index_set(dof_handler.n_dofs());
 
     std::vector<types::global_dof_index> local_dof_indices;
-    local_dof_indices.reserve(max_dofs_per_cell(dof_handler));
+    local_dof_indices.reserve(
+      dof_handler.get_fe_collection().max_dofs_per_cell());
 
     // first generate an unsorted list of all indices which we fill from
     // the back. could also insert them directly into the IndexSet, but
@@ -2113,7 +2129,7 @@ namespace DoFTools
                    numbers::invalid_dof_index);
 
     std::vector<types::global_dof_index> dofs_on_face;
-    dofs_on_face.reserve(max_dofs_per_face(dof_handler));
+    dofs_on_face.reserve(dof_handler.get_fe_collection().max_dofs_per_face());
     types::global_dof_index next_boundary_index = 0;
 
     // now loop over all cells and check whether their faces are at the
@@ -2164,7 +2180,7 @@ namespace DoFTools
       return;
 
     std::vector<types::global_dof_index> dofs_on_face;
-    dofs_on_face.reserve(max_dofs_per_face(dof_handler));
+    dofs_on_face.reserve(dof_handler.get_fe_collection().max_dofs_per_face());
     types::global_dof_index next_boundary_index = 0;
 
     typename DoFHandlerType::active_cell_iterator cell =
