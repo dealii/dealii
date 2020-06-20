@@ -68,22 +68,15 @@ namespace internal
          * Update the cache used for cell dof indices on all (non-artificial)
          * active cells of the given DoFHandler.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         void
         update_all_active_cell_dof_indices_caches(
-          const DoFHandlerType &dof_handler)
+          const DoFHandler<dim, spacedim> &dof_handler)
         {
-          typename DoFHandlerType::active_cell_iterator
-            beginc = dof_handler.begin_active(),
-            endc   = dof_handler.end();
-
-          auto worker =
-            [](const typename DoFHandlerType::active_cell_iterator &cell,
-               void *,
-               void *) {
-              if (!cell->is_artificial())
-                cell->update_cell_dof_indices_cache();
-            };
+          const auto worker = [](const auto &cell, void *, void *) {
+            if (!cell->is_artificial())
+              cell->update_cell_dof_indices_cache();
+          };
 
           // parallelize filling all of the cell caches. by using
           // WorkStream, we make sure that we only run through the
@@ -91,8 +84,8 @@ namespace internal
           // for example has to split the range multiple times,
           // which is expensive because cell iterators are not
           // random access iterators with a cheap operator-
-          WorkStream::run(beginc,
-                          endc,
+          WorkStream::run(dof_handler.begin_active(),
+                          dof_handler.end(),
                           worker,
                           /* copier */ std::function<void(void *)>(),
                           /* scratch_data */ nullptr,
@@ -106,22 +99,15 @@ namespace internal
          * Update the cache used for cell dof indices on all (non-artificial)
          * level (multigrid) cells of the given DoFHandler.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         void
         update_all_level_cell_dof_indices_caches(
-          const DoFHandlerType &dof_handler)
+          const DoFHandler<dim, spacedim> &dof_handler)
         {
-          typename DoFHandlerType::level_cell_iterator beginc =
-                                                         dof_handler.begin(),
-                                                       endc = dof_handler.end();
-
-          auto worker =
-            [](const typename DoFHandlerType::level_cell_iterator &cell,
-               void *,
-               void *) {
-              if (cell->has_children() || !cell->is_artificial())
-                cell->update_cell_dof_indices_cache();
-            };
+          const auto worker = [](const auto &cell, void *, void *) {
+            if (cell->has_children() || !cell->is_artificial())
+              cell->update_cell_dof_indices_cache();
+          };
 
           // parallelize filling all of the cell caches. by using
           // WorkStream, we make sure that we only run through the
@@ -129,8 +115,8 @@ namespace internal
           // for example has to split the range multiple times,
           // which is expensive because cell iterators are not
           // random access iterators with a cheap operator-
-          WorkStream::run(beginc,
-                          endc,
+          WorkStream::run(dof_handler.begin(),
+                          dof_handler.end(),
                           worker,
                           /* copier */ std::function<void(void *)>(),
                           /* scratch_data */ nullptr,
@@ -436,8 +422,7 @@ namespace internal
             for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
               if (cell->line(l)->user_flag_set() == false)
                 {
-                  const typename DoFHandler<dim, spacedim>::line_iterator line =
-                    cell->line(l);
+                  const auto line = cell->line(l);
                   line->set_user_flag();
 
                   unsigned int unique_sets_of_dofs =
@@ -807,8 +792,7 @@ namespace internal
               if ((cell->quad(q)->user_flag_set() == false) &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const typename DoFHandler<dim, spacedim>::quad_iterator quad =
-                    cell->quad(q);
+                  const auto quad = cell->quad(q);
                   quad->set_user_flag();
 
                   const std::set<unsigned int> fe_indices =
@@ -963,17 +947,16 @@ namespace internal
          * Returns the final number of degrees of freedom, which is the number
          * of all valid DoF indices in @p new_dof_indices.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         static types::global_dof_index
         enumerate_dof_indices_for_renumbering(
           std::vector<types::global_dof_index> &new_dof_indices,
           const std::vector<
             std::map<types::global_dof_index, types::global_dof_index>>
             &all_constrained_indices,
-          const DoFHandlerType &)
+          const DoFHandler<dim, spacedim> &)
         {
-          Assert(all_constrained_indices.size() == DoFHandlerType::dimension,
-                 ExcInternalError());
+          Assert(all_constrained_indices.size() == dim, ExcInternalError());
 
           // first preset the new DoF indices that are identities
           for (const auto &constrained_dof_indices : all_constrained_indices)
@@ -1284,8 +1267,7 @@ namespace internal
               if ((cell->is_locally_owned()) &&
                   (cell->line(l)->user_flag_set() == true))
                 {
-                  const typename DoFHandler<dim, spacedim>::line_iterator line =
-                    cell->line(l);
+                  const auto line = cell->line(l);
                   line->clear_user_flag();
 
                   unsigned int unique_sets_of_dofs =
@@ -1562,8 +1544,7 @@ namespace internal
                   (cell->quad(q)->user_flag_set() == true) &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const typename DoFHandler<dim, spacedim>::quad_iterator quad =
-                    cell->quad(q);
+                  const auto quad = cell->quad(q);
                   quad->clear_user_flag();
 
                   const std::set<unsigned int> fe_indices =
@@ -1695,10 +1676,10 @@ namespace internal
          * numbers::invalid_subdomain_id. Return the total number of dofs
          * distributed.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         static types::global_dof_index
-        distribute_dofs(const types::subdomain_id subdomain_id,
-                        DoFHandlerType &          dof_handler)
+        distribute_dofs(const types::subdomain_id  subdomain_id,
+                        DoFHandler<dim, spacedim> &dof_handler)
         {
           Assert(dof_handler.get_triangulation().n_levels() > 0,
                  ExcMessage("Empty triangulation"));
@@ -1749,12 +1730,12 @@ namespace internal
          * Phase 5, these values will be overwritten by the correct one. The
          * invalidated indices will be stored in the @p renumbering parameter.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         static void
         invalidate_dof_indices_on_weaker_ghost_cells_for_renumbering(
           std::vector<types::global_dof_index> &renumbering,
           const types::subdomain_id             subdomain_id,
-          const DoFHandlerType &                dof_handler)
+          const DoFHandler<dim, spacedim> &     dof_handler)
         {
           std::vector<types::global_dof_index> local_dof_indices;
 
@@ -1781,17 +1762,14 @@ namespace internal
 
 
 
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         static types::global_dof_index
-        distribute_dofs_on_level(const types::subdomain_id level_subdomain_id,
-                                 DoFHandlerType &          dof_handler,
-                                 const unsigned int        level)
+        distribute_dofs_on_level(const types::subdomain_id  level_subdomain_id,
+                                 DoFHandler<dim, spacedim> &dof_handler,
+                                 const unsigned int         level)
         {
           Assert(dof_handler.hp_capability_enabled == false,
                  ExcInternalError());
-
-          const unsigned int dim      = DoFHandlerType::dimension;
-          const unsigned int spacedim = DoFHandlerType::space_dimension;
 
           const dealii::Triangulation<dim, spacedim> &tria =
             dof_handler.get_triangulation();
@@ -2132,8 +2110,7 @@ namespace internal
                      ++l)
                   if (cell->line(l)->user_flag_set() == false)
                     {
-                      const typename DoFHandler<dim, spacedim>::line_iterator
-                        line = cell->line(l);
+                      const auto line = cell->line(l);
                       line->set_user_flag();
 
                       const unsigned int n_active_fe_indices =
@@ -2242,8 +2219,7 @@ namespace internal
                      ++l)
                   if (cell->line(l)->user_flag_set() == false)
                     {
-                      const typename DoFHandler<dim, spacedim>::line_iterator
-                        line = cell->line(l);
+                      const auto line = cell->line(l);
                       line->set_user_flag();
 
                       const unsigned int n_active_fe_indices =
@@ -2321,8 +2297,7 @@ namespace internal
                      ++q)
                   if (cell->quad(q)->user_flag_set() == false)
                     {
-                      const typename DoFHandler<dim, spacedim>::quad_iterator
-                        quad = cell->quad(q);
+                      const auto quad = cell->quad(q);
                       quad->set_user_flag();
 
                       const unsigned int n_active_fe_indices =
@@ -2582,19 +2557,16 @@ namespace internal
               // level, as those lines logically belong to the same
               // level as the cell, at least for for isotropic
               // refinement
-              typename DoFHandler<2, spacedim>::level_cell_iterator cell,
-                endc = dof_handler.end(level);
-              for (cell = dof_handler.begin(level); cell != endc; ++cell)
+              for (const auto &cell :
+                   dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
                   for (const unsigned int line :
                        GeometryInfo<2>::face_indices())
                     cell->face(line)->set_user_flag();
 
-              for (typename DoFHandler<2, spacedim>::cell_iterator cell =
-                     dof_handler.begin();
-                   cell != dof_handler.end();
-                   ++cell)
+              for (const auto &cell :
+                   dof_handler.cell_iterators_on_level(level))
                 for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell;
                      ++l)
                   if (cell->line(l)->user_flag_set())
@@ -2651,9 +2623,8 @@ namespace internal
               // flag all lines adjacent to cells of the current
               // level, as those lines logically belong to the same
               // level as the cell, at least for isotropic refinement
-              typename DoFHandler<3, spacedim>::level_cell_iterator cell,
-                endc = dof_handler.end(level);
-              for (cell = dof_handler.begin(level); cell != endc; ++cell)
+              for (const auto &cell :
+                   dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
                   for (unsigned int line = 0;
@@ -2661,10 +2632,8 @@ namespace internal
                        ++line)
                     cell->line(line)->set_user_flag();
 
-              for (typename DoFHandler<3, spacedim>::cell_iterator cell =
-                     dof_handler.begin();
-                   cell != dof_handler.end();
-                   ++cell)
+              for (const auto &cell :
+                   dof_handler.cell_iterators_on_level(level))
                 for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell;
                      ++l)
                   if (cell->line(l)->user_flag_set())
@@ -2694,7 +2663,8 @@ namespace internal
               // flag all quads adjacent to cells of the current level, as
               // those quads logically belong to the same level as the cell,
               // at least for isotropic refinement
-              for (cell = dof_handler.begin(level); cell != endc; ++cell)
+              for (const auto &cell :
+                   dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
                   for (unsigned int quad = 0;
@@ -2702,10 +2672,7 @@ namespace internal
                        ++quad)
                     cell->quad(quad)->set_user_flag();
 
-              for (typename DoFHandler<3, spacedim>::cell_iterator cell =
-                     dof_handler.begin();
-                   cell != dof_handler.end();
-                   ++cell)
+              for (const auto &cell : dof_handler.cell_iterators())
                 for (unsigned int l = 0; l < GeometryInfo<3>::quads_per_cell;
                      ++l)
                   if (cell->quad(l)->user_flag_set())
@@ -2791,16 +2758,17 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
-      Sequential<DoFHandlerType>::Sequential(DoFHandlerType &dof_handler)
+      template <int dim, int spacedim>
+      Sequential<dim, spacedim>::Sequential(
+        DoFHandler<dim, spacedim> &dof_handler)
         : dof_handler(&dof_handler)
       {}
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      Sequential<DoFHandlerType>::distribute_dofs() const
+      Sequential<dim, spacedim>::distribute_dofs() const
       {
         const types::global_dof_index n_initial_dofs =
           Implementation::distribute_dofs(numbers::invalid_subdomain_id,
@@ -2817,15 +2785,14 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       std::vector<NumberCache>
-      Sequential<DoFHandlerType>::distribute_mg_dofs() const
+      Sequential<dim, spacedim>::distribute_mg_dofs() const
       {
         std::vector<bool> user_flags;
         dof_handler->get_triangulation().save_user_flags(user_flags);
 
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> &>(
+        const_cast<dealii::Triangulation<dim, spacedim> &>(
           dof_handler->get_triangulation())
           .clear_user_flags();
 
@@ -2844,8 +2811,7 @@ namespace internal
             number_caches.emplace_back(n_level_dofs);
           }
 
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> &>(
+        const_cast<dealii::Triangulation<dim, spacedim> &>(
           dof_handler->get_triangulation())
           .load_user_flags(user_flags);
 
@@ -2854,9 +2820,9 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      Sequential<DoFHandlerType>::renumber_dofs(
+      Sequential<dim, spacedim>::renumber_dofs(
         const std::vector<types::global_dof_index> &new_numbers) const
       {
         Implementation::renumber_dofs(new_numbers,
@@ -2878,9 +2844,9 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      Sequential<DoFHandlerType>::renumber_mg_dofs(
+      Sequential<dim, spacedim>::renumber_mg_dofs(
         const unsigned int                          level,
         const std::vector<types::global_dof_index> &new_numbers) const
       {
@@ -2895,9 +2861,9 @@ namespace internal
       /* --------------------- class ParallelShared ---------------- */
 
 
-      template <class DoFHandlerType>
-      ParallelShared<DoFHandlerType>::ParallelShared(
-        DoFHandlerType &dof_handler)
+      template <int dim, int spacedim>
+      ParallelShared<dim, spacedim>::ParallelShared(
+        DoFHandler<dim, spacedim> &dof_handler)
         : dof_handler(&dof_handler)
       {}
 
@@ -2913,11 +2879,12 @@ namespace internal
          * has already been set up. In can, consequently, be called at a point
          * when we are still distributing degrees of freedom.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         std::vector<types::subdomain_id>
-        get_dof_subdomain_association(const DoFHandlerType &        dof_handler,
-                                      const types::global_dof_index n_dofs,
-                                      const unsigned int            n_procs)
+        get_dof_subdomain_association(
+          const DoFHandler<dim, spacedim> &dof_handler,
+          const types::global_dof_index    n_dofs,
+          const unsigned int               n_procs)
         {
           (void)n_procs;
           std::vector<types::subdomain_id> subdomain_association(
@@ -2928,10 +2895,7 @@ namespace internal
 
           // loop over all cells and record which subdomain a DoF belongs to.
           // give to the smaller subdomain_id in case it is on an interface
-          typename DoFHandlerType::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
-          for (; cell != endc; ++cell)
+          for (const auto &cell : dof_handler.active_cell_iterators())
             {
               // get the owner of the cell; note that we have made sure above
               // that all cells are either locally owned or ghosts (not
@@ -2975,13 +2939,13 @@ namespace internal
          * the same way as parallel::DistributedTriangulationBase (proc with
          * smallest index) instead of the coin flip method above.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         std::vector<types::subdomain_id>
         get_dof_level_subdomain_association(
-          const DoFHandlerType &        dof_handler,
-          const types::global_dof_index n_dofs_on_level,
-          const unsigned int            n_procs,
-          const unsigned int            level)
+          const DoFHandler<dim, spacedim> &dof_handler,
+          const types::global_dof_index    n_dofs_on_level,
+          const unsigned int               n_procs,
+          const unsigned int               level)
         {
           (void)n_procs;
           std::vector<types::subdomain_id> level_subdomain_association(
@@ -2992,10 +2956,7 @@ namespace internal
 
           // loop over all cells and record which subdomain a DoF belongs to.
           // interface goes to proccessor with smaller subdomain id
-          typename DoFHandlerType::cell_iterator cell =
-                                                   dof_handler.begin(level),
-                                                 endc = dof_handler.end(level);
-          for (; cell != endc; ++cell)
+          for (const auto &cell : dof_handler.cell_iterators_on_level(level))
             {
               // get the owner of the cell; note that we have made sure above
               // that all cells are either locally owned or ghosts (not
@@ -3038,13 +2999,10 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      ParallelShared<DoFHandlerType>::distribute_dofs() const
+      ParallelShared<dim, spacedim>::distribute_dofs() const
       {
-        const unsigned int dim      = DoFHandlerType::dimension;
-        const unsigned int spacedim = DoFHandlerType::space_dimension;
-
         const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<
             const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
@@ -3201,13 +3159,10 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       std::vector<NumberCache>
-      ParallelShared<DoFHandlerType>::distribute_mg_dofs() const
+      ParallelShared<dim, spacedim>::distribute_mg_dofs() const
       {
-        const unsigned int dim      = DoFHandlerType::dimension;
-        const unsigned int spacedim = DoFHandlerType::space_dimension;
-
         const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<
             const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
@@ -3392,9 +3347,9 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      ParallelShared<DoFHandlerType>::renumber_dofs(
+      ParallelShared<dim, spacedim>::renumber_dofs(
         const std::vector<types::global_dof_index> &new_numbers) const
       {
 #ifndef DEAL_II_WITH_MPI
@@ -3402,9 +3357,6 @@ namespace internal
         Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
-        const unsigned int dim      = DoFHandlerType::dimension;
-        const unsigned int spacedim = DoFHandlerType::space_dimension;
-
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
         const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
@@ -3561,9 +3513,9 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      ParallelShared<DoFHandlerType>::renumber_mg_dofs(
+      ParallelShared<dim, spacedim>::renumber_mg_dofs(
         const unsigned int /*level*/,
         const std::vector<types::global_dof_index> & /*new_numbers*/) const
       {
@@ -3581,12 +3533,12 @@ namespace internal
 
       namespace
       {
-        template <int dim, int spacedim, class DoFHandlerType>
+        template <int dim, int spacedim>
         void
         communicate_mg_ghost_cells(
           const typename dealii::parallel::
             DistributedTriangulationBase<dim, spacedim> &tria,
-          DoFHandlerType &                               dof_handler)
+          DoFHandler<dim, spacedim> &                    dof_handler)
         {
           (void)tria;
           const auto pack = [&](const auto &cell) {
@@ -3626,13 +3578,16 @@ namespace internal
                 complete = false;
 
             if (!complete)
-              const_cast<typename DoFHandlerType::level_cell_iterator &>(cell)
+              const_cast<
+                typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
                 ->set_user_flag();
             else
-              const_cast<typename DoFHandlerType::level_cell_iterator &>(cell)
+              const_cast<
+                typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
                 ->clear_user_flag();
 
-            const_cast<typename DoFHandlerType::level_cell_iterator &>(cell)
+            const_cast<
+              typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
               ->set_mg_dof_indices(dof_indices);
           };
 
@@ -3642,7 +3597,7 @@ namespace internal
 
           GridTools::exchange_cell_data_to_level_ghosts<
             std::vector<types::global_dof_index>,
-            DoFHandlerType>(dof_handler, pack, unpack, filter);
+            DoFHandler<dim, spacedim>>(dof_handler, pack, unpack, filter);
         }
 
 
@@ -3676,17 +3631,15 @@ namespace internal
          *   all ghost cells. In phase 2, this is only true if we
          *   did not receive a complete set of DoF indices in phase 1.
          */
-        template <class DoFHandlerType>
+        template <int dim, int spacedim>
         void
         communicate_dof_indices_on_marked_cells(
-          const DoFHandlerType &dof_handler)
+          const DoFHandler<dim, spacedim> &dof_handler)
         {
 #  ifndef DEAL_II_WITH_MPI
           (void)dof_handler;
           Assert(false, ExcNotImplemented());
 #  else
-          const unsigned int dim      = DoFHandlerType::dimension;
-          const unsigned int spacedim = DoFHandlerType::space_dimension;
 
           // define functions that pack data on cells that are ghost cells
           // somewhere else, and unpack data on cells where we get information
@@ -3725,13 +3678,18 @@ namespace internal
                 complete = false;
 
             if (!complete)
-              const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
+              const_cast<
+                typename DoFHandler<dim, spacedim>::active_cell_iterator &>(
+                cell)
                 ->set_user_flag();
             else
-              const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
+              const_cast<
+                typename DoFHandler<dim, spacedim>::active_cell_iterator &>(
+                cell)
                 ->clear_user_flag();
 
-            const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
+            const_cast<
+              typename DoFHandler<dim, spacedim>::active_cell_iterator &>(cell)
               ->set_dof_indices(dof_indices);
           };
 
@@ -3741,7 +3699,7 @@ namespace internal
 
           GridTools::exchange_cell_data_to_ghosts<
             std::vector<types::global_dof_index>,
-            DoFHandlerType>(dof_handler, pack, unpack, filter);
+            DoFHandler<dim, spacedim>>(dof_handler, pack, unpack, filter);
 
           // finally update the cell DoF indices caches to make sure
           // our internal data structures are consistent
@@ -3787,24 +3745,22 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
-      ParallelDistributed<DoFHandlerType>::ParallelDistributed(
-        DoFHandlerType &dof_handler)
+      template <int dim, int spacedim>
+      ParallelDistributed<dim, spacedim>::ParallelDistributed(
+        DoFHandler<dim, spacedim> &dof_handler)
         : dof_handler(&dof_handler)
       {}
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      ParallelDistributed<DoFHandlerType>::distribute_dofs() const
+      ParallelDistributed<dim, spacedim>::distribute_dofs() const
       {
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
-        const unsigned int dim      = DoFHandlerType::dimension;
-        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
         dealii::parallel::DistributedTriangulationBase<dim, spacedim>
           *triangulation =
@@ -4012,16 +3968,14 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       std::vector<NumberCache>
-      ParallelDistributed<DoFHandlerType>::distribute_mg_dofs() const
+      ParallelDistributed<dim, spacedim>::distribute_mg_dofs() const
       {
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNotImplemented());
         return std::vector<NumberCache>();
 #else
-        const unsigned int dim      = DoFHandlerType::dimension;
-        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
         dealii::parallel::DistributedTriangulationBase<dim, spacedim>
           *triangulation =
@@ -4066,11 +4020,8 @@ namespace internal
               {
                 std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-                typename DoFHandlerType::level_cell_iterator
-                  cell = dof_handler->begin(level),
-                  endc = dof_handler->end(level);
-
-                for (; cell != endc; ++cell)
+                for (const auto &cell :
+                     dof_handler->cell_iterators_on_level(level))
                   if (cell->level_subdomain_id() !=
                         numbers::artificial_subdomain_id &&
                       (cell->level_subdomain_id() <
@@ -4162,9 +4113,7 @@ namespace internal
 
           // mark all ghost cells for transfer
           {
-            typename DoFHandlerType::level_cell_iterator cell,
-              endc = dof_handler->end();
-            for (cell = dof_handler->begin(); cell != endc; ++cell)
+            for (const auto &cell : dof_handler->cell_iterators())
               if (cell->level_subdomain_id() !=
                     dealii::numbers::artificial_subdomain_id &&
                   !cell->is_locally_owned_on_level())
@@ -4199,9 +4148,7 @@ namespace internal
 #  ifdef DEBUG
           // make sure we have removed all flags:
           {
-            typename DoFHandlerType::level_cell_iterator cell,
-              endc = dof_handler->end();
-            for (cell = dof_handler->begin(); cell != endc; ++cell)
+            for (const auto &cell : dof_handler->cell_iterators())
               if (cell->level_subdomain_id() !=
                     dealii::numbers::artificial_subdomain_id &&
                   !cell->is_locally_owned_on_level())
@@ -4218,10 +4165,7 @@ namespace internal
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
-          typename DoFHandlerType::level_cell_iterator cell,
-            endc = dof_handler->end();
-
-          for (cell = dof_handler->begin(); cell != endc; ++cell)
+          for (const auto &cell : dof_handler->cell_iterators())
             if (cell->level_subdomain_id() !=
                 dealii::numbers::artificial_subdomain_id)
               {
@@ -4244,9 +4188,9 @@ namespace internal
       }
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      ParallelDistributed<DoFHandlerType>::renumber_dofs(
+      ParallelDistributed<dim, spacedim>::renumber_dofs(
         const std::vector<dealii::types::global_dof_index> &new_numbers) const
       {
         (void)new_numbers;
@@ -4258,8 +4202,6 @@ namespace internal
         Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
-        const unsigned int dim      = DoFHandlerType::dimension;
-        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
         dealii::parallel::DistributedTriangulationBase<dim, spacedim>
           *triangulation =
@@ -4496,9 +4438,9 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <int dim, int spacedim>
       NumberCache
-      ParallelDistributed<DoFHandlerType>::renumber_mg_dofs(
+      ParallelDistributed<dim, spacedim>::renumber_mg_dofs(
         const unsigned int                          level,
         const std::vector<types::global_dof_index> &new_numbers) const
       {
@@ -4509,8 +4451,6 @@ namespace internal
 
 #ifdef DEAL_II_WITH_MPI
 
-        constexpr int dim      = DoFHandlerType::dimension;
-        constexpr int spacedim = DoFHandlerType::space_dimension;
         const dealii::parallel::TriangulationBase<dim, spacedim> *tr =
           (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
                           *>(&this->dof_handler->get_triangulation()));
