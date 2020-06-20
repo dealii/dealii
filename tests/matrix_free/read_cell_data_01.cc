@@ -108,10 +108,18 @@ private:
     unsigned int n_cells = data.n_cell_batches() + data.n_ghost_cell_batches();
     cell_ids.resize(n_cells);
 
+    FEEvaluation<dim, 1> fe_eval(data);
     for (unsigned int cell = 0; cell < n_cells; cell++)
-      for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
-           lane++)
-        cell_ids[cell][lane] = data.get_cell_iterator(cell, lane)->id();
+      {
+        fe_eval.reinit(cell);
+
+        std::array<CellId, VectorizedArrayType::size()> cell_ids_local;
+        for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
+             lane++)
+          cell_ids_local[lane] = data.get_cell_iterator(cell, lane)->id();
+
+        fe_eval.set_cell_data(cell_ids, cell_ids_local);
+      }
   }
 
   void

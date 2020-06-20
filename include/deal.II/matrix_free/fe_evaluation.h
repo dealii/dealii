@@ -727,6 +727,16 @@ public:
   read_cell_data(const AlignedVector<VectorizedArrayType> &array) const;
 
   /**
+   * Provides a unified interface to set data in a vector of
+   * VectorizedArray fields of length MatrixFree::n_macro_cells() +
+   * MatrixFree::n_macro_ghost_cells() for both cells (plain read) and faces
+   * (indirect addressing).
+   */
+  void
+  set_cell_data(AlignedVector<VectorizedArrayType> &array,
+                const VectorizedArrayType &         value) const;
+
+  /**
    * The same as above, just for std::array of length of VectorizedArrayType for
    * arbitrary data type.
    */
@@ -734,6 +744,16 @@ public:
   std::array<T, VectorizedArrayType::size()>
   read_cell_data(const AlignedVector<std::array<T, VectorizedArrayType::size()>>
                    &array) const;
+
+  /**
+   * The same as above, just for std::array of length of VectorizedArrayType for
+   * arbitrary data type.
+   */
+  template <typename T>
+  void
+  set_cell_data(
+    AlignedVector<std::array<T, VectorizedArrayType::size()>> &array,
+    const std::array<T, VectorizedArrayType::size()> &         value) const;
 
   /**
    * Return the id of the cells this FEEvaluation or FEFaceEvaluation is
@@ -3821,6 +3841,45 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 }
 
 
+namespace internal
+{
+  template <int dim,
+            int n_components_,
+            typename Number,
+            bool is_face,
+            typename VectorizedArrayType,
+            typename VectorizedArrayType2,
+            typename GlobalVectorType,
+            typename FU>
+  inline void
+  process_cell_data(
+    const FEEvaluationBase<dim,
+                           n_components_,
+                           Number,
+                           is_face,
+                           VectorizedArrayType> &       phi,
+    const MatrixFree<dim, Number, VectorizedArrayType> *matrix_info,
+    GlobalVectorType &                                  array,
+    VectorizedArrayType2 &                              out,
+    const FU &                                          fu)
+  {
+    Assert(matrix_info != nullptr, ExcNotImplemented());
+    AssertDimension(array.size(),
+                    matrix_info->get_task_info().cell_partition_data.back());
+
+    // 1) collect ids of cell
+    const auto cells = phi.get_cell_ids();
+
+    // 2) actually gather values
+    for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+      if (cells[i] != numbers::invalid_unsigned_int)
+        fu(out[i],
+           array[cells[i] / VectorizedArrayType::size()]
+                [cells[i] % VectorizedArrayType::size()]);
+  }
+} // namespace internal
+
+
 
 template <int dim,
           int n_components_,
@@ -3831,20 +3890,30 @@ inline VectorizedArrayType
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_cell_data(const AlignedVector<VectorizedArrayType> &array) const
 {
-  Assert(matrix_info != nullptr, ExcNotImplemented());
-  AssertDimension(array.size(),
-                  matrix_info->get_task_info().cell_partition_data.back());
-
-  // 1) collect ids of cell
-  const auto cells = this->get_cell_ids();
-
-  // 2) actually gather values
   VectorizedArrayType out = Number(1.);
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
-    if (cells[i] != numbers::invalid_unsigned_int)
-      out[i] = array[cells[i] / VectorizedArrayType::size()]
-                    [cells[i] % VectorizedArrayType::size()];
+  internal::process_cell_data(
+    *this, this->matrix_info, array, out, [](auto &local, const auto &global) {
+      local = global;
+    });
   return out;
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+inline void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  set_cell_data(AlignedVector<VectorizedArrayType> &array,
+                const VectorizedArrayType &         in) const
+{
+  internal::process_cell_data(
+    *this, this->matrix_info, array, in, [](const auto &local, auto &global) {
+      global = local;
+    });
 }
 
 
@@ -3860,20 +3929,32 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_cell_data(const AlignedVector<std::array<T, VectorizedArrayType::size()>>
                    &array) const
 {
-  Assert(matrix_info != nullptr, ExcNotImplemented());
-  AssertDimension(array.size(),
-                  matrix_info->get_task_info().cell_partition_data.back());
-
-  // 1) collect ids of cell
-  const auto cells = this->get_cell_ids();
-
-  // 2) actually gather values
   std::array<T, VectorizedArrayType::size()> out;
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
-    if (cells[i] != numbers::invalid_unsigned_int)
-      out[i] = array[cells[i] / VectorizedArrayType::size()]
-                    [cells[i] % VectorizedArrayType::size()];
+  internal::process_cell_data(
+    *this, this->matrix_info, array, out, [](auto &local, const auto &global) {
+      local = global;
+    });
   return out;
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+template <typename T>
+inline void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  set_cell_data(
+    AlignedVector<std::array<T, VectorizedArrayType::size()>> &array,
+    const std::array<T, VectorizedArrayType::size()> &         in) const
+{
+  internal::process_cell_data(
+    *this, this->matrix_info, array, in, [](const auto &local, auto &global) {
+      global = local;
+    });
 }
 
 
