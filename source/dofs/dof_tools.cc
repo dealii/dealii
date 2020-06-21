@@ -1137,18 +1137,6 @@ namespace DoFTools
 
   template <typename DoFHandlerType>
   void
-  extract_locally_owned_dofs(const DoFHandlerType &dof_handler,
-                             IndexSet &            dof_set)
-  {
-    // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_dofs();
-    dof_set.compress();
-  }
-
-
-
-  template <typename DoFHandlerType>
-  void
   extract_locally_active_dofs(const DoFHandlerType &dof_handler,
                               IndexSet &            dof_set)
   {
