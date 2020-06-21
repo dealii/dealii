@@ -3150,7 +3150,7 @@ namespace GridTools
   {
     // We forward call to the ArrayView version:
     const ArrayView<const unsigned int> view(
-      &indices[0], GeometryInfo<dim>::vertices_per_cell);
+      indices, GeometryInfo<dim>::vertices_per_cell);
     return cell_measure(all_vertices, view);
   }
 
