@@ -251,7 +251,7 @@
  * The remaining question is how to identify the set of indices that
  * correspond to degrees of freedom we need to worry about on each
  * processor. To this end, you can use the
- * DoFTools::extract_locally_owned_dofs() function to get at all the
+ * DoFHandler::locally_owned_dofs() function to get at all the
  * indices a processor owns. Note that this is a subset of the degrees
  * of freedom that are defined on the locally owned cells (since some
  * of the degrees of freedom at the interface between two different
