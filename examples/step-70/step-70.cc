@@ -1292,7 +1292,7 @@ namespace Step70
       VectorTools::interpolate_boundary_values(
         fluid_dh,
         0,
-        ZeroFunction<spacedim>(spacedim + 1),
+        Functions::ZeroFunction<spacedim>(spacedim + 1),
         constraints,
         fluid_fe->component_mask(velocities));
       constraints.close();

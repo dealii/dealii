@@ -77,7 +77,9 @@ test()
   // prepare dof_values
   LinearAlgebra::distributed::Vector<double> dgq_solution;
   dgq_solution.reinit(dgq_locally_owned_dofs, dgq_ghost_dofs, MPI_COMM_WORLD);
-  VectorTools::interpolate(dgq_dof_handler, ZeroFunction<dim>(), dgq_solution);
+  VectorTools::interpolate(dgq_dof_handler,
+                           Functions::ZeroFunction<dim>(),
+                           dgq_solution);
   dgq_solution.update_ghost_values();
 
   parallel::distributed::SolutionTransfer<

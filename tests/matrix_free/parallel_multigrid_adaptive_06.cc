@@ -224,7 +224,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
 
   // Dirichlet BC
-  ZeroFunction<dim>                                   zero_function;
+  Functions::ZeroFunction<dim>                        zero_function;
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
 

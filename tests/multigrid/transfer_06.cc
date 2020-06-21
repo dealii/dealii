@@ -118,7 +118,7 @@ check(const unsigned int fe_degree)
       const std::vector<const DoFHandler<dim> *> mgdof_ptr{&mgdof_1, &mgdof_2};
 
       std::vector<MGConstrainedDoFs> mg_constrained_dofs_vector(2);
-      ZeroFunction<dim>              zero_function;
+      Functions::ZeroFunction<dim>   zero_function;
       std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
       dirichlet_boundary[0] = &zero_function;
       for (unsigned int i = 0; i < mgdof_ptr.size(); ++i)

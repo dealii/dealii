@@ -518,25 +518,6 @@ namespace Functions
 
 } // namespace Functions
 
-/**
- * Provide a function which always returns the constant values handed to the
- * constructor.
- *
- * @deprecated use Functions::ConstantFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ConstantFunction DEAL_II_DEPRECATED =
-  Functions::ConstantFunction<dim, RangeNumberType>;
-
-/**
- * Provide a function which always returns zero.
- *
- * @deprecated use Functions::ZeroFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ZeroFunction DEAL_II_DEPRECATED =
-  Functions::ZeroFunction<dim, RangeNumberType>;
-
 
 
 /**
@@ -553,7 +534,8 @@ using ZeroFunction DEAL_II_DEPRECATED =
  * @ingroup functions
  */
 template <int dim, typename RangeNumberType = double>
-class ComponentSelectFunction : public ConstantFunction<dim, RangeNumberType>
+class ComponentSelectFunction
+  : public Functions::ConstantFunction<dim, RangeNumberType>
 {
 public:
   /**

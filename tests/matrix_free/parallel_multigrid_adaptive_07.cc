@@ -243,7 +243,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
     DoFTools::extract_locally_relevant_dofs(*dof[i], locally_relevant_dofs[i]);
 
   // Dirichlet BC
-  ZeroFunction<dim>                                   zero_function;
+  Functions::ZeroFunction<dim>                        zero_function;
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
 

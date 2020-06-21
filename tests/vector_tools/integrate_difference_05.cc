@@ -102,7 +102,7 @@ test(VectorTools::NormType norm, double value)
                                             2 * dim);
   VectorTools::integrate_difference(dofh,
                                     solution,
-                                    ZeroFunction<dim>(2 * dim),
+                                    Functions::ZeroFunction<dim>(2 * dim),
                                     cellwise_errors,
                                     QGauss<dim>(5),
                                     norm);
@@ -117,7 +117,7 @@ test(VectorTools::NormType norm, double value)
 
   VectorTools::integrate_difference(dofh,
                                     solution,
-                                    ZeroFunction<dim>(2 * dim),
+                                    Functions::ZeroFunction<dim>(2 * dim),
                                     cellwise_errors,
                                     QGauss<dim>(5),
                                     norm,

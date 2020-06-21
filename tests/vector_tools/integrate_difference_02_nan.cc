@@ -91,7 +91,7 @@ test(VectorTools::NormType norm, double exp = 2.0)
   const ComponentSelectFunction<dim> component_mask(1, 2);
   VectorTools::integrate_difference(dofh,
                                     solution,
-                                    ZeroFunction<dim>(2),
+                                    Functions::ZeroFunction<dim>(2),
                                     cellwise_errors,
                                     quadrature,
                                     norm,

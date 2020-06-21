@@ -557,7 +557,7 @@ namespace Step12
       Vector<float> values(triangulation.n_active_cells());
       VectorTools::integrate_difference(dof_handler,
                                         solution,
-                                        ZeroFunction<dim>(),
+                                        Functions::ZeroFunction<dim>(),
                                         values,
                                         QGauss<dim>(fe.degree + 1),
                                         VectorTools::Linfty_norm);

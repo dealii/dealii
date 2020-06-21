@@ -539,7 +539,7 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const unsigned int    selected,
   const RangeNumberType value,
   const unsigned int    n_components)
-  : ConstantFunction<dim, RangeNumberType>(value, n_components)
+  : Functions::ConstantFunction<dim, RangeNumberType>(value, n_components)
   , selected_components(std::make_pair(selected, selected + 1))
 {}
 
@@ -549,7 +549,7 @@ template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const unsigned int selected,
   const unsigned int n_components)
-  : ConstantFunction<dim, RangeNumberType>(1., n_components)
+  : Functions::ConstantFunction<dim, RangeNumberType>(1., n_components)
   , selected_components(std::make_pair(selected, selected + 1))
 {
   AssertIndexRange(selected, n_components);
@@ -561,7 +561,7 @@ template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const std::pair<unsigned int, unsigned int> &selected,
   const unsigned int                           n_components)
-  : ConstantFunction<dim, RangeNumberType>(1., n_components)
+  : Functions::ConstantFunction<dim, RangeNumberType>(1., n_components)
   , selected_components(selected)
 {
   Assert(selected_components.first < selected_components.second,
@@ -577,7 +577,7 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
 template <int dim, typename RangeNumberType>
 void
 ComponentSelectFunction<dim, RangeNumberType>::substitute_function_value_with(
-  const ConstantFunction<dim, RangeNumberType> &f)
+  const Functions::ConstantFunction<dim, RangeNumberType> &f)
 {
   Point<dim> p;
   for (unsigned int i = 0; i < this->function_value_vector.size(); ++i)
@@ -626,8 +626,9 @@ ComponentSelectFunction<dim, RangeNumberType>::memory_consumption() const
   // No new complex data structure is introduced here, just evaluate how much
   // more memory is used *inside* the class via sizeof() and add that value to
   // parent class's memory_consumption()
-  return (sizeof(*this) - sizeof(ConstantFunction<dim, RangeNumberType>) +
-          ConstantFunction<dim, RangeNumberType>::memory_consumption());
+  return (
+    sizeof(*this) - sizeof(Functions::ConstantFunction<dim, RangeNumberType>) +
+    Functions::ConstantFunction<dim, RangeNumberType>::memory_consumption());
 }
 
 //---------------------------------------------------------------------------

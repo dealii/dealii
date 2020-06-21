@@ -101,7 +101,7 @@ check(const unsigned int fe_degree)
       mgdof.distribute_mg_dofs();
 
       MGConstrainedDoFs                                   mg_constrained_dofs;
-      ZeroFunction<dim>                                   zero_function;
+      Functions::ZeroFunction<dim>                        zero_function;
       std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
       dirichlet_boundary[0] = &zero_function;
       mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);

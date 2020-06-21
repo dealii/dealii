@@ -496,7 +496,7 @@ ParsedConvergenceTable::difference(
   solution -= solution2;
   error_from_exact(dh,
                    solution,
-                   ConstantFunction<DoFHandlerType::space_dimension>(
+                   Functions::ConstantFunction<DoFHandlerType::space_dimension>(
                      0, component_names.size()),
                    weight);
 }
@@ -520,7 +520,7 @@ ParsedConvergenceTable::difference(
   error_from_exact(mapping,
                    dh,
                    solution,
-                   ConstantFunction<DoFHandlerType::space_dimension>(
+                   Functions::ConstantFunction<DoFHandlerType::space_dimension>(
                      0, component_names.size()),
                    weight);
 }
