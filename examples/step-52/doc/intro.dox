@@ -59,9 +59,9 @@ S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
 \left(\Sigma_a (bx-x^2)+2D\right) \right).
 @f}
 Because the solution is a sine in time, we know that the exact solution
-satisfies $\phi\left(x,\pi\right) = 0$.
-Therefore, the error at time $t=\pi$ is simply the norm of the numerical
-solution, i.e., $\|e(\cdot,t=\pi)\|_{L_2} = \|\phi_h(\cdot,t=\pi)\|_{L_2}$,
+satisfies $\phi\left(x,\frac{\pi}{\omega}\right) = 0$.
+Therefore, the error at time $t=\frac{\pi}{\omega}$ is simply the norm of the numerical
+solution, i.e., $\|e(\cdot,t=\frac{\pi}{\omega})\|_{L_2} = \|\phi_h(\cdot,t=\frac{\pi}{\omega})\|_{L_2}$,
 and is particularly easily evaluated. In the code, we evaluate the $l_2$ norm
 of the vector of nodal values of $\phi_h$ instead of the $L_2$ norm of the
 associated spatial function, since the former is simpler to compute; however,
