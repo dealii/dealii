@@ -203,7 +203,8 @@ main(int argc, char **argv)
     {
       // constant function.
       Functions::ConstantFunction<dim> func(10 + i); // constant function
-      vec_enrichments.push_back(std::make_shared<ConstantFunction<dim>>(func));
+      vec_enrichments.push_back(
+        std::make_shared<Functions::ConstantFunction<dim>>(func));
     }
 
   // Construct container for color enrichment functions needed
