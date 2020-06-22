@@ -1306,7 +1306,7 @@ LaplaceProblem<dim>::make_enrichment_functions()
           pcout << "Dummy function added at " << i << std::endl;
           Functions::ConstantFunction<dim> func(0);
           vec_enrichments.push_back(
-            std::make_shared<ConstantFunction<dim>>(func));
+            std::make_shared<Functions::ConstantFunction<dim>>(func));
         }
     }
 }
