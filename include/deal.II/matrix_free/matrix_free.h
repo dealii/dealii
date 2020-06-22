@@ -207,12 +207,9 @@ public:
       color = internal::MatrixFreeFunctions::TaskInfo::color
     };
 
-    // clang-format off
-    // Remove with level_mg_handler
-#ifdef DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
-    _Pragma("GCC diagnostic push")
-    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#endif
+    // remove with level_mg_handler
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
     /**
      * Constructor for AdditionalData.
      */
@@ -272,9 +269,9 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
     {}
-#ifdef DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
-    _Pragma("GCC diagnostic pop")
-#endif
+
+    // remove with level_mg_handler
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
     /**
      * Copy assignment.
@@ -303,7 +300,6 @@ public:
 
       return *this;
     }
-    // clang-format on
 
     /**
      * Set the scheme for task parallelism. There are four options available.
