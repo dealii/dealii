@@ -33,6 +33,8 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 template <int, int>
+class DoFHandler;
+template <int, int>
 class Mapping;
 template <int>
 class Quadrature;
@@ -335,12 +337,12 @@ public:
    * cell in the mesh as reported by
    * parallel::distributed::Triangulation::n_locally_owned_active_cells().
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &mapping,
-    const DoFHandlerType &        dof,
-    const Quadrature<dim - 1> &   quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -357,11 +359,11 @@ public:
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &     dof,
-    const Quadrature<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -387,12 +389,12 @@ public:
    * construct of vector of references, so we had to use a vector of
    * pointers.)
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &mapping,
-    const DoFHandlerType &        dof,
-    const Quadrature<dim - 1> &   quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -409,11 +411,11 @@ public:
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &     dof,
-    const Quadrature<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -431,12 +433,12 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &  mapping,
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -454,11 +456,11 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -476,12 +478,12 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &  mapping,
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -499,11 +501,11 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -621,12 +623,12 @@ public:
    * respective parameter for compatibility with the function signature in the
    * general case.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const Quadrature<0> &       quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -643,11 +645,11 @@ public:
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &dof,
-    const Quadrature<0> & quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -673,12 +675,12 @@ public:
    * construct of vector of references, so we had to use a vector of
    * pointers.)
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const Quadrature<0> &       quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -695,11 +697,11 @@ public:
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &dof,
-    const Quadrature<0> & quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -717,12 +719,12 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const hp::QCollection<0> &  quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -740,11 +742,11 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &    dof,
-    const hp::QCollection<0> &quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -762,12 +764,12 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const hp::QCollection<0> &  quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -785,11 +787,11 @@ public:
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &    dof,
-    const hp::QCollection<0> &quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,

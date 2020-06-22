@@ -57,12 +57,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> &mapping,
-  const DoFHandlerType &      dof_handler,
-  const Quadrature<0> &       quadrature,
+  const Mapping<1, spacedim> &   mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const Quadrature<0> &          quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -95,11 +95,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &dof_handler,
-  const Quadrature<0> & quadrature,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const Quadrature<0> &          quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -129,11 +129,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &dof_handler,
-  const Quadrature<0> & quadrature,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const Quadrature<0> &          quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -163,12 +163,12 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> &mapping,
-  const DoFHandlerType &      dof_handler,
-  const hp::QCollection<0> &  quadrature,
+  const Mapping<1, spacedim> &   mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const hp::QCollection<0> &     quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -200,11 +200,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &    dof_handler,
-  const hp::QCollection<0> &quadrature,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const hp::QCollection<0> &     quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                       neumann_bc,
@@ -234,11 +234,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &    dof_handler,
-  const hp::QCollection<0> &quadrature,
+  const DoFHandler<1, spacedim> &dof_handler,
+  const hp::QCollection<0> &     quadrature,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
     &                                     neumann_bc,
@@ -268,11 +268,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> & /*mapping*/,
-  const DoFHandlerType & /*dof_handler*/,
+  const DoFHandler<1, spacedim> & /*dof_handler*/,
   const hp::QCollection<0> &,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
@@ -292,11 +292,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 template <int spacedim>
-template <typename InputVector, typename DoFHandlerType>
+template <typename InputVector>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> &mapping,
-  const DoFHandlerType &      dof_handler,
+  const Mapping<1, spacedim> &   mapping,
+  const DoFHandler<1, spacedim> &dof_handler,
   const Quadrature<0> &,
   const std::map<types::boundary_id,
                  const Function<spacedim, typename InputVector::value_type> *>
@@ -454,7 +454,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
         for (unsigned int n = 0; n < 2; ++n)
           {
             // find left or right active neighbor
-            typename DoFHandlerType::cell_iterator neighbor = cell->neighbor(n);
+            auto neighbor = cell->neighbor(n);
             if (neighbor.state() == IteratorState::valid)
               while (neighbor->has_children())
                 neighbor = neighbor->child(n == 0 ? 1 : 0);
