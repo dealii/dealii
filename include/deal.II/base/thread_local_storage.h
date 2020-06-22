@@ -248,9 +248,9 @@ namespace Threads
      * (https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock).
      */
 #  ifdef DEAL_II_HAVE_CXX17
-    std::shared_mutex insertion_mutex;
+    mutable std::shared_mutex insertion_mutex;
 #  else
-    std::shared_timed_mutex insertion_mutex;
+    mutable std::shared_timed_mutex insertion_mutex;
 #  endif
 
     /**
