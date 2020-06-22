@@ -13041,66 +13041,17 @@ Triangulation<dim, spacedim>::n_lines() const
 }
 
 
-// TODO: Merge the following 6 functions somehow
-template <>
-unsigned int
-Triangulation<1, 1>::n_raw_lines(const unsigned int level) const
-{
-  AssertIndexRange(level, n_levels());
-  return levels[level]->cells.n_objects();
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 1>::n_raw_lines() const
-{
-  Assert(false, ExcNotImplemented());
-  return 0;
-}
-
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_raw_lines(const unsigned int level) const
-{
-  AssertIndexRange(level, n_levels());
-  return levels[level]->cells.n_objects();
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_raw_lines() const
-{
-  Assert(false, ExcNotImplemented());
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_lines(const unsigned int level) const
-{
-  AssertIndexRange(level, n_levels());
-  return levels[level]->cells.n_objects();
-}
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_lines() const
-{
-  Assert(false, ExcNotImplemented());
-  return 0;
-}
-
-
 
 template <int dim, int spacedim>
 unsigned int
-Triangulation<dim, spacedim>::n_raw_lines(const unsigned int) const
+Triangulation<dim, spacedim>::n_raw_lines(const unsigned int level) const
 {
+  if (dim == 1)
+    {
+      AssertIndexRange(level, n_levels());
+      return levels[level]->cells.n_objects();
+    }
+
   Assert(false, ExcFacesHaveNoLevel());
   return 0;
 }
@@ -13110,6 +13061,12 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_raw_lines() const
 {
+  if (dim == 1)
+    {
+      Assert(false, ExcNotImplemented());
+      return 0;
+    }
+
   return faces->lines.n_objects();
 }
 

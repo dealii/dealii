@@ -4159,9 +4159,6 @@ Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
 
 template <>
 unsigned int
-Triangulation<1, 1>::n_raw_lines(const unsigned int level) const;
-template <>
-unsigned int
 Triangulation<1, 1>::n_quads() const;
 template <>
 unsigned int
@@ -4192,9 +4189,6 @@ Triangulation<1, 1>::max_adjacent_cells() const;
 
 template <>
 unsigned int
-Triangulation<1, 2>::n_raw_lines(const unsigned int level) const;
-template <>
-unsigned int
 Triangulation<1, 2>::n_quads() const;
 template <>
 unsigned int
@@ -4222,9 +4216,6 @@ Triangulation<1, 2>::max_adjacent_cells() const;
 // -- Explicit specializations for codimension two grids
 
 
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_lines(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 3>::n_quads() const;
