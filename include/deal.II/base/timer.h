@@ -973,7 +973,7 @@ inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
   , section_name(section_name_)
   , in(true)
 {
-  timer.enter_section(section_name);
+  timer.enter_subsection(section_name);
 }
 
 
@@ -985,7 +985,7 @@ TimerOutput::Scope::stop()
     return;
   in = false;
 
-  timer.exit_section(section_name);
+  timer.leave_subsection(section_name);
 }
 
 

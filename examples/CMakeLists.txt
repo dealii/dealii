@@ -49,6 +49,11 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
 
   IF(DEAL_II_COMPILE_EXAMPLES)
     #
+    # Make sure that there are no deprecated functions used in the tutorials.
+    #
+    STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
+
+    #
     # Set up all executables:
     #
     FILE(GLOB _steps
