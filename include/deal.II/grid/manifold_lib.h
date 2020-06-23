@@ -24,8 +24,6 @@
 
 #include <deal.II/grid/manifold.h>
 
-#include <boost/container/small_vector.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 
 /**

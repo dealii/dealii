@@ -25,6 +25,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <cmath>
 #include <memory>
 
