@@ -78,14 +78,12 @@ namespace DataPostprocessorInputs
    *
    * However, the situation is not so simple. This is because the current
    * class (and those derived from it) only knows the space dimension in
-   * which the output lives. But this can come from many sources. First,
-   * the cell may be a cell in a DoFHandler or hp::DoFHandler object.
-   * Second, if we are in 3d, this may be because we are working on a
-   * DoFHandler<3>, or a DoFHandler<2,3> (i.e., either a 3d mesh, or a
-   * 2d meshes of a 2d surface embedded in 3d space). Finally, if one
-   * considers classes such as DataOutRotation or DataOutStack, then
-   * @p spacedim being equal to 3 might mean that we are actually
-   * working on a DoFHandler<2> or hp::DoFHandler<2>.
+   * which the output lives. But this can come from many sources. For example,
+   * if we are in 3d, this may be because we are working on a DoFHandler<3> or
+   * a DoFHandler<2,3> (i.e., either a 3d mesh, or a 2d meshes of a 2d surface
+   * embedded in 3d space). Another case is classes like DataOutRotation or
+   * DataOutStack, then @p spacedim being equal to 3 might mean that we are
+   * actually working on a DoFHandler<2>.
    *
    * In other words, just because we know the value of the @p spacedim
    * template argument of the current class does not mean that the
@@ -104,11 +102,11 @@ namespace DataPostprocessorInputs
    * as a template parameter, the DoFHandler type to which the cell that
    * is currently being processed belongs. This is knowledge you typically
    * have in an application: for example, if your application runs in
-   * @p dim space dimensions, uses a hp::DoFHandler, and you are currently
-   * using the DataOut class, then the cells that are worked on have data
-   * type <code>DataOut<dim>::cell_iterator</code>. Consequently, in a
+   * @p dim space dimensions and you are currently using the DataOut class,
+   * then the cells that are worked on have data type
+   * <code>DataOut<dim>::cell_iterator</code>. Consequently, in a
    * postprocessor, you can call
-   * <code>inputs.get_cell@<hp::DoFHandler@<dim@> @> </code>. For technical
+   * <code>inputs.get_cell@<DoFHandler@<dim@> @> </code>. For technical
    * reasons, however, C++ will typically require you to write this as
    * <code>inputs.template get_cell@<DoFHandler@<dim@> @> </code>
    * because the member function we call here requires that we explicitly
@@ -123,7 +121,7 @@ namespace DataPostprocessorInputs
    * DataPostprocessor::evaluate_vector_field() function that receives the
    * values and gradients of the velocity (plus of other solution variables such
    * as the pressure, but let's ignore those for the moment). Then we could use
-   * code such as this, assuming that we use a hp::DoFHandler:
+   * code such as this:
    * @code
    *   template <int dim>
    *   class ComputeStress : public DataPostprocessorScalar<dim>
@@ -136,8 +134,8 @@ namespace DataPostprocessorInputs
    *       (const DataPostprocessorInputs::Vector<dim> &input_data,
    *        std::vector<Vector<double> > &computed_quantities) const override
    *       {
-   *         const typename hp::DoFHandler<dim>::cell_iterator current_cell =
-   *           input_data.template get_cell<hp::DoFHandler<dim> >();
+   *         const typename DoFHandler<dim>::cell_iterator current_cell =
+   *           input_data.template get_cell<DoFHandler<dim> >();
    *         const viscosity = look_up_viscosity (current_cell->material_id());
    *
    *         for (unsigned int q=0; q<input_data.solution_gradients.size(); ++q)
@@ -1203,13 +1201,13 @@ namespace DataPostprocessorInputs
              nullptr,
            ExcMessage(
              "You are trying to access the cell associated with a "
-             "DataPostprocessorInputs::Scalar with a DoFHandler type that "
-             "is different from the type with which it has been set. For "
-             "example, if the cell for which output is currently being "
-             "generated belongs to a hp::DoFHandler<2,3> object, then you can "
-             "only call the current function with a template argument "
-             "equal to hp::DoFHandler<2,3>, but not with any other class "
-             "type or dimension template argument."));
+             "DataPostprocessorInputs::Scalar with a DoFHandler type that is "
+             "different from the type with which it has been set. For example, "
+             "if the cell for which output is currently being generated "
+             "belongs to a DoFHandler<2, 3> object, then you can only call the "
+             "current function with a template argument equal to "
+             "DoFHandler<2, 3>, but not with any other class type or dimension "
+             "template argument."));
     return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
   }
 } // namespace DataPostprocessorInputs
