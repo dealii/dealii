@@ -41,6 +41,8 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cmath>
