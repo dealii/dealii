@@ -757,8 +757,7 @@ namespace GridTools
     // the halo layer
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (const unsigned int v :
-             GeometryInfo<MeshType::dimension>::vertex_indices())
+        for (const auto v : cell->vertex_indices())
           locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
 
     // Find the cells that do not conform to the predicate
@@ -766,8 +765,7 @@ namespace GridTools
     // These comprise the halo layer
     for (const auto &cell : mesh.active_cell_iterators())
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (const unsigned int v :
-             GeometryInfo<MeshType::dimension>::vertex_indices())
+        for (const auto v : cell->vertex_indices())
           if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
               true)
             {

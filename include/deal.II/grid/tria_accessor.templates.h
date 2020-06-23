@@ -29,6 +29,8 @@
 #include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/grid/tria_levels.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -660,7 +662,7 @@ namespace internal
       inline static bool
       face_flip(const TriaAccessor<3, 3, 3> &accessor, const unsigned int face)
       {
-        AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
+        AssertIndexRange(face, accessor.n_faces());
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
@@ -696,7 +698,7 @@ namespace internal
       face_rotation(const TriaAccessor<3, 3, 3> &accessor,
                     const unsigned int           face)
       {
-        AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
+        AssertIndexRange(face, accessor.n_faces());
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
@@ -750,7 +752,7 @@ namespace internal
                        const unsigned int           line)
       {
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(line, GeometryInfo<3>::lines_per_cell);
+        AssertIndexRange(line, accessor.n_lines());
 
         const auto pair =
           GeometryInfo<3>::standard_hex_line_to_quad_line_index(line);
@@ -821,7 +823,7 @@ namespace internal
                            const bool                   value)
       {
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
+        AssertIndexRange(face, accessor.n_faces());
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
@@ -853,7 +855,7 @@ namespace internal
                     const unsigned int           face,
                     const bool                   value)
       {
-        AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
+        AssertIndexRange(face, accessor.n_faces());
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
@@ -886,7 +888,7 @@ namespace internal
                         const unsigned int           face,
                         const bool                   value)
       {
-        AssertIndexRange(face, GeometryInfo<3>::faces_per_cell);
+        AssertIndexRange(face, accessor.n_faces());
         Assert(accessor.present_index * GeometryInfo<3>::faces_per_cell + face <
                  accessor.tria->levels[accessor.present_level]
                    ->face_orientations.size(),
@@ -931,14 +933,14 @@ namespace internal
                            const bool                          value)
       {
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(line, GeometryInfo<3>::lines_per_face);
-        Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
+        AssertIndexRange(line, accessor.n_lines());
+        Assert(accessor.present_index * GeometryInfo<2>::lines_per_cell + line <
                  accessor.tria->faces->quads_line_orientations.size(),
                ExcInternalError());
 
         // quads as part of 3d hexes can have non-standard orientation
         accessor.tria->faces->quads_line_orientations
-          [accessor.present_index * GeometryInfo<3>::lines_per_face + line] =
+          [accessor.present_index * GeometryInfo<2>::lines_per_cell + line] =
           value;
       }
 
@@ -1044,7 +1046,7 @@ inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::vertex_index(
   const unsigned int corner) const
 {
-  AssertIndexRange(corner, GeometryInfo<structdim>::vertices_per_cell);
+  AssertIndexRange(corner, this->n_vertices());
 
   return dealii::internal::TriaAccessorImplementation::Implementation::
     vertex_index(*this, corner);
@@ -1077,7 +1079,7 @@ template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
 {
-  AssertIndexRange(i, GeometryInfo<structdim>::lines_per_cell);
+  AssertIndexRange(i, this->n_lines());
 
   return dealii::internal::TriaAccessorImplementation::Implementation::
     line_index(*this, i);
@@ -1150,7 +1152,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   const unsigned int line) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
-  AssertIndexRange(line, GeometryInfo<structdim>::lines_per_cell);
+  AssertIndexRange(line, this->n_lines());
 
   return dealii::internal::TriaAccessorImplementation::Implementation::
     line_orientation(*this, line);
@@ -1205,7 +1207,7 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
   const bool         value) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
-  AssertIndexRange(line, GeometryInfo<structdim>::lines_per_cell);
+  AssertIndexRange(line, this->n_lines());
 
   dealii::internal::TriaAccessorImplementation::Implementation::
     set_line_orientation(*this, line, value);
@@ -1945,8 +1947,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
   // two vertices corresponding to the largest diagonal which is being used
   // to construct the initial ball.
   // We employ this mask to skip these two vertices while enlarging the ball.
-  std::array<bool, GeometryInfo<structdim>::vertices_per_cell>
-    is_initial_guess_vertex;
+  std::vector<bool> is_initial_guess_vertex(this->n_vertices());
 
   // First let all the vertices be outside
   std::fill(is_initial_guess_vertex.begin(),
@@ -2026,7 +2027,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
   // For each vertex that is found to be geometrically outside the ball
   // enlarge the ball  so that the new ball contains both the previous ball
   // and the given vertex.
-  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int v : this->vertex_indices())
     if (!is_initial_guess_vertex[v])
       {
         const double distance = center.distance(this->vertex(v));
@@ -2048,7 +2049,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
 
   // Set all_vertices_within_ball false if any of the vertices of the object
   // are geometrically outside the ball
-  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int v : this->vertex_indices())
     if (center.distance(this->vertex(v)) >
         radius + 100. * std::numeric_limits<double>::epsilon())
       {
@@ -2074,10 +2075,8 @@ TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance() const
       case 3:
         {
           double min = std::numeric_limits<double>::max();
-          for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
-            for (unsigned int j = i + 1;
-                 j < GeometryInfo<structdim>::vertices_per_cell;
-                 ++j)
+          for (const unsigned int i : this->vertex_indices())
+            for (unsigned int j = i + 1; j < this->n_vertices(); ++j)
               min = std::min(min,
                              (this->vertex(i) - this->vertex(j)) *
                                (this->vertex(i) - this->vertex(j)));
@@ -2113,7 +2112,7 @@ TriaAccessor<structdim, dim, spacedim>::is_translation_of(
   bool                      is_translation = true;
   const Tensor<1, spacedim> dist           = o->vertex(0) - this->vertex(0);
   const double              tol_square     = 1e-24 * dist.norm_square();
-  for (unsigned int i = 1; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
+  for (unsigned int i = 1; i < this->n_vertices(); ++i)
     {
       const Tensor<1, spacedim> dist_new =
         (o->vertex(i) - this->vertex(i)) - dist;
@@ -2124,6 +2123,62 @@ TriaAccessor<structdim, dim, spacedim>::is_translation_of(
         }
     }
   return is_translation;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+unsigned int
+TriaAccessor<structdim, dim, spacedim>::n_vertices() const
+{
+  return GeometryInfo<structdim>::vertices_per_cell;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+unsigned int
+TriaAccessor<structdim, dim, spacedim>::n_lines() const
+{
+  return GeometryInfo<structdim>::lines_per_cell;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+unsigned int
+TriaAccessor<structdim, dim, spacedim>::n_faces() const
+{
+  AssertDimension(structdim, dim);
+
+  return GeometryInfo<structdim>::faces_per_cell;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+TriaAccessor<structdim, dim, spacedim>::vertex_indices() const
+{
+  return {0U, n_vertices()};
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+TriaAccessor<structdim, dim, spacedim>::line_indices() const
+{
+  return {0U, n_lines()};
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+TriaAccessor<structdim, dim, spacedim>::face_indices() const
+{
+  return {0U, n_faces()};
 }
 
 
@@ -2974,6 +3029,42 @@ TriaAccessor<0, 1, spacedim>::used() const
   return tria->vertex_used(global_vertex_index);
 }
 
+
+
+template <int spacedim>
+unsigned int
+TriaAccessor<0, 1, spacedim>::n_vertices() const
+{
+  return 1;
+}
+
+
+
+template <int spacedim>
+unsigned int
+TriaAccessor<0, 1, spacedim>::n_lines() const
+{
+  return 0;
+}
+
+
+
+template <int spacedim>
+std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+TriaAccessor<0, 1, spacedim>::vertex_indices() const
+{
+  return {0U, n_vertices()};
+}
+
+
+
+template <int spacedim>
+std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+TriaAccessor<0, 1, spacedim>::line_indices() const
+{
+  return {0U, n_lines()};
+}
+
 /*------------------ Functions: CellAccessor<dim,spacedim> ------------------*/
 
 
@@ -3069,7 +3160,7 @@ inline unsigned int
 CellAccessor<dim, spacedim>::face_iterator_to_index(
   const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> &face) const
 {
-  for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face_n : this->face_indices())
     if (this->face(face_n) == face)
       return face_n;
 
@@ -3081,15 +3172,17 @@ CellAccessor<dim, spacedim>::face_iterator_to_index(
 
 
 template <int dim, int spacedim>
-inline std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-                  GeometryInfo<dim>::faces_per_cell>
+inline boost::container::small_vector<
+  TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+  GeometryInfo<dim>::faces_per_cell>
 CellAccessor<dim, spacedim>::face_iterators() const
 {
-  std::array<TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-             GeometryInfo<dim>::faces_per_cell>
-    face_iterators;
+  boost::container::small_vector<
+    TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
+    GeometryInfo<dim>::faces_per_cell>
+    face_iterators(this->n_faces());
 
-  for (unsigned int i : GeometryInfo<dim>::face_indices())
+  for (unsigned int i : this->face_indices())
     face_iterators[i] =
       dealii::internal::CellAccessorImplementation::get_face(*this, i);
 
@@ -3126,7 +3219,7 @@ template <int dim, int spacedim>
 inline int
 CellAccessor<dim, spacedim>::neighbor_index(const unsigned int i) const
 {
-  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i, this->n_faces());
   return this->tria->levels[this->present_level]
     ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
     .second;
@@ -3138,7 +3231,7 @@ template <int dim, int spacedim>
 inline int
 CellAccessor<dim, spacedim>::neighbor_level(const unsigned int i) const
 {
-  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i, this->n_faces());
   return this->tria->levels[this->present_level]
     ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
     .first;
@@ -3197,7 +3290,7 @@ CellAccessor<dim, spacedim>::flag_for_face_refinement(
   const RefinementCase<dim - 1> &face_refinement_case) const
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face_no, this->n_faces());
   AssertIndexRange(face_refinement_case,
                    RefinementCase<dim>::isotropic_refinement + 1);
 
@@ -3228,7 +3321,7 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
   const unsigned int line_no) const
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
-  AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
+  AssertIndexRange(line_no, this->n_lines());
 
   // the new refinement case is a combination
   // of the minimum required one for the given
@@ -3275,7 +3368,7 @@ inline dealii::internal::SubfaceCase<2>
 CellAccessor<2>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, GeometryInfo<2>::faces_per_cell);
+  AssertIndexRange(face_no, this->n_faces());
   return ((face(face_no)->has_children()) ?
             dealii::internal::SubfaceCase<2>::case_x :
             dealii::internal::SubfaceCase<2>::case_none);
@@ -3286,7 +3379,7 @@ inline dealii::internal::SubfaceCase<2>
 CellAccessor<2, 3>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, GeometryInfo<2>::faces_per_cell);
+  AssertIndexRange(face_no, this->n_faces());
   return ((face(face_no)->has_children()) ?
             dealii::internal::SubfaceCase<2>::case_x :
             dealii::internal::SubfaceCase<2>::case_none);
@@ -3298,7 +3391,7 @@ inline dealii::internal::SubfaceCase<3>
 CellAccessor<3>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, GeometryInfo<3>::faces_per_cell);
+  AssertIndexRange(face_no, this->n_faces());
   switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
     {
       case RefinementCase<3>::no_refinement:
