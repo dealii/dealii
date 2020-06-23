@@ -44,6 +44,9 @@ namespace PETScWrappers
 
 namespace SLEPcWrappers
 {
+  // forward declaration
+  class SolverBase;
+
   /**
    * Base class for spectral transformation classes using the SLEPc solvers
    * which are selected based on flags passed to the spectral transformation.
