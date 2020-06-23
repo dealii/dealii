@@ -330,11 +330,11 @@ do_test(const DoFHandler<dim> &          dof,
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.mapping_update_flags =
-      update_gradients | update_second_derivatives | update_quadrature_points;
+      update_gradients | update_hessians | update_quadrature_points;
     data.mapping_update_flags_boundary_faces =
-      update_gradients | update_second_derivatives | update_quadrature_points;
+      update_gradients | update_hessians | update_quadrature_points;
     data.mapping_update_flags_inner_faces =
-      update_gradients | update_second_derivatives | update_quadrature_points;
+      update_gradients | update_hessians | update_quadrature_points;
     mf_data.reinit(dof, constraints, quad, data);
   }
 

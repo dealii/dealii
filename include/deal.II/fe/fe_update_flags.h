@@ -134,14 +134,6 @@ enum UpdateFlags
    * error.
    */
   update_normal_vectors = 0x0080,
-  /**
-   * @deprecated Use #update_normal_vectors instead.
-   */
-  update_face_normal_vectors DEAL_II_DEPRECATED = update_normal_vectors,
-  /**
-   * @deprecated Use #update_normal_vectors instead.
-   */
-  update_cell_normal_vectors DEAL_II_DEPRECATED = update_normal_vectors,
   //! Volume element
   /**
    * Compute the Jacobian of the transformation from the reference cell to the
@@ -213,14 +205,6 @@ enum UpdateFlags
    * pushed forward to the real cell coordinates.
    */
   update_jacobian_pushed_forward_3rd_derivatives = 0x1000000,
-  /**
-   * @deprecated Use #update_quadrature_points instead.
-   */
-  update_q_points DEAL_II_DEPRECATED = update_quadrature_points,
-  /**
-   * @deprecated Use #update_hessians instead.
-   */
-  update_second_derivatives DEAL_II_DEPRECATED = update_hessians,
   //! Values needed for Piola transform
   /**
    * Combination of the flags needed for Piola transform of Hdiv elements.

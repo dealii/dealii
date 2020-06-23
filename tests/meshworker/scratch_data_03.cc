@@ -91,8 +91,8 @@ test()
   UpdateFlags cell_flags = update_values | update_gradients |
                            update_quadrature_points | update_JxW_values;
   UpdateFlags face_flags = update_values | update_gradients |
-                           update_quadrature_points |
-                           update_face_normal_vectors | update_JxW_values;
+                           update_quadrature_points | update_normal_vectors |
+                           update_JxW_values;
 
   // Stabilization for SIPG
   double gamma = 100;

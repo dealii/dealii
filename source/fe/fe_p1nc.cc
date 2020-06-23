@@ -55,8 +55,8 @@ FE_P1NC::requires_update_flags(const UpdateFlags flags) const
     out |= update_values | update_quadrature_points;
   if (flags & update_gradients)
     out |= update_gradients;
-  if (flags & update_cell_normal_vectors)
-    out |= update_cell_normal_vectors | update_JxW_values;
+  if (flags & update_normal_vectors)
+    out |= update_normal_vectors | update_JxW_values;
   if (flags & update_hessians)
     out |= update_hessians;
 
