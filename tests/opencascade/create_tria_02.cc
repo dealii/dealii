@@ -19,7 +19,7 @@
 
 #include <deal.II/grid/grid_out.h>
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 #include <BRepPrimAPI_MakeRevol.hxx>
