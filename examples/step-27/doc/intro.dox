@@ -212,7 +212,7 @@ i.e. the interesting part of the loop over all cells would look like this:
                                  fe_collection,
                                  quadrature_collection,
                                  update_values   | update_gradients |
-                                 update_q_points | update_JxW_values);
+                                 update_quadrature_points | update_JxW_values);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {

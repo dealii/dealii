@@ -761,7 +761,7 @@ namespace Step36
   template <int dim>
   Postprocessor<dim>::Postprocessor(const EnrichmentFunction<dim> &enrichment)
     : DataPostprocessorScalar<dim>("total_solution",
-                                   update_values | update_q_points)
+                                   update_values | update_quadrature_points)
     , enrichment(enrichment)
   {}
 
