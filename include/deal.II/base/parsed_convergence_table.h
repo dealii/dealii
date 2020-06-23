@@ -270,26 +270,23 @@ public:
    * components does not coincide with the number of components of the
    * underlying finite element space.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  error_from_exact(
-    const DoFHandlerType &                           vspace,
-    const VectorType &                               solution,
-    const Function<DoFHandlerType::space_dimension> &exact,
-    const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+  error_from_exact(const DoFHandler<dim, spacedim> &vspace,
+                   const VectorType &               solution,
+                   const Function<spacedim> &       exact,
+                   const Function<spacedim> *       weight = nullptr);
 
   /**
    * Same as above, with a different mapping.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  error_from_exact(
-    const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-      &                                              mapping,
-    const DoFHandlerType &                           vspace,
-    const VectorType &                               solution,
-    const Function<DoFHandlerType::space_dimension> &exact,
-    const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+  error_from_exact(const Mapping<dim, spacedim> &   mapping,
+                   const DoFHandler<dim, spacedim> &vspace,
+                   const VectorType &               solution,
+                   const Function<spacedim> &       exact,
+                   const Function<spacedim> *       weight = nullptr);
 
   /**
    * Add an additional column (with name @p column_name) to the table, by invoking
@@ -365,24 +362,23 @@ public:
   /**
    * Difference between two solutions in the same vector space.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  difference(const DoFHandlerType &,
+  difference(const DoFHandler<dim, spacedim> &,
              const VectorType &,
              const VectorType &,
-             const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+             const Function<spacedim> *weight = nullptr);
 
   /**
    * Same as above, with a non default mapping.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  difference(const Mapping<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &mapping,
-             const DoFHandlerType &,
+  difference(const Mapping<dim, spacedim> &mapping,
+             const DoFHandler<dim, spacedim> &,
              const VectorType &,
              const VectorType &,
-             const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+             const Function<spacedim> *weight = nullptr);
 
   /**
    * Write the error table to the @p out stream (in text format), and
@@ -482,81 +478,69 @@ private:
 // ============================================================
 // Template functions
 // ============================================================
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::difference(
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution1,
-  const VectorType &                               solution2,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::difference(const DoFHandler<dim, spacedim> &dh,
+                                   const VectorType &               solution1,
+                                   const VectorType &               solution2,
+                                   const Function<spacedim> *       weight)
 {
   AssertThrow(solution1.size() == solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
   VectorType solution(solution1);
   solution -= solution2;
-  error_from_exact(dh,
-                   solution,
-                   Functions::ConstantFunction<DoFHandlerType::space_dimension>(
-                     0, component_names.size()),
-                   weight);
+  error_from_exact(
+    dh,
+    solution,
+    Functions::ConstantFunction<spacedim>(0, component_names.size()),
+    weight);
 }
 
 
 
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::difference(
-  const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-    &                                              mapping,
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution1,
-  const VectorType &                               solution2,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::difference(const Mapping<dim, spacedim> &   mapping,
+                                   const DoFHandler<dim, spacedim> &dh,
+                                   const VectorType &               solution1,
+                                   const VectorType &               solution2,
+                                   const Function<spacedim> *       weight)
 {
   AssertThrow(solution1.size() == solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
   VectorType solution(solution1);
   solution -= solution2;
-  error_from_exact(mapping,
-                   dh,
-                   solution,
-                   Functions::ConstantFunction<DoFHandlerType::space_dimension>(
-                     0, component_names.size()),
-                   weight);
+  error_from_exact(
+    mapping,
+    dh,
+    solution,
+    Functions::ConstantFunction<spacedim>(0, component_names.size()),
+    weight);
 }
 
 
 
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::error_from_exact(
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution,
-  const Function<DoFHandlerType::space_dimension> &exact,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::error_from_exact(const DoFHandler<dim, spacedim> &dh,
+                                         const VectorType &        solution,
+                                         const Function<spacedim> &exact,
+                                         const Function<spacedim> *weight)
 {
-  error_from_exact(StaticMappingQ1<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>::mapping,
-                   dh,
-                   solution,
-                   exact,
-                   weight);
+  error_from_exact(
+    StaticMappingQ1<dim, spacedim>::mapping, dh, solution, exact, weight);
 }
 
 
 
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::error_from_exact(
-  const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-    &                                              mapping,
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution,
-  const Function<DoFHandlerType::space_dimension> &exact,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
+                                         const DoFHandler<dim, spacedim> &dh,
+                                         const VectorType &        solution,
+                                         const Function<spacedim> &exact,
+                                         const Function<spacedim> *weight)
 {
-  const int  dim          = DoFHandlerType::dimension;
-  const int  spacedim     = DoFHandlerType::space_dimension;
   const auto n_components = component_names.size();
 
   if (compute_error)
