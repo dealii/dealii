@@ -42,9 +42,22 @@ DEAL_II_FIND_PATH(MUPARSER_INCLUDE_DIR muParserDef.h
 
 IF(EXISTS ${MUPARSER_INCLUDE_DIR}/muParserDef.h)
   FILE(STRINGS "${MUPARSER_INCLUDE_DIR}/muParserDef.h" MUPARSER_VERSION_STRING_LINE
+    # Try to match the line
+    #
+    #     #define MUP_VERSION _T("2.2.4")
     REGEX "#define MUP_VERSION _T"
     )
- 
+
+  IF("${MUPARSER_VERSION_STRING_LINE}" STREQUAL "")
+    # try again with the newer version format (starting in at least 2.3.2),
+    # which matches the line
+    #
+    #     static const string_type ParserVersion = string_type(_T("2.3.2"));
+    FILE(STRINGS "${MUPARSER_INCLUDE_DIR}/muParserDef.h" MUPARSER_VERSION_STRING_LINE
+      REGEX "string_type ParserVersion = string_type"
+      )
+  ENDIF()
+
   STRING(REGEX REPLACE ".*\"(.*)\".*" "\\1"
     _VERSION_STRING "${MUPARSER_VERSION_STRING_LINE}"
     )
