@@ -207,6 +207,9 @@ public:
       color = internal::MatrixFreeFunctions::TaskInfo::color
     };
 
+    // remove with level_mg_handler
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
     /**
      * Constructor for AdditionalData.
      */
@@ -266,6 +269,9 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
     {}
+
+    // remove with level_mg_handler
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
     /**
      * Copy assignment.

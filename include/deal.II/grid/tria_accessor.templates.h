@@ -3274,7 +3274,7 @@ template <>
 inline dealii::internal::SubfaceCase<2>
 CellAccessor<2>::subface_case(const unsigned int face_no) const
 {
-  Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
+  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, GeometryInfo<2>::faces_per_cell);
   return ((face(face_no)->has_children()) ?
             dealii::internal::SubfaceCase<2>::case_x :
@@ -3285,7 +3285,7 @@ template <>
 inline dealii::internal::SubfaceCase<2>
 CellAccessor<2, 3>::subface_case(const unsigned int face_no) const
 {
-  Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
+  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, GeometryInfo<2>::faces_per_cell);
   return ((face(face_no)->has_children()) ?
             dealii::internal::SubfaceCase<2>::case_x :
@@ -3297,7 +3297,7 @@ template <>
 inline dealii::internal::SubfaceCase<3>
 CellAccessor<3>::subface_case(const unsigned int face_no) const
 {
-  Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
+  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, GeometryInfo<3>::faces_per_cell);
   switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
     {
