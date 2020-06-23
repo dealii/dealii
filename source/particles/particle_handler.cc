@@ -406,11 +406,16 @@ namespace Particles
   {
     for (auto particle = new_particles.begin(); particle != new_particles.end();
          ++particle)
-      particles.insert(
-        particles.end(),
-        std::make_pair(internal::LevelInd(particle->first->level(),
-                                          particle->first->index()),
-                       particle->second));
+      {
+        // Insert the particle. Store an iterator to the newly
+        // inserted particle, and then set its property_pool.
+        auto it = particles.insert(
+          particles.end(),
+          std::make_pair(internal::LevelInd(particle->first->level(),
+                                            particle->first->index()),
+                         particle->second));
+        it->second.set_property_pool(*property_pool);
+      }
 
     update_cached_numbers();
   }
