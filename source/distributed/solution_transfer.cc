@@ -365,6 +365,9 @@ namespace parallel
       const unsigned int dofs_per_cell =
         dof_handler->get_fe(fe_index).dofs_per_cell;
 
+      if (dofs_per_cell == 0)
+        return std::vector<char>(); // nothing to do for FE_Nothing
+
       auto it_input  = input_vectors.cbegin();
       auto it_output = dof_values.begin();
       for (; it_input != input_vectors.cend(); ++it_input, ++it_output)
@@ -436,6 +439,9 @@ namespace parallel
 
       const unsigned int dofs_per_cell =
         dof_handler->get_fe(fe_index).dofs_per_cell;
+
+      if (dofs_per_cell == 0)
+        return; // nothing to do for FE_Nothing
 
       const std::vector<::dealii::Vector<typename VectorType::value_type>>
         dof_values =
