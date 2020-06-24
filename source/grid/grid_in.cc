@@ -1971,8 +1971,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 unsigned int node_index = 0;
                 if (gmsh_file_format < 20)
                   {
-                    for (unsigned int i = 0; i < nod_num; ++i)
-                      in >> node_index;
+                    // For points (cell_type==15), we can only ever
+                    // list one node index.
+                    AssertThrow(nod_num == 1, ExcInternalError());
+                    in >> node_index;
                   }
                 else
                   {
