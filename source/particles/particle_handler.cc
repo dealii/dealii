@@ -92,7 +92,7 @@ namespace Particles
     , global_number_of_particles(0)
     , global_max_particles_per_cell(0)
     , next_free_particle_index(0)
-    , property_pool(new PropertyPool(0))
+    , property_pool(std::make_unique<PropertyPool>(0))
     , size_callback()
     , store_callback()
     , load_callback()
@@ -113,7 +113,7 @@ namespace Particles
     , global_number_of_particles(0)
     , global_max_particles_per_cell(0)
     , next_free_particle_index(0)
-    , property_pool(new PropertyPool(n_properties))
+    , property_pool(std::make_unique<PropertyPool>(n_properties))
     , size_callback()
     , store_callback()
     , load_callback()
@@ -451,8 +451,8 @@ namespace Particles
 
     local_start_index += local_next_particle_index;
 
-    GridTools::Cache<dim, spacedim> cache(*triangulation, *mapping);
-    auto point_locations = GridTools::compute_point_locations(cache, positions);
+    auto point_locations =
+      GridTools::compute_point_locations(*triangulation_cache, positions);
 
     auto &cells           = std::get<0>(point_locations);
     auto &local_positions = std::get<1>(point_locations);
@@ -488,8 +488,9 @@ namespace Particles
   ParticleHandler<dim, spacedim>::insert_global_particles(
     const std::vector<Point<spacedim>> &positions,
     const std::vector<std::vector<BoundingBox<spacedim>>>
-      &                                     global_bounding_boxes,
-    const std::vector<std::vector<double>> &properties)
+      &                                       global_bounding_boxes,
+    const std::vector<std::vector<double>> &  properties,
+    const std::vector<types::particle_index> &ids)
   {
     if (!properties.empty())
       {
@@ -500,6 +501,9 @@ namespace Particles
 #endif
       }
 
+    if (!ids.empty())
+      AssertDimension(ids.size(), positions.size());
+
     const auto tria =
       dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
         &(*triangulation));
@@ -507,8 +511,6 @@ namespace Particles
       (tria != nullptr ? tria->get_communicator() : MPI_COMM_WORLD);
 
     const auto n_mpi_processes = Utilities::MPI::n_mpi_processes(comm);
-
-    GridTools::Cache<dim, spacedim> cache(*triangulation, *mapping);
 
     // Compute the global number of properties
     const auto n_global_properties =
@@ -521,7 +523,7 @@ namespace Particles
     // Calculate all starting points locally
     std::vector<unsigned int> particle_start_indices(n_mpi_processes);
 
-    unsigned int particle_start_index = 0;
+    unsigned int particle_start_index = get_next_free_particle_index();
     for (unsigned int process = 0; process < particle_start_indices.size();
          ++process)
       {
@@ -531,7 +533,7 @@ namespace Particles
 
     // Get all local information
     const auto cells_positions_and_index_maps =
-      GridTools::distributed_compute_point_locations(cache,
+      GridTools::distributed_compute_point_locations(*triangulation_cache,
                                                      positions,
                                                      global_bounding_boxes);
 
@@ -588,42 +590,78 @@ namespace Particles
 
 
     // A map from mpi process to properties, ordered as in the IndexSet.
-    // Notice that this ordering maybe different from the ordering in the
+    // Notice that this ordering may be different from the ordering in the
     // vectors above, since no local ordering is guaranteed by the
     // distribute_compute_point_locations() call.
     // This is only filled if n_global_properties is > 0
     std::map<unsigned int, std::vector<std::vector<double>>>
       locally_owned_properties_from_other_processes;
 
-    if (n_global_properties > 0)
+    // A map from mpi process to ids, ordered as in the IndexSet.
+    // Notice that this ordering may be different from the ordering in the
+    // vectors above, since no local ordering is guaranteed by the
+    // distribute_compute_point_locations() call.
+    // This is only filled if ids.size() is > 0
+    std::map<unsigned int, std::vector<types::particle_index>>
+      locally_owned_ids_from_other_processes;
+
+    if (n_global_properties > 0 || !ids.empty())
       {
         // Gather whom I sent my own particles to, to decide whom to send
-        // the particle properties
+        // the particle properties or the ids
         auto send_to_cpu = Utilities::MPI::some_to_some(
           comm, original_process_to_local_particle_indices);
 
-        std::map<unsigned int, std::vector<std::vector<double>>>
-          non_locally_owned_properties;
-
         // Prepare the vector of properties to send
-        for (const auto &it : send_to_cpu)
+        if (n_global_properties > 0)
           {
-            std::vector<std::vector<double>> properties_to_send(
-              it.second.n_elements(),
-              std::vector<double>(n_properties_per_particle()));
-            unsigned int index = 0;
-            for (const auto &el : it.second)
-              properties_to_send[index++] = properties[el];
-            non_locally_owned_properties.insert({it.first, properties_to_send});
+            std::map<unsigned int, std::vector<std::vector<double>>>
+              non_locally_owned_properties;
+
+            for (const auto &it : send_to_cpu)
+              {
+                std::vector<std::vector<double>> properties_to_send(
+                  it.second.n_elements(),
+                  std::vector<double>(n_properties_per_particle()));
+                unsigned int index = 0;
+                for (const auto &el : it.second)
+                  properties_to_send[index++] = properties[el];
+                non_locally_owned_properties.insert(
+                  {it.first, properties_to_send});
+              }
+
+            // Send the non locally owned properties to each mpi process
+            // that needs them
+            locally_owned_properties_from_other_processes =
+              Utilities::MPI::some_to_some(comm, non_locally_owned_properties);
+
+            AssertDimension(
+              locally_owned_properties_from_other_processes.size(),
+              original_process_to_local_particle_indices.size());
           }
 
-        // Send the non locally owned properties to each mpi process
-        // that needs them
-        locally_owned_properties_from_other_processes =
-          Utilities::MPI::some_to_some(comm, non_locally_owned_properties);
+        if (!ids.empty())
+          {
+            std::map<unsigned int, std::vector<types::particle_index>>
+              non_locally_owned_ids;
+            for (const auto &it : send_to_cpu)
+              {
+                std::vector<types::particle_index> ids_to_send(
+                  it.second.n_elements());
+                unsigned int index = 0;
+                for (const auto &el : it.second)
+                  ids_to_send[index++] = ids[el];
+                non_locally_owned_ids.insert({it.first, ids_to_send});
+              }
 
-        AssertDimension(locally_owned_properties_from_other_processes.size(),
-                        original_process_to_local_particle_indices.size());
+            // Send the non locally owned ids to each mpi process
+            // that needs them
+            locally_owned_ids_from_other_processes =
+              Utilities::MPI::some_to_some(comm, non_locally_owned_ids);
+
+            AssertDimension(locally_owned_ids_from_other_processes.size(),
+                            original_process_to_local_particle_indices.size());
+          }
       }
 
 
@@ -643,29 +681,34 @@ namespace Particles
           {
             const unsigned int local_id_on_calling_process =
               original_indices_of_local_particles[i_cell][i_particle];
+
             const unsigned int calling_process =
               calling_process_indices[i_cell][i_particle];
 
+            const unsigned int index_within_set =
+              original_process_to_local_particle_indices[calling_process]
+                .index_within_set(local_id_on_calling_process);
+
             const unsigned int particle_id =
-              local_id_on_calling_process +
-              particle_start_indices[calling_process];
+              ids.empty() ?
+                local_id_on_calling_process +
+                  particle_start_indices[calling_process] :
+                locally_owned_ids_from_other_processes[calling_process]
+                                                      [index_within_set];
 
             Particle<dim, spacedim> particle(
               local_positions[i_cell][i_particle],
               local_reference_positions[i_cell][i_particle],
               particle_id);
 
+            particle.set_property_pool(get_property_pool());
+
             if (n_global_properties > 0)
               {
-                const unsigned int index_within_set =
-                  original_process_to_local_particle_indices[calling_process]
-                    .index_within_set(local_id_on_calling_process);
-
                 const auto &this_particle_properties =
                   locally_owned_properties_from_other_processes
                     [calling_process][index_within_set];
 
-                particle.set_property_pool(get_property_pool());
                 particle.set_properties(this_particle_properties);
               }
 
@@ -677,6 +720,43 @@ namespace Particles
     this->insert_particles(particles);
 
     return original_process_to_local_particle_indices;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::map<unsigned int, IndexSet>
+  ParticleHandler<dim, spacedim>::insert_global_particles(
+    const std::vector<Particle<dim, spacedim>> &particles,
+    const std::vector<std::vector<BoundingBox<spacedim>>>
+      &global_bounding_boxes)
+  {
+    // Store the positions in a vector of points, the ids in a vector of ids,
+    // and the properties, if any, in a vector of vector of properties.
+    std::vector<Point<spacedim>>       positions;
+    std::vector<std::vector<double>>   properties;
+    std::vector<types::particle_index> ids;
+    positions.resize(particles.size());
+    ids.resize(particles.size());
+    if (n_properties_per_particle() > 0)
+      properties.resize(particles.size(),
+                        std::vector<double>(n_properties_per_particle()));
+
+    unsigned int i = 0;
+    for (const auto &p : particles)
+      {
+        positions[i] = p.get_location();
+        ids[i]       = p.get_id();
+        if (p.has_properties())
+          properties[i] = {p.get_properties().begin(),
+                           p.get_properties().end()};
+        ++i;
+      }
+
+    return insert_global_particles(positions,
+                                   global_bounding_boxes,
+                                   properties,
+                                   ids);
   }
 
 
