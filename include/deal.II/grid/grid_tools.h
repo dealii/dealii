@@ -1136,32 +1136,37 @@ namespace GridTools
    * If the point requested does not lie in a locally-owned or ghost cell,
    * then this function throws an exception of type GridTools::ExcPointNotFound.
    * You can catch this exception and decide what to do in that case. Hence,
-   * this function should always be called inside a try-block.
+   * for programs that work with partitioned (parallel) triangulations, this
+   * function should always be called inside a `try`-block unless it is a
+   * priori clear that the point with which it is called must be inside
+   * a locally owned or ghost cell (and not close enough to the boundary
+   * between ghost and artificial cells so that decision which cell it is
+   * on depends on floating point accuracy).
    *
    * @param mapping The mapping used to determine whether the given point is
-   * inside a given cell.
+   *   inside a given cell.
    * @param mesh A variable of a type that satisfies the requirements of the
-   * @ref ConceptMeshType "MeshType concept".
+   *   @ref ConceptMeshType "MeshType concept".
    * @param p The point for which we want to find the surrounding cell.
-   * @param marked_vertices An array of bools indicating whether an
-   * entry in the vertex array should be considered
-   * (and the others must be ignored) as the potentially
-   * closest vertex to the specified point. On specifying a non-default
-   * @p marked_vertices, find_closest_vertex() would
-   * only search among @p marked_vertices for the closest vertex.
-   * The size of this array should be equal to n_vertices() of the
-   * triangulation (as opposed to n_used_vertices() ). The motivation of using
-   * @p marked_vertices is to cut down the search space of vertices if one has
-   * a priori knowledge of a collection of vertices that the point of interest
-   * may be close to.
+   * @param marked_vertices An array of `bool`s indicating whether an
+   *   entry in the vertex array should be considered
+   *   (and the others must be ignored) as the potentially
+   *   closest vertex to the specified point. On specifying a non-default
+   *   @p marked_vertices, find_closest_vertex() would
+   *   only search among @p marked_vertices for the closest vertex.
+   *   The size of this array should be equal to n_vertices() of the
+   *   triangulation (as opposed to n_used_vertices() ). The motivation of using
+   *   @p marked_vertices is to cut down the search space of vertices if one has
+   *   a priori knowledge of a collection of vertices that the point of interest
+   *   may be close to.
    * @param tolerance Tolerance in terms of unit cell coordinates. Depending
-   * on the problem, it might be necessary to adjust the tolerance in order
-   * to be able to identify a cell. Floating
-   * point arithmetic implies that a point will, in general, not lie exactly
-   * on a vertex, edge, or face. In either case, it is not predictable which
-   * of the cells adjacent to a vertex or an edge/face this function returns.
-   * Consequently, algorithms that call this function need to take into
-   * account that the returned cell will only contain the point approximately.
+   *   on the problem, it might be necessary to adjust the tolerance in order
+   *   to be able to identify a cell. Floating
+   *   point arithmetic implies that a point will, in general, not lie exactly
+   *   on a vertex, edge, or face. In either case, it is not predictable which
+   *   of the cells adjacent to a vertex or an edge/face this function returns.
+   *   Consequently, algorithms that call this function need to take into
+   *   account that the returned cell will only contain the point approximately.
    *
    * @return A pair of an iterators into the mesh that points to the
    * surrounding cell, and of the unit cell coordinates of that point. This
