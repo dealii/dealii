@@ -42,18 +42,18 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <typename DoFHandlerType, bool lda>
+template <int dim, int spacedim, bool lda>
 template <class InputVector, typename number>
 void
-DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
+DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
   const InputVector &values,
   Vector<number> &   interpolated_values,
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   if (this->is_active())
@@ -66,7 +66,7 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
           // active cells, you either don't specify an fe_index,
           // or that you specify the correct one
           (fe_index == this->active_fe_index()) ||
-          (fe_index == DoFHandlerType::invalid_fe_index))
+          (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
         this->get_dof_values(values, interpolated_values);
       else
         {
@@ -104,7 +104,7 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
       Assert((this->dof_handler->hp_capability_enabled == false) ||
-               (fe_index != DoFHandlerType::invalid_fe_index),
+               (fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
              ExcMessage(
                "You cannot call this function on non-active cells "
                "of hp::DoFHandler objects unless you provide an explicit "

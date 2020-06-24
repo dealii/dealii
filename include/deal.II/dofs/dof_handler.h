@@ -1670,9 +1670,9 @@ private:
 
 
   // Make accessor objects friends.
-  template <int, class, bool>
+  template <int, int, int, bool>
   friend class dealii::DoFAccessor;
-  template <class, bool>
+  template <int, int, bool>
   friend class dealii::DoFCellAccessor;
   friend struct dealii::internal::DoFAccessorImplementation::Implementation;
   friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;

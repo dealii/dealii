@@ -3634,8 +3634,8 @@ public:
    */
   template <bool level_dof_access>
   void
-  reinit(const TriaIterator<
-         DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access>> &cell);
+  reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, level_dof_access>> &cell);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given cell
@@ -3854,9 +3854,9 @@ public:
    */
   template <bool level_dof_access>
   void
-  reinit(const TriaIterator<
-           DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access>> &cell,
-         const unsigned int face_no);
+  reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, level_dof_access>> &cell,
+    const unsigned int face_no);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for face @p face
@@ -3866,9 +3866,9 @@ public:
    */
   template <bool level_dof_access>
   void
-  reinit(const TriaIterator<
-           DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access>> &cell,
-         const typename Triangulation<dim, spacedim>::face_iterator &     face);
+  reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, level_dof_access>> &cell,
+    const typename Triangulation<dim, spacedim>::face_iterator &          face);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given face
@@ -4003,10 +4003,10 @@ public:
    */
   template <bool level_dof_access>
   void
-  reinit(const TriaIterator<
-           DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access>> &cell,
-         const unsigned int face_no,
-         const unsigned int subface_no);
+  reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, level_dof_access>> &cell,
+    const unsigned int face_no,
+    const unsigned int subface_no);
 
   /**
    * Alternative reinitialization function that takes, as arguments, iterators
@@ -4014,10 +4014,10 @@ public:
    */
   template <bool level_dof_access>
   void
-  reinit(const TriaIterator<
-           DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access>> &cell,
-         const typename Triangulation<dim, spacedim>::face_iterator &     face,
-         const typename Triangulation<dim, spacedim>::face_iterator &subface);
+  reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, level_dof_access>> &cell,
+    const typename Triangulation<dim, spacedim>::face_iterator &          face,
+    const typename Triangulation<dim, spacedim>::face_iterator &subface);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given

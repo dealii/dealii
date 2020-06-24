@@ -41,26 +41,23 @@ DEAL_II_NAMESPACE_OPEN
 /*------------------------- Functions: DoFAccessor ---------------------------*/
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-inline DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor()
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor()
 {
   Assert(false, ExcInvalidObject());
 }
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-inline DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
-  const Triangulation<DoFHandlerType::dimension,
-                      DoFHandlerType::space_dimension> *tria,
-  const int                                             level,
-  const int                                             index,
-  const DoFHandlerType *                                dof_handler)
-  : dealii::internal::DoFAccessorImplementation::Inheritance<
-      structdim,
-      DoFHandlerType::dimension,
-      DoFHandlerType::space_dimension>::BaseClass(tria, level, index)
-  , dof_handler(const_cast<DoFHandlerType *>(dof_handler))
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor(
+  const Triangulation<dim, spacedim> *tria,
+  const int                           level,
+  const int                           index,
+  const DoFHandler<dim, spacedim> *   dof_handler)
+  : dealii::internal::DoFAccessorImplementation::
+      Inheritance<structdim, dim, spacedim>::BaseClass(tria, level, index)
+  , dof_handler(const_cast<DoFHandler<dim, spacedim> *>(dof_handler))
 {
   Assert(
     tria == nullptr || &dof_handler->get_triangulation() == tria,
@@ -71,9 +68,9 @@ inline DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 template <int structdim2, int dim2, int spacedim2>
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor(
   const InvalidAccessor<structdim2, dim2, spacedim2> &)
 {
   Assert(false, ExcInvalidObject());
@@ -81,10 +78,10 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-inline DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
-  const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &other)
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
+inline DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor(
+  const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &other)
   : BaseClass(other)
   , dof_handler(nullptr)
 {
@@ -100,20 +97,20 @@ inline DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 template <bool level_dof_access2>
-inline DoFAccessor<structdim, DoFHandlerType, level_dof_access>::DoFAccessor(
-  const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &other)
+inline DoFAccessor<structdim, dim, spacedim, level_dof_access>::DoFAccessor(
+  const DoFAccessor<structdim, dim, spacedim, level_dof_access2> &other)
   : BaseClass(other)
-  , dof_handler(const_cast<DoFHandlerType *>(other.dof_handler))
+  , dof_handler(const_cast<DoFHandler<dim, spacedim> *>(other.dof_handler))
 {}
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_dof_handler(
-  DoFHandlerType *dh)
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_dof_handler(
+  DoFHandler<dim, spacedim> *dh)
 {
   Assert(dh != nullptr, ExcInvalidObject());
   this->dof_handler = dh;
@@ -121,10 +118,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_dof_handler(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-inline const DoFHandlerType &
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_handler()
-  const
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline const DoFHandler<dim, spacedim> &
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_handler() const
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
   return *this->dof_handler;
@@ -132,12 +128,10 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_handler()
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::copy_from(
-  const TriaAccessorBase<structdim,
-                         DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &da)
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::copy_from(
+  const TriaAccessorBase<structdim, dim, spacedim> &da)
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
   BaseClass::copy_from(da);
@@ -145,11 +139,11 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::copy_from(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 template <bool level_dof_access2>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::copy_from(
-  const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &a)
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::copy_from(
+  const DoFAccessor<structdim, dim, spacedim, level_dof_access2> &a)
 {
   BaseClass::copy_from(a);
   this->dof_handler = a.dof_handler;
@@ -157,49 +151,45 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::copy_from(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
 inline bool
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::
-operator==(const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &a) const
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::operator==(
+  const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &a) const
 {
-  Assert(structdim == dim2, ExcCantCompareIterators());
+  Assert(structdim == structdim2, ExcCantCompareIterators());
   Assert(this->dof_handler == a.dof_handler, ExcCantCompareIterators());
   return (BaseClass::operator==(a));
 }
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
 inline bool
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::
-operator!=(const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &a) const
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::operator!=(
+  const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &a) const
 {
-  Assert(structdim == dim2, ExcCantCompareIterators());
+  Assert(structdim == structdim2, ExcCantCompareIterators());
   Assert(this->dof_handler == a.dof_handler, ExcCantCompareIterators());
   return (BaseClass::operator!=(a));
 }
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
-inline TriaIterator<DoFAccessor<structdim, DoFHandlerType, level_dof_access>>
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::child(
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline TriaIterator<DoFAccessor<structdim, dim, spacedim, level_dof_access>>
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::child(
   const unsigned int i) const
 {
   Assert(static_cast<unsigned int>(this->present_level) <
            this->dof_handler->object_dof_indices.size(),
          ExcMessage("DoFHandler not initialized"));
 
-  TriaIterator<TriaAccessor<structdim,
-                            DoFHandlerType::dimension,
-                            DoFHandlerType::space_dimension>>
-    t = TriaAccessor<structdim,
-                     DoFHandlerType::dimension,
-                     DoFHandlerType::space_dimension>::child(i);
+  TriaIterator<TriaAccessor<structdim, dim, spacedim>> t =
+    TriaAccessor<structdim, dim, spacedim>::child(i);
 
-  TriaIterator<DoFAccessor<structdim, DoFHandlerType, level_dof_access>> q(
+  TriaIterator<DoFAccessor<structdim, dim, spacedim, level_dof_access>> q(
     *t, this->dof_handler);
   return q;
 }
@@ -215,12 +205,12 @@ namespace internal
      */
     struct Implementation
     {
-      template <typename DoFHandlerType>
+      template <int dim, int spacedim>
       static const types::global_dof_index *
-      get_cache_ptr(DoFHandlerType *   dof_handler,
-                    const unsigned int present_level,
-                    const unsigned int present_index,
-                    const unsigned int dofs_per_cell)
+      get_cache_ptr(DoFHandler<dim, spacedim> *dof_handler,
+                    const unsigned int         present_level,
+                    const unsigned int         present_index,
+                    const unsigned int         dofs_per_cell)
       {
         (void)dofs_per_cell;
 
@@ -237,23 +227,23 @@ namespace internal
        * finite element specified by @p fe_index on the vertex with global
        * number @p vertex_index to @p global_index.
        */
-      template <typename DoFHandlerType, int d>
+      template <int dim, int spacedim, int d>
       static void
-      set_dof_index(const DoFHandlerType &dof_handler,
-                    const unsigned int    obj_level,
-                    const unsigned int    obj_index,
-                    const unsigned int    fe_index,
-                    const unsigned int    local_index,
+      set_dof_index(const DoFHandler<dim, spacedim> &dof_handler,
+                    const unsigned int               obj_level,
+                    const unsigned int               obj_index,
+                    const unsigned int               fe_index,
+                    const unsigned int               local_index,
                     const std::integral_constant<int, d> &,
                     const types::global_dof_index global_index)
       {
-        Assert(d == DoFHandlerType::dimension || obj_level == 0,
-               ExcNotImplemented());
+        Assert(d == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
           {
-            AssertDimension(fe_index, DoFHandlerType::default_fe_index);
+            AssertDimension(fe_index,
+                            (DoFHandler<dim, spacedim>::default_fe_index));
 
             if (d == 0)
               dof_handler.object_dof_indices
@@ -269,7 +259,7 @@ namespace internal
           }
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == DoFHandlerType::dimension)
+        if (d == dim)
           {
             dof_handler.object_dof_indices
               [obj_level][d]
@@ -338,22 +328,22 @@ namespace internal
        * finite element specified by @p fe_index on the vertex with global
        * number @p vertex_index to @p global_index.
        */
-      template <typename DoFHandlerType, int d>
+      template <int dim, int spacedim, int d>
       static types::global_dof_index
-      get_dof_index(const DoFHandlerType &dof_handler,
-                    const unsigned int    obj_level,
-                    const unsigned int    obj_index,
-                    const unsigned int    fe_index,
-                    const unsigned int    local_index,
+      get_dof_index(const DoFHandler<dim, spacedim> &dof_handler,
+                    const unsigned int               obj_level,
+                    const unsigned int               obj_index,
+                    const unsigned int               fe_index,
+                    const unsigned int               local_index,
                     const std::integral_constant<int, d> &)
       {
-        Assert(d == DoFHandlerType::dimension || obj_level == 0,
-               ExcNotImplemented());
+        Assert(d == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
           {
-            AssertDimension(fe_index, DoFHandlerType::default_fe_index);
+            AssertDimension(fe_index,
+                            (DoFHandler<dim, spacedim>::default_fe_index));
 
             if (d == 0)
               return dof_handler.object_dof_indices
@@ -367,7 +357,7 @@ namespace internal
           }
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == DoFHandlerType::dimension)
+        if (d == dim)
           {
             return dof_handler.object_dof_indices
               [obj_level][d]
@@ -430,12 +420,12 @@ namespace internal
       }
 
 
-      template <typename DoFHandlerType>
+      template <int dim, int spacedim>
       static types::global_dof_index
-      mg_vertex_dof_index(const DoFHandlerType &dof_handler,
-                          const int             level,
-                          const unsigned int    vertex_index,
-                          const unsigned int    i)
+      mg_vertex_dof_index(const DoFHandler<dim, spacedim> &dof_handler,
+                          const int                        level,
+                          const unsigned int               vertex_index,
+                          const unsigned int               i)
       {
         Assert(dof_handler.hp_capability_enabled == false,
                ExcMessage(
@@ -447,13 +437,13 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <int dim, int spacedim>
       static void
-      set_mg_vertex_dof_index(DoFHandlerType &        dof_handler,
-                              const int               level,
-                              const unsigned int      vertex_index,
-                              const unsigned int      i,
-                              types::global_dof_index index)
+      set_mg_vertex_dof_index(DoFHandler<dim, spacedim> &dof_handler,
+                              const int                  level,
+                              const unsigned int         vertex_index,
+                              const unsigned int         i,
+                              types::global_dof_index    index)
       {
         Assert(dof_handler.hp_capability_enabled == false,
                ExcMessage(
@@ -468,24 +458,23 @@ namespace internal
        * Return the number of different finite elements that are active on a
        * given vertex.
        */
-      template <typename DoFHandlerType, int d>
+      template <int dim, int spacedim, int d>
       static unsigned int
-      n_active_fe_indices(const DoFHandlerType &dof_handler,
-                          const unsigned int    obj_level,
-                          const unsigned int    obj_index,
+      n_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
+                          const unsigned int               obj_level,
+                          const unsigned int               obj_index,
                           const std::integral_constant<int, d> &)
       {
         (void)obj_level;
 
-        Assert(d == DoFHandlerType::dimension || obj_level == 0,
-               ExcNotImplemented());
+        Assert(d == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
           return 1;
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == DoFHandlerType::dimension)
+        if (d == dim)
           return 1;
 
         // 3) general entity and hp is used
@@ -502,28 +491,28 @@ namespace internal
        * Return the fe index of the n-th finite element active on a given
        * vertex.
        */
-      template <typename DoFHandlerType, int d>
+      template <int dim, int spacedim, int d>
       static unsigned int
-      nth_active_fe_index(const DoFHandlerType &dof_handler,
-                          const unsigned int    obj_level,
-                          const unsigned int    obj_index,
-                          const unsigned int    local_index,
+      nth_active_fe_index(const DoFHandler<dim, spacedim> &dof_handler,
+                          const unsigned int               obj_level,
+                          const unsigned int               obj_index,
+                          const unsigned int               local_index,
                           const std::integral_constant<int, d> &)
       {
-        Assert(d == DoFHandlerType::dimension || obj_level == 0,
-               ExcNotImplemented());
+        Assert(d == dim || obj_level == 0, ExcNotImplemented());
 
         // for cells only one active fe index available
-        Assert(((d == DoFHandlerType::dimension) &&
-                (local_index != DoFHandlerType::default_fe_index)) == false,
+        Assert(((d == dim) &&
+                (local_index != DoFHandler<dim, spacedim>::default_fe_index)) ==
+                 false,
                ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
-          return DoFHandlerType::default_fe_index;
+          return DoFHandler<dim, spacedim>::default_fe_index;
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == DoFHandlerType::dimension)
+        if (d == dim)
           return dof_handler.hp_cell_active_fe_indices[obj_level][obj_index];
 
         // 3) general entity and hp is used
@@ -547,22 +536,21 @@ namespace internal
        * The size of the returned set equals the number of finite elements that
        * are active on this vertex.
        */
-      template <typename DoFHandlerType, int d>
+      template <int dim, int spacedim, int d>
       static std::set<unsigned int>
-      get_active_fe_indices(const DoFHandlerType &                dof_handler,
+      get_active_fe_indices(const DoFHandler<dim, spacedim> &     dof_handler,
                             const unsigned int                    obj_level,
                             const unsigned int                    obj_index,
                             const std::integral_constant<int, d> &t)
       {
-        Assert(d == DoFHandlerType::dimension || obj_level == 0,
-               ExcNotImplemented());
+        Assert(d == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
-          return {DoFHandlerType::default_fe_index};
+          return {DoFHandler<dim, spacedim>::default_fe_index};
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == DoFHandlerType::dimension)
+        if (d == dim)
           return {dof_handler.hp_cell_active_fe_indices[obj_level][obj_index]};
 
         // 3) general entity and hp is used
@@ -577,23 +565,22 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType, int d>
+      template <int dim, int spacedim, int d>
       static bool
-      fe_index_is_active(const DoFHandlerType &dof_handler,
-                         const unsigned int    obj_level,
-                         const unsigned int    obj_index,
-                         const unsigned int    fe_index,
+      fe_index_is_active(const DoFHandler<dim, spacedim> &dof_handler,
+                         const unsigned int               obj_level,
+                         const unsigned int               obj_index,
+                         const unsigned int               fe_index,
                          const std::integral_constant<int, d> &)
       {
-        Assert(d == DoFHandlerType::dimension || obj_level == 0,
-               ExcNotImplemented());
+        Assert(d == dim || obj_level == 0, ExcNotImplemented());
 
         // 1) no hp used -> fe_index == 0
         if (dof_handler.hp_capability_enabled == false)
-          return (fe_index == DoFHandlerType::default_fe_index);
+          return (fe_index == DoFHandler<dim, spacedim>::default_fe_index);
 
         // 2) cell and hp is used -> there is only one fe_index
-        if (d == DoFHandlerType::dimension)
+        if (d == dim)
           return dof_handler.hp_cell_active_fe_indices[obj_level][obj_index] ==
                  fe_index;
 
@@ -609,17 +596,15 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void
       set_mg_dof_indices(
-        const dealii::DoFAccessor<1, DoFHandlerType, level_dof_access>
-          &                                         accessor,
-        const int                                   level,
+        const dealii::DoFAccessor<1, dim, spacedim, level_dof_access> &accessor,
+        const int                                                      level,
         const std::vector<types::global_dof_index> &dof_indices,
         const unsigned int                          fe_index)
       {
-        const FiniteElement<DoFHandlerType::dimension,
-                            DoFHandlerType::space_dimension> &fe =
+        const FiniteElement<dim, spacedim> &fe =
           accessor.get_dof_handler().get_fe(fe_index);
         std::vector<types::global_dof_index>::const_iterator next =
           dof_indices.begin();
@@ -637,15 +622,14 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void set_mg_dof_indices(
-        dealii::DoFAccessor<2, DoFHandlerType, level_dof_access> &accessor,
-        const int                                                 level,
-        const std::vector<types::global_dof_index> &              dof_indices,
-        const unsigned int                                        fe_index)
+        dealii::DoFAccessor<2, dim, spacedim, level_dof_access> &accessor,
+        const int                                                level,
+        const std::vector<types::global_dof_index> &             dof_indices,
+        const unsigned int                                       fe_index)
       {
-        const FiniteElement<DoFHandlerType::dimension,
-                            DoFHandlerType::space_dimension> &fe =
+        const FiniteElement<dim, spacedim> &fe =
           accessor.get_dof_handler().get_fe(fe_index);
         std::vector<types::global_dof_index>::const_iterator next =
           dof_indices.begin();
@@ -668,17 +652,15 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void
       set_mg_dof_indices(
-        const dealii::DoFAccessor<3, DoFHandlerType, level_dof_access>
-          &                                         accessor,
-        const int                                   level,
+        const dealii::DoFAccessor<3, dim, spacedim, level_dof_access> &accessor,
+        const int                                                      level,
         const std::vector<types::global_dof_index> &dof_indices,
         const unsigned int                          fe_index)
       {
-        const FiniteElement<DoFHandlerType::dimension,
-                            DoFHandlerType::space_dimension> &fe =
+        const FiniteElement<dim, spacedim> &fe =
           accessor.get_dof_handler().get_fe(fe_index);
         std::vector<types::global_dof_index>::const_iterator next =
           dof_indices.begin();
@@ -813,14 +795,15 @@ namespace internal
        * provided @p accessor and @p fe_index and perform the static functions
        * provided by DoFOperation (set/get) on these.
        */
-      template <typename DoFHandlerType,
+      template <int  dim,
+                int  spacedim,
                 bool level_dof_access,
                 int  structdim,
                 typename DoFIndicesType,
                 typename DoFOperation>
       static void
       process_dof_indices(
-        const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+        const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
           &                accessor,
         DoFIndicesType &   dof_indices,
         const unsigned int fe_index,
@@ -902,7 +885,7 @@ namespace internal
        * An internal struct encapsulating the task of getting (vertex)
        * DoF indices.
        */
-      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      template <int dim, int spacedim, bool level_dof_access, int structdim>
       struct DoFIndexGetter
       {
         /**
@@ -910,7 +893,7 @@ namespace internal
          */
         static DEAL_II_ALWAYS_INLINE void
         process_vertex_dof(
-          const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+          const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
             &                      accessor,
           const unsigned int       vertex,
           const unsigned int       d,
@@ -925,12 +908,12 @@ namespace internal
          */
         template <int structdim_>
         static DEAL_II_ALWAYS_INLINE void
-        process_dof(const dealii::DoFAccessor<structdim_,
-                                              DoFHandlerType,
-                                              level_dof_access> &accessor,
-                    const unsigned int                           d,
-                    types::global_dof_index &                    index_value,
-                    const unsigned int                           fe_index)
+        process_dof(
+          const dealii::DoFAccessor<structdim_, dim, spacedim, level_dof_access>
+            &                      accessor,
+          const unsigned int       d,
+          types::global_dof_index &index_value,
+          const unsigned int       fe_index)
         {
           index_value = accessor.dof_index(d, fe_index);
         }
@@ -941,9 +924,7 @@ namespace internal
         template <int structdim_>
         static DEAL_II_ALWAYS_INLINE void
         process_dof(
-          const dealii::DoFInvalidAccessor<structdim_,
-                                           DoFHandlerType::dimension,
-                                           DoFHandlerType::space_dimension> &,
+          const dealii::DoFInvalidAccessor<structdim_, dim, spacedim> &,
           const unsigned int,
           types::global_dof_index &,
           const unsigned int)
@@ -958,7 +939,7 @@ namespace internal
        * An internal struct encapsulating the task of setting (vertex)
        * DoF indices.
        */
-      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      template <int dim, int spacedim, bool level_dof_access, int structdim>
       struct DoFIndexSetter
       {
         /**
@@ -966,7 +947,7 @@ namespace internal
          */
         static DEAL_II_ALWAYS_INLINE void
         process_vertex_dof(
-          const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+          const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
             &                            accessor,
           const unsigned int             vertex,
           const unsigned int             d,
@@ -981,12 +962,12 @@ namespace internal
          */
         template <int structdim_>
         static DEAL_II_ALWAYS_INLINE void
-        process_dof(const dealii::DoFAccessor<structdim_,
-                                              DoFHandlerType,
-                                              level_dof_access> &accessor,
-                    const unsigned int                           d,
-                    const types::global_dof_index &              index_value,
-                    const unsigned int                           fe_index)
+        process_dof(
+          const dealii::DoFAccessor<structdim_, dim, spacedim, level_dof_access>
+            &                            accessor,
+          const unsigned int             d,
+          const types::global_dof_index &index_value,
+          const unsigned int             fe_index)
         {
           accessor.set_dof_index(d, index_value, fe_index);
         }
@@ -997,9 +978,7 @@ namespace internal
         template <int structdim_>
         static DEAL_II_ALWAYS_INLINE void
         process_dof(
-          const dealii::DoFInvalidAccessor<structdim_,
-                                           DoFHandlerType::dimension,
-                                           DoFHandlerType::space_dimension> &,
+          const dealii::DoFInvalidAccessor<structdim_, dim, spacedim> &,
           const unsigned int,
           const types::global_dof_index &,
           const unsigned int)
@@ -1010,10 +989,10 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      template <int dim, int spacedim, bool level_dof_access, int structdim>
       static void
       get_dof_indices(
-        const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+        const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
           &                                   accessor,
         std::vector<types::global_dof_index> &dof_indices,
         const unsigned int                    fe_index)
@@ -1022,15 +1001,15 @@ namespace internal
           accessor,
           dof_indices,
           fe_index,
-          DoFIndexGetter<DoFHandlerType, level_dof_access, structdim>());
+          DoFIndexGetter<dim, spacedim, level_dof_access, structdim>());
       }
 
 
 
-      template <typename DoFHandlerType, bool level_dof_access, int structdim>
+      template <int dim, int spacedim, bool level_dof_access, int structdim>
       static void
       set_dof_indices(
-        const dealii::DoFAccessor<structdim, DoFHandlerType, level_dof_access>
+        const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
           &                                         accessor,
         const std::vector<types::global_dof_index> &dof_indices,
         const unsigned int                          fe_index)
@@ -1041,7 +1020,7 @@ namespace internal
         // internal::DoFHandlerImplementation::Policy::Implementation::distribute_dofs().
         // In the case of new use cases, this assert can be removed.
         Assert(
-          DoFHandlerType::dimension == structdim,
+          dim == structdim,
           ExcMessage(
             "This function is intended to be used for DoFCellAccessor, i.e., dimension == structdim."));
 
@@ -1049,7 +1028,7 @@ namespace internal
           accessor,
           dof_indices,
           fe_index,
-          DoFIndexSetter<DoFHandlerType, level_dof_access, structdim>());
+          DoFIndexSetter<dim, spacedim, level_dof_access, structdim>());
       }
     };
   } // namespace DoFAccessorImplementation
@@ -1057,16 +1036,16 @@ namespace internal
 
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline types::global_dof_index
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::dof_index(
   const unsigned int i,
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   // access the respective DoF
@@ -1076,13 +1055,13 @@ DoFAccessor<dim, DoFHandlerType, level_dof_access>::dof_index(
                   this->present_index,
                   fe_index,
                   i,
-                  std::integral_constant<int, dim>());
+                  std::integral_constant<int, structdim>());
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline types::global_dof_index
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::mg_dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::mg_dof_index(
   const int          level,
   const unsigned int i) const
 {
@@ -1091,17 +1070,17 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::mg_dof_index(
 }
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::set_dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_dof_index(
   const unsigned int            i,
   const types::global_dof_index index,
   const unsigned int            fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   // access the respective DoF
@@ -1111,29 +1090,30 @@ DoFAccessor<dim, DoFHandlerType, level_dof_access>::set_dof_index(
     this->present_index,
     fe_index,
     i,
-    std::integral_constant<int, dim>(),
+    std::integral_constant<int, structdim>(),
     index);
 }
 
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline unsigned int
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::n_active_fe_indices() const
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::n_active_fe_indices()
+  const
 {
   // access the respective DoF
   return dealii::internal::DoFAccessorImplementation::Implementation::
     n_active_fe_indices(*this->dof_handler,
                         this->level(),
                         this->present_index,
-                        std::integral_constant<int, dim>());
+                        std::integral_constant<int, structdim>());
 }
 
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline unsigned int
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::nth_active_fe_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::nth_active_fe_index(
   const unsigned int n) const
 {
   // access the respective DoF
@@ -1142,14 +1122,14 @@ DoFAccessor<dim, DoFHandlerType, level_dof_access>::nth_active_fe_index(
                         this->level(),
                         this->present_index,
                         n,
-                        std::integral_constant<int, dim>());
+                        std::integral_constant<int, structdim>());
 }
 
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline std::set<unsigned int>
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::get_active_fe_indices()
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_active_fe_indices()
   const
 {
   std::set<unsigned int> active_fe_indices;
@@ -1160,9 +1140,9 @@ DoFAccessor<dim, DoFHandlerType, level_dof_access>::get_active_fe_indices()
 
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline bool
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::fe_index_is_active(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::fe_index_is_active(
   const unsigned int fe_index) const
 {
   // access the respective DoF
@@ -1171,22 +1151,22 @@ DoFAccessor<dim, DoFHandlerType, level_dof_access>::fe_index_is_active(
                        this->level(),
                        this->present_index,
                        fe_index,
-                       std::integral_constant<int, dim>());
+                       std::integral_constant<int, structdim>());
 }
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline types::global_dof_index
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::vertex_dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::vertex_dof_index(
   const unsigned int vertex,
   const unsigned int i,
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   return dealii::internal::DoFAccessorImplementation::Implementation::
@@ -1199,9 +1179,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::vertex_dof_index(
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline types::global_dof_index
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::mg_vertex_dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::mg_vertex_dof_index(
   const int          level,
   const unsigned int vertex,
   const unsigned int i,
@@ -1209,8 +1189,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::mg_vertex_dof_index(
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
@@ -1225,9 +1205,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::mg_vertex_dof_index(
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_vertex_dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_vertex_dof_index(
   const unsigned int            vertex,
   const unsigned int            i,
   const types::global_dof_index index,
@@ -1235,8 +1215,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_vertex_dof_index(
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   dealii::internal::DoFAccessorImplementation::Implementation::set_dof_index(
@@ -1250,9 +1230,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_vertex_dof_index(
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::
   set_mg_vertex_dof_index(const int                     level,
                           const unsigned int            vertex,
                           const unsigned int            i,
@@ -1261,8 +1241,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
@@ -1277,9 +1257,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_mg_dof_index(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_index(
   const int                     level,
   const unsigned int            i,
   const types::global_dof_index index) const
@@ -1290,10 +1270,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_mg_dof_index(
 
 
 
-template <int dim, typename DoFHandlerType, bool level_dof_access>
-inline const FiniteElement<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &
-DoFAccessor<dim, DoFHandlerType, level_dof_access>::get_fe(
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline const FiniteElement<dim, spacedim> &
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_fe(
   const unsigned int fe_index) const
 {
   Assert(fe_index_is_active(fe_index) == true,
@@ -1308,19 +1287,17 @@ namespace internal
 {
   namespace DoFAccessorImplementation
   {
-    template <typename DoFHandlerType, bool level_dof_access>
+    template <int dim, int spacedim, bool level_dof_access>
     void
     get_mg_dof_indices(
-      const dealii::DoFAccessor<1, DoFHandlerType, level_dof_access> &accessor,
-      const int                                                       level,
+      const dealii::DoFAccessor<1, dim, spacedim, level_dof_access> &accessor,
+      const int                                                      level,
       std::vector<types::global_dof_index> &dof_indices,
       const unsigned int                    fe_index)
     {
-      const DoFHandlerType &handler = accessor.get_dof_handler();
+      const DoFHandler<dim, spacedim> &handler = accessor.get_dof_handler();
 
-      const FiniteElement<DoFHandlerType::dimension,
-                          DoFHandlerType::space_dimension> &fe =
-        handler.get_fe(fe_index);
+      const FiniteElement<dim, spacedim> &fe = handler.get_fe(fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
 
       for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
@@ -1335,19 +1312,17 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, bool level_dof_access>
+    template <int dim, int spacedim, bool level_dof_access>
     void
     get_mg_dof_indices(
-      const dealii::DoFAccessor<2, DoFHandlerType, level_dof_access> &accessor,
-      const int                                                       level,
+      const dealii::DoFAccessor<2, dim, spacedim, level_dof_access> &accessor,
+      const int                                                      level,
       std::vector<types::global_dof_index> &dof_indices,
       const unsigned int                    fe_index)
     {
-      const DoFHandlerType &handler = accessor.get_dof_handler();
+      const DoFHandler<dim, spacedim> &handler = accessor.get_dof_handler();
 
-      const FiniteElement<DoFHandlerType::dimension,
-                          DoFHandlerType::space_dimension> &fe =
-        handler.get_fe(fe_index);
+      const FiniteElement<dim, spacedim> &fe = handler.get_fe(fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
 
       for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
@@ -1367,19 +1342,17 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, bool level_dof_access>
+    template <int dim, int spacedim, bool level_dof_access>
     void
     get_mg_dof_indices(
-      const dealii::DoFAccessor<3, DoFHandlerType, level_dof_access> &accessor,
-      const int                                                       level,
+      const dealii::DoFAccessor<3, dim, spacedim, level_dof_access> &accessor,
+      const int                                                      level,
       std::vector<types::global_dof_index> &dof_indices,
       const unsigned int                    fe_index)
     {
-      const DoFHandlerType &handler = accessor.get_dof_handler();
+      const DoFHandler<dim, spacedim> &handler = accessor.get_dof_handler();
 
-      const FiniteElement<DoFHandlerType::dimension,
-                          DoFHandlerType::space_dimension> &fe =
-        handler.get_fe(fe_index);
+      const FiniteElement<dim, spacedim> &fe = handler.get_fe(fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin();
 
       for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
@@ -1418,9 +1391,9 @@ namespace internal
 } // namespace internal
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_indices(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int                    fe_index_) const
 {
@@ -1428,8 +1401,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_indices(
 
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   Assert(static_cast<unsigned int>(this->level()) <
@@ -1497,9 +1470,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_dof_indices(
 
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_mg_dof_indices(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
   const int                             level,
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int                    fe_index_) const
@@ -1508,8 +1481,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_mg_dof_indices(
 
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   switch (structdim)
@@ -1561,9 +1534,9 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::get_mg_dof_indices(
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_mg_dof_indices(
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
   const int                                   level,
   const std::vector<types::global_dof_index> &dof_indices,
   const unsigned int                          fe_index_)
@@ -1572,8 +1545,8 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_mg_dof_indices(
 
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   switch (structdim)
@@ -1623,10 +1596,10 @@ DoFAccessor<structdim, DoFHandlerType, level_dof_access>::set_mg_dof_indices(
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandlerType, level_dof_access>::line_iterator
-  DoFAccessor<structdim, DoFHandlerType, level_dof_access>::line(
+  Iterators<DoFHandler<dim, spacedim>, level_dof_access>::line_iterator
+  DoFAccessor<structdim, dim, spacedim, level_dof_access>::line(
     const unsigned int i) const
 {
   // if we are asking for a particular line and this object refers to
@@ -1638,7 +1611,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
              ExcMessage("You can only ask for line zero if the "
                         "current object is a line itself."));
       return typename dealii::internal::DoFHandlerImplementation::Iterators<
-        DoFHandlerType,
+        DoFHandler<dim, spacedim>,
         level_dof_access>::cell_iterator(&this->get_triangulation(),
                                          this->level(),
                                          this->index(),
@@ -1647,12 +1620,11 @@ inline typename dealii::internal::DoFHandlerImplementation::
 
   // otherwise we need to be in structdim>=2
   Assert(structdim > 1, ExcImpossibleInDim(structdim));
-  Assert(DoFHandlerType::dimension > 1,
-         ExcImpossibleInDim(DoFHandlerType::dimension));
+  Assert(dim > 1, ExcImpossibleInDim(dim));
 
   // checking of 'i' happens in line_index(i)
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandlerType, level_dof_access>::line_iterator(
+    Iterators<DoFHandler<dim, spacedim>, level_dof_access>::line_iterator(
       this->tria,
       0, // only sub-objects are allowed, which have no level
       this->line_index(i),
@@ -1660,10 +1632,10 @@ inline typename dealii::internal::DoFHandlerImplementation::
 }
 
 
-template <int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandlerType, level_dof_access>::quad_iterator
-  DoFAccessor<structdim, DoFHandlerType, level_dof_access>::quad(
+  Iterators<DoFHandler<dim, spacedim>, level_dof_access>::quad_iterator
+  DoFAccessor<structdim, dim, spacedim, level_dof_access>::quad(
     const unsigned int i) const
 {
   // if we are asking for a
@@ -1677,20 +1649,19 @@ inline typename dealii::internal::DoFHandlerImplementation::
              ExcMessage("You can only ask for quad zero if the "
                         "current object is a quad itself."));
       return typename dealii::internal::DoFHandlerImplementation::Iterators<
-        DoFHandlerType>::cell_iterator(&this->get_triangulation(),
-                                       this->level(),
-                                       this->index(),
-                                       &this->get_dof_handler());
+        DoFHandler<dim, spacedim>>::cell_iterator(&this->get_triangulation(),
+                                                  this->level(),
+                                                  this->index(),
+                                                  &this->get_dof_handler());
     }
 
   // otherwise we need to be in structdim>=3
   Assert(structdim > 2, ExcImpossibleInDim(structdim));
-  Assert(DoFHandlerType::dimension > 2,
-         ExcImpossibleInDim(DoFHandlerType::dimension));
+  Assert(dim > 2, ExcImpossibleInDim(dim));
 
   // checking of 'i' happens in quad_index(i)
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandlerType, level_dof_access>::quad_iterator(
+    Iterators<DoFHandler<dim, spacedim>, level_dof_access>::quad_iterator(
       this->tria,
       0, // only sub-objects are allowed, which have no level
       this->quad_index(i),
@@ -1701,40 +1672,32 @@ inline typename dealii::internal::DoFHandlerImplementation::
 /*----------------- Functions: DoFAccessor<0,1,spacedim> --------------------*/
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  DoFAccessor()
+template <int spacedim, bool level_dof_access>
+inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor()
 {
   Assert(false, ExcInvalidObject());
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  DoFAccessor(
-    const Triangulation<1, spacedim> *                      tria,
-    const typename TriaAccessor<0, 1, spacedim>::VertexKind vertex_kind,
-    const unsigned int                                      vertex_index,
-    const DoFHandlerType<1, spacedim> *                     dof_handler)
+template <int spacedim, bool level_dof_access>
+inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
+  const Triangulation<1, spacedim> *                      tria,
+  const typename TriaAccessor<0, 1, spacedim>::VertexKind vertex_kind,
+  const unsigned int                                      vertex_index,
+  const DoFHandler<1, spacedim> *                         dof_handler)
   : BaseClass(tria, vertex_kind, vertex_index)
-  , dof_handler(const_cast<DoFHandlerType<1, spacedim> *>(dof_handler))
+  , dof_handler(const_cast<DoFHandler<1, spacedim> *>(dof_handler))
 {}
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  DoFAccessor(const Triangulation<1, spacedim> *,
-              const int,
-              const int,
-              const DoFHandlerType<1, spacedim> *)
+template <int spacedim, bool level_dof_access>
+inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
+  const Triangulation<1, spacedim> *,
+  const int,
+  const int,
+  const DoFHandler<1, spacedim> *)
   : dof_handler(nullptr)
 {
   Assert(false,
@@ -1744,11 +1707,9 @@ inline DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 template <int structdim2, int dim2, int spacedim2>
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::DoFAccessor(
+DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
   const InvalidAccessor<structdim2, dim2, spacedim2> &)
 {
   Assert(false, ExcInvalidObject());
@@ -1756,23 +1717,19 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::DoFAccessor(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-inline DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  DoFAccessor(const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &)
+template <int spacedim, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
+inline DoFAccessor<0, 1, spacedim, level_dof_access>::DoFAccessor(
+  const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &)
 {
   Assert(false, ExcInvalidObject());
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline void DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  set_dof_handler(DoFHandlerType<1, spacedim> *dh)
+template <int spacedim, bool level_dof_access>
+inline void DoFAccessor<0, 1, spacedim, level_dof_access>::set_dof_handler(
+  DoFHandler<1, spacedim> *dh)
 {
   Assert(dh != nullptr, ExcInvalidObject());
   this->dof_handler = dh;
@@ -1780,11 +1737,9 @@ inline void DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::set_dof_index(
+DoFAccessor<0, 1, spacedim, level_dof_access>::set_dof_index(
   const unsigned int /*i*/,
   const types::global_dof_index /*index*/,
   const unsigned int /*fe_index*/) const
@@ -1794,45 +1749,38 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::set_dof_index(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  set_vertex_dof_index(const unsigned int /*vertex*/,
-                       const unsigned int /*i*/,
-                       const types::global_dof_index /*index*/,
-                       const unsigned int /*fe_index*/) const
+DoFAccessor<0, 1, spacedim, level_dof_access>::set_vertex_dof_index(
+  const unsigned int /*vertex*/,
+  const unsigned int /*i*/,
+  const types::global_dof_index /*index*/,
+  const unsigned int /*fe_index*/) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline const DoFHandlerType<1, spacedim> &
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::get_dof_handler()
-  const
+template <int spacedim, bool level_dof_access>
+inline const DoFHandler<1, spacedim> &
+DoFAccessor<0, 1, spacedim, level_dof_access>::get_dof_handler() const
 {
   return *this->dof_handler;
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::get_dof_indices(
+DoFAccessor<0, 1, spacedim, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int                    fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType<1, spacedim>::invalid_fe_index) ?
-      DoFHandlerType<1, spacedim>::default_fe_index :
+     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
+      DoFHandler<1, spacedim>::default_fe_index :
       fe_index_;
 
   for (unsigned int i = 0; i < dof_indices.size(); ++i)
@@ -1847,22 +1795,20 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::get_dof_indices(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  get_mg_dof_indices(const int                             level,
-                     std::vector<types::global_dof_index> &dof_indices,
-                     const unsigned int                    fe_index_) const
+DoFAccessor<0, 1, spacedim, level_dof_access>::get_mg_dof_indices(
+  const int                             level,
+  std::vector<types::global_dof_index> &dof_indices,
+  const unsigned int                    fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType<1, spacedim>::invalid_fe_index) ?
-      DoFHandlerType<1, spacedim>::default_fe_index :
+     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
+      DoFHandler<1, spacedim>::default_fe_index :
       fe_index_;
   (void)fe_index;
-  AssertDimension(fe_index, (DoFHandlerType<1, spacedim>::default_fe_index));
+  AssertDimension(fe_index, (DoFHandler<1, spacedim>::default_fe_index));
 
   for (unsigned int i = 0; i < dof_indices.size(); ++i)
     dof_indices[i] =
@@ -1872,19 +1818,17 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline types::global_dof_index
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::vertex_dof_index(
+DoFAccessor<0, 1, spacedim, level_dof_access>::vertex_dof_index(
   const unsigned int vertex,
   const unsigned int i,
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType<1, spacedim>::invalid_fe_index) ?
-      DoFHandlerType<1, spacedim>::default_fe_index :
+     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
+      DoFHandler<1, spacedim>::default_fe_index :
       fe_index_;
 
   (void)vertex;
@@ -1900,18 +1844,16 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::vertex_dof_index(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline types::global_dof_index
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::dof_index(
+DoFAccessor<0, 1, spacedim, level_dof_access>::dof_index(
   const unsigned int i,
   const unsigned int fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType<1, spacedim>::invalid_fe_index) ?
-      DoFHandlerType<1, spacedim>::default_fe_index :
+     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
+      DoFHandler<1, spacedim>::default_fe_index :
       fe_index_;
 
   return dealii::internal::DoFAccessorImplementation::Implementation::
@@ -1925,14 +1867,11 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::dof_index(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline unsigned int
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  n_active_fe_indices() const
+DoFAccessor<0, 1, spacedim, level_dof_access>::n_active_fe_indices() const
 {
-  Assert((std::is_same<DoFHandlerType<1, spacedim>,
+  Assert((std::is_same<DoFHandler<1, spacedim>,
                        dealii::DoFHandler<1, spacedim>>::value == true),
          ExcNotImplemented());
 
@@ -1941,14 +1880,12 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline unsigned int
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  nth_active_fe_index(const unsigned int /*n*/) const
+DoFAccessor<0, 1, spacedim, level_dof_access>::nth_active_fe_index(
+  const unsigned int /*n*/) const
 {
-  Assert((std::is_same<DoFHandlerType<1, spacedim>,
+  Assert((std::is_same<DoFHandler<1, spacedim>,
                        dealii::DoFHandler<1, spacedim>>::value == true),
          ExcNotImplemented());
 
@@ -1957,12 +1894,10 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline bool
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-  fe_index_is_active(const unsigned int /*fe_index*/) const
+DoFAccessor<0, 1, spacedim, level_dof_access>::fe_index_is_active(
+  const unsigned int /*fe_index*/) const
 {
   Assert(false, ExcNotImplemented());
   return false;
@@ -1970,12 +1905,9 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline const FiniteElement<DoFHandlerType<1, spacedim>::dimension,
-                           DoFHandlerType<1, spacedim>::space_dimension> &
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::get_fe(
+template <int spacedim, bool level_dof_access>
+inline const FiniteElement<1, spacedim> &
+DoFAccessor<0, 1, spacedim, level_dof_access>::get_fe(
   const unsigned int fe_index) const
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
@@ -1984,11 +1916,9 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::get_fe(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline void
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::copy_from(
+DoFAccessor<0, 1, spacedim, level_dof_access>::copy_from(
   const TriaAccessorBase<0, 1, spacedim> &da)
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
@@ -1997,13 +1927,11 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::copy_from(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 template <bool level_dof_access2>
 inline void
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::copy_from(
-  const DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access2> &a)
+DoFAccessor<0, 1, spacedim, level_dof_access>::copy_from(
+  const DoFAccessor<0, 1, spacedim, level_dof_access2> &a)
 {
   BaseClass::copy_from(a);
   set_dof_handler(a.dof_handler);
@@ -2011,74 +1939,62 @@ DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::copy_from(
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-inline TriaIterator<
-  DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>>
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::child(
+template <int spacedim, bool level_dof_access>
+inline TriaIterator<DoFAccessor<0, 1, spacedim, level_dof_access>>
+DoFAccessor<0, 1, spacedim, level_dof_access>::child(
   const unsigned int /*i*/) const
 {
-  return TriaIterator<
-    DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>>();
+  return TriaIterator<DoFAccessor<0, 1, spacedim, level_dof_access>>();
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandlerType<1, spacedim>, level_dof_access>::line_iterator
-  DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::line(
+  Iterators<DoFHandler<1, spacedim>, level_dof_access>::line_iterator
+  DoFAccessor<0, 1, spacedim, level_dof_access>::line(
     const unsigned int /*c*/) const
 {
   Assert(false, ExcNotImplemented());
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandlerType<1, spacedim>, level_dof_access>::line_iterator();
+    Iterators<DoFHandler<1, spacedim>, level_dof_access>::line_iterator();
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
+template <int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandlerType<1, spacedim>, level_dof_access>::quad_iterator
-  DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::quad(
+  Iterators<DoFHandler<1, spacedim>, level_dof_access>::quad_iterator
+  DoFAccessor<0, 1, spacedim, level_dof_access>::quad(
     const unsigned int /*c*/) const
 {
   Assert(false, ExcNotImplemented());
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandlerType<1, spacedim>, level_dof_access>::quad_iterator();
+    Iterators<DoFHandler<1, spacedim>, level_dof_access>::quad_iterator();
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+template <int spacedim, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
 inline bool
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-operator==(const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &a) const
+DoFAccessor<0, 1, spacedim, level_dof_access>::operator==(
+  const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &a) const
 {
-  Assert(dim2 == 0, ExcCantCompareIterators());
+  Assert(structdim2 == 0, ExcCantCompareIterators());
   Assert(this->dof_handler == a.dof_handler, ExcCantCompareIterators());
   return (BaseClass::operator==(a));
 }
 
 
 
-template <template <int, int> class DoFHandlerType,
-          int  spacedim,
-          bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
+template <int spacedim, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
 inline bool
-DoFAccessor<0, DoFHandlerType<1, spacedim>, level_dof_access>::
-operator!=(const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &a) const
+DoFAccessor<0, 1, spacedim, level_dof_access>::operator!=(
+  const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &a) const
 {
-  Assert(dim2 == 0, ExcCantCompareIterators());
+  Assert(structdim2 == 0, ExcCantCompareIterators());
   Assert(this->dof_handler == a.dof_handler, ExcCantCompareIterators());
   return (BaseClass::operator!=(a));
 }
@@ -2108,10 +2024,10 @@ namespace internal
       /**
        * Implement the updating of the cache.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void
       update_cell_dof_indices_cache(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         // caches are only for cells with DoFs, i.e., for active ones and not
         // FE_Nothing
@@ -2126,9 +2042,9 @@ namespace internal
         // corresponding function of DoFCellAccessor can then later use the
         // cache
         std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-        static_cast<const dealii::DoFAccessor<DoFHandlerType::dimension,
-                                              DoFHandlerType,
-                                              level_dof_access> &>(accessor)
+        static_cast<
+          const dealii::DoFAccessor<dim, dim, spacedim, level_dof_access> &>(
+          accessor)
           .get_dof_indices(dof_indices, accessor.active_fe_index());
 
         types::global_dof_index *next_dof_index =
@@ -2149,10 +2065,10 @@ namespace internal
        * Do what the active_fe_index function in the parent class is supposed to
        * do.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static unsigned int
       active_fe_index(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           return 0; // ::DoFHandler only supports a single active fe with index
@@ -2175,16 +2091,16 @@ namespace internal
        * Do what the set_active_fe_index function in the parent class is
        * supposed to do.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void
       set_active_fe_index(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor,
-        const unsigned int                                       i)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor,
+        const unsigned int                                      i)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           {
             // ::DoFHandler only supports a single active fe with index zero
-            AssertDimension(i, DoFHandlerType::default_fe_index);
+            AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
             return;
           }
 
@@ -2206,15 +2122,16 @@ namespace internal
        * Do what the future_fe_index function in the parent class is supposed to
        * do.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static unsigned int
       future_fe_index(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return DoFHandlerType::default_fe_index; // ::DoFHandler only supports
-                                                   // a single active fe with
-                                                   // index zero
+          return DoFHandler<dim, spacedim>::
+            default_fe_index; // ::DoFHandler only supports
+                              // a single active fe with
+                              // index zero
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2238,16 +2155,16 @@ namespace internal
        * Do what the set_future_fe_index function in the parent class is
        * supposed to do.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void
       set_future_fe_index(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor,
-        const unsigned int                                       i)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor,
+        const unsigned int                                      i)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           {
             // ::DoFHandler only supports a single active fe with index zero
-            AssertDimension(i, DoFHandlerType::default_fe_index);
+            AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
             return;
           }
 
@@ -2269,10 +2186,10 @@ namespace internal
        * Do what the future_fe_index_set function in the parent class is
        * supposed to do.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static bool
       future_fe_index_set(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           return false; // ::DoFHandler only supports a single active fe with
@@ -2288,7 +2205,7 @@ namespace internal
         return accessor.dof_handler
                  ->hp_cell_future_fe_indices[accessor.level()]
                                             [accessor.present_index] !=
-               DoFHandlerType::invalid_active_fe_index;
+               DoFHandler<dim, spacedim>::invalid_active_fe_index;
       }
 
 
@@ -2297,10 +2214,10 @@ namespace internal
        * Do what the clear_fe_index function in the parent class is supposed to
        * do.
        */
-      template <typename DoFHandlerType, bool level_dof_access>
+      template <int dim, int spacedim, bool level_dof_access>
       static void
       clear_future_fe_index(
-        const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor)
+        const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           return; // ::DoFHandler only supports a single active fe with index
@@ -2328,14 +2245,13 @@ namespace internal
 } // namespace internal
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline DoFCellAccessor<DoFHandlerType, level_dof_access>::DoFCellAccessor(
-  const Triangulation<DoFHandlerType::dimension,
-                      DoFHandlerType::space_dimension> *tria,
-  const int                                             level,
-  const int                                             index,
-  const AccessorData *                                  local_data)
-  : DoFAccessor<DoFHandlerType::dimension, DoFHandlerType, level_dof_access>(
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  DoFCellAccessor(const Triangulation<dimension_, space_dimension_> *tria,
+                  const int                                          level,
+                  const int                                          index,
+                  const AccessorData *                               local_data)
+  : DoFAccessor<dimension_, dimension_, space_dimension_, level_dof_access>(
       tria,
       level,
       index,
@@ -2343,34 +2259,36 @@ inline DoFCellAccessor<DoFHandlerType, level_dof_access>::DoFCellAccessor(
 {}
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <int structdim2, int dim2, int spacedim2>
-inline DoFCellAccessor<DoFHandlerType, level_dof_access>::DoFCellAccessor(
-  const InvalidAccessor<structdim2, dim2, spacedim2> &)
+inline DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  DoFCellAccessor(const InvalidAccessor<structdim2, dim2, spacedim2> &)
 {
   Assert(false, typename BaseClass::ExcInvalidObject());
 }
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-inline DoFCellAccessor<DoFHandlerType, level_dof_access>::DoFCellAccessor(
-  const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &other)
+template <int dimension_, int space_dimension_, bool level_dof_access>
+template <int structdim2, int dim2, int spacedim2, bool level_dof_access2>
+inline DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  DoFCellAccessor(
+    const DoFAccessor<structdim2, dim2, spacedim2, level_dof_access2> &other)
   : BaseClass(other)
 {}
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>>
-DoFCellAccessor<DoFHandlerType, level_dof_access>::neighbor(
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline TriaIterator<
+  DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::neighbor(
   const unsigned int i) const
 {
-  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>> q(
-    this->tria,
-    this->neighbor_level(i),
-    this->neighbor_index(i),
-    this->dof_handler);
+  TriaIterator<DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
+    q(this->tria,
+      this->neighbor_level(i),
+      this->neighbor_index(i),
+      this->dof_handler);
 
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -2380,13 +2298,14 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::neighbor(
 }
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>>
-DoFCellAccessor<DoFHandlerType, level_dof_access>::child(
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline TriaIterator<
+  DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::child(
   const unsigned int i) const
 {
-  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>> q(
-    this->tria, this->level() + 1, this->child_index(i), this->dof_handler);
+  TriaIterator<DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
+    q(this->tria, this->level() + 1, this->child_index(i), this->dof_handler);
 
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -2396,12 +2315,13 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::child(
 }
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>>
-DoFCellAccessor<DoFHandlerType, level_dof_access>::parent() const
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline TriaIterator<
+  DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::parent() const
 {
-  TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>> q(
-    this->tria, this->level() - 1, this->parent_index(), this->dof_handler);
+  TriaIterator<DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
+    q(this->tria, this->level() - 1, this->parent_index(), this->dof_handler);
 
   return q;
 }
@@ -2411,52 +2331,46 @@ namespace internal
 {
   namespace DoFCellAccessorImplementation
   {
-    template <typename DoFHandlerType, bool level_dof_access>
-    inline TriaIterator<dealii::DoFAccessor<DoFHandlerType::dimension - 1,
-                                            DoFHandlerType,
-                                            level_dof_access>>
+    template <int dim, int spacedim, bool level_dof_access>
+    inline TriaIterator<
+      dealii::DoFAccessor<dim - 1, dim, spacedim, level_dof_access>>
     get_face(
-      const dealii::DoFCellAccessor<DoFHandlerType, level_dof_access> &cell,
-      const unsigned int                                               i,
+      const dealii::DoFCellAccessor<dim, spacedim, level_dof_access> &cell,
+      const unsigned int                                              i,
       const std::integral_constant<int, 1>)
     {
-      dealii::DoFAccessor<0, DoFHandlerType, level_dof_access> a(
+      dealii::DoFAccessor<0, dim, spacedim, level_dof_access> a(
         &cell.get_triangulation(),
         ((i == 0) && cell.at_boundary(0) ?
-           dealii::TriaAccessor<0, 1, DoFHandlerType::space_dimension>::
-             left_vertex :
+           dealii::TriaAccessor<0, 1, spacedim>::left_vertex :
            ((i == 1) && cell.at_boundary(1) ?
-              dealii::TriaAccessor<0, 1, DoFHandlerType::space_dimension>::
-                right_vertex :
-              dealii::TriaAccessor<0, 1, DoFHandlerType::space_dimension>::
-                interior_vertex)),
+              dealii::TriaAccessor<0, 1, spacedim>::right_vertex :
+              dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
         cell.vertex_index(i),
         &cell.get_dof_handler());
       return dealii::TriaIterator<
-        dealii::DoFAccessor<0, DoFHandlerType, level_dof_access>>(a);
+        dealii::DoFAccessor<0, dim, spacedim, level_dof_access>>(a);
     }
 
 
-    template <typename DoFHandlerType, bool level_dof_access>
-    inline TriaIterator<dealii::DoFAccessor<DoFHandlerType::dimension - 1,
-                                            DoFHandlerType,
-                                            level_dof_access>>
+    template <int dim, int spacedim, bool level_dof_access>
+    inline TriaIterator<
+      dealii::DoFAccessor<dim - 1, dim, spacedim, level_dof_access>>
     get_face(
-      const dealii::DoFCellAccessor<DoFHandlerType, level_dof_access> &cell,
-      const unsigned int                                               i,
+      const dealii::DoFCellAccessor<dim, spacedim, level_dof_access> &cell,
+      const unsigned int                                              i,
       const std::integral_constant<int, 2>)
     {
       return cell.line(i);
     }
 
 
-    template <typename DoFHandlerType, bool level_dof_access>
-    inline TriaIterator<dealii::DoFAccessor<DoFHandlerType::dimension - 1,
-                                            DoFHandlerType,
-                                            level_dof_access>>
+    template <int dim, int spacedim, bool level_dof_access>
+    inline TriaIterator<
+      dealii::DoFAccessor<dim - 1, dim, spacedim, level_dof_access>>
     get_face(
-      const dealii::DoFCellAccessor<DoFHandlerType, level_dof_access> &cell,
-      const unsigned int                                               i,
+      const dealii::DoFCellAccessor<dim, spacedim, level_dof_access> &cell,
+      const unsigned int                                              i,
       const std::integral_constant<int, 3>)
     {
       return cell.quad(i);
@@ -2465,46 +2379,49 @@ namespace internal
 } // namespace internal
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline typename DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterator
-DoFCellAccessor<DoFHandlerType, level_dof_access>::face(
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline typename DoFCellAccessor<dimension_,
+                                space_dimension_,
+                                level_dof_access>::face_iterator
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::face(
   const unsigned int i) const
 {
-  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i, GeometryInfo<dimension_>::faces_per_cell);
 
-  const unsigned int dim = DoFHandlerType::dimension;
   return dealii::internal::DoFCellAccessorImplementation::get_face(
-    *this, i, std::integral_constant<int, dim>());
+    *this, i, std::integral_constant<int, dimension_>());
 }
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline std::array<
-  typename DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterator,
-  GeometryInfo<DoFHandlerType::dimension>::faces_per_cell>
-DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterators() const
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline std::array<typename DoFCellAccessor<dimension_,
+                                           space_dimension_,
+                                           level_dof_access>::face_iterator,
+                  GeometryInfo<dimension_>::faces_per_cell>
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  face_iterators() const
 {
-  std::array<
-    typename DoFCellAccessor<DoFHandlerType, level_dof_access>::face_iterator,
-    GeometryInfo<dim>::faces_per_cell>
+  std::array<typename DoFCellAccessor<dimension_,
+                                      space_dimension_,
+                                      level_dof_access>::face_iterator,
+             GeometryInfo<dimension_>::faces_per_cell>
     face_iterators;
 
-  const unsigned int dim = DoFHandlerType::dimension;
-  for (unsigned int i : GeometryInfo<dim>::face_indices())
+  for (unsigned int i : GeometryInfo<dimension_>::face_indices())
     face_iterators[i] =
       dealii::internal::DoFCellAccessorImplementation::get_face(
-        *this, i, std::integral_constant<int, dim>());
+        *this, i, std::integral_constant<int, dimension_>());
 
   return face_iterators;
 }
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_indices(
-  std::vector<types::global_dof_index> &dof_indices) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  get_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
 {
   Assert(this->is_active(),
          ExcMessage("get_dof_indices() only works on active cells."));
@@ -2528,32 +2445,33 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_indices(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_mg_dof_indices(
-  std::vector<types::global_dof_index> &dof_indices) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  get_mg_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
 {
-  DoFAccessor<dim, DoFHandlerType, level_dof_access>::get_mg_dof_indices(
-    this->level(), dof_indices);
+  DoFAccessor<dimension_, dimension_, space_dimension_, level_dof_access>::
+    get_mg_dof_indices(this->level(), dof_indices);
 }
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::set_mg_dof_indices(
-  const std::vector<types::global_dof_index> &dof_indices)
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  set_mg_dof_indices(const std::vector<types::global_dof_index> &dof_indices)
 {
-  DoFAccessor<dim, DoFHandlerType, level_dof_access>::set_mg_dof_indices(
-    this->level(), dof_indices);
+  DoFAccessor<dimension_, dimension_, space_dimension_, level_dof_access>::
+    set_mg_dof_indices(this->level(), dof_indices);
 }
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_active_or_mg_dof_indices(
-  std::vector<types::global_dof_index> &dof_indices) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  get_active_or_mg_dof_indices(
+    std::vector<types::global_dof_index> &dof_indices) const
 {
   if (level_dof_access)
     get_mg_dof_indices(dof_indices);
@@ -2563,10 +2481,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_active_or_mg_dof_indices(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <class InputVector, typename number>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
   const InputVector &values,
   Vector<number> &   local_values) const
 {
@@ -2575,10 +2493,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <class InputVector, typename ForwardIterator>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
   const InputVector &values,
   ForwardIterator    local_values_begin,
   ForwardIterator    local_values_end) const
@@ -2610,10 +2528,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <class InputVector, typename ForwardIterator>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
   const AffineConstraints<typename InputVector::value_type> &constraints,
   const InputVector &                                        values,
   ForwardIterator                                            local_values_begin,
@@ -2645,10 +2563,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <class OutputVector, typename number>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::set_dof_values(
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::set_dof_values(
   const Vector<number> &local_values,
   OutputVector &        values) const
 {
@@ -2677,10 +2595,9 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_dof_values(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline const FiniteElement<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_fe() const
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline const FiniteElement<dimension_, space_dimension_> &
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_fe() const
 {
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
   Assert((this->dof_handler->hp_capability_enabled == false) ||
@@ -2695,9 +2612,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_fe() const
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline unsigned int
-DoFCellAccessor<DoFHandlerType, level_dof_access>::active_fe_index() const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  active_fe_index() const
 {
   Assert((this->dof_handler->hp_capability_enabled == false) ||
            this->is_active(),
@@ -2718,10 +2636,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::active_fe_index() const
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::set_active_fe_index(
-  const unsigned int i) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  set_active_fe_index(const unsigned int i) const
 {
   Assert((this->dof_handler->hp_capability_enabled == false) ||
            this->is_active(),
@@ -2743,10 +2661,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_active_fe_index(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
-inline const FiniteElement<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &
-DoFCellAccessor<DoFHandlerType, level_dof_access>::get_future_fe() const
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline const FiniteElement<dimension_, space_dimension_> &
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_future_fe()
+  const
 {
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
   Assert((this->dof_handler->hp_capability_enabled == false) ||
@@ -2761,9 +2679,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::get_future_fe() const
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline unsigned int
-DoFCellAccessor<DoFHandlerType, level_dof_access>::future_fe_index() const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  future_fe_index() const
 {
   Assert((this->dof_handler->hp_capability_enabled == false) ||
            (this->has_children() == false),
@@ -2783,10 +2702,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::future_fe_index() const
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::set_future_fe_index(
-  const unsigned int i) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  set_future_fe_index(const unsigned int i) const
 {
   Assert((this->dof_handler->hp_capability_enabled == false) ||
            (this->has_children() == false),
@@ -2805,9 +2724,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_future_fe_index(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline bool
-DoFCellAccessor<DoFHandlerType, level_dof_access>::future_fe_index_set() const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  future_fe_index_set() const
 {
   Assert((this->dof_handler->hp_capability_enabled == false) ||
            (this->has_children() == false),
@@ -2827,9 +2747,10 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::future_fe_index_set() const
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::clear_future_fe_index() const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  clear_future_fe_index() const
 {
   Assert((this->dof_handler->hp_capability_enabled == false) ||
            (this->has_children() == false),
@@ -2849,12 +2770,12 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::clear_future_fe_index() const
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <typename number, typename OutputVector>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
-  const Vector<number> &local_source,
-  OutputVector &        global_destination) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  distribute_local_to_global(const Vector<number> &local_source,
+                             OutputVector &        global_destination) const
 {
   this->distribute_local_to_global(local_source.begin(),
                                    local_source.end(),
@@ -2863,13 +2784,13 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <typename ForwardIterator, typename OutputVector>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
-  ForwardIterator local_source_begin,
-  ForwardIterator local_source_end,
-  OutputVector &  global_destination) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  distribute_local_to_global(ForwardIterator local_source_begin,
+                             ForwardIterator local_source_end,
+                             OutputVector &  global_destination) const
 {
   Assert(this->dof_handler != nullptr,
          (typename std::decay<decltype(*this)>::type::ExcInvalidObject()));
@@ -2893,14 +2814,15 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <typename ForwardIterator, typename OutputVector>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
-  const AffineConstraints<typename OutputVector::value_type> &constraints,
-  ForwardIterator local_source_begin,
-  ForwardIterator local_source_end,
-  OutputVector &  global_destination) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  distribute_local_to_global(
+    const AffineConstraints<typename OutputVector::value_type> &constraints,
+    ForwardIterator local_source_begin,
+    ForwardIterator local_source_end,
+    OutputVector &  global_destination) const
 {
   Assert(this->dof_handler != nullptr,
          (typename std::decay<decltype(*this)>::type::ExcInvalidObject()));
@@ -2926,12 +2848,12 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <typename number, typename OutputMatrix>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
-  const FullMatrix<number> &local_source,
-  OutputMatrix &            global_destination) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  distribute_local_to_global(const FullMatrix<number> &local_source,
+                             OutputMatrix &            global_destination) const
 {
   Assert(this->dof_handler != nullptr,
          (typename std::decay<decltype(*this)>::type::ExcInvalidObject()));
@@ -2959,14 +2881,14 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
 
 
 
-template <typename DoFHandlerType, bool level_dof_access>
+template <int dimension_, int space_dimension_, bool level_dof_access>
 template <typename number, typename OutputMatrix, typename OutputVector>
 inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
-  const FullMatrix<number> &local_matrix,
-  const Vector<number> &    local_vector,
-  OutputMatrix &            global_matrix,
-  OutputVector &            global_vector) const
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  distribute_local_to_global(const FullMatrix<number> &local_matrix,
+                             const Vector<number> &    local_vector,
+                             OutputMatrix &            global_matrix,
+                             OutputVector &            global_vector) const
 {
   Assert(this->dof_handler != nullptr,
          (typename std::decay<decltype(*this)>::type::ExcInvalidObject()));

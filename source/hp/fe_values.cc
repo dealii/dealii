@@ -226,11 +226,10 @@ namespace hp
   template <bool lda>
   void
   FEValues<dim, spacedim>::reinit(
-    const TriaIterator<DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, lda>>
-                       cell,
-    const unsigned int q_index,
-    const unsigned int mapping_index,
-    const unsigned int fe_index)
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
+    const unsigned int                                      q_index,
+    const unsigned int                                      mapping_index,
+    const unsigned int                                      fe_index)
   {
     // determine which indices we
     // should actually use
@@ -338,12 +337,11 @@ namespace hp
   template <bool lda>
   void
   FEFaceValues<dim, spacedim>::reinit(
-    const TriaIterator<DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, lda>>
-                       cell,
-    const unsigned int face_no,
-    const unsigned int q_index,
-    const unsigned int mapping_index,
-    const unsigned int fe_index)
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
+    const unsigned int                                      face_no,
+    const unsigned int                                      q_index,
+    const unsigned int                                      mapping_index,
+    const unsigned int                                      fe_index)
   {
     // determine which indices we
     // should actually use
@@ -452,13 +450,12 @@ namespace hp
   template <bool lda>
   void
   FESubfaceValues<dim, spacedim>::reinit(
-    const TriaIterator<DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, lda>>
-                       cell,
-    const unsigned int face_no,
-    const unsigned int subface_no,
-    const unsigned int q_index,
-    const unsigned int mapping_index,
-    const unsigned int fe_index)
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
+    const unsigned int                                      face_no,
+    const unsigned int                                      subface_no,
+    const unsigned int                                      q_index,
+    const unsigned int                                      mapping_index,
+    const unsigned int                                      fe_index)
   {
     // determine which indices we
     // should actually use

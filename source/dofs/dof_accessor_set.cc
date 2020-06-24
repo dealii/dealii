@@ -42,18 +42,18 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <typename DoFHandlerType, bool lda>
+template <int dim, int spacedim, bool lda>
 template <class OutputVector, typename number>
 void
-DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
+DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
   const Vector<number> &local_values,
   OutputVector &        values,
   const unsigned int    fe_index_) const
 {
   const unsigned int fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandlerType::invalid_fe_index) ?
-      DoFHandlerType::default_fe_index :
+     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+      DoFHandler<dim, spacedim>::default_fe_index :
       fe_index_;
 
   if (this->is_active() && !this->is_artificial())
@@ -63,7 +63,7 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
           // active cells, you either don't specify an fe_index,
           // or that you specify the correct one
           (fe_index == this->active_fe_index()) ||
-          (fe_index == DoFHandlerType::invalid_fe_index))
+          (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
         // simply set the values on this cell
         this->set_dof_values(local_values, values);
       else
@@ -94,7 +94,7 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
     // otherwise distribute them to the children
     {
       Assert((this->dof_handler->hp_capability_enabled == false) ||
-               (fe_index != DoFHandlerType::invalid_fe_index),
+               (fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
              ExcMessage(
                "You cannot call this function on non-active cells "
                "of hp::DoFHandler objects unless you provide an explicit "

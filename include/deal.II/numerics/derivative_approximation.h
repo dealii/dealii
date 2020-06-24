@@ -261,8 +261,10 @@ namespace DerivativeApproximation
 #ifndef _MSC_VER
     const typename DoFHandlerType::active_cell_iterator &cell,
 #else
-    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false>>
-      &cell,
+    const TriaActiveIterator<
+      dealii::DoFCellAccessor<DoFHandlerType::dimension,
+                              DoFHandlerType::space_dimension,
+                              false>> &cell,
 #endif
     Tensor<order, DoFHandlerType::dimension> &derivative,
     const unsigned int                        component = 0);
@@ -278,8 +280,10 @@ namespace DerivativeApproximation
 #ifndef _MSC_VER
     const typename DoFHandlerType::active_cell_iterator &cell,
 #else
-    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false>>
-      &cell,
+    const TriaActiveIterator<
+      dealii::DoFCellAccessor<DoFHandlerType::dimension,
+                              DoFHandlerType::space_dimension,
+                              false>> &cell,
 #endif
     Tensor<order, DoFHandlerType::dimension> &derivative,
     const unsigned int                        component = 0);
