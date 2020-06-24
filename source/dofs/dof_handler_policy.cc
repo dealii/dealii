@@ -1005,9 +1005,8 @@ namespace internal
 
         /**
          * Once degrees of freedom have been distributed on all cells, see if
-         * we can identify DoFs on neighboring cells. This function does nothing
-         * on regular DoFHandlers, but goes through vertices, lines, and quads
-         * for hp::DoFHandler objects.
+         * we can identify DoFs on neighboring cells. This function does
+         * nothing unless the DoFHandler has hp capabilities.
          *
          * Return the final number of degrees of freedom, which is the old one
          * minus however many were identified.
@@ -1630,8 +1629,8 @@ namespace internal
          * know the indices of all dominating DoFs, and we have to assign those
          * invalid entries to their corresponding global value.
          *
-         * This function does nothing on regular DoFHandlers, but goes through
-         * vertices, lines, and quads for hp::DoFHandler objects.
+         * This function does nothing unless the DoFHandler has hp
+         * capabilities.
          */
         template <int dim, int spacedim>
         static void
@@ -2833,11 +2832,11 @@ namespace internal
         // return a sequential, complete index set. take into account that the
         // number of DoF indices may in fact be smaller than there were before
         // if some previously separately numbered dofs have been identified.
-        // this is, for example, what the hp::DoFHandler does: it first
-        // enumerates all DoFs on cells independently, and then unifies
-        // some located at vertices or faces; this leaves us with fewer
-        // DoFs than there were before, so use the largest index as
-        // the one to determine the size of the index space
+        // this is, for example, what we do when the DoFHandler has hp
+        // capabilities enabled: it first enumerates all DoFs on cells
+        // independently, and then unifies some located at vertices or faces;
+        // this leaves us with fewer DoFs than there were before, so use the
+        // largest index as the one to determine the size of the index space
         return NumberCache(
           *std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
       }
@@ -3805,7 +3804,7 @@ namespace internal
         // --------- Phase 2: eliminate dof duplicates on all cells:
         //                    - un-numerate dofs on interfaces to ghost cells
         //                      that we don't own
-        //                    - in case of hp::DoFHandler, unify dofs
+        //                    - in case of hp support, unify dofs
         std::vector<dealii::types::global_dof_index> renumbering(
           n_initial_local_dofs, enumeration_dof_index);
 
@@ -3816,7 +3815,8 @@ namespace internal
           invalidate_dof_indices_on_weaker_ghost_cells_for_renumbering(
             renumbering, subdomain_id, *dof_handler);
 
-        // then, we identify DoF duplicates if a hp::DoFHandler is used
+        // then, we identify DoF duplicates if the DoFHandler has hp
+        // capabilities
         std::vector<std::map<types::global_dof_index, types::global_dof_index>>
           all_constrained_indices(dim);
         Implementation::compute_dof_identities(all_constrained_indices,
@@ -3902,11 +3902,10 @@ namespace internal
           // done twice
           communicate_dof_indices_on_marked_cells(*dof_handler);
 
-          // in case of hp::DoFHandlers, we may have received valid
-          // indices of degrees of freedom that are dominated by a fe
-          // object adjacent to a ghost interface.
-          // thus, we overwrite the remaining invalid indices with
-          // the valid ones in this step.
+          // If the DoFHandler has hp capabilities enabled, then we may have
+          // received valid indices of degrees of freedom that are dominated
+          // by a fe object adjacent to a ghost interface.  thus, we overwrite
+          // the remaining invalid indices with the valid ones in this step.
           Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
             *dof_handler);
 
@@ -4413,11 +4412,11 @@ namespace internal
               // done twice
               communicate_dof_indices_on_marked_cells(*dof_handler);
 
-              // in case of hp::DoFHandlers, we may have received valid
-              // indices of degrees of freedom that are dominated by a fe
-              // object adjacent to a ghost interface.
-              // thus, we overwrite the remaining invalid indices with
-              // the valid ones in this step.
+              // if the DoFHandler has hp capabilities then we may have
+              // received valid indices of degrees of freedom that are
+              // dominated by a fe object adjacent to a ghost interface.
+              // thus, we overwrite the remaining invalid indices with the
+              // valid ones in this step.
               Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
                 *dof_handler);
 
