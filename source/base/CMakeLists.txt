@@ -83,6 +83,7 @@ SET(_unity_include_src
   subscriptor.cc
   symbolic_function.cc
   table_handler.cc
+  tensor.cc
   tensor_function.cc
   tensor_function_parser.cc
   tensor_product_polynomials.cc

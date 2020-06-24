@@ -158,6 +158,10 @@ namespace LAPACKSupport
   /**
    * Character constant.
    */
+  static const char O = 'O';
+  /**
+   * Character constant.
+   */
   static const char T = 'T';
   /**
    * Character constant.

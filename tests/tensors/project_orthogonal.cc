@@ -17,8 +17,6 @@
 
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/lac/full_matrix.h>
-
 #include "../tests.h"
 
 template <int dim, typename number>
@@ -53,18 +51,24 @@ main()
 {
   initlog();
   // not orthogonal
-  test(Tensor<2, 3, double>{{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}});
+  test(Tensor<2, 3, float>{{{1, 2, 3}, {2, 1, 4}, {3, 4, 1}}});
+  test(Tensor<2, 3, double>{{{1, 2, 3}, {2, 1, 4}, {3, 4, 1}}});
   // already orthogonal
+  test(Tensor<2, 3, float>{{{1, 0, 0}, {0, 0, 1}, {0, 1, 0}}});
   test(Tensor<2, 3, double>{{{1, 0, 0}, {0, 0, 1}, {0, 1, 0}}});
   // not orthogonal, but det = 1
   test(Tensor<2, 3, double>{{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}}});
   // 2D not orthogonal
+  test(Tensor<2, 2, float>{{{1, 2}, {3, 4}}});
   test(Tensor<2, 2, double>{{{1, 2}, {3, 4}}});
   // 2D already orthogonal
+  test(Tensor<2, 2, float>{{{0, 1}, {1, 0}}});
   test(Tensor<2, 2, double>{{{0, 1}, {1, 0}}});
   // 1D not orthogonal
+  test(Tensor<2, 1, float>{{{2.5}}});
   test(Tensor<2, 1, double>{{{2.5}}});
   // 1D already orthogonal
+  test(Tensor<2, 1, float>{{{1.}}});
   test(Tensor<2, 1, double>{{{1.}}});
 
   deallog << "OK" << std::endl;

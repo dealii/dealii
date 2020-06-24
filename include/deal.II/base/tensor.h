@@ -25,8 +25,6 @@
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/lapack_full_matrix.h>
-
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
 #endif
@@ -2647,34 +2645,16 @@ cofactor(const Tensor<2, dim, Number> &t)
  * where $\mathbf U$ and $\mathbf V$ are computed from the SVD decomposition:
  * $\mathbf U  \mathbf S \mathbf V^T$,
  * effectively replacing $\mathbf S$ with the identity matrix.
- * @param tensor The tensor which to find the closest orthogonal
- * tensor to.
+ * @param A The tensor which to find the closest orthogonal tensor to.
+ * @pre @p Number must be either `float` or `double`.
+ * @pre In order to use this function, this program must be linked with the
+ *      LAPACK library.
+ * @pre @p A must not be singular.
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
 Tensor<2, dim, Number>
-project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &tensor)
-{
-  Tensor<2, dim, Number>   output_tensor;
-  FullMatrix<Number>       matrix(dim);
-  LAPACKFullMatrix<Number> lapack_matrix(dim);
-  LAPACKFullMatrix<Number> result(dim);
-
-  // todo: find or add dealii functionality to copy in one step.
-  matrix.copy_from(tensor);
-  lapack_matrix.copy_from(matrix);
-
-  // now compute the svd of the matrices
-  lapack_matrix.compute_svd();
-
-  // Use the SVD results to orthogonalize: $U V^T$
-  lapack_matrix.get_svd_u().mmult(result, lapack_matrix.get_svd_vt());
-
-  // todo: find or add dealii functionality to copy in one step.
-  matrix = result;
-  matrix.copy_to(output_tensor);
-  return output_tensor;
-}
+project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &A);
 
 
 /**
