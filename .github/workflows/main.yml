@@ -1,4 +1,4 @@
-name: github-CI
+name: github-linux
 
 on: [push, pull_request]
 
@@ -29,67 +29,3 @@ jobs:
     - name: build
       run: |
         make -j 2
-
-  osx-serial:
-    # simple serial build using apple clang
-
-    name: OSX serial
-    runs-on: [macos-latest]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: setup
-      run: |
-        ./contrib/utilities/download_clang_format
-    - name: info
-      run: |
-        g++ -v
-        cmake --version
-    - name: configure
-      run: |
-        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' .
-    - name: archive
-      uses: actions/upload-artifact@v1
-      with:
-        name: serial-detailed.log
-        path: detailed.log
-    - name: build
-      run: |
-        make -j 2
-        make -j 2 test # quicktests
-
-  osx-parallel64:
-    # MPI build using apple clang and 64 bit indices
-
-    name: OSX parallel 64bit
-    runs-on: [macos-latest]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: setup
-      run: |
-        brew install openmpi
-        cmake --version
-        # uncomment these for a gcc based build
-        #export OMPI_CXX=g++-9
-        #export OMPI_CC=gcc-9
-        #export OMPI_FC=gfortran-9
-        ./contrib/utilities/download_clang_format
-    - name: info
-      run: |
-        g++-9 -v
-        mpicxx -v
-        cmake --version
-    - name: configure
-      run: |
-        CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_WITH_MPI=on .
-    - name: archive
-      uses: actions/upload-artifact@v1
-      with:
-        name: parallel-detailed.log
-        path: detailed.log
-    - name: build
-      run: |
-        make -j 2
-        make -j 2 test #quicktests
-
