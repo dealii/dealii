@@ -66,7 +66,7 @@ test()
   constraints.close();
 
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(5);
+  tria.refine_global(3);
   tria.execute_coarsening_and_refinement();
   dh.distribute_dofs(fe);
 
@@ -161,6 +161,8 @@ test()
     const auto &p   = s.get_quadrature_points();
     const auto &n   = s.get_normal_vectors();
 
+    const double gh = gamma / cell->diameter();
+
     for (unsigned int q = 0; q < p.size(); ++q)
       for (unsigned int i = 0; i < fev.dofs_per_cell; ++i)
         {
@@ -169,13 +171,11 @@ test()
               c.cell_matrix(i, j) +=
                 (-fev.shape_grad(i, q) * n[q] * fev.shape_value(j, q) +
                  -fev.shape_grad(j, q) * n[q] * fev.shape_value(i, q) +
-                 gamma / cell->face(f)->diameter() * fev.shape_value(i, q) *
-                   fev.shape_value(j, q)) *
+                 gh * fev.shape_value(i, q) * fev.shape_value(j, q)) *
                 JxW[q];
             }
           c.cell_rhs(i) +=
-            ((gamma / cell->face(f)->diameter() * fev.shape_value(i, q) -
-              fev.shape_grad(i, q) * n[q]) *
+            ((gh * fev.shape_value(i, q) - fev.shape_grad(i, q) * n[q]) *
              boundary_function.value(p[q])) *
             JxW[q];
         }
@@ -203,7 +203,7 @@ test()
     const auto n_dofs                = fev.n_current_interface_dofs();
     face_matrix.reinit(n_dofs, n_dofs);
 
-    const double gh = gamma / cell->face(f)->diameter();
+    const double gh = gamma / cell->diameter();
 
     for (unsigned int q = 0; q < p.size(); ++q)
       for (unsigned int i = 0; i < n_dofs; ++i)
@@ -253,5 +253,10 @@ int
 main()
 {
   initlog();
+  test<1, 1>();
+  test<1, 2>();
+  test<1, 3>();
   test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 }
