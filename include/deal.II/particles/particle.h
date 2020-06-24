@@ -268,13 +268,27 @@ namespace Particles
     get_reference_location() const;
 
     /**
-     * Return the ID number of this particle.
+     * Return the ID number of this particle. The ID of a particle is intended
+     * to be a property that is globally unique even in parallel computations
+     * and is transfered along with other properties of a particle if it
+     * moves from a cell owned by the current processor to a cell owned by
+     * a different processor, or if ownership of the cell it is on is
+     * transferred to a different processor.
      */
     types::particle_index
     get_id() const;
 
     /**
-     * Set the ID number of this particle.
+     * Set the ID number of this particle. The ID of a particle is intended
+     * to be a property that is globally unique even in parallel computations
+     * and is transfered along with other properties of a particle if it
+     * moves from a cell owned by the current processor to a cell owned by
+     * a different processor, or if ownership of the cell it is on is
+     * transferred to a different processor. As a consequence, when setting
+     * the ID of a particle, care needs to be taken to ensure that particles
+     * have globally unique IDs. (The ParticleHandler does not itself check
+     * whether particle IDs so set are globally unique in a parallel setting
+     * since this would be a very expensive operation.)
      *
      * @param[in] new_id The new ID number for this particle.
      */
