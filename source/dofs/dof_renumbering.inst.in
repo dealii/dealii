@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFRenumbering
@@ -28,15 +27,14 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
 
       // non-boost functions:
       template void
-      Cuthill_McKee<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      Cuthill_McKee<deal_II_dimension, deal_II_space_dimension>(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const bool,
         const bool,
         const std::vector<types::global_dof_index> &);
 
       template void
-      compute_Cuthill_McKee<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      compute_Cuthill_McKee<deal_II_dimension, deal_II_space_dimension>(
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const bool,
@@ -44,16 +42,16 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
         const std::vector<types::global_dof_index> &);
 
       template void
-      component_wise<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      component_wise<deal_II_dimension, deal_II_space_dimension>(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<unsigned int> &);
 
       template void
-      block_wise<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      block_wise<deal_II_dimension, deal_II_space_dimension>(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
 
       template void
-      subdomain_wise<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      subdomain_wise<deal_II_dimension, deal_II_space_dimension>(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
 
       template void
@@ -72,8 +70,7 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
 // TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension,
 // deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension == deal_II_space_dimension
     namespace DoFRenumbering
@@ -118,17 +115,17 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
                      const std::vector<unsigned int> &);
 
       template void
-      block_wise<DoFHandler<deal_II_dimension>>(DoFHandler<deal_II_dimension> &,
-                                                unsigned int);
+      block_wise<deal_II_dimension>(DoFHandler<deal_II_dimension> &,
+                                    unsigned int);
 
       template void
-      cell_wise<DoFHandler<deal_II_dimension>>(
+      cell_wise<deal_II_dimension>(
         DoFHandler<deal_II_dimension> &,
         const std::vector<DoFHandler<deal_II_dimension>::active_cell_iterator>
           &);
 
       template void
-      compute_cell_wise<DoFHandler<deal_II_dimension>>(
+      compute_cell_wise<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
@@ -136,14 +133,14 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
           &);
 
       template void
-      cell_wise<DoFHandler<deal_II_dimension>>(
+      cell_wise<deal_II_dimension>(
         DoFHandler<deal_II_dimension> &,
         unsigned int,
         const std::vector<DoFHandler<deal_II_dimension>::level_cell_iterator>
           &);
 
       template void
-      compute_cell_wise<DoFHandler<deal_II_dimension>>(
+      compute_cell_wise<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
@@ -152,7 +149,7 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
           &);
 
       template void
-      compute_downstream<DoFHandler<deal_II_dimension>>(
+      compute_downstream<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
@@ -160,13 +157,12 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
         const bool);
 
       template void
-      clockwise_dg<DoFHandler<deal_II_dimension>>(
-        DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        bool);
+      clockwise_dg<deal_II_dimension>(DoFHandler<deal_II_dimension> &,
+                                      const Point<deal_II_dimension> &,
+                                      bool);
 
       template void
-      compute_clockwise_dg<DoFHandler<deal_II_dimension>>(
+      compute_clockwise_dg<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
         const Point<deal_II_dimension> &,
@@ -199,36 +195,34 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
       // Generic numbering schemes
 
       template void
-      random<DoFHandler<deal_II_dimension>>(DoFHandler<deal_II_dimension> &);
+      random<deal_II_dimension>(DoFHandler<deal_II_dimension> &);
 
       template void
-      compute_random<DoFHandler<deal_II_dimension>>(
-        std::vector<types::global_dof_index> &,
-        const DoFHandler<deal_II_dimension> &);
+      compute_random<deal_II_dimension>(std::vector<types::global_dof_index> &,
+                                        const DoFHandler<deal_II_dimension> &);
 
       template void
-      random<DoFHandler<deal_II_dimension>>(DoFHandler<deal_II_dimension> &,
-                                            const unsigned int);
+      random<deal_II_dimension>(DoFHandler<deal_II_dimension> &,
+                                const unsigned int);
 
       template void
-      compute_random<DoFHandler<deal_II_dimension>>(
-        std::vector<types::global_dof_index> &,
-        const DoFHandler<deal_II_dimension> &,
-        const unsigned int);
+      compute_random<deal_II_dimension>(std::vector<types::global_dof_index> &,
+                                        const DoFHandler<deal_II_dimension> &,
+                                        const unsigned int);
 
       template void
-      sort_selected_dofs_back<DoFHandler<deal_II_dimension>>(
+      sort_selected_dofs_back<deal_II_dimension>(
         DoFHandler<deal_II_dimension> &,
         const std::vector<bool> &);
 
       template void
-      compute_sort_selected_dofs_back<DoFHandler<deal_II_dimension>>(
+      compute_sort_selected_dofs_back<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
         const std::vector<bool> &);
 
       template void
-      Cuthill_McKee<DoFHandler<deal_II_dimension>>(
+      Cuthill_McKee<deal_II_dimension>(
         DoFHandler<deal_II_dimension> &,
         const unsigned int,
         const bool,
