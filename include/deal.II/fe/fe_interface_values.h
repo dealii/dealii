@@ -340,7 +340,7 @@ public:
    * If this is a boundary face (at_boundary() returns true), then
    * $\average{\nabla u}=\nabla u_{\text{cell0}}$.
    */
-  Tensor<1, dim>
+  Tensor<1, spacedim>
   average_gradient(const unsigned int interface_dof_index,
                    const unsigned int q_point,
                    const unsigned int component = 0) const;
@@ -355,7 +355,7 @@ public:
    * If this is a boundary face (at_boundary() returns true), then
    * $\average{\nabla^2 u}=\nabla^2 u_{\text{cell0}}$.
    */
-  Tensor<2, dim>
+  Tensor<2, spacedim>
   average_hessian(const unsigned int interface_dof_index,
                   const unsigned int q_point,
                   const unsigned int component = 0) const;
@@ -369,7 +369,7 @@ public:
    * If this is a boundary face (at_boundary() returns true), then
    * $\jump{\nabla u}=\nabla u_{\text{cell0}}$.
    */
-  Tensor<1, dim>
+  Tensor<1, spacedim>
   jump_gradient(const unsigned int interface_dof_index,
                 const unsigned int q_point,
                 const unsigned int component = 0) const;
@@ -384,7 +384,7 @@ public:
    * If this is a boundary face (at_boundary() returns true), then
    * $\jump{\nabla^2 u} = \nabla^2 u_{\text{cell0}}$.
    */
-  Tensor<2, dim>
+  Tensor<2, spacedim>
   jump_hessian(const unsigned int interface_dof_index,
                const unsigned int q_point,
                const unsigned int component = 0) const;
@@ -398,7 +398,7 @@ public:
    * If this is a boundary face (at_boundary() returns true), then
    * $\jump{\nabla^3 u} = \nabla^3 u_{\text{cell0}}$.
    */
-  Tensor<3, dim>
+  Tensor<3, spacedim>
   jump_3rd_derivative(const unsigned int interface_dof_index,
                       const unsigned int q_point,
                       const unsigned int component = 0) const;
@@ -423,35 +423,35 @@ private:
   /**
    * The FEFaceValues object for the current cell.
    */
-  FEFaceValues<dim> internal_fe_face_values;
+  FEFaceValues<dim, spacedim> internal_fe_face_values;
 
   /**
    * The FEFaceValues object for the current cell if the cell is refined.
    */
-  FESubfaceValues<dim> internal_fe_subface_values;
+  FESubfaceValues<dim, spacedim> internal_fe_subface_values;
 
   /**
    * The FEFaceValues object for the neighboring cell.
    */
-  FEFaceValues<dim> internal_fe_face_values_neighbor;
+  FEFaceValues<dim, spacedim> internal_fe_face_values_neighbor;
 
   /**
    * The FEFaceValues object for the neighboring cell if the cell is refined.
    */
-  FESubfaceValues<dim> internal_fe_subface_values_neighbor;
+  FESubfaceValues<dim, spacedim> internal_fe_subface_values_neighbor;
 
   /**
    * Pointer to internal_fe_face_values or internal_fe_subface_values,
    * respectively as determined in reinit().
    */
-  FEFaceValuesBase<dim> *fe_face_values;
+  FEFaceValuesBase<dim, spacedim> *fe_face_values;
 
   /**
    * Pointer to internal_fe_face_values_neighbor,
    * internal_fe_subface_values_neighbor, or nullptr, respectively
    * as determined in reinit().
    */
-  FEFaceValuesBase<dim> *fe_face_values_neighbor;
+  FEFaceValuesBase<dim, spacedim> *fe_face_values_neighbor;
 };
 
 
@@ -818,7 +818,7 @@ FEInterfaceValues<dim, spacedim>::average(
 
 
 template <int dim, int spacedim>
-Tensor<1, dim>
+Tensor<1, spacedim>
 FEInterfaceValues<dim, spacedim>::average_gradient(
   const unsigned int interface_dof_index,
   const unsigned int q_point,
@@ -831,7 +831,7 @@ FEInterfaceValues<dim, spacedim>::average_gradient(
                                                       q_point,
                                                       component);
 
-  Tensor<1, dim> value;
+  Tensor<1, spacedim> value;
 
   if (dof_pair[0] != numbers::invalid_unsigned_int)
     value += 0.5 * get_fe_face_values(0).shape_grad_component(dof_pair[0],
@@ -848,7 +848,7 @@ FEInterfaceValues<dim, spacedim>::average_gradient(
 
 
 template <int dim, int spacedim>
-Tensor<2, dim>
+Tensor<2, spacedim>
 FEInterfaceValues<dim, spacedim>::average_hessian(
   const unsigned int interface_dof_index,
   const unsigned int q_point,
@@ -861,7 +861,7 @@ FEInterfaceValues<dim, spacedim>::average_hessian(
                                                          q_point,
                                                          component);
 
-  Tensor<2, dim> value;
+  Tensor<2, spacedim> value;
 
   if (dof_pair[0] != numbers::invalid_unsigned_int)
     value += 0.5 * get_fe_face_values(0).shape_hessian_component(dof_pair[0],
@@ -878,7 +878,7 @@ FEInterfaceValues<dim, spacedim>::average_hessian(
 
 
 template <int dim, int spacedim>
-Tensor<1, dim>
+Tensor<1, spacedim>
 FEInterfaceValues<dim, spacedim>::jump_gradient(
   const unsigned int interface_dof_index,
   const unsigned int q_point,
@@ -891,7 +891,7 @@ FEInterfaceValues<dim, spacedim>::jump_gradient(
                                                       q_point,
                                                       component);
 
-  Tensor<1, dim> value;
+  Tensor<1, spacedim> value;
 
   if (dof_pair[0] != numbers::invalid_unsigned_int)
     value += 1.0 * get_fe_face_values(0).shape_grad_component(dof_pair[0],
@@ -908,7 +908,7 @@ FEInterfaceValues<dim, spacedim>::jump_gradient(
 
 
 template <int dim, int spacedim>
-Tensor<2, dim>
+Tensor<2, spacedim>
 FEInterfaceValues<dim, spacedim>::jump_hessian(
   const unsigned int interface_dof_index,
   const unsigned int q_point,
@@ -921,7 +921,7 @@ FEInterfaceValues<dim, spacedim>::jump_hessian(
                                                          q_point,
                                                          component);
 
-  Tensor<2, dim> value;
+  Tensor<2, spacedim> value;
 
   if (dof_pair[0] != numbers::invalid_unsigned_int)
     value += 1.0 * get_fe_face_values(0).shape_hessian_component(dof_pair[0],
@@ -937,7 +937,7 @@ FEInterfaceValues<dim, spacedim>::jump_hessian(
 
 
 template <int dim, int spacedim>
-Tensor<3, dim>
+Tensor<3, spacedim>
 FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
   const unsigned int interface_dof_index,
   const unsigned int q_point,
@@ -950,7 +950,7 @@ FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
                                                                 q_point,
                                                                 component);
 
-  Tensor<3, dim> value;
+  Tensor<3, spacedim> value;
 
   if (dof_pair[0] != numbers::invalid_unsigned_int)
     value +=
