@@ -686,14 +686,6 @@ public:
   JxW(const unsigned int q_index) const;
 
   /**
-   * Fills the JxW values currently used into the given array.
-   *
-   * @deprecated Use JxW() instead.
-   */
-  DEAL_II_DEPRECATED void
-  fill_JxW_values(AlignedVector<VectorizedArrayType> &JxW_values) const;
-
-  /**
    * Return the inverse and transposed version of Jacobian of the mapping
    * between the unit to the real cell (representing the covariant
    * transformation). This is exactly the matrix used internally to transform
@@ -3675,30 +3667,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 {
   Assert(data != nullptr, ExcInternalError());
   return *data;
-}
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline void
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  fill_JxW_values(AlignedVector<VectorizedArrayType> &JxW_values) const
-{
-  AssertDimension(JxW_values.size(), n_quadrature_points);
-  Assert(J_value != nullptr, ExcNotInitialized());
-  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
-    {
-      VectorizedArrayType J = J_value[0];
-      for (unsigned int q = 0; q < this->n_quadrature_points; ++q)
-        JxW_values[q] = J * this->quadrature_weights[q];
-    }
-  else
-    for (unsigned int q = 0; q < n_quadrature_points; ++q)
-      JxW_values[q] = J_value[q];
 }
 
 
