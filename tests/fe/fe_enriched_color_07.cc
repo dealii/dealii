@@ -813,11 +813,12 @@ void
 EstimateEnrichmentFunction::refine_grid()
 {
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
-  KellyErrorEstimator<1>::estimate(dof_handler,
-                                   QGauss<1 - 1>(3),
-                                   typename FunctionMap<1>::type(),
-                                   solution,
-                                   estimated_error_per_cell);
+  KellyErrorEstimator<1>::estimate(
+    dof_handler,
+    QGauss<1 - 1>(3),
+    std::map<types::boundary_id, const Function<1> *>{},
+    solution,
+    estimated_error_per_cell);
   GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                   estimated_error_per_cell,
                                                   0.2,
@@ -1599,15 +1600,16 @@ LaplaceProblem<dim>::refine_grid()
   for (unsigned int i = 0; i < q_collection.size(); ++i)
     q_collection_face.push_back(QGauss<dim - 1>(1));
 
-  KellyErrorEstimator<dim>::estimate(dof_handler,
-                                     q_collection_face,
-                                     typename FunctionMap<dim>::type(),
-                                     localized_solution,
-                                     local_error_per_cell,
-                                     ComponentMask(),
-                                     nullptr,
-                                     n_mpi_processes,
-                                     this_mpi_process);
+  KellyErrorEstimator<dim>::estimate(
+    dof_handler,
+    q_collection_face,
+    std::map<types::boundary_id, const Function<dim> *>{},
+    localized_solution,
+    local_error_per_cell,
+    ComponentMask(),
+    nullptr,
+    n_mpi_processes,
+    this_mpi_process);
   const unsigned int n_local_cells =
     GridTools::count_cells_with_subdomain_association(triangulation,
                                                       this_mpi_process);
