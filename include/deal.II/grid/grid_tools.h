@@ -100,8 +100,8 @@ namespace internal
   class ActiveCellIterator<dim, spacedim, dealii::DoFHandler<dim, spacedim>>
   {
   public:
-    using type = TriaActiveIterator<
-      dealii::DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, false>>;
+    using type =
+      TriaActiveIterator<dealii::DoFCellAccessor<dim, spacedim, false>>;
   };
 #  endif
 
@@ -111,8 +111,8 @@ namespace internal
   class ActiveCellIterator<dim, spacedim, dealii::hp::DoFHandler<dim, spacedim>>
   {
   public:
-    using type = TriaActiveIterator<
-      dealii::DoFCellAccessor<dealii::DoFHandler<dim, spacedim>, false>>;
+    using type =
+      TriaActiveIterator<dealii::DoFCellAccessor<dim, spacedim, false>>;
   };
 #  endif
 } // namespace internal

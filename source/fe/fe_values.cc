@@ -4527,7 +4527,7 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FEValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>> &cell)
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell)
 {
   // assert that the finite elements passed to the constructor and
   // used by the DoFHandler used by this cell, are the same
@@ -4540,8 +4540,8 @@ FEValues<dim, spacedim>::reinit(
 
   reset_pointer_in_place_if_possible<
     typename FEValuesBase<dim, spacedim>::template CellIterator<
-      TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>>>>(
-    this->present_cell, cell);
+      TriaIterator<DoFCellAccessor<dim, spacedim, lda>>>>(this->present_cell,
+                                                          cell);
 
   // this was the part of the work that is dependent on the actual
   // data type of the iterator. now pass on to the function doing
@@ -4734,8 +4734,8 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FEFaceValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>> &cell,
-  const unsigned int                                                   face_no)
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
+  const unsigned int                                       face_no)
 {
   // assert that the finite elements passed to the constructor and
   // used by the DoFHandler used by this cell, are the same
@@ -4749,8 +4749,8 @@ FEFaceValues<dim, spacedim>::reinit(
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
     typename FEValuesBase<dim, spacedim>::template CellIterator<
-      TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>>>>(
-    this->present_cell, cell);
+      TriaIterator<DoFCellAccessor<dim, spacedim, lda>>>>(this->present_cell,
+                                                          cell);
 
   // this was the part of the work that is dependent on the actual
   // data type of the iterator. now pass on to the function doing
@@ -4764,8 +4764,8 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FEFaceValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>> &cell,
-  const typename Triangulation<dim, spacedim>::face_iterator &         face)
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &face)
 {
   const auto face_n = cell->face_iterator_to_index(face);
   reinit(cell, face_n);
@@ -4935,9 +4935,9 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FESubfaceValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>> &cell,
-  const unsigned int                                                   face_no,
-  const unsigned int subface_no)
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
+  const unsigned int                                       face_no,
+  const unsigned int                                       subface_no)
 {
   // assert that the finite elements passed to the constructor and
   // used by the DoFHandler used by this cell, are the same
@@ -4968,8 +4968,8 @@ FESubfaceValues<dim, spacedim>::reinit(
   this->maybe_invalidate_previous_present_cell(cell);
   reset_pointer_in_place_if_possible<
     typename FEValuesBase<dim, spacedim>::template CellIterator<
-      TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>>>>(
-    this->present_cell, cell);
+      TriaIterator<DoFCellAccessor<dim, spacedim, lda>>>>(this->present_cell,
+                                                          cell);
 
   // this was the part of the work that is dependent on the actual
   // data type of the iterator. now pass on to the function doing
@@ -4983,9 +4983,9 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FESubfaceValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<DoFHandler<dim, spacedim>, lda>> &cell,
-  const typename Triangulation<dim, spacedim>::face_iterator &         face,
-  const typename Triangulation<dim, spacedim>::face_iterator &         subface)
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+  const typename Triangulation<dim, spacedim>::face_iterator &face,
+  const typename Triangulation<dim, spacedim>::face_iterator &subface)
 {
   reinit(cell,
          cell->face_iterator_to_index(face),

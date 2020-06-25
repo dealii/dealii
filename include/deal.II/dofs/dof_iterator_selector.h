@@ -26,9 +26,9 @@ DEAL_II_NAMESPACE_OPEN
 template <int, int, int>
 class DoFInvalidAccessor;
 
-template <int structdim, typename DoFHandlerType, bool lda>
+template <int structdim, int dim, int spacedim, bool lda>
 class DoFAccessor;
-template <typename DoFHandlerType, bool lda>
+template <int dim, int spacedim, bool lda>
 class DoFCellAccessor;
 
 template <typename Accessor>
@@ -60,8 +60,8 @@ namespace internal
     struct Iterators<DoFHandlerType<1, spacedim>, lda>
     {
       using DoFHandler_type = DoFHandlerType<1, spacedim>;
-      using CellAccessor    = dealii::DoFCellAccessor<DoFHandler_type, lda>;
-      using FaceAccessor    = dealii::DoFAccessor<0, DoFHandler_type, lda>;
+      using CellAccessor    = dealii::DoFCellAccessor<1, spacedim, lda>;
+      using FaceAccessor    = dealii::DoFAccessor<0, 1, spacedim, lda>;
 
       using raw_line_iterator    = TriaRawIterator<CellAccessor>;
       using line_iterator        = TriaIterator<CellAccessor>;
@@ -103,8 +103,8 @@ namespace internal
     struct Iterators<DoFHandlerType<2, spacedim>, lda>
     {
       using DoFHandler_type = DoFHandlerType<2, spacedim>;
-      using CellAccessor    = dealii::DoFCellAccessor<DoFHandler_type, lda>;
-      using FaceAccessor    = dealii::DoFAccessor<1, DoFHandler_type, lda>;
+      using CellAccessor    = dealii::DoFCellAccessor<2, spacedim, lda>;
+      using FaceAccessor    = dealii::DoFAccessor<1, 2, spacedim, lda>;
 
       using raw_line_iterator    = TriaRawIterator<FaceAccessor>;
       using line_iterator        = TriaIterator<FaceAccessor>;
@@ -144,15 +144,15 @@ namespace internal
     struct Iterators<DoFHandlerType<3, spacedim>, lda>
     {
       using DoFHandler_type = DoFHandlerType<3, spacedim>;
-      using CellAccessor    = dealii::DoFCellAccessor<DoFHandler_type, lda>;
-      using FaceAccessor    = dealii::DoFAccessor<2, DoFHandler_type, lda>;
+      using CellAccessor    = dealii::DoFCellAccessor<3, spacedim, lda>;
+      using FaceAccessor    = dealii::DoFAccessor<2, 3, spacedim, lda>;
 
       using raw_line_iterator =
-        TriaRawIterator<dealii::DoFAccessor<1, DoFHandler_type, lda>>;
+        TriaRawIterator<dealii::DoFAccessor<1, 3, spacedim, lda>>;
       using line_iterator =
-        TriaIterator<dealii::DoFAccessor<1, DoFHandler_type, lda>>;
+        TriaIterator<dealii::DoFAccessor<1, 3, spacedim, lda>>;
       using active_line_iterator =
-        TriaActiveIterator<dealii::DoFAccessor<1, DoFHandler_type, lda>>;
+        TriaActiveIterator<dealii::DoFAccessor<1, 3, spacedim, lda>>;
 
       using raw_quad_iterator    = TriaRawIterator<FaceAccessor>;
       using quad_iterator        = TriaIterator<FaceAccessor>;

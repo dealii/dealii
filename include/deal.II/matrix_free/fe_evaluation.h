@@ -2569,10 +2569,9 @@ public:
    * also read from vectors (but less efficient than with data coming from
    * MatrixFree).
    */
-  template <typename DoFHandlerType, bool level_dof_access>
+  template <bool level_dof_access>
   void
-  reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>>
-           &cell);
+  reinit(const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell);
 
   /**
    * Initialize the data to the current cell using a TriaIterator object as
@@ -7001,7 +7000,7 @@ template <int dim,
           int n_components_,
           typename Number,
           typename VectorizedArrayType>
-template <typename DoFHandlerType, bool level_dof_access>
+template <bool level_dof_access>
 inline void
 FEEvaluation<dim,
              fe_degree,
@@ -7009,8 +7008,7 @@ FEEvaluation<dim,
              n_components_,
              Number,
              VectorizedArrayType>::
-  reinit(
-    const TriaIterator<DoFCellAccessor<DoFHandlerType, level_dof_access>> &cell)
+  reinit(const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell)
 {
   Assert(this->matrix_info == nullptr,
          ExcMessage("Cannot use initialization from cell iterator if "
