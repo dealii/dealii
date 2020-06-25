@@ -576,11 +576,6 @@ namespace internal
       unsigned int n_procs;
     };
 
-    /**
-     * Typedef to deprecated name.
-     */
-    using SizeInfo DEAL_II_DEPRECATED = TaskInfo;
-
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 
