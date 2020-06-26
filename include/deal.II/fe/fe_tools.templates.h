@@ -40,6 +40,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_nedelec_sz.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_bubbles.h>
@@ -1174,6 +1175,8 @@ namespace FETools
           std::make_unique<FETools::FEFactory<FE_RT_Bubbles<dim>>>();
         result["FE_Nedelec"] =
           std::make_unique<FETools::FEFactory<FE_Nedelec<dim>>>();
+        result["FE_NedelecSZ"] =
+          std::make_unique<FETools::FEFactory<FE_NedelecSZ<dim>>>();
         result["FE_DGPNonparametric"] =
           std::make_unique<FETools::FEFactory<FE_DGPNonparametric<dim>>>();
         result["FE_DGP"] = std::make_unique<FETools::FEFactory<FE_DGP<dim>>>();
