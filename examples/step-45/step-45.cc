@@ -457,11 +457,11 @@ namespace Step45
       // After setting up all the information in periodicity_vector all we have
       // to do is to tell make_periodicity_constraints to create the desired
       // constraints.
-      DoFTools::make_periodicity_constraints<DoFHandler<dim>>(
-        periodicity_vector,
-        constraints,
-        fe.component_mask(velocities),
-        first_vector_components);
+      DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vector,
+                                                       constraints,
+                                                       fe.component_mask(
+                                                         velocities),
+                                                       first_vector_components);
 
       VectorTools::interpolate_boundary_values(mapping,
                                                dof_handler,

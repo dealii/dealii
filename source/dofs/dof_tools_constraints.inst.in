@@ -42,22 +42,24 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
   }
 
-for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS)
   {
-    template void
-    DoFTools::make_periodicity_constraints<DH<deal_II_dimension>, double>(
-      const std::vector<
-        GridTools::PeriodicFacePair<DH<deal_II_dimension>::cell_iterator>> &,
+    template void DoFTools::make_periodicity_constraints<deal_II_dimension,
+                                                         deal_II_dimension,
+                                                         double>(
+      const std::vector<GridTools::PeriodicFacePair<
+        DoFHandler<deal_II_dimension>::cell_iterator>> &,
       AffineConstraints<double> &,
       const ComponentMask &,
       const std::vector<unsigned int> &,
       const double);
 
 #ifdef DEAL_II_WITH_COMPLEX_VALUES
-    template void DoFTools::make_periodicity_constraints<DH<deal_II_dimension>,
+    template void DoFTools::make_periodicity_constraints<deal_II_dimension,
+                                                         deal_II_dimension,
                                                          std::complex<double>>(
-      const std::vector<
-        GridTools::PeriodicFacePair<DH<deal_II_dimension>::cell_iterator>> &,
+      const std::vector<GridTools::PeriodicFacePair<
+        DoFHandler<deal_II_dimension>::cell_iterator>> &,
       AffineConstraints<std::complex<double>> &,
       const ComponentMask &,
       const std::vector<unsigned int> &,
@@ -65,7 +67,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 #endif
 
     template void DoFTools::make_periodicity_constraints(
-      const DH<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
       const types::boundary_id,
       const types::boundary_id,
       const unsigned int,
@@ -75,7 +77,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 
 #ifdef DEAL_II_WITH_COMPLEX_VALUES
     template void DoFTools::make_periodicity_constraints(
-      const DH<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
       const types::boundary_id,
       const types::boundary_id,
       const unsigned int,
@@ -85,7 +87,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 #endif
 
     template void DoFTools::make_periodicity_constraints(
-      const DH<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
       const types::boundary_id,
       const unsigned int,
       AffineConstraints<double> &,
@@ -94,7 +96,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 
 #ifdef DEAL_II_WITH_COMPLEX_VALUES
     template void DoFTools::make_periodicity_constraints(
-      const DH<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
       const types::boundary_id,
       const unsigned int,
       AffineConstraints<std::complex<double>> &,
@@ -103,22 +105,22 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 #endif
   }
 
-for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
+for (DoFHandler : DOFHANDLER_TEMPLATE; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS;
      S : REAL_AND_COMPLEX_SCALARS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template void DoFTools::make_hanging_node_constraints(
-      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
       AffineConstraints<S> &);
 
     template void DoFTools::make_zero_boundary_constraints(
-      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
       AffineConstraints<S> &,
       const ComponentMask &);
 
     template void DoFTools::make_zero_boundary_constraints(
-      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
       const types::boundary_id,
       AffineConstraints<S> &,
       const ComponentMask &);
