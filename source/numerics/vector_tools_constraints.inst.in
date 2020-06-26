@@ -17,8 +17,7 @@
 // TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension,
 // deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace VectorTools
     \{

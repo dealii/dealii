@@ -48,13 +48,10 @@ namespace VectorTools
      * mapping here because the function we evaluate for the DoFs is zero in
      * the mapped locations as well as in the original, unmapped locations
      */
-    template <int dim,
-              int spacedim,
-              template <int, int> class DoFHandlerType,
-              typename number>
+    template <int dim, int spacedim, typename number>
     void
     interpolate_zero_boundary_values(
-      const DoFHandlerType<dim, spacedim> &      dof_handler,
+      const DoFHandler<dim, spacedim> &          dof_handler,
       std::map<types::global_dof_index, number> &boundary_values)
     {
       // loop over all boundary faces
@@ -78,7 +75,7 @@ namespace VectorTools
       // that is actually wholly on
       // the boundary, not only by
       // one line or one vertex
-      typename DoFHandlerType<dim, spacedim>::active_cell_iterator
+      typename DoFHandler<dim, spacedim>::active_cell_iterator
         cell = dof_handler.begin_active(),
         endc = dof_handler.end();
       std::vector<types::global_dof_index> face_dof_indices;
@@ -105,14 +102,13 @@ namespace VectorTools
      */
     template <int dim,
               int spacedim,
-              template <int, int> class DoFHandlerType,
               template <int, int> class M_or_MC,
               template <int> class Q_or_QC,
               typename number>
     void
     project_compute_b_v(
       const M_or_MC<dim, spacedim> &             mapping,
-      const DoFHandlerType<dim, spacedim> &      dof,
+      const DoFHandler<dim, spacedim> &          dof,
       const Function<spacedim, number> &         function,
       const bool                                 enforce_zero_boundary,
       const Q_or_QC<dim - 1> &                   q_boundary,
@@ -481,13 +477,12 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename VectorType,
-              template <int, int> class DoFHandlerType,
               template <int, int> class M_or_MC,
               template <int> class Q_or_QC>
     void
     do_project(
       const M_or_MC<dim, spacedim> &                             mapping,
-      const DoFHandlerType<dim, spacedim> &                      dof,
+      const DoFHandler<dim, spacedim> &                          dof,
       const AffineConstraints<typename VectorType::value_type> & constraints,
       const Q_or_QC<dim> &                                       quadrature,
       const Function<spacedim, typename VectorType::value_type> &function,

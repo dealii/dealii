@@ -796,15 +796,11 @@ namespace VectorTools
 
 
 
-    template <int dim,
-              class InVector,
-              class OutVector,
-              typename DoFHandlerType,
-              int spacedim>
+    template <int dim, int spacedim, class InVector, class OutVector>
     static void
     do_integrate_difference(
       const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
-      const DoFHandlerType &                                   dof,
+      const DoFHandler<dim, spacedim> &                        dof,
       const InVector &                                         fe_function,
       const Function<spacedim, typename InVector::value_type> &exact_solution,
       OutVector &                                              difference,
@@ -917,16 +913,12 @@ namespace VectorTools
           difference(cell->active_cell_index()) = 0;
     }
 
-    template <int dim,
-              class InVector,
-              class OutVector,
-              typename DoFHandlerType,
-              int spacedim>
+    template <int dim, int spacedim, class InVector, class OutVector>
     DEAL_II_DEPRECATED static typename std::enable_if<
       !std::is_same<typename InVector::value_type, double>::value>::type
     do_integrate_difference(
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
-      const DoFHandlerType &                              dof,
+      const DoFHandler<dim, spacedim> &                   dof,
       const InVector &                                    fe_function,
       const Function<spacedim> &                          exact_solution,
       OutVector &                                         difference,

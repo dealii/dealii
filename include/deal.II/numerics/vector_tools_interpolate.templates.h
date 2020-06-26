@@ -213,17 +213,13 @@ namespace VectorTools
     // Function<spacedim, typename VectorType::value_type>*
     //
     // A given cell is skipped if function(cell) == nullptr
-    template <int dim,
-              int spacedim,
-              typename VectorType,
-              template <int, int> class DoFHandlerType,
-              typename T>
+    template <int dim, int spacedim, typename VectorType, typename T>
     void
-    interpolate(const Mapping<dim, spacedim> &       mapping,
-                const DoFHandlerType<dim, spacedim> &dof_handler,
-                T &                                  function,
-                VectorType &                         vec,
-                const ComponentMask &                component_mask)
+    interpolate(const Mapping<dim, spacedim> &   mapping,
+                const DoFHandler<dim, spacedim> &dof_handler,
+                T &                              function,
+                VectorType &                     vec,
+                const ComponentMask &            component_mask)
     {
       Assert(component_mask.represents_n_components(
                dof_handler.get_fe_collection().n_components()),
@@ -606,14 +602,11 @@ namespace VectorTools
   }
 
 
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  get_position_vector(const DoFHandlerType<dim, spacedim> &dh,
-                      VectorType &                         vector,
-                      const ComponentMask &                mask)
+  get_position_vector(const DoFHandler<dim, spacedim> &dh,
+                      VectorType &                     vector,
+                      const ComponentMask &            mask)
   {
     AssertDimension(vector.size(), dh.n_dofs());
     const FiniteElement<dim, spacedim> &fe = dh.get_fe();
@@ -699,8 +692,8 @@ namespace VectorTools
         // interpolate from that vector space to this one, by
         // carefully selecting the right components.
 
-        FESystem<dim, spacedim> feq(FE_Q<dim, spacedim>(degree), spacedim);
-        DoFHandlerType<dim, spacedim> dhq(dh.get_triangulation());
+        FESystem<dim, spacedim>   feq(FE_Q<dim, spacedim>(degree), spacedim);
+        DoFHandler<dim, spacedim> dhq(dh.get_triangulation());
         dhq.distribute_dofs(feq);
         Vector<double>      eulerq(dhq.n_dofs());
         const ComponentMask maskq(spacedim, true);
@@ -782,14 +775,11 @@ namespace VectorTools
       }
   }
 
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType>
   void
   interpolate_based_on_material_id(
-    const Mapping<dim, spacedim> &       mapping,
-    const DoFHandlerType<dim, spacedim> &dof_handler,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof_handler,
     const std::map<types::material_id,
                    const Function<spacedim, typename VectorType::value_type> *>
       &                  functions,
@@ -799,7 +789,7 @@ namespace VectorTools
     // Create a small lambda capture wrapping the function map and call the
     // internal implementation
     const auto function_map = [&functions](
-      const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &cell)
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell)
       -> const Function<spacedim, typename VectorType::value_type> *
     {
       const auto function = functions.find(cell->material_id());
@@ -833,21 +823,18 @@ namespace VectorTools
     }
   } // namespace internal
 
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  interpolate_to_different_mesh(const DoFHandlerType<dim, spacedim> &dof1,
-                                const VectorType &                   u1,
-                                const DoFHandlerType<dim, spacedim> &dof2,
-                                VectorType &                         u2)
+  interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
+                                const VectorType &               u1,
+                                const DoFHandler<dim, spacedim> &dof2,
+                                VectorType &                     u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
            ExcMessage("The two DoF handlers must represent triangulations that "
                       "have the same coarse meshes"));
 
-    InterGridMap<DoFHandlerType<dim, spacedim>> intergridmap;
+    InterGridMap<DoFHandler<dim, spacedim>> intergridmap;
     intergridmap.make_mapping(dof1, dof2);
 
     AffineConstraints<typename VectorType::value_type> dummy;
@@ -858,15 +845,12 @@ namespace VectorTools
 
 
 
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType>
   void
   interpolate_to_different_mesh(
-    const DoFHandlerType<dim, spacedim> &                     dof1,
+    const DoFHandler<dim, spacedim> &                         dof1,
     const VectorType &                                        u1,
-    const DoFHandlerType<dim, spacedim> &                     dof2,
+    const DoFHandler<dim, spacedim> &                         dof2,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType &                                              u2)
   {
@@ -874,26 +858,22 @@ namespace VectorTools
            ExcMessage("The two DoF handlers must represent triangulations that "
                       "have the same coarse meshes"));
 
-    InterGridMap<DoFHandlerType<dim, spacedim>> intergridmap;
+    InterGridMap<DoFHandler<dim, spacedim>> intergridmap;
     intergridmap.make_mapping(dof1, dof2);
 
     interpolate_to_different_mesh(intergridmap, u1, constraints, u2);
   }
 
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType>
   void
   interpolate_to_different_mesh(
-    const InterGridMap<DoFHandlerType<dim, spacedim>> &       intergridmap,
+    const InterGridMap<DoFHandler<dim, spacedim>> &           intergridmap,
     const VectorType &                                        u1,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType &                                              u2)
   {
-    const DoFHandlerType<dim, spacedim> &dof1 = intergridmap.get_source_grid();
-    const DoFHandlerType<dim, spacedim> &dof2 =
-      intergridmap.get_destination_grid();
+    const DoFHandler<dim, spacedim> &dof1 = intergridmap.get_source_grid();
+    const DoFHandler<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
     (void)dof2;
 
     Assert(dof1.get_fe_collection() == dof2.get_fe_collection(),
@@ -915,13 +895,12 @@ namespace VectorTools
     // Therefore, loop over all cells
     // (active and inactive) of the source
     // grid ..
-    typename DoFHandlerType<dim, spacedim>::cell_iterator cell1 = dof1.begin();
-    const typename DoFHandlerType<dim, spacedim>::cell_iterator endc1 =
-      dof1.end();
+    typename DoFHandler<dim, spacedim>::cell_iterator cell1 = dof1.begin();
+    const typename DoFHandler<dim, spacedim>::cell_iterator endc1 = dof1.end();
 
     for (; cell1 != endc1; ++cell1)
       {
-        const typename DoFHandlerType<dim, spacedim>::cell_iterator cell2 =
+        const typename DoFHandler<dim, spacedim>::cell_iterator cell2 =
           intergridmap[cell1];
 
         // .. and skip if source and destination
