@@ -2635,15 +2635,6 @@ namespace FETools
 
 
 
-  template <int dim>
-  FiniteElement<dim> *
-  get_fe_from_name(const std::string &parameter_name)
-  {
-    return get_fe_by_name<dim, dim>(parameter_name).release();
-  }
-
-
-
   template <int dim, int spacedim>
   std::unique_ptr<FiniteElement<dim, spacedim>>
   get_fe_by_name(const std::string &parameter_name)
