@@ -464,12 +464,12 @@ namespace VectorTools
   } // namespace internal
 
 
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_nonzero_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
     const std::map<types::boundary_id, const Function<spacedim> *>
       &                           function_map,
     AffineConstraints<double> &   constraints,
@@ -527,14 +527,14 @@ namespace VectorTools
     using DoFToNormalsMap = std::multimap<
       internal::VectorDoFTuple<dim>,
       std::pair<Tensor<1, dim>,
-                typename DoFHandlerType<dim, spacedim>::active_cell_iterator>>;
+                typename DoFHandler<dim, spacedim>::active_cell_iterator>>;
     std::map<internal::VectorDoFTuple<dim>, Vector<double>>
       dof_vector_to_b_values;
 
     DoFToNormalsMap dof_to_normals_map;
 
     // now loop over all cells and all faces
-    typename DoFHandlerType<dim, spacedim>::active_cell_iterator
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     std::set<types::boundary_id>::iterator b_id;
@@ -545,7 +545,7 @@ namespace VectorTools
               boundary_ids.end())
             {
               const FiniteElement<dim> &fe = cell->get_fe();
-              typename DoFHandlerType<dim, spacedim>::face_iterator face =
+              typename DoFHandler<dim, spacedim>::face_iterator face =
                 cell->face(face_no);
 
               // get the indices of the dofs on this cell...
@@ -709,7 +709,7 @@ namespace VectorTools
         // vectors. the values of the map are pairs of normal vectors and
         // number of cells that have contributed
         using CellToNormalsMap =
-          std::map<typename DoFHandlerType<dim, spacedim>::active_cell_iterator,
+          std::map<typename DoFHandler<dim, spacedim>::active_cell_iterator,
                    std::pair<Tensor<1, dim>, unsigned int>>;
 
         CellToNormalsMap cell_to_normals_map;
@@ -886,7 +886,7 @@ namespace VectorTools
                 // natural) because std::set requires that the stored elements
                 // are comparable with operator<
                 using CellContributions = std::map<
-                  typename DoFHandlerType<dim, spacedim>::active_cell_iterator,
+                  typename DoFHandler<dim, spacedim>::active_cell_iterator,
                   std::list<Tensor<1, dim>>>;
                 CellContributions cell_contributions;
 
@@ -1050,12 +1050,12 @@ namespace VectorTools
     };
   } // namespace internal
 
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_nonzero_tangential_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
     const std::map<types::boundary_id, const Function<spacedim> *>
       &                           function_map,
     AffineConstraints<double> &   constraints,
@@ -1119,7 +1119,7 @@ namespace VectorTools
               boundary_ids.end())
             {
               const FiniteElement<dim> &fe = cell->get_fe();
-              typename DoFHandlerType<dim, spacedim>::face_iterator face =
+              typename DoFHandler<dim, spacedim>::face_iterator face =
                 cell->face(face_no);
 
               // get the indices of the dofs on this cell...
@@ -1258,14 +1258,14 @@ namespace VectorTools
   }
 
 
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_no_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
-    AffineConstraints<double> &          constraints,
-    const Mapping<dim, spacedim> &       mapping)
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    AffineConstraints<double> &         constraints,
+    const Mapping<dim, spacedim> &      mapping)
   {
     Functions::ZeroFunction<dim>                             zero_function(dim);
     std::map<types::boundary_id, const Function<spacedim> *> function_map;
@@ -1279,14 +1279,14 @@ namespace VectorTools
                                             mapping);
   }
 
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
-    AffineConstraints<double> &          constraints,
-    const Mapping<dim, spacedim> &       mapping)
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    AffineConstraints<double> &         constraints,
+    const Mapping<dim, spacedim> &      mapping)
   {
     Functions::ZeroFunction<dim>                             zero_function(dim);
     std::map<types::boundary_id, const Function<spacedim> *> function_map;

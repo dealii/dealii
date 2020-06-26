@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <map>
 #include <set>
 
@@ -268,12 +270,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_nonzero_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
     const std::map<types::boundary_id, const Function<spacedim, double> *>
       &                           function_map,
     AffineConstraints<double> &   constraints,
@@ -292,14 +294,14 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_no_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
-    AffineConstraints<double> &          constraints,
-    const Mapping<dim, spacedim> &       mapping =
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    AffineConstraints<double> &         constraints,
+    const Mapping<dim, spacedim> &      mapping =
       StaticMappingQ1<dim, spacedim>::mapping);
 
   /**
@@ -318,12 +320,12 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_nonzero_tangential_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
     const std::map<types::boundary_id, const Function<spacedim, double> *>
       &                           function_map,
     AffineConstraints<double> &   constraints,
@@ -338,14 +340,14 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim>
   void
   compute_normal_flux_constraints(
-    const DoFHandlerType<dim, spacedim> &dof_handler,
-    const unsigned int                   first_vector_component,
-    const std::set<types::boundary_id> & boundary_ids,
-    AffineConstraints<double> &          constraints,
-    const Mapping<dim, spacedim> &       mapping =
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    AffineConstraints<double> &         constraints,
+    const Mapping<dim, spacedim> &      mapping =
       StaticMappingQ1<dim, spacedim>::mapping);
 
   //@}
