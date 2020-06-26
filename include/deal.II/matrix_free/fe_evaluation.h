@@ -3830,6 +3830,7 @@ namespace internal
     VectorizedArrayType2 &                              out,
     const FU &                                          fu)
   {
+    (void)matrix_info;
     Assert(matrix_info != nullptr, ExcNotImplemented());
     AssertDimension(array.size(),
                     matrix_info->get_task_info().cell_partition_data.back());
