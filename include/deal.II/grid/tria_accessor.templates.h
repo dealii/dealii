@@ -671,7 +671,7 @@ namespace internal
         return get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
-          1 /*=flip_bit*/);
+          2 /*=flip_bit*/);
       }
 
 
@@ -707,7 +707,7 @@ namespace internal
         return get_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
-          2 /*=rotation_bit*/);
+          1 /*=rotation_bit*/);
       }
 
       /**
@@ -864,7 +864,7 @@ namespace internal
         set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
-          1 /*=flip_bit*/,
+          2 /*=flip_bit*/,
           value);
       }
 
@@ -897,7 +897,7 @@ namespace internal
         set_bit(
           accessor.tria->levels[accessor.present_level]->face_orientations
             [accessor.present_index * GeometryInfo<3>::faces_per_cell + face],
-          2 /*=rotation_bit*/,
+          1 /*=rotation_bit*/,
           value);
       }
 
