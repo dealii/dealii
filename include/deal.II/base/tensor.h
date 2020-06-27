@@ -39,6 +39,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
 #ifndef DOXYGEN
+template <typename ElementType, typename MemorySpace>
+class ArrayView;
 template <int dim, typename Number>
 class Point;
 template <int rank_, int dim, typename Number = double>
@@ -501,12 +503,29 @@ public:
 #endif
 
   /**
-   * Constructor, where the data is copied from a C-style array.
+   * A constructor where the data is copied from a C-style array.
    *
    * @note This function can also be used in CUDA device code.
    */
   constexpr DEAL_II_CUDA_HOST_DEV explicit Tensor(
     const array_type &initializer);
+
+  /**
+   * A constructor where the data is copied from an ArrayView object.
+   * Obviously, the ArrayView object must represent a stretch of
+   * data of size `dim`<sup>`rank`</sup>. The sequentially ordered elements
+   * of the argument `initializer` are interpreted as described by
+   * unrolled_to_component_index().
+   *
+   * This constructor obviously requires that the @p ElementType type is
+   * either equal to @p Number, or is convertible to @p Number.
+   * Number.
+   *
+   * @note This function can also be used in CUDA device code.
+   */
+  template <typename ElementType, typename MemorySpace>
+  constexpr DEAL_II_CUDA_HOST_DEV explicit Tensor(
+    const ArrayView<ElementType, MemorySpace> &initializer);
 
   /**
    * Constructor from tensors with different underlying scalar type. This
@@ -1151,6 +1170,21 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
                                 Tensor<rank_, dim, Number>::Tensor(const array_type &initializer)
   : Tensor(initializer, std::make_index_sequence<dim>{})
 {}
+
+
+
+template <int rank_, int dim, typename Number>
+template <typename ElementType, typename MemorySpace>
+constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                                Tensor<rank_, dim, Number>::Tensor(
+  const ArrayView<ElementType, MemorySpace> &initializer)
+{
+  AssertDimension(initializer.size(), n_independent_components);
+
+  for (unsigned int i = 0; i < n_independent_components; ++i)
+    (*this)[unrolled_to_component_indices(i)] = initializer[i];
+}
+
 
 
 template <int rank_, int dim, typename Number>
