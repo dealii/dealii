@@ -1105,7 +1105,7 @@ namespace MGTools
                                 const DoFHandler<dim, spacedim> &,
                                 const ComponentMask &,
                                 std::vector<bool> &) =
-                  &DoFTools::extract_level_dofs<DoFHandler<dim, spacedim>>;
+                  &DoFTools::extract_level_dofs<dim, spacedim>;
 
                 std::vector<bool> tmp(n_components, false);
                 tmp[i]              = true;
@@ -1216,7 +1216,8 @@ namespace MGTools
                             const DoFHandlerType &,
                             const BlockMask &,
                             std::vector<bool> &) =
-              &DoFTools::extract_level_dofs<DoFHandlerType>;
+              &DoFTools::extract_level_dofs<DoFHandlerType::dimension,
+                                            DoFHandlerType::space_dimension>;
 
             std::vector<bool> tmp(n_blocks, false);
             tmp[i]          = true;

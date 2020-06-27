@@ -14,81 +14,73 @@
 // ---------------------------------------------------------------------
 
 
-for (DoFHandler : DOFHANDLER_TEMPLATES;
-     deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
     \{
       template void
-      extract_locally_relevant_dofs<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_locally_relevant_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &       dof_handler,
         IndexSet &dof_set);
 
       template void
-      extract_locally_relevant_level_dofs<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_locally_relevant_level_dofs<deal_II_dimension,
+                                          deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &                dof_handler,
         const unsigned int level,
         IndexSet &         dof_set);
 
       template void
-      extract_locally_active_dofs<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_locally_active_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &       dof_handler,
         IndexSet &dof_set);
 
       template std::vector<IndexSet>
-      locally_owned_dofs_per_component<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      locally_owned_dofs_per_component<deal_II_dimension,
+                                       deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &                  dof_handler,
         const ComponentMask &components);
 
       // deprecated versions of the count_dofs_per_*() functions
       template void
-      count_dofs_per_component<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      count_dofs_per_component<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<types::global_dof_index> &,
         const bool,
         const std::vector<unsigned int> &);
 
       template void
-      count_dofs_per_block<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      count_dofs_per_block<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<types::global_dof_index> &,
         const std::vector<unsigned int> &);
 
       // new versions of the count_dofs_per_*() functions
       template std::vector<types::global_dof_index>
-      count_dofs_per_fe_component<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      count_dofs_per_fe_component<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const bool,
         const std::vector<unsigned int> &);
 
       template std::vector<types::global_dof_index>
-      count_dofs_per_fe_block<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      count_dofs_per_fe_block<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<unsigned int> &);
 
 
       template unsigned int
-      count_dofs_on_patch<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      count_dofs_on_patch<deal_II_dimension, deal_II_space_dimension>(
         const std::vector<
           DoFHandler<deal_II_dimension,
                      deal_II_space_dimension>::active_cell_iterator> &patch);
 
       template std::vector<types::global_dof_index>
-      get_dofs_on_patch<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      get_dofs_on_patch<deal_II_dimension, deal_II_space_dimension>(
         const std::vector<
           DoFHandler<deal_II_dimension,
                      deal_II_space_dimension>::active_cell_iterator> &patch);
@@ -96,13 +88,13 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
       // extract_dofs(): Deprecated versions that return information through
       // the last argument
       template void
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const ComponentMask &,
         std::vector<bool> &);
 
       template void
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &,
         std::vector<bool> &);
@@ -110,12 +102,12 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
 
       // extract_dofs(): New versions that return information as an IndexSet
       template IndexSet
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const ComponentMask &);
 
       template IndexSet
-      extract_dofs<DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &);
     \}
@@ -124,7 +116,7 @@ for (DoFHandler : DOFHANDLER_TEMPLATES;
 
 
 
-for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS)
   {
     template std::vector<unsigned int> DoFTools::make_vertex_patches(
       SparsityPattern &,
@@ -161,36 +153,39 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 
     // TODO: can cleanup a bit more to fit into the scheme used above
 
-    template void
-    DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension>>(
+    template void DoFTools::distribute_cell_to_dof_vector<deal_II_dimension,
+                                                          deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       const Vector<float> &                cell_data,
       Vector<double> &                     dof_data,
       const unsigned int                   component);
-    template void
-    DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension>>(
+    template void DoFTools::distribute_cell_to_dof_vector<deal_II_dimension,
+                                                          deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       const Vector<double> &               cell_data,
       Vector<double> &                     dof_data,
       const unsigned int                   component);
 
-    template void DoFTools::extract_boundary_dofs<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const ComponentMask &,
-                                     std::vector<bool> &,
-                                     const std::set<types::boundary_id> &);
+    template void
+    DoFTools::extract_boundary_dofs<deal_II_dimension, deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const ComponentMask &,
+      std::vector<bool> &,
+      const std::set<types::boundary_id> &);
 
-    template void DoFTools::extract_boundary_dofs<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const ComponentMask &,
-                                     IndexSet &,
-                                     const std::set<types::boundary_id> &);
+    template void
+    DoFTools::extract_boundary_dofs<deal_II_dimension, deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const ComponentMask &,
+      IndexSet &,
+      const std::set<types::boundary_id> &);
 
     template void DoFTools::extract_dofs_with_support_on_boundary<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const ComponentMask &,
-                                     std::vector<bool> &,
-                                     const std::set<types::boundary_id> &);
+      deal_II_dimension,
+      deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                         const ComponentMask &,
+                         std::vector<bool> &,
+                         const std::set<types::boundary_id> &);
 
     template IndexSet DoFTools::extract_hanging_node_dofs(
       const DoFHandler<deal_II_dimension> &);
@@ -198,149 +193,154 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
     template void DoFTools::extract_hanging_node_dofs(
       const DoFHandler<deal_II_dimension> &, std::vector<bool> &);
 
-    template void
-    DoFTools::extract_subdomain_dofs<DoFHandler<deal_II_dimension>>(
+    template void DoFTools::extract_subdomain_dofs<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       const types::subdomain_id            subdomain_id,
       std::vector<bool> &                  selected_dofs);
 
-    template void
-    DoFTools::extract_constant_modes<DoFHandler<deal_II_dimension>>(
+    template void DoFTools::extract_constant_modes<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       const ComponentMask &                selected_components,
       std::vector<std::vector<bool>> &     constant_modes);
 
-    template void
-    DoFTools::get_active_fe_indices<DoFHandler<deal_II_dimension>>(
+    template void DoFTools::get_active_fe_indices<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       std::vector<unsigned int> &          active_fe_indices);
 
-    template void
-    DoFTools::get_subdomain_association<DoFHandler<deal_II_dimension>>(
+    template void DoFTools::get_subdomain_association<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       std::vector<types::subdomain_id> &   subdomain_association);
 
     template std::vector<IndexSet>
-    DoFTools::locally_owned_dofs_per_subdomain<DoFHandler<deal_II_dimension>>(
+    DoFTools::locally_owned_dofs_per_subdomain<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler);
 
-    template std::vector<IndexSet> DoFTools::
-      locally_relevant_dofs_per_subdomain<DoFHandler<deal_II_dimension>>(
-        const DoFHandler<deal_II_dimension> &dof_handler);
+    template std::vector<IndexSet>
+    DoFTools::locally_relevant_dofs_per_subdomain<deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &dof_handler);
 
-    template unsigned int DoFTools::count_dofs_with_subdomain_association<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const types::subdomain_id);
-    template IndexSet DoFTools::dof_indices_with_subdomain_association<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const types::subdomain_id);
+    template unsigned int
+    DoFTools::count_dofs_with_subdomain_association<deal_II_dimension,
+                                                    deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &, const types::subdomain_id);
+    template IndexSet
+    DoFTools::dof_indices_with_subdomain_association<deal_II_dimension,
+                                                     deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &, const types::subdomain_id);
     template void DoFTools::count_dofs_with_subdomain_association<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const types::subdomain_id,
-                                     std::vector<unsigned int> &);
+      deal_II_dimension,
+      deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                         const types::subdomain_id,
+                         std::vector<unsigned int> &);
 
 #if deal_II_dimension < 3
 
-    template void DoFTools::extract_boundary_dofs<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template void
+    DoFTools::extract_boundary_dofs<deal_II_dimension, deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       const ComponentMask &,
       std::vector<bool> &,
       const std::set<types::boundary_id> &);
 
-    template void DoFTools::extract_boundary_dofs<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template void
+    DoFTools::extract_boundary_dofs<deal_II_dimension, deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       const ComponentMask &,
       IndexSet &,
       const std::set<types::boundary_id> &);
 
-    template unsigned int DoFTools::count_dofs_with_subdomain_association<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template unsigned int
+    DoFTools::count_dofs_with_subdomain_association<deal_II_dimension,
+                                                    deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       const types::subdomain_id);
 
-    template IndexSet DoFTools::dof_indices_with_subdomain_association<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template IndexSet
+    DoFTools::dof_indices_with_subdomain_association<deal_II_dimension,
+                                                     deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       const types::subdomain_id);
-    template void DoFTools::count_dofs_with_subdomain_association<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template void
+    DoFTools::count_dofs_with_subdomain_association<deal_II_dimension,
+                                                    deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       const types::subdomain_id,
       std::vector<unsigned int> &);
 
-    template void DoFTools::get_subdomain_association<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template void DoFTools::get_subdomain_association<deal_II_dimension,
+                                                      deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_handler,
       std::vector<types::subdomain_id> &subdomain_association);
 
-    template std::vector<IndexSet> DoFTools::locally_owned_dofs_per_subdomain<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template std::vector<IndexSet>
+    DoFTools::locally_owned_dofs_per_subdomain<deal_II_dimension,
+                                               deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_handler);
 
     template std::vector<IndexSet>
-    DoFTools::locally_relevant_dofs_per_subdomain<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    DoFTools::locally_relevant_dofs_per_subdomain<deal_II_dimension,
+                                                  deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_handler);
 
 #endif
 
 #if deal_II_dimension == 3
-    template void DoFTools::extract_boundary_dofs<DoFHandler<1, 3>>(
+    template void DoFTools::extract_boundary_dofs<1, 3>(
       const DoFHandler<1, 3> &,
       const ComponentMask &,
       std::vector<bool> &,
       const std::set<types::boundary_id> &);
 
-    template void DoFTools::extract_boundary_dofs<DoFHandler<1, 3>>(
+    template void DoFTools::extract_boundary_dofs<1, 3>(
       const DoFHandler<1, 3> &,
       const ComponentMask &,
       IndexSet &,
       const std::set<types::boundary_id> &);
 
-    template void DoFTools::get_subdomain_association<DoFHandler<1, 3>>(
+    template void DoFTools::get_subdomain_association<1, 3>(
       const DoFHandler<1, 3> &          dof_handler,
       std::vector<types::subdomain_id> &subdomain_association);
 
     template std::vector<IndexSet>
-    DoFTools::locally_owned_dofs_per_subdomain<DoFHandler<1, 3>>(
+    DoFTools::locally_owned_dofs_per_subdomain<1, 3>(
       const DoFHandler<1, 3> &dof_handler);
 
     template std::vector<IndexSet>
-    DoFTools::locally_relevant_dofs_per_subdomain<DoFHandler<1, 3>>(
+    DoFTools::locally_relevant_dofs_per_subdomain<1, 3>(
       const DoFHandler<1, 3> &dof_handler);
 
-    template unsigned int DoFTools::count_dofs_with_subdomain_association<
-      DoFHandler<1, 3>>(const DoFHandler<1, 3> &, const types::subdomain_id);
-    template IndexSet DoFTools::dof_indices_with_subdomain_association<
-      DoFHandler<1, 3>>(const DoFHandler<1, 3> &, const types::subdomain_id);
-    template void DoFTools::count_dofs_with_subdomain_association<
-      DoFHandler<1, 3>>(const DoFHandler<1, 3> &,
-                        const types::subdomain_id,
-                        std::vector<unsigned int> &);
+    template unsigned int DoFTools::count_dofs_with_subdomain_association<1, 3>(
+      const DoFHandler<1, 3> &, const types::subdomain_id);
+    template IndexSet DoFTools::dof_indices_with_subdomain_association<1, 3>(
+      const DoFHandler<1, 3> &, const types::subdomain_id);
+    template void DoFTools::count_dofs_with_subdomain_association<1, 3>(
+      const DoFHandler<1, 3> &,
+      const types::subdomain_id,
+      std::vector<unsigned int> &);
 #endif
 
-    template void DoFTools::map_dof_to_boundary_indices<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     const std::set<types::boundary_id> &,
-                                     std::vector<types::global_dof_index> &);
+    template void
+    DoFTools::map_dof_to_boundary_indices<deal_II_dimension, deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const std::set<types::boundary_id> &,
+      std::vector<types::global_dof_index> &);
 
-    template void DoFTools::map_dof_to_boundary_indices<
-      DoFHandler<deal_II_dimension>>(const DoFHandler<deal_II_dimension> &,
-                                     std::vector<types::global_dof_index> &);
+    template void
+    DoFTools::map_dof_to_boundary_indices<deal_II_dimension, deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      std::vector<types::global_dof_index> &);
 
 
 #if deal_II_dimension < 3
 
-    template void DoFTools::map_dof_to_boundary_indices<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template void DoFTools::map_dof_to_boundary_indices<deal_II_dimension,
+                                                        deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       const std::set<types::boundary_id> &,
       std::vector<types::global_dof_index> &);
 
-    template void DoFTools::map_dof_to_boundary_indices<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>>(
+    template void DoFTools::map_dof_to_boundary_indices<deal_II_dimension,
+                                                        deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
       std::vector<types::global_dof_index> &);
 
@@ -355,12 +355,12 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 
 #if deal_II_dimension == 3
 
-    template void DoFTools::map_dof_to_boundary_indices<DoFHandler<1, 3>>(
+    template void DoFTools::map_dof_to_boundary_indices<1, 3>(
       const DoFHandler<1, 3> &,
       const std::set<types::boundary_id> &,
       std::vector<types::global_dof_index> &);
 
-    template void DoFTools::map_dof_to_boundary_indices<DoFHandler<1, 3>>(
+    template void DoFTools::map_dof_to_boundary_indices<1, 3>(
       const DoFHandler<1, 3> &, std::vector<types::global_dof_index> &);
 
     template IndexSet DoFTools::extract_hanging_node_dofs(
@@ -386,12 +386,12 @@ for (deal_II_dimension : DIMENSIONS)
   }
 
 
-for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     S : REAL_AND_COMPLEX_SCALARS)
+for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
   {
-    template IndexSet DoFTools::extract_dofs_with_support_contained_within<
-      DoFHandler<deal_II_dimension>,
-      S>(
+    template IndexSet
+    DoFTools::extract_dofs_with_support_contained_within<deal_II_dimension,
+                                                         deal_II_dimension,
+                                                         S>(
       const DoFHandler<deal_II_dimension> &,
       const std::function<bool(
         const typename DoFHandler<deal_II_dimension>::active_cell_iterator &)>
@@ -439,24 +439,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   }
 
 
-for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
     \{
       // extract_level_dofs() for ComponentMask and BlockMask
       template void
-      extract_level_dofs<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_level_dofs<deal_II_dimension, deal_II_space_dimension>(
         const unsigned int level,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const ComponentMask &,
         std::vector<bool> &);
 
       template void
-      extract_level_dofs<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>>(
+      extract_level_dofs<deal_II_dimension, deal_II_space_dimension>(
         const unsigned int level,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &,
