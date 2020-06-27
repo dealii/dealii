@@ -68,67 +68,6 @@ namespace MatrixCreator
 {
   namespace internal
   {
-    /**
-     * Convenience abbreviation for
-     * pairs of DoF handler cell
-     * iterators. This type works
-     * just like a
-     * <tt>std::pair<iterator,iterator></tt>
-     * but is templatized on the
-     * dof handler that should be used.
-     */
-    template <typename DoFHandlerType>
-    struct IteratorRange
-    {
-      /**
-       * Typedef for the iterator type.
-       */
-      using active_cell_iterator =
-        typename DoFHandlerType::active_cell_iterator;
-
-      /**
-       * Abbreviation for a pair of iterators.
-       */
-      using iterator_pair =
-        std::pair<active_cell_iterator, active_cell_iterator>;
-
-      /**
-       * Constructor. Initialize the two values by the given values.
-       */
-      IteratorRange(const active_cell_iterator &first,
-                    const active_cell_iterator &second);
-
-      /**
-       * Constructor taking a pair of values for initialization.
-       */
-      IteratorRange(const iterator_pair &ip);
-
-      /**
-       * Pair of iterators denoting a half-open range.
-       */
-      active_cell_iterator first, second;
-    };
-
-
-
-    template <typename DoFHandlerType>
-    inline IteratorRange<DoFHandlerType>::IteratorRange(
-      const active_cell_iterator &first,
-      const active_cell_iterator &second)
-      : first(first)
-      , second(second)
-    {}
-
-
-
-    template <typename DoFHandlerType>
-    inline IteratorRange<DoFHandlerType>::IteratorRange(const iterator_pair &ip)
-      : first(ip.first)
-      , second(ip.second)
-    {}
-
-
-
     namespace AssemblerData
     {
       template <int dim, int spacedim, typename number>
