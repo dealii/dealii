@@ -660,22 +660,22 @@ namespace MatrixCreator
         Scratch() = default;
       };
 
-      template <typename DoFHandlerType, typename number>
+      template <int dim, int spacedim, typename number>
       struct CopyData
       {
         CopyData();
 
-        unsigned int                                  dofs_per_cell;
-        std::vector<types::global_dof_index>          dofs;
-        std::vector<std::vector<bool>>                dof_is_on_face;
-        typename DoFHandlerType::active_cell_iterator cell;
-        std::vector<FullMatrix<number>>               cell_matrix;
-        std::vector<Vector<number>>                   cell_vector;
+        unsigned int                                             dofs_per_cell;
+        std::vector<types::global_dof_index>                     dofs;
+        std::vector<std::vector<bool>>                           dof_is_on_face;
+        typename DoFHandler<dim, spacedim>::active_cell_iterator cell;
+        std::vector<FullMatrix<number>>                          cell_matrix;
+        std::vector<Vector<number>>                              cell_vector;
       };
 
 
-      template <typename DoFHandlerType, typename number>
-      CopyData<DoFHandlerType, number>::CopyData()
+      template <int dim, int spacedim, typename number>
+      CopyData<dim, spacedim, number>::CopyData()
         : dofs_per_cell(numbers::invalid_unsigned_int)
       {}
 
@@ -991,10 +991,10 @@ namespace MatrixCreator
       typename DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
       MatrixCreator::internal::AssemblerBoundary::Scratch const &,
       MatrixCreator::internal::AssemblerBoundary::
-        CopyData<DoFHandler<dim, spacedim>, number> &copy_data,
-      Mapping<dim, spacedim> const &                 mapping,
-      FiniteElement<dim, spacedim> const &           fe,
-      Quadrature<dim - 1> const &                    q,
+        CopyData<dim, spacedim, number> & copy_data,
+      Mapping<dim, spacedim> const &      mapping,
+      FiniteElement<dim, spacedim> const &fe,
+      Quadrature<dim - 1> const &         q,
       std::map<types::boundary_id, const Function<spacedim, number> *> const
         &                                     boundary_functions,
       Function<spacedim, number> const *const coefficient,
@@ -1226,7 +1226,7 @@ namespace MatrixCreator
     void
     copy_boundary_mass_matrix_1(
       MatrixCreator::internal::AssemblerBoundary::
-        CopyData<DoFHandler<dim, spacedim>, number> const &copy_data,
+        CopyData<dim, spacedim, number> const &copy_data,
       std::map<types::boundary_id, const Function<spacedim, number> *> const
         &                                         boundary_functions,
       std::vector<types::global_dof_index> const &dof_to_boundary_mapping,
@@ -1300,8 +1300,7 @@ namespace MatrixCreator
     void inline create_boundary_mass_matrix_1<1, 3, float>(
       DoFHandler<1, 3>::active_cell_iterator const & /*cell*/,
       MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-      MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1, 3>,
-                                                           float>
+      MatrixCreator::internal::AssemblerBoundary::CopyData<1, 3, float>
         & /*copy_data*/,
       Mapping<1, 3> const &,
       FiniteElement<1, 3> const &,
@@ -1318,8 +1317,7 @@ namespace MatrixCreator
     void inline create_boundary_mass_matrix_1<1, 3, double>(
       DoFHandler<1, 3>::active_cell_iterator const & /*cell*/,
       MatrixCreator::internal::AssemblerBoundary::Scratch const &,
-      MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1, 3>,
-                                                           double>
+      MatrixCreator::internal::AssemblerBoundary::CopyData<1, 3, double>
         & /*copy_data*/,
       Mapping<1, 3> const &,
       FiniteElement<1, 3> const &,
@@ -1383,9 +1381,8 @@ namespace MatrixCreator
       AssertDimension(n_components, component_mapping.size());
 
     MatrixCreator::internal::AssemblerBoundary::Scratch scratch;
-    MatrixCreator::internal::AssemblerBoundary::
-      CopyData<DoFHandler<dim, spacedim>, number>
-        copy_data;
+    MatrixCreator::internal::AssemblerBoundary::CopyData<dim, spacedim, number>
+      copy_data;
 
     WorkStream::run(
       dof.begin_active(),
@@ -1394,7 +1391,7 @@ namespace MatrixCreator
         typename DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
         MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch_data,
         MatrixCreator::internal::AssemblerBoundary::
-          CopyData<DoFHandler<dim, spacedim>, number> &copy_data) {
+          CopyData<dim, spacedim, number> &copy_data) {
         internal::create_boundary_mass_matrix_1(cell,
                                                 scratch_data,
                                                 copy_data,
@@ -1407,7 +1404,7 @@ namespace MatrixCreator
       },
       [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
         MatrixCreator::internal::AssemblerBoundary::
-          CopyData<DoFHandler<dim, spacedim>, number> const &copy_data) {
+          CopyData<dim, spacedim, number> const &copy_data) {
         internal::copy_boundary_mass_matrix_1(copy_data,
                                               boundary_functions,
                                               dof_to_boundary_mapping,
@@ -1428,10 +1425,10 @@ namespace MatrixCreator
       typename DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
       MatrixCreator::internal::AssemblerBoundary::Scratch const &,
       MatrixCreator::internal::AssemblerBoundary ::
-        CopyData<DoFHandler<dim, spacedim>, number> &copy_data,
-      hp::MappingCollection<dim, spacedim> const &   mapping,
-      hp::FECollection<dim, spacedim> const &        fe_collection,
-      hp::QCollection<dim - 1> const &               q,
+        CopyData<dim, spacedim, number> &         copy_data,
+      hp::MappingCollection<dim, spacedim> const &mapping,
+      hp::FECollection<dim, spacedim> const &     fe_collection,
+      hp::QCollection<dim - 1> const &            q,
       const std::map<types::boundary_id, const Function<spacedim, number> *>
         &                                     boundary_functions,
       Function<spacedim, number> const *const coefficient,
@@ -1683,7 +1680,7 @@ namespace MatrixCreator
     void
     copy_hp_boundary_mass_matrix_1(
       MatrixCreator::internal::AssemblerBoundary ::
-        CopyData<DoFHandler<dim, spacedim>, number> const &copy_data,
+        CopyData<dim, spacedim, number> const &copy_data,
       std::map<types::boundary_id, const Function<spacedim, number> *> const
         &                                         boundary_functions,
       std::vector<types::global_dof_index> const &dof_to_boundary_mapping,
@@ -1854,9 +1851,8 @@ namespace MatrixCreator
       AssertDimension(n_components, component_mapping.size());
 
     MatrixCreator::internal::AssemblerBoundary::Scratch scratch;
-    MatrixCreator::internal::AssemblerBoundary::
-      CopyData<DoFHandler<dim, spacedim>, number>
-        copy_data;
+    MatrixCreator::internal::AssemblerBoundary::CopyData<dim, spacedim, number>
+      copy_data;
 
     WorkStream::run(
       dof.begin_active(),
@@ -1870,7 +1866,7 @@ namespace MatrixCreator
         typename DoFHandler<dim, spacedim>::active_cell_iterator const &cell,
         MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch_data,
         MatrixCreator::internal::AssemblerBoundary ::
-          CopyData<DoFHandler<dim, spacedim>, number> &copy_data) {
+          CopyData<dim, spacedim, number> &copy_data) {
         internal::create_hp_boundary_mass_matrix_1(cell,
                                                    scratch_data,
                                                    copy_data,
@@ -1883,7 +1879,7 @@ namespace MatrixCreator
       },
       [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
         MatrixCreator::internal::AssemblerBoundary ::
-          CopyData<DoFHandler<dim, spacedim>, number> const &copy_data) {
+          CopyData<dim, spacedim, number> const &copy_data) {
         internal::copy_hp_boundary_mass_matrix_1(copy_data,
                                                  boundary_functions,
                                                  dof_to_boundary_mapping,
