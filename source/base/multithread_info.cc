@@ -21,9 +21,7 @@
 #include <thread>
 
 #ifdef DEAL_II_WITH_TBB
-#  define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #  include <tbb/task_scheduler_init.h>
-#  undef TBB_SUPPRESS_DEPRECATED_MESSAGES
 #endif
 
 

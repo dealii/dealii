@@ -64,12 +64,13 @@
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
+#ifdef DEAL_II_WITH_TBB
 /*
  * Backward compatibility setting:
  * FIXME: Update once transition to taskflow is complete
  */
-#ifdef DEAL_II_WITH_TBB
 #define DEAL_II_WITH_THREADS
+#define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
 #endif
 
 /***********************************************************************
