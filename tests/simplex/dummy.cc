@@ -15,7 +15,7 @@
 
 
 
-// Dummy TET test.
+// Dummy simplex test.
 
 #include "../tests.h"
 
@@ -24,9 +24,9 @@ main()
 {
   initlog();
 
-#ifdef DEAL_II_WITH_TET_SUPPORT
-  deallog << "deal.II is configured with TET support." << std::endl;
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+  deallog << "deal.II is configured with simplex support." << std::endl;
 #else
-  deallog << "deal.II is configured without TET support." << std::endl;
+  deallog << "deal.II is configured without simplex support." << std::endl;
 #endif
 }

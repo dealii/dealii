@@ -54,11 +54,11 @@
 #cmakedefine DEAL_II_WITH_P4EST
 #cmakedefine DEAL_II_WITH_PETSC
 #cmakedefine DEAL_II_WITH_SCALAPACK
+#cmakedefine DEAL_II_WITH_SIMPLEX_SUPPORT
 #cmakedefine DEAL_II_WITH_SLEPC
 #cmakedefine DEAL_II_WITH_SUNDIALS
 #cmakedefine DEAL_II_WITH_SYMENGINE
 #cmakedefine DEAL_II_WITH_TASKFLOW
-#cmakedefine DEAL_II_WITH_TET_SUPPORT
 #cmakedefine DEAL_II_WITH_TBB
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
