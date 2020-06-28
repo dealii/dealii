@@ -941,16 +941,6 @@ FiniteElement<dim, spacedim>::hp_quad_dof_identities(
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FiniteElement<dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe_other) const
-{
-  return this->compare_for_domination(fe_other, 1);
-}
-
-
-
-template <int dim, int spacedim>
-FiniteElementDomination::Domination
 FiniteElement<dim, spacedim>::compare_for_domination(
   const FiniteElement<dim, spacedim> &,
   const unsigned int) const

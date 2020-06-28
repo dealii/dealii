@@ -23,17 +23,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
   template <int dim, int spacedim>
-  unsigned int
-  FECollection<dim, spacedim>::find_least_face_dominating_fe(
-    const std::set<unsigned int> &fes) const
-  {
-    return find_dominated_fe(find_common_fes(fes, /*codim*/ 1),
-                             /*codim*/ 1);
-  }
-
-
-
-  template <int dim, int spacedim>
   std::set<unsigned int>
   FECollection<dim, spacedim>::find_common_fes(
     const std::set<unsigned int> &fes,
