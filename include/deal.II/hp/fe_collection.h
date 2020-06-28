@@ -302,56 +302,6 @@ namespace hp
     hp_constraints_are_implemented() const;
 
     /**
-     * Try to find a least dominant finite element inside this FECollection
-     * which dominates all of those finite elements in the current collection
-     * indexed by the numbers provided through @p fes . In other words, we
-     * first form the set of elements in this collection that dominate
-     * all of the ones that are indexed by the argument @p fes, and then
-     * within that set of dominating elements, we find the <i>least</i>
-     * dominant one.
-     *
-     * For example, if an FECollection consists of
-     * `{FE_Q(1),FE_Q(2),FE_Q(3),FE_Q(4)}` elements
-     * and the argument @p fes equals `{2,3}`, then the set of dominating
-     * elements consists of `{0,1,2}`, of which `2` (i.e., the `FE_Q(3)`) is the
-     * least dominant one, and then that's what the function returns.
-     *
-     * On the other hand, if the FECollection consists of
-     * `{FE_Q(1)xFE_Q(1),FE_Q(2)xFE_Q(2),FE_Q(2)xFE_Q(3),FE_Q(3)xFE_Q(2)}`
-     * elements and the argument is again @p fes equal to `{2,3}`, then the set of dominating
-     * elements consists of `{0,1}` because now neither of the last two
-     * elements dominates the other, of which `1` (i.e., the `FE_Q(2)xFE_Q(2)`)
-     * is the least dominant one -- so that's what the function returns in
-     * this case.
-     *
-     * For the purpose of this function by domination we consider either
-     * FiniteElementDomination::Domination::this_element_dominates or
-     * FiniteElementDomination::Domination::either_element_can_dominate;
-     * therefore the element can dominate itself. Thus, if an FECollection
-     * contains `{FE_Q(1),FE_Q(2),FE_Q(3),FE_Q(4)}` and @p fes only has
-     * a single element `{3}`, then the function returns 3.
-     *
-     * If the function is not able to find a finite element that satisfies
-     * the description above, the function returns
-     * numbers::invalid_unsigned_int. An example would go like this:
-     * If the FECollection consists of `{FE_Nothing x FE_Nothing, FE_Q(1)xFE_Q(2), FE_Q(2)xFE_Q(1)}` with @p fes as `{1}`,
-     * the function will not find a most dominating element as the default
-     * behavior of FE_Nothing is to return
-     * FiniteElementDomination::no_requirements when comparing for face
-     * domination with any other element. In other words, the set of dominating
-     * elements is empty, and we can not find a least dominant one among it. The
-     * return value is therefore numbers::invalid_unsigned_int.
-     *
-     * @deprecated This function has been succeeded by
-     * `hp::FECollection::find_dominating_fe_extended(fes, 1)`.
-     * To recreate its exact behavior, use code such as
-     * `fe_collection.find_dominated_fe(
-     * fe_collection.find_common_fes(fes, 1), 1)`.
-     */
-    DEAL_II_DEPRECATED unsigned int
-    find_least_face_dominating_fe(const std::set<unsigned int> &fes) const;
-
-    /**
      * Return the indices of finite elements in this FECollection that dominate
      * all elements associated with the provided set of indices @p fes.
      *
