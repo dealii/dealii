@@ -19,6 +19,7 @@
 
 #include <deal.II/fe/mapping_q1.h>
 
+#include <deal.II/grid/connectivity.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/magic_numbers.h>
 #include <deal.II/grid/manifold.h>
@@ -2173,1539 +2174,411 @@ namespace internal
 
 
       /**
-       * Create a triangulation from
-       * given data. This function does
-       * this work for 1-dimensional
-       * triangulations independently
-       * of the actual space dimension.
+       * Create a triangulation from given data.
        */
-      template <int spacedim>
+      template <int dim, int spacedim>
       static void
-      create_triangulation(const std::vector<Point<spacedim>> &v,
-                           const std::vector<CellData<1>> &    cells,
-                           const SubCellData & /*subcelldata*/,
-                           Triangulation<1, spacedim> &triangulation)
+      create_triangulation(const std::vector<Point<spacedim>> &vertices,
+                           const std::vector<CellData<dim>> &  cells,
+                           const SubCellData &                 subcelldata,
+                           Triangulation<dim, spacedim> &      tria)
       {
-        AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        // clear old content
+        tria.levels.clear();
+        tria.levels.push_back(
+          std::make_unique<
+            dealii::internal::TriangulationImplementation::TriaLevel>(dim));
 
-        // note: since no boundary
-        // information can be given in one
-        // dimension, the @p{subcelldata}
-        // field is ignored. (only used for
-        // error checking, which is a good
-        // idea in any case)
-        const unsigned int dim = 1;
+        if (dim > 1)
+          tria.faces = std::make_unique<
+            dealii::internal::TriangulationImplementation::TriaFaces>(dim);
 
         // copy vertices
-        triangulation.vertices      = v;
-        triangulation.vertices_used = std::vector<bool>(v.size(), true);
+        tria.vertices = vertices;
+        tria.vertices_used.assign(vertices.size(), true);
 
-        // Check that all cells have positive volume. This check is not run in
-        // the codimension one or two cases since cell_measure is not
-        // implemented for those.
-#ifndef _MSC_VER
-        // TODO: The following code does not compile with MSVC. Find a way
-        // around it
-        if (dim == spacedim)
+        // compute connectivity
+        const auto connectivity   = build_connectivity<unsigned int>(cells);
+        const unsigned int n_cell = cells.size();
+
+        // TriaObjects: lines
+        if (dim >= 2)
           {
-            for (unsigned int cell_no = 0; cell_no < cells.size(); ++cell_no)
+            auto &lines_0 = tria.faces->lines; // data structure to be filled
+
+            // get connectivity between quads and lines
+            const auto &       crs     = connectivity.entity_to_entities(1, 0);
+            const unsigned int n_lines = crs.ptr.size() - 1;
+
+            // allocate memory
+            reserve_space_(lines_0, n_lines);
+
+            // loop over lines
+            for (unsigned int line = 0; line < n_lines; ++line)
+              for (unsigned int i = crs.ptr[line], j = 0; i < crs.ptr[line + 1];
+                   ++i, ++j)
+                lines_0.cells[line * GeometryInfo<1>::faces_per_cell + j] =
+                  crs.col[i]; // set vertex indices
+          }
+
+        // TriaObjects: quads
+        if (dim == 3)
+          {
+            auto &quads_0 = tria.faces->quads; // data structures to be filled
+            auto &faces   = *tria.faces;
+
+            // get connectivity between quads and lines
+            const auto &       crs     = connectivity.entity_to_entities(2, 1);
+            const unsigned int n_quads = crs.ptr.size() - 1;
+
+            // allocate memory
+            reserve_space_(quads_0, n_quads);
+            reserve_space_(faces, 2 /*structdim*/, n_quads);
+
+            // loop over all quads -> entity type, line indices/orientations
+            for (unsigned int q = 0, k = 0; q < n_quads; ++q)
               {
-                // If we should check for distorted cells, then we permit them
-                // to exist. If a cell has negative measure, then it must be
-                // distorted (the converse is not necessarily true); hence
-                // throw an exception if no such cells should exist.
-                if (!triangulation.check_for_distorted_cells)
+                // set entity type of quads
+                faces.quad_reference_cell_type[q] =
+                  connectivity.entity_types(2)[q];
+
+                // loop over all its lines
+                for (unsigned int i = crs.ptr[q], j = 0; i < crs.ptr[q + 1];
+                     ++i, ++j, ++k)
                   {
-                    unsigned int vertices[GeometryInfo<1>::vertices_per_cell];
+                    // set line index
+                    quads_0.cells[q * GeometryInfo<2>::faces_per_cell + j] =
+                      crs.col[i];
 
-                    for (unsigned int i = 0;
-                         i < GeometryInfo<1>::vertices_per_cell;
-                         ++i)
-                      vertices[i] = cells[cell_no].vertices[i];
-
-                    const double cell_measure =
-                      GridTools::cell_measure<1>(triangulation.vertices,
-                                                 vertices);
-                    AssertThrow(cell_measure > 0,
-                                ExcGridHasInvalidCell(cell_no));
+                    // set line orientations
+                    faces.quads_line_orientations
+                      [q * GeometryInfo<2>::faces_per_cell + j] =
+                      connectivity.entity_orientations(1)[k];
                   }
               }
           }
-#endif
 
-
-        // store the indices of the lines
-        // which are adjacent to a given
-        // vertex
-        std::vector<std::vector<int>> lines_at_vertex(v.size());
-
-        // reserve enough space
-        triangulation.levels.push_back(
-          std::make_unique<internal::TriangulationImplementation::TriaLevel>(
-            dim));
-        reserve_space(*triangulation.levels[0], cells.size(), dim, spacedim);
-        reserve_space(triangulation.levels[0]->cells, 0, cells.size());
-
-        // make up cells
-        typename Triangulation<dim, spacedim>::raw_line_iterator
-          next_free_line = triangulation.begin_raw_line();
-        for (unsigned int cell = 0; cell < cells.size(); ++cell)
-          {
-            while (next_free_line->used())
-              ++next_free_line;
-
-            next_free_line->set_bounding_object_indices(
-              {cells[cell].vertices[0], cells[cell].vertices[1]});
-            next_free_line->set_used_flag();
-            next_free_line->set_material_id(cells[cell].material_id);
-            next_free_line->set_manifold_id(cells[cell].manifold_id);
-            next_free_line->clear_user_data();
-            next_free_line->set_subdomain_id(0);
-
-            // note that this cell is
-            // adjacent to these vertices
-            lines_at_vertex[cells[cell].vertices[0]].push_back(cell);
-            lines_at_vertex[cells[cell].vertices[1]].push_back(cell);
-          }
-
-
-        // some security tests
+        // TriaObjects/TriaLevel: cell
         {
-          unsigned int boundary_nodes = 0;
-          for (const auto &line : lines_at_vertex)
-            switch (line.size())
-              {
-                case 1:
-                  // this vertex has only
-                  // one adjacent line
-                  ++boundary_nodes;
-                  break;
-                case 2:
-                  break;
-                default:
-                  AssertThrow(
-                    false,
-                    ExcMessage(
-                      "You have a vertex in your triangulation "
-                      "at which more than two cells come together. "
-                      "(For one dimensional triangulation, cells are "
-                      "line segments.)"
-                      "\n\n"
-                      "This is not currently supported because the "
-                      "Triangulation class makes the assumption that "
-                      "every cell has zero or one neighbors behind "
-                      "each face (here, behind each vertex), but in your "
-                      "situation there would be more than one."
-                      "\n\n"
-                      "Support for this is not currently implemented. "
-                      "If you need to work with triangulations where "
-                      "more than two cells come together at a vertex, "
-                      "duplicate the vertices once per cell (i.e., put "
-                      "multiple vertices at the same physical location, "
-                      "but using different vertex indices for each) "
-                      "and then ensure continuity of the solution by "
-                      "explicitly creating constraints that the degrees "
-                      "of freedom at these vertices have the same "
-                      "value, using the AffineConstraints class."));
-              }
+          auto &cells_0 = tria.levels[0]->cells; // data structure to be filled
+          auto &level   = *tria.levels[0];
+
+          // get connectivity between cells/faces and cells/cells
+          const auto &crs = connectivity.entity_to_entities(dim, dim - 1);
+          const auto &nei = connectivity.entity_to_entities(dim, dim);
+
+          // in 2D optional: since in in pure QUAD meshes same line
+          // orientations can be guaranteed
+          const bool orientation_needed =
+            dim == 3 ||
+            (dim == 2 &&
+             std::any_of(connectivity.entity_orientations(1).begin(),
+                         connectivity.entity_orientations(1).end(),
+                         [](const auto &i) { return i == 0; }));
+
+          // allocate memory
+          reserve_space_(cells_0, n_cell);
+          reserve_space_(level, spacedim, n_cell, orientation_needed);
+
+          // loop over all cells
+          for (unsigned int cell = 0; cell < n_cell; ++cell)
+            {
+              // set material ids
+              cells_0.boundary_or_material_id[cell].material_id =
+                cells[cell].material_id;
+
+              // set manifold ids
+              cells_0.manifold_id[cell] = cells[cell].manifold_id;
+
+              // set entity types
+              level.reference_cell_type[cell] =
+                connectivity.entity_types(dim)[cell];
+
+              // loop over faces
+              for (unsigned int i = crs.ptr[cell], j = 0; i < crs.ptr[cell + 1];
+                   ++i, ++j)
+                {
+                  // set neighbor if not at boundary
+                  if (nei.col[i] != static_cast<unsigned int>(-1))
+                    level.neighbors[cell * GeometryInfo<dim>::faces_per_cell +
+                                    j] = {0, nei.col[i]};
+
+                  // set face indices
+                  cells_0.cells[cell * GeometryInfo<dim>::faces_per_cell + j] =
+                    crs.col[i];
+
+                  // set face orientation if needed
+                  if (orientation_needed)
+                    level.face_orientations
+                      [cell * GeometryInfo<dim>::faces_per_cell + j] =
+                      connectivity.entity_orientations(dim - 1)[i];
+                }
+            }
         }
 
+        // TriaFaces: boundary id of boundary faces
+        if (dim > 1)
+          {
+            auto &bids_face = dim == 3 ?
+                                tria.faces->quads.boundary_or_material_id :
+                                tria.faces->lines.boundary_or_material_id;
 
+            // count number of cells a face is belonging to
+            std::vector<unsigned int> count(bids_face.size(), 0);
 
-        // update neighborship info
-        typename Triangulation<dim, spacedim>::active_line_iterator line =
-          triangulation.begin_active_line();
-        // for all lines
-        for (; line != triangulation.end(); ++line)
-          // for each of the two vertices
-          for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
-            // if first cell adjacent to
-            // this vertex is the present
-            // one, then the neighbor is
-            // the second adjacent cell and
-            // vice versa
-            if (lines_at_vertex[line->vertex_index(vertex)][0] == line->index())
-              if (lines_at_vertex[line->vertex_index(vertex)].size() == 2)
-                {
-                  const typename Triangulation<dim, spacedim>::cell_iterator
-                    neighbor(&triangulation,
-                             0, // level
-                             lines_at_vertex[line->vertex_index(vertex)][1]);
-                  line->set_neighbor(vertex, neighbor);
-                }
-              else
-                // no second adjacent cell
-                // entered -> cell at
-                // boundary
-                line->set_neighbor(vertex, triangulation.end());
-            else
-              // present line is not first
-              // adjacent one -> first
-              // adjacent one is neighbor
+            // get connectivity between cells/faces
+            const auto &crs = connectivity.entity_to_entities(dim, dim - 1);
+
+            // count how many cells are adjacent to the same face
+            for (unsigned int cell = 0; cell < cells.size(); ++cell)
+              for (unsigned int i = crs.ptr[cell]; i < crs.ptr[cell + 1]; ++i)
+                count[crs.col[i]]++;
+
+            // loop over all faces
+            for (unsigned int face = 0; face < count.size(); ++face)
               {
-                const typename Triangulation<dim, spacedim>::cell_iterator
-                  neighbor(&triangulation,
-                           0, // level
-                           lines_at_vertex[line->vertex_index(vertex)][0]);
-                line->set_neighbor(vertex, neighbor);
+                if (count[face] != 1) // inner face
+                  continue;
+
+                // boundary faces ...
+                bids_face[face].boundary_id = 0;
+
+                if (dim != 3)
+                  continue;
+
+                // ... and the lines of quads in 3D
+                const auto &crs = connectivity.entity_to_entities(2, 1);
+                for (unsigned int i = crs.ptr[face]; i < crs.ptr[face + 1]; ++i)
+                  tria.faces->lines.boundary_or_material_id[crs.col[i]]
+                    .boundary_id = 0;
               }
+          }
+        else // 1D
+          {
+            static const unsigned int t_tba   = static_cast<unsigned int>(-1);
+            static const unsigned int t_inner = static_cast<unsigned int>(-2);
 
-        // finally set the
-        // vertex_to_boundary_id_map_1d
-        // and vertex_to_manifold_id_map_1d
-        // maps
-        triangulation.vertex_to_boundary_id_map_1d->clear();
-        triangulation.vertex_to_manifold_id_map_1d->clear();
-        for (const auto &cell : triangulation.active_cell_iterators())
-          for (auto f : GeometryInfo<dim>::face_indices())
-            {
-              (*triangulation.vertex_to_manifold_id_map_1d)
-                [cell->face(f)->vertex_index()] = numbers::flat_manifold_id;
+            std::vector<unsigned int> type(vertices.size(), t_tba);
 
-              if (cell->at_boundary(f))
-                (*triangulation.vertex_to_boundary_id_map_1d)
-                  [cell->face(f)->vertex_index()] = f;
-            }
+            const auto &crs = connectivity.entity_to_entities(1, 0);
+
+            for (unsigned int cell = 0; cell < cells.size(); ++cell)
+              for (unsigned int i = crs.ptr[cell], j = 0; i < crs.ptr[cell + 1];
+                   ++i, ++j)
+                if (type[crs.col[i]] != t_inner)
+                  type[crs.col[i]] = type[crs.col[i]] == t_tba ? j : t_inner;
+
+            for (unsigned int face = 0; face < type.size(); ++face)
+              {
+                // note: we also treat manifolds here!?
+                (*tria.vertex_to_manifold_id_map_1d)[face] =
+                  numbers::flat_manifold_id;
+                if (type[face] != t_inner && type[face] != t_tba)
+                  (*tria.vertex_to_boundary_id_map_1d)[face] = type[face];
+              }
+          }
+
+        // SubCellData: line
+        if (dim >= 2)
+          process_subcelldata(connectivity.entity_to_entities(1, 0),
+                              tria.faces->lines,
+                              subcelldata.boundary_lines);
+
+        // SubCellData: quad
+        if (dim == 3)
+          process_subcelldata(connectivity.entity_to_entities(2, 0),
+                              tria.faces->quads,
+                              subcelldata.boundary_quads);
       }
 
 
-      /**
-       * Create a triangulation from
-       * given data. This function does
-       * this work for 2-dimensional
-       * triangulations independently
-       * of the actual space dimension.
-       */
-      template <int spacedim>
+      template <int structdim, typename T>
       static void
-      create_triangulation(const std::vector<Point<spacedim>> &v,
-                           const std::vector<CellData<2>> &    cells,
-                           const SubCellData &                 subcelldata,
-                           Triangulation<2, spacedim> &        triangulation)
+      process_subcelldata(
+        const CRS<T> &                          crs,
+        TriaObjects &                           obj,
+        const std::vector<CellData<structdim>> &boundary_objects_in)
       {
-        AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        AssertDimension(obj.structdim, structdim);
 
-        const unsigned int dim = 2;
+        if (boundary_objects_in.size() == 0)
+          return; // empty subcelldata -> nothing to do
 
-        // copy vertices
-        triangulation.vertices      = v;
-        triangulation.vertices_used = std::vector<bool>(v.size(), true);
+        // pre-sort subcelldata
+        auto boundary_objects = boundary_objects_in;
 
-        // Check that all cells have positive volume. This check is not run in
-        // the codimension one or two cases since cell_measure is not
-        // implemented for those.
-#ifndef _MSC_VER
-        // TODO: The following code does not compile with MSVC. Find a way
-        // around it
-        if (dim == spacedim)
+        // ... sort vertices
+        for (auto &boundary_object : boundary_objects)
+          std::sort(boundary_object.vertices.begin(),
+                    boundary_object.vertices.end());
+
+        // ... sort cells
+        std::sort(boundary_objects.begin(),
+                  boundary_objects.end(),
+                  [](const auto &a, const auto &b) {
+                    return a.vertices < b.vertices;
+                  });
+
+        unsigned int counter = 0;
+
+        std::vector<unsigned int> key;
+        key.reserve(GeometryInfo<structdim>::vertices_per_cell);
+
+        for (unsigned int o = 0; o < obj.n_objects(); ++o)
           {
-            for (unsigned int cell_no = 0; cell_no < cells.size(); ++cell_no)
+            auto &boundary_id = obj.boundary_or_material_id[o].boundary_id;
+            auto &manifold_id = obj.manifold_id[o];
+
+            // assert that object has not been visited yet and its value
+            // has not been modified yet
+            AssertThrow(boundary_id == 0 ||
+                          boundary_id == numbers::internal_face_boundary_id,
+                        ExcNotImplemented());
+            AssertThrow(manifold_id == numbers::flat_manifold_id,
+                        ExcNotImplemented());
+
+            // create key
+            key.assign(crs.col.data() + crs.ptr[o],
+                       crs.col.data() + crs.ptr[o + 1]);
+            std::sort(key.begin(), key.end());
+
+            // is subcelldata provided? -> binary search
+            const auto subcell_object =
+              std::lower_bound(boundary_objects.begin(),
+                               boundary_objects.end(),
+                               key,
+                               [&](const auto &cell, const auto &key) {
+                                 return cell.vertices < key;
+                               });
+
+            // no subcelldata provided for this object
+            if (subcell_object == boundary_objects.end() ||
+                subcell_object->vertices != key)
+              continue;
+
+            counter++;
+
+            // set manifold id
+            manifold_id = subcell_object->manifold_id;
+
+            // set boundary id
+            if (subcell_object->boundary_id !=
+                numbers::internal_face_boundary_id)
               {
-                // See the note in the 1D function on this if statement.
-                if (!triangulation.check_for_distorted_cells)
-                  {
-                    unsigned int vertices[GeometryInfo<2>::vertices_per_cell];
-
-                    for (unsigned int i = 0;
-                         i < GeometryInfo<2>::vertices_per_cell;
-                         ++i)
-                      vertices[i] = cells[cell_no].vertices[i];
-
-                    const double cell_measure =
-                      GridTools::cell_measure<2>(triangulation.vertices,
-                                                 vertices);
-                    AssertThrow(cell_measure > 0,
-                                ExcGridHasInvalidCell(cell_no));
-                  }
-              }
-          }
-#endif
-
-        // make up a list of the needed
-        // lines each line is a pair of
-        // vertices. The list is kept
-        // sorted and it is guaranteed that
-        // each line is inserted only once.
-        // While the key of such an entry
-        // is the pair of vertices, the
-        // thing it points to is an
-        // iterator pointing to the line
-        // object itself. In the first run,
-        // these iterators are all invalid
-        // ones, but they are filled
-        // afterwards
-        std::map<std::pair<int, int>,
-                 typename Triangulation<dim, spacedim>::line_iterator>
-          needed_lines;
-        for (unsigned int cell = 0; cell < cells.size(); ++cell)
-          {
-            for (const auto vertex : cells[cell].vertices)
-              AssertThrow(vertex < triangulation.vertices.size(),
-                          ExcInvalidVertexIndex(cell,
-                                                vertex,
-                                                triangulation.vertices.size()));
-
-            for (const unsigned int line : GeometryInfo<dim>::face_indices())
-              {
-                // given a line vertex number (0,1) on a specific line
-                // we get the cell vertex number (0-4) through the
-                // line_to_cell_vertices function
-                std::pair<int, int> line_vertices(
-                  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                    line, 0)],
-                  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                    line, 1)]);
-
-                // assert that the line was not already inserted in
-                // reverse order. This happens in spite of the vertex
-                // rotation above, if the sense of the cell was
-                // incorrect.
-                //
-                // Here is what usually happened when this exception
-                // is thrown: consider these two cells and the
-                // vertices
-                //  3---4---5
-                //  |   |   |
-                //  0---1---2
-                // If in the input vector the two cells are given with
-                // vertices <0 1 3 4> and <4 1 5 2>, in the first cell
-                // the middle line would have direction 1->4, while in
-                // the second it would be 4->1.  This will cause the
-                // exception.
-                AssertThrow(needed_lines.find(std::make_pair(
-                              line_vertices.second, line_vertices.first)) ==
-                              needed_lines.end(),
-                            ExcGridHasInvalidCell(cell));
-
-                // insert line, with
-                // invalid iterator if line
-                // already exists, then
-                // nothing bad happens here
-                needed_lines[line_vertices] = triangulation.end_line();
+                AssertThrow(boundary_id != numbers::internal_face_boundary_id,
+                            ExcNotImplemented());
+                boundary_id = subcell_object->boundary_id;
               }
           }
 
-
-        // check that every vertex has at
-        // least two adjacent lines
-        {
-          std::vector<unsigned short int> vertex_touch_count(v.size(), 0);
-          typename std::map<
-            std::pair<int, int>,
-            typename Triangulation<dim, spacedim>::line_iterator>::iterator i;
-          for (i = needed_lines.begin(); i != needed_lines.end(); ++i)
-            {
-              // touch the vertices of
-              // this line
-              ++vertex_touch_count[i->first.first];
-              ++vertex_touch_count[i->first.second];
-            }
-
-          // assert minimum touch count
-          // is at least two. if not so,
-          // then clean triangulation and
-          // exit with an exception
-          AssertThrow(*(std::min_element(vertex_touch_count.begin(),
-                                         vertex_touch_count.end())) >= 2,
-                      ExcMessage(
-                        "During creation of a triangulation, a part of the "
-                        "algorithm encountered a vertex that is part of only "
-                        "a single adjacent line. However, in 2d, every vertex "
-                        "needs to be at least part of two lines."));
-        }
-
-        // reserve enough space
-        triangulation.levels.push_back(
-          std::make_unique<internal::TriangulationImplementation::TriaLevel>(
-            dim));
-        triangulation.faces =
-          std::make_unique<internal::TriangulationImplementation::TriaFaces>(
-            dim);
-        reserve_space(*triangulation.levels[0], cells.size(), dim, spacedim);
-        reserve_space(triangulation.faces->lines, 0, needed_lines.size());
-        reserve_space(triangulation.levels[0]->cells, 0, cells.size());
-
-        // make up lines
-        {
-          typename Triangulation<dim, spacedim>::raw_line_iterator line =
-            triangulation.begin_raw_line();
-          typename std::map<
-            std::pair<int, int>,
-            typename Triangulation<dim, spacedim>::line_iterator>::iterator i;
-          for (i = needed_lines.begin(); line != triangulation.end_line();
-               ++line, ++i)
-            {
-              line->set_bounding_object_indices(
-                {i->first.first, i->first.second});
-              line->set_used_flag();
-              line->clear_user_flag();
-              line->clear_user_data();
-              i->second = line;
-            }
-        }
-
-
-        // store for each line index
-        // the adjacent cells
-        std::map<
-          int,
-          std::vector<typename Triangulation<dim, spacedim>::cell_iterator>>
-          adjacent_cells;
-
-        // finally make up cells
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator cell =
-            triangulation.begin_raw_quad();
-          for (unsigned int c = 0; c < cells.size(); ++c, ++cell)
-            {
-              typename Triangulation<dim, spacedim>::line_iterator
-                lines[GeometryInfo<dim>::lines_per_cell];
-              for (unsigned int line = 0;
-                   line < GeometryInfo<dim>::lines_per_cell;
-                   ++line)
-                lines[line] = needed_lines[std::make_pair(
-                  cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                    line, 0)],
-                  cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                    line, 1)])];
-
-              cell->set_bounding_object_indices({lines[0]->index(),
-                                                 lines[1]->index(),
-                                                 lines[2]->index(),
-                                                 lines[3]->index()});
-
-              cell->set_used_flag();
-              cell->set_material_id(cells[c].material_id);
-              cell->set_manifold_id(cells[c].manifold_id);
-              cell->clear_user_data();
-              cell->set_subdomain_id(0);
-
-              // note that this cell is
-              // adjacent to the four
-              // lines
-              for (const auto &line : lines)
-                adjacent_cells[line->index()].push_back(cell);
-            }
-        }
-
-
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
-          {
-            const unsigned int n_adj_cells =
-              adjacent_cells[line->index()].size();
-
-            // assert that every line has one or two adjacent cells.
-            // this has to be the case for 2d triangulations in 2d.
-            // in higher dimensions, this may happen but is not
-            // implemented
-            if (spacedim == 2)
-              {
-                AssertThrow((n_adj_cells >= 1) && (n_adj_cells <= 2),
-                            ExcInternalError());
-              }
-            else
-              {
-                AssertThrow(
-                  (n_adj_cells >= 1) && (n_adj_cells <= 2),
-                  ExcMessage("You have a line in your triangulation at which "
-                             "more than two cells come together."
-                             "\n\n"
-                             "This is not currently supported because the "
-                             "Triangulation class makes the assumption that "
-                             "every cell has zero or one neighbors behind each "
-                             "face (here, behind each line), but in your "
-                             "situation there would be more than one."
-                             "\n\n"
-                             "Support for this is not currently implemented. "
-                             "If you need to work with triangulations where "
-                             "more than two cells come together at a line, "
-                             "duplicate the vertices once per cell (i.e., put "
-                             "multiple vertices at the same physical location, "
-                             "but using different vertex indices for each) "
-                             "and then ensure continuity of the solution by "
-                             "explicitly creating constraints that the degrees "
-                             "of freedom at these lines have the same "
-                             "value, using the AffineConstraints class."));
-              }
-
-            // if only one cell: line is at boundary -> give it the boundary
-            // indicator zero by default
-            line->set_boundary_id_internal(
-              (n_adj_cells == 1) ? 0 : numbers::internal_face_boundary_id);
-            line->set_manifold_id(numbers::flat_manifold_id);
-          }
-
-        // set boundary indicators where given
-        for (const auto &subcell_line : subcelldata.boundary_lines)
-          {
-            typename Triangulation<dim, spacedim>::line_iterator line;
-            std::pair<int, int>                                  line_vertices(
-              std::make_pair(subcell_line.vertices[0],
-                             subcell_line.vertices[1]));
-            if (needed_lines.find(line_vertices) != needed_lines.end())
-              // line found in this direction
-              line = needed_lines[line_vertices];
-            else
-              {
-                // look whether it exists in reverse direction
-                std::swap(line_vertices.first, line_vertices.second);
-                if (needed_lines.find(line_vertices) != needed_lines.end())
-                  line = needed_lines[line_vertices];
-                else
-                  // line does not exist
-                  AssertThrow(false,
-                              ExcLineInexistant(line_vertices.first,
-                                                line_vertices.second));
-              }
-
-            // assert that we only set boundary info once
-            AssertThrow(!(line->boundary_id() != 0 &&
-                          line->boundary_id() !=
-                            numbers::internal_face_boundary_id),
-                        ExcMultiplySetLineInfoOfLine(line_vertices.first,
-                                                     line_vertices.second));
-
-            // assert that the manifold id is not yet set or consistent
-            // with the previous id
-            AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
-                          line->manifold_id() == subcell_line.manifold_id,
-                        ExcInconsistentLineInfoOfLine(line_vertices.first,
-                                                      line_vertices.second,
-                                                      "manifold ids"));
-            line->set_manifold_id(subcell_line.manifold_id);
-
-            // assert that only exterior lines are given a boundary
-            // indicator
-            if (subcell_line.boundary_id != numbers::internal_face_boundary_id)
-              {
-                AssertThrow(
-                  line->boundary_id() != numbers::internal_face_boundary_id,
-                  ExcInteriorLineCantBeBoundary(line->vertex_index(0),
-                                                line->vertex_index(1),
-                                                subcell_line.boundary_id));
-                line->set_boundary_id_internal(subcell_line.boundary_id);
-              }
-          }
-
-
-        // finally update neighborship info
-        for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int side = 0; side < 4; ++side)
-            if (adjacent_cells[cell->line(side)->index()][0] == cell)
-              // first adjacent cell is
-              // this one
-              {
-                if (adjacent_cells[cell->line(side)->index()].size() == 2)
-                  // there is another
-                  // adjacent cell
-                  cell->set_neighbor(
-                    side, adjacent_cells[cell->line(side)->index()][1]);
-              }
-            // first adjacent cell is not this
-            // one, -> it must be the neighbor
-            // we are looking for
-            else
-              cell->set_neighbor(side,
-                                 adjacent_cells[cell->line(side)->index()][0]);
+        // make sure that all subcelldata entries have been processed
+        // TODO: this is not guaranteed, why?
+        // AssertDimension(counter, boundary_objects_in.size());
       }
 
 
-      /**
-       * Invent an object which compares two std::vector objects against each
-       * other. This comparison is needed in order to establish a map of vertex
-       * index tuples to iterators in the
-       * Triangulation<3,3>::create_triangulation function.
-       */
-      struct QuadComparator
-      {
-        inline bool
-        operator()(const std::vector<int> &q1, const std::vector<int> &q2) const
-        {
-          Assert(q1.size() == 4, ExcInternalError());
-          Assert(q2.size() == 4, ExcInternalError());
 
-          // here is room to
-          // optimize the repeated
-          // equality test of the
-          // previous lines; the
-          // compiler will probably
-          // take care of most of
-          // it anyway
-          if ((q1[0] < q2[0]) || ((q1[0] == q2[0]) && (q1[1] < q2[1])) ||
-              ((q1[0] == q2[0]) && (q1[1] == q2[1]) && (q1[2] < q2[2])) ||
-              ((q1[0] == q2[0]) && (q1[1] == q2[1]) && (q1[2] == q2[2]) &&
-               (q1[3] < q2[3])))
-            return true;
-          else
-            return false;
-        }
-      };
-
-
-      /**
-       * Create a triangulation from
-       * given data. This function does
-       * this work for 3-dimensional
-       * triangulations independently
-       * of the actual space dimension.
-       */
-      template <int spacedim>
       static void
-      create_triangulation(const std::vector<Point<spacedim>> &v,
-                           const std::vector<CellData<3>> &    cells,
-                           const SubCellData &                 subcelldata,
-                           Triangulation<3, spacedim> &        triangulation)
+      reserve_space_(TriaFaces &        faces,
+                     const unsigned     structdim,
+                     const unsigned int size)
       {
-        AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        const unsigned int dim = faces.dim;
 
-        const unsigned int dim = 3;
+        const unsigned int faces_per_cell =
+          structdim == 1 ? GeometryInfo<1>::faces_per_cell :
+                           (structdim == 2 ? GeometryInfo<2>::faces_per_cell :
+                                             GeometryInfo<3>::faces_per_cell);
 
-        // copy vertices
-        triangulation.vertices      = v;
-        triangulation.vertices_used = std::vector<bool>(v.size(), true);
-
-        // Check that all cells have positive volume.
-#ifndef _MSC_VER
-        // TODO: The following code does not compile with MSVC. Find a way
-        // around it
-        for (unsigned int cell_no = 0; cell_no < cells.size(); ++cell_no)
+        if (dim == 3 && structdim == 2)
           {
-            // See the note in the 1D function on this if statement.
-            if (!triangulation.check_for_distorted_cells)
-              {
-                unsigned int vertices[GeometryInfo<3>::vertices_per_cell];
+            // quad entity types
+            faces.quad_reference_cell_type.assign(size,
+                                                  ReferenceCell::Type::Invalid);
 
-                for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell;
-                     ++i)
-                  vertices[i] = cells[cell_no].vertices[i];
-
-                const double cell_measure =
-                  GridTools::cell_measure<3>(triangulation.vertices, vertices);
-                AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
-              }
+            // quad line orientations
+            faces.quads_line_orientations.assign(size * faces_per_cell, -1);
           }
-#endif
+      }
 
-        ///////////////////////////////////////
-        // first set up some collections of data
-        //
-        // make up a list of the needed
-        // lines
-        //
-        // each line is a pair of
-        // vertices. The list is kept
-        // sorted and it is guaranteed that
-        // each line is inserted only once.
-        // While the key of such an entry
-        // is the pair of vertices, the
-        // thing it points to is an
-        // iterator pointing to the line
-        // object itself. In the first run,
-        // these iterators are all invalid
-        // ones, but they are filled
-        // afterwards same applies for the
-        // quads
-        typename std::map<std::pair<int, int>,
-                          typename Triangulation<dim, spacedim>::line_iterator>
-          needed_lines;
-        for (unsigned int cell = 0; cell < cells.size(); ++cell)
+
+
+      static void
+      reserve_space_(TriaLevel &        level,
+                     const unsigned int spacedim,
+                     const unsigned int size,
+                     const bool         orientation_needed)
+      {
+        const unsigned int dim = level.dim;
+
+        const unsigned int faces_per_cell =
+          dim == 1 ? GeometryInfo<1>::faces_per_cell :
+                     (dim == 2 ? GeometryInfo<2>::faces_per_cell :
+                                 GeometryInfo<3>::faces_per_cell);
+
+        level.active_cell_indices.assign(size, -1);
+        level.subdomain_ids.assign(size, 0);
+        level.level_subdomain_ids.assign(size, 0);
+
+        level.refine_flags.assign(size, false);
+        level.coarsen_flags.assign(size, false);
+
+        level.parents.assign((size + 1) / 2, -1);
+
+        if (dim < spacedim)
+          level.direction_flags.assign(size, true);
+
+        level.neighbors.assign(size * faces_per_cell, {-1, -1});
+
+        level.reference_cell_type.assign(size, ReferenceCell::Type::Invalid);
+
+        if (orientation_needed)
+          level.face_orientations.assign(size * faces_per_cell, -1);
+      }
+
+
+
+      static void
+      reserve_space_(TriaObjects &obj, const unsigned int size)
+      {
+        const unsigned int structdim = obj.structdim;
+
+        const unsigned int max_children_per_cell =
+          structdim == 1 ?
+            GeometryInfo<1>::max_children_per_cell :
+            (structdim == 2 ? GeometryInfo<2>::max_children_per_cell :
+                              GeometryInfo<3>::max_children_per_cell);
+        const unsigned int faces_per_cell =
+          structdim == 1 ? GeometryInfo<1>::faces_per_cell :
+                           (structdim == 2 ? GeometryInfo<2>::faces_per_cell :
+                                             GeometryInfo<3>::faces_per_cell);
+
+        obj.used.assign(size, true);
+        obj.boundary_or_material_id.assign(
+          size,
+          internal::TriangulationImplementation::TriaObjects::
+            BoundaryOrMaterialId());
+        obj.manifold_id.assign(size, -1);
+        obj.user_flags.assign(size, false);
+        obj.user_data.resize(size);
+
+        if (structdim > 1) // TODO: why?
+          obj.refinement_cases.assign(size, 0);
+
+        obj.children.assign(max_children_per_cell / 2 * size, -1);
+
+        obj.cells.assign(faces_per_cell * size, -1);
+
+        if (structdim <= 2)
           {
-            // check whether vertex indices
-            // are valid ones
-            for (const auto vertex : cells[cell].vertices)
-              AssertThrow(vertex < triangulation.vertices.size(),
-                          ExcInvalidVertexIndex(cell,
-                                                vertex,
-                                                triangulation.vertices.size()));
-
-            for (unsigned int line = 0;
-                 line < GeometryInfo<dim>::lines_per_cell;
-                 ++line)
-              {
-                // given a line vertex number
-                // (0,1) on a specific line we
-                // get the cell vertex number
-                // (0-7) through the
-                // line_to_cell_vertices
-                // function
-                std::pair<int, int> line_vertices(
-                  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                    line, 0)],
-                  cells[cell].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                    line, 1)]);
-
-                // if that line was already inserted
-                // in reverse order do nothing, else
-                // insert the line
-                if ((needed_lines.find(std::make_pair(line_vertices.second,
-                                                      line_vertices.first)) ==
-                     needed_lines.end()))
-                  {
-                    // insert line, with
-                    // invalid iterator. if line
-                    // already exists, then
-                    // nothing bad happens here
-                    needed_lines[line_vertices] = triangulation.end_line();
-                  }
-              }
+            obj.next_free_single               = size - 1;
+            obj.next_free_pair                 = 0;
+            obj.reverse_order_next_free_single = true;
           }
-
-
-        /////////////////////////////////
-        // now for some sanity-checks:
-        //
-        // check that every vertex has at
-        // least tree adjacent lines
-        {
-          std::vector<unsigned short int> vertex_touch_count(v.size(), 0);
-          typename std::map<
-            std::pair<int, int>,
-            typename Triangulation<dim, spacedim>::line_iterator>::iterator i;
-          for (i = needed_lines.begin(); i != needed_lines.end(); ++i)
-            {
-              // touch the vertices of
-              // this line
-              ++vertex_touch_count[i->first.first];
-              ++vertex_touch_count[i->first.second];
-            }
-
-          // assert minimum touch count
-          // is at least three. if not so,
-          // then clean triangulation and
-          // exit with an exception
-          AssertThrow(
-            *(std::min_element(vertex_touch_count.begin(),
-                               vertex_touch_count.end())) >= 3,
-            ExcMessage(
-              "During creation of a triangulation, a part of the "
-              "algorithm encountered a vertex that is part of only "
-              "one or two adjacent lines. However, in 3d, every vertex "
-              "needs to be at least part of three lines."));
-        }
-
-
-        ///////////////////////////////////
-        // actually set up data structures
-        // for the lines
-        // reserve enough space
-        triangulation.levels.push_back(
-          std::make_unique<internal::TriangulationImplementation::TriaLevel>(
-            dim));
-        triangulation.faces =
-          std::make_unique<internal::TriangulationImplementation::TriaFaces>(
-            dim);
-        reserve_space(*triangulation.levels[0], cells.size(), dim, spacedim);
-        reserve_space(triangulation.faces->lines, 0, needed_lines.size());
-
-        // make up lines
-        {
-          typename Triangulation<dim, spacedim>::raw_line_iterator line =
-            triangulation.begin_raw_line();
-          typename std::map<
-            std::pair<int, int>,
-            typename Triangulation<dim, spacedim>::line_iterator>::iterator i;
-          for (i = needed_lines.begin(); line != triangulation.end_line();
-               ++line, ++i)
-            {
-              line->set_bounding_object_indices(
-                {i->first.first, i->first.second});
-              line->set_used_flag();
-              line->clear_user_flag();
-              line->clear_user_data();
-
-              // now set the iterator for
-              // this line
-              i->second = line;
-            }
-        }
-
-
-        ///////////////////////////////////////////
-        // make up the quads of this triangulation
-        //
-        // same thing: the iterators are
-        // set to the invalid value at
-        // first, we only collect the data
-        // now
-
-        // the bool array stores, whether the lines
-        // are in the standard orientation or not
-
-        // note that QuadComparator is a
-        // class declared and defined in
-        // this file
-        std::map<std::vector<int>,
-                 std::pair<typename Triangulation<dim, spacedim>::quad_iterator,
-                           std::array<bool, GeometryInfo<dim>::lines_per_face>>,
-                 QuadComparator>
-          needed_quads;
-        for (const auto &cell : cells)
+        else
           {
-            // the faces are quads which
-            // consist of four numbers
-            // denoting the index of the
-            // four lines bounding the
-            // quad. we can get this index
-            // by asking @p{needed_lines}
-            // for an iterator to this
-            // line, dereferencing it and
-            // thus return an iterator into
-            // the @p{lines} array of the
-            // triangulation, which is
-            // already set up. we can then
-            // ask this iterator for its
-            // index within the present
-            // level (the level is zero, of
-            // course)
-            //
-            // to make things easier, we
-            // don't create the lines
-            // (pairs of their vertex
-            // indices) in place, but
-            // before they are really
-            // needed.
-            std::pair<int, int> line_list[GeometryInfo<dim>::lines_per_cell],
-              inverse_line_list[GeometryInfo<dim>::lines_per_cell];
-            unsigned int face_line_list[GeometryInfo<dim>::lines_per_face];
-            std::array<bool, GeometryInfo<dim>::lines_per_face> orientation;
-
-            for (unsigned int line = 0;
-                 line < GeometryInfo<dim>::lines_per_cell;
-                 ++line)
-              {
-                line_list[line] = std::pair<int, int>(
-                  cell.vertices[GeometryInfo<dim>::line_to_cell_vertices(line,
-                                                                         0)],
-                  cell.vertices[GeometryInfo<dim>::line_to_cell_vertices(line,
-                                                                         1)]);
-                inverse_line_list[line] = std::pair<int, int>(
-                  cell.vertices[GeometryInfo<dim>::line_to_cell_vertices(line,
-                                                                         1)],
-                  cell.vertices[GeometryInfo<dim>::line_to_cell_vertices(line,
-                                                                         0)]);
-              }
-
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
-              {
-                // set up a list of the lines to be
-                // used for this face. check the
-                // direction for each line
-                //
-                // given a face line number (0-3) on
-                // a specific face we get the cell
-                // line number (0-11) through the
-                // face_to_cell_lines function
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_face;
-                     ++l)
-                  if (needed_lines.find(
-                        inverse_line_list[GeometryInfo<dim>::face_to_cell_lines(
-                          face, l)]) == needed_lines.end())
-                    {
-                      face_line_list[l] =
-                        needed_lines[line_list[GeometryInfo<
-                                       dim>::face_to_cell_lines(face, l)]]
-                          ->index();
-                      orientation[l] = true;
-                    }
-                  else
-                    {
-                      face_line_list[l] =
-                        needed_lines[inverse_line_list[GeometryInfo<
-                                       dim>::face_to_cell_lines(face, l)]]
-                          ->index();
-                      orientation[l] = false;
-                    }
-
-
-                const std::vector<int> quad(
-                  {static_cast<int>(face_line_list[0]),
-                   static_cast<int>(face_line_list[1]),
-                   static_cast<int>(face_line_list[2]),
-                   static_cast<int>(face_line_list[3])});
-
-                // insert quad, with invalid iterator
-                //
-                // if quad already exists, then nothing bad happens here, as
-                // this will then simply become an interior face of the
-                // triangulation. however, we will run into major trouble if the
-                // face was already inserted in the opposite direction. there
-                // are really only two orientations for a face to be in, since
-                // the edge directions are already set. thus, vertex 0 is the
-                // one from which two edges originate, and vertex 3 is the one
-                // to which they converge. we are then left with orientations
-                // 0-1-2-3 and 2-3-0-1 for the order of lines. the corresponding
-                // quad can be easily constructed by exchanging lines. we do so
-                // here, just to check that that flipped quad isn't already in
-                // the triangulation. if it is, then don't insert the new one
-                // and instead later set the face_orientation flag
-
-                // face_orientation=false, face_flip=false, face_rotation=false
-                const std::vector<int> test_quad_1(
-                  {quad[2], quad[3], quad[0], quad[1]}),
-                  // face_orientation=false, face_flip=false, face_rotation=true
-                  test_quad_2({quad[0], quad[1], quad[3], quad[2]}),
-                  // face_orientation=false, face_flip=true, face_rotation=false
-                  test_quad_3({quad[3], quad[2], quad[1], quad[0]}),
-                  // face_orientation=false, face_flip=true, face_rotation=true
-                  test_quad_4({quad[1], quad[0], quad[2], quad[3]}),
-                  // face_orientation=true, face_flip=false, face_rotation=true
-                  test_quad_5({quad[2], quad[3], quad[1], quad[0]}),
-                  // face_orientation=true, face_flip=true, face_rotation=false
-                  test_quad_6({quad[1], quad[0], quad[3], quad[2]}),
-                  // face_orientation=true, face_flip=true, face_rotation=true
-                  test_quad_7({quad[3], quad[2], quad[0], quad[1]});
-
-                if (needed_quads.find(test_quad_1) == needed_quads.end() &&
-                    needed_quads.find(test_quad_2) == needed_quads.end() &&
-                    needed_quads.find(test_quad_3) == needed_quads.end() &&
-                    needed_quads.find(test_quad_4) == needed_quads.end() &&
-                    needed_quads.find(test_quad_5) == needed_quads.end() &&
-                    needed_quads.find(test_quad_6) == needed_quads.end() &&
-                    needed_quads.find(test_quad_7) == needed_quads.end())
-                  needed_quads[quad] =
-                    std::make_pair(triangulation.end_quad(), orientation);
-              }
+            obj.next_free_single = obj.next_free_pair = 0;
           }
-
-
-        /////////////////////////////////
-        // enter the resulting quads into
-        // the arrays of the Triangulation
-        //
-        // first reserve enough space
-        reserve_space(*triangulation.faces, 0, needed_quads.size());
-        reserve_space(triangulation.faces->quads, 0, needed_quads.size());
-
-        {
-          typename Triangulation<dim, spacedim>::raw_quad_iterator quad =
-            triangulation.begin_raw_quad();
-          typename std::map<
-            std::vector<int>,
-            std::pair<typename Triangulation<dim, spacedim>::quad_iterator,
-                      std::array<bool, GeometryInfo<dim>::lines_per_face>>,
-            QuadComparator>::iterator q;
-          for (q = needed_quads.begin(); quad != triangulation.end_quad();
-               ++quad, ++q)
-            {
-              quad->set_bounding_object_indices(
-                {q->first[0], q->first[1], q->first[2], q->first[3]});
-              quad->set_used_flag();
-              quad->clear_user_flag();
-              quad->clear_user_data();
-              // set the line orientation
-              quad->set_line_orientation(0, q->second.second[0]);
-              quad->set_line_orientation(1, q->second.second[1]);
-              quad->set_line_orientation(2, q->second.second[2]);
-              quad->set_line_orientation(3, q->second.second[3]);
-
-
-              // now set the iterator for
-              // this quad
-              q->second.first = quad;
-            }
-        }
-
-        /////////////////////////////////
-        // finally create the cells
-        reserve_space(triangulation.levels[0]->cells, cells.size());
-
-        // store for each quad index the
-        // adjacent cells
-        std::map<
-          int,
-          std::vector<typename Triangulation<dim, spacedim>::cell_iterator>>
-          adjacent_cells;
-
-        // finally make up cells
-        {
-          typename Triangulation<dim, spacedim>::raw_cell_iterator cell =
-            triangulation.begin_raw_hex();
-          for (unsigned int c = 0; c < cells.size(); ++c, ++cell)
-            {
-              // first find for each of
-              // the cells the quad
-              // iterator of the
-              // respective faces.
-              //
-              // to this end, set up the
-              // lines of this cell and
-              // find the quads that are
-              // bounded by these lines;
-              // these are then the faces
-              // of the present cell
-              std::pair<int, int> line_list[GeometryInfo<dim>::lines_per_cell],
-                inverse_line_list[GeometryInfo<dim>::lines_per_cell];
-              unsigned int face_line_list[4];
-              for (unsigned int line = 0;
-                   line < GeometryInfo<dim>::lines_per_cell;
-                   ++line)
-                {
-                  line_list[line] = std::make_pair(
-                    cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                      line, 0)],
-                    cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                      line, 1)]);
-                  inverse_line_list[line] = std::pair<int, int>(
-                    cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                      line, 1)],
-                    cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(
-                      line, 0)]);
-                }
-
-              // get the iterators
-              // corresponding to the
-              // faces. also store
-              // whether they are
-              // reversed or not
-              typename Triangulation<dim, spacedim>::quad_iterator
-                   face_iterator[GeometryInfo<dim>::faces_per_cell];
-              bool face_orientation[GeometryInfo<dim>::faces_per_cell];
-              bool face_flip[GeometryInfo<dim>::faces_per_cell];
-              bool face_rotation[GeometryInfo<dim>::faces_per_cell];
-              for (const unsigned int face : GeometryInfo<dim>::face_indices())
-                {
-                  for (unsigned int l = 0;
-                       l < GeometryInfo<dim>::lines_per_face;
-                       ++l)
-                    if (needed_lines.find(inverse_line_list[GeometryInfo<
-                          dim>::face_to_cell_lines(face, l)]) ==
-                        needed_lines.end())
-                      face_line_list[l] =
-                        needed_lines[line_list[GeometryInfo<
-                                       dim>::face_to_cell_lines(face, l)]]
-                          ->index();
-                    else
-                      face_line_list[l] =
-                        needed_lines[inverse_line_list[GeometryInfo<
-                                       dim>::face_to_cell_lines(face, l)]]
-                          ->index();
-
-                  const std::vector<int> quad(
-                    {static_cast<int>(face_line_list[0]),
-                     static_cast<int>(face_line_list[1]),
-                     static_cast<int>(face_line_list[2]),
-                     static_cast<int>(face_line_list[3])});
-
-                  if (needed_quads.find(quad) != needed_quads.end())
-                    {
-                      // face is in standard
-                      // orientation (and not
-                      // flipped or rotated). this
-                      // must be true for at least
-                      // one of the two cells
-                      // containing this face
-                      // (i.e. for the cell which
-                      // originally inserted the
-                      // face)
-                      face_iterator[face]    = needed_quads[quad].first;
-                      face_orientation[face] = true;
-                      face_flip[face]        = false;
-                      face_rotation[face]    = false;
-                    }
-                  else
-                    {
-                      // face must be available in reverse order then. construct
-                      // all possibilities and check them one after the other
-
-                      // face_orientation=false, face_flip=false,
-                      // face_rotation=false
-                      const std::vector<int> test_quad_1(
-                        {quad[2], quad[3], quad[0], quad[1]}),
-                        // face_orientation=false, face_flip=false,
-                        // face_rotation=true
-                        test_quad_2({quad[0], quad[1], quad[3], quad[2]}),
-                        // face_orientation=false, face_flip=true,
-                        // face_rotation=false
-                        test_quad_3({quad[3], quad[2], quad[1], quad[0]}),
-                        // face_orientation=false, face_flip=true,
-                        // face_rotation=true
-                        test_quad_4({quad[1], quad[0], quad[2], quad[3]}),
-                        // face_orientation=true, face_flip=false,
-                        // face_rotation=true
-                        test_quad_5({quad[2], quad[3], quad[1], quad[0]}),
-                        // face_orientation=true, face_flip=true,
-                        // face_rotation=false
-                        test_quad_6({quad[1], quad[0], quad[3], quad[2]}),
-                        // face_orientation=true, face_flip=true,
-                        // face_rotation=true
-                        test_quad_7({quad[3], quad[2], quad[0], quad[1]});
-
-                      if (needed_quads.find(test_quad_1) != needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_1].first;
-                          face_orientation[face] = false;
-                          face_flip[face]        = false;
-                          face_rotation[face]    = false;
-                        }
-                      else if (needed_quads.find(test_quad_2) !=
-                               needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_2].first;
-                          face_orientation[face] = false;
-                          face_flip[face]        = false;
-                          face_rotation[face]    = true;
-                        }
-                      else if (needed_quads.find(test_quad_3) !=
-                               needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_3].first;
-                          face_orientation[face] = false;
-                          face_flip[face]        = true;
-                          face_rotation[face]    = false;
-                        }
-                      else if (needed_quads.find(test_quad_4) !=
-                               needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_4].first;
-                          face_orientation[face] = false;
-                          face_flip[face]        = true;
-                          face_rotation[face]    = true;
-                        }
-                      else if (needed_quads.find(test_quad_5) !=
-                               needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_5].first;
-                          face_orientation[face] = true;
-                          face_flip[face]        = false;
-                          face_rotation[face]    = true;
-                        }
-                      else if (needed_quads.find(test_quad_6) !=
-                               needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_6].first;
-                          face_orientation[face] = true;
-                          face_flip[face]        = true;
-                          face_rotation[face]    = false;
-                        }
-                      else if (needed_quads.find(test_quad_7) !=
-                               needed_quads.end())
-                        {
-                          face_iterator[face] = needed_quads[test_quad_7].first;
-                          face_orientation[face] = true;
-                          face_flip[face]        = true;
-                          face_rotation[face]    = true;
-                        }
-
-                      else
-                        // we didn't find the
-                        // face in any direction,
-                        // so something went
-                        // wrong above
-                        Assert(false, ExcInternalError());
-                    }
-                } // for all faces
-
-              // make the cell out of
-              // these iterators
-              cell->set_bounding_object_indices({face_iterator[0]->index(),
-                                                 face_iterator[1]->index(),
-                                                 face_iterator[2]->index(),
-                                                 face_iterator[3]->index(),
-                                                 face_iterator[4]->index(),
-                                                 face_iterator[5]->index()});
-
-              cell->set_used_flag();
-              cell->set_material_id(cells[c].material_id);
-              cell->set_manifold_id(cells[c].manifold_id);
-              cell->clear_user_flag();
-              cell->clear_user_data();
-              cell->set_subdomain_id(0);
-
-              // set orientation flag for
-              // each of the faces
-              for (const unsigned int quad : GeometryInfo<dim>::face_indices())
-                {
-                  cell->set_face_orientation(quad, face_orientation[quad]);
-                  cell->set_face_flip(quad, face_flip[quad]);
-                  cell->set_face_rotation(quad, face_rotation[quad]);
-                }
-
-
-              // note that this cell is
-              // adjacent to the six
-              // quads
-              for (const auto &quad : face_iterator)
-                adjacent_cells[quad->index()].push_back(cell);
-
-#ifdef DEBUG
-              // make some checks on the
-              // lines and their
-              // ordering
-
-              // first map all cell lines
-              // to the two face lines
-              // which should
-              // coincide. all face lines
-              // are included with a cell
-              // line number (0-11)
-              // key. At the end all keys
-              // will be included twice
-              // (for each of the two
-              // coinciding lines once)
-              std::multimap<unsigned int, std::pair<unsigned int, unsigned int>>
-                cell_to_face_lines;
-              for (const unsigned int face : GeometryInfo<dim>::face_indices())
-                for (unsigned int line = 0;
-                     line < GeometryInfo<dim>::lines_per_face;
-                     ++line)
-                  cell_to_face_lines.insert(
-                    std::pair<unsigned int,
-                              std::pair<unsigned int, unsigned int>>(
-                      GeometryInfo<dim>::face_to_cell_lines(face, line),
-                      std::pair<unsigned int, unsigned int>(face, line)));
-              std::multimap<unsigned int,
-                            std::pair<unsigned int, unsigned int>>::
-                const_iterator map_iter = cell_to_face_lines.begin();
-
-              for (; map_iter != cell_to_face_lines.end(); ++map_iter)
-                {
-                  const unsigned int cell_line = map_iter->first;
-                  const unsigned int face1     = map_iter->second.first;
-                  const unsigned int line1     = map_iter->second.second;
-                  ++map_iter;
-                  Assert(map_iter != cell_to_face_lines.end(),
-                         ExcInternalErrorOnCell(c));
-                  Assert(map_iter->first == cell_line,
-                         ExcInternalErrorOnCell(c));
-                  const unsigned int face2 = map_iter->second.first;
-                  const unsigned int line2 = map_iter->second.second;
-
-                  // check that the pair
-                  // of lines really
-                  // coincide. Take care
-                  // about the face
-                  // orientation;
-                  Assert(face_iterator[face1]->line(
-                           GeometryInfo<dim>::standard_to_real_face_line(
-                             line1,
-                             face_orientation[face1],
-                             face_flip[face1],
-                             face_rotation[face1])) ==
-                           face_iterator[face2]->line(
-                             GeometryInfo<dim>::standard_to_real_face_line(
-                               line2,
-                               face_orientation[face2],
-                               face_flip[face2],
-                               face_rotation[face2])),
-                         ExcInternalErrorOnCell(c));
-                }
-#endif
-            }
-        }
-
-
-        /////////////////////////////////////////
-        // find those quads which are at the
-        // boundary and mark them appropriately
-        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
-               triangulation.begin_quad();
-             quad != triangulation.end_quad();
-             ++quad)
-          {
-            const unsigned int n_adj_cells =
-              adjacent_cells[quad->index()].size();
-            // assert that every quad has
-            // one or two adjacent cells
-            AssertThrow((n_adj_cells >= 1) && (n_adj_cells <= 2),
-                        ExcInternalError());
-
-            // if only one cell: quad is at boundary -> give it the boundary
-            // indicator zero by default
-            quad->set_boundary_id_internal(
-              (n_adj_cells == 1) ? 0 : numbers::internal_face_boundary_id);
-
-            // Manifold ids are set independently of where they are
-            quad->set_manifold_id(numbers::flat_manifold_id);
-          }
-
-        /////////////////////////////////////////
-        // next find those lines which are at
-        // the boundary and mark all others as
-        // interior ones
-        //
-        // for this: first mark all lines as interior. use this loop
-        // to also set all manifold ids of all lines
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
-          {
-            line->set_boundary_id_internal(numbers::internal_face_boundary_id);
-            line->set_manifold_id(numbers::flat_manifold_id);
-          }
-
-        // next reset all lines bounding
-        // boundary quads as on the
-        // boundary also. note that since
-        // we are in 3d, there are cases
-        // where one or more lines of a
-        // quad that is not on the
-        // boundary, are actually boundary
-        // lines. they will not be marked
-        // when visiting this
-        // face. however, since we do not
-        // support dim-2 dimensional
-        // boundaries (i.e. internal lines
-        // constituting boundaries), every
-        // such line is also part of a face
-        // that is actually on the
-        // boundary, so sooner or later we
-        // get to mark that line for being
-        // on the boundary
-        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
-               triangulation.begin_quad();
-             quad != triangulation.end_quad();
-             ++quad)
-          if (quad->at_boundary())
-            {
-              for (unsigned int l = 0; l < 4; ++l)
-                {
-                  typename Triangulation<dim, spacedim>::line_iterator line =
-                    quad->line(l);
-                  line->set_boundary_id_internal(0);
-                }
-            }
-
-        ///////////////////////////////////////
-        // now set boundary indicators
-        // where given
-        //
-        // first do so for lines
-        for (const auto &subcell_line : subcelldata.boundary_lines)
-          {
-            typename Triangulation<dim, spacedim>::line_iterator line;
-            std::pair<int, int>                                  line_vertices(
-              std::make_pair(subcell_line.vertices[0],
-                             subcell_line.vertices[1]));
-            if (needed_lines.find(line_vertices) != needed_lines.end())
-              // line found in this
-              // direction
-              line = needed_lines[line_vertices];
-
-            else
-              {
-                // look whether it exists in
-                // reverse direction
-                std::swap(line_vertices.first, line_vertices.second);
-                if (needed_lines.find(line_vertices) != needed_lines.end())
-                  line = needed_lines[line_vertices];
-                else
-                  // line does not exist
-                  AssertThrow(false,
-                              ExcLineInexistant(line_vertices.first,
-                                                line_vertices.second));
-              }
-            // Only exterior lines can be given a boundary indicator
-            if (line->at_boundary())
-              {
-                // make sure that we don't attempt to reset the boundary
-                // indicator to a different than the previously set value
-                AssertThrow(line->boundary_id() == 0 ||
-                              line->boundary_id() == subcell_line.boundary_id,
-                            ExcInconsistentLineInfoOfLine(line_vertices.first,
-                                                          line_vertices.second,
-                                                          "boundary ids"));
-                // If the boundary id provided in subcell_line
-                // is anything other than the default
-                // (internal_face_boundary_id), then set it in the new
-                // triangulation.
-                if (subcell_line.boundary_id !=
-                    numbers::internal_face_boundary_id)
-                  line->set_boundary_id(subcell_line.boundary_id);
-              }
-            // Set manifold id if given
-            AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
-                          line->manifold_id() == subcell_line.manifold_id,
-                        ExcInconsistentLineInfoOfLine(line_vertices.first,
-                                                      line_vertices.second,
-                                                      "manifold ids"));
-            line->set_manifold_id(subcell_line.manifold_id);
-          }
-
-
-        // now go on with the faces
-        for (const auto &subcell_quad : subcelldata.boundary_quads)
-          {
-            typename Triangulation<dim, spacedim>::quad_iterator quad;
-            typename Triangulation<dim, spacedim>::line_iterator line[4];
-
-            // first find the lines that
-            // are made up of the given
-            // vertices, then build up a
-            // quad from these lines
-            // finally use the find
-            // function of the map template
-            // to find the quad
-            for (unsigned int i = 0; i < 4; ++i)
-              {
-                std::pair<int, int> line_vertices(
-                  subcell_quad
-                    .vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(i,
-                                                                           0)],
-                  subcell_quad
-                    .vertices[GeometryInfo<dim - 1>::line_to_cell_vertices(i,
-                                                                           1)]);
-
-                // check whether line
-                // already exists
-                if (needed_lines.find(line_vertices) != needed_lines.end())
-                  line[i] = needed_lines[line_vertices];
-                else
-                  // look whether it exists
-                  // in reverse direction
-                  {
-                    std::swap(line_vertices.first, line_vertices.second);
-                    if (needed_lines.find(line_vertices) != needed_lines.end())
-                      line[i] = needed_lines[line_vertices];
-                    else
-                      // line does
-                      // not exist
-                      AssertThrow(false,
-                                  ExcLineInexistant(line_vertices.first,
-                                                    line_vertices.second));
-                  }
-              }
-
-
-            // Set up 2 quads that are
-            // built up from the lines for
-            // reasons of comparison to
-            // needed_quads.  The second
-            // quad is the reversed version
-            // of the first quad in order
-            // find the quad regardless of
-            // its orientation.  This is
-            // introduced for convenience
-            // and because boundary quad
-            // orientation does not carry
-            // any information.
-            std::vector<int> quad_compare_1({line[0]->index(),
-                                             line[1]->index(),
-                                             line[2]->index(),
-                                             line[3]->index()});
-            std::vector<int> quad_compare_2({line[2]->index(),
-                                             line[3]->index(),
-                                             line[0]->index(),
-                                             line[1]->index()});
-
-            // try to find the quad with
-            // lines situated as
-            // constructed above.  if it
-            // could not be found, rotate
-            // the boundary lines 3 times
-            // until it is found or it does
-            // not exist.
-
-            // mapping from counterclock to
-            // lexicographic ordering of
-            // quad lines
-            static const unsigned int lex2cclock[4] = {3, 1, 0, 2};
-            // copy lines from
-            // lexicographic to
-            // counterclock ordering, as
-            // rotation is much simpler in
-            // counterclock ordering
-            typename Triangulation<dim, spacedim>::line_iterator
-              line_counterclock[4];
-            for (unsigned int i = 0; i < 4; ++i)
-              line_counterclock[lex2cclock[i]] = line[i];
-            unsigned int n_rotations = 0;
-            bool         not_found_quad_1;
-            while ((not_found_quad_1 = (needed_quads.find(quad_compare_1) ==
-                                        needed_quads.end())) &&
-                   (needed_quads.find(quad_compare_2) == needed_quads.end()) &&
-                   (n_rotations < 4))
-              {
-                // use the rotate defined
-                // in <algorithms>
-                std::rotate(line_counterclock,
-                            line_counterclock + 1,
-                            line_counterclock + 4);
-                // update the quads with
-                // rotated lines (i runs in
-                // lexicographic ordering)
-                for (unsigned int i = 0; i < 4; ++i)
-                  {
-                    quad_compare_1[i] =
-                      line_counterclock[lex2cclock[i]]->index();
-                    quad_compare_2[(i + 2) % 4] =
-                      line_counterclock[lex2cclock[i]]->index();
-                  }
-
-                ++n_rotations;
-              }
-
-            AssertThrow(n_rotations != 4,
-                        ExcQuadInexistant(line[0]->index(),
-                                          line[1]->index(),
-                                          line[2]->index(),
-                                          line[3]->index()));
-
-            if (not_found_quad_1)
-              quad = needed_quads[quad_compare_2].first;
-            else
-              quad = needed_quads[quad_compare_1].first;
-
-            // check whether this face is
-            // really an exterior one
-            if (quad->at_boundary())
-              {
-                // and make sure that we don't attempt to reset the boundary
-                // indicator to a different than the previously set value
-                AssertThrow(quad->boundary_id() == 0 ||
-                              quad->boundary_id() == subcell_quad.boundary_id,
-                            ExcInconsistentQuadInfoOfQuad(line[0]->index(),
-                                                          line[1]->index(),
-                                                          line[2]->index(),
-                                                          line[3]->index(),
-                                                          "boundary ids"));
-                // If the boundary id provided in subcell_line
-                // is anything other than the default
-                // (internal_face_boundary_id), then set it in the new
-                // triangulation.
-                if (subcell_quad.boundary_id !=
-                    numbers::internal_face_boundary_id)
-                  quad->set_boundary_id(subcell_quad.boundary_id);
-              }
-            // Set manifold id if given
-            if (quad->manifold_id() != numbers::flat_manifold_id)
-              AssertThrow(quad->manifold_id() == subcell_quad.manifold_id,
-                          ExcInconsistentQuadInfoOfQuad(line[0]->index(),
-                                                        line[1]->index(),
-                                                        line[2]->index(),
-                                                        line[3]->index(),
-                                                        "manifold ids"));
-
-            quad->set_manifold_id(subcell_quad.manifold_id);
-          }
-
-
-        /////////////////////////////////////////
-        // finally update neighborship info
-        for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int face = 0; face < 6; ++face)
-            if (adjacent_cells[cell->quad(face)->index()][0] == cell)
-              // first adjacent cell is
-              // this one
-              {
-                if (adjacent_cells[cell->quad(face)->index()].size() == 2)
-                  // there is another
-                  // adjacent cell
-                  cell->set_neighbor(
-                    face, adjacent_cells[cell->quad(face)->index()][1]);
-              }
-            // first adjacent cell is not this
-            // one, -> it must be the neighbor
-            // we are looking for
-            else
-              cell->set_neighbor(face,
-                                 adjacent_cells[cell->quad(face)->index()][0]);
       }
 
 
@@ -10757,23 +9630,20 @@ Triangulation<dim, spacedim>::create_triangulation(
   // because sometimes other objects are already attached to it:
   try
     {
-      const bool arbitray_mesh_provided =
-        std::any_of(cells.begin(), cells.end(), [](const auto &cell) {
-          return cell.vertices.size() != GeometryInfo<dim>::vertices_per_cell;
-        });
+#ifndef DEAL_II_WITH_SIMPLEX_SUPPORT
+      AssertThrow(
+        std::any_of(cells.begin(),
+                    cells.end(),
+                    [](const auto &cell) {
+                      return cell.vertices.size() !=
+                             GeometryInfo<dim>::vertices_per_cell;
+                    }) == false,
+        ExcMessage(
+          "A cell with invalid number of vertices has been provided."));
+#endif
 
-      if (arbitray_mesh_provided == false)
-        {
-          internal::TriangulationImplementation::Implementation::
-            create_triangulation(v, cells, subcelldata, *this);
-        }
-      else
-        {
-          AssertThrow(
-            false,
-            ExcMessage(
-              "A cell with invalid number of vertices has been provided."));
-        }
+      internal::TriangulationImplementation::Implementation::
+        create_triangulation(v, cells, subcelldata, *this);
     }
   catch (...)
     {
