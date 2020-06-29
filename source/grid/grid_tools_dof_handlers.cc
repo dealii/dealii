@@ -1706,10 +1706,11 @@ namespace GridTools
 
 
 
-  template <class DoFHandlerType>
-  std::map<types::global_dof_index,
-           std::vector<typename DoFHandlerType::active_cell_iterator>>
-  get_dof_to_support_patch_map(DoFHandlerType &dof_handler)
+  template <int dim, int spacedim>
+  std::map<
+    types::global_dof_index,
+    std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>>
+  get_dof_to_support_patch_map(DoFHandler<dim, spacedim> &dof_handler)
   {
     // This is the map from global_dof_index to
     // a set of cells on patch.  We first map into
@@ -1722,7 +1723,7 @@ namespace GridTools
     // since that is the preferred output for other
     // functions.
     std::map<types::global_dof_index,
-             std::set<typename DoFHandlerType::active_cell_iterator>>
+             std::set<typename DoFHandler<dim, spacedim>::active_cell_iterator>>
       dof_to_set_of_cells_map;
 
     std::vector<types::global_dof_index> local_dof_indices;
@@ -1736,22 +1737,21 @@ namespace GridTools
 
     // in 3d, we need pointers from active lines to the
     // active parent lines, so we construct it as needed.
-    std::map<typename DoFHandlerType::active_line_iterator,
-             typename DoFHandlerType::line_iterator>
+    std::map<typename DoFHandler<dim, spacedim>::active_line_iterator,
+             typename DoFHandler<dim, spacedim>::line_iterator>
       lines_to_parent_lines_map;
-    if (DoFHandlerType::dimension == 3)
+    if (dim == 3)
       {
         // save user flags as they will be modified and then later restored
         dof_handler.get_triangulation().save_user_flags(user_flags);
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> &>(
+        const_cast<dealii::Triangulation<dim, spacedim> &>(
           dof_handler.get_triangulation())
           .clear_user_flags();
 
 
-        typename DoFHandlerType::active_cell_iterator cell = dof_handler
-                                                               .begin_active(),
-                                                      endc = dof_handler.end();
+        typename DoFHandler<dim, spacedim>::active_cell_iterator
+          cell = dof_handler.begin_active(),
+          endc = dof_handler.end();
         for (; cell != endc; ++cell)
           {
             // We only want lines that are locally_relevant
@@ -1760,9 +1760,7 @@ namespace GridTools
             // few and we don't have to use them.
             if (cell->is_artificial() == false)
               {
-                for (unsigned int l = 0;
-                     l <
-                     GeometryInfo<DoFHandlerType::dimension>::lines_per_cell;
+                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
                      ++l)
                   if (cell->line(l)->has_children())
                     for (unsigned int c = 0; c < cell->line(l)->n_children();
@@ -1785,9 +1783,9 @@ namespace GridTools
     // which it is a part, mainly the ones that must
     // be added on account of adaptivity hanging node
     // constraints.
-    typename DoFHandlerType::active_cell_iterator cell =
-                                                    dof_handler.begin_active(),
-                                                  endc = dof_handler.end();
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         // Need to loop through all cells that could
@@ -1812,8 +1810,7 @@ namespace GridTools
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (const unsigned int f :
-                 GeometryInfo<DoFHandlerType::dimension>::face_indices())
+            for (const unsigned int f : GeometryInfo<dim>::face_indices())
               {
                 if (cell->face(f)->has_children())
                   {
@@ -1918,11 +1915,9 @@ namespace GridTools
             // if cell's line has an active parent, then
             // distribute cell to dofs on parent line
             // and dofs on all children of parent line.
-            if (DoFHandlerType::dimension == 3)
+            if (dim == 3)
               {
-                for (unsigned int l = 0;
-                     l <
-                     GeometryInfo<DoFHandlerType::dimension>::lines_per_cell;
+                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
                      ++l)
                   {
                     if (cell->line(l)->has_children())
@@ -1955,8 +1950,9 @@ namespace GridTools
                     // children
                     else if (cell->line(l)->user_flag_set() == true)
                       {
-                        typename DoFHandlerType::line_iterator parent_line =
-                          lines_to_parent_lines_map[cell->line(l)];
+                        typename DoFHandler<dim, spacedim>::line_iterator
+                          parent_line =
+                            lines_to_parent_lines_map[cell->line(l)];
                         Assert(parent_line->has_children(), ExcInternalError());
 
                         // dofs_per_line returns number of dofs
@@ -1991,30 +1987,31 @@ namespace GridTools
                           }
                       }
                   } // for lines l
-              }     // if DoFHandlerType::dimension == 3
+              }     // if dim == 3
           }         // if cell->is_locally_owned()
       }             // for cells
 
 
-    if (DoFHandlerType::dimension == 3)
+    if (dim == 3)
       {
         // finally, restore user flags that were changed above
         // to when we constructed the pointers to parent of lines
         // Since dof_handler is const, we must leave it unchanged.
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> &>(
+        const_cast<dealii::Triangulation<dim, spacedim> &>(
           dof_handler.get_triangulation())
           .load_user_flags(user_flags);
       }
 
     // Finally, we copy map of sets to
     // map of vectors using the std::vector::assign() function
-    std::map<types::global_dof_index,
-             std::vector<typename DoFHandlerType::active_cell_iterator>>
+    std::map<
+      types::global_dof_index,
+      std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>>
       dof_to_cell_patches;
 
-    typename std::map<types::global_dof_index,
-                      std::set<typename DoFHandlerType::active_cell_iterator>>::
+    typename std::map<
+      types::global_dof_index,
+      std::set<typename DoFHandler<dim, spacedim>::active_cell_iterator>>::
       iterator it     = dof_to_set_of_cells_map.begin(),
                it_end = dof_to_set_of_cells_map.end();
     for (; it != it_end; ++it)
