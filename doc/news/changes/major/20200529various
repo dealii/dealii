@@ -1,5 +1,5 @@
 New: The multithreading framework in the library has been completely revamped:
-Intel TBB has been replaced by cpp-taskflow, which is bundled within the
+Intel TBB has been replaced by taskflow, which is bundled within the
 library. Multithreading support is now unconditionally enabled and we removed
 the CMake option DEAL_II_WITH_THREADS. The tasking framework can be controlled
 using MultithreadInfo and the DEAL_II_NUM_THREADS environment variable.
