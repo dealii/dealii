@@ -80,11 +80,11 @@ namespace MGTools
    * There is no need to consider hanging nodes here, since only one level is
    * considered.
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <int dim, int spacedim, typename SparsityPatternType>
   void
-  make_sparsity_pattern(const DoFHandlerType &dof_handler,
-                        SparsityPatternType & sparsity,
-                        const unsigned int    level);
+  make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
+                        SparsityPatternType &            sparsity,
+                        const unsigned int               level);
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin
@@ -151,9 +151,9 @@ namespace MGTools
    * degrees of freedom on a refinement edge to those not on the refinement edge
    * of a certain level.
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <int dim, int spacedim, typename SparsityPatternType>
   void
-  make_interface_sparsity_pattern(const DoFHandlerType &   dof_handler,
+  make_interface_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
                                   const MGConstrainedDoFs &mg_constrained_dofs,
                                   SparsityPatternType &    sparsity,
                                   const unsigned int       level);
@@ -165,10 +165,10 @@ namespace MGTools
    * Result is a vector containing for each level a vector containing the
    * number of dofs for each block (access is <tt>result[level][block]</tt>).
    */
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   void
   count_dofs_per_block(
-    const DoFHandlerType &                             dof_handler,
+    const DoFHandler<dim, spacedim> &                  dof_handler,
     std::vector<std::vector<types::global_dof_index>> &dofs_per_block,
     std::vector<unsigned int>                          target_block = {});
 

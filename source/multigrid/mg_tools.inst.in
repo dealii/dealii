@@ -15,8 +15,7 @@
 
 
 
-for (DoFHandler : DOFHANDLER_TEMPLATES; PATTERN : SPARSITY_PATTERNS;
-     deal_II_dimension : DIMENSIONS;
+for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace MGTools
@@ -24,11 +23,12 @@ for (DoFHandler : DOFHANDLER_TEMPLATES; PATTERN : SPARSITY_PATTERNS;
 
 #if deal_II_dimension <= deal_II_space_dimension
       template void
-      make_sparsity_pattern<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>,
-        PATTERN>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-                 PATTERN &,
-                 const unsigned int);
+      make_sparsity_pattern<deal_II_dimension,
+                            deal_II_space_dimension,
+                            PATTERN>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        PATTERN &,
+        const unsigned int);
 #endif
     \}
   }
@@ -42,12 +42,13 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
 
 #if deal_II_dimension <= deal_II_space_dimension
       template void
-      make_interface_sparsity_pattern<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>,
-        PATTERN>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-                 const MGConstrainedDoFs &,
-                 PATTERN &,
-                 const unsigned int);
+      make_interface_sparsity_pattern<deal_II_dimension,
+                                      deal_II_space_dimension,
+                                      PATTERN>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const MGConstrainedDoFs &,
+        PATTERN &,
+        const unsigned int);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
