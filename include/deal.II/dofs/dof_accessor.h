@@ -356,7 +356,7 @@ public:
    * function returns an iterator to itself.
    */
   typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, level_dof_access>::line_iterator
+    Iterators<dim, spacedim, level_dof_access>::line_iterator
     line(const unsigned int i) const;
 
   /**
@@ -365,7 +365,7 @@ public:
    * function returns an iterator to itself.
    */
   typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, level_dof_access>::quad_iterator
+    Iterators<dim, spacedim, level_dof_access>::quad_iterator
     quad(const unsigned int i) const;
 
   /**
@@ -907,7 +907,7 @@ public:
    * an exception.
    */
   typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<1, spacedim>, level_dof_access>::line_iterator
+    Iterators<1, spacedim, level_dof_access>::line_iterator
     line(const unsigned int i) const;
 
   /**
@@ -917,7 +917,7 @@ public:
    * an exception.
    */
   typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<1, spacedim>, level_dof_access>::quad_iterator
+    Iterators<1, spacedim, level_dof_access>::quad_iterator
     quad(const unsigned int i) const;
 
   /**

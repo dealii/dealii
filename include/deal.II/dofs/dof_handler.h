@@ -218,10 +218,10 @@ namespace parallel
 template <int dim, int spacedim = dim>
 class DoFHandler : public Subscriptor
 {
-  using ActiveSelector = dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, false>;
-  using LevelSelector = dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, true>;
+  using ActiveSelector =
+    dealii::internal::DoFHandlerImplementation::Iterators<dim, spacedim, false>;
+  using LevelSelector =
+    dealii::internal::DoFHandlerImplementation::Iterators<dim, spacedim, true>;
 
 public:
   /**
