@@ -31,6 +31,9 @@ class DoFAccessor;
 template <int dim, int spacedim, bool lda>
 class DoFCellAccessor;
 
+template <int dim, int spacedim>
+class DoFHandler;
+
 template <typename Accessor>
 class TriaRawIterator;
 template <typename Accessor>
@@ -43,7 +46,7 @@ namespace internal
 {
   namespace DoFHandlerImplementation
   {
-    template <typename DoFHandlerType, bool lda = false>
+    template <int dim, int spacedim, bool lda = false>
     struct Iterators;
 
 
@@ -56,12 +59,11 @@ namespace internal
      * @ref Iterators
      * module for more information.
      */
-    template <template <int, int> class DoFHandlerType, int spacedim, bool lda>
-    struct Iterators<DoFHandlerType<1, spacedim>, lda>
+    template <int spacedim, bool lda>
+    struct Iterators<1, spacedim, lda>
     {
-      using DoFHandler_type = DoFHandlerType<1, spacedim>;
-      using CellAccessor    = dealii::DoFCellAccessor<1, spacedim, lda>;
-      using FaceAccessor    = dealii::DoFAccessor<0, 1, spacedim, lda>;
+      using CellAccessor = dealii::DoFCellAccessor<1, spacedim, lda>;
+      using FaceAccessor = dealii::DoFAccessor<0, 1, spacedim, lda>;
 
       using raw_line_iterator    = TriaRawIterator<CellAccessor>;
       using line_iterator        = TriaIterator<CellAccessor>;
@@ -99,12 +101,11 @@ namespace internal
      * @ref Iterators
      * module for more information.
      */
-    template <template <int, int> class DoFHandlerType, int spacedim, bool lda>
-    struct Iterators<DoFHandlerType<2, spacedim>, lda>
+    template <int spacedim, bool lda>
+    struct Iterators<2, spacedim, lda>
     {
-      using DoFHandler_type = DoFHandlerType<2, spacedim>;
-      using CellAccessor    = dealii::DoFCellAccessor<2, spacedim, lda>;
-      using FaceAccessor    = dealii::DoFAccessor<1, 2, spacedim, lda>;
+      using CellAccessor = dealii::DoFCellAccessor<2, spacedim, lda>;
+      using FaceAccessor = dealii::DoFAccessor<1, 2, spacedim, lda>;
 
       using raw_line_iterator    = TriaRawIterator<FaceAccessor>;
       using line_iterator        = TriaIterator<FaceAccessor>;
@@ -140,12 +141,11 @@ namespace internal
      * @ref Iterators
      * module for more information.
      */
-    template <template <int, int> class DoFHandlerType, int spacedim, bool lda>
-    struct Iterators<DoFHandlerType<3, spacedim>, lda>
+    template <int spacedim, bool lda>
+    struct Iterators<3, spacedim, lda>
     {
-      using DoFHandler_type = DoFHandlerType<3, spacedim>;
-      using CellAccessor    = dealii::DoFCellAccessor<3, spacedim, lda>;
-      using FaceAccessor    = dealii::DoFAccessor<2, 3, spacedim, lda>;
+      using CellAccessor = dealii::DoFCellAccessor<3, spacedim, lda>;
+      using FaceAccessor = dealii::DoFAccessor<2, 3, spacedim, lda>;
 
       using raw_line_iterator =
         TriaRawIterator<dealii::DoFAccessor<1, 3, spacedim, lda>>;

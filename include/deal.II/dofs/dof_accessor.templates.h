@@ -1598,7 +1598,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandler<dim, spacedim>, level_dof_access>::line_iterator
+  Iterators<dim, spacedim, level_dof_access>::line_iterator
   DoFAccessor<structdim, dim, spacedim, level_dof_access>::line(
     const unsigned int i) const
 {
@@ -1610,12 +1610,12 @@ inline typename dealii::internal::DoFHandlerImplementation::
       Assert(i == 0,
              ExcMessage("You can only ask for line zero if the "
                         "current object is a line itself."));
-      return typename dealii::internal::DoFHandlerImplementation::Iterators<
-        DoFHandler<dim, spacedim>,
-        level_dof_access>::cell_iterator(&this->get_triangulation(),
-                                         this->level(),
-                                         this->index(),
-                                         &this->get_dof_handler());
+      return typename dealii::internal::DoFHandlerImplementation::
+        Iterators<dim, spacedim, level_dof_access>::cell_iterator(
+          &this->get_triangulation(),
+          this->level(),
+          this->index(),
+          &this->get_dof_handler());
     }
 
   // otherwise we need to be in structdim>=2
@@ -1624,7 +1624,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
 
   // checking of 'i' happens in line_index(i)
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, level_dof_access>::line_iterator(
+    Iterators<dim, spacedim, level_dof_access>::line_iterator(
       this->tria,
       0, // only sub-objects are allowed, which have no level
       this->line_index(i),
@@ -1634,7 +1634,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandler<dim, spacedim>, level_dof_access>::quad_iterator
+  Iterators<dim, spacedim, level_dof_access>::quad_iterator
   DoFAccessor<structdim, dim, spacedim, level_dof_access>::quad(
     const unsigned int i) const
 {
@@ -1648,11 +1648,11 @@ inline typename dealii::internal::DoFHandlerImplementation::
       Assert(i == 0,
              ExcMessage("You can only ask for quad zero if the "
                         "current object is a quad itself."));
-      return typename dealii::internal::DoFHandlerImplementation::Iterators<
-        DoFHandler<dim, spacedim>>::cell_iterator(&this->get_triangulation(),
-                                                  this->level(),
-                                                  this->index(),
-                                                  &this->get_dof_handler());
+      return typename dealii::internal::DoFHandlerImplementation::
+        Iterators<dim, spacedim>::cell_iterator(&this->get_triangulation(),
+                                                this->level(),
+                                                this->index(),
+                                                &this->get_dof_handler());
     }
 
   // otherwise we need to be in structdim>=3
@@ -1661,7 +1661,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
 
   // checking of 'i' happens in quad_index(i)
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, level_dof_access>::quad_iterator(
+    Iterators<dim, spacedim, level_dof_access>::quad_iterator(
       this->tria,
       0, // only sub-objects are allowed, which have no level
       this->quad_index(i),
@@ -1951,26 +1951,26 @@ DoFAccessor<0, 1, spacedim, level_dof_access>::child(
 
 template <int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandler<1, spacedim>, level_dof_access>::line_iterator
+  Iterators<1, spacedim, level_dof_access>::line_iterator
   DoFAccessor<0, 1, spacedim, level_dof_access>::line(
     const unsigned int /*c*/) const
 {
   Assert(false, ExcNotImplemented());
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<1, spacedim>, level_dof_access>::line_iterator();
+    Iterators<1, spacedim, level_dof_access>::line_iterator();
 }
 
 
 
 template <int spacedim, bool level_dof_access>
 inline typename dealii::internal::DoFHandlerImplementation::
-  Iterators<DoFHandler<1, spacedim>, level_dof_access>::quad_iterator
+  Iterators<1, spacedim, level_dof_access>::quad_iterator
   DoFAccessor<0, 1, spacedim, level_dof_access>::quad(
     const unsigned int /*c*/) const
 {
   Assert(false, ExcNotImplemented());
   return typename dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<1, spacedim>, level_dof_access>::quad_iterator();
+    Iterators<1, spacedim, level_dof_access>::quad_iterator();
 }
 
 
