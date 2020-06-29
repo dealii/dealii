@@ -264,6 +264,28 @@ public:
   cross_section(const unsigned int direction) const;
 
   /**
+   * Apply the affine transformation that transforms this BoundingBox to a unit
+   * BoundingBox object.
+   *
+   * If $B$ is this bounding box, and $\hat{B}$ is the unit bounding box,
+   * compute the affine mapping that satisfies $G(B) = \hat{B}$ and apply it to
+   * @p point.
+   */
+  Point<spacedim, Number>
+  real_to_unit(const Point<spacedim, Number> &point) const;
+
+  /**
+   * Apply the affine transformation that transforms the unit BoundingBox object
+   * to this object.
+   *
+   * If $B$ is this bounding box, and $\hat{B}$ is the unit bounding box,
+   * compute the affine mapping that satisfies $F(\hat{B}) = B$ and apply it to
+   * @p point.
+   */
+  Point<spacedim, Number>
+  unit_to_real(const Point<spacedim, Number> &point) const;
+
+  /**
    * Boost serialization function
    */
   template <class Archive>
