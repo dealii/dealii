@@ -25,10 +25,8 @@ DEAL_II_NAMESPACE_OPEN
  * time-dependent simulation. It manages stepping forward from a start time
  * $T_{\text{start}}$ to an end time $T_{\text{end}}$. It also allows adjusting
  * the time step size during the simulation. This class provides the necessary
- * interface to be incorporated in any time-dependent simulation. As an
- * example, the usage of this class is demonstrated in step-21. This class
- * attempts to replace the usage of TimestepControl with a better and more
- * modern interface.
+ * interface to be incorporated in any time-dependent simulation.
+ * The usage of this class is demonstrated in step-19 and step-21.
  *
  * This class provides a number of invariants that are guaranteed to be
  * true at all times.
@@ -227,6 +225,9 @@ DEAL_II_NAMESPACE_OPEN
  *   // } end snapshot stage
  * }
  * @endcode
+ * The `run()` function in step-19 shows a very similar example where the call
+ * to advance_time() ends the update stage and is followed by generating
+ * graphical output with the then-current time.
  */
 class DiscreteTime
 {

@@ -733,6 +733,8 @@ namespace Particles
        *
        * The connected function receives an iterator to the particle in
        * question, and its last known cell association.
+       *
+       * This signal is used in step-19.
        */
       boost::signals2::signal<void(
         const typename Particles::ParticleIterator<dim, spacedim> &particle,
