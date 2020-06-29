@@ -644,17 +644,12 @@ namespace FETools
    * by calling the @p distribute function of your hanging node constraints
    * object.
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType1,
-            template <int, int> class DoFHandlerType2,
-            class InVector,
-            class OutVector>
+  template <int dim, int spacedim, class InVector, class OutVector>
   void
-  interpolate(const DoFHandlerType1<dim, spacedim> &dof1,
-              const InVector &                      u1,
-              const DoFHandlerType2<dim, spacedim> &dof2,
-              OutVector &                           u2);
+  interpolate(const DoFHandler<dim, spacedim> &dof1,
+              const InVector &                 u1,
+              const DoFHandler<dim, spacedim> &dof2,
+              OutVector &                      u2);
 
   /**
    * Compute the interpolation of a the @p dof1-function @p u1 to a @p
@@ -672,17 +667,12 @@ namespace FETools
    * the discontinuities.  Therefore the mean value is taken at the DoF values
    * at the discontinuities.
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType1,
-            template <int, int> class DoFHandlerType2,
-            class InVector,
-            class OutVector>
+  template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(
-    const DoFHandlerType1<dim, spacedim> &                   dof1,
+    const DoFHandler<dim, spacedim> &                        dof1,
     const InVector &                                         u1,
-    const DoFHandlerType2<dim, spacedim> &                   dof2,
+    const DoFHandler<dim, spacedim> &                        dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2);
 

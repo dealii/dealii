@@ -59,17 +59,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace FETools
 {
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType1,
-            template <int, int> class DoFHandlerType2,
-            class InVector,
-            class OutVector>
+  template <int dim, int spacedim, class InVector, class OutVector>
   void
-  interpolate(const DoFHandlerType1<dim, spacedim> &dof1,
-              const InVector &                      u1,
-              const DoFHandlerType2<dim, spacedim> &dof2,
-              OutVector &                           u2)
+  interpolate(const DoFHandler<dim, spacedim> &dof1,
+              const InVector &                 u1,
+              const DoFHandler<dim, spacedim> &dof2,
+              OutVector &                      u2)
   {
     AffineConstraints<typename OutVector::value_type> dummy;
     dummy.close();
@@ -78,17 +73,12 @@ namespace FETools
 
 
 
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType1,
-            template <int, int> class DoFHandlerType2,
-            class InVector,
-            class OutVector>
+  template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(
-    const DoFHandlerType1<dim, spacedim> &                   dof1,
+    const DoFHandler<dim, spacedim> &                        dof1,
     const InVector &                                         u1,
-    const DoFHandlerType2<dim, spacedim> &                   dof2,
+    const DoFHandler<dim, spacedim> &                        dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
@@ -132,10 +122,10 @@ namespace FETools
                       std::unique_ptr<FullMatrix<double>>>>
       interpolation_matrices;
 
-    typename DoFHandlerType1<dim, spacedim>::active_cell_iterator
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
       cell1 = dof1.begin_active(),
       endc1 = dof1.end();
-    typename DoFHandlerType2<dim, spacedim>::active_cell_iterator
+    typename DoFHandler<dim, spacedim>::active_cell_iterator
       cell2 = dof2.begin_active(),
       endc2 = dof2.end();
     (void)endc2;
