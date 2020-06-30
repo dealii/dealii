@@ -2398,14 +2398,14 @@ namespace GridTools
 
   /**
    * This function runs through the degrees of freedom defined by the
-   * DoFHandlerType and for each dof constructs a vector of
+   * DoFHandler and for each dof constructs a vector of
    * active_cell_iterators representing the cells of support of the associated
    * basis element at that degree of freedom. This function was originally
    * designed for the implementation of local projections, for instance the
    * Clement interpolant, in conjunction with other local patch functions like
    * GridTools::build_triangulation_from_patch.
    *
-   * DoFHandlerType's built on top of Triangulation or
+   * DoFHandler's built on top of Triangulation or
    * parallel:distributed::Triangulation are supported and handled
    * appropriately.
    *
@@ -2418,21 +2418,20 @@ namespace GridTools
    * consist exclusively of the single cell on which the degree of freedom is
    * located.
    *
-   * @tparam DoFHandlerType The DoFHandlerType should be a DoFHandler or
-   * hp::DoFHandler.
-   * @param[in] dof_handler The DoFHandlerType which could be built on a
+   * @param[in] dof_handler The DoFHandler which could be built on a
    * Triangulation or a parallel::distributed::Triangulation with a finite
    * element that has degrees of freedom that are logically associated to a
    * vertex, line, quad, or hex.
    * @return A map from the global_dof_index of
    * degrees of freedom on locally relevant cells to vectors containing
-   * DoFHandlerType::active_cell_iterators of cells in the support of the basis
+   * DoFHandler::active_cell_iterators of cells in the support of the basis
    * function at that degree of freedom.
    */
-  template <class DoFHandlerType>
-  std::map<types::global_dof_index,
-           std::vector<typename DoFHandlerType::active_cell_iterator>>
-  get_dof_to_support_patch_map(DoFHandlerType &dof_handler);
+  template <int dim, int spacedim>
+  std::map<
+    types::global_dof_index,
+    std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>>
+  get_dof_to_support_patch_map(DoFHandler<dim, spacedim> &dof_handler);
 
 
   /*@}*/

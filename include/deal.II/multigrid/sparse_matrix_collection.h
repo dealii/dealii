@@ -44,9 +44,9 @@ namespace mg
     void
     resize(const unsigned int minlevel, const unsigned int maxlevel);
 
-    template <typename DoFHandlerType>
+    template <int dim, int spacedim>
     void
-    reinit(const DoFHandlerType &dof_handler);
+    reinit(const DoFHandler<dim, spacedim> &dof_handler);
 
     void
     set_zero();
@@ -83,9 +83,10 @@ namespace mg
 
 
   template <typename number>
-  template <typename DoFHandlerType>
+  template <int dim, int spacedim>
   void
-  SparseMatrixCollection<number>::reinit(const DoFHandlerType &dof_handler)
+  SparseMatrixCollection<number>::reinit(
+    const DoFHandler<dim, spacedim> &dof_handler)
   {
     AssertIndexRange(sparsity.max_level(),
                      dof_handler.get_triangulation().n_levels());

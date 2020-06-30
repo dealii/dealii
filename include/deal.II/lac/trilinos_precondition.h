@@ -1366,7 +1366,7 @@ namespace TrilinosWrappers
        *   #include <deal.II/dofs/dof_tools.h>
        *   ...
        *
-       *   DoFHandlerType<...> dof_handler;
+       *   DoFHandler<...> dof_handler;
        *   FEValuesExtractors::Type... field_extractor;
        *   ...
        *
