@@ -540,7 +540,7 @@ namespace VectorTools
     std::set<types::boundary_id>::iterator b_id;
     for (; cell != endc; ++cell)
       if (!cell->is_artificial())
-        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           if ((b_id = boundary_ids.find(cell->face(face_no)->boundary_id())) !=
               boundary_ids.end())
             {
@@ -1114,7 +1114,7 @@ namespace VectorTools
     std::vector<std::array<types::global_dof_index, dim>> cell_vector_dofs;
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (!cell->is_artificial())
-        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           if ((b_id = boundary_ids.find(cell->face(face_no)->boundary_id())) !=
               boundary_ids.end())
             {

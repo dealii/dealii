@@ -96,8 +96,7 @@ namespace VectorTools
       if (dim == 1)
         {
           for (const auto &cell : dof.active_cell_iterators())
-            for (const unsigned int direction :
-                 GeometryInfo<dim>::face_indices())
+            for (const unsigned int direction : cell->face_indices())
               if (cell->at_boundary(direction) &&
                   (function_map.find(cell->face(direction)->boundary_id()) !=
                    function_map.end()))
@@ -220,8 +219,7 @@ namespace VectorTools
 
           for (auto const &cell : dof.active_cell_iterators())
             if (!cell->is_artificial())
-              for (const unsigned int face_no :
-                   GeometryInfo<dim>::face_indices())
+              for (const unsigned int face_no : cell->face_indices())
                 {
                   const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
@@ -704,7 +702,7 @@ namespace VectorTools
           // Assert that there are no hanging nodes at the boundary
           int level = -1;
           for (const auto &cell : dof.active_cell_iterators())
-            for (auto f : GeometryInfo<dim>::face_indices())
+            for (auto f : cell->face_indices())
               {
                 if (cell->at_boundary(f))
                   {
@@ -930,11 +928,10 @@ namespace VectorTools
       const unsigned int dim      = 3;
       const unsigned int spacedim = 3;
 
-      hp_fe_values.reinit(
-        cell,
-        (cell->active_fe_index() * GeometryInfo<dim>::faces_per_cell + face) *
-            GeometryInfo<dim>::lines_per_face +
-          line);
+      hp_fe_values.reinit(cell,
+                          (cell->active_fe_index() * cell->n_faces() + face) *
+                              GeometryInfo<dim>::lines_per_face +
+                            line);
 
       // Initialize the required
       // objects.
@@ -1104,9 +1101,7 @@ namespace VectorTools
     {
       const unsigned int spacedim = dim;
       hp_fe_values.reinit(cell,
-                          cell->active_fe_index() *
-                              GeometryInfo<dim>::faces_per_cell +
-                            face);
+                          cell->active_fe_index() * cell->n_faces() + face);
       // Initialize the required
       // objects.
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
@@ -1610,8 +1605,7 @@ namespace VectorTools
           {
             for (; cell != dof_handler.end(); ++cell)
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // if the FE is a
@@ -1705,8 +1699,7 @@ namespace VectorTools
 
             for (; cell != dof_handler.end(); ++cell)
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // if the FE is a
@@ -1841,8 +1834,7 @@ namespace VectorTools
           {
             for (; cell != dof_handler.end(); ++cell)
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // if the FE is a FE_Nothing object there is no work to do
@@ -1933,8 +1925,7 @@ namespace VectorTools
 
             for (; cell != dof_handler.end(); ++cell)
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // if the FE is a FE_Nothing object there is no work to do
@@ -2043,11 +2034,10 @@ namespace VectorTools
       const FiniteElement<dim> &fe = cell->get_fe();
 
       // reinit for this cell, face and line.
-      hp_fe_values.reinit(
-        cell,
-        (cell->active_fe_index() * GeometryInfo<dim>::faces_per_cell + face) *
-            GeometryInfo<dim>::lines_per_face +
-          line);
+      hp_fe_values.reinit(cell,
+                          (cell->active_fe_index() * cell->n_faces() + face) *
+                              GeometryInfo<dim>::lines_per_face +
+                            line);
 
       // Initialize the required objects.
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
@@ -2899,8 +2889,7 @@ namespace VectorTools
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
-                      for (const unsigned int face :
-                           GeometryInfo<dim>::face_indices())
+                      for (const unsigned int face : cell->face_indices())
                         {
                           if (cell->face(face)->boundary_id() ==
                               boundary_component)
@@ -3023,8 +3012,7 @@ namespace VectorTools
                 {
                   if (cell->at_boundary() && cell->is_locally_owned())
                     {
-                      for (const unsigned int face :
-                           GeometryInfo<dim>::face_indices())
+                      for (const unsigned int face : cell->face_indices())
                         {
                           if (cell->face(face)->boundary_id() ==
                               boundary_component)
@@ -3444,8 +3432,7 @@ namespace VectorTools
           {
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // if the FE is a
@@ -3473,9 +3460,8 @@ namespace VectorTools
                         }
 
                       fe_values.reinit(cell,
-                                       face +
-                                         cell->active_fe_index() *
-                                           GeometryInfo<dim>::faces_per_cell);
+                                       face + cell->active_fe_index() *
+                                                cell->n_faces());
 
                       const std::vector<DerivativeForm<1, dim, spacedim>>
                         &jacobians =
@@ -3513,8 +3499,7 @@ namespace VectorTools
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // This is only implemented, if the FE is a
@@ -3531,9 +3516,8 @@ namespace VectorTools
                         }
 
                       fe_values.reinit(cell,
-                                       face +
-                                         cell->active_fe_index() *
-                                           GeometryInfo<dim>::faces_per_cell);
+                                       face + cell->active_fe_index() *
+                                                cell->n_faces());
 
                       const std::vector<DerivativeForm<1, dim, spacedim>>
                         &jacobians =
@@ -3615,8 +3599,7 @@ namespace VectorTools
           {
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // This is only
@@ -3636,9 +3619,8 @@ namespace VectorTools
                         }
 
                       fe_values.reinit(cell,
-                                       face +
-                                         cell->active_fe_index() *
-                                           GeometryInfo<dim>::faces_per_cell);
+                                       face + cell->active_fe_index() *
+                                                cell->n_faces());
 
                       const std::vector<DerivativeForm<1, dim, spacedim>>
                         &jacobians =
@@ -3669,8 +3651,7 @@ namespace VectorTools
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
                       // This is only
@@ -3690,9 +3671,8 @@ namespace VectorTools
                         }
 
                       fe_values.reinit(cell,
-                                       face +
-                                         cell->active_fe_index() *
-                                           GeometryInfo<dim>::faces_per_cell);
+                                       face + cell->active_fe_index() *
+                                                cell->n_faces());
 
                       const std::vector<DerivativeForm<1, dim, spacedim>>
                         &jacobians =

@@ -3215,7 +3215,7 @@ namespace GridTools
           cell = triangulation.begin_active(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
@@ -3231,7 +3231,7 @@ namespace GridTools
           cell = triangulation.begin_active(),
           endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
@@ -3296,8 +3296,7 @@ namespace GridTools
     std::vector<typename MeshType::active_cell_iterator> &active_neighbors)
   {
     active_neighbors.clear();
-    for (const unsigned int n :
-         GeometryInfo<MeshType::dimension>::face_indices())
+    for (const unsigned int n : cell->face_indices())
       if (!cell->at_boundary(n))
         {
           if (MeshType::dimension == 1)

@@ -203,7 +203,7 @@ namespace internal
                 continue;
               typename dealii::Triangulation<dim>::cell_iterator dcell(
                 &triangulation, cell_levels[i].first, cell_levels[i].second);
-              for (const unsigned int f : GeometryInfo<dim>::face_indices())
+              for (const unsigned int f : dcell->face_indices())
                 {
                   if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                     continue;
@@ -571,7 +571,7 @@ namespace internal
             &triangulation, cell_levels[i].first, cell_levels[i].second);
           if (use_active_cells)
             Assert(dcell->is_active(), ExcNotImplemented());
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : dcell->face_indices())
             {
               if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
                 face_is_owned[dcell->face(f)->index()] =
@@ -767,7 +767,7 @@ namespace internal
                   &triangulation,
                   cell_levels[cell].first,
                   cell_levels[cell].second);
-                for (const unsigned int f : GeometryInfo<dim>::face_indices())
+                for (const auto f : dcell->face_indices())
                   {
                     // boundary face
                     if (face_is_owned[dcell->face(f)->index()] ==

@@ -2408,7 +2408,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
              GeometryInfo<dimension_>::faces_per_cell>
     face_iterators;
 
-  for (unsigned int i : GeometryInfo<dimension_>::face_indices())
+  for (unsigned int i : this->face_indices())
     face_iterators[i] =
       dealii::internal::DoFCellAccessorImplementation::get_face(
         *this, i, std::integral_constant<int, dimension_>());

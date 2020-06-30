@@ -243,8 +243,7 @@ namespace MeshWorker
     info.post_cell(dof_info);
 
     if (integrate_interior_face || integrate_boundary)
-      for (const unsigned int face_no : GeometryInfo<
-             ITERATOR::AccessorType::Container::dimension>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           typename ITERATOR::AccessorType::Container::face_iterator face =
             cell->face(face_no);

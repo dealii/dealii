@@ -162,7 +162,7 @@ namespace FETools
              (constraints.n_constraints() == 0));
 
           if (hanging_nodes_not_allowed)
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell1->face_indices())
               Assert(cell1->at_boundary(face) ||
                        cell1->neighbor(face)->level() == cell1->level(),
                      ExcHangingNodesNotAllowed());
@@ -315,7 +315,7 @@ namespace FETools
             (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
 
           if (hanging_nodes_not_allowed)
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell->face_indices())
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
                      ExcHangingNodesNotAllowed());
@@ -648,7 +648,7 @@ namespace FETools
             (dof1.get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
 
           if (hanging_nodes_not_allowed)
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face : cell->face_indices())
               Assert(cell->at_boundary(face) ||
                        cell->neighbor(face)->level() == cell->level(),
                      ExcHangingNodesNotAllowed());
