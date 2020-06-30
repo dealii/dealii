@@ -472,18 +472,6 @@ public:
     {}
 
     /**
-     * @deprecated: use the other constructor as the second argument is
-     unused.
-     */
-    DEAL_II_DEPRECATED
-    AdditionalData(const unsigned int max_basis_size,
-                   const bool         use_default_residual)
-      : max_basis_size(max_basis_size)
-    {
-      (void)use_default_residual;
-    }
-
-    /**
      * Maximum basis size.
      */
     unsigned int max_basis_size;
