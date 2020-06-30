@@ -21,6 +21,7 @@
 
 #include <deal.II/base/point.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_objects.h>
 
 #include <boost/serialization/utility.hpp>
@@ -207,6 +208,13 @@ namespace internal
       std::vector<unsigned char> face_orientations;
 
       /**
+       * Reference cell type of each cell.
+       *
+       * @note Used only for dim=2 and dim=3.
+       */
+      std::vector<ReferenceCell::Type> reference_cell_type;
+
+      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
@@ -244,6 +252,9 @@ namespace internal
 
       if (dim == 3)
         ar &face_orientations;
+
+      if (dim == 2 || dim == 3)
+        ar &reference_cell_type;
     }
 
   } // namespace TriangulationImplementation

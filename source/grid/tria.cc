@@ -1363,6 +1363,12 @@ namespace internal
             new_size * GeometryInfo<2>::lines_per_cell -
               tria_faces.quads_line_orientations.size(),
             true);
+
+          tria_faces.quad_reference_cell_type.reserve(new_size);
+          tria_faces.quad_reference_cell_type.insert(
+            tria_faces.quad_reference_cell_type.end(),
+            new_size - tria_faces.quad_reference_cell_type.size(),
+            ReferenceCell::Type::Quad);
         }
     }
 
@@ -1458,6 +1464,16 @@ namespace internal
                 total_cells * GeometryInfo<3>::faces_per_cell -
                   tria_level.face_orientations.size(),
                 true);
+            }
+
+          if (tria_level.dim == 2 || tria_level.dim == 3)
+            {
+              tria_level.reference_cell_type.reserve(total_cells);
+              tria_level.reference_cell_type.insert(
+                tria_level.reference_cell_type.end(),
+                total_cells - tria_level.reference_cell_type.size(),
+                tria_level.dim == 2 ? ReferenceCell::Type::Quad :
+                                      ReferenceCell::Type::Hex);
             }
         }
     }
