@@ -1659,6 +1659,13 @@ public:
    * @}
    */
 
+protected:
+  /**
+   * Return additional information related to the current geometric entity
+   * type.
+   */
+  inline const ReferenceCell::internal::Info::Base &
+  reference_cell_info() const;
 
 private:
   /**
