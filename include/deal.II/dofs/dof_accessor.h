@@ -26,6 +26,8 @@
 
 #include <deal.II/hp/dof_handler.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1480,8 +1482,9 @@ public:
   /**
    * Return an array of iterators to all faces of this cell.
    */
-  inline std::array<face_iterator, GeometryInfo<dimension_>::faces_per_cell>
-  face_iterators() const;
+  inline boost::container::
+    small_vector<face_iterator, GeometryInfo<dimension_>::faces_per_cell>
+    face_iterators() const;
 
   /**
    * Return the result of the @p neighbor_child_on_subface function of the
