@@ -336,35 +336,39 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       for (unsigned int i = 0; i < n_ints; ++i)
         in >> tmp_int;
 
+      /////////////////////
+      ////Processing the CELL_DATA and FIELD_DATA sections
+      /////////////////////
       // Ignore everything up to CELL_DATA
       while (in >> keyword)
-        if (keyword == "CELL_DATA")
-          {
-            unsigned int n_ids;
-            in >> n_ids;
+        {
+          if (keyword == "CELL_DATA")
+            {
+              unsigned int n_ids;
+              in >> n_ids;
 
-            AssertThrow(n_ids == n_geometric_objects,
-                        ExcMessage("The VTK reader found a CELL_DATA statement "
-                                   "that lists a total of " +
-                                   Utilities::int_to_string(n_ids) +
-                                   " cell data objects, but this needs to "
-                                   "equal the number of cells (which is " +
-                                   Utilities::int_to_string(cells.size()) +
-                                   ") plus the number of quads (" +
-                                   Utilities::int_to_string(
-                                     subcelldata.boundary_quads.size()) +
-                                   " in 3d or the number of lines (" +
-                                   Utilities::int_to_string(
-                                     subcelldata.boundary_lines.size()) +
-                                   ") in 2d."));
+              AssertThrow(
+                n_ids == n_geometric_objects,
+                ExcMessage(
+                  "The VTK reader found a CELL_DATA statement "
+                  "that lists a total of " +
+                  Utilities::int_to_string(n_ids) +
+                  " cell data objects, but this needs to "
+                  "equal the number of cells (which is " +
+                  Utilities::int_to_string(cells.size()) +
+                  ") plus the number of quads (" +
+                  Utilities::int_to_string(subcelldata.boundary_quads.size()) +
+                  " in 3d or the number of lines (" +
+                  Utilities::int_to_string(subcelldata.boundary_lines.size()) +
+                  ") in 2d."));
 
-            const std::vector<std::string> data_sets{"MaterialID",
-                                                     "ManifoldID"};
+              const std::vector<std::string> data_sets{"MaterialID",
+                                                       "ManifoldID"};
+              in >> keyword;
 
-            for (unsigned int i = 0; i < data_sets.size(); ++i)
-              {
-                // Ignore everything until we get to a SCALARS data set
-                while (in >> keyword)
+              for (unsigned int i = 0; i < data_sets.size(); ++i)
+                {
+                  // Ignore everything until we get to a SCALARS data set
                   if (keyword == "SCALARS")
                     {
                       // Now see if we know about this type of data set,
@@ -375,8 +379,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       if (std::find(data_sets.begin(),
                                     data_sets.end(),
                                     field_name) == data_sets.end())
-                        // The data set here is not one of the ones we know, so
-                        // keep ignoring everything until the next SCALARS
+                        // The data set here is not one of the ones we know,
+                        // so keep ignoring everything until the next SCALARS
                         // keyword.
                         continue;
 
@@ -471,9 +475,64 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             }
                         }
                     }
-              }
-          }
+                }
+            }
+          //////////////////
+          //// Addition of FIELD DATA:
+          //////////////////
+          else if (keyword == "FIELD")
+            {
+              unsigned int n_fields;
+              in >> keyword;
+              AssertThrow(
+                keyword == "FieldData",
+                ExcMessage(
+                  "While reading VTK file, missing keyword FieldData"));
 
+              in >> n_fields;
+
+              for (unsigned int i = 0; i < n_fields; ++i)
+                {
+                  std::string  section_name;
+                  std::string  data_type;
+                  unsigned int temp, n_ids;
+                  double       data;
+                  in >> section_name;
+                  in >> temp;
+                  in >> n_ids;
+                  AssertThrow(
+                    n_ids == n_geometric_objects,
+                    ExcMessage(
+                      "The VTK reader found a FIELD statement "
+                      "that lists a total of " +
+                      Utilities::int_to_string(n_ids) +
+                      " cell data objects, but this needs to equal the number of cells (which is " +
+                      Utilities::int_to_string(cells.size()) +
+                      ") plus the number of quads (" +
+                      Utilities::int_to_string(
+                        subcelldata.boundary_quads.size()) +
+                      " in 3d or the number of lines (" +
+                      Utilities::int_to_string(
+                        subcelldata.boundary_lines.size()) +
+                      ") in 2d."));
+                  in >> data_type;
+                  std::vector<double> temp_data;
+                  temp_data.resize(n_ids);
+                  for (unsigned int j = 0; j < n_ids; ++j)
+                    {
+                      in >> data;
+                      if (j < cells.size())
+                        temp_data[j] = data;
+                    }
+                  this->field_data[section_name] = std::move(temp_data);
+                }
+            }
+          else
+            {
+              // just ignore a line that doesn't start with any of the
+              // recognized tags
+            }
+        } // closes while loop
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
