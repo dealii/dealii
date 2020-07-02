@@ -1608,13 +1608,13 @@ public:
   /**
    * Number of vertices.
    */
-  inline unsigned int
+  unsigned int
   n_vertices() const;
 
   /**
    * Number of lines.
    */
-  inline unsigned int
+  unsigned int
   n_lines() const;
 
   /**
@@ -1622,21 +1622,21 @@ public:
    *
    * @note Only implemented for cells (dim==spacedim).
    */
-  inline unsigned int
+  unsigned int
   n_faces() const;
 
   /**
    * Return an object that can be thought of as an array containing all indices
    * from zero to n_vertices().
    */
-  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   vertex_indices() const;
 
   /**
    * Return an object that can be thought of as an array containing all indices
    * from zero to n_lines().
    */
-  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   line_indices() const;
 
   /**
@@ -1645,7 +1645,7 @@ public:
    *
    * @note Only implemented for cells (dim==spacedim).
    */
-  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   face_indices() const;
 
   /**
@@ -2674,27 +2674,27 @@ public:
   /**
    * Number of vertices.
    */
-  inline unsigned int
+  unsigned int
   n_vertices() const;
 
   /**
    * Number of lines.
    */
-  inline unsigned int
+  unsigned int
   n_lines() const;
 
   /**
    * Return an object that can be thought of as an array containing all indices
    * from zero to n_vertices().
    */
-  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   vertex_indices() const;
 
   /**
    * Return an object that can be thought of as an array containing all indices
    * from zero to n_lines().
    */
-  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   line_indices() const;
 
 protected:
