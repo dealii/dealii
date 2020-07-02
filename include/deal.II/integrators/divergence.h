@@ -404,44 +404,6 @@ namespace LocalIntegrators
     }
 
     /**
-     * @deprecated Use LocalIntegrators::GradDiv::cell_matrix() instead.
-     */
-    template <int dim>
-    DEAL_II_DEPRECATED void
-    grad_div_matrix(FullMatrix<double> &     M,
-                    const FEValuesBase<dim> &fe,
-                    const double             factor = 1.);
-
-    template <int dim>
-    void
-    grad_div_matrix(FullMatrix<double> &     M,
-                    const FEValuesBase<dim> &fe,
-                    const double             factor)
-    {
-      GradDiv::cell_matrix(M, fe, factor);
-    }
-
-    /**
-     * @deprecated Use LocalIntegrators::GradDiv::cell_residual() instead.
-     */
-    template <int dim, typename number>
-    DEAL_II_DEPRECATED void
-    grad_div_residual(Vector<number> &         result,
-                      const FEValuesBase<dim> &fetest,
-                      const ArrayView<const std::vector<Tensor<1, dim>>> &input,
-                      const double factor = 1.);
-
-    template <int dim, typename number>
-    void
-    grad_div_residual(Vector<number> &         result,
-                      const FEValuesBase<dim> &fetest,
-                      const ArrayView<const std::vector<Tensor<1, dim>>> &input,
-                      const double factor)
-    {
-      GradDiv::cell_residual(result, fetest, input, factor);
-    }
-
-    /**
      * The jump of the normal component
      * @f[
      * \int_F
