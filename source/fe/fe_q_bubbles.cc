@@ -52,7 +52,7 @@ namespace internal
         std::vector<std::vector<FullMatrix<double>>> &matrices,
         const bool                                    isotropic_only)
       {
-        const unsigned int dpc    = fe.dofs_per_cell;
+        const unsigned int dpc    = fe.n_dofs_per_cell();
         const unsigned int degree = fe.degree;
 
         // Initialize quadrature formula on fine cells
@@ -134,7 +134,7 @@ namespace internal
             FullMatrix<double> coarse_rhs_matrix(n_dofs, dpc);
 
             std::vector<std::vector<types::global_dof_index>> child_ldi(
-              nc, std::vector<types::global_dof_index>(fe.dofs_per_cell));
+              nc, std::vector<types::global_dof_index>(fe.n_dofs_per_cell()));
 
             // now create the mass matrix and all the right_hand sides
             unsigned int                                           child_no = 0;
@@ -210,7 +210,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
     point[d] = 0.5;
   for (unsigned int i = 0; i < n_bubbles; ++i)
     this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
@@ -249,7 +249,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points)
     point[d] = 0.5;
   for (unsigned int i = 0; i < n_bubbles; ++i)
     this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
@@ -276,7 +276,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->dofs_per_cell;
+  const unsigned int             dofs_per_cell = this->n_dofs_per_cell();
   const std::vector<Point<dim>> &unit_support_points =
     this->unit_support_points;
   unsigned int index = 0;
@@ -362,13 +362,13 @@ FE_Q_Bubbles<dim, spacedim>::
   Assert(support_point_values.size() == this->unit_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->unit_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 
-  for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell() - 1; ++i)
     {
       const std::pair<unsigned int, unsigned int> index =
         this->system_to_component_index(i);
@@ -397,11 +397,12 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
     (x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||
       (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == this->dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_cell));
+                              this->n_dofs_per_cell()));
+  Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.n_dofs_per_cell()));
 
   // Provide a short cut in case we are just inquiring the identity
   auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);

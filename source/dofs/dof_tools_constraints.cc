@@ -178,7 +178,8 @@ namespace DoFTools
         Assert(fe1.dofs_per_face >= fe2.dofs_per_face, ExcInternalError());
         AssertDimension(primary_dof_mask.size(), fe1.dofs_per_face);
 
-        Assert(fe2.dofs_per_vertex <= fe1.dofs_per_vertex, ExcInternalError());
+        Assert(fe2.n_dofs_per_vertex() <= fe1.n_dofs_per_vertex(),
+               ExcInternalError());
         Assert(fe2.dofs_per_line <= fe1.dofs_per_line, ExcInternalError());
         Assert((dim < 3) || (fe2.dofs_per_quad <= fe1.dofs_per_quad),
                ExcInternalError());
@@ -211,11 +212,11 @@ namespace DoFTools
           {
             unsigned int dofs_added = 0;
             unsigned int i          = 0;
-            while (dofs_added < fe2.dofs_per_vertex)
+            while (dofs_added < fe2.n_dofs_per_vertex())
               {
                 // make sure that we were able to find a set of primary dofs and
                 // that the code down below didn't just reject all our efforts
-                Assert(i < fe1.dofs_per_vertex, ExcInternalError());
+                Assert(i < fe1.n_dofs_per_vertex(), ExcInternalError());
 
                 // tentatively push this vertex dof
                 primary_dof_list.push_back(index + i);
@@ -232,7 +233,7 @@ namespace DoFTools
                 // forward counter by one
                 ++i;
               }
-            index += fe1.dofs_per_vertex;
+            index += fe1.n_dofs_per_vertex();
           }
 
         for (int l = 0;
@@ -646,9 +647,10 @@ namespace DoFTools
                 const unsigned int fe_index = cell->active_fe_index();
 
                 const unsigned int n_dofs_on_mother =
-                                     2 * fe.dofs_per_vertex + fe.dofs_per_line,
-                                   n_dofs_on_children =
-                                     fe.dofs_per_vertex + 2 * fe.dofs_per_line;
+                                     2 * fe.n_dofs_per_vertex() +
+                                     fe.dofs_per_line,
+                                   n_dofs_on_children = fe.n_dofs_per_vertex() +
+                                                        2 * fe.dofs_per_line;
 
                 dofs_on_mother.resize(n_dofs_on_mother);
                 // we might not use all of those in case of artificial cells, so
@@ -670,7 +672,8 @@ namespace DoFTools
                 // @p{FiniteElement::constraints()}
                 unsigned int next_index = 0;
                 for (unsigned int vertex = 0; vertex < 2; ++vertex)
-                  for (unsigned int dof = 0; dof != fe.dofs_per_vertex; ++dof)
+                  for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
+                       ++dof)
                     dofs_on_mother[next_index++] =
                       this_face->vertex_dof_index(vertex, dof, fe_index);
                 for (unsigned int dof = 0; dof != fe.dofs_per_line; ++dof)
@@ -678,7 +681,7 @@ namespace DoFTools
                     this_face->dof_index(dof, fe_index);
                 AssertDimension(next_index, dofs_on_mother.size());
 
-                for (unsigned int dof = 0; dof != fe.dofs_per_vertex; ++dof)
+                for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex(); ++dof)
                   dofs_on_children.push_back(
                     this_face->child(0)->vertex_dof_index(1, dof, fe_index));
                 for (unsigned int child = 0; child < 2; ++child)
@@ -829,7 +832,7 @@ namespace DoFTools
 
                 const unsigned int n_dofs_on_mother = fe.dofs_per_face;
                 const unsigned int n_dofs_on_children =
-                  (5 * fe.dofs_per_vertex + 12 * fe.dofs_per_line +
+                  (5 * fe.n_dofs_per_vertex() + 12 * fe.dofs_per_line +
                    4 * fe.dofs_per_quad);
 
                 // TODO[TL]: think about this and the following in case of
@@ -855,7 +858,8 @@ namespace DoFTools
                 // @p{FiniteElement::constraints()}
                 unsigned int next_index = 0;
                 for (unsigned int vertex = 0; vertex < 4; ++vertex)
-                  for (unsigned int dof = 0; dof != fe.dofs_per_vertex; ++dof)
+                  for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
+                       ++dof)
                     dofs_on_mother[next_index++] =
                       this_face->vertex_dof_index(vertex, dof, fe_index);
                 for (unsigned int line = 0; line < 4; ++line)
@@ -881,13 +885,14 @@ namespace DoFTools
                            this_face->child(3)->vertex_index(0))),
                        ExcInternalError());
 
-                for (unsigned int dof = 0; dof != fe.dofs_per_vertex; ++dof)
+                for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex(); ++dof)
                   dofs_on_children.push_back(
                     this_face->child(0)->vertex_dof_index(3, dof));
 
                 // dof numbers on the centers of the lines bounding this face
                 for (unsigned int line = 0; line < 4; ++line)
-                  for (unsigned int dof = 0; dof != fe.dofs_per_vertex; ++dof)
+                  for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
+                       ++dof)
                     dofs_on_children.push_back(
                       this_face->line(line)->child(0)->vertex_dof_index(
                         1, dof, fe_index));
@@ -2617,7 +2622,7 @@ namespace DoFTools
         // vector to hold the representation of a single degree of freedom on
         // the coarse grid (for the selected fe) on the fine grid
 
-        copy_data.dofs_per_cell = coarse_fe.dofs_per_cell;
+        copy_data.dofs_per_cell = coarse_fe.n_dofs_per_cell();
         copy_data.parameter_dof_indices.resize(copy_data.dofs_per_cell);
 
         // get the global indices of the parameter dofs on this parameter grid
@@ -2744,7 +2749,7 @@ namespace DoFTools
 
         unsigned int n_interesting_dofs = 0;
         for (unsigned int local_dof = 0;
-             local_dof < coarse_grid.get_fe().dofs_per_cell;
+             local_dof < coarse_grid.get_fe().n_dofs_per_cell();
              ++local_dof)
           if (coarse_grid.get_fe().system_to_component_index(local_dof).first ==
               coarse_component)
@@ -2866,7 +2871,7 @@ namespace DoFTools
                                       n_fine_dofs   = fine_grid.n_dofs();
 
         // local numbers of dofs
-        const unsigned int fine_dofs_per_cell = fine_fe.dofs_per_cell;
+        const unsigned int fine_dofs_per_cell = fine_fe.n_dofs_per_cell();
 
         // alias the number of dofs per cell belonging to the coarse_component
         // which is to be the restriction of the fine grid:
@@ -2874,7 +2879,7 @@ namespace DoFTools
           coarse_fe
             .base_element(
               coarse_fe.component_to_base_index(coarse_component).first)
-            .dofs_per_cell;
+            .n_dofs_per_cell();
 
 
         // Try to find out whether the grids stem from the same coarse grid.
@@ -2939,7 +2944,7 @@ namespace DoFTools
         for (unsigned int local_coarse_dof = 0;
              local_coarse_dof < coarse_dofs_per_cell_component;
              ++local_coarse_dof)
-          for (unsigned int fine_dof = 0; fine_dof < fine_fe.dofs_per_cell;
+          for (unsigned int fine_dof = 0; fine_dof < fine_fe.n_dofs_per_cell();
                ++fine_dof)
             if (fine_fe.system_to_component_index(fine_dof) ==
                 std::make_pair(fine_component, local_coarse_dof))
@@ -2957,13 +2962,13 @@ namespace DoFTools
           // this is an interesting dof. finally count how many true's there
           std::vector<bool> dof_is_interesting(fine_grid.n_dofs(), false);
           std::vector<types::global_dof_index> local_dof_indices(
-            fine_fe.dofs_per_cell);
+            fine_fe.n_dofs_per_cell());
 
           for (const auto &cell : fine_grid.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 cell->get_dof_indices(local_dof_indices);
-                for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < fine_fe.n_dofs_per_cell(); ++i)
                   if (fine_fe.system_to_component_index(i).first ==
                       fine_component)
                     dof_is_interesting[local_dof_indices[i]] = true;
@@ -2984,13 +2989,13 @@ namespace DoFTools
 
         {
           std::vector<types::global_dof_index> local_dof_indices(
-            fine_fe.dofs_per_cell);
+            fine_fe.n_dofs_per_cell());
           unsigned int next_free_index = 0;
           for (const auto &cell : fine_grid.active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 cell->get_dof_indices(local_dof_indices);
-                for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < fine_fe.n_dofs_per_cell(); ++i)
                   // if this DoF is a parameter dof and has not yet been
                   // numbered, then do so
                   if ((fine_fe.system_to_component_index(i).first ==
@@ -3376,7 +3381,7 @@ namespace DoFTools
           const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
           // get global indices of dofs on the cell
-          cell_dofs.resize(fe.dofs_per_cell);
+          cell_dofs.resize(fe.n_dofs_per_cell());
           cell->get_dof_indices(cell_dofs);
 
           for (const auto face_no : cell->face_indices())

@@ -134,7 +134,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
   if (fe_data.update_each & update_values)
     for (unsigned int i = 0; i < quadrature.size(); ++i)
       {
-        for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+        for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
           output_data.shape_values(k, i) = 0.;
         switch (dim)
           {
@@ -182,7 +182,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
             case 1:
               {
                 // Fill data for vertex shape functions
-                if (this->dofs_per_vertex != 0)
+                if (this->n_dofs_per_vertex() != 0)
                   for (unsigned int lvertex = 0;
                        lvertex < GeometryInfo<dim>::vertices_per_face;
                        ++lvertex)
@@ -227,7 +227,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_subface_values(
 
   if (fe_data.update_each & update_values)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         for (unsigned int i = 0; i < quadrature.size(); ++i)
           output_data.shape_values(k, i) = 0.;
       for (unsigned int k = 0; k < fe_data.shape_values.size(); ++k)

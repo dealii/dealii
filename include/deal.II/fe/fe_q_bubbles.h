@@ -115,7 +115,7 @@ public:
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one.  The size of the matrix is then @p dofs_per_cell times
-   * <tt>source.dofs_per_cell</tt>.
+   * <tt>source.n_dofs_per_cell()</tt>.
    *
    * These matrices are only available if the source element is also a @p
    * FE_Q_Bubbles element. Otherwise, an exception of type

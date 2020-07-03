@@ -270,7 +270,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
 
 
   std::vector<types::global_dof_index> local_dof_indices(
-    dof_handler->get_fe().dofs_per_cell);
+    dof_handler->get_fe().n_dofs_per_cell());
   std::vector<types::global_dof_index> new_solution_indices;
   current_cell->get_dof_indices(local_dof_indices);
   // there is an implicit assumption here
@@ -419,7 +419,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
     }
 
   std::vector<types::global_dof_index> local_dof_indices(
-    dof_handler->get_fe().dofs_per_cell);
+    dof_handler->get_fe().n_dofs_per_cell());
   for (unsigned int point = 0; point < locations.size(); point++)
     {
       current_cell[point]->get_dof_indices(local_dof_indices);

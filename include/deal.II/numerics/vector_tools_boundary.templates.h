@@ -130,7 +130,7 @@ namespace VectorTools
                     boundary_function.vector_value(cell->vertex(direction),
                                                    function_values);
 
-                  for (unsigned int i = 0; i < fe.dofs_per_vertex; ++i)
+                  for (unsigned int i = 0; i < fe.n_dofs_per_vertex(); ++i)
                     if (component_mask[fe.face_system_to_component_index(i)
                                          .first])
                       boundary_values[cell->vertex_dof_index(
@@ -229,7 +229,7 @@ namespace VectorTools
                   // interested in, however. make sure that all shape functions
                   // that are non-zero for the components we are interested in,
                   // are in fact primitive
-                  for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell;
+                  for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell();
                        ++i)
                     {
                       const ComponentMask &nonzero_component_array =
@@ -310,19 +310,23 @@ namespace VectorTools
                                     (dim == 1 ?
                                        i :
                                        (dim == 2 ?
-                                          (i < 2 * fe.dofs_per_vertex ?
+                                          (i < 2 * fe.n_dofs_per_vertex() ?
                                              i :
-                                             i + 2 * fe.dofs_per_vertex) :
+                                             i + 2 * fe.n_dofs_per_vertex()) :
                                           (dim == 3 ?
-                                             (i < 4 * fe.dofs_per_vertex ?
+                                             (i < 4 * fe.n_dofs_per_vertex() ?
                                                 i :
-                                                (i < 4 * fe.dofs_per_vertex +
+                                                (i < 4 * fe.n_dofs_per_vertex() +
                                                        4 * fe.dofs_per_line ?
-                                                   i + 4 * fe.dofs_per_vertex :
-                                                   i + 4 * fe.dofs_per_vertex +
+                                                   i +
+                                                     4 *
+                                                       fe.n_dofs_per_vertex() :
+                                                   i +
+                                                     4 *
+                                                       fe.n_dofs_per_vertex() +
                                                      8 * fe.dofs_per_line)) :
                                              numbers::invalid_unsigned_int)));
-                                  Assert(cell_i < fe.dofs_per_cell,
+                                  Assert(cell_i < fe.n_dofs_per_cell(),
                                          ExcInternalError());
 
                                   // make sure that if this is not a primitive
@@ -2150,7 +2154,7 @@ namespace VectorTools
           //      and so on.
 
           const unsigned int face_dof_idx =
-            GeometryInfo<dim>::vertices_per_face * fe.dofs_per_vertex +
+            GeometryInfo<dim>::vertices_per_face * fe.n_dofs_per_vertex() +
             line * fe.dofs_per_line + line_dof_idx;
 
           // Note, assuming that the edge orientations are "standard"
@@ -2586,7 +2590,7 @@ namespace VectorTools
                       //      (degree+1),..,2*(degree+1) and so on.
                       const unsigned int face_dof_idx =
                         GeometryInfo<dim>::vertices_per_face *
-                          fe.dofs_per_vertex +
+                          fe.n_dofs_per_vertex() +
                         line * fe.dofs_per_line + line_dof_idx;
 
                       // Next, translate from face to cell. Note, this might be
@@ -2661,7 +2665,8 @@ namespace VectorTools
                    ++quad_dof_idx)
                 {
                   const unsigned int face_idx =
-                    GeometryInfo<dim>::vertices_per_face * fe.dofs_per_vertex +
+                    GeometryInfo<dim>::vertices_per_face *
+                      fe.n_dofs_per_vertex() +
                     lines_per_face * fe.dofs_per_line + quad_dof_idx;
                   const unsigned int cell_idx =
                     fe.face_to_cell_index(face_idx, face);

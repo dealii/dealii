@@ -59,8 +59,8 @@ FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree)
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_TraceQ). Note that we simply take the points of fe_q but
   // skip the last ones which are associated with the interior of FE_Q.
-  this->unit_support_points.resize(this->dofs_per_cell);
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  this->unit_support_points.resize(this->n_dofs_per_cell());
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     this->unit_support_points[i] = fe_q.get_unit_support_points()[i];
 
   // Initialize constraint matrices
@@ -101,14 +101,14 @@ FE_TraceQ<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // FE_TraceQ shares the numbering of elemental degrees of freedom with FE_Q
   // except for the missing interior ones (quad dofs in 2D and hex dofs in
   // 3D). Therefore, it is safe to ask fe_q for the corresponding
-  // information. The assertion 'shape_index < this->dofs_per_cell' will make
-  // sure that we only access the trace dofs.
+  // information. The assertion 'shape_index < this->n_dofs_per_cell()' will
+  // make sure that we only access the trace dofs.
   return fe_q.has_support_on_face(shape_index, face_index);
 }
 
@@ -118,8 +118,8 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_TraceQ<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     constant_modes(0, i) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));
@@ -135,9 +135,9 @@ FE_TraceQ<dim, spacedim>::
   AssertDimension(support_point_values.size(),
                   this->get_unit_support_points().size());
   AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  AssertDimension(this->n_dofs_per_cell(), nodal_values.size());
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       AssertDimension(support_point_values[i].size(), 1);
 

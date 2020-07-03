@@ -244,8 +244,8 @@ namespace LocalIntegrators
                 const double             factor1 = 1.,
                 const double             factor2 = 1.)
     {
-      const unsigned int n1_dofs      = fe1.dofs_per_cell;
-      const unsigned int n2_dofs      = fe2.dofs_per_cell;
+      const unsigned int n1_dofs      = fe1.n_dofs_per_cell();
+      const unsigned int n2_dofs      = fe2.n_dofs_per_cell();
       const unsigned int n_components = fe1.get_fe().n_components();
 
       Assert(n1_dofs == n2_dofs, ExcNotImplemented());

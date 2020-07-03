@@ -546,7 +546,7 @@ namespace FETools
         {
           const FiniteElement<dim, spacedim> &fe =
             dealii_cell->get_dof_handler().get_fe();
-          const unsigned int dofs_per_cell = fe.dofs_per_cell;
+          const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
           Vector<typename OutVector::value_type> interpolated_values(
             dofs_per_cell);
@@ -608,7 +608,7 @@ namespace FETools
         {
           const FiniteElement<dim, spacedim> &fe =
             dealii_cell->get_dof_handler().get_fe();
-          const unsigned int dofs_per_cell = fe.dofs_per_cell;
+          const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
           Assert(interpolated_values.size() == dofs_per_cell,
                  ExcDimensionMismatch(interpolated_values.size(),
@@ -728,7 +728,7 @@ namespace FETools
     {
       const FiniteElement<dim, spacedim> &fe =
         dealii_cell->get_dof_handler().get_fe();
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
       if (dealii_cell->is_active())
         {
@@ -1242,7 +1242,7 @@ namespace FETools
     {
       const FiniteElement<dim, spacedim> &fe =
         dealii_cell->get_dof_handler().get_fe();
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
       CellData cell_data(dofs_per_cell);
       cell_data.quadrant   = p4est_cell;
@@ -1416,7 +1416,7 @@ namespace FETools
       const unsigned int                  dofs_per_face = fe.dofs_per_face;
       if (dofs_per_face > 0)
         {
-          const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
+          const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
           std::vector<types::global_dof_index> indices(dofs_per_cell);
           typename DoFHandler<dim, spacedim>::active_cell_iterator
             cell = dof2.begin_active(),
@@ -1715,7 +1715,7 @@ namespace FETools
                        const DoFHandler<dim, spacedim> &dof2,
                        OutVector &                      u2)
     {
-      const unsigned int dofs_per_cell = dof2.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof2.get_fe().n_dofs_per_cell();
       Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
 
       // then traverse grid bottom up

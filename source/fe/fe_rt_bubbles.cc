@@ -52,7 +52,7 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
     deg >= 1,
     ExcMessage(
       "Lowest order RT_Bubbles element is degree 1, but you requested for degree 0"));
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_raviart_thomas};
   // Initialize support points and quadrature weights
@@ -131,7 +131,7 @@ template <int dim>
 void
 FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
 {
-  this->generalized_support_points.resize(this->dofs_per_cell);
+  this->generalized_support_points.resize(this->n_dofs_per_cell());
   this->generalized_face_support_points.resize(this->dofs_per_face);
 
   // Index of the point being entered
@@ -197,7 +197,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       for (unsigned int k = 0; k < quadrature->size(); ++k)
         this->generalized_support_points[current++] = quadrature->point(k);
     }
-  Assert(current == this->dofs_per_cell, ExcInternalError());
+  Assert(current == this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -266,8 +266,8 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values.size() == this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
@@ -287,11 +287,11 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
     }
 
   // The remaining points form dim chunks, one for each component.
-  const unsigned int istep = (this->dofs_per_cell - fbase) / dim;
-  Assert((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
+  const unsigned int istep = (this->n_dofs_per_cell() - fbase) / dim;
+  Assert((this->n_dofs_per_cell() - fbase) % dim == 0, ExcInternalError());
 
   f = 0;
-  while (fbase < this->dofs_per_cell)
+  while (fbase < this->n_dofs_per_cell())
     {
       for (unsigned int i = 0; i < istep; ++i)
         {
@@ -300,7 +300,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
       fbase += istep;
       ++f;
     }
-  Assert(fbase == this->dofs_per_cell, ExcInternalError());
+  Assert(fbase == this->n_dofs_per_cell(), ExcInternalError());
 }
 
 

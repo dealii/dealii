@@ -639,7 +639,7 @@ namespace VectorTools
                                 quadrature,
                                 update_values | update_JxW_values);
 
-        const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
         const unsigned int n_q_points    = quadrature.size();
         Vector<Number>     cell_rhs(dofs_per_cell);
         std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);

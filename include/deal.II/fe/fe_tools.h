@@ -183,7 +183,7 @@ namespace FETools
   /**
    * Compute the interpolation matrix that interpolates a @p fe1-function to a
    * @p fe2-function on each cell. The interpolation_matrix needs to be of
-   * size <tt>(fe2.dofs_per_cell, fe1.dofs_per_cell)</tt>.
+   * size <tt>(fe2.n_dofs_per_cell(), fe1.n_dofs_per_cell())</tt>.
    *
    * Note, that if the finite element space @p fe1 is a subset of the finite
    * element space @p fe2 then the @p interpolation_matrix is an embedding
@@ -199,7 +199,7 @@ namespace FETools
    * Compute the interpolation matrix that interpolates a @p fe1-function to a
    * @p fe2-function, and interpolates this to a second @p fe1-function on
    * each cell. The interpolation_matrix needs to be of size
-   * <tt>(fe1.dofs_per_cell, fe1.dofs_per_cell)</tt>.
+   * <tt>(fe1.n_dofs_per_cell(), fe1.n_dofs_per_cell())</tt>.
    *
    * Note, that this function only makes sense if the finite element space due
    * to @p fe1 is not a subset of the finite element space due to @p fe2, as
@@ -214,8 +214,8 @@ namespace FETools
 
   /**
    * Compute the identity matrix minus the back interpolation matrix.
-   * The @p difference_matrix will be of size <tt>(fe1.dofs_per_cell,
-   * fe1.dofs_per_cell)</tt> after this function. Previous content
+   * The @p difference_matrix will be of size <tt>(fe1.n_dofs_per_cell(),
+   * fe1.n_dofs_per_cell())</tt> after this function. Previous content
    * of the argument will be overwritten.
    *
    * This function computes the matrix that transforms a @p fe1 function $z$ to
@@ -569,7 +569,7 @@ namespace FETools
    * This method implements the
    * FETools::compute_projection_from_quadrature_points_matrix method for
    * faces of a mesh.  The matrix that it returns, X, is face specific and its
-   * size is fe.dofs_per_cell by rhs_quadrature.size().  The dimension, dim
+   * size is fe.n_dofs_per_cell() by rhs_quadrature.size().  The dimension, dim
    * must be larger than 1 for this class, since Quadrature<dim-1> objects are
    * required. See the documentation on the Quadrature class for more
    * information.

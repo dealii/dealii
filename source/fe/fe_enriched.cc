@@ -211,7 +211,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
                               this->n_base_elements()));
 
   // build the map: (base_no, base_m) -> vector of local element DoFs
-  for (unsigned int system_index = 0; system_index < this->dofs_per_cell;
+  for (unsigned int system_index = 0; system_index < this->n_dofs_per_cell();
        ++system_index)
     {
       const unsigned int base_no =
@@ -248,10 +248,10 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
            m < base_no_mult_local_enriched_dofs[base_no].size();
            m++)
         Assert(base_no_mult_local_enriched_dofs[base_no][m].size() ==
-                 fes[base_no]->dofs_per_cell,
+                 fes[base_no]->n_dofs_per_cell(),
                ExcDimensionMismatch(
                  base_no_mult_local_enriched_dofs[base_no][m].size(),
-                 fes[base_no]->dofs_per_cell));
+                 fes[base_no]->n_dofs_per_cell()));
     }
 }
 
@@ -439,7 +439,7 @@ FE_Enriched<dim, spacedim>::initialize(
   {
     // If the system is not primitive, these have not been initialized by
     // FiniteElement
-    this->system_to_component_table.resize(this->dofs_per_cell);
+    this->system_to_component_table.resize(this->n_dofs_per_cell());
     this->face_system_to_component_table.resize(this->dofs_per_face);
 
     FETools::Compositing::build_cell_tables(this->system_to_base_table,
@@ -659,13 +659,15 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
         const UpdateFlags base_flags = base_fe_data.update_each;
 
-        for (unsigned int system_index = 0; system_index < this->dofs_per_cell;
+        for (unsigned int system_index = 0;
+             system_index < this->n_dofs_per_cell();
              ++system_index)
           if (this->system_to_base_table[system_index].first.first == base_no)
             {
               const unsigned int base_index =
                 this->system_to_base_table[system_index].second;
-              Assert(base_index < base_fe.dofs_per_cell, ExcInternalError());
+              Assert(base_index < base_fe.n_dofs_per_cell(),
+                     ExcInternalError());
 
               // now copy. if the shape function is primitive, then there
               // is only one value to be copied, but for non-primitive

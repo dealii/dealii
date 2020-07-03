@@ -154,7 +154,7 @@ MGTransferPrebuilt<VectorType>::build(
 {
   const unsigned int n_levels =
     dof_handler.get_triangulation().n_global_levels();
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
   this->sizes.resize(n_levels);
   for (unsigned int l = 0; l < n_levels; ++l)

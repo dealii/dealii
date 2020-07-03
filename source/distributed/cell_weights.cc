@@ -82,7 +82,7 @@ namespace parallel
              const FiniteElement<dim, spacedim> &future_fe) -> unsigned int {
       const float result =
         std::trunc(coefficients.first *
-                   std::pow(future_fe.dofs_per_cell, coefficients.second));
+                   std::pow(future_fe.n_dofs_per_cell(), coefficients.second));
 
       Assert(result >= 0. &&
                result <=
@@ -106,7 +106,8 @@ namespace parallel
              const FiniteElement<dim, spacedim> &future_fe) -> unsigned int {
       float result = 0;
       for (const auto &pair : coefficients)
-        result += pair.first * std::pow(future_fe.dofs_per_cell, pair.second);
+        result +=
+          pair.first * std::pow(future_fe.n_dofs_per_cell(), pair.second);
       result = std::trunc(result);
 
       Assert(result >= 0. &&

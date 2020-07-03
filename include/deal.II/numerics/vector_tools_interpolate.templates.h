@@ -334,7 +334,7 @@ namespace VectorTools
           const unsigned int fe_index = cell->active_fe_index();
 
           // Do nothing if there are no local degrees of freedom.
-          if (fe[fe_index].dofs_per_cell == 0)
+          if (fe[fe_index].n_dofs_per_cell() == 0)
             continue;
 
           // Skip processing of the current cell if the function object is
@@ -349,7 +349,7 @@ namespace VectorTools
             fe_values.get_present_fe_values().get_quadrature_points();
 
           // Get indices of the dofs on this cell
-          const auto n_dofs = fe[fe_index].dofs_per_cell;
+          const auto n_dofs = fe[fe_index].n_dofs_per_cell();
           dofs_on_cell.resize(n_dofs);
           cell->get_dof_indices(dofs_on_cell);
 
@@ -533,8 +533,8 @@ namespace VectorTools
               OutVector &                      data_2)
   {
     using number = typename OutVector::value_type;
-    Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
-    Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
+    Vector<number> cell_data_1(dof_1.get_fe().n_dofs_per_cell());
+    Vector<number> cell_data_2(dof_2.get_fe().n_dofs_per_cell());
 
     // Reset output vector.
     data_2 = static_cast<number>(0);
@@ -544,7 +544,7 @@ namespace VectorTools
     touch_count.reinit(data_2);
 
     std::vector<types::global_dof_index> local_dof_indices(
-      dof_2.get_fe().dofs_per_cell);
+      dof_2.get_fe().n_dofs_per_cell());
 
     typename DoFHandler<dim, spacedim>::active_cell_iterator cell_1 =
       dof_1.begin_active();
@@ -565,7 +565,7 @@ namespace VectorTools
             cell_2->get_dof_indices(local_dof_indices);
 
             // Distribute cell vector.
-            for (unsigned int j = 0; j < dof_2.get_fe().dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < dof_2.get_fe().n_dofs_per_cell(); ++j)
               {
                 ::dealii::internal::ElementAccess<OutVector>::add(
                   cell_data_2(j), local_dof_indices[j], data_2);
@@ -638,9 +638,10 @@ namespace VectorTools
 
         MappingQGeneric<dim, spacedim> map_q(fe.degree);
         FEValues<dim, spacedim> fe_v(map_q, fe, quad, update_quadrature_points);
-        std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
+        std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
 
-        AssertDimension(fe.dofs_per_cell, fe.get_unit_support_points().size());
+        AssertDimension(fe.n_dofs_per_cell(),
+                        fe.get_unit_support_points().size());
         Assert(fe.is_primitive(),
                ExcMessage("FE is not Primitive! This won't work."));
 
@@ -699,8 +700,9 @@ namespace VectorTools
         const ComponentMask maskq(spacedim, true);
         get_position_vector(dhq, eulerq);
 
-        FullMatrix<double> transfer(fe.dofs_per_cell, feq.dofs_per_cell);
-        FullMatrix<double> local_transfer(feq.dofs_per_cell);
+        FullMatrix<double>             transfer(fe.n_dofs_per_cell(),
+                                    feq.n_dofs_per_cell());
+        FullMatrix<double>             local_transfer(feq.n_dofs_per_cell());
         const std::vector<Point<dim>> &points = feq.get_unit_support_points();
 
         // Here we construct the interpolation matrix from
@@ -735,18 +737,18 @@ namespace VectorTools
         // and check that this is the case. If not, we bail out, not
         // knowing what to do in this case.
 
-        std::vector<unsigned int> fe_to_feq(fe.dofs_per_cell,
+        std::vector<unsigned int> fe_to_feq(fe.n_dofs_per_cell(),
                                             numbers::invalid_unsigned_int);
         unsigned int              index = 0;
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           if (fe_mask[fe.system_to_component_index(i).first])
             fe_to_feq[i] = index++;
 
-        // If index is not the same as feq.dofs_per_cell, we won't
+        // If index is not the same as feq.n_dofs_per_cell(), we won't
         // know how to invert the resulting matrix. Bail out.
-        Assert(index == feq.dofs_per_cell, ExcNotImplemented());
+        Assert(index == feq.n_dofs_per_cell(), ExcNotImplemented());
 
-        for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+        for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
           {
             const unsigned int comp_j = fe.system_to_component_index(j).first;
             if (fe_mask[comp_j])
@@ -763,9 +765,9 @@ namespace VectorTools
         // one is filled only with the information from the components
         // of the displacement. The rest is set to zero.
         local_transfer.invert(local_transfer);
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           if (fe_to_feq[i] != numbers::invalid_unsigned_int)
-            for (unsigned int j = 0; j < feq.dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < feq.n_dofs_per_cell(); ++j)
               transfer(i, j) = local_transfer(fe_to_feq[i], j);
 
         // The interpolation matrix is then passed to the
@@ -927,7 +929,7 @@ namespace VectorTools
         // dof_values by interpolation.
         if (cell1->is_active())
           {
-            cache.reinit(cell1->get_fe().dofs_per_cell);
+            cache.reinit(cell1->get_fe().n_dofs_per_cell());
             cell1->get_interpolated_dof_values(u1,
                                                cache,
                                                cell1->active_fe_index());
@@ -937,7 +939,7 @@ namespace VectorTools
           }
         else
           {
-            cache.reinit(cell2->get_fe().dofs_per_cell);
+            cache.reinit(cell2->get_fe().n_dofs_per_cell());
             cell1->get_interpolated_dof_values(u1,
                                                cache,
                                                cell2->active_fe_index());

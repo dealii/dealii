@@ -49,7 +49,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int deg)
                          std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_raviart_thomas};
   // First, initialize the
@@ -147,7 +147,7 @@ template <int dim>
 void
 FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
 {
-  this->generalized_support_points.resize(this->dofs_per_cell);
+  this->generalized_support_points.resize(this->n_dofs_per_cell());
   this->generalized_face_support_points.resize(this->dofs_per_face);
 
   // Number of the point being entered
@@ -211,7 +211,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
       for (unsigned int k = 0; k < quadrature->size(); ++k)
         this->generalized_support_points[current++] = quadrature->point(k);
     }
-  Assert(current == this->dofs_per_cell, ExcInternalError());
+  Assert(current == this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -278,7 +278,7 @@ FE_RaviartThomasNodal<dim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // The first degrees of freedom are
@@ -310,8 +310,8 @@ FE_RaviartThomasNodal<dim>::
   Assert(support_point_values.size() == this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
@@ -334,11 +334,11 @@ FE_RaviartThomasNodal<dim>::
 
   // The remaining points form dim
   // chunks, one for each component.
-  const unsigned int istep = (this->dofs_per_cell - fbase) / dim;
-  Assert((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
+  const unsigned int istep = (this->n_dofs_per_cell() - fbase) / dim;
+  Assert((this->n_dofs_per_cell() - fbase) % dim == 0, ExcInternalError());
 
   f = 0;
-  while (fbase < this->dofs_per_cell)
+  while (fbase < this->n_dofs_per_cell())
     {
       for (unsigned int i = 0; i < istep; ++i)
         {
@@ -347,7 +347,7 @@ FE_RaviartThomasNodal<dim>::
       fbase += istep;
       ++f;
     }
-  Assert(fbase == this->dofs_per_cell, ExcInternalError());
+  Assert(fbase == this->n_dofs_per_cell(), ExcInternalError());
 }
 
 

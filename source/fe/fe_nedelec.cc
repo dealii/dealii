@@ -85,7 +85,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_nedelec};
   // First, initialize the
@@ -534,7 +534,7 @@ FE_Nedelec<dim>::initialize_restriction()
           // functions of the child cells
           // to the lowest order shape
           // functions of the parent cell.
-          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -626,7 +626,7 @@ FE_Nedelec<dim>::initialize_restriction()
               FullMatrix<double> system_rhs(this->degree - 1, 4);
               Vector<double>     tmp(4);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                 for (unsigned int i = 0; i < 2; ++i)
                   {
                     system_rhs = 0.0;
@@ -801,7 +801,7 @@ FE_Nedelec<dim>::initialize_restriction()
               system_rhs.reinit(system_matrix_inv.m(), 8);
               tmp.reinit(8);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -963,7 +963,7 @@ FE_Nedelec<dim>::initialize_restriction()
           // functions of the child cells
           // to the lowest order shape
           // functions of the parent cell.
-          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -1068,7 +1068,8 @@ FE_Nedelec<dim>::initialize_restriction()
 
               for (unsigned int i = 0; i < 2; ++i)
                 for (unsigned int j = 0; j < 2; ++j)
-                  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+                  for (unsigned int dof = 0; dof < this->n_dofs_per_cell();
+                       ++dof)
                     {
                       system_rhs = 0.0;
 
@@ -1300,7 +1301,7 @@ FE_Nedelec<dim>::initialize_restriction()
               tmp.reinit(24);
 
               for (unsigned int i = 0; i < 2; ++i)
-                for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+                for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                   {
                     system_rhs = 0.0;
 
@@ -1641,7 +1642,7 @@ FE_Nedelec<dim>::initialize_restriction()
               system_rhs.reinit(system_matrix_inv.m(), 24);
               tmp.reinit(24);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -2035,7 +2036,7 @@ bool
 FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
                                      const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   const unsigned int deg = this->degree - 1;
@@ -2970,7 +2971,7 @@ FE_Nedelec<dim>::get_prolongation_matrix(
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
-          this->dofs_per_cell)
+          this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
@@ -3026,7 +3027,7 @@ FE_Nedelec<dim>::get_restriction_matrix(
 
       // if matrix got updated while waiting for the lock...
       if (this->restriction[refinement_case - 1][child].n() ==
-          this->dofs_per_cell)
+          this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
@@ -3081,8 +3082,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);
 
   switch (dim)
@@ -4018,9 +4019,9 @@ template <int dim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_Nedelec<dim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(dim, this->dofs_per_cell);
+  Table<2, bool> constant_modes(dim, this->n_dofs_per_cell());
   for (unsigned int d = 0; d < dim; ++d)
-    for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       constant_modes(d, i) = true;
   std::vector<unsigned int> components;
   for (unsigned int d = 0; d < dim; ++d)

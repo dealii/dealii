@@ -54,7 +54,7 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
     ExcMessage(
       "Lowest order BDM element are degree 1, but you asked for degree 0"));
 
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_bdm};
   // These must be done first, since
@@ -139,8 +139,8 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   // First do interpolation on faces. There, the component evaluated
   // depends on the face direction and orientation.
@@ -185,14 +185,14 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
                     test_values_cell.size());
 
   // Done for BDM1
-  if (dbase == this->dofs_per_cell)
+  if (dbase == this->n_dofs_per_cell())
     return;
 
   // What's missing are the interior
   // degrees of freedom. In each
   // point, we take all components of
   // the solution.
-  Assert((this->dofs_per_cell - dbase) % dim == 0, ExcInternalError());
+  Assert((this->n_dofs_per_cell() - dbase) % dim == 0, ExcInternalError());
 
   for (unsigned int d = 0; d < dim; ++d, dbase += test_values_cell[0].size())
     {
@@ -205,7 +205,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
         }
     }
 
-  Assert(dbase == this->dofs_per_cell, ExcInternalError());
+  Assert(dbase == this->n_dofs_per_cell(), ExcInternalError());
 }
 
 

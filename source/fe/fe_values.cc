@@ -79,9 +79,9 @@ namespace internal
   make_shape_function_to_row_table(const FiniteElement<dim, spacedim> &fe)
   {
     std::vector<unsigned int> shape_function_to_row_table(
-      fe.dofs_per_cell * fe.n_components(), numbers::invalid_unsigned_int);
+      fe.n_dofs_per_cell() * fe.n_components(), numbers::invalid_unsigned_int);
     unsigned int row = 0;
-    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       {
         // loop over all components that are nonzero for this particular
         // shape function. if a component is zero then we leave the
@@ -144,7 +144,7 @@ namespace FEValuesViews
                                 const unsigned int                 component)
     : fe_values(&fe_values)
     , component(component)
-    , shape_function_data(this->fe_values->fe->dofs_per_cell)
+    , shape_function_data(this->fe_values->fe->n_dofs_per_cell())
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
     AssertIndexRange(component, fe.n_components());
@@ -155,7 +155,7 @@ namespace FEValuesViews
     const std::vector<unsigned int> shape_function_to_row_table =
       dealii::internal::make_shape_function_to_row_table(fe);
 
-    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       {
         const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
 
@@ -189,7 +189,7 @@ namespace FEValuesViews
                                 const unsigned int first_vector_component)
     : fe_values(&fe_values)
     , first_vector_component(first_vector_component)
-    , shape_function_data(this->fe_values->fe->dofs_per_cell)
+    , shape_function_data(this->fe_values->fe->n_dofs_per_cell())
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
     AssertIndexRange(first_vector_component + spacedim - 1, fe.n_components());
@@ -204,7 +204,7 @@ namespace FEValuesViews
       {
         const unsigned int component = first_vector_component + d;
 
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
             const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
 
@@ -225,7 +225,7 @@ namespace FEValuesViews
           }
       }
 
-    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       {
         unsigned int n_nonzero_components = 0;
         for (unsigned int d = 0; d < spacedim; ++d)
@@ -268,7 +268,7 @@ namespace FEValuesViews
     const unsigned int                 first_tensor_component)
     : fe_values(&fe_values)
     , first_tensor_component(first_tensor_component)
-    , shape_function_data(this->fe_values->fe->dofs_per_cell)
+    , shape_function_data(this->fe_values->fe->n_dofs_per_cell())
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
     Assert(first_tensor_component + (dim * dim + dim) / 2 - 1 <
@@ -290,7 +290,7 @@ namespace FEValuesViews
       {
         const unsigned int component = first_tensor_component + d;
 
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
             const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
 
@@ -311,7 +311,7 @@ namespace FEValuesViews
           }
       }
 
-    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       {
         unsigned int n_nonzero_components = 0;
         for (unsigned int d = 0;
@@ -357,7 +357,7 @@ namespace FEValuesViews
                                    const unsigned int first_tensor_component)
     : fe_values(&fe_values)
     , first_tensor_component(first_tensor_component)
-    , shape_function_data(this->fe_values->fe->dofs_per_cell)
+    , shape_function_data(this->fe_values->fe->n_dofs_per_cell())
   {
     const FiniteElement<dim, spacedim> &fe = *this->fe_values->fe;
     AssertIndexRange(first_tensor_component + dim * dim - 1, fe.n_components());
@@ -371,7 +371,7 @@ namespace FEValuesViews
       {
         const unsigned int component = first_tensor_component + d;
 
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
             const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
 
@@ -392,7 +392,7 @@ namespace FEValuesViews
           }
       }
 
-    for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
       {
         unsigned int n_nonzero_components = 0;
         for (unsigned int d = 0; d < dim * dim; ++d)
@@ -2839,10 +2839,10 @@ FEValuesBase<dim, spacedim>::CellIterator<CI>::get_interpolated_dof_values(
   Assert(cell->is_active(), ExcNotImplemented());
 
   std::vector<types::global_dof_index> dof_indices(
-    cell->get_fe().dofs_per_cell);
+    cell->get_fe().n_dofs_per_cell());
   cell->get_dof_indices(dof_indices);
 
-  for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell(); ++i)
     out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
 }
 
@@ -3008,9 +3008,9 @@ namespace internal
       // count the total number of non-zero components accumulated
       // over all shape functions
       unsigned int n_nonzero_shape_components = 0;
-      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
         n_nonzero_shape_components += fe.n_nonzero_components(i);
-      Assert(n_nonzero_shape_components >= fe.dofs_per_cell,
+      Assert(n_nonzero_shape_components >= fe.n_dofs_per_cell(),
              ExcInternalError());
 
       // with the number of rows now known, initialize those fields
@@ -3171,7 +3171,7 @@ namespace internal
 
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     if (dofs_per_cell == 0)
       return;
 
@@ -3322,7 +3322,7 @@ namespace internal
 
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     if (dofs_per_cell == 0)
       return;
 
@@ -3467,7 +3467,7 @@ namespace internal
 
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     if (dofs_per_cell == 0)
       return;
 
@@ -4388,7 +4388,7 @@ FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim> &      mapping,
                                   const Quadrature<dim> &             q,
                                   const UpdateFlags update_flags)
   : FEValuesBase<dim, spacedim>(q.size(),
-                                fe.dofs_per_cell,
+                                fe.n_dofs_per_cell(),
                                 update_default,
                                 mapping,
                                 fe)
@@ -4404,7 +4404,7 @@ FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
                                   const Quadrature<dim> &             q,
                                   const UpdateFlags update_flags)
   : FEValuesBase<dim, spacedim>(q.size(),
-                                fe.dofs_per_cell,
+                                fe.n_dofs_per_cell(),
                                 update_default,
                                 StaticMappingQ1<dim, spacedim>::mapping,
                                 fe)
@@ -4656,7 +4656,7 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(quadrature.size(),
-                                    fe.dofs_per_cell,
+                                    fe.n_dofs_per_cell(),
                                     update_flags,
                                     mapping,
                                     fe,
@@ -4673,7 +4673,7 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(quadrature.size(),
-                                    fe.dofs_per_cell,
+                                    fe.n_dofs_per_cell(),
                                     update_flags,
                                     StaticMappingQ1<dim, spacedim>::mapping,
                                     fe,
@@ -4855,7 +4855,7 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(quadrature.size(),
-                                    fe.dofs_per_cell,
+                                    fe.n_dofs_per_cell(),
                                     update_flags,
                                     mapping,
                                     fe,
@@ -4872,7 +4872,7 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(quadrature.size(),
-                                    fe.dofs_per_cell,
+                                    fe.n_dofs_per_cell(),
                                     update_flags,
                                     StaticMappingQ1<dim, spacedim>::mapping,
                                     fe,

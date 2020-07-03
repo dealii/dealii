@@ -475,8 +475,8 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceQ<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     constant_modes(0, i) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));
@@ -491,9 +491,9 @@ FE_FaceQ<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   AssertDimension(support_point_values.size(),
                   this->get_unit_support_points().size());
   AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  AssertDimension(this->n_dofs_per_cell(), nodal_values.size());
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       AssertDimension(support_point_values[i].size(), 1);
 
@@ -647,8 +647,8 @@ template <int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceQ<1, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     constant_modes(0, i) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));
@@ -712,7 +712,7 @@ FE_FaceQ<1, spacedim>::fill_fe_face_values(
   const unsigned int foffset = face;
   if (fe_internal.update_each & update_values)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         output_data.shape_values(k, 0) = 0.;
       output_data.shape_values(foffset, 0) = 1;
     }
@@ -978,7 +978,7 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceP<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
   for (unsigned int face : GeometryInfo<dim>::face_indices())
     constant_modes(0, face * this->dofs_per_face) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(

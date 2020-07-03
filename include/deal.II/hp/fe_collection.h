@@ -884,8 +884,8 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_vertex > max)
-        max = finite_elements[i]->dofs_per_vertex;
+      if (finite_elements[i]->n_dofs_per_vertex() > max)
+        max = finite_elements[i]->n_dofs_per_vertex();
 
     return max;
   }
@@ -964,8 +964,8 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->dofs_per_cell > max)
-        max = finite_elements[i]->dofs_per_cell;
+      if (finite_elements[i]->n_dofs_per_cell() > max)
+        max = finite_elements[i]->n_dofs_per_cell();
 
     return max;
   }

@@ -435,15 +435,15 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize(
   // class FE_Q_DG0 that otherwise shares 95% of the code.
   const unsigned int q_dofs_per_cell =
     Utilities::fixed_power<dim>(q_degree + 1);
-  Assert(q_dofs_per_cell == this->dofs_per_cell ||
-           q_dofs_per_cell + 1 == this->dofs_per_cell ||
-           q_dofs_per_cell + dim == this->dofs_per_cell,
+  Assert(q_dofs_per_cell == this->n_dofs_per_cell() ||
+           q_dofs_per_cell + 1 == this->n_dofs_per_cell() ||
+           q_dofs_per_cell + dim == this->n_dofs_per_cell(),
          ExcInternalError());
 
   [this, q_dofs_per_cell]() {
     std::vector<unsigned int> renumber =
       FETools::hierarchic_to_lexicographic_numbering<dim>(q_degree);
-    for (unsigned int i = q_dofs_per_cell; i < this->dofs_per_cell; ++i)
+    for (unsigned int i = q_dofs_per_cell; i < this->n_dofs_per_cell(); ++i)
       renumber.push_back(i);
     auto *tensor_poly_space_ptr =
       dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
@@ -509,12 +509,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
           &x_source_fe))
     {
       // ok, source is a Q element, so we will be able to do the work
-      Assert(interpolation_matrix.m() == this->dofs_per_cell,
+      Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
              ExcDimensionMismatch(interpolation_matrix.m(),
-                                  this->dofs_per_cell));
-      Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+                                  this->n_dofs_per_cell()));
+      Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
              ExcDimensionMismatch(interpolation_matrix.m(),
-                                  x_source_fe.dofs_per_cell));
+                                  x_source_fe.n_dofs_per_cell()));
 
       // only evaluate Q dofs
       const unsigned int q_dofs_per_cell =
@@ -542,9 +542,10 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
         }
 
       // for FE_Q_DG0, add one last row of identity
-      if (q_dofs_per_cell < this->dofs_per_cell)
+      if (q_dofs_per_cell < this->n_dofs_per_cell())
         {
-          AssertDimension(source_q_dofs_per_cell + 1, source_fe->dofs_per_cell);
+          AssertDimension(source_q_dofs_per_cell + 1,
+                          source_fe->n_dofs_per_cell());
           for (unsigned int i = 0; i < source_q_dofs_per_cell; ++i)
             interpolation_matrix(q_dofs_per_cell, i) = 0.;
           for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
@@ -554,17 +555,17 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
 
       // cut off very small values
       const double eps = 2e-13 * q_degree * dim;
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < source_fe->dofs_per_cell; ++j)
+      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+        for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
           if (std::fabs(interpolation_matrix(i, j)) < eps)
             interpolation_matrix(i, j) = 0.;
 
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
         {
           double sum = 0.;
-          for (unsigned int j = 0; j < source_fe->dofs_per_cell; ++j)
+          for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
             sum += interpolation_matrix(i, j);
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
@@ -578,13 +579,13 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_interpolation_matrix(
       // with a n_dofs x 0 matrix. there is nothing to do here
 
       // we would like to verify that the number of rows and columns of
-      // the matrix equals this->dofs_per_cell and zero. unfortunately,
+      // the matrix equals this->n_dofs_per_cell() and zero. unfortunately,
       // whenever we do FullMatrix::reinit(m,0), it sets both rows and
       // columns to zero, instead of m and zero. thus, only test the
       // number of columns
-      Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+      Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
              ExcDimensionMismatch(interpolation_matrix.m(),
-                                  x_source_fe.dofs_per_cell));
+                                  x_source_fe.n_dofs_per_cell()));
     }
   else
     AssertThrow(
@@ -1055,15 +1056,15 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
     {
       // get the number of the vertex on the face that corresponds to this DoF,
       // along with the number of the DoF on this vertex
-      const unsigned int face_vertex = face_index / this->dofs_per_vertex;
+      const unsigned int face_vertex = face_index / this->n_dofs_per_vertex();
       const unsigned int dof_index_on_vertex =
-        face_index % this->dofs_per_vertex;
+        face_index % this->n_dofs_per_vertex();
 
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
       return (GeometryInfo<dim>::face_to_cell_vertices(
                 face, face_vertex, face_orientation, face_flip, face_rotation) *
-                this->dofs_per_vertex +
+                this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
   else if (face_index < this->first_face_quad_index)
@@ -1186,7 +1187,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
-          this->dofs_per_cell)
+          this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       // distinguish q/q_dg0 case: only treat Q dofs first
@@ -1251,7 +1252,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
           }
       }
 
-      FullMatrix<double> prolongate(this->dofs_per_cell, this->dofs_per_cell);
+      FullMatrix<double> prolongate(this->n_dofs_per_cell(),
+                                    this->n_dofs_per_cell());
 
       // go through the points in diagonal to capture variation in all
       // directions simultaneously
@@ -1331,19 +1333,19 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_prolongation_matrix(
 
       // the discontinuous node is simply mapped on the discontinuous node on
       // the child element
-      if (q_dofs_per_cell < this->dofs_per_cell)
+      if (q_dofs_per_cell < this->n_dofs_per_cell())
         prolongate(q_dofs_per_cell, q_dofs_per_cell) = 1.;
 
         // and make sure that the row sum is 1. this must be so since for this
         // element, the shape functions add up to one
 #ifdef DEBUG
-      for (unsigned int row = 0; row < this->dofs_per_cell; ++row)
+      for (unsigned int row = 0; row < this->n_dofs_per_cell(); ++row)
         {
           double sum = 0;
-          for (unsigned int col = 0; col < this->dofs_per_cell; ++col)
+          for (unsigned int col = 0; col < this->n_dofs_per_cell(); ++col)
             sum += prolongate(row, col);
           Assert(std::fabs(sum - 1.) <
-                   std::max(eps, 5e-16 * std::sqrt(this->dofs_per_cell)),
+                   std::max(eps, 5e-16 * std::sqrt(this->n_dofs_per_cell())),
                  ExcInternalError("The entries in a row of the local "
                                   "prolongation matrix do not add to one. "
                                   "This typically indicates that the "
@@ -1384,11 +1386,11 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
 
       // if matrix got updated while waiting for the lock...
       if (this->restriction[refinement_case - 1][child].n() ==
-          this->dofs_per_cell)
+          this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
-      FullMatrix<double> my_restriction(this->dofs_per_cell,
-                                        this->dofs_per_cell);
+      FullMatrix<double> my_restriction(this->n_dofs_per_cell(),
+                                        this->n_dofs_per_cell());
       // distinguish q/q_dg0 case
       const unsigned int q_dofs_per_cell =
         Utilities::fixed_power<dim>(q_degree + 1);
@@ -1418,7 +1420,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
       const unsigned int          dofs1d = q_degree + 1;
       std::vector<Tensor<1, dim>> evaluations1d(dofs1d);
 
-      my_restriction.reinit(this->dofs_per_cell, this->dofs_per_cell);
+      my_restriction.reinit(this->n_dofs_per_cell(), this->n_dofs_per_cell());
 
       for (unsigned int i = 0; i < q_dofs_per_cell; ++i)
         {
@@ -1474,7 +1476,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
                                                               dofs1d);
                 }
               Assert(std::fabs(sum_check - 1) <
-                       std::max(eps, 5e-16 * std::sqrt(this->dofs_per_cell)),
+                       std::max(eps,
+                                5e-16 * std::sqrt(this->n_dofs_per_cell())),
                      ExcInternalError("The entries in a row of the local "
                                       "restriction matrix do not add to one. "
                                       "This typically indicates that the "
@@ -1484,8 +1487,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_restriction_matrix(
             }
 
           // part for FE_Q_DG0
-          if (q_dofs_per_cell < this->dofs_per_cell)
-            my_restriction(this->dofs_per_cell - 1, this->dofs_per_cell - 1) =
+          if (q_dofs_per_cell < this->n_dofs_per_cell())
+            my_restriction(this->n_dofs_per_cell() - 1,
+                           this->n_dofs_per_cell() - 1) =
               1. / GeometryInfo<dim>::n_children(
                      RefinementCase<dim>(refinement_case));
         }
@@ -1512,7 +1516,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // in 1d, things are simple. since there is only one degree of freedom per
@@ -1610,7 +1614,7 @@ template <typename PolynomialType, int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_Q_Base<PolynomialType, dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
   // We here just care for the constant mode due to the polynomial space
   // without any enrichments
   // As there may be more constant modes derived classes may to implement this

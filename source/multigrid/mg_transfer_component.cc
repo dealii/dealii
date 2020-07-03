@@ -318,7 +318,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
   const unsigned int n_components =
     *std::max_element(mg_target_component.begin(), mg_target_component.end()) +
     1;
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
   const unsigned int n_levels      = mg_dof.get_triangulation().n_levels();
 
   Assert(mg_component_mask.represents_n_components(fe.n_components()),
@@ -657,8 +657,8 @@ MGTransferSelect<number>::build(
   // use a temporary vector to create the
   // relation between global and level dofs
   std::vector<types::global_dof_index> temp_copy_indices;
-  std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
-  std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> global_dof_indices(fe.n_dofs_per_cell());
+  std::vector<types::global_dof_index> level_dof_indices(fe.n_dofs_per_cell());
   for (int level = mg_dof.get_triangulation().n_levels() - 1; level >= 0;
        --level)
     {
@@ -683,7 +683,7 @@ MGTransferSelect<number>::build(
           level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices(level_dof_indices);
 
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             {
               const unsigned int component =
                 fe.system_to_component_index(i).first;

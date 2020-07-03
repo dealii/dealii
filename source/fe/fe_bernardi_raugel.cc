@@ -52,7 +52,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
   Assert(dim == 2 || dim == 3, ExcImpossibleInDim(dim));
   Assert(p == 1, ExcMessage("Only BR1 elements are available"));
 
-  // const unsigned int n_dofs = this->dofs_per_cell;
+  // const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_none};
   // These must be done first, since
@@ -97,8 +97,8 @@ FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   std::vector<Tensor<1, dim>> normals;
   for (unsigned int i : GeometryInfo<dim>::face_indices())
@@ -150,7 +150,7 @@ FE_BernardiRaugel<dim>::initialize_support_points()
 {
   // The support points for our shape functions are the vertices and
   // the face midpoints, for a total of #vertices + #faces points
-  this->generalized_support_points.resize(this->dofs_per_cell);
+  this->generalized_support_points.resize(this->n_dofs_per_cell());
 
   // We need dim copies of each vertex for the first dim*vertices_per_cell
   // generalized support points

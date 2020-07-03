@@ -212,7 +212,7 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
     n_support_pts, Vector<typename VectorType::value_type>(n_components));
 
   std::vector<types::global_dof_index> dof_indices(
-    mapping_q_eulerian.euler_dof_handler->get_fe(0).dofs_per_cell);
+    mapping_q_eulerian.euler_dof_handler->get_fe(0).n_dofs_per_cell());
   // fill shift vector for each support point using an fe_values object. make
   // sure that the fe_values variable isn't used simultaneously from different
   // threads

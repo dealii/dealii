@@ -951,7 +951,7 @@ namespace MatrixCreator
       const unsigned int dofs_per_face = fe.dofs_per_face;
 
       copy_data.cell          = cell;
-      copy_data.dofs_per_cell = fe.dofs_per_cell;
+      copy_data.dofs_per_cell = fe.n_dofs_per_cell();
 
       UpdateFlags update_flags =
         UpdateFlags(update_values | update_JxW_values | update_normal_vectors |
@@ -1382,7 +1382,7 @@ namespace MatrixCreator
       const unsigned int                  dofs_per_face   = fe.dofs_per_face;
 
       copy_data.cell          = cell;
-      copy_data.dofs_per_cell = fe.dofs_per_cell;
+      copy_data.dofs_per_cell = fe.n_dofs_per_cell();
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices(copy_data.dofs);
 

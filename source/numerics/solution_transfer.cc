@@ -106,7 +106,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 
   for (unsigned int i = 0; cell != endc; ++cell, ++i)
     {
-      indices_on_cell[i].resize(cell->get_fe().dofs_per_cell);
+      indices_on_cell[i].resize(cell->get_fe().n_dofs_per_cell());
       // on each cell store the indices of the
       // dofs. after refining we get the values
       // on the children by taking these
@@ -161,7 +161,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
           const unsigned int this_fe_index =
             pointerstruct->second.active_fe_index;
           const unsigned int dofs_per_cell =
-            cell->get_dof_handler().get_fe(this_fe_index).dofs_per_cell;
+            cell->get_dof_handler().get_fe(this_fe_index).n_dofs_per_cell();
           local_values.reinit(dofs_per_cell, true);
 
           // make sure that the size of the stored indices is the same as
@@ -210,7 +210,8 @@ namespace internal
       for (unsigned int j = 0; j < fe.size(); ++j)
         if (i != j)
           {
-            matrices(i, j).reinit(fe[i].dofs_per_cell, fe[j].dofs_per_cell);
+            matrices(i, j).reinit(fe[i].n_dofs_per_cell(),
+                                  fe[j].n_dofs_per_cell());
 
             // see if we can get the interpolation matrices for this
             // combination of elements. if not, reset the matrix sizes to zero
@@ -246,8 +247,8 @@ namespace internal
     restriction_is_additive.resize(fe.size());
     for (unsigned int f = 0; f < fe.size(); ++f)
       {
-        restriction_is_additive[f].resize(fe[f].dofs_per_cell);
-        for (unsigned int i = 0; i < fe[f].dofs_per_cell; ++i)
+        restriction_is_additive[f].resize(fe[f].n_dofs_per_cell());
+        for (unsigned int i = 0; i < fe[f].n_dofs_per_cell(); ++i)
           restriction_is_additive[f][i] = fe[f].restriction_is_additive(i);
       }
   }
@@ -334,7 +335,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
       // CASE 1: active cell that remains as it is
       if (cell->is_active() && !cell->coarsen_flag_set())
         {
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
           indices_on_cell[n_sr].resize(dofs_per_cell);
           // cell will not be coarsened,
           // so we get away by storing the
@@ -377,7 +378,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
                    dim>::ExcNoDominatedFiniteElementAmongstChildren());
 
           const unsigned int dofs_per_cell =
-            dof_handler->get_fe(target_fe_index).dofs_per_cell;
+            dof_handler->get_fe(target_fe_index).n_dofs_per_cell();
 
           std::vector<Vector<typename VectorType::value_type>>(
             in_size, Vector<typename VectorType::value_type>(dofs_per_cell))
@@ -492,7 +493,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
               Assert(!cell->has_children(), ExcInternalError());
               Assert(indexptr == nullptr, ExcInternalError());
 
-              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell =
+                cell->get_fe().n_dofs_per_cell();
               dofs.resize(dofs_per_cell);
               // get the local
               // indices

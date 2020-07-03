@@ -124,7 +124,8 @@ namespace internal
 
       const unsigned int fe_degree     = fe->degree;
       const unsigned int n_q_points_1d = quad.size();
-      const unsigned int n_dofs_1d = std::min(fe->dofs_per_cell, fe_degree + 1);
+      const unsigned int n_dofs_1d =
+        std::min(fe->n_dofs_per_cell(), fe_degree + 1);
 
       // renumber (this is necessary for FE_Q, for example, since there the
       // vertex DoFs come first, which is incompatible with the lexicographic
@@ -154,8 +155,8 @@ namespace internal
           scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
         else if (fe_dgp != nullptr)
           {
-            scalar_lexicographic.resize(fe_dgp->dofs_per_cell);
-            for (unsigned int i = 0; i < fe_dgp->dofs_per_cell; ++i)
+            scalar_lexicographic.resize(fe_dgp->n_dofs_per_cell());
+            for (unsigned int i = 0; i < fe_dgp->n_dofs_per_cell(); ++i)
               scalar_lexicographic[i] = i;
             element_type = truncated_tensor;
           }
@@ -164,7 +165,7 @@ namespace internal
             scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
             element_type         = tensor_symmetric_plus_dg0;
           }
-        else if (fe->dofs_per_cell == 0)
+        else if (fe->n_dofs_per_cell() == 0)
           {
             // FE_Nothing case -> nothing to do here
           }
@@ -183,7 +184,7 @@ namespace internal
             std::vector<unsigned int> scalar_inv =
               Utilities::invert_permutation(scalar_lexicographic);
             std::vector<unsigned int> lexicographic(
-              fe_in.dofs_per_cell, numbers::invalid_unsigned_int);
+              fe_in.n_dofs_per_cell(), numbers::invalid_unsigned_int);
             unsigned int components_before = 0;
             for (unsigned int e = 0; e < base_element_number; ++e)
               components_before += fe_in.element_multiplicity(e);
@@ -199,7 +200,7 @@ namespace internal
             // have undefined blocks
             lexicographic_numbering.resize(fe_in.element_multiplicity(
                                              base_element_number) *
-                                             fe->dofs_per_cell,
+                                             fe->n_dofs_per_cell(),
                                            numbers::invalid_unsigned_int);
             for (unsigned int i = 0; i < lexicographic.size(); ++i)
               if (lexicographic[i] != numbers::invalid_unsigned_int)
@@ -216,7 +217,7 @@ namespace internal
         // by reading the name, as done before r29356)
         if (fe->has_support_points())
           unit_point = fe->get_unit_support_points()[scalar_lexicographic[0]];
-        Assert(fe->dofs_per_cell == 0 ||
+        Assert(fe->n_dofs_per_cell() == 0 ||
                  std::abs(fe->shape_value(scalar_lexicographic[0], unit_point) -
                           1) < 1e-13,
                ExcInternalError("Could not decode 1D shape functions for the "
@@ -227,7 +228,7 @@ namespace internal
       n_q_points = Utilities::fixed_power<dim>(n_q_points_1d);
       n_q_points_face =
         dim > 1 ? Utilities::fixed_power<dim - 1>(n_q_points_1d) : 1;
-      dofs_per_component_on_cell = fe->dofs_per_cell;
+      dofs_per_component_on_cell = fe->n_dofs_per_cell();
       dofs_per_component_on_face =
         dim > 1 ? Utilities::fixed_power<dim - 1>(fe_degree + 1) : 1;
 

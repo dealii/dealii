@@ -1789,7 +1789,8 @@ namespace GridTools
         // cells including ghost cells
         if (cell->is_artificial() == false)
           {
-            const unsigned int n_dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int n_dofs_per_cell =
+              cell->get_fe().n_dofs_per_cell();
             local_dof_indices.resize(n_dofs_per_cell);
 
             // Take care of adding cell pointer to each
@@ -1928,7 +1929,7 @@ namespace GridTools
                             // dofs_per_line returns number of dofs
                             // on line not including the vertices of the line.
                             const unsigned int n_dofs_per_line =
-                              2 * cell->get_fe().dofs_per_vertex +
+                              2 * cell->get_fe().n_dofs_per_vertex() +
                               cell->get_fe().dofs_per_line;
                             local_line_dof_indices.resize(n_dofs_per_line);
 
@@ -1953,7 +1954,7 @@ namespace GridTools
                         // dofs_per_line returns number of dofs
                         // on line not including the vertices of the line.
                         const unsigned int n_dofs_per_line =
-                          2 * cell->get_fe().dofs_per_vertex +
+                          2 * cell->get_fe().n_dofs_per_vertex() +
                           cell->get_fe().dofs_per_line;
                         local_line_dof_indices.resize(n_dofs_per_line);
 
@@ -1970,7 +1971,7 @@ namespace GridTools
                                    ExcInternalError());
 
                             const unsigned int n_dofs_per_line =
-                              2 * cell->get_fe().dofs_per_vertex +
+                              2 * cell->get_fe().n_dofs_per_vertex() +
                               cell->get_fe().dofs_per_line;
                             local_line_dof_indices.resize(n_dofs_per_line);
 

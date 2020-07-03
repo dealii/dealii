@@ -138,7 +138,7 @@ namespace MGTools
     for (const auto &cell : dofs.cell_iterators_on_level(level))
       {
         const FiniteElement<dim> &fe = cell->get_fe();
-        cell_indices.resize(fe.dofs_per_cell);
+        cell_indices.resize(fe.n_dofs_per_cell());
         cell->get_mg_dof_indices(cell_indices);
         unsigned int i = 0;
         // First, dofs on
@@ -159,12 +159,12 @@ namespace MGTools
         // are identical. Nevertheless,
         // this will only work if
         // dofs_per_face is zero and
-        // dofs_per_vertex is
+        // n_dofs_per_vertex() is
         // arbitrary, not the other way
         // round.
         // TODO: This assumes that even in hp context, the dofs per face
         // coincide!
-        unsigned int increment = fe.dofs_per_cell - dim * fe.dofs_per_face;
+        unsigned int increment = fe.n_dofs_per_cell() - dim * fe.dofs_per_face;
         while (i < fe.first_line_index)
           row_lengths[cell_indices[i++]] += increment;
         // From now on, if an object is
@@ -178,23 +178,23 @@ namespace MGTools
         // subtract adjacent faces to be
         // added in the loop below.
         increment = (dim > 1) ?
-                      fe.dofs_per_cell - (dim - 1) * fe.dofs_per_face :
-                      fe.dofs_per_cell -
+                      fe.n_dofs_per_cell() - (dim - 1) * fe.dofs_per_face :
+                      fe.n_dofs_per_cell() -
                         GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
         while (i < fe.first_quad_index)
           row_lengths[cell_indices[i++]] += increment;
 
         // Now quads in 2D and 3D
         increment = (dim > 2) ?
-                      fe.dofs_per_cell - (dim - 2) * fe.dofs_per_face :
-                      fe.dofs_per_cell -
+                      fe.n_dofs_per_cell() - (dim - 2) * fe.dofs_per_face :
+                      fe.n_dofs_per_cell() -
                         GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
         while (i < fe.first_hex_index)
           row_lengths[cell_indices[i++]] += increment;
         // Finally, cells in 3D
-        increment = fe.dofs_per_cell -
+        increment = fe.n_dofs_per_cell() -
                     GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
-        while (i < fe.dofs_per_cell)
+        while (i < fe.n_dofs_per_cell())
           row_lengths[cell_indices[i++]] += increment;
 
         // At this point, we have
@@ -221,7 +221,8 @@ namespace MGTools
 
             if (level_boundary)
               {
-                for (unsigned int local_dof = 0; local_dof < fe.dofs_per_cell;
+                for (unsigned int local_dof = 0;
+                     local_dof < fe.n_dofs_per_cell();
                      ++local_dof)
                   row_lengths[cell_indices[local_dof]] += fe.dofs_per_face;
                 continue;
@@ -242,8 +243,9 @@ namespace MGTools
             if (flux_coupling != DoFTools::none)
               {
                 const unsigned int dof_increment =
-                  nfe.dofs_per_cell - nfe.dofs_per_face;
-                for (unsigned int local_dof = 0; local_dof < fe.dofs_per_cell;
+                  nfe.n_dofs_per_cell() - nfe.dofs_per_face;
+                for (unsigned int local_dof = 0;
+                     local_dof < fe.n_dofs_per_cell();
                      ++local_dof)
                   row_lengths[cell_indices[local_dof]] += dof_increment;
               }
@@ -265,12 +267,12 @@ namespace MGTools
             // is refined, all the fine
             // face dofs couple with
             // the coarse one.
-            neighbor_indices.resize(nfe.dofs_per_cell);
+            neighbor_indices.resize(nfe.n_dofs_per_cell());
             neighbor->get_mg_dof_indices(neighbor_indices);
-            for (unsigned int local_dof = 0; local_dof < fe.dofs_per_cell;
+            for (unsigned int local_dof = 0; local_dof < fe.n_dofs_per_cell();
                  ++local_dof)
               row_lengths[cell_indices[local_dof]] += nfe.dofs_per_face;
-            for (unsigned int local_dof = 0; local_dof < nfe.dofs_per_cell;
+            for (unsigned int local_dof = 0; local_dof < nfe.n_dofs_per_cell();
                  ++local_dof)
               row_lengths[neighbor_indices[local_dof]] += fe.dofs_per_face;
           }
@@ -341,7 +343,7 @@ namespace MGTools
                ExcDimensionMismatch(flux_couplings.n_cols(),
                                     fe.n_components()));
 
-        cell_indices.resize(fe.dofs_per_cell);
+        cell_indices.resize(fe.n_dofs_per_cell());
         cell->get_mg_dof_indices(cell_indices);
         unsigned int i = 0;
         // First, dofs on
@@ -362,7 +364,7 @@ namespace MGTools
         // are identical. Nevertheless,
         // this will only work if
         // dofs_per_face is zero and
-        // dofs_per_vertex is
+        // n_dofs_per_vertex() is
         // arbitrary, not the other way
         // round.
         unsigned int increment;
@@ -375,7 +377,7 @@ namespace MGTools
                                           fe.first_block_of_base(base) +
                                             mult) != DoFTools::none)
                   {
-                    increment = fe.base_element(base).dofs_per_cell -
+                    increment = fe.base_element(base).n_dofs_per_cell() -
                                 dim * fe.base_element(base).dofs_per_face;
                     row_lengths[cell_indices[i]] += increment;
                   }
@@ -401,7 +403,7 @@ namespace MGTools
                                             mult) != DoFTools::none)
                   {
                     increment =
-                      fe.base_element(base).dofs_per_cell -
+                      fe.base_element(base).n_dofs_per_cell() -
                       ((dim > 1) ? (dim - 1) :
                                    GeometryInfo<dim>::faces_per_cell) *
                         fe.base_element(base).dofs_per_face;
@@ -421,7 +423,7 @@ namespace MGTools
                                             mult) != DoFTools::none)
                   {
                     increment =
-                      fe.base_element(base).dofs_per_cell -
+                      fe.base_element(base).n_dofs_per_cell() -
                       ((dim > 2) ? (dim - 2) :
                                    GeometryInfo<dim>::faces_per_cell) *
                         fe.base_element(base).dofs_per_face;
@@ -431,7 +433,7 @@ namespace MGTools
           }
 
         // Finally, cells in 3D
-        while (i < fe.dofs_per_cell)
+        while (i < fe.n_dofs_per_cell())
           {
             for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
               for (unsigned int mult = 0; mult < fe.element_multiplicity(base);
@@ -440,7 +442,7 @@ namespace MGTools
                                           fe.first_block_of_base(base) +
                                             mult) != DoFTools::none)
                   {
-                    increment = fe.base_element(base).dofs_per_cell -
+                    increment = fe.base_element(base).n_dofs_per_cell() -
                                 GeometryInfo<dim>::faces_per_cell *
                                   fe.base_element(base).dofs_per_face;
                     row_lengths[cell_indices[i]] += increment;
@@ -472,7 +474,8 @@ namespace MGTools
 
             if (level_boundary)
               {
-                for (unsigned int local_dof = 0; local_dof < fe.dofs_per_cell;
+                for (unsigned int local_dof = 0;
+                     local_dof < fe.n_dofs_per_cell();
                      ++local_dof)
                   row_lengths[cell_indices[local_dof]] += fe.dofs_per_face;
                 continue;
@@ -493,14 +496,15 @@ namespace MGTools
             for (unsigned int base = 0; base < nfe.n_base_elements(); ++base)
               for (unsigned int mult = 0; mult < nfe.element_multiplicity(base);
                    ++mult)
-                for (unsigned int local_dof = 0; local_dof < fe.dofs_per_cell;
+                for (unsigned int local_dof = 0;
+                     local_dof < fe.n_dofs_per_cell();
                      ++local_dof)
                   if (couple_face[fe_index](
                         fe.system_to_block_index(local_dof).first,
                         nfe.first_block_of_base(base) + mult) != DoFTools::none)
                     {
                       const unsigned int dof_increment =
-                        nfe.base_element(base).dofs_per_cell -
+                        nfe.base_element(base).n_dofs_per_cell() -
                         nfe.base_element(base).dofs_per_face;
                       row_lengths[cell_indices[local_dof]] += dof_increment;
                     }
@@ -531,12 +535,13 @@ namespace MGTools
             // This will not work with
             // different couplings on
             // different cells.
-            neighbor_indices.resize(nfe.dofs_per_cell);
+            neighbor_indices.resize(nfe.n_dofs_per_cell());
             neighbor->get_mg_dof_indices(neighbor_indices);
             for (unsigned int base = 0; base < nfe.n_base_elements(); ++base)
               for (unsigned int mult = 0; mult < nfe.element_multiplicity(base);
                    ++mult)
-                for (unsigned int local_dof = 0; local_dof < fe.dofs_per_cell;
+                for (unsigned int local_dof = 0;
+                     local_dof < fe.n_dofs_per_cell();
                      ++local_dof)
                   if (couple_cell[fe_index](
                         fe.system_to_component_index(local_dof).first,
@@ -546,7 +551,8 @@ namespace MGTools
             for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
               for (unsigned int mult = 0; mult < fe.element_multiplicity(base);
                    ++mult)
-                for (unsigned int local_dof = 0; local_dof < nfe.dofs_per_cell;
+                for (unsigned int local_dof = 0;
+                     local_dof < nfe.n_dofs_per_cell();
                      ++local_dof)
                   if (couple_cell[fe_index](
                         nfe.system_to_component_index(local_dof).first,
@@ -574,7 +580,7 @@ namespace MGTools
     Assert(sparsity.n_cols() == n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
                                                       endc = dof.end(level);
@@ -608,7 +614,7 @@ namespace MGTools
     Assert(sparsity.n_cols() == n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
@@ -690,7 +696,7 @@ namespace MGTools
     Assert(sparsity.n_cols() == fine_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
@@ -765,7 +771,7 @@ namespace MGTools
     Assert(flux_mask.n_cols() == n_comp,
            ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
-    const unsigned int                   total_dofs = fe.dofs_per_cell;
+    const unsigned int                   total_dofs = fe.n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(total_dofs);
     std::vector<types::global_dof_index> dofs_on_other_cell(total_dofs);
     Table<2, bool>                       support_on_face(total_dofs,
@@ -956,7 +962,7 @@ namespace MGTools
     Assert(flux_mask.n_cols() == n_comp,
            ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
-    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     Table<2, bool>                       support_on_face(dofs_per_cell,
@@ -1033,7 +1039,7 @@ namespace MGTools
     Assert(sparsity.n_cols() == n_dofs,
            ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
                                                       endc = dof.end(level);
@@ -1365,7 +1371,8 @@ namespace MGTools
                 if (boundary_ids.find(boundary_component) != boundary_ids.end())
                   // we want to constrain this boundary
                   {
-                    for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell;
+                    for (unsigned int i = 0;
+                         i < cell->get_fe().n_dofs_per_cell();
                          ++i)
                       {
                         const ComponentMask &nonzero_component_array =
@@ -1460,7 +1467,7 @@ namespace MGTools
 
     const FiniteElement<dim, spacedim> &fe = mg_dof_handler.get_fe();
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int dofs_per_face = fe.dofs_per_face;
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);

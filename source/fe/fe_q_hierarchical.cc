@@ -57,19 +57,20 @@ namespace internal
 
 template <int dim>
 FE_Q_Hierarchical<dim>::FE_Q_Hierarchical(const unsigned int degree)
-  : FE_Poly<dim>(
-      TensorProductPolynomials<dim>(
-        Polynomials::Hierarchical::generate_complete_basis(degree)),
-      FiniteElementData<dim>(get_dpo_vector(degree),
-                             1,
-                             degree,
-                             FiniteElementData<dim>::H1),
-      std::vector<bool>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-        false),
-      std::vector<ComponentMask>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-        std::vector<bool>(1, true)))
+  : FE_Poly<dim>(TensorProductPolynomials<dim>(
+                   Polynomials::Hierarchical::generate_complete_basis(degree)),
+                 FiniteElementData<dim>(get_dpo_vector(degree),
+                                        1,
+                                        degree,
+                                        FiniteElementData<dim>::H1),
+                 std::vector<bool>(
+                   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+                     .n_dofs_per_cell(),
+                   false),
+                 std::vector<ComponentMask>(
+                   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+                     .n_dofs_per_cell(),
+                   std::vector<bool>(1, true)))
   , face_renumber(face_fe_q_hierarchical_to_hierarchic_numbering(degree))
 {
   TensorProductPolynomials<dim> *poly_space_derived_ptr =
@@ -93,12 +94,12 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical(const unsigned int degree)
   // for all dimensions.
   std::vector<FullMatrix<double>> dofs_cell(
     GeometryInfo<1>::max_children_per_cell,
-    FullMatrix<double>(2 * this->dofs_per_vertex + this->dofs_per_line,
-                       2 * this->dofs_per_vertex + this->dofs_per_line));
+    FullMatrix<double>(2 * this->n_dofs_per_vertex() + this->dofs_per_line,
+                       2 * this->n_dofs_per_vertex() + this->dofs_per_line));
   std::vector<FullMatrix<double>> dofs_subcell(
     GeometryInfo<1>::max_children_per_cell,
-    FullMatrix<double>(2 * this->dofs_per_vertex + this->dofs_per_line,
-                       2 * this->dofs_per_vertex + this->dofs_per_line));
+    FullMatrix<double>(2 * this->n_dofs_per_vertex() + this->dofs_per_line,
+                       2 * this->n_dofs_per_vertex() + this->dofs_per_line));
   // build these fields, as they are
   // needed as auxiliary fields later
   // on
@@ -157,10 +158,10 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(
     {
       // ok, source is a Q_Hierarchical element, so we will be able to do the
       // work
-      Assert(matrix.m() == this->dofs_per_cell,
-             ExcDimensionMismatch(matrix.m(), this->dofs_per_cell));
-      Assert(matrix.n() == source.dofs_per_cell,
-             ExcDimensionMismatch(matrix.m(), source_fe->dofs_per_cell));
+      Assert(matrix.m() == this->n_dofs_per_cell(),
+             ExcDimensionMismatch(matrix.m(), this->n_dofs_per_cell()));
+      Assert(matrix.n() == source.n_dofs_per_cell(),
+             ExcDimensionMismatch(matrix.m(), source_fe->n_dofs_per_cell()));
 
       // Recall that DoFs are renumbered in the following order:
       // vertices, lines, quads, hexes.
@@ -171,7 +172,7 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(
       matrix = 0.;
 
       // distinguish between the case when we interpolate to a richer element
-      if (this->dofs_per_cell >= source_fe->dofs_per_cell)
+      if (this->n_dofs_per_cell() >= source_fe->n_dofs_per_cell())
         {
           const std::vector<unsigned int> dof_map =
             this->get_embedding_dofs(source_fe->degree);
@@ -388,7 +389,8 @@ FE_Q_Hierarchical<dim>::build_dofs_cell(
   std::vector<FullMatrix<double>> &dofs_cell,
   std::vector<FullMatrix<double>> &dofs_subcell) const
 {
-  const unsigned int dofs_1d = 2 * this->dofs_per_vertex + this->dofs_per_line;
+  const unsigned int dofs_1d =
+    2 * this->n_dofs_per_vertex() + this->dofs_per_line;
 
   // The dofs_subcell matrices are transposed
   // (4.19), (4.21) and (4.27),(4.28),(4.30) in
@@ -501,7 +503,8 @@ void
 FE_Q_Hierarchical<dim>::initialize_constraints(
   const std::vector<FullMatrix<double>> &dofs_subcell)
 {
-  const unsigned int dofs_1d = 2 * this->dofs_per_vertex + this->dofs_per_line;
+  const unsigned int dofs_1d =
+    2 * this->n_dofs_per_vertex() + this->dofs_per_line;
 
   this->interface_constraints.TableBase<2, double>::reinit(
     this->interface_constraints_size());
@@ -674,7 +677,8 @@ FE_Q_Hierarchical<dim>::initialize_embedding_and_restriction(
 {
   unsigned int iso = RefinementCase<dim>::isotropic_refinement - 1;
 
-  const unsigned int dofs_1d = 2 * this->dofs_per_vertex + this->dofs_per_line;
+  const unsigned int dofs_1d =
+    2 * this->n_dofs_per_vertex() + this->dofs_per_line;
   TensorProductPolynomials<dim> *poly_space_derived_ptr =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   const std::vector<unsigned int> &renumber =
@@ -682,10 +686,10 @@ FE_Q_Hierarchical<dim>::initialize_embedding_and_restriction(
 
   for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
     {
-      this->prolongation[iso][c].reinit(this->dofs_per_cell,
-                                        this->dofs_per_cell);
-      this->restriction[iso][c].reinit(this->dofs_per_cell,
-                                       this->dofs_per_cell);
+      this->prolongation[iso][c].reinit(this->n_dofs_per_cell(),
+                                        this->n_dofs_per_cell());
+      this->restriction[iso][c].reinit(this->n_dofs_per_cell(),
+                                       this->n_dofs_per_cell());
     }
 
   // the 1d case is particularly
@@ -711,8 +715,8 @@ FE_Q_Hierarchical<dim>::initialize_embedding_and_restriction(
   // i loops over the dofs in the
   // parent cell. These are the
   // columns in the embedding matrix.
-  for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
-    for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+    for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       switch (dim)
         {
           case 2:
@@ -1950,7 +1954,7 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
   const FiniteElementData<dim> &fe)
 {
   Assert(fe.n_components() == 1, ExcInternalError());
-  std::vector<unsigned int> h2l(fe.dofs_per_cell);
+  std::vector<unsigned int> h2l(fe.n_dofs_per_cell());
 
   // polynomial degree
   const unsigned int degree = fe.dofs_per_line + 1;
@@ -1974,7 +1978,7 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
     {
       case 1:
         {
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             h2l[i] = i;
 
           break;
@@ -2020,7 +2024,7 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
             for (unsigned int j = 0; j < fe.dofs_per_line; ++j)
               h2l[next_index++] = (2 + i) * n + 2 + j;
 
-          Assert(next_index == fe.dofs_per_cell, ExcInternalError());
+          Assert(next_index == fe.n_dofs_per_cell(), ExcInternalError());
 
           break;
         }
@@ -2106,7 +2110,7 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
               for (unsigned int k = 0; k < fe.dofs_per_line; ++k)
                 h2l[next_index++] = (2 + i) * n2 + (2 + j) * n + 2 + k;
 
-          Assert(next_index == fe.dofs_per_cell, ExcInternalError());
+          Assert(next_index == fe.n_dofs_per_cell(), ExcInternalError());
 
           break;
         }
@@ -2146,7 +2150,7 @@ bool
 FE_Q_Hierarchical<1>::has_support_on_face(const unsigned int shape_index,
                                           const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<1>::faces_per_cell);
 
 
@@ -2167,7 +2171,7 @@ bool
 FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
                                             const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // first, special-case interior
@@ -2275,8 +2279,8 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
     }
   else if (sub_degree == this->degree)
     {
-      std::vector<unsigned int> embedding_dofs(this->dofs_per_cell);
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+      std::vector<unsigned int> embedding_dofs(this->n_dofs_per_cell());
+      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
         embedding_dofs[i] = i;
 
       return embedding_dofs;
@@ -2392,11 +2396,11 @@ template <int dim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_Q_Hierarchical<dim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     constant_modes(0, i) = true;
   for (unsigned int i = GeometryInfo<dim>::vertices_per_cell;
-       i < this->dofs_per_cell;
+       i < this->n_dofs_per_cell();
        ++i)
     constant_modes(0, i) = false;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
