@@ -17,9 +17,11 @@ maximum wavespeed method</i> based on a first-order <i>graph viscosity</i>
 for solving Euler's equations of gas dynamics @cite GuermondPopov2016. As
 such it is presented primarily for educational purposes. For actual
 research computations you might want to consider exploring a corresponding
-high-performance implementation of a second-order accurate scheme that uses
-<i>convex limiting</i> techniques, and strong stability-preserving (SSP)
-time integration, see @cite GuermondEtAl2018.
+<a href="https://github.com/conservation-laws/ryujin">high-performance
+implementation of a second-order accurate scheme</a> that uses <i>convex
+limiting</i> techniques, and strong stability-preserving (SSP) time
+integration, see @cite GuermondEtAl2018
+(<a href="https://conservation-laws.43-1.org/">website</a>).
 
 @dealiiTutorialDOI{10.5281/zenodo.3698223,https://zenodo.org/badge/DOI/10.5281/zenodo.3698223.svg}
 
