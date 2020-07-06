@@ -205,16 +205,6 @@ public:
   get_level_constraints(const unsigned int level) const;
 
   /**
-   * Return the AffineConstraints object for a given level, containing
-   * periodicity constraints (if enabled on the triangulation).
-   *
-   * @deprecated Use get_level_constraints instead, which has a more descriptive name.
-   */
-  DEAL_II_DEPRECATED
-  const AffineConstraints<double> &
-  get_level_constraint_matrix(const unsigned int level) const;
-
-  /**
    * Return the user defined constraint matrix for a given level. These
    * constraints are set using the function add_user_constraints() and
    * should not contain constraints for DoF indices set in
@@ -529,14 +519,6 @@ MGConstrainedDoFs::get_level_constraints(const unsigned int level) const
 {
   AssertIndexRange(level, level_constraints.size());
   return level_constraints[level];
-}
-
-
-
-inline const AffineConstraints<double> &
-MGConstrainedDoFs::get_level_constraint_matrix(const unsigned int level) const
-{
-  return get_level_constraints(level);
 }
 
 
