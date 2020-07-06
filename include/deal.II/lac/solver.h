@@ -473,17 +473,6 @@ protected:
 
 
 
-/**
- * Type definition for the base class for iterative linear solvers.
- * This class provides interfaces to a memory pool and the objects that
- * determine whether a solver has converged.
- *
- * @deprecated Use <code>SolverBase</code> instead.
- */
-template <class VectorType = Vector<double>>
-using Solver DEAL_II_DEPRECATED = SolverBase<VectorType>;
-
-
 /*-------------------------------- Inline functions ------------------------*/
 
 

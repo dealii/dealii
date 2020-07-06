@@ -1246,14 +1246,6 @@ PointValueHistory<dim>::get_support_locations(
 }
 
 
-template <int dim>
-void
-PointValueHistory<dim>::get_points(
-  std::vector<std::vector<Point<dim>>> &locations)
-{
-  get_support_locations(locations);
-}
-
 
 template <int dim>
 void
