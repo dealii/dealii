@@ -1879,36 +1879,6 @@ public:
 
 
 /**
- * A namespace for iterators for TransposeTable. TransposeTable is unique in
- * that it stores entries in column-major order.
- *
- * @warning The classes defined in this namespace have been deprecated in
- * favor of the more general versions in MatrixTableIterators. Use those
- * instead.
- */
-namespace TransposeTableIterators
-{
-  template <typename T, bool Constness>
-  using AccessorBase DEAL_II_DEPRECATED = MatrixTableIterators::AccessorBase<
-    TransposeTable<T>,
-    Constness,
-    MatrixTableIterators::Storage::column_major>;
-
-  template <typename T, bool Constness>
-  using Accessor DEAL_II_DEPRECATED =
-    MatrixTableIterators::Accessor<TransposeTable<T>,
-                                   Constness,
-                                   MatrixTableIterators::Storage::column_major>;
-
-  template <typename T, bool Constness>
-  using Iterator DEAL_II_DEPRECATED =
-    MatrixTableIterators::Iterator<TransposeTable<T>,
-                                   Constness,
-                                   MatrixTableIterators::Storage::column_major>;
-} // namespace TransposeTableIterators
-
-
-/**
  * A class representing a transpose two-dimensional table, i.e. a matrix of
  * objects (not necessarily only numbers) in column first numbering (FORTRAN
  * convention). The only real difference is therefore really in the storage
