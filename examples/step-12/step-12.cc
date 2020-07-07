@@ -555,7 +555,8 @@ namespace Step12
 
     {
       Vector<float> values(triangulation.n_active_cells());
-      VectorTools::integrate_difference(dof_handler,
+      VectorTools::integrate_difference(mapping,
+                                        dof_handler,
                                         solution,
                                         Functions::ZeroFunction<dim>(),
                                         values,
