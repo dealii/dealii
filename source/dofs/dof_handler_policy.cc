@@ -1102,98 +1102,99 @@ namespace internal
 
                     // find out which is the most dominating finite
                     // element of the ones that are used on this vertex
-                    const unsigned int most_dominating_fe_index =
+                    unsigned int most_dominating_fe_index =
                       dof_handler.get_fe_collection().find_dominating_fe(
                         fe_indices,
                         /*codim=*/dim);
 
-                    // if we found the most dominating element, then use
-                    // this to eliminate some of the degrees of freedom
-                    // by identification. otherwise, the code that
-                    // computes hanging node constraints will have to
-                    // deal with it by computing appropriate constraints
-                    // along this face/edge
-                    if (most_dominating_fe_index !=
+                    // if we haven't found a dominating finite element,
+                    // choose the very first one to be dominant similar
+                    // to compute_vertex_dof_identities()
+                    if (most_dominating_fe_index ==
                         numbers::invalid_unsigned_int)
-                      {
-                        // loop over the indices of all the finite
-                        // elements that are not dominating, and
-                        // identify their dofs to the most dominating
-                        // one
-                        for (const auto &other_fe_index : fe_indices)
-                          if (other_fe_index != most_dominating_fe_index)
+                      most_dominating_fe_index =
+                        dealii::internal::DoFAccessorImplementation::
+                          Implementation::nth_active_fe_index(
+                            dof_handler,
+                            0,
+                            vertex_index,
+                            0,
+                            std::integral_constant<int, 0>());
+
+                    // loop over the indices of all the finite
+                    // elements that are not dominating, and
+                    // identify their dofs to the most dominating
+                    // one
+                    for (const auto &other_fe_index : fe_indices)
+                      if (other_fe_index != most_dominating_fe_index)
+                        {
+                          // make sure the entry in the equivalence
+                          // table exists
+                          ensure_existence_of_dof_identities<0>(
+                            dof_handler.get_fe(most_dominating_fe_index),
+                            dof_handler.get_fe(other_fe_index),
+                            vertex_dof_identities[most_dominating_fe_index]
+                                                 [other_fe_index]);
+
+                          // then loop through the identities we
+                          // have. first get the global numbers of the
+                          // dofs we want to identify and make sure they
+                          // are not yet constrained to anything else,
+                          // except for to each other. use the rule that
+                          // we will always constrain the dof with the
+                          // higher fe index to the one with the lower,
+                          // to avoid circular reasoning.
+                          DoFIdentities &identities =
+                            *vertex_dof_identities[most_dominating_fe_index]
+                                                  [other_fe_index];
+                          for (const auto &identity : identities)
                             {
-                              // make sure the entry in the equivalence
-                              // table exists
-                              ensure_existence_of_dof_identities<0>(
-                                dof_handler.get_fe(most_dominating_fe_index),
-                                dof_handler.get_fe(other_fe_index),
-                                vertex_dof_identities[most_dominating_fe_index]
-                                                     [other_fe_index]);
+                              const types::global_dof_index master_dof_index =
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::get_dof_index(
+                                    dof_handler,
+                                    0,
+                                    vertex_index,
+                                    most_dominating_fe_index,
+                                    identity.first,
+                                    std::integral_constant<int, 0>());
+                              const types::global_dof_index slave_dof_index =
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::get_dof_index(
+                                    dof_handler,
+                                    0,
+                                    vertex_index,
+                                    other_fe_index,
+                                    identity.second,
+                                    std::integral_constant<int, 0>());
 
-                              // then loop through the identities we
-                              // have. first get the global numbers of the
-                              // dofs we want to identify and make sure they
-                              // are not yet constrained to anything else,
-                              // except for to each other. use the rule that
-                              // we will always constrain the dof with the
-                              // higher fe index to the one with the lower,
-                              // to avoid circular reasoning.
-                              DoFIdentities &identities =
-                                *vertex_dof_identities[most_dominating_fe_index]
-                                                      [other_fe_index];
-                              for (const auto &identity : identities)
-                                {
-                                  const types::global_dof_index
-                                    master_dof_index = dealii::internal::
-                                      DoFAccessorImplementation::
-                                        Implementation::get_dof_index(
-                                          dof_handler,
-                                          0,
-                                          vertex_index,
-                                          most_dominating_fe_index,
-                                          identity.first,
-                                          std::integral_constant<int, 0>());
-                                  const types::global_dof_index
-                                    slave_dof_index = dealii::internal::
-                                      DoFAccessorImplementation::
-                                        Implementation::get_dof_index(
-                                          dof_handler,
-                                          0,
-                                          vertex_index,
-                                          other_fe_index,
-                                          identity.second,
-                                          std::integral_constant<int, 0>());
-
-                                  // check if we are on an interface between
-                                  // a locally owned and a ghost cell on which
-                                  // we need to work on.
-                                  //
-                                  // all degrees of freedom belonging to
-                                  // dominating fe indices or to a processor
-                                  // with a higher rank have been set at this
-                                  // point (either in Phase 2, or after the
-                                  // first ghost exchange in Phase 5). thus,
-                                  // we only have to set the indices of
-                                  // degrees of freedom that have been
-                                  // previously flagged invalid.
-                                  if ((slave_dof_index ==
-                                       numbers::invalid_dof_index) &&
-                                      (master_dof_index !=
-                                       numbers::invalid_dof_index))
-                                    dealii::internal::
-                                      DoFAccessorImplementation::
-                                        Implementation::set_dof_index(
-                                          dof_handler,
-                                          0,
-                                          vertex_index,
-                                          other_fe_index,
-                                          identity.second,
-                                          std::integral_constant<int, 0>(),
-                                          master_dof_index);
-                                }
+                              // check if we are on an interface between
+                              // a locally owned and a ghost cell on which
+                              // we need to work on.
+                              //
+                              // all degrees of freedom belonging to
+                              // dominating fe indices or to a processor
+                              // with a higher rank have been set at this
+                              // point (either in Phase 2, or after the
+                              // first ghost exchange in Phase 5). thus,
+                              // we only have to set the indices of
+                              // degrees of freedom that have been
+                              // previously flagged invalid.
+                              if ((slave_dof_index ==
+                                   numbers::invalid_dof_index) &&
+                                  (master_dof_index !=
+                                   numbers::invalid_dof_index))
+                                dealii::internal::DoFAccessorImplementation::
+                                  Implementation::set_dof_index(
+                                    dof_handler,
+                                    0,
+                                    vertex_index,
+                                    other_fe_index,
+                                    identity.second,
+                                    std::integral_constant<int, 0>(),
+                                    master_dof_index);
                             }
-                      }
+                        }
                   }
               }
         }
