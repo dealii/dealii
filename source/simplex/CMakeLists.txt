@@ -16,6 +16,7 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
+  polynomials.cc
   quadrature_lib.cc
   )
 
