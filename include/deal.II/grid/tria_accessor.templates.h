@@ -724,10 +724,18 @@ namespace internal
 
       template <int spacedim>
       inline static bool
-      line_orientation(const TriaAccessor<2, 2, spacedim> &, const unsigned int)
+      line_orientation(const TriaAccessor<2, 2, spacedim> &accessor,
+                       const unsigned int                  line)
       {
-        // quads in 2d have no non-standard orientation
-        return true;
+        if (accessor.tria->levels[accessor.present_level]
+              ->face_orientations.size() == 0)
+          return true; // quads in 2d have no non-standard orientation and
+                       // the array TriaLevel::face_orientations is left empty
+        else
+          return accessor.tria->levels[accessor.present_level]
+            ->face_orientations[accessor.present_index *
+                                  GeometryInfo<2>::faces_per_cell +
+                                line];
       }
 
 
