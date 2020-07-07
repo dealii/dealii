@@ -161,6 +161,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         std::map<types::global_dof_index, number> &,
         std::vector<unsigned int>);
 
+      template void
+      project_boundary_values<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const std::map<types::boundary_id,
+                       const Function<deal_II_space_dimension, number> *> &,
+        const hp::QCollection<deal_II_dimension - 1> &,
+        std::map<types::global_dof_index, number> &,
+        std::vector<unsigned int>);
+
     \}
 #endif
   }
@@ -212,6 +221,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         AffineConstraints<double> &,
         const Mapping<deal_II_dimension> &);
       template void
+      project_boundary_values_curl_conforming<deal_II_dimension>(
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Function<deal_II_dimension> &,
+        const types::boundary_id,
+        AffineConstraints<double> &,
+        const hp::MappingCollection<deal_II_dimension> &);
+      template void
       project_boundary_values_curl_conforming_l2(
         const DoFHandler<deal_II_dimension> &,
         const unsigned int,
@@ -229,7 +246,23 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         AffineConstraints<std::complex<double>> &,
         const Mapping<deal_II_dimension> &);
 #    endif
+      template void
+      project_boundary_values_curl_conforming_l2(
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Function<deal_II_dimension, double> &,
+        const types::boundary_id,
+        AffineConstraints<double> &,
+        const hp::MappingCollection<deal_II_dimension> &);
 #    ifdef DEAL_II_WITH_COMPLEX_VALUES
+      template void
+      project_boundary_values_curl_conforming_l2(
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Function<deal_II_dimension, std::complex<double>> &,
+        const types::boundary_id,
+        AffineConstraints<std::complex<double>> &,
+        const hp::MappingCollection<deal_II_dimension> &);
 #    endif
       template void
       project_boundary_values_div_conforming<deal_II_dimension>(
@@ -239,6 +272,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const types::boundary_id,
         AffineConstraints<double> &,
         const Mapping<deal_II_dimension> &);
+      template void
+      project_boundary_values_div_conforming<deal_II_dimension>(
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Function<deal_II_dimension> &,
+        const types::boundary_id,
+        AffineConstraints<double> &,
+        const hp::MappingCollection<deal_II_dimension> &);
 #  endif
 #endif
     \}
