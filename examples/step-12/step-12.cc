@@ -298,9 +298,9 @@ namespace Step12
     const BoundaryValues<dim> boundary_function;
 
     // This is the function that will be executed for each cell.
-    auto cell_worker = [&](const Iterator &  cell,
-                           ScratchData<dim> &scratch_data,
-                           CopyData &        copy_data) {
+    const auto cell_worker = [&](const Iterator &  cell,
+                                 ScratchData<dim> &scratch_data,
+                                 CopyData &        copy_data) {
       const unsigned int n_dofs = scratch_data.fe_values.get_fe().dofs_per_cell;
       copy_data.reinit(cell, n_dofs);
       scratch_data.fe_values.reinit(cell);
@@ -330,10 +330,10 @@ namespace Step12
     // This is the function called for boundary faces and consists of a normal
     // integration using FEFaceValues. New is the logic to decide if the term
     // goes into the system matrix (outflow) or the right-hand side (inflow).
-    auto boundary_worker = [&](const Iterator &    cell,
-                               const unsigned int &face_no,
-                               ScratchData<dim> &  scratch_data,
-                               CopyData &          copy_data) {
+    const auto boundary_worker = [&](const Iterator &    cell,
+                                     const unsigned int &face_no,
+                                     ScratchData<dim> &  scratch_data,
+                                     CopyData &          copy_data) {
       scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
         scratch_data.fe_interface_values.get_fe_face_values(0);
@@ -373,14 +373,14 @@ namespace Step12
     // This is the function called on interior faces. The arguments specify
     // cells, face and subface indices (for adaptive refinement). We just pass
     // them along to the reinit() function of FEInterfaceValues.
-    auto face_worker = [&](const Iterator &    cell,
-                           const unsigned int &f,
-                           const unsigned int &sf,
-                           const Iterator &    ncell,
-                           const unsigned int &nf,
-                           const unsigned int &nsf,
-                           ScratchData<dim> &  scratch_data,
-                           CopyData &          copy_data) {
+    const auto face_worker = [&](const Iterator &    cell,
+                                 const unsigned int &f,
+                                 const unsigned int &sf,
+                                 const Iterator &    ncell,
+                                 const unsigned int &nf,
+                                 const unsigned int &nsf,
+                                 ScratchData<dim> &  scratch_data,
+                                 CopyData &          copy_data) {
       FEInterfaceValues<dim> &fe_iv = scratch_data.fe_interface_values;
       fe_iv.reinit(cell, f, sf, ncell, nf, nsf);
       const auto &q_points = fe_iv.get_quadrature_points();
@@ -417,9 +417,9 @@ namespace Step12
     // no hanging node constraints in DG discretizations, we use an empty
     // object here as this allows us to use its `copy_local_to_global`
     // functionality.
-    AffineConstraints<double> constraints;
+    const AffineConstraints<double> constraints;
 
-    auto copier = [&](const CopyData &c) {
+    const auto copier = [&](const CopyData &c) {
       constraints.distribute_local_to_global(c.cell_matrix,
                                              c.cell_rhs,
                                              c.local_dof_indices,
