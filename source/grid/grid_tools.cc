@@ -4623,7 +4623,10 @@ namespace GridTools
               break;
             }
           catch (...)
-            {}
+            {
+              if (counter == n_points)
+                return cell_qpoint_map;
+            }
 
         auto last_cell = cell_qpoint_map.emplace(std::make_pair(
           point_and_reference_location.first,
