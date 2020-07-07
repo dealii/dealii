@@ -267,7 +267,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
       for (; cell != endc; ++cell)
         if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
           {
-            for (auto f : GeometryInfo<dim>::face_indices())
+            for (auto f : cell->face_indices())
               if (cell->has_periodic_neighbor(f) &&
                   cell->periodic_neighbor(f)->level() == cell->level())
                 {

@@ -881,7 +881,7 @@ namespace internal
     local_face_integrals.clear();
 
     // loop over all faces of this cell
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       {
         const typename DoFHandler<dim, spacedim>::face_iterator face =
           cell->face(face_no);
@@ -1290,7 +1290,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
         const unsigned int present_cell = cell->active_cell_index();
 
         // loop over all faces of this cell
-        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             Assert(face_integrals.find(cell->face(face_no)) !=
                      face_integrals.end(),

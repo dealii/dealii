@@ -628,7 +628,7 @@ namespace internal
         new_indices.clear();
         typename dealii::Triangulation<dim>::cell_iterator dcell(
           &tria, cell_level_index[cell].first, cell_level_index[cell].second);
-        for (auto f : GeometryInfo<dim>::face_indices())
+        for (auto f : dcell->face_indices())
           {
             // Only inner faces couple different cells
             if (dcell->at_boundary(f) == false &&
@@ -931,8 +931,7 @@ namespace internal
                 for (const auto &cell :
                      dof_handler[no]->cell_iterators_on_level(mg_level + 1))
                   if (cell->level_subdomain_id() == task_info.my_pid)
-                    for (const unsigned int f :
-                         GeometryInfo<dim>::face_indices())
+                    for (const unsigned int f : cell->face_indices())
                       if ((cell->at_boundary(f) == false ||
                            cell->has_periodic_neighbor(f) == true) &&
                           cell->level() >

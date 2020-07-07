@@ -340,9 +340,7 @@ namespace MeshWorker
         cell_worker(cell, scratch, copy);
 
       if (flags & (work_on_faces | work_on_boundary))
-        for (const unsigned int face_no :
-             GeometryInfo<CellIteratorBaseType::AccessorType::Container::
-                            dimension>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             if (cell->at_boundary(face_no) &&
                 !cell->has_periodic_neighbor(face_no))

@@ -73,7 +73,7 @@ namespace VectorTools
         std::vector<double> rhs_values(n_q_points);
 
         for (; cell != endc; ++cell)
-          for (unsigned int face : GeometryInfo<dim>::face_indices())
+          for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -104,7 +104,7 @@ namespace VectorTools
                                                Vector<double>(n_components));
 
         for (; cell != endc; ++cell)
-          for (unsigned int face : GeometryInfo<dim>::face_indices())
+          for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -218,7 +218,7 @@ namespace VectorTools
         std::vector<double> rhs_values;
 
         for (; cell != endc; ++cell)
-          for (unsigned int face : GeometryInfo<dim>::face_indices())
+          for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -256,7 +256,7 @@ namespace VectorTools
         std::vector<Vector<double>> rhs_values;
 
         for (; cell != endc; ++cell)
-          for (unsigned int face : GeometryInfo<dim>::face_indices())
+          for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
