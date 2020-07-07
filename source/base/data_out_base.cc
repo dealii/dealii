@@ -7044,7 +7044,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
     }
 
   // write pvtu record
-  const std::string filename_master =
+  const std::string pvtu_filename =
     filename_without_extension + "_" +
     Utilities::int_to_string(counter, n_digits_for_counter) + ".pvtu";
 
@@ -7061,11 +7061,11 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
           filename_vector.emplace_back(filename);
         }
 
-      std::ofstream master_output((directory + filename_master).c_str());
-      this->write_pvtu_record(master_output, filename_vector);
+      std::ofstream pvtu_output((directory + pvtu_filename).c_str());
+      this->write_pvtu_record(pvtu_output, filename_vector);
     }
 
-  return filename_master;
+  return pvtu_filename;
 }
 
 

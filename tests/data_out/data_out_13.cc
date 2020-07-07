@@ -178,8 +178,8 @@ check()
   filenames.push_back("output_" + Utilities::int_to_string(dim) + "d.vtu");
 
   /*
-  std::ofstream master_output("output_" + Utilities::int_to_string(dim) +
-  "d.pvtu"); data_out.write_pvtu_record(master_output, filenames);
+  std::ofstream pvtu_output("output_" + Utilities::int_to_string(dim) +
+  "d.pvtu"); data_out.write_pvtu_record(pvtu_output, filenames);
 
   std::ofstream out(filenames[0]);
   data_out.write_vtu(out);

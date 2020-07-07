@@ -573,17 +573,18 @@ namespace Step18
           filenames.push_back("solution-" +
                               Utilities::int_to_string(timestep_no, 4) + "." +
                               Utilities::int_to_string(i, 3) + ".vtu");
-        const std::string visit_master_filename =
+        const std::string visit_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".visit");
-        std::ofstream visit_master(visit_master_filename.c_str());
-        DataOutBase::write_visit_record(visit_master, filenames);
-        const std::string pvtu_master_filename =
+        std::ofstream visit_output(visit_filename.c_str());
+        DataOutBase::write_visit_record(visit_output, filenames);
+
+        const std::string pvtu_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename.c_str());
-        data_out.write_pvtu_record(pvtu_master, filenames);
+        std::ofstream pvtu_output(pvtu_filename.c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
         static std::vector<std::pair<double, std::string>> times_and_names;
         times_and_names.push_back(
-          std::pair<double, std::string>(present_time, pvtu_master_filename));
+          std::pair<double, std::string>(present_time, pvtu_filename));
         std::ofstream pvd_output("solution.pvd");
         DataOutBase::write_pvd_record(pvd_output, times_and_names);
       }

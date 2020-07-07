@@ -1001,7 +1001,7 @@ namespace Step17
 
 // The <code>main()</code> works the same way as most of the main
 // functions in the other example programs, i.e., it delegates work to
-// the <code>run</code> function of a master object, and only wraps
+// the <code>run</code> function of a managing object, and only wraps
 // everything into some code to catch exceptions:
 int main(int argc, char **argv)
 {

@@ -1257,9 +1257,8 @@ namespace Step18
     // The function also writes a record files (with suffix `.pvd`) for Paraview
     // that describes how all of these output files combine into the data for
     // this single time step:
-    const std::string pvtu_master_filename =
-      data_out.write_vtu_with_pvtu_record(
-        "./", "solution", timestep_no, mpi_communicator, 4);
+    const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
+      "./", "solution", timestep_no, mpi_communicator, 4);
 
     // The record files must be written only once and not by each processor,
     // so we do this on processor 0:
@@ -1271,7 +1270,7 @@ namespace Step18
         // from the previous timesteps.
         static std::vector<std::pair<double, std::string>> times_and_names;
         times_and_names.push_back(
-          std::pair<double, std::string>(present_time, pvtu_master_filename));
+          std::pair<double, std::string>(present_time, pvtu_filename));
         std::ofstream pvd_output("solution.pvd");
         DataOutBase::write_pvd_record(pvd_output, times_and_names);
       }

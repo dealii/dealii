@@ -2092,8 +2092,8 @@ namespace Euler_DG
   // than the standard library's `std::ofstream` variants used in most other
   // tutorial programs. A particularly nice feature of the
   // `write_vtu_in_parallel()` function is the fact that it can combine output
-  // from all MPI ranks into a single file, obviating a VTU master file (the
-  // "pvtu" file).
+  // from all MPI ranks into a single file, making it unnecessary to have a
+  // central record of all such files (namely, the "pvtu" file).
   //
   // For parallel programs, it is often instructive to look at the partitioning
   // of cells among processors. To this end, one can pass a vector of numbers

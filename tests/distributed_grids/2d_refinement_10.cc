@@ -337,8 +337,8 @@ TriaTest<dim>::write_vtu(const unsigned int counter) const
           filenames.push_back(output_tag + ".slot-" +
                               Utilities::int_to_string(i, 4) + ".vtu");
         }
-      std::ofstream master_output((output_tag + ".pvtu").c_str());
-      data_out.write_pvtu_record(master_output, filenames);
+      std::ofstream pvtu_output((output_tag + ".pvtu").c_str());
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 #else
   (void)counter;

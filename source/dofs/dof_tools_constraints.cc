@@ -57,16 +57,16 @@ namespace DoFTools
     namespace
     {
       inline bool
-      check_master_dof_list(
+      check_primary_dof_list(
         const FullMatrix<double> &                  face_interpolation_matrix,
-        const std::vector<types::global_dof_index> &master_dof_list)
+        const std::vector<types::global_dof_index> &primary_dof_list)
       {
-        const unsigned int N = master_dof_list.size();
+        const unsigned int N = primary_dof_list.size();
 
         FullMatrix<double> tmp(N, N);
         for (unsigned int i = 0; i < N; ++i)
           for (unsigned int j = 0; j < N; ++j)
-            tmp(i, j) = face_interpolation_matrix(master_dof_list[i], j);
+            tmp(i, j) = face_interpolation_matrix(primary_dof_list[i], j);
 
         // then use the algorithm from FullMatrix::gauss_jordan on this matrix
         // to find out whether it is singular. the algorithm there does pivoting
@@ -103,7 +103,7 @@ namespace DoFTools
                   }
               }
             // check whether the pivot is too small. if that is the case, then
-            // the matrix is singular and we shouldn't use this set of master
+            // the matrix is singular and we shouldn't use this set of primary
             // dofs
             if (max < 1.e-12 * typical_diagonal_element)
               return false;
@@ -139,7 +139,7 @@ namespace DoFTools
             tmp(j, j) = hr;
           }
 
-        // everything went fine, so we can accept this set of master dofs (at
+        // everything went fine, so we can accept this set of primary dofs (at
         // least as far as they have already been collected)
         return true;
       }
@@ -151,10 +151,10 @@ namespace DoFTools
        * described by fe2 (for example for the complex case described
        * in the @ref hp_paper "hp paper"), we have to select fe2.dofs_per_face
        * out of the fe1.dofs_per_face face DoFs as the
-       * master DoFs, and the rest become slave dofs. This function selects
-       * which ones will be masters, and which ones will be slaves.
+       * primary dofs, and the rest become dependent dofs. This function selects
+       * which ones will be primary, and which ones will be dependents.
        *
-       * The function assumes that master_dofs already has size
+       * The function assumes that primary_dofs already has size
        * fe1.dofs_per_face. After the function, exactly fe2.dofs_per_face
        * entries will be true.
        *
@@ -169,14 +169,14 @@ namespace DoFTools
        */
       template <int dim, int spacedim>
       void
-      select_master_dofs_for_face_restriction(
+      select_primary_dofs_for_face_restriction(
         const FiniteElement<dim, spacedim> &fe1,
         const FiniteElement<dim, spacedim> &fe2,
         const FullMatrix<double> &          face_interpolation_matrix,
-        std::vector<bool> &                 master_dof_mask)
+        std::vector<bool> &                 primary_dof_mask)
       {
         Assert(fe1.dofs_per_face >= fe2.dofs_per_face, ExcInternalError());
-        AssertDimension(master_dof_mask.size(), fe1.dofs_per_face);
+        AssertDimension(primary_dof_mask.size(), fe1.dofs_per_face);
 
         Assert(fe2.dofs_per_vertex <= fe1.dofs_per_vertex, ExcInternalError());
         Assert(fe2.dofs_per_line <= fe1.dofs_per_line, ExcInternalError());
@@ -184,13 +184,13 @@ namespace DoFTools
                ExcInternalError());
 
         // the idea here is to designate as many DoFs in fe1 per object (vertex,
-        // line, quad) as master as there are such dofs in fe2 (indices are int,
-        // because we want to avoid the 'unsigned int < 0 is always false
+        // line, quad) as primary as there are such dofs in fe2 (indices are
+        // int, because we want to avoid the 'unsigned int < 0 is always false
         // warning for the cases at the bottom in 1d and 2d)
         //
         // as mentioned in the paper, it is not always easy to find a set of
-        // master dofs that produces an invertible matrix. to this end, we check
-        // in each step whether the matrix is still invertible and simply
+        // primary dofs that produces an invertible matrix. to this end, we
+        // check in each step whether the matrix is still invertible and simply
         // discard this dof if the matrix is not invertible anymore.
         //
         // the cases where we did have trouble in the past were with adding more
@@ -198,12 +198,12 @@ namespace DoFTools
         // the hp/crash_12 test that tests that we can do exactly this, and
         // failed before we had code to compensate for this case). the other
         // case are system elements: if we have say a Q1Q2 vs a Q2Q3 element,
-        // then we can't just take all master dofs on a line from a single base
+        // then we can't just take all primary dofs on a line from a single base
         // element, since the shape functions of that base element are
         // independent of that of the other one. this latter case shows up when
         // running hp/hp_constraints_q_system_06
 
-        std::vector<types::global_dof_index> master_dof_list;
+        std::vector<types::global_dof_index> primary_dof_list;
         unsigned int                         index = 0;
         for (int v = 0;
              v < static_cast<signed int>(GeometryInfo<dim>::vertices_per_face);
@@ -213,21 +213,21 @@ namespace DoFTools
             unsigned int i          = 0;
             while (dofs_added < fe2.dofs_per_vertex)
               {
-                // make sure that we were able to find a set of master dofs and
+                // make sure that we were able to find a set of primary dofs and
                 // that the code down below didn't just reject all our efforts
                 Assert(i < fe1.dofs_per_vertex, ExcInternalError());
 
                 // tentatively push this vertex dof
-                master_dof_list.push_back(index + i);
+                primary_dof_list.push_back(index + i);
 
                 // then see what happens. if it succeeds, fine
-                if (check_master_dof_list(face_interpolation_matrix,
-                                          master_dof_list) == true)
+                if (check_primary_dof_list(face_interpolation_matrix,
+                                           primary_dof_list) == true)
                   ++dofs_added;
                 else
                   // well, it didn't. simply pop that dof from the list again
                   // and try with the next dof
-                  master_dof_list.pop_back();
+                  primary_dof_list.pop_back();
 
                 // forward counter by one
                 ++i;
@@ -246,12 +246,12 @@ namespace DoFTools
               {
                 Assert(i < fe1.dofs_per_line, ExcInternalError());
 
-                master_dof_list.push_back(index + i);
-                if (check_master_dof_list(face_interpolation_matrix,
-                                          master_dof_list) == true)
+                primary_dof_list.push_back(index + i);
+                if (check_primary_dof_list(face_interpolation_matrix,
+                                           primary_dof_list) == true)
                   ++dofs_added;
                 else
-                  master_dof_list.pop_back();
+                  primary_dof_list.pop_back();
 
                 ++i;
               }
@@ -269,12 +269,12 @@ namespace DoFTools
               {
                 Assert(i < fe1.dofs_per_quad, ExcInternalError());
 
-                master_dof_list.push_back(index + i);
-                if (check_master_dof_list(face_interpolation_matrix,
-                                          master_dof_list) == true)
+                primary_dof_list.push_back(index + i);
+                if (check_primary_dof_list(face_interpolation_matrix,
+                                           primary_dof_list) == true)
                   ++dofs_added;
                 else
-                  master_dof_list.pop_back();
+                  primary_dof_list.pop_back();
 
                 ++i;
               }
@@ -282,36 +282,36 @@ namespace DoFTools
           }
 
         AssertDimension(index, fe1.dofs_per_face);
-        AssertDimension(master_dof_list.size(), fe2.dofs_per_face);
+        AssertDimension(primary_dof_list.size(), fe2.dofs_per_face);
 
         // finally copy the list into the mask
-        std::fill(master_dof_mask.begin(), master_dof_mask.end(), false);
-        for (const auto dof : master_dof_list)
-          master_dof_mask[dof] = true;
+        std::fill(primary_dof_mask.begin(), primary_dof_mask.end(), false);
+        for (const auto dof : primary_dof_list)
+          primary_dof_mask[dof] = true;
       }
 
 
 
       /**
        * Make sure that the mask exists that determines which dofs will be the
-       * masters on refined faces where an fe1 and a fe2 meet.
+       * primary on refined faces where an fe1 and a fe2 meet.
        */
       template <int dim, int spacedim>
       void
-      ensure_existence_of_master_dof_mask(
+      ensure_existence_of_primary_dof_mask(
         const FiniteElement<dim, spacedim> &fe1,
         const FiniteElement<dim, spacedim> &fe2,
         const FullMatrix<double> &          face_interpolation_matrix,
-        std::unique_ptr<std::vector<bool>> &master_dof_mask)
+        std::unique_ptr<std::vector<bool>> &primary_dof_mask)
       {
-        if (master_dof_mask == nullptr)
+        if (primary_dof_mask == nullptr)
           {
-            master_dof_mask =
+            primary_dof_mask =
               std::make_unique<std::vector<bool>>(fe1.dofs_per_face);
-            select_master_dofs_for_face_restriction(fe1,
-                                                    fe2,
-                                                    face_interpolation_matrix,
-                                                    *master_dof_mask);
+            select_primary_dofs_for_face_restriction(fe1,
+                                                     fe2,
+                                                     face_interpolation_matrix,
+                                                     *primary_dof_mask);
           }
       }
 
@@ -362,19 +362,19 @@ namespace DoFTools
 
       /**
        * Given the face interpolation matrix between two elements, split it into
-       * its master and slave parts and invert the master part as
+       * its primary and dependent parts and invert the primary part as
        * explained in the @ref hp_paper "hp paper".
        */
       void
       ensure_existence_of_split_face_matrix(
         const FullMatrix<double> &face_interpolation_matrix,
-        const std::vector<bool> & master_dof_mask,
+        const std::vector<bool> & primary_dof_mask,
         std::unique_ptr<std::pair<FullMatrix<double>, FullMatrix<double>>>
           &split_matrix)
       {
-        AssertDimension(master_dof_mask.size(), face_interpolation_matrix.m());
-        Assert(std::count(master_dof_mask.begin(),
-                          master_dof_mask.end(),
+        AssertDimension(primary_dof_mask.size(), face_interpolation_matrix.m());
+        Assert(std::count(primary_dof_mask.begin(),
+                          primary_dof_mask.end(),
                           true) ==
                  static_cast<signed int>(face_interpolation_matrix.n()),
                ExcInternalError());
@@ -384,35 +384,37 @@ namespace DoFTools
             split_matrix = std::make_unique<
               std::pair<FullMatrix<double>, FullMatrix<double>>>();
 
-            const unsigned int n_master_dofs = face_interpolation_matrix.n();
-            const unsigned int n_dofs        = face_interpolation_matrix.m();
+            const unsigned int n_primary_dofs = face_interpolation_matrix.n();
+            const unsigned int n_dofs         = face_interpolation_matrix.m();
 
-            Assert(n_master_dofs <= n_dofs, ExcInternalError());
+            Assert(n_primary_dofs <= n_dofs, ExcInternalError());
 
-            // copy and invert the master component, copy the slave component
-            split_matrix->first.reinit(n_master_dofs, n_master_dofs);
-            split_matrix->second.reinit(n_dofs - n_master_dofs, n_master_dofs);
+            // copy and invert the primary component, copy the dependent
+            // component
+            split_matrix->first.reinit(n_primary_dofs, n_primary_dofs);
+            split_matrix->second.reinit(n_dofs - n_primary_dofs,
+                                        n_primary_dofs);
 
-            unsigned int nth_master_dof = 0, nth_slave_dof = 0;
+            unsigned int nth_primary_dof = 0, nth_dependent_dof = 0;
 
             for (unsigned int i = 0; i < n_dofs; ++i)
-              if (master_dof_mask[i] == true)
+              if (primary_dof_mask[i] == true)
                 {
-                  for (unsigned int j = 0; j < n_master_dofs; ++j)
-                    split_matrix->first(nth_master_dof, j) =
+                  for (unsigned int j = 0; j < n_primary_dofs; ++j)
+                    split_matrix->first(nth_primary_dof, j) =
                       face_interpolation_matrix(i, j);
-                  ++nth_master_dof;
+                  ++nth_primary_dof;
                 }
               else
                 {
-                  for (unsigned int j = 0; j < n_master_dofs; ++j)
-                    split_matrix->second(nth_slave_dof, j) =
+                  for (unsigned int j = 0; j < n_primary_dofs; ++j)
+                    split_matrix->second(nth_dependent_dof, j) =
                       face_interpolation_matrix(i, j);
-                  ++nth_slave_dof;
+                  ++nth_dependent_dof;
                 }
 
-            AssertDimension(nth_master_dof, n_master_dofs);
-            AssertDimension(nth_slave_dof, n_dofs - n_master_dofs);
+            AssertDimension(nth_primary_dof, n_primary_dofs);
+            AssertDimension(nth_dependent_dof, n_dofs - n_primary_dofs);
 
             // TODO[WB]: We should make sure very small entries are removed
             // after inversion
@@ -451,40 +453,41 @@ namespace DoFTools
       template <typename number1, typename number2>
       void
       filter_constraints(
-        const std::vector<types::global_dof_index> &master_dofs,
-        const std::vector<types::global_dof_index> &slave_dofs,
+        const std::vector<types::global_dof_index> &primary_dofs,
+        const std::vector<types::global_dof_index> &dependent_dofs,
         const FullMatrix<number1> &                 face_constraints,
         AffineConstraints<number2> &                constraints)
       {
-        Assert(face_constraints.n() == master_dofs.size(),
-               ExcDimensionMismatch(master_dofs.size(), face_constraints.n()));
-        Assert(face_constraints.m() == slave_dofs.size(),
-               ExcDimensionMismatch(slave_dofs.size(), face_constraints.m()));
+        Assert(face_constraints.n() == primary_dofs.size(),
+               ExcDimensionMismatch(primary_dofs.size(), face_constraints.n()));
+        Assert(face_constraints.m() == dependent_dofs.size(),
+               ExcDimensionMismatch(dependent_dofs.size(),
+                                    face_constraints.m()));
 
-        const unsigned int n_master_dofs = master_dofs.size();
-        const unsigned int n_slave_dofs  = slave_dofs.size();
+        const unsigned int n_primary_dofs   = primary_dofs.size();
+        const unsigned int n_dependent_dofs = dependent_dofs.size();
 
         // check for a couple conditions that happened in parallel distributed
         // mode
-        for (unsigned int row = 0; row != n_slave_dofs; ++row)
-          Assert(slave_dofs[row] != numbers::invalid_dof_index,
+        for (unsigned int row = 0; row != n_dependent_dofs; ++row)
+          Assert(dependent_dofs[row] != numbers::invalid_dof_index,
                  ExcInternalError());
-        for (unsigned int col = 0; col != n_master_dofs; ++col)
-          Assert(master_dofs[col] != numbers::invalid_dof_index,
+        for (unsigned int col = 0; col != n_primary_dofs; ++col)
+          Assert(primary_dofs[col] != numbers::invalid_dof_index,
                  ExcInternalError());
 
 
-        for (unsigned int row = 0; row != n_slave_dofs; ++row)
-          if (constraints.is_constrained(slave_dofs[row]) == false)
+        for (unsigned int row = 0; row != n_dependent_dofs; ++row)
+          if (constraints.is_constrained(dependent_dofs[row]) == false)
             {
               bool constraint_already_satisfied = false;
 
               // Check if we have an identity constraint, which is already
               // satisfied by unification of the corresponding global dof
               // indices
-              for (unsigned int i = 0; i < n_master_dofs; ++i)
+              for (unsigned int i = 0; i < n_primary_dofs; ++i)
                 if (face_constraints(row, i) == 1.0)
-                  if (master_dofs[i] == slave_dofs[row])
+                  if (primary_dofs[i] == dependent_dofs[row])
                     {
                       constraint_already_satisfied = true;
                       break;
@@ -495,7 +498,7 @@ namespace DoFTools
                   // add up the absolute values of all constraints in this line
                   // to get a measure of their absolute size
                   number1 abs_sum = 0;
-                  for (unsigned int i = 0; i < n_master_dofs; ++i)
+                  for (unsigned int i = 0; i < n_primary_dofs; ++i)
                     abs_sum += std::abs(face_constraints(row, i));
 
                   // then enter those constraints that are larger than
@@ -504,15 +507,15 @@ namespace DoFTools
                   // those constraints in here will only lead to problems
                   // because it makes sparsity patterns fuller than necessary
                   // without producing any significant effect
-                  constraints.add_line(slave_dofs[row]);
-                  for (unsigned int i = 0; i < n_master_dofs; ++i)
+                  constraints.add_line(dependent_dofs[row]);
+                  for (unsigned int i = 0; i < n_primary_dofs; ++i)
                     if ((face_constraints(row, i) != 0) &&
                         (std::fabs(face_constraints(row, i)) >=
                          1e-14 * abs_sum))
-                      constraints.add_entry(slave_dofs[row],
-                                            master_dofs[i],
+                      constraints.add_entry(dependent_dofs[row],
+                                            primary_dofs[i],
                                             face_constraints(row, i));
-                  constraints.set_inhomogeneity(slave_dofs[row], 0.);
+                  constraints.set_inhomogeneity(dependent_dofs[row], 0.);
                 }
             }
       }
@@ -981,10 +984,10 @@ namespace DoFTools
       // resized down below to avoid permanent re-allocation of memory
       FullMatrix<double> constraint_matrix;
 
-      // similarly have arrays that will hold master and slave dof numbers, as
-      // well as a scratch array needed for the complicated case below
-      std::vector<types::global_dof_index> master_dofs;
-      std::vector<types::global_dof_index> slave_dofs;
+      // similarly have arrays that will hold primary and dependent dof numbers,
+      // as well as a scratch array needed for the complicated case below
+      std::vector<types::global_dof_index> primary_dofs;
+      std::vector<types::global_dof_index> dependent_dofs;
       std::vector<types::global_dof_index> scratch_dofs;
 
       // caches for the face and subface interpolation matrices between
@@ -999,8 +1002,9 @@ namespace DoFTools
           GeometryInfo<dim>::max_children_per_face);
 
       // similarly have a cache for the matrices that are split into their
-      // master and slave parts, and for which the master part is inverted.
-      // these two matrices are derived from the face interpolation matrix
+      // primary and dependent parts, and for which the primary part is
+      // inverted. these two matrices are derived from the face interpolation
+      // matrix
       // as described in the @ref hp_paper "hp paper"
       Table<2,
             std::unique_ptr<std::pair<FullMatrix<double>, FullMatrix<double>>>>
@@ -1009,8 +1013,8 @@ namespace DoFTools
 
       // finally, for each pair of finite elements, have a mask that states
       // which of the degrees of freedom on the coarse side of a refined face
-      // will act as master dofs.
-      Table<2, std::unique_ptr<std::vector<bool>>> master_dof_masks(
+      // will act as primary dofs.
+      Table<2, std::unique_ptr<std::vector<bool>>> primary_dof_masks(
         n_finite_elements(dof_handler), n_finite_elements(dof_handler));
 
       // loop over all faces
@@ -1103,10 +1107,10 @@ namespace DoFTools
                         //
                         // so we are going to constrain the DoFs on the face
                         // children against the DoFs on the face itself
-                        master_dofs.resize(cell->get_fe().dofs_per_face);
+                        primary_dofs.resize(cell->get_fe().dofs_per_face);
 
                         cell->face(face)->get_dof_indices(
-                          master_dofs, cell->active_fe_index());
+                          primary_dofs, cell->active_fe_index());
 
                         // Now create constraints for the subfaces and
                         // assemble it. ignore all interfaces with artificial
@@ -1147,16 +1151,17 @@ namespace DoFTools
 
                             // Same procedure as for the mother cell. Extract
                             // the face DoFs from the cell DoFs.
-                            slave_dofs.resize(
+                            dependent_dofs.resize(
                               subface->get_fe(subface_fe_index).dofs_per_face);
-                            subface->get_dof_indices(slave_dofs,
+                            subface->get_dof_indices(dependent_dofs,
                                                      subface_fe_index);
 
-                            for (const types::global_dof_index slave_dof :
-                                 slave_dofs)
+                            for (const types::global_dof_index dependent_dof :
+                                 dependent_dofs)
                               {
-                                (void)slave_dof;
-                                Assert(slave_dof != numbers::invalid_dof_index,
+                                (void)dependent_dof;
+                                Assert(dependent_dof !=
+                                         numbers::invalid_dof_index,
                                        ExcInternalError());
                               }
 
@@ -1191,8 +1196,8 @@ namespace DoFTools
 
                             // Add constraints to global AffineConstraints
                             // object.
-                            filter_constraints(master_dofs,
-                                               slave_dofs,
+                            filter_constraints(primary_dofs,
+                                               dependent_dofs,
                                                *(subface_interpolation_matrices
                                                    [cell->active_fe_index()]
                                                    [subface_fe_index][c]),
@@ -1266,72 +1271,73 @@ namespace DoFTools
                           face_interpolation_matrices[dominating_fe_index]
                                                      [cell->active_fe_index()]);
 
-                        // split this matrix into master and slave components.
-                        // invert the master component
-                        ensure_existence_of_master_dof_mask(
+                        // split this matrix into primary and dependent
+                        // components. invert the primary component
+                        ensure_existence_of_primary_dof_mask(
                           cell->get_fe(),
                           dominating_fe,
                           (*face_interpolation_matrices
                              [dominating_fe_index][cell->active_fe_index()]),
-                          master_dof_masks[dominating_fe_index]
-                                          [cell->active_fe_index()]);
+                          primary_dof_masks[dominating_fe_index]
+                                           [cell->active_fe_index()]);
 
                         ensure_existence_of_split_face_matrix(
                           *face_interpolation_matrices[dominating_fe_index]
                                                       [cell->active_fe_index()],
-                          (*master_dof_masks[dominating_fe_index]
-                                            [cell->active_fe_index()]),
+                          (*primary_dof_masks[dominating_fe_index]
+                                             [cell->active_fe_index()]),
                           split_face_interpolation_matrices
                             [dominating_fe_index][cell->active_fe_index()]);
 
                         const FullMatrix<double>
-                          &restrict_mother_to_virtual_master_inv =
+                          &restrict_mother_to_virtual_primary_inv =
                             (split_face_interpolation_matrices
                                [dominating_fe_index][cell->active_fe_index()]
                                  ->first);
 
                         const FullMatrix<double>
-                          &restrict_mother_to_virtual_slave =
+                          &restrict_mother_to_virtual_dependent =
                             (split_face_interpolation_matrices
                                [dominating_fe_index][cell->active_fe_index()]
                                  ->second);
 
                         // now compute the constraint matrix as the product
-                        // between the inverse matrix and the slave part
+                        // between the inverse matrix and the dependent part
                         constraint_matrix.reinit(cell->get_fe().dofs_per_face -
                                                    dominating_fe.dofs_per_face,
                                                  dominating_fe.dofs_per_face);
-                        restrict_mother_to_virtual_slave.mmult(
+                        restrict_mother_to_virtual_dependent.mmult(
                           constraint_matrix,
-                          restrict_mother_to_virtual_master_inv);
+                          restrict_mother_to_virtual_primary_inv);
 
-                        // then figure out the global numbers of master and
-                        // slave dofs and apply constraints
+                        // then figure out the global numbers of primary and
+                        // dependent dofs and apply constraints
                         scratch_dofs.resize(cell->get_fe().dofs_per_face);
                         cell->face(face)->get_dof_indices(
                           scratch_dofs, cell->active_fe_index());
 
-                        // split dofs into master and slave components
-                        master_dofs.clear();
-                        slave_dofs.clear();
+                        // split dofs into primary and dependent components
+                        primary_dofs.clear();
+                        dependent_dofs.clear();
                         for (unsigned int i = 0;
                              i < cell->get_fe().dofs_per_face;
                              ++i)
-                          if ((*master_dof_masks[dominating_fe_index]
-                                                [cell->active_fe_index()])[i] ==
+                          if ((*primary_dof_masks[dominating_fe_index]
+                                                 [cell
+                                                    ->active_fe_index()])[i] ==
                               true)
-                            master_dofs.push_back(scratch_dofs[i]);
+                            primary_dofs.push_back(scratch_dofs[i]);
                           else
-                            slave_dofs.push_back(scratch_dofs[i]);
+                            dependent_dofs.push_back(scratch_dofs[i]);
 
-                        AssertDimension(master_dofs.size(),
+                        AssertDimension(primary_dofs.size(),
                                         dominating_fe.dofs_per_face);
-                        AssertDimension(slave_dofs.size(),
+                        AssertDimension(dependent_dofs.size(),
                                         cell->get_fe().dofs_per_face -
                                           dominating_fe.dofs_per_face);
 
-                        filter_constraints(master_dofs,
-                                           slave_dofs,
+                        filter_constraints(primary_dofs,
+                                           dependent_dofs,
                                            constraint_matrix,
                                            constraints);
 
@@ -1386,14 +1392,14 @@ namespace DoFTools
 
                             restrict_subface_to_virtual.mmult(
                               constraint_matrix,
-                              restrict_mother_to_virtual_master_inv);
+                              restrict_mother_to_virtual_primary_inv);
 
-                            slave_dofs.resize(subface_fe.dofs_per_face);
+                            dependent_dofs.resize(subface_fe.dofs_per_face);
                             cell->face(face)->child(sf)->get_dof_indices(
-                              slave_dofs, subface_fe_index);
+                              dependent_dofs, subface_fe_index);
 
-                            filter_constraints(master_dofs,
-                                               slave_dofs,
+                            filter_constraints(primary_dofs,
+                                               dependent_dofs,
                                                constraint_matrix,
                                                constraints);
                           } // loop over subfaces
@@ -1449,19 +1455,20 @@ namespace DoFTools
                           {
                             // Get DoFs on dominating and dominated side of the
                             // face
-                            master_dofs.resize(cell->get_fe().dofs_per_face);
+                            primary_dofs.resize(cell->get_fe().dofs_per_face);
                             cell->face(face)->get_dof_indices(
-                              master_dofs, cell->active_fe_index());
+                              primary_dofs, cell->active_fe_index());
 
-                            // break if the n_master_dofs == 0, because we are
+                            // break if the n_primary_dofs == 0, because we are
                             // attempting to constrain to an element that has no
                             // face dofs
-                            if (master_dofs.size() == 0)
+                            if (primary_dofs.size() == 0)
                               break;
 
-                            slave_dofs.resize(neighbor->get_fe().dofs_per_face);
+                            dependent_dofs.resize(
+                              neighbor->get_fe().dofs_per_face);
                             cell->face(face)->get_dof_indices(
-                              slave_dofs, neighbor->active_fe_index());
+                              dependent_dofs, neighbor->active_fe_index());
 
                             // make sure the element constraints for this face
                             // are available
@@ -1474,8 +1481,8 @@ namespace DoFTools
 
                             // Add constraints to global constraint matrix.
                             filter_constraints(
-                              master_dofs,
-                              slave_dofs,
+                              primary_dofs,
+                              dependent_dofs,
                               *(face_interpolation_matrices
                                   [cell->active_fe_index()]
                                   [neighbor->active_fe_index()]),
@@ -1529,10 +1536,11 @@ namespace DoFTools
                             // FEs to that one. More precisely, we follow the
                             // strategy outlined on page 17 of the hp paper:
                             // First we find the dominant FE space S. Then we
-                            // divide our dofs in master and slave such that
-                            // I^{face,master}_{S^{face}->S} is invertible. And
-                            // finally constrain slave dofs to master dofs based
-                            // on the interpolation matrix.
+                            // divide our dofs in primary and dependent such
+                            // that I^{face,primary}_{S^{face}->S} is
+                            // invertible. And finally constrain dependent dofs
+                            // to primary dofs based on the interpolation
+                            // matrix.
 
                             const unsigned int this_fe_index =
                               cell->active_fe_index();
@@ -1575,74 +1583,74 @@ namespace DoFTools
                               face_interpolation_matrices
                                 [dominating_fe_index][cell->active_fe_index()]);
 
-                            // split this matrix into master and slave
-                            // components. invert the master component
-                            ensure_existence_of_master_dof_mask(
+                            // split this matrix into primary and dependent
+                            // components. invert the primary component
+                            ensure_existence_of_primary_dof_mask(
                               cell->get_fe(),
                               dominating_fe,
                               (*face_interpolation_matrices
                                  [dominating_fe_index]
                                  [cell->active_fe_index()]),
-                              master_dof_masks[dominating_fe_index]
-                                              [cell->active_fe_index()]);
+                              primary_dof_masks[dominating_fe_index]
+                                               [cell->active_fe_index()]);
 
                             ensure_existence_of_split_face_matrix(
                               *face_interpolation_matrices
                                 [dominating_fe_index][cell->active_fe_index()],
-                              (*master_dof_masks[dominating_fe_index]
-                                                [cell->active_fe_index()]),
+                              (*primary_dof_masks[dominating_fe_index]
+                                                 [cell->active_fe_index()]),
                               split_face_interpolation_matrices
                                 [dominating_fe_index][cell->active_fe_index()]);
 
                             const FullMatrix<
-                              double> &restrict_mother_to_virtual_master_inv =
+                              double> &restrict_mother_to_virtual_primary_inv =
                               (split_face_interpolation_matrices
                                  [dominating_fe_index][cell->active_fe_index()]
                                    ->first);
 
                             const FullMatrix<
-                              double> &restrict_mother_to_virtual_slave =
+                              double> &restrict_mother_to_virtual_dependent =
                               (split_face_interpolation_matrices
                                  [dominating_fe_index][cell->active_fe_index()]
                                    ->second);
 
                             // now compute the constraint matrix as the product
-                            // between the inverse matrix and the slave part
+                            // between the inverse matrix and the dependent part
                             constraint_matrix.reinit(
                               cell->get_fe().dofs_per_face -
                                 dominating_fe.dofs_per_face,
                               dominating_fe.dofs_per_face);
-                            restrict_mother_to_virtual_slave.mmult(
+                            restrict_mother_to_virtual_dependent.mmult(
                               constraint_matrix,
-                              restrict_mother_to_virtual_master_inv);
+                              restrict_mother_to_virtual_primary_inv);
 
-                            // then figure out the global numbers of master and
-                            // slave dofs and apply constraints
+                            // then figure out the global numbers of primary and
+                            // dependent dofs and apply constraints
                             scratch_dofs.resize(cell->get_fe().dofs_per_face);
                             cell->face(face)->get_dof_indices(
                               scratch_dofs, cell->active_fe_index());
 
-                            // split dofs into master and slave components
-                            master_dofs.clear();
-                            slave_dofs.clear();
+                            // split dofs into primary and dependent components
+                            primary_dofs.clear();
+                            dependent_dofs.clear();
                             for (unsigned int i = 0;
                                  i < cell->get_fe().dofs_per_face;
                                  ++i)
-                              if ((*master_dof_masks[dominating_fe_index]
-                                                    [cell->active_fe_index()])
+                              if ((*primary_dof_masks[dominating_fe_index]
+                                                     [cell->active_fe_index()])
                                     [i] == true)
-                                master_dofs.push_back(scratch_dofs[i]);
+                                primary_dofs.push_back(scratch_dofs[i]);
                               else
-                                slave_dofs.push_back(scratch_dofs[i]);
+                                dependent_dofs.push_back(scratch_dofs[i]);
 
-                            AssertDimension(master_dofs.size(),
+                            AssertDimension(primary_dofs.size(),
                                             dominating_fe.dofs_per_face);
-                            AssertDimension(slave_dofs.size(),
+                            AssertDimension(dependent_dofs.size(),
                                             cell->get_fe().dofs_per_face -
                                               dominating_fe.dofs_per_face);
 
-                            filter_constraints(master_dofs,
-                                               slave_dofs,
+                            filter_constraints(primary_dofs,
+                                               dependent_dofs,
                                                constraint_matrix,
                                                constraints);
 
@@ -1672,14 +1680,15 @@ namespace DoFTools
 
                             restrict_secondface_to_virtual.mmult(
                               constraint_matrix,
-                              restrict_mother_to_virtual_master_inv);
+                              restrict_mother_to_virtual_primary_inv);
 
-                            slave_dofs.resize(neighbor->get_fe().dofs_per_face);
+                            dependent_dofs.resize(
+                              neighbor->get_fe().dofs_per_face);
                             cell->face(face)->get_dof_indices(
-                              slave_dofs, neighbor->active_fe_index());
+                              dependent_dofs, neighbor->active_fe_index());
 
-                            filter_constraints(master_dofs,
-                                               slave_dofs,
+                            filter_constraints(primary_dofs,
+                                               dependent_dofs,
                                                constraint_matrix,
                                                constraints);
 

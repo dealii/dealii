@@ -73,7 +73,7 @@ LogStream::Prefix::~Prefix()
 
 
 LogStream::LogStream()
-  : master_thread(std::this_thread::get_id())
+  : parent_thread(std::this_thread::get_id())
   , std_out(&std::cout)
   , file(nullptr)
   , std_depth(0)
@@ -389,7 +389,7 @@ LogStream::get_prefixes() const
   // from the initial thread that created logstream.
   if (!exists)
     {
-      auto it = prefixes.data.find(master_thread);
+      auto it = prefixes.data.find(parent_thread);
       if (it != prefixes.data.end())
         local_prefixes = it->second;
     }
