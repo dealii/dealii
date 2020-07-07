@@ -64,6 +64,17 @@ namespace Particles
      * whether this is a valid location in the simulation domain.
      *
      * @param [in] new_location The new location for this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_location(const Point<spacedim> &new_location);
@@ -81,6 +92,17 @@ namespace Particles
      *
      * @param [in] new_reference_location The new reference location for
      * this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_reference_location(const Point<dim> &new_reference_location);
@@ -119,6 +141,17 @@ namespace Particles
      *
      * @param [in] new_properties A vector containing the
      * new properties for this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_properties(const std::vector<double> &new_properties);
@@ -128,6 +161,17 @@ namespace Particles
      *
      * @param [in] new_properties An ArrayView pointing to memory locations
      * containing the new properties for this particle.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in @ref GlossGhostedVector "vectors with ghost elements"
+     *   or @ref GlossGhostCells "ghost cells": In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
      */
     void
     set_properties(const ArrayView<const double> &new_properties);
