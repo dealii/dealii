@@ -585,10 +585,19 @@ namespace internal
         /*
          * Default implementation used in 1d and 2d
          *
-         * In 1d and 2d, face_orientation is always true
+         * In 1d, face_orientation is always true
          */
 
         return true;
+      }
+
+
+      template <int spacedim>
+      inline static bool
+      face_orientation(const TriaAccessor<2, 2, spacedim> &accessor,
+                       const unsigned int                  face)
+      {
+        return line_orientation(accessor, face);
       }
 
 
