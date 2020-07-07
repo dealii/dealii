@@ -407,7 +407,8 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
 /**
  * Similar to the previous apply_transformation().
  * Each row of the result corresponds to one of the rows of @p D_X transformed
- * by @p grad_F, equivalent to $\text{D\_X} \, \text{grad\_F}^T$ in matrix notation.
+ * by @p grad_F, equivalent to $\mathrm{D\_X} \, \mathrm{grad\_F}^T$ in matrix
+ * notation.
  *
  * @relatesalso DerivativeForm
  */
