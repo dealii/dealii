@@ -340,10 +340,29 @@ namespace CUDAWrappers
       LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const;
 
     /**
+     * Return the partitioner that represents the locally owned data and the
+     * ghost indices where access is needed to for the cell loop. The
+     * partitioner is constructed from the locally owned dofs and ghost dofs
+     * given by the respective fields. If you want to have specific information
+     * about these objects, you can query them with the respective access
+     * functions. If you just want to initialize a (parallel) vector, you should
+     * usually prefer this data structure as the data exchange information can
+     * be reused from one vector to another.
+     */
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &
+    get_vector_partitioner() const;
+
+    /**
      * Free all the memory allocated.
      */
     void
     free();
+
+    /**
+     * Return the DoFHandler.
+     */
+    const DoFHandler<dim> &
+    get_dof_handler() const;
 
     /**
      * Return an approximation of the memory consumption of this class in bytes.
@@ -592,6 +611,11 @@ namespace CUDAWrappers
      */
     std::vector<unsigned int> row_start;
 
+    /**
+     * Pointer to the DoFHandler associated with the object.
+     */
+    const DoFHandler<dim> *dof_handler;
+
     friend class internal::ReinitHelper<dim, Number>;
   };
 
@@ -654,7 +678,7 @@ namespace CUDAWrappers
   }
 
 
-
+  /*----------------------- Helper functions ---------------------------------*/
   /**
    * Compute the quadrature point index in the local cell of a given thread.
    *
@@ -709,6 +733,30 @@ namespace CUDAWrappers
     return *(data->q_points + data->padding_length * cell +
              q_point_id_in_cell<dim>(n_q_points_1d));
   }
+
+
+  /*----------------------- Inline functions ---------------------------------*/
+
+#  ifndef DOXYGEN
+
+  template <int dim, typename Number>
+  const std::shared_ptr<const Utilities::MPI::Partitioner> &
+  MatrixFree<dim, Number>::get_vector_partitioner() const
+  {
+    return partitioner;
+  }
+
+  template <int dim, typename Number>
+  const DoFHandler<dim> &
+  MatrixFree<dim, Number>::get_dof_handler() const
+  {
+    Assert(dof_handler != nullptr, ExcNotInitialized());
+
+    return *dof_handler;
+  }
+
+#  endif
+
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
