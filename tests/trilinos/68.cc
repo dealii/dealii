@@ -83,6 +83,8 @@ test(TrilinosWrappers::SparseMatrix &m)
 
   m.clear_row(N / 2, rnd);
 
+  Assert(m.el(N / 2, N / 2) == rnd, ExcInternalError());
+
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
 
