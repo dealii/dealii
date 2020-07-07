@@ -89,11 +89,8 @@ public:
   /**
    * Initialize the data cache by getting the support points from a Gmsh file
    * read through GridIn::read_msh(). Currently mesh refinement is not
-   * supported.
-   *
-   * Note that the cache is
-   * invalidated upon the signal Triangulation::Signals::any_change of the
-   * underlying triangulation.
+   * supported. Note that the cache is invalidated upon the signal
+   * Triangulation::Signals::any_change of the underlying triangulation.
    */
   void
   initialize(const Triangulation<dim, spacedim> &             triangulation,

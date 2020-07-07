@@ -1,16 +1,17 @@
 
+DEAL:quad9_1ele_dim2_spacedim2::Print vertices
 DEAL:quad9_1ele_dim2_spacedim2::0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::0.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::
-DEAL:quad9_1ele_dim2_spacedim2::MappingQ(1)
+DEAL:quad9_1ele_dim2_spacedim2::MappingQ(1) - vertices
 DEAL:quad9_1ele_dim2_spacedim2::0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::0.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::
-DEAL:quad9_1ele_dim2_spacedim2::MappingQ(2)
+DEAL:quad9_1ele_dim2_spacedim2::MappingQ(2) - vertices plus support points
 DEAL:quad9_1ele_dim2_spacedim2::0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::0.500000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 0.00000
@@ -21,18 +22,7 @@ DEAL:quad9_1ele_dim2_spacedim2::0.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::0.500000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::
-DEAL:quad9_1ele_dim2_spacedim2::MappingQ2()
-DEAL:quad9_1ele_dim2_spacedim2::0.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim2::0.500000 0.00000
-DEAL:quad9_1ele_dim2_spacedim2::1.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim2::0.00000 0.500000
-DEAL:quad9_1ele_dim2_spacedim2::0.600000 0.600000
-DEAL:quad9_1ele_dim2_spacedim2::1.00000 0.500000
-DEAL:quad9_1ele_dim2_spacedim2::0.00000 1.00000
-DEAL:quad9_1ele_dim2_spacedim2::0.500000 1.00000
-DEAL:quad9_1ele_dim2_spacedim2::1.00000 1.00000
-DEAL:quad9_1ele_dim2_spacedim2::
-DEAL:quad9_1ele_dim2_spacedim2::MappingQCache(2)
+DEAL:quad9_1ele_dim2_spacedim2::MappingQCache(2) - vertices plus support points
 DEAL:quad9_1ele_dim2_spacedim2::0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::0.500000 0.00000
 DEAL:quad9_1ele_dim2_spacedim2::1.00000 0.00000
@@ -45,18 +35,19 @@ DEAL:quad9_1ele_dim2_spacedim2::1.00000 1.00000
 DEAL:quad9_1ele_dim2_spacedim2::
 DEAL:quad9_1ele_dim2_spacedim2::END OF TEST
 DEAL:quad9_1ele_dim2_spacedim2::
+DEAL:quad9_1ele_dim2_spacedim3::Print vertices
 DEAL:quad9_1ele_dim2_spacedim3::0.00000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::0.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::
-DEAL:quad9_1ele_dim2_spacedim3::MappingQ(1)
+DEAL:quad9_1ele_dim2_spacedim3::MappingQ(1) - vertices
 DEAL:quad9_1ele_dim2_spacedim3::0.00000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::0.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::
-DEAL:quad9_1ele_dim2_spacedim3::MappingQ(2)
+DEAL:quad9_1ele_dim2_spacedim3::MappingQ(2) - vertices plus support points
 DEAL:quad9_1ele_dim2_spacedim3::0.00000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::0.500000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 0.00000 0.00000
@@ -67,18 +58,7 @@ DEAL:quad9_1ele_dim2_spacedim3::0.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::0.500000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::
-DEAL:quad9_1ele_dim2_spacedim3::MappingQ2()
-DEAL:quad9_1ele_dim2_spacedim3::0.00000 0.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::0.500000 0.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::1.00000 0.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::0.00000 0.500000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::0.600000 0.600000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::1.00000 0.500000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::0.00000 1.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::0.500000 1.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::1.00000 1.00000 0.00000
-DEAL:quad9_1ele_dim2_spacedim3::
-DEAL:quad9_1ele_dim2_spacedim3::MappingQCache(2)
+DEAL:quad9_1ele_dim2_spacedim3::MappingQCache(2) - vertices plus support points
 DEAL:quad9_1ele_dim2_spacedim3::0.00000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::0.500000 0.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::1.00000 0.00000 0.00000
@@ -91,29 +71,19 @@ DEAL:quad9_1ele_dim2_spacedim3::1.00000 1.00000 0.00000
 DEAL:quad9_1ele_dim2_spacedim3::
 DEAL:quad9_1ele_dim2_spacedim3::END OF TEST
 DEAL:quad9_1ele_dim2_spacedim3::
+DEAL:quad9_4ele_dim2_spacedim2_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2)
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 1.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.750000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.250000 1.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.250000 0.750000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.250000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.750000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ2()
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
@@ -124,7 +94,7 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
@@ -135,29 +105,19 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
+DEAL:quad9_4ele_dim2_spacedim2_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2)
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.250000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.250000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.250000 0.250000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.250000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ2()
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.00000
@@ -168,7 +128,7 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.00000 0.00000
@@ -179,29 +139,19 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
+DEAL:quad9_4ele_dim2_spacedim2_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2)
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.750000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.750000 1.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.750000 0.750000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.750000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 1.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.750000
-DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ2()
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
@@ -212,7 +162,7 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
@@ -223,18 +173,19 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 1.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.750000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
+DEAL:quad9_4ele_dim2_spacedim2_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
@@ -245,18 +196,7 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQ2()
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.250000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.750000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.750000 0.250000
-DEAL:quad9_4ele_dim2_spacedim2_v4::0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.500000
-DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.250000
-DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim2_v4::
-DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim2_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.500000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.250000
 DEAL:quad9_4ele_dim2_spacedim2_v4::0.500000 0.00000
@@ -269,29 +209,19 @@ DEAL:quad9_4ele_dim2_spacedim2_v4::1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim2_v4::
 DEAL:quad9_4ele_dim2_spacedim2_v4::END OF TEST
 DEAL:quad9_4ele_dim2_spacedim2_v4::
+DEAL:quad9_4ele_dim2_spacedim3_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2)
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.250000 1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.250000 0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.250000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ2()
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
@@ -302,7 +232,7 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
@@ -313,29 +243,19 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
+DEAL:quad9_4ele_dim2_spacedim3_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2)
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.250000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.250000 0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.250000 0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ2()
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.00000 0.00000
@@ -346,7 +266,7 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.00000 0.00000 0.00000
@@ -357,29 +277,19 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
+DEAL:quad9_4ele_dim2_spacedim3_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2)
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.750000 1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.750000 0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.750000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 1.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.750000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ2()
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
@@ -390,7 +300,7 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
@@ -401,18 +311,19 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 1.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.750000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
+DEAL:quad9_4ele_dim2_spacedim3_v4::Print vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(1) - vertices
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
@@ -423,18 +334,7 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQ2()
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.750000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.750000 0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::0.750000 0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.500000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.250000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.00000 0.00000
-DEAL:quad9_4ele_dim2_spacedim3_v4::
-DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2)
+DEAL:quad9_4ele_dim2_spacedim3_v4::MappingQCache(2) - vertices plus support points
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.500000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.250000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::0.500000 0.00000 0.00000
@@ -447,6 +347,7 @@ DEAL:quad9_4ele_dim2_spacedim3_v4::1.00000 0.00000 0.00000
 DEAL:quad9_4ele_dim2_spacedim3_v4::
 DEAL:quad9_4ele_dim2_spacedim3_v4::END OF TEST
 DEAL:quad9_4ele_dim2_spacedim3_v4::
+DEAL:hex27_1ele::Print vertices
 DEAL:hex27_1ele::0.00000 0.00000 1.00000
 DEAL:hex27_1ele::1.00000 0.00000 1.00000
 DEAL:hex27_1ele::0.00000 0.00000 0.00000
@@ -456,7 +357,7 @@ DEAL:hex27_1ele::1.00000 1.00000 1.00000
 DEAL:hex27_1ele::0.00000 1.00000 0.00000
 DEAL:hex27_1ele::1.00000 1.00000 0.00000
 DEAL:hex27_1ele::
-DEAL:hex27_1ele::MappingQ(1)
+DEAL:hex27_1ele::MappingQ(1) - vertices
 DEAL:hex27_1ele::0.00000 0.00000 1.00000
 DEAL:hex27_1ele::1.00000 0.00000 1.00000
 DEAL:hex27_1ele::0.00000 0.00000 0.00000
@@ -466,7 +367,7 @@ DEAL:hex27_1ele::1.00000 1.00000 1.00000
 DEAL:hex27_1ele::0.00000 1.00000 0.00000
 DEAL:hex27_1ele::1.00000 1.00000 0.00000
 DEAL:hex27_1ele::
-DEAL:hex27_1ele::MappingQ(2)
+DEAL:hex27_1ele::MappingQ(2) - vertices plus support points
 DEAL:hex27_1ele::0.00000 0.00000 1.00000
 DEAL:hex27_1ele::0.500000 0.00000 1.00000
 DEAL:hex27_1ele::1.00000 0.00000 1.00000
@@ -495,36 +396,7 @@ DEAL:hex27_1ele::0.00000 1.00000 0.00000
 DEAL:hex27_1ele::0.500000 1.00000 0.00000
 DEAL:hex27_1ele::1.00000 1.00000 0.00000
 DEAL:hex27_1ele::
-DEAL:hex27_1ele::MappingQ2()
-DEAL:hex27_1ele::0.00000 0.00000 1.00000
-DEAL:hex27_1ele::0.500000 0.00000 1.00000
-DEAL:hex27_1ele::1.00000 0.00000 1.00000
-DEAL:hex27_1ele::0.00000 0.00000 0.500000
-DEAL:hex27_1ele::0.500000 0.00000 0.500000
-DEAL:hex27_1ele::1.00000 0.00000 0.500000
-DEAL:hex27_1ele::0.00000 0.00000 0.00000
-DEAL:hex27_1ele::0.500000 0.00000 0.00000
-DEAL:hex27_1ele::1.00000 0.00000 0.00000
-DEAL:hex27_1ele::0.00000 0.500000 1.00000
-DEAL:hex27_1ele::0.500000 0.500000 1.00000
-DEAL:hex27_1ele::1.00000 0.500000 1.00000
-DEAL:hex27_1ele::0.00000 0.500000 0.500000
-DEAL:hex27_1ele::0.600000 0.600000 0.600000
-DEAL:hex27_1ele::1.00000 0.500000 0.500000
-DEAL:hex27_1ele::0.00000 0.500000 0.00000
-DEAL:hex27_1ele::0.500000 0.500000 0.00000
-DEAL:hex27_1ele::1.00000 0.500000 0.00000
-DEAL:hex27_1ele::0.00000 1.00000 1.00000
-DEAL:hex27_1ele::0.500000 1.00000 1.00000
-DEAL:hex27_1ele::1.00000 1.00000 1.00000
-DEAL:hex27_1ele::0.00000 1.00000 0.500000
-DEAL:hex27_1ele::0.500000 1.00000 0.500000
-DEAL:hex27_1ele::1.00000 1.00000 0.500000
-DEAL:hex27_1ele::0.00000 1.00000 0.00000
-DEAL:hex27_1ele::0.500000 1.00000 0.00000
-DEAL:hex27_1ele::1.00000 1.00000 0.00000
-DEAL:hex27_1ele::
-DEAL:hex27_1ele::MappingQCache(2)
+DEAL:hex27_1ele::MappingQCache(2) - vertices plus support points
 DEAL:hex27_1ele::0.00000 0.00000 1.00000
 DEAL:hex27_1ele::0.500000 0.00000 1.00000
 DEAL:hex27_1ele::1.00000 0.00000 1.00000
@@ -555,6 +427,7 @@ DEAL:hex27_1ele::1.00000 1.00000 0.00000
 DEAL:hex27_1ele::
 DEAL:hex27_1ele::END OF TEST
 DEAL:hex27_1ele::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
@@ -564,7 +437,7 @@ DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
@@ -574,7 +447,7 @@ DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
@@ -603,7 +476,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.250000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
@@ -632,35 +505,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.250000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.250000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.00000 1.00000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.250000 0.250000 0.750000
-DEAL:hex27_8ele_v2::0.250000 0.00000 0.750000
-DEAL:hex27_8ele_v2::0.250000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.250000 0.250000 1.00000
-DEAL:hex27_8ele_v2::0.250000 0.00000 1.00000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.00000 0.250000 0.750000
-DEAL:hex27_8ele_v2::0.00000 0.00000 0.750000
-DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.00000 0.250000 1.00000
-DEAL:hex27_8ele_v2::0.00000 0.00000 1.00000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
@@ -670,7 +515,7 @@ DEAL:hex27_8ele_v2::0.00000 0.00000 0.00000
 DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
@@ -680,7 +525,7 @@ DEAL:hex27_8ele_v2::0.00000 0.00000 0.00000
 DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.250000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
@@ -709,7 +554,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.250000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.250000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
@@ -738,35 +583,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.250000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.250000 0.250000 0.00000
-DEAL:hex27_8ele_v2::0.250000 0.00000 0.00000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.250000 0.250000 0.250000
-DEAL:hex27_8ele_v2::0.250000 0.00000 0.250000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.00000 0.250000 0.00000
-DEAL:hex27_8ele_v2::0.00000 0.00000 0.00000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.00000 0.250000 0.250000
-DEAL:hex27_8ele_v2::0.00000 0.00000 0.250000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.00000 0.500000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
@@ -776,7 +593,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.00000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
@@ -786,7 +603,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.00000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
@@ -815,7 +632,7 @@ DEAL:hex27_8ele_v2::0.00000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.750000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
@@ -844,35 +661,7 @@ DEAL:hex27_8ele_v2::0.00000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.750000 1.00000
 DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.750000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.250000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.250000 1.00000 0.750000
-DEAL:hex27_8ele_v2::0.250000 0.750000 0.750000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.250000 1.00000 1.00000
-DEAL:hex27_8ele_v2::0.250000 0.750000 1.00000
-DEAL:hex27_8ele_v2::0.250000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.00000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.00000 1.00000 0.750000
-DEAL:hex27_8ele_v2::0.00000 0.750000 0.750000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.00000 1.00000 1.00000
-DEAL:hex27_8ele_v2::0.00000 0.750000 1.00000
-DEAL:hex27_8ele_v2::0.00000 0.500000 1.00000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
@@ -882,7 +671,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
@@ -892,7 +681,7 @@ DEAL:hex27_8ele_v2::0.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.750000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
@@ -921,7 +710,7 @@ DEAL:hex27_8ele_v2::0.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.750000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.750000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
@@ -950,35 +739,7 @@ DEAL:hex27_8ele_v2::0.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.750000 0.500000
 DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.250000 1.00000 0.00000
-DEAL:hex27_8ele_v2::0.250000 0.750000 0.00000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.250000 1.00000 0.250000
-DEAL:hex27_8ele_v2::0.250000 0.750000 0.250000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.250000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.250000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.00000 1.00000 0.00000
-DEAL:hex27_8ele_v2::0.00000 0.750000 0.00000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.00000 1.00000 0.250000
-DEAL:hex27_8ele_v2::0.00000 0.750000 0.250000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.00000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.500000 1.00000
@@ -988,7 +749,7 @@ DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.500000 1.00000
@@ -998,7 +759,7 @@ DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.250000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.500000
@@ -1027,7 +788,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.250000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.250000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.500000
@@ -1056,35 +817,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.250000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.00000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.250000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.00000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.750000
-DEAL:hex27_8ele_v2::1.00000 0.250000 0.750000
-DEAL:hex27_8ele_v2::1.00000 0.00000 0.750000
-DEAL:hex27_8ele_v2::1.00000 0.500000 1.00000
-DEAL:hex27_8ele_v2::1.00000 0.250000 1.00000
-DEAL:hex27_8ele_v2::1.00000 0.00000 1.00000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.750000 0.250000 0.750000
-DEAL:hex27_8ele_v2::0.750000 0.00000 0.750000
-DEAL:hex27_8ele_v2::0.750000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.750000 0.250000 1.00000
-DEAL:hex27_8ele_v2::0.750000 0.00000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.250000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.00000 1.00000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
@@ -1094,7 +827,7 @@ DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
@@ -1104,7 +837,7 @@ DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.250000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.00000
@@ -1133,7 +866,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.250000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.00000 0.00000
@@ -1162,35 +895,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
-DEAL:hex27_8ele_v2::1.00000 0.250000 0.00000
-DEAL:hex27_8ele_v2::1.00000 0.00000 0.00000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.250000
-DEAL:hex27_8ele_v2::1.00000 0.250000 0.250000
-DEAL:hex27_8ele_v2::1.00000 0.00000 0.250000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.250000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.750000 0.250000 0.00000
-DEAL:hex27_8ele_v2::0.750000 0.00000 0.00000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.750000 0.250000 0.250000
-DEAL:hex27_8ele_v2::0.750000 0.00000 0.250000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.250000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.00000 0.500000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::1.00000 1.00000 1.00000
@@ -1200,7 +905,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
 DEAL:hex27_8ele_v2::1.00000 1.00000 1.00000
@@ -1210,7 +915,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.750000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
@@ -1239,7 +944,7 @@ DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.750000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.750000 0.500000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
@@ -1268,35 +973,7 @@ DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.750000 1.00000
 DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
-DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.750000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::1.00000 1.00000 0.750000
-DEAL:hex27_8ele_v2::1.00000 0.750000 0.750000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.750000
-DEAL:hex27_8ele_v2::1.00000 1.00000 1.00000
-DEAL:hex27_8ele_v2::1.00000 0.750000 1.00000
-DEAL:hex27_8ele_v2::1.00000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.750000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.750000 1.00000 0.750000
-DEAL:hex27_8ele_v2::0.750000 0.750000 0.750000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.750000 1.00000 1.00000
-DEAL:hex27_8ele_v2::0.750000 0.750000 1.00000
-DEAL:hex27_8ele_v2::0.750000 0.500000 1.00000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.750000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.750000
-DEAL:hex27_8ele_v2::0.500000 1.00000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.750000 1.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 1.00000
-DEAL:hex27_8ele_v2::
+DEAL:hex27_8ele_v2::Print vertices
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
@@ -1306,7 +983,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(1)
+DEAL:hex27_8ele_v2::MappingQ(1) - vertices
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
@@ -1316,7 +993,7 @@ DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
 DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ(2)
+DEAL:hex27_8ele_v2::MappingQ(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.750000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
@@ -1345,36 +1022,7 @@ DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
 DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
 DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQ2()
-DEAL:hex27_8ele_v2::1.00000 1.00000 0.00000
-DEAL:hex27_8ele_v2::1.00000 0.750000 0.00000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000
-DEAL:hex27_8ele_v2::1.00000 1.00000 0.250000
-DEAL:hex27_8ele_v2::1.00000 0.750000 0.250000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.250000
-DEAL:hex27_8ele_v2::1.00000 1.00000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.750000 0.500000
-DEAL:hex27_8ele_v2::1.00000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.750000 1.00000 0.00000
-DEAL:hex27_8ele_v2::0.750000 0.750000 0.00000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.750000 1.00000 0.250000
-DEAL:hex27_8ele_v2::0.750000 0.750000 0.250000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.750000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.750000 0.500000 0.500000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.00000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.00000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.250000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.250000
-DEAL:hex27_8ele_v2::0.500000 1.00000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.750000 0.500000
-DEAL:hex27_8ele_v2::0.500000 0.500000 0.500000
-DEAL:hex27_8ele_v2::
-DEAL:hex27_8ele_v2::MappingQCache(2)
+DEAL:hex27_8ele_v2::MappingQCache(2) - vertices plus support points
 DEAL:hex27_8ele_v2::1.00000 1.00000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.750000 0.00000
 DEAL:hex27_8ele_v2::1.00000 0.500000 0.00000

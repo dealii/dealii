@@ -483,7 +483,7 @@ public:
   read_xda(std::istream &in);
 
   /**
-   * Read grid data from an msh file with linear elements, either version 1
+   * Read grid data from a msh file with linear elements, either version 1
    * or version 2 of that file format. The %Gmsh formats are documented at
    * http://www.gmsh.info/.
    *
@@ -500,8 +500,9 @@ public:
    * (Quadrangels with 9 nodes, i.e. 4 vertices plus 5 support points or
    * Hexahedra with 27 nodes, i.e. 8 vertices plus 19 support points) and
    * stores the location of the support points for each cell in the vector
-   * @p support_points. This vector can then be used as an input to create
-   * a quadratic mapping, MappingQ2. See the MappingQ2 class for more details.
+   * @p support_points. This vector can then be used, for example, as an
+   * input to create a quadratic mapping by using MappingQCache. See the
+   * MappingQCache class for more details.
    *
    * @param in The file to read from
    * @param support_points Vector storing the support points of each cell

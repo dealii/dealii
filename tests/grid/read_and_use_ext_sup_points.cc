@@ -14,11 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-// read a file in the MSH format with quadratic elements
-// created by the GMSH program. Use the additional support
-// points to create a quadratic mapping.
-
-#include "../../include/deal.II/fe/mapping_q2.h"
+// Read a file in the MSH format with quadratic elements
+// (quad9 or hex28) created by the GMSH program. Use the additional
+// support points to construct a quadratic mapping using MappingQCache
+// with a new initialize function.
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -64,13 +63,11 @@ check_file(const std::string file_name)
   // create different mappings for comparison
   // MappingGeneric with polynomial degree 1
   MappingQGeneric<dim, spacedim> mapping_1(1);
-  // New MappingQ2 (always with polynomial degree 2) and
-  // additional input parameter support_points
-  MappingQ2<dim, spacedim> mapping_2(support_points);
 
-  // added functionality to MaapingQCache
-  MappingQCache<dim, spacedim> mapping_3(2);
-  mapping_3.initialize(tria, support_points);
+  // test added functionality to MappingQCache
+  MappingQCache<dim, spacedim> mapping_2(2);
+  // initialize MappingQCache with support point vector
+  mapping_2.initialize(tria, support_points);
 
   // create quadrature rules. Use GaussLobatto since the quadrature
   // points correspond to the support points
@@ -86,22 +83,24 @@ check_file(const std::string file_name)
 
   // create different FEValues objects with the above mappings,
   // finite elements, and quadrature rules
+  // linear, MappingQ1
   FEValues<dim, spacedim> fe_values_1(mapping_1, fe_1, quad_1, flags);
+  // quadratic, MappingQ2
   FEValues<dim, spacedim> fe_values_2(mapping_1, fe_2, quad_2, flags);
+  // quadratic, MappingQCache(2) with support points
   FEValues<dim, spacedim> fe_values_3(mapping_2, fe_2, quad_2, flags);
-
-  FEValues<dim, spacedim> fe_values_4(mapping_3, fe_2, quad_2, flags);
 
   for (auto cell : tria.active_cell_iterators())
     {
       // print vertices
+      deallog << "Print vertices" << std::endl;
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         deallog << cell->vertex(v) << std::endl;
       deallog << std::endl;
 
       // print quadrature points, should be the same results as
       // above from print vertices
-      deallog << "MappingQ(1)" << std::endl;
+      deallog << "MappingQ(1) - vertices" << std::endl;
       fe_values_1.reinit(cell);
       for (auto q : fe_values_1.get_quadrature_points())
         deallog << q << std::endl;
@@ -109,7 +108,7 @@ check_file(const std::string file_name)
 
       // print quadrature points, since quadrature rule has degree 3
       // also support points are computed and printed.
-      deallog << "MappingQ(2)" << std::endl;
+      deallog << "MappingQ(2) - vertices plus support points" << std::endl;
       fe_values_2.reinit(cell);
       for (auto q : fe_values_2.get_quadrature_points())
         deallog << q << std::endl;
@@ -118,18 +117,9 @@ check_file(const std::string file_name)
       // print quadrature points, this time the support points should
       // be at the same location as specified in the input file, the
       // ordering will be different though.
-      deallog << "MappingQ2()" << std::endl;
+      deallog << "MappingQCache(2) - vertices plus support points" << std::endl;
       fe_values_3.reinit(cell);
       for (auto q : fe_values_3.get_quadrature_points())
-        deallog << q << std::endl;
-      deallog << std::endl;
-
-      // print quadrature points, this time the support points should
-      // be at the same location as specified in the input file, the
-      // ordering will be different though.
-      deallog << "MappingQCache(2)" << std::endl;
-      fe_values_4.reinit(cell);
-      for (auto q : fe_values_4.get_quadrature_points())
         deallog << q << std::endl;
       deallog << std::endl;
     }
@@ -144,22 +134,26 @@ main()
   // QUAD9 ELEMENTS
   // one quadrangle with 9 nodes, dim = spacedim = 2, Gmsh file version 2
   deallog.push("quad9_1ele_dim2_spacedim2");
-  check_file<2, 2>(std::string(SOURCE_DIR "/mapping_q2/quad9_1ele.msh"));
+  check_file<2, 2>(
+    std::string(SOURCE_DIR "/read_and_use_ext_sup_points/quad9_1ele.msh"));
   deallog.pop();
 
   // one quadrangle with 9 nodes, dim = 2 and spacedim = 3
   deallog.push("quad9_1ele_dim2_spacedim3");
-  check_file<2, 3>(std::string(SOURCE_DIR "/mapping_q2/quad9_1ele.msh"));
+  check_file<2, 3>(
+    std::string(SOURCE_DIR "/read_and_use_ext_sup_points/quad9_1ele.msh"));
   deallog.pop();
 
   // four 9-noded quadrangles, dim = spacedim = 2, Gmsh file version 4
   deallog.push("quad9_4ele_dim2_spacedim2_v4");
-  check_file<2, 2>(std::string(SOURCE_DIR "/mapping_q2/quad9_4ele_v4.msh"));
+  check_file<2, 2>(
+    std::string(SOURCE_DIR "/read_and_use_ext_sup_points/quad9_4ele_v4.msh"));
   deallog.pop();
 
   // four 9-noded quadrangles, dim = 2 and spacedim = 3, Gmsh file version 4
   deallog.push("quad9_4ele_dim2_spacedim3_v4");
-  check_file<2, 3>(std::string(SOURCE_DIR "/mapping_q2/quad9_4ele_v4.msh"));
+  check_file<2, 3>(
+    std::string(SOURCE_DIR "/read_and_use_ext_sup_points/quad9_4ele_v4.msh"));
   deallog.pop();
 
 
@@ -167,11 +161,13 @@ main()
   // HEX27 ELEMENTS
   // one hexadron with 27 nodes, dim = spacedim = 3, Gmsh file version 2
   deallog.push("hex27_1ele");
-  check_file<3, 3>(std::string(SOURCE_DIR "/mapping_q2/hex27_1ele.msh"));
+  check_file<3, 3>(
+    std::string(SOURCE_DIR "/read_and_use_ext_sup_points/hex27_1ele.msh"));
   deallog.pop();
 
   // 8 hexadra with 27 nodes, dim = spacedim = 3, Gmsh file version 2
   deallog.push("hex27_8ele_v2");
-  check_file<3, 3>(std::string(SOURCE_DIR "/mapping_q2/hex27_8ele_v2.msh"));
+  check_file<3, 3>(
+    std::string(SOURCE_DIR "/read_and_use_ext_sup_points/hex27_8ele_v2.msh"));
   deallog.pop();
 }
