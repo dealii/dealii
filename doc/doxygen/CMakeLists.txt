@@ -88,6 +88,8 @@ ENDIF()
 # To get at this, find all of the .inst.in files, strip all but the
 # directory name under $CMAKE_SOURCE_DIR/source, and then prepend
 # the build directory to it
+#
+# See options.dox.in where ${_inst_in_dirs} is later added to INCLUDE_PATH.
 FILE(GLOB _inst_in_files
      "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
 STRING(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
@@ -98,8 +100,7 @@ FOREACH (_dir ${_inst_in_dirs_y})
   SET(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
 ENDFOREACH()
 
-MESSAGE(STATUS "translated this into")
-MESSAGE(STATUS "found ${_inst_in_dirs}")
+MESSAGE(STATUS "Additional doxygen include paths: ${_inst_in_dirs}")
 
 # make sure doxygen sees the extra.sty stylefile:
 SET(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
