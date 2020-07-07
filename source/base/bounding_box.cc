@@ -315,6 +315,35 @@ BoundingBox<spacedim, Number>::cross_section(const unsigned int direction) const
 
 
 
+template <int spacedim, typename Number>
+Point<spacedim, Number>
+BoundingBox<spacedim, Number>::real_to_unit(
+  const Point<spacedim, Number> &point) const
+{
+  auto       unit = point;
+  const auto diag = boundary_points.second - boundary_points.first;
+  unit -= boundary_points.first;
+  for (unsigned int d = 0; d < spacedim; ++d)
+    unit[d] /= diag[d];
+  return unit;
+}
+
+
+
+template <int spacedim, typename Number>
+Point<spacedim, Number>
+BoundingBox<spacedim, Number>::unit_to_real(
+  const Point<spacedim, Number> &point) const
+{
+  auto       real = boundary_points.first;
+  const auto diag = boundary_points.second - boundary_points.first;
+  for (unsigned int d = 0; d < spacedim; ++d)
+    real[d] += diag[d] * point[d];
+  return real;
+}
+
+
+
 template <int dim, typename Number>
 BoundingBox<dim, Number>
 create_unit_bounding_box()
