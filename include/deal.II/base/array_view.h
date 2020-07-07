@@ -342,9 +342,9 @@ namespace internal
         {
           AssertCuda(cuda_error);
           if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
-            return attributes.memoryType == cudaMemoryTypeHost;
+            return attributes.type == cudaMemoryTypeHost;
           else
-            return attributes.memoryType == cudaMemoryTypeDevice;
+            return attributes.type == cudaMemoryTypeDevice;
         }
       else
         {
