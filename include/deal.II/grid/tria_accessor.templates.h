@@ -1050,6 +1050,23 @@ TriaAccessor<structdim, dim, spacedim>::vertex_iterator(
 
 
 template <int structdim, int dim, int spacedim>
+inline ReferenceCell::Type
+TriaAccessor<structdim, dim, spacedim>::reference_cell_type() const
+{
+  if (structdim == 0)
+    return ReferenceCell::Type::Vertex;
+  else if (structdim == 1)
+    return ReferenceCell::Type::Line;
+  else if (structdim == dim)
+    return this->tria->levels[this->present_level]
+      ->reference_cell_type[this->present_index];
+  else
+    return this->tria->faces->quad_reference_cell_type[this->present_index];
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::vertex_index(
   const unsigned int corner) const
@@ -3035,6 +3052,15 @@ inline bool
 TriaAccessor<0, 1, spacedim>::used() const
 {
   return tria->vertex_used(global_vertex_index);
+}
+
+
+
+template <int spacedim>
+inline ReferenceCell::Type
+TriaAccessor<0, 1, spacedim>::reference_cell_type() const
+{
+  return ReferenceCell::Type::Vertex;
 }
 
 
