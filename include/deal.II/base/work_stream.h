@@ -772,6 +772,50 @@ namespace WorkStream
               copier(copy_data);
           }
       }
+
+
+
+      /**
+       * Sequential version with colors
+       */
+      template <typename Worker,
+                typename Copier,
+                typename Iterator,
+                typename ScratchData,
+                typename CopyData>
+      void
+      run(const std::vector<std::vector<Iterator>> &colored_iterators,
+          Worker                                    worker,
+          Copier                                    copier,
+          const ScratchData &                       sample_scratch_data,
+          const CopyData &                          sample_copy_data)
+      {
+        // need to copy the sample since it is marked const
+        ScratchData scratch_data = sample_scratch_data;
+        CopyData    copy_data    = sample_copy_data; // NOLINT
+
+        // Optimization: Check if the functions are not the zero function. To
+        // check zero-ness, create a C++ function out of it:
+        const bool have_worker =
+          (static_cast<const std::function<
+             void(const Iterator &, ScratchData &, CopyData &)> &>(worker)) !=
+          nullptr;
+        const bool have_copier =
+          (static_cast<const std::function<void(const CopyData &)> &>(
+            copier)) != nullptr;
+
+        // Finally loop over all items and perform the necessary work:
+        for (unsigned int color = 0; color < colored_iterators.size(); ++color)
+          if (colored_iterators[color].size() > 0)
+            for (auto &it : colored_iterators[color])
+              {
+                if (have_worker)
+                  worker(it, scratch_data, copy_data);
+                if (have_copier)
+                  copier(copy_data);
+              }
+      }
+
     } // namespace sequential
 
 
@@ -1296,15 +1340,11 @@ namespace WorkStream
 
     // run all colors sequentially:
     {
-      for (unsigned int color = 0; color < colored_iterators.size(); ++color)
-        {
-          internal::sequential::run(*colored_iterators[color].begin(),
-                                    *colored_iterators[color].end(),
-                                    worker,
-                                    copier,
-                                    sample_scratch_data,
-                                    sample_copy_data);
-        }
+      internal::sequential::run(colored_iterators,
+                                worker,
+                                copier,
+                                sample_scratch_data,
+                                sample_copy_data);
     }
   }
 
