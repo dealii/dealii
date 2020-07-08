@@ -1684,27 +1684,33 @@ namespace GridTools
               {
                 auto cell = vertex_to_cells[closest_vertex_index].begin();
                 std::advance(cell, neighbor_permutation[i]);
-                const Point<dim> p_unit =
-                  mapping.transform_real_to_unit_cell(*cell, p);
-                if (GeometryInfo<dim>::is_inside_unit_cell(p_unit, tolerance))
+
+                if (!(*cell)->is_artificial())
                   {
-                    cell_and_position.first  = *cell;
-                    cell_and_position.second = p_unit;
-                    found_cell               = true;
-                    approx_cell              = false;
-                    break;
-                  }
-                // The point is not inside this cell: checking how far outside
-                // it is and whether we want to use this cell as a backup if we
-                // can't find a cell within which the point lies.
-                const double dist =
-                  GeometryInfo<dim>::distance_to_unit_cell(p_unit);
-                if (dist < best_distance)
-                  {
-                    best_distance                   = dist;
-                    cell_and_position_approx.first  = *cell;
-                    cell_and_position_approx.second = p_unit;
-                    approx_cell                     = true;
+                    const Point<dim> p_unit =
+                      mapping.transform_real_to_unit_cell(*cell, p);
+                    if (GeometryInfo<dim>::is_inside_unit_cell(p_unit,
+                                                               tolerance))
+                      {
+                        cell_and_position.first  = *cell;
+                        cell_and_position.second = p_unit;
+                        found_cell               = true;
+                        approx_cell              = false;
+                        break;
+                      }
+                    // The point is not inside this cell: checking how far
+                    // outside it is and whether we want to use this cell as a
+                    // backup if we can't find a cell within which the point
+                    // lies.
+                    const double dist =
+                      GeometryInfo<dim>::distance_to_unit_cell(p_unit);
+                    if (dist < best_distance)
+                      {
+                        best_distance                   = dist;
+                        cell_and_position_approx.first  = *cell;
+                        cell_and_position_approx.second = p_unit;
+                        approx_cell                     = true;
+                      }
                   }
               }
             catch (typename Mapping<dim>::ExcTransformationFailed &)
@@ -4602,14 +4608,33 @@ namespace GridTools
           return cell_qpoint_map;
 
         // We begin by finding the cell/transform of the first point
-        auto point_and_reference_location =
-          GridTools::find_active_cell_around_point(cache, points[0]);
+        std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
+                  Point<dim>>
+          point_and_reference_location;
+
+        unsigned int counter = 0;
+
+        while (counter < n_points)
+          try
+            {
+              unsigned int i = counter;
+              ++counter;
+
+              point_and_reference_location =
+                GridTools::find_active_cell_around_point(cache, points[i]);
+              break;
+            }
+          catch (...)
+            {
+              if (counter == n_points)
+                return cell_qpoint_map;
+            }
 
         auto last_cell = cell_qpoint_map.emplace(std::make_pair(
           point_and_reference_location.first,
           std::make_pair(
             std::vector<Point<dim>>{point_and_reference_location.second},
-            std::vector<unsigned int>{0})));
+            std::vector<unsigned int>{counter - 1})));
 
         // Now the second easy case.
         if (n_points == 1)
@@ -4621,17 +4646,31 @@ namespace GridTools
                                (0.5 + std::numeric_limits<double>::epsilon());
 
         // Cycle over all points left
-        for (unsigned int p = 1; p < n_points; ++p)
+        for (unsigned int p = counter; p < n_points; ++p)
           {
             // Checking if the point is close to the cell center, in which
             // case calling find active cell with a cell hint
             if (cell_center.distance(points[p]) < cell_diameter)
-              point_and_reference_location =
-                GridTools::find_active_cell_around_point(
-                  cache, points[p], last_cell.first->first);
+              try
+                {
+                  point_and_reference_location =
+                    GridTools::find_active_cell_around_point(
+                      cache, points[p], last_cell.first->first);
+                }
+              catch (...)
+                {
+                  continue;
+                }
             else
-              point_and_reference_location =
-                GridTools::find_active_cell_around_point(cache, points[p]);
+              try
+                {
+                  point_and_reference_location =
+                    GridTools::find_active_cell_around_point(cache, points[p]);
+                }
+              catch (...)
+                {
+                  continue;
+                }
 
             if (last_cell.first->first == point_and_reference_location.first)
               {
@@ -4681,8 +4720,6 @@ namespace GridTools
                                         map_entry.second.first.size()));
             inserted_points += map_entry.second.second.size();
           }
-        Assert(inserted_points == n_points,
-               ExcDimensionMismatch(inserted_points, n_points));
 #endif
         return cell_qpoint_map;
       }
