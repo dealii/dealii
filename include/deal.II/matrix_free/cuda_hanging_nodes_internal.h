@@ -20,6 +20,7 @@
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
+#  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/dofs/dof_accessor.h>
@@ -103,10 +104,8 @@ namespace CUDAWrappers
 
     namespace internal
     {
-      // TODO: use a template parameter instead of a macro
-#  define DEAL_II_MAX_ELEM_DEGREE 10
-      __constant__ double constraint_weights[(DEAL_II_MAX_ELEM_DEGREE + 1) *
-                                             (DEAL_II_MAX_ELEM_DEGREE + 1)];
+      __constant__ double
+        constraint_weights[(mf_max_elem_degree + 1) * (mf_max_elem_degree + 1)];
 
       // Here is the system for how we store constraint types in a binary mask.
       // This is not a complete contradiction-free system, i.e., there are
