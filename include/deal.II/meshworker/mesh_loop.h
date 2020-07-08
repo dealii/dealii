@@ -435,6 +435,42 @@ namespace MeshWorker
                                     copy);
                       }
                   }
+                else if (CellIteratorType::AccessorType::dimension == 1 &&
+                         cell->level() > neighbor->level())
+                  {
+                    // In one dimension, there is no other check to do
+                    const unsigned int neighbor_face_no =
+                      periodic_neighbor ?
+                        cell->periodic_neighbor_face_no(face_no) :
+                        cell->neighbor_face_no(face_no);
+                    Assert(periodic_neighbor ||
+                             neighbor->face(neighbor_face_no) ==
+                               cell->face(face_no),
+                           ExcInternalError());
+
+                    face_worker(cell,
+                                face_no,
+                                numbers::invalid_unsigned_int,
+                                neighbor,
+                                neighbor_face_no,
+                                numbers::invalid_unsigned_int,
+                                scratch,
+                                copy);
+
+                    if (flags & assemble_own_interior_faces_both)
+                      {
+                        // If own faces are to be assembled from both sides,
+                        // call the faceworker again with swapped arguments.
+                        face_worker(neighbor,
+                                    neighbor_face_no,
+                                    numbers::invalid_unsigned_int,
+                                    cell,
+                                    face_no,
+                                    numbers::invalid_unsigned_int,
+                                    scratch,
+                                    copy);
+                      }
+                  }
                 else
                   {
                     // If iterator is active and neighbor is refined, skip
