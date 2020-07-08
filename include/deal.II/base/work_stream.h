@@ -1015,6 +1015,49 @@ namespace WorkStream
         const ScratchData &sample_scratch_data;
         const CopyData &   sample_copy_data;
       };
+
+      /**
+       * The colored run function using TBB.
+       */
+      template <typename Worker,
+                typename Copier,
+                typename Iterator,
+                typename ScratchData,
+                typename CopyData>
+      void
+      run(const std::vector<std::vector<Iterator>> &colored_iterators,
+          Worker                                    worker,
+          Copier                                    copier,
+          const ScratchData &                       sample_scratch_data,
+          const CopyData &                          sample_copy_data,
+          const unsigned int                        chunk_size)
+      {
+        // loop over the various colors of what we're given
+        for (unsigned int color = 0; color < colored_iterators.size(); ++color)
+          if (colored_iterators[color].size() > 0)
+            {
+              using WorkerAndCopier = internal::tbb_colored::
+                WorkerAndCopier<Iterator, ScratchData, CopyData>;
+
+              using RangeType = typename std::vector<Iterator>::const_iterator;
+
+              WorkerAndCopier worker_and_copier(worker,
+                                                copier,
+                                                sample_scratch_data,
+                                                sample_copy_data);
+
+              parallel::internal::parallel_for(
+                colored_iterators[color].begin(),
+                colored_iterators[color].end(),
+                [&worker_and_copier](
+                  const tbb::blocked_range<
+                    typename std::vector<Iterator>::const_iterator> &range) {
+                  worker_and_copier(range);
+                },
+                chunk_size);
+            }
+      }
+
     }    // namespace tbb_colored
 #  endif // DEAL_II_WITH_TBB
 
@@ -1308,30 +1351,12 @@ namespace WorkStream
     if (MultithreadInfo::n_threads() > 1)
       {
 #  ifdef DEAL_II_WITH_TBB
-        // loop over the various colors of what we're given
-        for (unsigned int color = 0; color < colored_iterators.size(); ++color)
-          if (colored_iterators[color].size() > 0)
-            {
-              using WorkerAndCopier = internal::tbb_colored::
-                WorkerAndCopier<Iterator, ScratchData, CopyData>;
-
-              using RangeType = typename std::vector<Iterator>::const_iterator;
-
-              WorkerAndCopier worker_and_copier(worker,
-                                                copier,
-                                                sample_scratch_data,
-                                                sample_copy_data);
-
-              parallel::internal::parallel_for(
-                colored_iterators[color].begin(),
-                colored_iterators[color].end(),
-                [&worker_and_copier](
-                  const tbb::blocked_range<
-                    typename std::vector<Iterator>::const_iterator> &range) {
-                  worker_and_copier(range);
-                },
-                chunk_size);
-            }
+        internal::tbb_colored::run(colored_iterators,
+                                   worker,
+                                   copier,
+                                   sample_scratch_data,
+                                   sample_copy_data,
+                                   chunk_size);
 
         // exit this function to not run the sequential version below:
         return;
