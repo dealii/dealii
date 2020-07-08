@@ -67,15 +67,15 @@ process "source" ".*\.inst.in" format_inst
 # Fix permissions and convert to unix line ending if necessary:
 #
 
-process "tests include source examples contrib/python-bindings" \
+process "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-process "tests include source examples contrib/python-bindings" \
+process "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix
 
 #
 # Removing trailing whitespace
 #
 
-process "include source examples contrib/python-bindings doc" \
+process "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|cu|cuh|html|dox|txt)" remove_trailing_whitespace
