@@ -153,7 +153,6 @@ namespace GridOutFlags
                    const bool         write_additional_boundary_lines)
     : write_cell_numbers(write_cell_numbers)
     , n_extra_curved_line_points(n_extra_curved_line_points)
-    , n_boundary_face_points(this->n_extra_curved_line_points)
     , curved_inner_cells(curved_inner_cells)
     , write_additional_boundary_lines(write_additional_boundary_lines)
   {}
@@ -194,8 +193,8 @@ namespace GridOutFlags
   void
   Gnuplot::parse_parameters(ParameterHandler &param)
   {
-    write_cell_numbers     = param.get_bool("Cell number");
-    n_boundary_face_points = param.get_integer("Boundary points");
+    write_cell_numbers         = param.get_bool("Cell number");
+    n_extra_curved_line_points = param.get_integer("Boundary points");
   }
 
 
@@ -4029,7 +4028,7 @@ namespace internal
       const int dim = 2;
 
       const unsigned int n_additional_points =
-        gnuplot_flags.n_boundary_face_points;
+        gnuplot_flags.n_extra_curved_line_points;
       const unsigned int n_points = 2 + n_additional_points;
 
       // If we need to plot curved lines then generate a quadrature formula to
@@ -4140,7 +4139,7 @@ namespace internal
       const int dim = 3;
 
       const unsigned int n_additional_points =
-        gnuplot_flags.n_boundary_face_points;
+        gnuplot_flags.n_extra_curved_line_points;
       const unsigned int n_points = 2 + n_additional_points;
 
       // If we need to plot curved lines then generate a quadrature formula to
