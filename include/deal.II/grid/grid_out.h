@@ -280,19 +280,6 @@ namespace GridOutFlags
             const bool         write_additional_boundary_lines = true);
 
     /**
-     * Copy constructor. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot(const Gnuplot &flags);
-
-    /**
-     * Copy operator. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot &
-    operator=(const Gnuplot &flags);
-
-    /**
      * Declare parameters in ParameterHandler.
      */
     static void

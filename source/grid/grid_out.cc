@@ -158,29 +158,6 @@ namespace GridOutFlags
   {}
 
 
-  // TODO we can get rid of these extra constructors and assignment operators
-  // once we remove the reference member variable.
-  Gnuplot::Gnuplot(const Gnuplot &flags)
-    : Gnuplot(flags.write_cell_numbers,
-              flags.n_extra_curved_line_points,
-              flags.curved_inner_cells,
-              flags.write_additional_boundary_lines)
-  {}
-
-
-
-  Gnuplot &
-  Gnuplot::operator=(const Gnuplot &flags)
-  {
-    write_cell_numbers              = flags.write_cell_numbers;
-    n_extra_curved_line_points      = flags.n_extra_curved_line_points;
-    curved_inner_cells              = flags.curved_inner_cells;
-    write_additional_boundary_lines = flags.write_additional_boundary_lines;
-
-    return *this;
-  }
-
-
 
   void
   Gnuplot::declare_parameters(ParameterHandler &param)
