@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_tria_referce_cell_h
-#define dealii_tria_referce_cell_h
+#ifndef dealii_tria_reference_cell_h
+#define dealii_tria_reference_cell_h
 
 #include <deal.II/base/config.h>
 
