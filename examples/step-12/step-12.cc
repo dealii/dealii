@@ -166,12 +166,10 @@ namespace Step12
                   scratch_data.fe_values.get_fe(),
                   scratch_data.fe_values.get_quadrature(),
                   scratch_data.fe_values.get_update_flags())
-      , fe_interface_values(
-          scratch_data.fe_values
-            .get_mapping(), // TODO: implement for fe_interface_values
-          scratch_data.fe_values.get_fe(),
-          scratch_data.fe_interface_values.get_quadrature(),
-          scratch_data.fe_interface_values.get_update_flags())
+      , fe_interface_values(scratch_data.fe_interface_values.get_mapping(),
+                            scratch_data.fe_interface_values.get_fe(),
+                            scratch_data.fe_interface_values.get_quadrature(),
+                            scratch_data.fe_interface_values.get_update_flags())
     {}
 
     FEValues<dim>          fe_values;

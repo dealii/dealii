@@ -143,6 +143,18 @@ public:
   get_fe_face_values(const unsigned int cell_index) const;
 
   /**
+   * Constant reference to the selected mapping object.
+   */
+  const Mapping<dim, spacedim> &
+  get_mapping() const;
+
+  /**
+   * Constant reference to the selected finite element object.
+   */
+  const FiniteElement<dim, spacedim> &
+  get_fe() const;
+
+  /**
    * Return a reference to the quadrature object in use.
    */
   const Quadrature<dim - 1> &
@@ -640,6 +652,24 @@ FEInterfaceValues<dim, spacedim>::get_normal_vectors() const
   Assert(fe_face_values != nullptr,
          ExcMessage("This call requires a call to reinit() first."));
   return fe_face_values->get_normal_vectors();
+}
+
+
+
+template <int dim, int spacedim>
+const Mapping<dim, spacedim> &
+FEInterfaceValues<dim, spacedim>::get_mapping() const
+{
+  return internal_fe_face_values.get_mapping();
+}
+
+
+
+template <int dim, int spacedim>
+const FiniteElement<dim, spacedim> &
+FEInterfaceValues<dim, spacedim>::get_fe() const
+{
+  return internal_fe_face_values.get_fe();
 }
 
 
