@@ -81,6 +81,12 @@ namespace internal
       DoFObjects<dim> dof_object;
 
       /**
+       * The offsets for each cell of the cache that holds all DoF indices.
+       * Only used for hp elements.
+       */
+      std::vector<unsigned int> cell_cache_offsets;
+
+      /**
        * Return a pointer to the beginning of the DoF indices cache for a
        * given cell.
        *

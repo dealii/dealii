@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -250,6 +250,23 @@ public:
   const unsigned int dofs_per_hex;
 
   /**
+   * Number of non-zero degrees of freedom (DoFs) on the cell that,
+   * however, can not be associated with the specific geometric object (such as
+   * face or edge). In these cases, DoFs are typically globally distributed over
+   * (patches of) the Triangulation. Typical examples are:
+   *  - <a
+   * href="https://www.sciencedirect.com/science/article/pii/S0045782504005171">Isogeometric
+   * Analysis</a>
+   *  - <a
+   * href="https://onlinelibrary.wiley.com/doi/abs/10.1002/%28SICI%291097-0207%2819990910%2946%3A1%3C131%3A%3AAID-NME726%3E3.0.CO%3B2-J">Extended
+   * finite element method</a>
+   *  - <a
+   * href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.21.4515&rep=rep1&type=pdf">Catmull-Clark's
+   * subdivision surfaces</a>
+   */
+  const unsigned int non_local_dofs_per_cell;
+
+  /**
    * First index of dof on a line.
    */
   const unsigned int first_line_index;
@@ -321,12 +338,16 @@ public:
    * to geometrical objects.
    *
    * @param[in] dofs_per_object A vector that describes the number of degrees
-   * of freedom on geometrical objects for each dimension. This vector must
-   * have size dim+1, and entry 0 describes the number of degrees of freedom
-   * per vertex, entry 1 the number of degrees of freedom per line, etc. As an
-   * example, for the common $Q_1$ Lagrange element in 2d, this vector would
-   * have elements <code>(1,0,0)</code>. On the other hand, for a $Q_3$
-   * element in 3d, it would have entries <code>(1,2,4,8)</code>.
+   * of freedom on geometrical objects for each dimension.
+   * The first dim+1 elements of the vector describe the number
+   * of degrees of freedom per geometrical object: entry 0 describes the number
+   * of degrees of freedom per vertex, entry 1 the number of degrees of freedom
+   * per line, etc. If the vector is of size dim+2, the last entry specifices
+   * the number of non-local degrees of freedom for this element. In case the
+   * vector size is dim+1, the number of non-local degrees of freedom is set to
+   * zero. As an example, for the common $Q_1$ Lagrange element in 2d, this
+   * vector would have elements <code>(1,0,0)</code>. On the other hand, for a
+   * $Q_3$ element in 3d, it would have entries <code>(1,2,4,8)</code>.
    *
    * @param[in] n_components Number of vector components of the element.
    *
@@ -414,6 +435,24 @@ public:
    */
   unsigned int
   n_dofs_per_cell() const;
+
+  /**
+   * Return the number of non-zero degrees of freedom (DoFs) on the cell that,
+   * however, can not be associated with the specific geometric object (such as
+   * face or edge). In these cases, DoFs are typically globally distributed over
+   * (patches of) the Triangulation. Typical examples are:
+   *  - <a
+   * href="https://www.sciencedirect.com/science/article/pii/S0045782504005171">Isogeometric
+   * Analysis</a>
+   *  - <a
+   * href="https://onlinelibrary.wiley.com/doi/abs/10.1002/%28SICI%291097-0207%2819990910%2946%3A1%3C131%3A%3AAID-NME726%3E3.0.CO%3B2-J">Extended
+   * finite element method</a>
+   *  - <a
+   * href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.21.4515&rep=rep1&type=pdf">Catmull-Clark's
+   * subdivision surfaces</a>
+   */
+  unsigned int
+  n_non_local_dofs_per_cell() const;
 
   /**
    * Return the number of degrees per structdim-dimensional object. For
@@ -617,6 +656,15 @@ inline unsigned int
 FiniteElementData<dim>::n_dofs_per_cell() const
 {
   return dofs_per_cell;
+}
+
+
+
+template <int dim>
+inline unsigned int
+FiniteElementData<dim>::n_non_local_dofs_per_cell() const
+{
+  return non_local_dofs_per_cell;
 }
 
 

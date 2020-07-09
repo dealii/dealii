@@ -1940,6 +1940,14 @@ public:
   set_dof_indices(const std::vector<types::global_dof_index> &dof_indices);
 
   /**
+   * Set the DoF indices of this cell to the given values. This function
+   * bypasses the DoF cache, if one exists for the given DoF handler class.
+   */
+  void
+  set_non_local_dof_indices(
+    const std::vector<types::global_dof_index> &non_local_dof_indices);
+
+  /**
    * Set the Level DoF indices of this cell to the given values.
    */
   void
