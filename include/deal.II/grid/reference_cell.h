@@ -162,7 +162,7 @@ namespace ReferenceCell
 
           (void)vertex;
 
-          return {0u, 0u};
+          return {{0u, 0u}};
         }
 
         /**
@@ -175,7 +175,7 @@ namespace ReferenceCell
 
           (void)line;
 
-          return {0, 0};
+          return {{0, 0}};
         }
 
         /**
