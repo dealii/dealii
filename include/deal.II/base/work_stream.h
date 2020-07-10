@@ -31,6 +31,10 @@
 #    include <tbb/pipeline.h>
 #  endif
 
+#  ifdef DEAL_II_WITH_TASKFLOW
+#    include <taskflow/taskflow.hpp>
+#  endif
+
 #  include <functional>
 #  include <iterator>
 #  include <memory>
