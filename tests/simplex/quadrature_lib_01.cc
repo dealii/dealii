@@ -43,8 +43,23 @@ main()
   initlog();
 
   {
+    deallog.push("1d-1");
+    test<1>(1 /*n_points*/);
+    deallog.pop();
+  }
+  {
+    deallog.push("1d-2");
+    test<1>(2);
+    deallog.pop();
+  }
+  {
+    deallog.push("1d-3");
+    test<1>(2);
+    deallog.pop();
+  }
+  {
     deallog.push("2d-1");
-    test<2>(1 /*n_points*/);
+    test<2>(1);
     deallog.pop();
   }
   {

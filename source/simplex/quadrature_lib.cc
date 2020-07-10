@@ -33,8 +33,14 @@ namespace Simplex
     : QSimplex<dim>(Quadrature<dim>())
   {
     // fill quadrature points and quadrature weights
+    if (dim == 1)
+      {
+        const dealii::QGauss<dim> quad(n_points);
 
-    if (dim == 2)
+        this->quadrature_points = quad.get_points();
+        this->weights           = quad.get_weights();
+      }
+    else if (dim == 2)
       {
         if (n_points == 1)
           {
@@ -140,6 +146,7 @@ namespace Simplex
 } // namespace Simplex
 
 
+template class Simplex::PGauss<1>;
 template class Simplex::PGauss<2>;
 template class Simplex::PGauss<3>;
 
