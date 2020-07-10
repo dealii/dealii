@@ -1265,7 +1265,7 @@ namespace
   measure(const TriaAccessor<2, 2, 2> &accessor)
   {
     unsigned int vertex_indices[GeometryInfo<2>::vertices_per_cell];
-    for (const unsigned int i : GeometryInfo<2>::vertex_indices())
+    for (const unsigned int i : accessor.vertex_indices())
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<2>(
@@ -1277,7 +1277,7 @@ namespace
   measure(const TriaAccessor<3, 3, 3> &accessor)
   {
     unsigned int vertex_indices[GeometryInfo<3>::vertices_per_cell];
-    for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+    for (const unsigned int i : accessor.vertex_indices())
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<3>(
@@ -1555,7 +1555,7 @@ TriaAccessor<structdim, dim, spacedim>::bounding_box() const
   std::pair<Point<spacedim>, Point<spacedim>> boundary_points =
     std::make_pair(this->vertex(0), this->vertex(0));
 
-  for (unsigned int v = 1; v < GeometryInfo<structdim>::vertices_per_cell; ++v)
+  for (unsigned int v = 1; v < this->n_vertices(); ++v)
     {
       const Point<spacedim> &x = this->vertex(v);
       for (unsigned int k = 0; k < spacedim; ++k)
@@ -1686,7 +1686,7 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point(
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> p;
   std::array<double, GeometryInfo<structdim>::vertices_per_cell>          w;
 
-  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int i : this->vertex_indices())
     {
       p[i] = this->vertex(i);
       w[i] = GeometryInfo<structdim>::d_linear_shape_function(coordinates, i);
@@ -1806,16 +1806,16 @@ TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   // copy vertices to avoid expensive resolution of vertex index inside loop
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
     vertices;
-  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int v : this->vertex_indices())
     vertices[v] = this->vertex(v);
   for (unsigned int d = 0; d < spacedim; ++d)
-    for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
+    for (const unsigned int v : this->vertex_indices())
       for (unsigned int e = 0; e < structdim; ++e)
         A[d][e] += vertices[v][d] * TransformR2UAffine<structdim>::KA[v][e];
 
   // b = vertex * Kb
   Tensor<1, spacedim> b = point;
-  for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int v : this->vertex_indices())
     b -= vertices[v] * TransformR2UAffine<structdim>::Kb[v];
 
   DerivativeForm<1, spacedim, structdim> A_inv = A.covariant_form().transpose();
@@ -1833,9 +1833,9 @@ TriaAccessor<structdim, dim, spacedim>::center(
     {
       Assert(use_interpolation == false, ExcNotImplemented());
       Point<spacedim> p;
-      for (const unsigned int v : GeometryInfo<structdim>::vertex_indices())
+      for (const unsigned int v : this->vertex_indices())
         p += vertex(v);
-      return p / GeometryInfo<structdim>::vertices_per_cell;
+      return p / this->n_vertices();
     }
   else
     return get_new_point_on_object(*this, use_interpolation);
@@ -1938,7 +1938,7 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
   Point<spacedim>    maxp     = this->vertex(0);
   Point<spacedim>    minp     = this->vertex(0);
 
-  for (unsigned int v = 1; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (unsigned int v = 1; v < this->n_vertices(); ++v)
     for (unsigned int d = 0; d < dim; ++d)
       {
         maxp[d] = std::max(maxp[d], this->vertex(v)[d]);
@@ -2023,7 +2023,7 @@ template <int dim, int spacedim>
 bool
 CellAccessor<dim, spacedim>::at_boundary() const
 {
-  for (const auto face : GeometryInfo<dim>::face_indices())
+  for (const auto face : this->face_indices())
     if (at_boundary(face))
       return true;
 
@@ -2224,7 +2224,7 @@ CellAccessor<dim, spacedim>::set_neighbor(
   const unsigned int                               i,
   const TriaIterator<CellAccessor<dim, spacedim>> &pointer) const
 {
-  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i, this->n_faces());
 
   if (pointer.state() == IteratorState::valid)
     {
@@ -2294,7 +2294,7 @@ unsigned int
 CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   const unsigned int neighbor) const
 {
-  AssertIndexRange(neighbor, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(neighbor, this->n_faces());
 
   // if we have a 1d mesh in 1d, we
   // can assume that the left
@@ -2329,7 +2329,8 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   const unsigned int neighbor_guess =
     GeometryInfo<dim>::opposite_face[neighbor];
 
-  if (neighbor_cell->face_index(neighbor_guess) == this_face_index)
+  if (neighbor_guess < neighbor_cell->n_faces() &&
+      neighbor_cell->face_index(neighbor_guess) == this_face_index)
     return neighbor_guess;
   else
     // if the guess was false, then
@@ -2337,7 +2338,7 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
     // neighbors and find the number
     // the hard way
     {
-      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : neighbor_cell->face_indices())
         if (neighbor_cell->face_index(face_no) == this_face_index)
           return face_no;
 
@@ -2384,7 +2385,7 @@ std::pair<unsigned int, unsigned int>
 CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
   const unsigned int neighbor) const
 {
-  AssertIndexRange(neighbor, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(neighbor, this->n_faces());
   // make sure that the neighbor is
   // on a coarser level
   Assert(neighbor_is_coarser(neighbor),
@@ -2428,7 +2429,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // we need to loop over all faces
           // and subfaces and find the
           // number the hard way
-          for (const unsigned int face_no : GeometryInfo<2>::face_indices())
+          for (const unsigned int face_no : neighbor_cell->face_indices())
             {
               if (face_no != face_no_guess)
                 {
@@ -2499,7 +2500,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
 
           // if the guess was false, then we need to loop over all faces and
           // subfaces and find the number the hard way
-          for (const unsigned int face_no : GeometryInfo<3>::face_indices())
+          for (const unsigned int face_no : neighbor_cell->face_indices())
             {
               if (face_no == face_no_guess)
                 continue;
@@ -2582,7 +2583,7 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
    *
    * We decided to use the 2nd option.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   // my_it : is the iterator to the current cell.
   cell_iterator my_it(*this);
@@ -2607,7 +2608,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor(const unsigned int i_face) const
    * my_face_pair : the pair reported by periodic_face_map as its first pair
    * being the current cell_face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
 
@@ -2659,7 +2660,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
    * nb_parent_face_it: the iterator to the parent face of the periodically
    *                    neighboring face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2712,7 +2713,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
    * iterator of the periodic neighbor of the periodic neighbor of the current
    * cell.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i_face, this->n_faces());
   using cell_iterator         = TriaIterator<CellAccessor<dim, spacedim>>;
   const int     my_face_index = this->face_index(i_face);
   cell_iterator my_it(*this);
@@ -2803,7 +2804,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_face_no(
    * my_face_pair : the pair reported by periodic_face_map as its first pair
    * being the current cell_face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2845,7 +2846,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser(
    * neighbor. nb_face_pair : the pair reported by periodic_face_map as its
    * first pair being the periodic neighbor cell_face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i_face, this->n_faces());
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2886,7 +2887,7 @@ bool
 CellAccessor<dim, spacedim>::at_boundary(const unsigned int i) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(i, this->n_faces());
 
   return (neighbor_index(i) == -1);
 }
@@ -2901,7 +2902,7 @@ CellAccessor<dim, spacedim>::has_boundary_lines() const
     return at_boundary();
   else
     {
-      for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+      for (unsigned int l = 0; l < this->n_lines(); ++l)
         if (this->line(l)->at_boundary())
           return true;
 
