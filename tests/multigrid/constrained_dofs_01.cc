@@ -124,20 +124,16 @@ check_fe(FiniteElement<dim> &fe)
         cell->update_cell_dof_indices_cache();
       }
 
-    std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-    Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
-    dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    mg_constrained_dofs_ref.initialize(dofhref, dirichlet_boundary);
+    mg_constrained_dofs_ref.initialize(dofhref);
+    mg_constrained_dofs_ref.make_zero_boundary_constraints(dofhref, {0});
   }
 
 
 
   MGConstrainedDoFs mg_constrained_dofs;
 
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
-  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  mg_constrained_dofs.initialize(dofh, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dofh);
+  mg_constrained_dofs.make_zero_boundary_constraints(dofh, {0});
 
   const unsigned int n_levels = tr.n_global_levels();
   for (unsigned int level = 0; level < n_levels; ++level)

@@ -377,11 +377,9 @@ do_test(const DoFHandler<dim> &dof)
       mg_matrices[level].initialize(mapping, dof, dirichlet_boundaries, level);
     }
 
-  MGConstrainedDoFs                                   mg_constrained_dofs;
-  Functions::ZeroFunction<dim>                        zero_function;
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  dirichlet_boundary[0] = &zero_function;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  MGConstrainedDoFs mg_constrained_dofs;
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MGTransferPrebuiltMF<dim, LevelMatrixType> mg_transfer(mg_matrices,
                                                          mg_constrained_dofs);

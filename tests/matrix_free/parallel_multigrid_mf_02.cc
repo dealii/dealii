@@ -135,7 +135,8 @@ do_test(const DoFHandler<dim> &dof)
 
   // set up multigrid in analogy to step-37
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   typedef MatrixFreeOperators::LaplaceOperator<
     dim,
