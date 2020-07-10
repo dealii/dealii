@@ -16,7 +16,7 @@
 
 // Create the TriangulationDescription::Description with
 // create_description_from_triangulation_in_groups, i.e. by a set of
-// master processes.
+// parent processes.
 
 #include <deal.II/base/mpi.h>
 

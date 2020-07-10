@@ -79,12 +79,12 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical(const unsigned int degree)
 
   // The matrix @p{dofs_cell} contains the
   // values of the linear functionals of
-  // the master 1d cell applied to the
+  // the parent 1d cell applied to the
   // shape functions of the two 1d subcells.
   // The matrix @p{dofs_subcell} contains
   // the values of the linear functionals
   // on each 1d subcell applied to the
-  // shape functions on the master 1d
+  // shape functions on the parent 1d
   // subcell.
   // We use @p{dofs_cell} and
   // @p{dofs_subcell} to compute the
@@ -709,7 +709,7 @@ FE_Q_Hierarchical<dim>::initialize_embedding_and_restriction(
   // the embedding matrix.
   //
   // i loops over the dofs in the
-  // master cell. These are the
+  // parent cell. These are the
   // columns in the embedding matrix.
   for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
     for (unsigned int i = 0; i < this->dofs_per_cell; ++i)

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// write the pvd master record for parallel visualization through the
+// write the pvd primary record for parallel visualization through the
 // vtu file format
 
 #include <deal.II/base/data_out_base.h>

@@ -2035,9 +2035,9 @@ namespace Step42
     // output files. We then do the same again for the competitor of
     // Paraview, the VisIt visualization program, by creating a matching
     // <code>.visit</code> file.
-    const std::string master_name = data_out.write_vtu_with_pvtu_record(
+    const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
       output_dir, "solution", current_refinement_cycle, mpi_communicator, 2);
-    pcout << master_name << std::endl;
+    pcout << pvtu_filename << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp(solution);
     tmp *= -1;

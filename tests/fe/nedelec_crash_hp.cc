@@ -18,7 +18,7 @@
 // interpolation matrices from lower to higher order elements. This
 // consequently led to a situation where
 // DoFTools::make_hanging_node_constraints got into trouble because it could
-// not find a master DoF for one particular slave DoF.
+// not find a primary DoF for one particular dependent DoF.
 
 
 char logname[] = "output";

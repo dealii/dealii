@@ -704,11 +704,11 @@ namespace Step22
           filenames.push_back(std::string("solution-") +
                               Utilities::int_to_string(refinement_cycle, 2) +
                               "." + Utilities::int_to_string(i, 2) + ".vtu");
-        const std::string pvtu_master_filename =
+        const std::string pvtu_filename =
           ("solution-" + Utilities::int_to_string(refinement_cycle, 2) +
            ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename.c_str());
-        data_out.write_pvtu_record(pvtu_master, filenames);
+        std::ofstream pvtu_output(pvtu_filename.c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
   }
 

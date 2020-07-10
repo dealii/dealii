@@ -1451,10 +1451,10 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
 
   data_out.build_patches();
 
-  const std::string master = data_out.write_vtu_with_pvtu_record(
+  const std::string pvtu_filename = data_out.write_vtu_with_pvtu_record(
     "", "solution", cycle, mpi_communicator, 2 /*n_digits*/, 1 /*n_groups*/);
 
-  pcout << "   Wrote " << master << std::endl;
+  pcout << "   Wrote " << pvtu_filename << std::endl;
 }
 
 

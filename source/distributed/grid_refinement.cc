@@ -241,15 +241,15 @@ namespace internal
                                            global_min_and_max.second};
             adjust_interesting_range(interesting_range);
 
-            const unsigned int master_mpi_rank = 0;
-            unsigned int       iteration       = 0;
+            const unsigned int root_mpi_rank = 0;
+            unsigned int       iteration     = 0;
 
             do
               {
                 int ierr = MPI_Bcast(interesting_range,
                                      2,
                                      MPI_DOUBLE,
-                                     master_mpi_rank,
+                                     root_mpi_rank,
                                      mpi_communicator);
                 AssertThrowMPI(ierr);
 
@@ -277,10 +277,10 @@ namespace internal
                 // now adjust the range. if we have too many cells, we take the
                 // upper half of the previous range, otherwise the lower half.
                 // if we have hit the right number, then set the range to the
-                // exact value. slave nodes also update their own
+                // exact value. non-root nodes also update their own
                 // interesting_range, however their results are not significant
                 // since the values will be overwritten by MPI_Bcast from the
-                // master node in next loop.
+                // root node in next loop.
                 if (total_count > n_target_cells)
                   interesting_range[0] = test_threshold;
                 else if (total_count < n_target_cells)
@@ -324,15 +324,15 @@ namespace internal
                                            global_min_and_max.second};
             adjust_interesting_range(interesting_range);
 
-            const unsigned int master_mpi_rank = 0;
-            unsigned int       iteration       = 0;
+            const unsigned int root_mpi_rank = 0;
+            unsigned int       iteration     = 0;
 
             do
               {
                 int ierr = MPI_Bcast(interesting_range,
                                      2,
                                      MPI_DOUBLE,
-                                     master_mpi_rank,
+                                     root_mpi_rank,
                                      mpi_communicator);
                 AssertThrowMPI(ierr);
 
@@ -350,7 +350,7 @@ namespace internal
                     ierr = MPI_Bcast(&final_threshold,
                                      1,
                                      MPI_DOUBLE,
-                                     master_mpi_rank,
+                                     root_mpi_rank,
                                      mpi_communicator);
                     AssertThrowMPI(ierr);
 
@@ -376,17 +376,17 @@ namespace internal
                                   1,
                                   MPI_DOUBLE,
                                   MPI_SUM,
-                                  master_mpi_rank,
+                                  root_mpi_rank,
                                   mpi_communicator);
                 AssertThrowMPI(ierr);
 
                 // now adjust the range. if we have too many cells, we take the
                 // upper half of the previous range, otherwise the lower half.
                 // if we have hit the right number, then set the range to the
-                // exact value. slave nodes also update their own
+                // exact value. non-root nodes also update their own
                 // interesting_range, however their results are not significant
                 // since the values will be overwritten by MPI_Bcast from the
-                // master node in next loop.
+                // root node in next loop.
                 if (total_error > target_error)
                   interesting_range[0] = test_threshold;
                 else if (total_error < target_error)

@@ -3474,9 +3474,9 @@ GridOut::write_mesh_per_processor_as_vtu(
                                 ".proc" + Utilities::int_to_string(i, 4) +
                                 ".vtu");
 
-          const std::string pvtu_master_filename =
+          const std::string pvtu_filename =
             (filename_without_extension + ".pvtu");
-          std::ofstream pvtu_master(pvtu_master_filename.c_str());
+          std::ofstream pvtu_output(pvtu_filename.c_str());
 
           DataOut<dim, DoFHandler<dim, spacedim>> data_out;
           data_out.attach_triangulation(*tr);
@@ -3491,7 +3491,7 @@ GridOut::write_mesh_per_processor_as_vtu(
 
           data_out.build_patches();
 
-          data_out.write_pvtu_record(pvtu_master, filenames);
+          data_out.write_pvtu_record(pvtu_output, filenames);
         }
     }
 

@@ -1128,7 +1128,7 @@
  * that are owned by other processors. In other words, for each element
  * there is a clear owner among all of the processors and those elements
  * that the current processor stores but does not own (i.e., the
- * "ghost elements") are simply mirror images of a master value somewhere
+ * "ghost elements") are simply mirror images of a primary value somewhere
  * else -- thus, the name "ghost". This is also the case for the
  * parallel::distributed::Vector class.
  *
@@ -1144,7 +1144,7 @@
  * the name "ghost element" may be misleading since in this view,
  * every element we have available locally may or may not be stored
  * somewhere else as well, but even if it is, the local element is not
- * a mirror value of a master location as there is no owner of each
+ * a mirror value of a primary location as there is no owner of each
  * element.
  *
  * @note The @ref distributed documentation module provides a brief
