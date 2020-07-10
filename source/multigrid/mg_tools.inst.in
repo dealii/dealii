@@ -144,12 +144,6 @@ for (deal_II_dimension : DIMENSIONS)
         const DoFHandler<deal_II_dimension> &mg_dof_handler,
         std::vector<IndexSet> &              interface_dofs);
 
-      template void
-      extract_non_interface_dofs(
-        const DoFHandler<deal_II_dimension> &           mg_dof_handler,
-        std::vector<std::set<types::global_dof_index>> &non_interface_dofs);
-
-
 #if deal_II_dimension < 3
       template void
       count_dofs_per_block(

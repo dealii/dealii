@@ -253,18 +253,6 @@ namespace GridOutFlags
     unsigned int n_extra_curved_line_points;
 
     /**
-     * Based on the vertices of the face and #n_boundary_face_points
-     * additional points a tensor product mesh (transformed to the real space)
-     * of (#n_boundary_face_points+2)<sup>dim-1</sup> points is plotted on
-     * each boundary face.
-     *
-     * @deprecated Use n_extra_curved_line_points instead, which has
-     * a more precise name. For compatibility this is implemented as a
-     * reference to n_extra_curved_line_points.
-     */
-    DEAL_II_DEPRECATED unsigned int &n_boundary_face_points;
-
-    /**
      * Boolean indicating whether or not interior lines should be plotted with
      * <tt>n_extra_curved_line_points</tt> line segments.
      */
@@ -290,19 +278,6 @@ namespace GridOutFlags
             const unsigned int n_extra_curved_line_points      = 2,
             const bool         curved_inner_cells              = false,
             const bool         write_additional_boundary_lines = true);
-
-    /**
-     * Copy constructor. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot(const Gnuplot &flags);
-
-    /**
-     * Copy operator. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot &
-    operator=(const Gnuplot &flags);
 
     /**
      * Declare parameters in ParameterHandler.

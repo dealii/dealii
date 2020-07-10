@@ -216,7 +216,7 @@ run()
   MappingQ<3>           m(4);
   GridOut               go;
   GridOutFlags::Gnuplot gof;
-  gof.n_boundary_face_points = 6;
+  gof.n_extra_curved_line_points = 6;
   go.set_flags(gof);
   go.write_gnuplot(triangulation, deallog.get_file_stream(), &m);
 

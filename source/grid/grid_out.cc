@@ -153,33 +153,9 @@ namespace GridOutFlags
                    const bool         write_additional_boundary_lines)
     : write_cell_numbers(write_cell_numbers)
     , n_extra_curved_line_points(n_extra_curved_line_points)
-    , n_boundary_face_points(this->n_extra_curved_line_points)
     , curved_inner_cells(curved_inner_cells)
     , write_additional_boundary_lines(write_additional_boundary_lines)
   {}
-
-
-  // TODO we can get rid of these extra constructors and assignment operators
-  // once we remove the reference member variable.
-  Gnuplot::Gnuplot(const Gnuplot &flags)
-    : Gnuplot(flags.write_cell_numbers,
-              flags.n_extra_curved_line_points,
-              flags.curved_inner_cells,
-              flags.write_additional_boundary_lines)
-  {}
-
-
-
-  Gnuplot &
-  Gnuplot::operator=(const Gnuplot &flags)
-  {
-    write_cell_numbers              = flags.write_cell_numbers;
-    n_extra_curved_line_points      = flags.n_extra_curved_line_points;
-    curved_inner_cells              = flags.curved_inner_cells;
-    write_additional_boundary_lines = flags.write_additional_boundary_lines;
-
-    return *this;
-  }
 
 
 
@@ -194,8 +170,8 @@ namespace GridOutFlags
   void
   Gnuplot::parse_parameters(ParameterHandler &param)
   {
-    write_cell_numbers     = param.get_bool("Cell number");
-    n_boundary_face_points = param.get_integer("Boundary points");
+    write_cell_numbers         = param.get_bool("Cell number");
+    n_extra_curved_line_points = param.get_integer("Boundary points");
   }
 
 
@@ -4029,7 +4005,7 @@ namespace internal
       const int dim = 2;
 
       const unsigned int n_additional_points =
-        gnuplot_flags.n_boundary_face_points;
+        gnuplot_flags.n_extra_curved_line_points;
       const unsigned int n_points = 2 + n_additional_points;
 
       // If we need to plot curved lines then generate a quadrature formula to
@@ -4140,7 +4116,7 @@ namespace internal
       const int dim = 3;
 
       const unsigned int n_additional_points =
-        gnuplot_flags.n_boundary_face_points;
+        gnuplot_flags.n_extra_curved_line_points;
       const unsigned int n_points = 2 + n_additional_points;
 
       // If we need to plot curved lines then generate a quadrature formula to
