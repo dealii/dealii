@@ -64,8 +64,8 @@ namespace Simplex
       if (dim == 2)
         {
           // determine cell sizes
-          Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
-                        (p2[1] - p1[1]) / repetitions[1]);
+          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                              (p2[1] - p1[1]) / repetitions[1]);
 
           // create vertices
           for (unsigned int j = 0; j <= repetitions[1]; ++j)
@@ -103,9 +103,9 @@ namespace Simplex
       else if (dim == 3)
         {
           // determine cell sizes
-          Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
-                        (p2[1] - p1[1]) / repetitions[1],
-                        (p2[2] - p1[2]) / repetitions[1]);
+          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                              (p2[1] - p1[1]) / repetitions[1],
+                              (p2[2] - p1[2]) / repetitions[2]);
 
           // create vertices
           for (unsigned int k = 0; k <= repetitions[2]; ++k)
