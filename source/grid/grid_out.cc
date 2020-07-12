@@ -3002,7 +3002,7 @@ namespace
     const_cast<Triangulation<3, 3> &>(tria).clear_user_flags_line();
 
     for (auto face : tria.active_face_iterators())
-      for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
+      for (const auto l : face->line_indices())
         {
           const auto line = face->line(l);
           if (line->user_flag_set() || line->has_children())
@@ -3044,7 +3044,7 @@ namespace
     const_cast<Triangulation<3, 3> &>(tria).clear_user_flags_line();
 
     for (auto face : tria.active_face_iterators())
-      for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
+      for (const auto l : face->line_indices())
         {
           const auto line = face->line(l);
           if (line->user_flag_set() || line->has_children())
@@ -3170,15 +3170,19 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   // and then specifying the index of every vertex. This means that for every
   // deal.II object type, we always need n_vertices + 1 integer per cell.
   // Compute the total number here.
-  const int cells_size =
-    (vtk_flags.output_cells ?
-       tria.n_active_cells() * (GeometryInfo<dim>::vertices_per_cell + 1) :
-       0) +
-    (vtk_flags.output_faces ?
-       faces.size() * (GeometryInfo<dim>::vertices_per_face + 1) :
-       0) +
-    (vtk_flags.output_edges ? edges.size() * (3) :
-                              0); // only in 3d, otherwise it is always zero.
+  int cells_size = 0;
+
+  if (vtk_flags.output_cells)
+    for (const auto &cell : tria.active_cell_iterators())
+      cells_size += cell->n_vertices() + 1;
+
+  if (vtk_flags.output_faces)
+    for (const auto &face : faces)
+      cells_size += face->n_vertices() + 1;
+
+  if (vtk_flags.output_edges)
+    for (const auto &edge : edges)
+      cells_size += edge->n_vertices() + 1;
 
   AssertThrow(cells_size > 0, ExcMessage("No cells given to be output!"));
 
@@ -3186,37 +3190,47 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   /*
    * VTK cells:
    *
-   * 1 VTK_VERTEX
-   * 3 VTK_LINE
-   * 9 VTK_QUAD
+   *  1 VTK_VERTEX
+   *  3 VTK_LINE
+   *  5 VTK_TRIANGLE
+   *  9 VTK_QUAD
+   * 10 VTK_TETRA
+   * 14 VTK_PYRAMID
+   * 13 VTK_WEDGE
    * 12 VTK_HEXAHEDRON
-   * ...
+   *
+   * see also: https://vtk.org/wp-content/uploads/2015/04/file-formats.pdf
    */
-  const int cell_type    = (dim == 1 ? 3 : dim == 2 ? 9 : 12);
-  const int face_type    = (dim == 1 ? 1 : dim == 2 ? 3 : 9);
-  const int co_face_type = (dim == 1 ? -1 : dim == 2 ? -1 : 3);
+  static const std::array<int, 8> table = {{1, 3, 5, 9, 10, 14, 13, 12}};
 
   // write cells.
   if (vtk_flags.output_cells)
     for (const auto &cell : tria.active_cell_iterators())
       {
-        out << GeometryInfo<dim>::vertices_per_cell;
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+        out << cell->n_vertices();
+        for (const unsigned int i : cell->vertex_indices())
           {
-            out << ' ' << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
+            out << ' '
+                << cell->vertex_index(GeometryInfo<dim>::vertices_per_cell ==
+                                          cell->n_vertices() ?
+                                        GeometryInfo<dim>::ucd_to_deal[i] :
+                                        i);
           }
         out << '\n';
       }
   if (vtk_flags.output_faces)
     for (const auto &face : faces)
       {
-        out << GeometryInfo<dim>::vertices_per_face;
-        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
+        out << face->n_vertices();
+        for (const unsigned int i : face->vertex_indices())
           {
             out << ' '
-                << face->vertex_index(GeometryInfo < (dim > 1) ?
+                << face->vertex_index(GeometryInfo<dim>::vertices_per_face ==
+                                          face->n_vertices() ?
+                                        GeometryInfo < (dim > 1) ?
                                         dim - 1 :
-                                        dim > ::ucd_to_deal[i]);
+                                        dim > ::ucd_to_deal[i] :
+                                        i);
           }
         out << '\n';
       }
@@ -3224,7 +3238,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     for (const auto &edge : edges)
       {
         out << 2;
-        for (unsigned int i = 0; i < 2; ++i)
+        for (const unsigned int i : edge->vertex_indices())
           out << ' ' << edge->vertex_index(i);
         out << '\n';
       }
@@ -3233,26 +3247,20 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   out << "\nCELL_TYPES " << n_cells << '\n';
   if (vtk_flags.output_cells)
     {
-      for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
-        {
-          out << cell_type << ' ';
-        }
+      for (const auto &cell : tria.active_cell_iterators())
+        out << table[static_cast<int>(cell->reference_cell_type())] << ' ';
       out << '\n';
     }
   if (vtk_flags.output_faces)
     {
-      for (unsigned int i = 0; i < faces.size(); ++i)
-        {
-          out << face_type << ' ';
-        }
+      for (const auto &face : faces)
+        out << table[static_cast<int>(face->reference_cell_type())] << ' ';
       out << '\n';
     }
   if (vtk_flags.output_edges)
     {
-      for (unsigned int i = 0; i < edges.size(); ++i)
-        {
-          out << co_face_type << ' ';
-        }
+      for (const auto &edge : edges)
+        out << table[static_cast<int>(edge->reference_cell_type())] << ' ';
     }
   out << "\n\nCELL_DATA " << n_cells << '\n'
       << "SCALARS MaterialID int 1\n"
