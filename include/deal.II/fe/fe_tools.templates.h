@@ -247,73 +247,70 @@ namespace FETools
         }
 
       // 2. Lines
-      if (GeometryInfo<dim>::lines_per_cell > 0)
-        for (unsigned int line_number = 0;
-             line_number != GeometryInfo<dim>::lines_per_cell;
-             ++line_number)
-          {
-            for (unsigned int base = 0; base < fes.size(); ++base)
-              for (unsigned int m = 0; m < multiplicities[base]; ++m)
-                for (unsigned int local_index = 0;
-                     local_index < fes[base]->dofs_per_line;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fes[base]->dofs_per_line * line_number + local_index +
-                       fes[base]->first_line_index);
+      for (unsigned int line_number = 0;
+           line_number < GeometryInfo<dim>::lines_per_cell;
+           ++line_number)
+        {
+          for (unsigned int base = 0; base < fes.size(); ++base)
+            for (unsigned int m = 0; m < multiplicities[base]; ++m)
+              for (unsigned int local_index = 0;
+                   local_index < fes[base]->dofs_per_line;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fes[base]->dofs_per_line * line_number + local_index +
+                     fes[base]->first_line_index);
 
-                    Assert(index_in_base < fes[base]->dofs_per_cell,
-                           ExcInternalError());
-                    retval[total_index] =
-                      fes[base]->restriction_is_additive(index_in_base);
-                  }
-          }
+                  Assert(index_in_base < fes[base]->dofs_per_cell,
+                         ExcInternalError());
+                  retval[total_index] =
+                    fes[base]->restriction_is_additive(index_in_base);
+                }
+        }
 
       // 3. Quads
-      if (GeometryInfo<dim>::quads_per_cell > 0)
-        for (unsigned int quad_number = 0;
-             quad_number != GeometryInfo<dim>::quads_per_cell;
-             ++quad_number)
-          {
-            for (unsigned int base = 0; base < fes.size(); ++base)
-              for (unsigned int m = 0; m < multiplicities[base]; ++m)
-                for (unsigned int local_index = 0;
-                     local_index < fes[base]->dofs_per_quad;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fes[base]->dofs_per_quad * quad_number + local_index +
-                       fes[base]->first_quad_index);
+      for (unsigned int quad_number = 0;
+           quad_number < GeometryInfo<dim>::quads_per_cell;
+           ++quad_number)
+        {
+          for (unsigned int base = 0; base < fes.size(); ++base)
+            for (unsigned int m = 0; m < multiplicities[base]; ++m)
+              for (unsigned int local_index = 0;
+                   local_index < fes[base]->dofs_per_quad;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fes[base]->dofs_per_quad * quad_number + local_index +
+                     fes[base]->first_quad_index);
 
-                    Assert(index_in_base < fes[base]->dofs_per_cell,
-                           ExcInternalError());
-                    retval[total_index] =
-                      fes[base]->restriction_is_additive(index_in_base);
-                  }
-          }
+                  Assert(index_in_base < fes[base]->dofs_per_cell,
+                         ExcInternalError());
+                  retval[total_index] =
+                    fes[base]->restriction_is_additive(index_in_base);
+                }
+        }
 
       // 4. Hexes
-      if (GeometryInfo<dim>::hexes_per_cell > 0)
-        for (unsigned int hex_number = 0;
-             hex_number != GeometryInfo<dim>::hexes_per_cell;
-             ++hex_number)
-          {
-            for (unsigned int base = 0; base < fes.size(); ++base)
-              for (unsigned int m = 0; m < multiplicities[base]; ++m)
-                for (unsigned int local_index = 0;
-                     local_index < fes[base]->dofs_per_hex;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fes[base]->dofs_per_hex * hex_number + local_index +
-                       fes[base]->first_hex_index);
+      for (unsigned int hex_number = 0;
+           hex_number < GeometryInfo<dim>::hexes_per_cell;
+           ++hex_number)
+        {
+          for (unsigned int base = 0; base < fes.size(); ++base)
+            for (unsigned int m = 0; m < multiplicities[base]; ++m)
+              for (unsigned int local_index = 0;
+                   local_index < fes[base]->dofs_per_hex;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fes[base]->dofs_per_hex * hex_number + local_index +
+                     fes[base]->first_hex_index);
 
-                    Assert(index_in_base < fes[base]->dofs_per_cell,
-                           ExcInternalError());
-                    retval[total_index] =
-                      fes[base]->restriction_is_additive(index_in_base);
-                  }
-          }
+                  Assert(index_in_base < fes[base]->dofs_per_cell,
+                         ExcInternalError());
+                  retval[total_index] =
+                    fes[base]->restriction_is_additive(index_in_base);
+                }
+        }
 
       Assert(total_index == n_shape_functions, ExcInternalError());
 
@@ -450,109 +447,106 @@ namespace FETools
         }
 
       // 2. Lines
-      if (GeometryInfo<dim>::lines_per_cell > 0)
-        for (unsigned int line_number = 0;
-             line_number != GeometryInfo<dim>::lines_per_cell;
-             ++line_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fes.size(); ++base)
-              for (unsigned int m = 0; m < multiplicities[base];
-                   ++m,
-                                comp_start +=
-                                fes[base]->n_components() * do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fes[base]->dofs_per_line;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fes[base]->dofs_per_line * line_number + local_index +
-                       fes[base]->first_line_index);
+      for (unsigned int line_number = 0;
+           line_number < GeometryInfo<dim>::lines_per_cell;
+           ++line_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fes.size(); ++base)
+            for (unsigned int m = 0; m < multiplicities[base];
+                 ++m,
+                              comp_start +=
+                              fes[base]->n_components() * do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fes[base]->dofs_per_line;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fes[base]->dofs_per_line * line_number + local_index +
+                     fes[base]->first_line_index);
 
-                    Assert(comp_start + fes[base]->n_components() <=
-                             retval[total_index].size(),
-                           ExcInternalError());
-                    for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
-                      {
-                        Assert(c < fes[base]
-                                     ->get_nonzero_components(index_in_base)
-                                     .size(),
-                               ExcInternalError());
-                        retval[total_index][comp_start + c] =
-                          fes[base]->get_nonzero_components(index_in_base)[c];
-                      }
-                  }
-          }
+                  Assert(comp_start + fes[base]->n_components() <=
+                           retval[total_index].size(),
+                         ExcInternalError());
+                  for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
+                    {
+                      Assert(c < fes[base]
+                                   ->get_nonzero_components(index_in_base)
+                                   .size(),
+                             ExcInternalError());
+                      retval[total_index][comp_start + c] =
+                        fes[base]->get_nonzero_components(index_in_base)[c];
+                    }
+                }
+        }
 
       // 3. Quads
-      if (GeometryInfo<dim>::quads_per_cell > 0)
-        for (unsigned int quad_number = 0;
-             quad_number != GeometryInfo<dim>::quads_per_cell;
-             ++quad_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fes.size(); ++base)
-              for (unsigned int m = 0; m < multiplicities[base];
-                   ++m,
-                                comp_start +=
-                                fes[base]->n_components() * do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fes[base]->dofs_per_quad;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fes[base]->dofs_per_quad * quad_number + local_index +
-                       fes[base]->first_quad_index);
+      for (unsigned int quad_number = 0;
+           quad_number < GeometryInfo<dim>::quads_per_cell;
+           ++quad_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fes.size(); ++base)
+            for (unsigned int m = 0; m < multiplicities[base];
+                 ++m,
+                              comp_start +=
+                              fes[base]->n_components() * do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fes[base]->dofs_per_quad;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fes[base]->dofs_per_quad * quad_number + local_index +
+                     fes[base]->first_quad_index);
 
-                    Assert(comp_start + fes[base]->n_components() <=
-                             retval[total_index].size(),
-                           ExcInternalError());
-                    for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
-                      {
-                        Assert(c < fes[base]
-                                     ->get_nonzero_components(index_in_base)
-                                     .size(),
-                               ExcInternalError());
-                        retval[total_index][comp_start + c] =
-                          fes[base]->get_nonzero_components(index_in_base)[c];
-                      }
-                  }
-          }
+                  Assert(comp_start + fes[base]->n_components() <=
+                           retval[total_index].size(),
+                         ExcInternalError());
+                  for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
+                    {
+                      Assert(c < fes[base]
+                                   ->get_nonzero_components(index_in_base)
+                                   .size(),
+                             ExcInternalError());
+                      retval[total_index][comp_start + c] =
+                        fes[base]->get_nonzero_components(index_in_base)[c];
+                    }
+                }
+        }
 
       // 4. Hexes
-      if (GeometryInfo<dim>::hexes_per_cell > 0)
-        for (unsigned int hex_number = 0;
-             hex_number != GeometryInfo<dim>::hexes_per_cell;
-             ++hex_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fes.size(); ++base)
-              for (unsigned int m = 0; m < multiplicities[base];
-                   ++m,
-                                comp_start +=
-                                fes[base]->n_components() * do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fes[base]->dofs_per_hex;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fes[base]->dofs_per_hex * hex_number + local_index +
-                       fes[base]->first_hex_index);
+      for (unsigned int hex_number = 0;
+           hex_number < GeometryInfo<dim>::hexes_per_cell;
+           ++hex_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fes.size(); ++base)
+            for (unsigned int m = 0; m < multiplicities[base];
+                 ++m,
+                              comp_start +=
+                              fes[base]->n_components() * do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fes[base]->dofs_per_hex;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fes[base]->dofs_per_hex * hex_number + local_index +
+                     fes[base]->first_hex_index);
 
-                    Assert(comp_start + fes[base]->n_components() <=
-                             retval[total_index].size(),
-                           ExcInternalError());
-                    for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
-                      {
-                        Assert(c < fes[base]
-                                     ->get_nonzero_components(index_in_base)
-                                     .size(),
-                               ExcInternalError());
-                        retval[total_index][comp_start + c] =
-                          fes[base]->get_nonzero_components(index_in_base)[c];
-                      }
-                  }
-          }
+                  Assert(comp_start + fes[base]->n_components() <=
+                           retval[total_index].size(),
+                         ExcInternalError());
+                  for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
+                    {
+                      Assert(c < fes[base]
+                                   ->get_nonzero_components(index_in_base)
+                                   .size(),
+                             ExcInternalError());
+                      retval[total_index][comp_start + c] =
+                        fes[base]->get_nonzero_components(index_in_base)[c];
+                    }
+                }
+        }
 
       Assert(total_index == n_shape_functions, ExcInternalError());
 
@@ -703,136 +697,133 @@ namespace FETools
         }
 
       // 2. Lines
-      if (GeometryInfo<dim>::lines_per_cell > 0)
-        for (unsigned int line_number = 0;
-             line_number != GeometryInfo<dim>::lines_per_cell;
-             ++line_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
-              for (unsigned int m = 0; m < fe.element_multiplicity(base);
-                   ++m,
-                                comp_start +=
-                                fe.base_element(base).n_components() *
-                                do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fe.base_element(base).dofs_per_line;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fe.base_element(base).dofs_per_line * line_number +
-                       local_index + fe.base_element(base).first_line_index);
+      for (unsigned int line_number = 0;
+           line_number < GeometryInfo<dim>::lines_per_cell;
+           ++line_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+            for (unsigned int m = 0; m < fe.element_multiplicity(base);
+                 ++m,
+                              comp_start +=
+                              fe.base_element(base).n_components() *
+                              do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_line;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fe.base_element(base).dofs_per_line * line_number +
+                     local_index + fe.base_element(base).first_line_index);
 
-                    system_to_base_table[total_index] =
-                      std::make_pair(std::make_pair(base, m), index_in_base);
+                  system_to_base_table[total_index] =
+                    std::make_pair(std::make_pair(base, m), index_in_base);
 
-                    if (fe.base_element(base).is_primitive(index_in_base))
-                      {
-                        const unsigned int comp_in_base =
-                          fe.base_element(base)
-                            .system_to_component_index(index_in_base)
-                            .first;
-                        const unsigned int comp = comp_start + comp_in_base;
-                        const unsigned int index_in_comp =
-                          fe.base_element(base)
-                            .system_to_component_index(index_in_base)
-                            .second;
-                        system_to_component_table[total_index] =
-                          std::make_pair(comp, index_in_comp);
-                      }
-                    else
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base =
+                        fe.base_element(base)
+                          .system_to_component_index(index_in_base)
+                          .first;
+                      const unsigned int comp = comp_start + comp_in_base;
+                      const unsigned int index_in_comp =
+                        fe.base_element(base)
+                          .system_to_component_index(index_in_base)
+                          .second;
                       system_to_component_table[total_index] =
-                        non_primitive_index;
-                  }
-          }
+                        std::make_pair(comp, index_in_comp);
+                    }
+                  else
+                    system_to_component_table[total_index] =
+                      non_primitive_index;
+                }
+        }
 
       // 3. Quads
-      if (GeometryInfo<dim>::quads_per_cell > 0)
-        for (unsigned int quad_number = 0;
-             quad_number != GeometryInfo<dim>::quads_per_cell;
-             ++quad_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
-              for (unsigned int m = 0; m < fe.element_multiplicity(base);
-                   ++m,
-                                comp_start +=
-                                fe.base_element(base).n_components() *
-                                do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fe.base_element(base).dofs_per_quad;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fe.base_element(base).dofs_per_quad * quad_number +
-                       local_index + fe.base_element(base).first_quad_index);
+      for (unsigned int quad_number = 0;
+           quad_number < GeometryInfo<dim>::quads_per_cell;
+           ++quad_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+            for (unsigned int m = 0; m < fe.element_multiplicity(base);
+                 ++m,
+                              comp_start +=
+                              fe.base_element(base).n_components() *
+                              do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_quad;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fe.base_element(base).dofs_per_quad * quad_number +
+                     local_index + fe.base_element(base).first_quad_index);
 
-                    system_to_base_table[total_index] =
-                      std::make_pair(std::make_pair(base, m), index_in_base);
+                  system_to_base_table[total_index] =
+                    std::make_pair(std::make_pair(base, m), index_in_base);
 
-                    if (fe.base_element(base).is_primitive(index_in_base))
-                      {
-                        const unsigned int comp_in_base =
-                          fe.base_element(base)
-                            .system_to_component_index(index_in_base)
-                            .first;
-                        const unsigned int comp = comp_start + comp_in_base;
-                        const unsigned int index_in_comp =
-                          fe.base_element(base)
-                            .system_to_component_index(index_in_base)
-                            .second;
-                        system_to_component_table[total_index] =
-                          std::make_pair(comp, index_in_comp);
-                      }
-                    else
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base =
+                        fe.base_element(base)
+                          .system_to_component_index(index_in_base)
+                          .first;
+                      const unsigned int comp = comp_start + comp_in_base;
+                      const unsigned int index_in_comp =
+                        fe.base_element(base)
+                          .system_to_component_index(index_in_base)
+                          .second;
                       system_to_component_table[total_index] =
-                        non_primitive_index;
-                  }
-          }
+                        std::make_pair(comp, index_in_comp);
+                    }
+                  else
+                    system_to_component_table[total_index] =
+                      non_primitive_index;
+                }
+        }
 
       // 4. Hexes
-      if (GeometryInfo<dim>::hexes_per_cell > 0)
-        for (unsigned int hex_number = 0;
-             hex_number != GeometryInfo<dim>::hexes_per_cell;
-             ++hex_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
-              for (unsigned int m = 0; m < fe.element_multiplicity(base);
-                   ++m,
-                                comp_start +=
-                                fe.base_element(base).n_components() *
-                                do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fe.base_element(base).dofs_per_hex;
-                     ++local_index, ++total_index)
-                  {
-                    const unsigned int index_in_base =
-                      (fe.base_element(base).dofs_per_hex * hex_number +
-                       local_index + fe.base_element(base).first_hex_index);
+      for (unsigned int hex_number = 0;
+           hex_number < GeometryInfo<dim>::hexes_per_cell;
+           ++hex_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+            for (unsigned int m = 0; m < fe.element_multiplicity(base);
+                 ++m,
+                              comp_start +=
+                              fe.base_element(base).n_components() *
+                              do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_hex;
+                   ++local_index, ++total_index)
+                {
+                  const unsigned int index_in_base =
+                    (fe.base_element(base).dofs_per_hex * hex_number +
+                     local_index + fe.base_element(base).first_hex_index);
 
-                    system_to_base_table[total_index] =
-                      std::make_pair(std::make_pair(base, m), index_in_base);
+                  system_to_base_table[total_index] =
+                    std::make_pair(std::make_pair(base, m), index_in_base);
 
-                    if (fe.base_element(base).is_primitive(index_in_base))
-                      {
-                        const unsigned int comp_in_base =
-                          fe.base_element(base)
-                            .system_to_component_index(index_in_base)
-                            .first;
-                        const unsigned int comp = comp_start + comp_in_base;
-                        const unsigned int index_in_comp =
-                          fe.base_element(base)
-                            .system_to_component_index(index_in_base)
-                            .second;
-                        system_to_component_table[total_index] =
-                          std::make_pair(comp, index_in_comp);
-                      }
-                    else
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base =
+                        fe.base_element(base)
+                          .system_to_component_index(index_in_base)
+                          .first;
+                      const unsigned int comp = comp_start + comp_in_base;
+                      const unsigned int index_in_comp =
+                        fe.base_element(base)
+                          .system_to_component_index(index_in_base)
+                          .second;
                       system_to_component_table[total_index] =
-                        non_primitive_index;
-                  }
-          }
+                        std::make_pair(comp, index_in_comp);
+                    }
+                  else
+                    system_to_component_table[total_index] =
+                      non_primitive_index;
+                }
+        }
     }
 
 
@@ -911,106 +902,102 @@ namespace FETools
         }
 
       // 2. Lines
-      if (GeometryInfo<dim>::lines_per_face > 0)
-        for (unsigned int line_number = 0;
-             line_number != GeometryInfo<dim>::lines_per_face;
-             ++line_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
-              for (unsigned int m = 0; m < fe.element_multiplicity(base);
-                   ++m,
-                                comp_start +=
-                                fe.base_element(base).n_components() *
-                                do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fe.base_element(base).dofs_per_line;
-                     ++local_index, ++total_index)
-                  {
-                    // do everything alike for this type of object
-                    const unsigned int index_in_base =
-                      (fe.base_element(base).dofs_per_line * line_number +
-                       local_index + fe.base_element(base).first_line_index);
+      for (unsigned int line_number = 0;
+           line_number < GeometryInfo<dim>::lines_per_face;
+           ++line_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+            for (unsigned int m = 0; m < fe.element_multiplicity(base);
+                 ++m,
+                              comp_start +=
+                              fe.base_element(base).n_components() *
+                              do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_line;
+                   ++local_index, ++total_index)
+                {
+                  // do everything alike for this type of object
+                  const unsigned int index_in_base =
+                    (fe.base_element(base).dofs_per_line * line_number +
+                     local_index + fe.base_element(base).first_line_index);
 
-                    const unsigned int face_index_in_base =
-                      (fe.base_element(base).first_face_line_index +
-                       fe.base_element(base).dofs_per_line * line_number +
-                       local_index);
+                  const unsigned int face_index_in_base =
+                    (fe.base_element(base).first_face_line_index +
+                     fe.base_element(base).dofs_per_line * line_number +
+                     local_index);
 
-                    face_system_to_base_table[total_index] =
-                      std::make_pair(std::make_pair(base, m),
-                                     face_index_in_base);
+                  face_system_to_base_table[total_index] =
+                    std::make_pair(std::make_pair(base, m), face_index_in_base);
 
-                    if (fe.base_element(base).is_primitive(index_in_base))
-                      {
-                        const unsigned int comp_in_base =
-                          fe.base_element(base)
-                            .face_system_to_component_index(face_index_in_base)
-                            .first;
-                        const unsigned int comp = comp_start + comp_in_base;
-                        const unsigned int face_index_in_comp =
-                          fe.base_element(base)
-                            .face_system_to_component_index(face_index_in_base)
-                            .second;
-                        face_system_to_component_table[total_index] =
-                          std::make_pair(comp, face_index_in_comp);
-                      }
-                    else
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base =
+                        fe.base_element(base)
+                          .face_system_to_component_index(face_index_in_base)
+                          .first;
+                      const unsigned int comp = comp_start + comp_in_base;
+                      const unsigned int face_index_in_comp =
+                        fe.base_element(base)
+                          .face_system_to_component_index(face_index_in_base)
+                          .second;
                       face_system_to_component_table[total_index] =
-                        non_primitive_index;
-                  }
-          }
+                        std::make_pair(comp, face_index_in_comp);
+                    }
+                  else
+                    face_system_to_component_table[total_index] =
+                      non_primitive_index;
+                }
+        }
 
       // 3. Quads
-      if (GeometryInfo<dim>::quads_per_face > 0)
-        for (unsigned int quad_number = 0;
-             quad_number != GeometryInfo<dim>::quads_per_face;
-             ++quad_number)
-          {
-            unsigned int comp_start = 0;
-            for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
-              for (unsigned int m = 0; m < fe.element_multiplicity(base);
-                   ++m,
-                                comp_start +=
-                                fe.base_element(base).n_components() *
-                                do_tensor_product)
-                for (unsigned int local_index = 0;
-                     local_index < fe.base_element(base).dofs_per_quad;
-                     ++local_index, ++total_index)
-                  {
-                    // do everything alike for this type of object
-                    const unsigned int index_in_base =
-                      (fe.base_element(base).dofs_per_quad * quad_number +
-                       local_index + fe.base_element(base).first_quad_index);
+      for (unsigned int quad_number = 0;
+           quad_number < GeometryInfo<dim>::quads_per_face;
+           ++quad_number)
+        {
+          unsigned int comp_start = 0;
+          for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
+            for (unsigned int m = 0; m < fe.element_multiplicity(base);
+                 ++m,
+                              comp_start +=
+                              fe.base_element(base).n_components() *
+                              do_tensor_product)
+              for (unsigned int local_index = 0;
+                   local_index < fe.base_element(base).dofs_per_quad;
+                   ++local_index, ++total_index)
+                {
+                  // do everything alike for this type of object
+                  const unsigned int index_in_base =
+                    (fe.base_element(base).dofs_per_quad * quad_number +
+                     local_index + fe.base_element(base).first_quad_index);
 
-                    const unsigned int face_index_in_base =
-                      (fe.base_element(base).first_face_quad_index +
-                       fe.base_element(base).dofs_per_quad * quad_number +
-                       local_index);
+                  const unsigned int face_index_in_base =
+                    (fe.base_element(base).first_face_quad_index +
+                     fe.base_element(base).dofs_per_quad * quad_number +
+                     local_index);
 
-                    face_system_to_base_table[total_index] =
-                      std::make_pair(std::make_pair(base, m),
-                                     face_index_in_base);
+                  face_system_to_base_table[total_index] =
+                    std::make_pair(std::make_pair(base, m), face_index_in_base);
 
-                    if (fe.base_element(base).is_primitive(index_in_base))
-                      {
-                        const unsigned int comp_in_base =
-                          fe.base_element(base)
-                            .face_system_to_component_index(face_index_in_base)
-                            .first;
-                        const unsigned int comp = comp_start + comp_in_base;
-                        const unsigned int face_index_in_comp =
-                          fe.base_element(base)
-                            .face_system_to_component_index(face_index_in_base)
-                            .second;
-                        face_system_to_component_table[total_index] =
-                          std::make_pair(comp, face_index_in_comp);
-                      }
-                    else
+                  if (fe.base_element(base).is_primitive(index_in_base))
+                    {
+                      const unsigned int comp_in_base =
+                        fe.base_element(base)
+                          .face_system_to_component_index(face_index_in_base)
+                          .first;
+                      const unsigned int comp = comp_start + comp_in_base;
+                      const unsigned int face_index_in_comp =
+                        fe.base_element(base)
+                          .face_system_to_component_index(face_index_in_base)
+                          .second;
                       face_system_to_component_table[total_index] =
-                        non_primitive_index;
-                  }
-          }
+                        std::make_pair(comp, face_index_in_comp);
+                    }
+                  else
+                    face_system_to_component_table[total_index] =
+                      non_primitive_index;
+                }
+        }
       Assert(total_index == fe.dofs_per_face, ExcInternalError());
       Assert(total_index == face_system_to_component_table.size(),
              ExcInternalError());
