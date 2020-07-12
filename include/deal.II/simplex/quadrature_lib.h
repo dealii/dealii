@@ -31,6 +31,8 @@ namespace Simplex
    * Following number of quadrature points are currently supported:
    *   - 2D: 1, 3, 7
    *   - 3D: 1, 4, 10
+   *
+   *  @ingroup simplex
    */
   template <int dim>
   class PGauss : public QSimplex<dim>

@@ -26,12 +26,16 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A namespace for functions and classes that provide support for simplex
  * reference cell entities, i.e., triangles and tetrahedrons.
+ *
+ *  @ingroup simplex
  */
 namespace Simplex
 {
   /**
    * Polynomials defined on dim-dimensional simplex entities. This class is
    * basis of Simplex::FE_P.
+   *
+   *  @ingroup simplex
    */
   template <int dim>
   class ScalarPolynomial : public ScalarPolynomialsBase<dim>
