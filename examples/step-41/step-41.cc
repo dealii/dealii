@@ -443,10 +443,9 @@ namespace Step41
     std::vector<bool>   dof_touched(dof_handler.n_dofs(), false);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const auto v : cell->vertex_indices())
         {
-          Assert(dof_handler.get_fe().n_dofs_per_cell() ==
-                   GeometryInfo<dim>::vertices_per_cell,
+          Assert(dof_handler.get_fe().n_dofs_per_cell() == cell->n_vertices(),
                  ExcNotImplemented());
 
           const unsigned int dof_index = cell->vertex_dof_index(v, 0);

@@ -199,17 +199,13 @@ void second_grid()
           // classes used in deal.II, and @ref CPP11 for more information about
           // range-based for loops and the `auto` keyword.
           //
-          // Next, we want to loop over all vertices of the cells. Since we are
-          // in 2d, we know that each cell has exactly four vertices. However,
-          // instead of penning down a 4 in the loop bound, we make a first
-          // attempt at writing it in a dimension-independent way by which we
-          // find out about the number of vertices of a cell. Using the
-          // GeometryInfo class, we will later have an easier time getting the
-          // program to also run in 3d: we only have to change all occurrences
-          // of <code>&lt;2&gt;</code> to <code>&lt;3&gt;</code>, and do not
-          // have to audit our code for the hidden appearance of magic numbers
-          // like a 4 that needs to be replaced by an 8:
-          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+          // Next, we loop over all vertices of the cells. For that purpose
+          // we query an iterator over indices from zero to four, which happens
+          // to be the number of vertices in 2d. Since the upper bound is
+          // automatically adjusted in all dimensions this enables us a
+          // dimension-independent programming. This will later enable us to
+          // get the program to also run in 3d.
+          for (const auto v : cell->vertex_indices())
             {
               // If this cell is at the inner boundary, then at least one of its
               // vertices must sit on the inner ring and therefore have a radial

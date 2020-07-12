@@ -1339,7 +1339,9 @@ namespace Step59
             triangulation.begin_active()->face(0)->set_boundary_id(10);
             triangulation.begin_active()->face(1)->set_boundary_id(11);
             triangulation.begin_active()->face(2)->set_boundary_id(0);
-            for (unsigned int f = 3; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (unsigned int f = 3;
+                 f < triangulation.begin_active()->n_faces();
+                 ++f)
               triangulation.begin_active()->face(f)->set_boundary_id(1);
 
             std::vector<GridTools::PeriodicFacePair<

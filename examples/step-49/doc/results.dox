@@ -91,7 +91,7 @@ void create_2d_grid(
   std::vector<CellData<2>> cells(vertex_indices.size());
   for (unsigned int i = 0; i < cells.size(); ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+      for (unsigned int j = 0; j < vertex_indices[i].size(); ++j)
         cells[i].vertices[j] = vertex_indices[i][j];
     }
 

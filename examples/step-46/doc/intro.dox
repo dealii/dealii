@@ -468,7 +468,7 @@ solid cell is refined, yielding the following code:
 std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
 for (const auto &cell: dof_handler.active_cell_iterators())
   if (cell_is_in_fluid_domain (cell))
-    for (unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const auto f : cell->face_indices())
       if (!cell->at_boundary(f))
         {
           bool face_is_on_interface = false;
