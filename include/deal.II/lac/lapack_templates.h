@@ -5910,48 +5910,6 @@ trtrs(const char *                   uplo,
 #endif // DEAL_II_WITH_LAPACK
 }
 
-
-
-// These overloads of lamch were added for 9.0 but are replaced by the
-// automatically generated versions provided above. These are manual additions
-// and should be kept even if this file is regenerated.
-template <typename number>
-DEAL_II_DEPRECATED inline void
-lamch(const char *, number &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-DEAL_II_DEPRECATED
-inline void
-lamch(const char *cmach, float &precision)
-{
-#ifdef DEAL_II_WITH_LAPACK
-  precision = slamch_(cmach);
-#else
-  (void)cmach;
-  (void)precision;
-  Assert(false, LAPACKSupport::ExcMissing("slamch"));
-#endif // DEAL_II_WITH_LAPACK
-}
-
-
-
-DEAL_II_DEPRECATED
-inline void
-lamch(const char *cmach, double &precision)
-{
-#ifdef DEAL_II_WITH_LAPACK
-  precision = dlamch_(cmach);
-#else
-  (void)cmach;
-  (void)precision;
-  Assert(false, LAPACKSupport::ExcMissing("dlamch"));
-#endif // DEAL_II_WITH_LAPACK
-}
-
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
