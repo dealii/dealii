@@ -1706,11 +1706,12 @@ namespace internal
                     .hp_cell_active_fe_indices[cell->level()][cell->index()] =
                     active_fe_indices[cell->active_cell_index()];
             }
-          else if (const dealii::parallel::distributed::Triangulation<dim,
-                                                                      spacedim>
-                     *tr = dynamic_cast<const dealii::parallel::distributed::
-                                          Triangulation<dim, spacedim> *>(
-                       &dof_handler.get_triangulation()))
+          else if (const dealii::parallel::
+                     DistributedTriangulationBase<dim, spacedim> *tr =
+                       dynamic_cast<
+                         const dealii::parallel::
+                           DistributedTriangulationBase<dim, spacedim> *>(
+                         &dof_handler.get_triangulation()))
             {
               // For completely distributed meshes, use the function that is
               // able to move data from locally owned cells on one processor to
