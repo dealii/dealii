@@ -1731,6 +1731,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   std::vector<CellData<dim>>                 cells;
   SubCellData                                subcelldata;
   std::map<unsigned int, types::boundary_id> boundary_ids_1d;
+  bool                                       is_hex_mesh = false;
+  bool                                       is_tet_mesh = false;
 
   {
     unsigned int global_cell = 0;
@@ -1818,14 +1820,33 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 for (unsigned int i = 1; i < n_tags; ++i)
                   in >> dummy;
 
-                nod_num = GeometryInfo<dim>::vertices_per_cell;
+                if (cell_type == 1) // line
+                  nod_num = 2;
+                else if (cell_type == 2) // tri
+                  nod_num = 3;
+                else if (cell_type == 3) // quad
+                  nod_num = 4;
+                else if (cell_type == 4) // tet
+                  nod_num = 4;
+                else if (cell_type == 5) // hex
+                  nod_num = 8;
               }
             else
               {
                 // ignore tag
                 int tag;
                 in >> tag;
-                nod_num = GeometryInfo<dim>::vertices_per_cell;
+
+                if (cell_type == 1) // line
+                  nod_num = 2;
+                else if (cell_type == 2) // tri
+                  nod_num = 3;
+                else if (cell_type == 3) // quad
+                  nod_num = 4;
+                else if (cell_type == 4) // tet
+                  nod_num = 4;
+                else if (cell_type == 5) // hex
+                  nod_num = 8;
               }
 
 
@@ -1834,8 +1855,14 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                      `1'
                      Line (2 nodes, 1 edge).
 
+                     `2'
+                     Triangle (3 nodes, 3 edges).
+
                      `3'
                      Quadrangle (4 nodes, 4 edges).
+
+                     `4'
+                     Tetrahedron (4 nodes, 6 edges, 6 faces).
 
                      `5'
                      Hexahedron (8 nodes, 12 edges, 6 faces).
@@ -1845,18 +1872,45 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             */
 
             if (((cell_type == 1) && (dim == 1)) ||
+                ((cell_type == 2) && (dim == 2)) ||
                 ((cell_type == 3) && (dim == 2)) ||
+                ((cell_type == 4) && (dim == 3)) ||
                 ((cell_type == 5) && (dim == 3)))
               // found a cell
               {
-                AssertThrow(nod_num == GeometryInfo<dim>::vertices_per_cell,
+                unsigned int vertices_per_cell = 0;
+                if (cell_type == 1) // line
+                  vertices_per_cell = 2;
+                else if (cell_type == 2) // tri
+                  {
+                    vertices_per_cell = 3;
+                    is_tet_mesh       = true;
+                  }
+                else if (cell_type == 3) // quad
+                  {
+                    vertices_per_cell = 4;
+                    is_hex_mesh       = true;
+                  }
+                else if (cell_type == 4) // tet
+                  {
+                    vertices_per_cell = 4;
+                    is_tet_mesh       = true;
+                  }
+                else if (cell_type == 5) // hex
+                  {
+                    vertices_per_cell = 8;
+                    is_hex_mesh       = true;
+                  }
+
+                AssertThrow(nod_num == vertices_per_cell,
                             ExcMessage(
                               "Number of nodes does not coincide with the "
                               "number required for this object"));
 
                 // allocate and read indices
                 cells.emplace_back();
-                for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+                cells.back().vertices.resize(vertices_per_cell);
+                for (unsigned int i = 0; i < vertices_per_cell; ++i)
                   in >> cells.back().vertices[i];
 
                 // to make sure that the cast won't fail
@@ -1874,7 +1928,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 // transform from ucd to
                 // consecutive numbering
-                for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+                for (unsigned int i = 0; i < vertices_per_cell; ++i)
                   {
                     AssertThrow(
                       vertex_indices.find(cells.back().vertices[i]) !=
@@ -1926,14 +1980,30 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                       vertex = numbers::invalid_unsigned_int;
                     }
               }
-            else if ((cell_type == 3) && (dim == 3))
+            else if ((cell_type == 2 || cell_type == 3) && (dim == 3))
               // boundary info
               {
+                unsigned int vertices_per_cell = 0;
+                // check cell type
+                if (cell_type == 2) // tri
+                  {
+                    vertices_per_cell = 3;
+                    is_tet_mesh       = true;
+                  }
+                else if (cell_type == 3) // quad
+                  {
+                    vertices_per_cell = 4;
+                    is_hex_mesh       = true;
+                  }
+
                 subcelldata.boundary_quads.emplace_back();
-                in >> subcelldata.boundary_quads.back().vertices[0] >>
-                  subcelldata.boundary_quads.back().vertices[1] >>
-                  subcelldata.boundary_quads.back().vertices[2] >>
-                  subcelldata.boundary_quads.back().vertices[3];
+
+                // resize vertices
+                subcelldata.boundary_quads.back().vertices.resize(
+                  vertices_per_cell);
+                // for loop
+                for (unsigned int i = 0; i < vertices_per_cell; ++i)
+                  in >> subcelldata.boundary_quads.back().vertices[i];
 
                 // to make sure that the cast won't fail
                 Assert(material_id <=
@@ -1987,22 +2057,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                   boundary_ids_1d[vertex_indices[node_index]] = material_id;
               }
             else
-              // cannot read this, so throw
-              // an exception. treat
-              // triangles and tetrahedra
-              // specially since this
-              // deserves a more explicit
-              // error message
               {
-                AssertThrow(cell_type != 2,
-                            ExcMessage("Found triangles while reading a file "
-                                       "in gmsh format. deal.II does not "
-                                       "support triangles"));
-                AssertThrow(cell_type != 11,
-                            ExcMessage("Found tetrahedra while reading a file "
-                                       "in gmsh format. deal.II does not "
-                                       "support tetrahedra"));
-
                 AssertThrow(false, ExcGmshUnsupportedGeometry(cell_type));
               }
           }
@@ -2020,19 +2075,33 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
   AssertThrow(in, ExcIO());
 
-  // check that we actually read some
-  // cells.
+  // check that we actually read some cells.
   AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
 
-  // do some clean-up on
-  // vertices...
-  GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-  // ... and cells
-  if (dim == spacedim)
-    GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                     cells);
-  GridReordering<dim, spacedim>::reorder_cells(cells);
-  tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+  // make sure that only either simplex or hypercube cells are available
+  //
+  // TODO: the functions below (GridTools::delete_unused_vertices(),
+  // GridTools::invert_all_cells_of_negative_grid(),
+  // GridReordering::reorder_cells(),
+  // Triangulation::create_triangulation_compatibility()) need to be revisited
+  // for simplex meshes
+  AssertThrow(dim == 1 || (is_tet_mesh ^ is_hex_mesh), ExcNotImplemented());
+
+  if (dim == 1 || is_hex_mesh)
+    {
+      // do some clean-up on vertices...
+      GridTools::delete_unused_vertices(vertices, cells, subcelldata);
+      // ... and cells
+      if (dim == spacedim)
+        GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
+          vertices, cells);
+      GridReordering<dim, spacedim>::reorder_cells(cells);
+      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+    }
+  else
+    {
+      tria->create_triangulation(vertices, cells, subcelldata);
+    }
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
   // currently work through the call above

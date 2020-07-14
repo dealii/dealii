@@ -9743,7 +9743,7 @@ Triangulation<dim, spacedim>::create_triangulation(
                cell != this_round.end();
                ++cell)
             {
-              for (const unsigned int i : GeometryInfo<dim>::face_indices())
+              for (const unsigned int i : (*cell)->face_indices())
                 {
                   if (!((*cell)->face(i)->at_boundary()))
                     {
