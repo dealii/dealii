@@ -75,6 +75,15 @@ namespace hp
       const MappingCollection<dim, spacedim> &mapping_collection);
 
     /**
+     * Constructor. This constructor creates a MappingCollection from one or
+     * more mapping objects passed to the constructor. For this
+     * call to be valid, all arguments need to be of types derived
+     * from class Mapping<dim,spacedim>.
+     */
+    template <class... MappingTypes>
+    explicit MappingCollection(const MappingTypes &... mappings);
+
+    /**
      * Add a new mapping to the MappingCollection. Generally, you will
      * want to use the same order for mappings as for the elements of
      * the hp::FECollection object you use. However, the same
@@ -148,6 +157,25 @@ namespace hp
 
 
   /* --------------- inline functions ------------------- */
+
+  template <int dim, int spacedim>
+  template <class... MappingTypes>
+  MappingCollection<dim, spacedim>::MappingCollection(
+    const MappingTypes &... mappings)
+  {
+    static_assert(
+      is_base_of_all<Mapping<dim, spacedim>, MappingTypes...>::value,
+      "Not all of the input arguments of this function "
+      "are derived from FiniteElement<dim,spacedim>!");
+
+    // loop over all of the given arguments and add the mappings to
+    // this collection. Inlining the definition of mapping_pointers causes
+    // internal compiler errors on GCC 7.1.1 so we define it separately:
+    const auto mapping_pointers = {
+      (static_cast<const Mapping<dim, spacedim> *>(&mappings))...};
+    for (const auto p : mapping_pointers)
+      push_back(*p);
+  }
 
   template <int dim, int spacedim>
   inline unsigned int
