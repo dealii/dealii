@@ -48,7 +48,7 @@
 const unsigned int n_refinements = 3;
 // how many times to run each benchmark before averaging
 const unsigned int n_runs = 1;
-// maximum number of threads to test (to speed up test)
+// maximum number of threads to test (to speed up testing)
 const unsigned int n_max_threads = 4;
 
 
@@ -410,15 +410,29 @@ assemble()
 
   double reference_l2 = -1.;
   {
-    // reference
-    system_rhs = 0.;
-    WorkStream::internal::sequential::run(dof_handler.begin_active(),
-                                          dof_handler.end(),
-                                          worker,
-                                          copier,
-                                          AssemblyScratchData<dim>(fe),
-                                          AssemblyCopyData());
-    reference_l2 = system_rhs.l2_norm();
+    // reference sequential implementation
+
+    double avg = 0.;
+
+    for (unsigned int c = 0; c < n_runs; ++c)
+      {
+        system_rhs = 0.;
+        timer.reset();
+        timer.start();
+        WorkStream::internal::sequential::run(dof_handler.begin_active(),
+                                              dof_handler.end(),
+                                              worker,
+                                              copier,
+                                              AssemblyScratchData<dim>(fe),
+                                              AssemblyCopyData());
+        timer.stop();
+        const double time = timer.last_wall_time();
+        avg += time;
+        std::cout << time << " " << std::flush;
+        reference_l2 = system_rhs.l2_norm();
+      }
+    avg /= n_runs;
+    std::cout << " avg: " << avg << std::endl;
   }
 
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
@@ -523,8 +537,78 @@ assemble()
   }
 
   {
-    std::cout << "** TBB graph **" << std::endl;
-    for (unsigned int n_cores = 1 /*n_phys_cores*/; n_cores > 0; n_cores /= 2)
+    std::cout << "** TBB colored **" << std::endl;
+    for (unsigned int n_cores = n_phys_cores; n_cores > 0; n_cores /= 2)
+      {
+        MultithreadInfo::set_thread_limit(n_cores);
+
+        std::cout << "n_cores " << n_cores;
+        std::cout << ' ' << std::flush;
+        double avg = 0.;
+
+        for (unsigned int c = 0; c < n_runs; ++c)
+          {
+            system_rhs = 0.;
+            timer.reset();
+            timer.start();
+            WorkStream::internal::tbb_colored::run(graph,
+                                                   worker,
+                                                   copier,
+                                                   AssemblyScratchData<dim>(fe),
+                                                   AssemblyCopyData(),
+                                                   8);
+
+            timer.stop();
+            const double time = timer.last_wall_time();
+            avg += time;
+            std::cout << time << " " << std::flush;
+            Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
+                   ExcInternalError());
+          }
+        avg /= n_runs;
+        std::cout << " avg: " << avg << std::endl;
+      }
+  }
+
+#endif
+
+  {
+    std::cout << "** WorkStream **" << std::endl;
+    for (unsigned int n_cores = n_phys_cores; n_cores > 0; n_cores /= 2)
+      {
+        MultithreadInfo::set_thread_limit(n_cores);
+
+        std::cout << "n_cores " << n_cores;
+        std::cout << ' ' << std::flush;
+        double avg = 0.;
+
+        for (unsigned int c = 0; c < n_runs; ++c)
+          {
+            system_rhs = 0.;
+            timer.reset();
+            timer.start();
+            WorkStream::run(dof_handler.begin_active(),
+                            dof_handler.end(),
+                            worker,
+                            copier,
+                            AssemblyScratchData<dim>(fe),
+                            AssemblyCopyData());
+
+            timer.stop();
+            const double time = timer.last_wall_time();
+            avg += time;
+            std::cout << time << " " << std::flush;
+            Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
+                   ExcInternalError());
+          }
+        avg /= n_runs;
+        std::cout << " avg: " << avg << std::endl;
+      }
+  }
+
+  {
+    std::cout << "** WorkStream colored **" << std::endl;
+    for (unsigned int n_cores = n_phys_cores; n_cores > 0; n_cores /= 2)
       {
         MultithreadInfo::set_thread_limit(n_cores);
 
@@ -554,8 +638,6 @@ assemble()
         std::cout << " avg: " << avg << std::endl;
       }
   }
-
-#endif
 }
 
 
@@ -564,6 +646,7 @@ int
 main()
 {
   initlog();
+  // remove the limit normally applied to all tests:
   MultithreadInfo::set_thread_limit();
 
   assemble<2>();
