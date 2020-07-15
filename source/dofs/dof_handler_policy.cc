@@ -421,7 +421,7 @@ namespace internal
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
           for (const auto &cell : dof_handler.active_cell_iterators())
-            for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+            for (const auto l : cell->line_indices())
               if (cell->line(l)->user_flag_set() == false)
                 {
                   const auto line = cell->line(l);
@@ -790,7 +790,7 @@ namespace internal
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
           for (const auto &cell : dof_handler.active_cell_iterators())
-            for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
+            for (const auto q : cell->face_indices())
               if ((cell->quad(q)->user_flag_set() == false) &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
@@ -1076,7 +1076,7 @@ namespace internal
                 &dof_handler.get_triangulation()) != nullptr)
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->is_ghost())
-                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int v : cell->vertex_indices())
                   include_vertex[cell->vertex_index(v)] = true;
 
           // loop over all vertices and see which one we need to work on
@@ -1241,8 +1241,7 @@ namespace internal
           // mark all lines on ghost cells
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (cell->is_ghost())
-              for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                   ++l)
+              for (const auto l : cell->line_indices())
                 cell->line(l)->set_user_flag();
 
           // An implementation of the algorithm described in the hp paper,
@@ -1268,7 +1267,7 @@ namespace internal
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
           for (const auto &cell : dof_handler.active_cell_iterators())
-            for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+            for (const auto l : cell->line_indices())
               if ((cell->is_locally_owned()) &&
                   (cell->line(l)->user_flag_set() == true))
                 {
@@ -1525,8 +1524,7 @@ namespace internal
           // mark all quads on ghost cells
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (cell->is_ghost())
-              for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell;
-                   ++q)
+              for (const auto q : cell->face_indices())
                 cell->quad(q)->set_user_flag();
 
           // An implementation of the algorithm described in the hp
@@ -1544,7 +1542,7 @@ namespace internal
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
           for (const auto &cell : dof_handler.active_cell_iterators())
-            for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
+            for (const auto q : cell->face_indices())
               if ((cell->is_locally_owned()) &&
                   (cell->quad(q)->user_flag_set() == true) &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
@@ -2113,8 +2111,7 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (const auto l : cell->line_indices())
                   if (cell->line(l)->user_flag_set() == false)
                     {
                       const auto line = cell->line(l);
@@ -2222,8 +2219,7 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (const auto l : cell->line_indices())
                   if (cell->line(l)->user_flag_set() == false)
                     {
                       const auto line = cell->line(l);
@@ -2300,8 +2296,7 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell;
-                     ++q)
+                for (const auto q : cell->face_indices())
                   if (cell->quad(q)->user_flag_set() == false)
                     {
                       const auto quad = cell->quad(q);
@@ -2568,14 +2563,12 @@ namespace internal
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
-                  for (const unsigned int line :
-                       GeometryInfo<2>::face_indices())
+                  for (const unsigned int line : cell->face_indices())
                     cell->face(line)->set_user_flag();
 
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
-                for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell;
-                     ++l)
+                for (const auto l : cell->line_indices())
                   if (cell->line(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;
@@ -2634,15 +2627,12 @@ namespace internal
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<3>::lines_per_cell;
-                       ++line)
+                  for (const auto line : cell->line_indices())
                     cell->line(line)->set_user_flag();
 
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
-                for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell;
-                     ++l)
+                for (const auto l : cell->line_indices())
                   if (cell->line(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;
@@ -2674,14 +2664,11 @@ namespace internal
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
-                  for (unsigned int quad = 0;
-                       quad < GeometryInfo<3>::quads_per_cell;
-                       ++quad)
+                  for (const auto quad : cell->face_indices())
                     cell->quad(quad)->set_user_flag();
 
               for (const auto &cell : dof_handler.cell_iterators())
-                for (unsigned int l = 0; l < GeometryInfo<3>::quads_per_cell;
-                     ++l)
+                for (const auto l : cell->face_indices())
                   if (cell->quad(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;

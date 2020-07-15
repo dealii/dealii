@@ -454,7 +454,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (const unsigned int vertex : GeometryInfo<1>::vertex_indices())
+            for (const auto vertex : cell->vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -528,7 +528,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (const unsigned int vertex : GeometryInfo<2>::vertex_indices())
+            for (const auto vertex : cell->vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -603,7 +603,7 @@ namespace internal
           {
             const unsigned int level = cell->level();
 
-            for (const unsigned int vertex : GeometryInfo<3>::vertex_indices())
+            for (const auto vertex : cell->vertex_indices())
               {
                 const unsigned int vertex_index = cell->vertex_index(vertex);
 
@@ -1019,7 +1019,7 @@ namespace internal
             dof_handler.tria->n_vertices(), false);
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
-              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+              for (const auto v : cell->vertex_indices())
                 locally_used_vertices[cell->vertex_index(v)] = true;
 
           std::vector<std::vector<bool>> vertex_fe_association(
@@ -1028,7 +1028,7 @@ namespace internal
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
-              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+              for (const auto v : cell->vertex_indices())
                 vertex_fe_association[cell->active_fe_index()]
                                      [cell->vertex_index(v)] = true;
 
@@ -1262,8 +1262,7 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const auto face : cell->face_indices())
                   if (cell->face(face)->user_flag_set() == false)
                     {
                       unsigned int fe_slots_needed = 0;
@@ -1345,8 +1344,7 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const auto face : cell->face_indices())
                   if (!cell->face(face)->user_flag_set())
                     {
                       // Same decision tree as before
@@ -1519,8 +1517,6 @@ namespace internal
         template <int spacedim>
         static void reserve_space(dealii::DoFHandler<3, spacedim> &dof_handler)
         {
-          const unsigned int dim = 3;
-
           Assert(dof_handler.fe_collection.size() > 0,
                  (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
@@ -1558,8 +1554,7 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (const auto l : cell->line_indices())
                   line_fe_association[cell->active_fe_index()]
                                      [cell->line_index(l)] = true;
 
@@ -2256,7 +2251,7 @@ DoFHandler<dim, spacedim>::n_boundary_dofs() const
   for (const auto &cell : this->active_cell_iterators())
     if (cell->is_locally_owned() && cell->at_boundary())
       {
-        for (auto iface : GeometryInfo<dim>::face_indices())
+        for (const auto iface : cell->face_indices())
           {
             const auto face = cell->face(iface);
             if (face->at_boundary())
@@ -2305,7 +2300,7 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
   for (const auto &cell : this->active_cell_iterators())
     if (cell->is_locally_owned() && cell->at_boundary())
       {
-        for (auto iface : GeometryInfo<dim>::face_indices())
+        for (const auto iface : cell->face_indices())
           {
             const auto         face        = cell->face(iface);
             const unsigned int boundary_id = face->boundary_id();
