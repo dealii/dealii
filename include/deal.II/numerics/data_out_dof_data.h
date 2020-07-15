@@ -413,6 +413,17 @@ namespace internal
         const UpdateFlags update_flags,
         const bool        use_face_values);
 
+      ParallelDataBase(
+        const unsigned int               n_datasets,
+        const unsigned int               n_subdivisions,
+        const std::vector<unsigned int> &n_postprocessor_outputs,
+        const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+        const std::vector<
+          std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+          &               finite_elements,
+        const UpdateFlags update_flags,
+        const bool        use_face_values);
+
       ParallelDataBase(const ParallelDataBase &data);
 
       template <typename DoFHandlerType>
