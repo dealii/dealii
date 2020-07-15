@@ -105,6 +105,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         unsigned int,
         unsigned int);
       template void
+      FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+        const TriaIterator<
+          DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
+        const Triangulation<deal_II_dimension,
+                            deal_II_space_dimension>::face_iterator &,
+        unsigned int,
+        unsigned int,
+        unsigned int);
+      template void
       FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
         TriaIterator<
           DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>>,
