@@ -351,7 +351,7 @@ namespace hp
      */
     template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
@@ -470,8 +470,8 @@ namespace hp
      */
     template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
-           const unsigned int                                      face_no,
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
+           const unsigned int                                       face_no,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
@@ -566,9 +566,9 @@ namespace hp
      */
     template <bool lda>
     void
-    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> cell,
-           const unsigned int                                      face_no,
-           const unsigned int                                      subface_no,
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
+           const unsigned int                                       face_no,
+           const unsigned int                                       subface_no,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
