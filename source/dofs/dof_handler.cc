@@ -2992,7 +2992,7 @@ DoFHandler<dim, spacedim>::setup_policy_and_listeners()
   // policy and attach corresponding callback functions dealing with the
   // transfer of active_fe_indices
   if (dynamic_cast<
-        const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+        const dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
         &this->get_triangulation()))
     {
       this->policy =
