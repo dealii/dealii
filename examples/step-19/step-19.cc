@@ -48,7 +48,7 @@
 #include <deal.II/numerics/error_estimator.h>
 
 
-// The ones that are new are only the following three: The first declared the
+// The ones that are new are only the following three: The first declares the
 // DiscreteTime class that helps us keep track of time in a time-dependent
 // simulation. The latter two provide all of the particle functionality,
 // namely a way to keep track of particles located on a mesh (the
@@ -815,7 +815,7 @@ namespace Step19
 
   // @sect4{CathodeRaySimulator::update_timestep_size}
 
-  // As discussed at length in the introduction, we need to respect a CFL
+  // As discussed at length in the introduction, we need to respect a time step
   // condition whereby particles can not move further than one cell in one time
   // step. To ensure that this is the case, we again first compute the maximal
   // speed of all particles on each cell, and divide the cell size by that

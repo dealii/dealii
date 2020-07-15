@@ -35,7 +35,7 @@ then accelerated by an electric field towards the positively charged electrode
 (the "anode"). The anode is typically ring-shaped so that the majority of
 electrons can fly through the hole in the form of an electron beam. In the olden
 times, they might then have illuminated the screen of a TV built from a
-[cathode ray rube](https://en.wikipedia.org/wiki/Cathode-ray_tube).
+[cathode ray tube](https://en.wikipedia.org/wiki/Cathode-ray_tube).
 Today, instead, electron beams are useful in
 [X-ray machines](https://en.wikipedia.org/wiki/X-ray_tube),
 [electron beam lithography](https://en.wikipedia.org/wiki/Electron-beam_lithography),
@@ -175,7 +175,7 @@ use a simple time discretization for the ODE, then this means
 that we have to solve the following set of equations in each time
 step:
 @f{align*}{
-  -\epsilon_0 \Delta V^(n) &= \sum_i e\delta(\mathbf x-\mathbf x_i^{(n-1)})
+  -\epsilon_0 \Delta V^{(n)} &= \sum_i e\delta(\mathbf x-\mathbf x_i^{(n-1)})
   \\
   \frac{{\mathbf v}_i^{(n)}-{\mathbf v}_i^{(n-1)}}{\Delta t} &= \frac{e\nabla V^{(n)}}{m}
   \\
@@ -331,7 +331,7 @@ fields at locations $\mathbf x_i$. But this requires evaluating the
 finite element shape functions at points on the refence cell
 $\hat{\mathbf x}_i$. To make this efficient, every particle doesn't
 just store its location and the cell it is on, but also what location
-that point corresponds to reference coordinates.
+that point corresponds to in the cell's reference coordinate system.
 
 Updating a particle's position is then no more difficult: One just has
 to call
@@ -350,7 +350,7 @@ function.
 There are, of course, times where a particle may leave the domain in
 question. In that case,
 Particles::ParticleHandler::sort_particles_into_subdomains_and_cells()
-can not find a surrounding cell and simply deletes the cell. But, it
+can not find a surrounding cell and simply deletes the particle. But, it
 is often useful to track the number of particles that have been lost
 this way, and for this the Particles::ParticleHandler class offers a
 "signal" that one can attach to. We show how to do this in the
@@ -381,6 +381,16 @@ find a new home. This gives us the chance to record where the particle
 is, and to record statistics on it.
 
 
+@note In this tutorial program, we insert particles by hand and at
+  locations we specifically choose based on conditions that include
+  the solution of the electrostatic problem. But there are other cases
+  where one primarily wants to use particles as passive objects, for
+  example to trace and visualize the flow field of a fluid flow
+  problem. In those cases, there are numerous functions in the
+  Particles::Generators namespace that can generate particles
+  automatically. One of the functions of this namespace is also used
+  in the step-70 tutorial program, for example.
+
 
 <h3>The test case</h3>
 
@@ -397,15 +407,15 @@ The following picture shows the geometry that we're going to use:
        width="600">
 </p>
 
-In this picture, that parts of the boundary marked in red and blue are the
+In this picture, the parts of the boundary marked in red and blue are the
 cathode, held at an electric potential $V=-V_0$. The part of the cathode shown
-in red is that part that is heated, leading to electrons leaving the metal
+in red is the part that is heated, leading to electrons leaving the metal
 and then being accelerated by the electric field (a few electric
 field lines are also shown). The green part of the boundary is the anode,
 held at $V=+V_0$. The rest of the boundary satisfies a Neumann boundary
 condition.
 
-This set up mimicks real devices. The re-entrant corner results in an
+This setup mimicks real devices. The re-entrant corner results in an
 electric potential $V$ whose derivative (the electric field $\mathbf E$)
 has a singularity -- in other words, it becomes very large in the vicinity
 of the corner, allowing it to rip electrons away from the metal. These
@@ -432,7 +442,7 @@ locations.
 
 Of practical interest is to figure out which fraction of the
 electrons emitted from the cathode actually make it through the
-hole in the anode -- electrons that just bounce into the enode
+hole in the anode -- electrons that just bounce into the anode
 itself are not actually doing anything useful other than converting
 eletricity into heat. As a consequence, in the `track_lost_particle()`
 function (which is called for each particle that leaves the domain,
