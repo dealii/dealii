@@ -36,7 +36,7 @@ Writing background field file: background-2000
 @endcode
 
 We note that, by default, the simulation runs the particle tracking with
-an analytical velocity for 2000 iterations, then runs the particle tracking with
+an analytical velocity for 2000 iterations, then restarts from the beginning and runs the particle tracking with
 velocity interpolation for the same duration. The results are written every
 10th iteration.
 
