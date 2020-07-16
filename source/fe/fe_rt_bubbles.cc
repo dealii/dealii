@@ -80,13 +80,13 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
   FETools::compute_embedding_matrices(*this, this->prolongation, true, 1.0);
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
+    face_embeddings[i].reinit(this->n_dofs_per_face(), this->n_dofs_per_face());
   FETools::compute_face_embedding_matrices<dim, double>(*this,
                                                         face_embeddings,
                                                         0,
                                                         0);
-  this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
-                                     this->dofs_per_face);
+  this->interface_constraints.reinit((1 << (dim - 1)) * this->n_dofs_per_face(),
+                                     this->n_dofs_per_face());
   unsigned int target_row = 0;
   for (unsigned int d = 0; d < GeometryInfo<dim>::max_children_per_face; ++d)
     for (unsigned int i = 0; i < face_embeddings[d].m(); ++i)
@@ -132,7 +132,7 @@ void
 FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
 {
   this->generalized_support_points.resize(this->n_dofs_per_cell());
-  this->generalized_face_support_points.resize(this->dofs_per_face);
+  this->generalized_face_support_points.resize(this->n_dofs_per_face());
 
   // Index of the point being entered
   unsigned int current = 0;
@@ -143,19 +143,19 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
   if (dim > 1)
     {
       QGaussLobatto<dim - 1> face_points(deg + 1);
-      Assert(face_points.size() == this->dofs_per_face, ExcInternalError());
-      for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+      Assert(face_points.size() == this->n_dofs_per_face(), ExcInternalError());
+      for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
         this->generalized_face_support_points[k] = face_points.point(k);
       Quadrature<dim> faces =
         QProjector<dim>::project_to_all_faces(face_points);
       for (unsigned int k = 0;
-           k < this->dofs_per_face * GeometryInfo<dim>::faces_per_cell;
+           k < this->n_dofs_per_face() * GeometryInfo<dim>::faces_per_cell;
            ++k)
         this->generalized_support_points[k] =
           faces.point(k + QProjector<dim>::DataSetDescriptor::face(
-                            0, true, false, false, this->dofs_per_face));
+                            0, true, false, false, this->n_dofs_per_face()));
 
-      current = this->dofs_per_face * GeometryInfo<dim>::faces_per_cell;
+      current = this->n_dofs_per_face() * GeometryInfo<dim>::faces_per_cell;
     }
 
   if (deg == 1)
@@ -277,9 +277,9 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
   unsigned int fbase = 0;
   unsigned int f     = 0;
   for (; f < GeometryInfo<dim>::faces_per_cell;
-       ++f, fbase += this->dofs_per_face)
+       ++f, fbase += this->n_dofs_per_face())
     {
-      for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+      for (unsigned int i = 0; i < this->n_dofs_per_face(); ++i)
         {
           nodal_values[fbase + i] = support_point_values[fbase + i](
             GeometryInfo<dim>::unit_normal_direction[f]);

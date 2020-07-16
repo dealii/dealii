@@ -701,7 +701,7 @@ namespace Step63
     copy_data.level = cell->level();
 
     const unsigned int dofs_per_cell =
-      scratch_data.fe_values.get_fe().dofs_per_cell;
+      scratch_data.fe_values.get_fe().n_dofs_per_cell();
     copy_data.dofs_per_cell = dofs_per_cell;
     copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 

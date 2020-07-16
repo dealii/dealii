@@ -364,7 +364,7 @@ namespace Step46
     // introduction:
     {
       std::vector<types::global_dof_index> local_face_dof_indices(
-        stokes_fe.dofs_per_face);
+        stokes_fe.n_dofs_per_face());
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell_is_in_fluid_domain(cell))
           for (unsigned int face_no : GeometryInfo<dim>::face_indices())
@@ -498,8 +498,9 @@ namespace Step46
 
     // ...to objects that are needed to describe the local contributions to
     // the global linear system...
-    const unsigned int stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
-    const unsigned int elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
+    const unsigned int stokes_dofs_per_cell = stokes_fe.n_dofs_per_cell();
+    const unsigned int elasticity_dofs_per_cell =
+      elasticity_fe.n_dofs_per_cell();
 
     FullMatrix<double> local_matrix;
     FullMatrix<double> local_interface_matrix(elasticity_dofs_per_cell,
@@ -538,9 +539,9 @@ namespace Step46
 
         const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
-        local_matrix.reinit(cell->get_fe().dofs_per_cell,
-                            cell->get_fe().dofs_per_cell);
-        local_rhs.reinit(cell->get_fe().dofs_per_cell);
+        local_matrix.reinit(cell->get_fe().n_dofs_per_cell(),
+                            cell->get_fe().n_dofs_per_cell());
+        local_rhs.reinit(cell->get_fe().n_dofs_per_cell());
 
         // With all of this done, we continue to assemble the cell terms for
         // cells that are part of the Stokes and elastic regions. While we
@@ -558,7 +559,7 @@ namespace Step46
         // documentation module for the elasticity equations:
         if (cell_is_in_fluid_domain(cell))
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             Assert(dofs_per_cell == stokes_dofs_per_cell, ExcInternalError());
 
             for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
@@ -584,7 +585,7 @@ namespace Step46
           }
         else
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             Assert(dofs_per_cell == elasticity_dofs_per_cell,
                    ExcInternalError());
 
@@ -622,7 +623,7 @@ namespace Step46
         // along since the elimination of nonzero boundary values requires the
         // modification of local and consequently also global right hand side
         // values:
-        local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+        local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
         cell->get_dof_indices(local_dof_indices);
         constraints.distribute_local_to_global(local_matrix,
                                                local_rhs,

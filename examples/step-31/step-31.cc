@@ -1045,7 +1045,7 @@ namespace Step31
                                    update_JxW_values | update_values |
                                      update_gradients);
 
-    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
@@ -1250,7 +1250,7 @@ namespace Step31
                                         quadrature_formula,
                                         update_values);
 
-    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
@@ -1414,7 +1414,7 @@ namespace Step31
                                         update_values | update_gradients |
                                           update_JxW_values);
 
-    const unsigned int dofs_per_cell = temperature_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_mass_matrix(dofs_per_cell, dofs_per_cell);
@@ -1522,7 +1522,7 @@ namespace Step31
                                    quadrature_formula,
                                    update_values);
 
-    const unsigned int dofs_per_cell = temperature_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double> local_rhs(dofs_per_cell);

@@ -1413,7 +1413,7 @@ namespace FETools
 
       // exclude dofs on more refined ghosted cells
       const FiniteElement<dim, spacedim> &fe            = dof2.get_fe();
-      const unsigned int                  dofs_per_face = fe.dofs_per_face;
+      const unsigned int                  dofs_per_face = fe.n_dofs_per_face();
       if (dofs_per_face > 0)
         {
           const unsigned int dofs_per_cell = fe.n_dofs_per_cell();

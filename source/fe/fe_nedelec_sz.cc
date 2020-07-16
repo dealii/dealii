@@ -146,8 +146,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   const unsigned int lines_per_cell    = GeometryInfo<dim>::lines_per_cell;
   const unsigned int faces_per_cell    = GeometryInfo<dim>::faces_per_cell;
 
-  const unsigned int n_line_dofs = this->dofs_per_line * lines_per_cell;
-  const unsigned int n_face_dofs = this->dofs_per_quad * faces_per_cell;
+  const unsigned int n_line_dofs = this->n_dofs_per_line() * lines_per_cell;
+  const unsigned int n_face_dofs = this->n_dofs_per_quad() * faces_per_cell;
 
   const UpdateFlags  flags(data.update_each);
   const unsigned int n_q_points = quadrature.size();
@@ -1251,7 +1251,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
 
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
-                  const unsigned int shift_m(m * this->dofs_per_line);
+                  const unsigned int shift_m(m * this->n_dofs_per_line());
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // Only compute 1d polynomials if degree>0.
@@ -1440,7 +1440,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                 degree, std::vector<double>(poly_length));
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
-                  const unsigned int shift_m(m * this->dofs_per_line);
+                  const unsigned int shift_m(m * this->n_dofs_per_line());
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // precompute values of all 1d polynomials required:
@@ -1580,7 +1580,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
 
           // DoF info:
           const unsigned int n_line_dofs =
-            this->dofs_per_line * GeometryInfo<dim>::lines_per_cell;
+            this->n_dofs_per_line() * GeometryInfo<dim>::lines_per_cell;
 
           // First we find the global face orientations on the current cell.
           std::vector<std::vector<unsigned int>> face_orientation(
@@ -1695,7 +1695,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
           // Loop through quad points:
           for (unsigned int m = 0; m < faces_per_cell; ++m)
             {
-              const unsigned int shift_m(m * this->dofs_per_quad);
+              const unsigned int shift_m(m * this->n_dofs_per_quad());
               // Calculate the offsets for each face-based shape function:
               //
               // Type-1 (gradients)

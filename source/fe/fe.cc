@@ -60,13 +60,13 @@ FiniteElement<dim, spacedim>::FiniteElement(
   const std::vector<ComponentMask> &nonzero_c)
   : FiniteElementData<dim>(fe_data)
   , adjust_quad_dof_index_for_face_orientation_table(dim == 3 ?
-                                                       this->dofs_per_quad :
+                                                       this->n_dofs_per_quad() :
                                                        0,
                                                      dim == 3 ? 8 : 0)
   , adjust_line_dof_index_for_line_orientation_table(
-      dim == 3 ? this->dofs_per_line : 0)
+      dim == 3 ? this->n_dofs_per_line() : 0)
   , system_to_base_table(this->n_dofs_per_cell())
-  , face_system_to_base_table(this->dofs_per_face)
+  , face_system_to_base_table(this->n_dofs_per_face())
   , component_to_base_table(this->components,
                             std::make_pair(std::make_pair(0U, 0U), 0U))
   ,
@@ -109,16 +109,16 @@ FiniteElement<dim, spacedim>::FiniteElement(
   if (this->is_primitive())
     {
       system_to_component_table.resize(this->n_dofs_per_cell());
-      face_system_to_component_table.resize(this->dofs_per_face);
+      face_system_to_component_table.resize(this->n_dofs_per_face());
       for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
         system_to_component_table[j] = std::pair<unsigned, unsigned>(0, j);
-      for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+      for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
         face_system_to_component_table[j] = std::pair<unsigned, unsigned>(0, j);
     }
 
   for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
     system_to_base_table[j] = std::make_pair(std::make_pair(0U, 0U), j);
-  for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+  for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
     face_system_to_base_table[j] = std::make_pair(std::make_pair(0U, 0U), j);
 
   // Fill with default value; may be changed by constructor of derived class.
@@ -544,7 +544,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                                                  const bool face_flip,
                                                  const bool face_rotation) const
 {
-  AssertIndexRange(face_index, this->dofs_per_face);
+  AssertIndexRange(face_index, this->n_dofs_per_face());
   AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
 
   // TODO: we could presumably solve the 3d case below using the
@@ -562,7 +562,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   // other than standard orientation
   if ((face_orientation != true) || (face_flip != false) ||
       (face_rotation != false))
-    Assert((this->dofs_per_line <= 1) && (this->dofs_per_quad <= 1),
+    Assert((this->n_dofs_per_line() <= 1) && (this->n_dofs_per_quad() <= 1),
            ExcMessage(
              "The function in this base class can not handle this case. "
              "Rather, the derived class you are using must provide "
@@ -571,7 +571,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
-  if (face_index < this->first_face_line_index)
+  if (face_index < this->get_first_face_line_index())
     // DoF is on a vertex
     {
       // get the number of the vertex on the face that corresponds to this DoF,
@@ -587,20 +587,20 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
-  else if (face_index < this->first_face_quad_index)
+  else if (face_index < this->get_first_face_quad_index())
     // DoF is on a face
     {
       // do the same kind of translation as before. we need to only consider
       // DoFs on the lines, i.e., ignoring those on the vertices
-      const unsigned int index = face_index - this->first_face_line_index;
+      const unsigned int index = face_index - this->get_first_face_line_index();
 
-      const unsigned int face_line         = index / this->dofs_per_line;
-      const unsigned int dof_index_on_line = index % this->dofs_per_line;
+      const unsigned int face_line         = index / this->n_dofs_per_line();
+      const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
 
-      return (this->first_line_index +
+      return (this->get_first_line_index() +
               GeometryInfo<dim>::face_to_cell_lines(
                 face, face_line, face_orientation, face_flip, face_rotation) *
-                this->dofs_per_line +
+                this->n_dofs_per_line() +
               dof_index_on_line);
     }
   else
@@ -609,9 +609,10 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       Assert(dim >= 3, ExcInternalError());
 
       // ignore vertex and line dofs
-      const unsigned int index = face_index - this->first_face_quad_index;
+      const unsigned int index = face_index - this->get_first_face_quad_index();
 
-      return (this->first_quad_index + face * this->dofs_per_quad + index);
+      return (this->get_first_quad_index() + face * this->n_dofs_per_quad() +
+              index);
     }
 }
 
@@ -642,9 +643,9 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // in 3d), so we don't need the table, but
   // the function should also not have been
   // called
-  AssertIndexRange(index, this->dofs_per_quad);
+  AssertIndexRange(index, this->n_dofs_per_quad());
   Assert(adjust_quad_dof_index_for_face_orientation_table.n_elements() ==
-           8 * this->dofs_per_quad,
+           8 * this->n_dofs_per_quad(),
          ExcInternalError());
   return index + adjust_quad_dof_index_for_face_orientation_table(
                    index, 4 * face_orientation + 2 * face_flip + face_rotation);
@@ -665,9 +666,9 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   if (dim < 3)
     return index;
 
-  AssertIndexRange(index, this->dofs_per_line);
+  AssertIndexRange(index, this->n_dofs_per_line());
   Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
-           this->dofs_per_line,
+           this->n_dofs_per_line(),
          ExcInternalError());
   if (line_orientation)
     return index;
@@ -795,7 +796,7 @@ FiniteElement<dim, spacedim>::constraints_are_implemented(
   const internal::SubfaceCase<dim> &subface_case) const
 {
   if (subface_case == internal::SubfaceCase<dim>::case_isotropic)
-    return (this->dofs_per_face == 0) || (interface_constraints.m() != 0);
+    return (this->n_dofs_per_face() == 0) || (interface_constraints.m() != 0);
   else
     return false;
 }
@@ -823,7 +824,7 @@ FiniteElement<dim, spacedim>::constraints(
                     "(which is always the case in 2d, and in 3d requires "
                     "that the neighboring cell of a coarse cell presents "
                     "exactly four children on the common face)."));
-  Assert((this->dofs_per_face == 0) || (interface_constraints.m() != 0),
+  Assert((this->n_dofs_per_face() == 0) || (interface_constraints.m() != 0),
          ExcMessage("The finite element for which you try to obtain "
                     "hanging node constraints does not appear to "
                     "implement them."));
@@ -847,12 +848,12 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
       case 1:
         return {0U, 0U};
       case 2:
-        return {this->n_dofs_per_vertex() + 2 * this->dofs_per_line,
-                this->dofs_per_face};
+        return {this->n_dofs_per_vertex() + 2 * this->n_dofs_per_line(),
+                this->n_dofs_per_face()};
       case 3:
-        return {5 * this->n_dofs_per_vertex() + 12 * this->dofs_per_line +
-                  4 * this->dofs_per_quad,
-                this->dofs_per_face};
+        return {5 * this->n_dofs_per_vertex() + 12 * this->n_dofs_per_line() +
+                  4 * this->n_dofs_per_quad(),
+                this->n_dofs_per_face()};
       default:
         Assert(false, ExcNotImplemented());
     }
@@ -1048,7 +1049,7 @@ FiniteElement<dim, spacedim>::get_unit_face_support_points() const
   // there are as many as there are
   // degrees of freedom on a face
   Assert((unit_face_support_points.size() == 0) ||
-           (unit_face_support_points.size() == this->dofs_per_face),
+           (unit_face_support_points.size() == this->n_dofs_per_face()),
          ExcInternalError());
   return unit_face_support_points;
 }
@@ -1069,8 +1070,8 @@ Point<dim - 1>
 FiniteElement<dim, spacedim>::unit_face_support_point(
   const unsigned int index) const
 {
-  AssertIndexRange(index, this->dofs_per_face);
-  Assert(unit_face_support_points.size() == this->dofs_per_face,
+  AssertIndexRange(index, this->n_dofs_per_face());
+  Assert(unit_face_support_points.size() == this->n_dofs_per_face(),
          ExcFEHasNoSupportPoints());
   return unit_face_support_points[index];
 }

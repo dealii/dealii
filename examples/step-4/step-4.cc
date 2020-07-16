@@ -342,7 +342,7 @@ void Step4<dim>::assemble_system()
   // are presently using, but the FiniteElement class does all the necessary
   // work for you and you don't have to care about the dimension dependent
   // parts:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);

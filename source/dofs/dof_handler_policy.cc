@@ -458,13 +458,15 @@ namespace internal
                         // FE_Q objects of the same order, from which one is
                         // enhanced by a bubble function that is zero on the
                         // boundary.
-                        if ((dof_handler.get_fe(fe_index_1).dofs_per_line ==
-                             dof_handler.get_fe(fe_index_2).dofs_per_line) &&
-                            (dof_handler.get_fe(fe_index_1).dofs_per_line > 0))
+                        if ((dof_handler.get_fe(fe_index_1).n_dofs_per_line() ==
+                             dof_handler.get_fe(fe_index_2)
+                               .n_dofs_per_line()) &&
+                            (dof_handler.get_fe(fe_index_1).n_dofs_per_line() >
+                             0))
                           {
                             // the number of dofs per line is identical
                             const unsigned int dofs_per_line =
-                              dof_handler.get_fe(fe_index_1).dofs_per_line;
+                              dof_handler.get_fe(fe_index_1).n_dofs_per_line();
 
                             ensure_existence_of_dof_identities<1>(
                               dof_handler.get_fe(fe_index_1),
@@ -1290,13 +1292,15 @@ namespace internal
                                            fe_index_2 =
                                              line->nth_active_fe_index(g);
 
-                        if ((dof_handler.get_fe(fe_index_1).dofs_per_line ==
-                             dof_handler.get_fe(fe_index_2).dofs_per_line) &&
-                            (dof_handler.get_fe(fe_index_1).dofs_per_line > 0))
+                        if ((dof_handler.get_fe(fe_index_1).n_dofs_per_line() ==
+                             dof_handler.get_fe(fe_index_2)
+                               .n_dofs_per_line()) &&
+                            (dof_handler.get_fe(fe_index_1).n_dofs_per_line() >
+                             0))
                           {
                             // the number of dofs per line is identical
                             const unsigned int dofs_per_line =
-                              dof_handler.get_fe(fe_index_1).dofs_per_line;
+                              dof_handler.get_fe(fe_index_1).n_dofs_per_line();
 
                             ensure_existence_of_dof_identities<1>(
                               dof_handler.get_fe(fe_index_1),
@@ -2129,7 +2133,8 @@ namespace internal
                             line->nth_active_fe_index(f);
 
                           for (unsigned int d = 0;
-                               d < dof_handler.get_fe(fe_index).dofs_per_line;
+                               d <
+                               dof_handler.get_fe(fe_index).n_dofs_per_line();
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -2238,7 +2243,8 @@ namespace internal
                             line->nth_active_fe_index(f);
 
                           for (unsigned int d = 0;
-                               d < dof_handler.get_fe(fe_index).dofs_per_line;
+                               d <
+                               dof_handler.get_fe(fe_index).n_dofs_per_line();
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -2316,7 +2322,8 @@ namespace internal
                             quad->nth_active_fe_index(f);
 
                           for (unsigned int d = 0;
-                               d < dof_handler.get_fe(fe_index).dofs_per_quad;
+                               d <
+                               dof_handler.get_fe(fe_index).n_dofs_per_quad();
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -2552,7 +2559,7 @@ namespace internal
           const unsigned int       level,
           const bool               check_validity)
         {
-          if (dof_handler.get_fe().dofs_per_line > 0)
+          if (dof_handler.get_fe().n_dofs_per_line() > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
@@ -2580,7 +2587,7 @@ namespace internal
                   if (cell->line(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;
-                           d < dof_handler.get_fe().dofs_per_line;
+                           d < dof_handler.get_fe().n_dofs_per_line();
                            ++d)
                         {
                           const dealii::types::global_dof_index idx =
@@ -2618,8 +2625,8 @@ namespace internal
           const unsigned int       level,
           const bool               check_validity)
         {
-          if (dof_handler.get_fe().dofs_per_line > 0 ||
-              dof_handler.get_fe().dofs_per_quad > 0)
+          if (dof_handler.get_fe().n_dofs_per_line() > 0 ||
+              dof_handler.get_fe().n_dofs_per_quad() > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
@@ -2647,7 +2654,7 @@ namespace internal
                   if (cell->line(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;
-                           d < dof_handler.get_fe().dofs_per_line;
+                           d < dof_handler.get_fe().n_dofs_per_line();
                            ++d)
                         {
                           const dealii::types::global_dof_index idx =
@@ -2686,7 +2693,7 @@ namespace internal
                   if (cell->quad(l)->user_flag_set())
                     {
                       for (unsigned int d = 0;
-                           d < dof_handler.get_fe().dofs_per_quad;
+                           d < dof_handler.get_fe().n_dofs_per_quad();
                            ++d)
                         {
                           const dealii::types::global_dof_index idx =

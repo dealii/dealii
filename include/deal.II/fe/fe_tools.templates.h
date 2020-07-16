@@ -109,10 +109,11 @@ namespace FETools
             multiplied_dofs_per_vertex +=
               fes[i]->n_dofs_per_vertex() * multiplicities[i];
             multiplied_dofs_per_line +=
-              fes[i]->dofs_per_line * multiplicities[i];
+              fes[i]->n_dofs_per_line() * multiplicities[i];
             multiplied_dofs_per_quad +=
-              fes[i]->dofs_per_quad * multiplicities[i];
-            multiplied_dofs_per_hex += fes[i]->dofs_per_hex * multiplicities[i];
+              fes[i]->n_dofs_per_quad() * multiplicities[i];
+            multiplied_dofs_per_hex +=
+              fes[i]->n_dofs_per_hex() * multiplicities[i];
 
             multiplied_n_components +=
               fes[i]->n_components() * multiplicities[i];
@@ -255,12 +256,12 @@ namespace FETools
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
               for (unsigned int local_index = 0;
-                   local_index < fes[base]->dofs_per_line;
+                   local_index < fes[base]->n_dofs_per_line();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->dofs_per_line * line_number + local_index +
-                     fes[base]->first_line_index);
+                    (fes[base]->n_dofs_per_line() * line_number + local_index +
+                     fes[base]->get_first_line_index());
 
                   Assert(index_in_base < fes[base]->n_dofs_per_cell(),
                          ExcInternalError());
@@ -277,12 +278,12 @@ namespace FETools
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
               for (unsigned int local_index = 0;
-                   local_index < fes[base]->dofs_per_quad;
+                   local_index < fes[base]->n_dofs_per_quad();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->dofs_per_quad * quad_number + local_index +
-                     fes[base]->first_quad_index);
+                    (fes[base]->n_dofs_per_quad() * quad_number + local_index +
+                     fes[base]->get_first_quad_index());
 
                   Assert(index_in_base < fes[base]->n_dofs_per_cell(),
                          ExcInternalError());
@@ -299,12 +300,12 @@ namespace FETools
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
               for (unsigned int local_index = 0;
-                   local_index < fes[base]->dofs_per_hex;
+                   local_index < fes[base]->n_dofs_per_hex();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->dofs_per_hex * hex_number + local_index +
-                     fes[base]->first_hex_index);
+                    (fes[base]->n_dofs_per_hex() * hex_number + local_index +
+                     fes[base]->get_first_hex_index());
 
                   Assert(index_in_base < fes[base]->n_dofs_per_cell(),
                          ExcInternalError());
@@ -460,12 +461,12 @@ namespace FETools
                               comp_start +=
                               fes[base]->n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fes[base]->dofs_per_line;
+                   local_index < fes[base]->n_dofs_per_line();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->dofs_per_line * line_number + local_index +
-                     fes[base]->first_line_index);
+                    (fes[base]->n_dofs_per_line() * line_number + local_index +
+                     fes[base]->get_first_line_index());
 
                   Assert(comp_start + fes[base]->n_components() <=
                            retval[total_index].size(),
@@ -494,12 +495,12 @@ namespace FETools
                               comp_start +=
                               fes[base]->n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fes[base]->dofs_per_quad;
+                   local_index < fes[base]->n_dofs_per_quad();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->dofs_per_quad * quad_number + local_index +
-                     fes[base]->first_quad_index);
+                    (fes[base]->n_dofs_per_quad() * quad_number + local_index +
+                     fes[base]->get_first_quad_index());
 
                   Assert(comp_start + fes[base]->n_components() <=
                            retval[total_index].size(),
@@ -528,12 +529,12 @@ namespace FETools
                               comp_start +=
                               fes[base]->n_components() * do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fes[base]->dofs_per_hex;
+                   local_index < fes[base]->n_dofs_per_hex();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->dofs_per_hex * hex_number + local_index +
-                     fes[base]->first_hex_index);
+                    (fes[base]->n_dofs_per_hex() * hex_number + local_index +
+                     fes[base]->get_first_hex_index());
 
                   Assert(comp_start + fes[base]->n_components() <=
                            retval[total_index].size(),
@@ -711,12 +712,13 @@ namespace FETools
                               fe.base_element(base).n_components() *
                               do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fe.base_element(base).dofs_per_line;
+                   local_index < fe.base_element(base).n_dofs_per_line();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fe.base_element(base).dofs_per_line * line_number +
-                     local_index + fe.base_element(base).first_line_index);
+                    (fe.base_element(base).n_dofs_per_line() * line_number +
+                     local_index +
+                     fe.base_element(base).get_first_line_index());
 
                   system_to_base_table[total_index] =
                     std::make_pair(std::make_pair(base, m), index_in_base);
@@ -754,12 +756,13 @@ namespace FETools
                               fe.base_element(base).n_components() *
                               do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fe.base_element(base).dofs_per_quad;
+                   local_index < fe.base_element(base).n_dofs_per_quad();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fe.base_element(base).dofs_per_quad * quad_number +
-                     local_index + fe.base_element(base).first_quad_index);
+                    (fe.base_element(base).n_dofs_per_quad() * quad_number +
+                     local_index +
+                     fe.base_element(base).get_first_quad_index());
 
                   system_to_base_table[total_index] =
                     std::make_pair(std::make_pair(base, m), index_in_base);
@@ -797,12 +800,12 @@ namespace FETools
                               fe.base_element(base).n_components() *
                               do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fe.base_element(base).dofs_per_hex;
+                   local_index < fe.base_element(base).n_dofs_per_hex();
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fe.base_element(base).dofs_per_hex * hex_number +
-                     local_index + fe.base_element(base).first_hex_index);
+                    (fe.base_element(base).n_dofs_per_hex() * hex_number +
+                     local_index + fe.base_element(base).get_first_hex_index());
 
                   system_to_base_table[total_index] =
                     std::make_pair(std::make_pair(base, m), index_in_base);
@@ -916,17 +919,18 @@ namespace FETools
                               fe.base_element(base).n_components() *
                               do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fe.base_element(base).dofs_per_line;
+                   local_index < fe.base_element(base).n_dofs_per_line();
                    ++local_index, ++total_index)
                 {
                   // do everything alike for this type of object
                   const unsigned int index_in_base =
-                    (fe.base_element(base).dofs_per_line * line_number +
-                     local_index + fe.base_element(base).first_line_index);
+                    (fe.base_element(base).n_dofs_per_line() * line_number +
+                     local_index +
+                     fe.base_element(base).get_first_line_index());
 
                   const unsigned int face_index_in_base =
-                    (fe.base_element(base).first_face_line_index +
-                     fe.base_element(base).dofs_per_line * line_number +
+                    (fe.base_element(base).get_first_face_line_index() +
+                     fe.base_element(base).n_dofs_per_line() * line_number +
                      local_index);
 
                   face_system_to_base_table[total_index] =
@@ -965,17 +969,18 @@ namespace FETools
                               fe.base_element(base).n_components() *
                               do_tensor_product)
               for (unsigned int local_index = 0;
-                   local_index < fe.base_element(base).dofs_per_quad;
+                   local_index < fe.base_element(base).n_dofs_per_quad();
                    ++local_index, ++total_index)
                 {
                   // do everything alike for this type of object
                   const unsigned int index_in_base =
-                    (fe.base_element(base).dofs_per_quad * quad_number +
-                     local_index + fe.base_element(base).first_quad_index);
+                    (fe.base_element(base).n_dofs_per_quad() * quad_number +
+                     local_index +
+                     fe.base_element(base).get_first_quad_index());
 
                   const unsigned int face_index_in_base =
-                    (fe.base_element(base).first_face_quad_index +
-                     fe.base_element(base).dofs_per_quad * quad_number +
+                    (fe.base_element(base).get_first_face_quad_index() +
+                     fe.base_element(base).n_dofs_per_quad() * quad_number +
                      local_index);
 
                   face_system_to_base_table[total_index] =
@@ -1000,7 +1005,7 @@ namespace FETools
                       non_primitive_index;
                 }
         }
-      Assert(total_index == fe.dofs_per_face, ExcInternalError());
+      Assert(total_index == fe.n_dofs_per_face(), ExcInternalError());
       Assert(total_index == face_system_to_component_table.size(),
              ExcInternalError());
       Assert(total_index == face_system_to_base_table.size(),
@@ -1919,7 +1924,7 @@ namespace FETools
     Assert(face_fine == 0, ExcNotImplemented());
 
     const unsigned int nc     = GeometryInfo<dim>::max_children_per_face;
-    const unsigned int n      = fe.dofs_per_face;
+    const unsigned int n      = fe.n_dofs_per_face();
     const unsigned int nd     = fe.n_components();
     const unsigned int degree = fe.degree;
 
@@ -1959,14 +1964,14 @@ namespace FETools
       for (unsigned int i = 1; i <= GeometryInfo<dim>::lines_per_face; ++i)
         {
           const unsigned int offset_c =
-            fe.first_line_index +
+            fe.get_first_line_index() +
             GeometryInfo<dim>::face_to_cell_lines(face_coarse, i - 1) *
-              fe.dofs_per_line;
+              fe.n_dofs_per_line();
           const unsigned int offset_f =
-            fe.first_line_index +
+            fe.get_first_line_index() +
             GeometryInfo<dim>::face_to_cell_lines(face_fine, i - 1) *
-              fe.dofs_per_line;
-          for (unsigned int j = 0; j < fe.dofs_per_line; ++j)
+              fe.n_dofs_per_line();
+          for (unsigned int j = 0; j < fe.n_dofs_per_line(); ++j)
             {
               face_c_dofs[face_dof] = offset_c + j;
               face_f_dofs[face_dof] = offset_f + j;
@@ -1976,17 +1981,17 @@ namespace FETools
       for (unsigned int i = 1; i <= GeometryInfo<dim>::quads_per_face; ++i)
         {
           const unsigned int offset_c =
-            fe.first_quad_index + face_coarse * fe.dofs_per_quad;
+            fe.get_first_quad_index() + face_coarse * fe.n_dofs_per_quad();
           const unsigned int offset_f =
-            fe.first_quad_index + face_fine * fe.dofs_per_quad;
-          for (unsigned int j = 0; j < fe.dofs_per_quad; ++j)
+            fe.get_first_quad_index() + face_fine * fe.n_dofs_per_quad();
+          for (unsigned int j = 0; j < fe.n_dofs_per_quad(); ++j)
             {
               face_c_dofs[face_dof] = offset_c + j;
               face_f_dofs[face_dof] = offset_f + j;
               ++face_dof;
             }
         }
-      Assert(face_dof == fe.dofs_per_face, ExcInternalError());
+      Assert(face_dof == fe.n_dofs_per_face(), ExcInternalError());
     }
 
     // Set up meshes, one with a single
@@ -3289,7 +3294,7 @@ namespace FETools
   {
     Assert(h2l.size() == fe.n_dofs_per_cell(),
            ExcDimensionMismatch(h2l.size(), fe.n_dofs_per_cell()));
-    hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1, h2l);
+    hierarchic_to_lexicographic_numbering<dim>(fe.n_dofs_per_line() + 1, h2l);
   }
 
 
@@ -3299,7 +3304,7 @@ namespace FETools
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe)
   {
     Assert(fe.n_components() == 1, ExcInvalidFE());
-    return hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1);
+    return hierarchic_to_lexicographic_numbering<dim>(fe.n_dofs_per_line() + 1);
   }
 
 

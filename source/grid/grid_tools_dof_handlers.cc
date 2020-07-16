@@ -1830,7 +1830,7 @@ namespace GridTools
                                ExcInternalError());
 
                         const unsigned int n_dofs_per_face =
-                          cell->get_fe().dofs_per_face;
+                          cell->get_fe().n_dofs_per_face();
                         local_face_dof_indices.resize(n_dofs_per_face);
 
                         cell->face(f)->child(c)->get_dof_indices(
@@ -1865,7 +1865,7 @@ namespace GridTools
                     unsigned int subface = neighbor_face_no_subface_no.second;
 
                     const unsigned int n_dofs_per_face =
-                      cell->get_fe().dofs_per_face;
+                      cell->get_fe().n_dofs_per_face();
                     local_face_dof_indices.resize(n_dofs_per_face);
 
                     cell->neighbor(f)->face(face_no)->get_dof_indices(
@@ -1884,7 +1884,7 @@ namespace GridTools
                                           // original cell
                           {
                             const unsigned int n_dofs_per_face =
-                              cell->get_fe().dofs_per_face;
+                              cell->get_fe().n_dofs_per_face();
                             local_face_dof_indices.resize(n_dofs_per_face);
 
                             Assert(cell->neighbor(f)
@@ -1930,7 +1930,7 @@ namespace GridTools
                             // on line not including the vertices of the line.
                             const unsigned int n_dofs_per_line =
                               2 * cell->get_fe().n_dofs_per_vertex() +
-                              cell->get_fe().dofs_per_line;
+                              cell->get_fe().n_dofs_per_line();
                             local_line_dof_indices.resize(n_dofs_per_line);
 
                             cell->line(l)->child(c)->get_dof_indices(
@@ -1955,7 +1955,7 @@ namespace GridTools
                         // on line not including the vertices of the line.
                         const unsigned int n_dofs_per_line =
                           2 * cell->get_fe().n_dofs_per_vertex() +
-                          cell->get_fe().dofs_per_line;
+                          cell->get_fe().n_dofs_per_line();
                         local_line_dof_indices.resize(n_dofs_per_line);
 
                         parent_line->get_dof_indices(local_line_dof_indices);
@@ -1972,7 +1972,7 @@ namespace GridTools
 
                             const unsigned int n_dofs_per_line =
                               2 * cell->get_fe().n_dofs_per_vertex() +
-                              cell->get_fe().dofs_per_line;
+                              cell->get_fe().n_dofs_per_line();
                             local_line_dof_indices.resize(n_dofs_per_line);
 
                             parent_line->child(c)->get_dof_indices(

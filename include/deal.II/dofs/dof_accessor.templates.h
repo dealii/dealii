@@ -614,7 +614,7 @@ namespace internal
             accessor.set_mg_vertex_dof_index(
               level, vertex, dof, *next++, fe_index);
 
-        for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+        for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
           accessor.set_mg_dof_index(level, dof, *next++);
 
         Assert(next == dof_indices.end(), ExcInternalError());
@@ -640,10 +640,10 @@ namespace internal
               level, vertex, dof, *next++, fe_index);
 
         for (unsigned int line = 0; line < accessor.n_lines(); ++line)
-          for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+          for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
             accessor.line(line)->set_mg_dof_index(level, dof, *next++);
 
-        for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+        for (unsigned int dof = 0; dof < fe.n_dofs_per_quad(); ++dof)
           accessor.set_mg_dof_index(level, dof, *next++);
 
         Assert(next == dof_indices.end(), ExcInternalError());
@@ -670,7 +670,7 @@ namespace internal
               level, vertex, dof, *next++, fe_index);
 
         for (unsigned int line = 0; line < accessor.n_lines(); ++line)
-          for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+          for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
             accessor.line(line)->set_mg_dof_index(
               level,
               fe.adjust_line_dof_index_for_line_orientation(
@@ -678,7 +678,7 @@ namespace internal
               *next++);
 
         for (unsigned int quad = 0; quad < accessor.n_faces(); ++quad)
-          for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+          for (unsigned int dof = 0; dof < fe.n_dofs_per_quad(); ++dof)
             accessor.quad(quad)->set_mg_dof_index(
               level,
               fe.adjust_quad_dof_index_for_face_orientation(
@@ -688,7 +688,7 @@ namespace internal
                 accessor.face_rotation(quad)),
               *next++);
 
-        for (unsigned int dof = 0; dof < fe.dofs_per_hex; ++dof)
+        for (unsigned int dof = 0; dof < fe.n_dofs_per_hex(); ++dof)
           accessor.set_mg_dof_index(level, dof, *next++);
 
         Assert(next == dof_indices.end(), ExcInternalError());
@@ -808,9 +808,9 @@ namespace internal
       {
         const unsigned int                                                 //
           dofs_per_vertex = accessor.get_fe(fe_index).n_dofs_per_vertex(), //
-          dofs_per_line   = accessor.get_fe(fe_index).dofs_per_line,       //
-          dofs_per_quad   = accessor.get_fe(fe_index).dofs_per_quad,       //
-          dofs_per_hex    = accessor.get_fe(fe_index).dofs_per_hex;        //
+          dofs_per_line   = accessor.get_fe(fe_index).n_dofs_per_line(),   //
+          dofs_per_quad   = accessor.get_fe(fe_index).n_dofs_per_quad(),   //
+          dofs_per_hex    = accessor.get_fe(fe_index).n_dofs_per_hex();    //
 
         const unsigned int inner_dofs =
           structdim == 1 ? dofs_per_line :
@@ -1296,7 +1296,7 @@ namespace internal
         for (unsigned int dof = 0; dof < fe.n_dofs_per_vertex(); ++dof)
           *next++ = accessor.mg_vertex_dof_index(level, vertex, dof);
 
-      for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+      for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
         *next++ = accessor.mg_dof_index(level, dof);
 
       Assert(next == dof_indices.end(), ExcInternalError());
@@ -1322,10 +1322,10 @@ namespace internal
           *next++ = accessor.mg_vertex_dof_index(level, vertex, dof);
 
       for (unsigned int line = 0; line < accessor.n_lines(); ++line)
-        for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+        for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
           *next++ = accessor.line(line)->mg_dof_index(level, dof);
 
-      for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+      for (unsigned int dof = 0; dof < fe.n_dofs_per_quad(); ++dof)
         *next++ = accessor.mg_dof_index(level, dof);
 
       Assert(next == dof_indices.end(), ExcInternalError());
@@ -1351,7 +1351,7 @@ namespace internal
           *next++ = accessor.mg_vertex_dof_index(level, vertex, dof);
 
       for (unsigned int line = 0; line < accessor.n_lines(); ++line)
-        for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+        for (unsigned int dof = 0; dof < fe.n_dofs_per_line(); ++dof)
           *next++ = accessor.line(line)->mg_dof_index(
             level,
             accessor.get_fe(fe_index)
@@ -1359,7 +1359,7 @@ namespace internal
                 dof, accessor.line_orientation(line)));
 
       for (unsigned int quad = 0; quad < accessor.n_faces(); ++quad)
-        for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+        for (unsigned int dof = 0; dof < fe.n_dofs_per_quad(); ++dof)
           *next++ = accessor.quad(quad)->mg_dof_index(
             level,
             accessor.get_fe(fe_index)
@@ -1369,7 +1369,7 @@ namespace internal
                 accessor.face_flip(quad),
                 accessor.face_rotation(quad)));
 
-      for (unsigned int dof = 0; dof < fe.dofs_per_hex; ++dof)
+      for (unsigned int dof = 0; dof < fe.n_dofs_per_hex(); ++dof)
         *next++ = accessor.mg_dof_index(level, dof);
 
       Assert(next == dof_indices.end(), ExcInternalError());
@@ -1407,7 +1407,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
         Assert(dof_indices.size() ==
                  (this->n_vertices() *
                     this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
-                  this->dof_handler->get_fe(fe_index).dofs_per_line),
+                  this->dof_handler->get_fe(fe_index).n_dofs_per_line()),
                ExcVectorDoesNotMatch());
         break;
       case 2:
@@ -1415,8 +1415,8 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
                  (this->n_vertices() *
                     this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
                   this->n_lines() *
-                    this->dof_handler->get_fe(fe_index).dofs_per_line +
-                  this->dof_handler->get_fe(fe_index).dofs_per_quad),
+                    this->dof_handler->get_fe(fe_index).n_dofs_per_line() +
+                  this->dof_handler->get_fe(fe_index).n_dofs_per_quad()),
                ExcVectorDoesNotMatch());
         break;
       case 3:
@@ -1424,10 +1424,10 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
                  (this->n_vertices() *
                     this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
                   this->n_lines() *
-                    this->dof_handler->get_fe(fe_index).dofs_per_line +
+                    this->dof_handler->get_fe(fe_index).n_dofs_per_line() +
                   this->n_faces() *
-                    this->dof_handler->get_fe(fe_index).dofs_per_quad +
-                  this->dof_handler->get_fe(fe_index).dofs_per_hex),
+                    this->dof_handler->get_fe(fe_index).n_dofs_per_quad() +
+                  this->dof_handler->get_fe(fe_index).n_dofs_per_hex()),
                ExcVectorDoesNotMatch());
         break;
       default:
@@ -1480,7 +1480,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
         Assert(dof_indices.size() ==
                  (this->n_vertices() *
                     this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
-                  this->dof_handler->get_fe(fe_index).dofs_per_line),
+                  this->dof_handler->get_fe(fe_index).n_dofs_per_line()),
                ExcVectorDoesNotMatch());
         break;
       case 2:
@@ -1488,8 +1488,8 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
                  (this->n_vertices() *
                     this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
                   this->n_lines() *
-                    this->dof_handler->get_fe(fe_index).dofs_per_line +
-                  this->dof_handler->get_fe(fe_index).dofs_per_quad),
+                    this->dof_handler->get_fe(fe_index).n_dofs_per_line() +
+                  this->dof_handler->get_fe(fe_index).n_dofs_per_quad()),
                ExcVectorDoesNotMatch());
         break;
       case 3:
@@ -1497,10 +1497,10 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
                  (this->n_vertices() *
                     this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
                   this->n_lines() *
-                    this->dof_handler->get_fe(fe_index).dofs_per_line +
+                    this->dof_handler->get_fe(fe_index).n_dofs_per_line() +
                   this->n_faces() *
-                    this->dof_handler->get_fe(fe_index).dofs_per_quad +
-                  this->dof_handler->get_fe(fe_index).dofs_per_hex),
+                    this->dof_handler->get_fe(fe_index).n_dofs_per_quad() +
+                  this->dof_handler->get_fe(fe_index).n_dofs_per_hex()),
                ExcVectorDoesNotMatch());
         break;
       default:
@@ -1536,7 +1536,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
           Assert(dof_indices.size() ==
                    this->n_vertices() *
                        this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
-                     this->dof_handler->get_fe(fe_index).dofs_per_line,
+                     this->dof_handler->get_fe(fe_index).n_dofs_per_line(),
                  ExcVectorDoesNotMatch());
           break;
         }
@@ -1547,8 +1547,8 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
                    this->n_vertices() *
                        this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
                      this->n_lines() *
-                       this->dof_handler->get_fe(fe_index).dofs_per_line +
-                     this->dof_handler->get_fe(fe_index).dofs_per_quad,
+                       this->dof_handler->get_fe(fe_index).n_dofs_per_line() +
+                     this->dof_handler->get_fe(fe_index).n_dofs_per_quad(),
                  ExcVectorDoesNotMatch());
           break;
         }
@@ -1559,10 +1559,10 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
                    this->n_vertices() *
                        this->dof_handler->get_fe(fe_index).n_dofs_per_vertex() +
                      this->n_lines() *
-                       this->dof_handler->get_fe(fe_index).dofs_per_line +
+                       this->dof_handler->get_fe(fe_index).n_dofs_per_line() +
                      this->n_faces() *
-                       this->dof_handler->get_fe(fe_index).dofs_per_quad +
-                     this->dof_handler->get_fe(fe_index).dofs_per_hex,
+                       this->dof_handler->get_fe(fe_index).n_dofs_per_quad() +
+                     this->dof_handler->get_fe(fe_index).n_dofs_per_hex(),
                  ExcVectorDoesNotMatch());
           break;
         }

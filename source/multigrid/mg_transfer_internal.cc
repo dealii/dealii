@@ -602,7 +602,7 @@ namespace internal
       {
         AssertIndexRange(fe.n_dofs_per_vertex(), 2);
         renumbering[0] = 0;
-        for (unsigned int i = 0; i < fe.dofs_per_line; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
           renumbering[i + fe.n_dofs_per_vertex()] =
             GeometryInfo<1>::vertices_per_cell * fe.n_dofs_per_vertex() + i;
         if (fe.n_dofs_per_vertex() > 0)

@@ -3289,11 +3289,11 @@ FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
 
   // just go through the usual cases, taking into account how DoFs
   // are enumerated on the reference cell
-  if (cell_dof_index < this->first_line_index)
+  if (cell_dof_index < this->get_first_line_index())
     return GeometryPrimitive::vertex;
-  else if (cell_dof_index < this->first_quad_index)
+  else if (cell_dof_index < this->get_first_quad_index())
     return GeometryPrimitive::line;
-  else if (cell_dof_index < this->first_hex_index)
+  else if (cell_dof_index < this->get_first_hex_index())
     return GeometryPrimitive::quad;
   else
     return GeometryPrimitive::hex;

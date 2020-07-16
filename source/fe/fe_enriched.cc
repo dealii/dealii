@@ -440,7 +440,7 @@ FE_Enriched<dim, spacedim>::initialize(
     // If the system is not primitive, these have not been initialized by
     // FiniteElement
     this->system_to_component_table.resize(this->n_dofs_per_cell());
-    this->face_system_to_component_table.resize(this->dofs_per_face);
+    this->face_system_to_component_table.resize(this->n_dofs_per_face());
 
     FETools::Compositing::build_cell_tables(this->system_to_base_table,
                                             this->system_to_component_table,

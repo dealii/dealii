@@ -664,7 +664,7 @@ namespace Step28
                             update_values | update_gradients |
                               update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -729,7 +729,7 @@ namespace Step28
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FEValues<dim> fe_values(fe,
@@ -801,7 +801,7 @@ namespace Step28
 
     for (const auto &cell_pair : cell_list)
       {
-        FullMatrix<double> unit_matrix(fe.dofs_per_cell);
+        FullMatrix<double> unit_matrix(fe.n_dofs_per_cell());
         for (unsigned int i = 0; i < unit_matrix.m(); ++i)
           unit_matrix(i, i) = 1;
         assemble_cross_group_rhs_recursive(g_prime,
@@ -875,14 +875,14 @@ namespace Step28
                                           group,
                                           cell_g_prime->material_id());
 
-        FullMatrix<double> local_mass_matrix_f(fe.dofs_per_cell,
-                                               fe.dofs_per_cell);
-        FullMatrix<double> local_mass_matrix_g(fe.dofs_per_cell,
-                                               fe.dofs_per_cell);
+        FullMatrix<double> local_mass_matrix_f(fe.n_dofs_per_cell(),
+                                               fe.n_dofs_per_cell());
+        FullMatrix<double> local_mass_matrix_g(fe.n_dofs_per_cell(),
+                                               fe.n_dofs_per_cell());
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+            for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
               {
                 local_mass_matrix_f(i, j) +=
                   (fission_dist_XS * fe_values.shape_value(i, q_point) *
@@ -903,13 +903,13 @@ namespace Step28
         // or the product with the transpose matrix using <code>Tvmult</code>.
         // After doing so, we transfer the result into the global right hand
         // side vector of energy group $g$.
-        Vector<double> g_prime_new_values(fe.dofs_per_cell);
-        Vector<double> g_prime_old_values(fe.dofs_per_cell);
+        Vector<double> g_prime_new_values(fe.n_dofs_per_cell());
+        Vector<double> g_prime_old_values(fe.n_dofs_per_cell());
         cell_g_prime->get_dof_values(g_prime.solution_old, g_prime_old_values);
         cell_g_prime->get_dof_values(g_prime.solution, g_prime_new_values);
 
-        Vector<double> cell_rhs(fe.dofs_per_cell);
-        Vector<double> tmp(fe.dofs_per_cell);
+        Vector<double> cell_rhs(fe.n_dofs_per_cell());
+        Vector<double> tmp(fe.n_dofs_per_cell());
 
         if (cell_g->level() > cell_g_prime->level())
           {
@@ -929,10 +929,10 @@ namespace Step28
           }
 
         std::vector<types::global_dof_index> local_dof_indices(
-          fe.dofs_per_cell);
+          fe.n_dofs_per_cell());
         cell_g->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
       }
 
@@ -948,7 +948,8 @@ namespace Step28
            child < GeometryInfo<dim>::max_children_per_cell;
            ++child)
         {
-          FullMatrix<double> new_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+          FullMatrix<double> new_matrix(fe.n_dofs_per_cell(),
+                                        fe.n_dofs_per_cell());
           fe.get_prolongation_matrix(child).mmult(new_matrix,
                                                   prolongation_matrix);
 

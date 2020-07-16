@@ -141,14 +141,16 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
             case 3:
               {
                 // Fill data for quad shape functions
-                if (this->dofs_per_quad != 0)
+                if (this->n_dofs_per_quad() != 0)
                   {
                     const unsigned int foffset =
-                      this->first_quad_index + this->dofs_per_quad * face_no;
-                    for (unsigned int k = 0; k < this->dofs_per_quad; ++k)
+                      this->get_first_quad_index() +
+                      this->n_dofs_per_quad() * face_no;
+                    for (unsigned int k = 0; k < this->n_dofs_per_quad(); ++k)
                       output_data.shape_values(foffset + k, i) =
                         fe_data
-                          .shape_values[k + this->first_face_quad_index][i];
+                          .shape_values[k + this->get_first_face_quad_index()]
+                                       [i];
                   }
               }
               DEAL_II_FALLTHROUGH;
@@ -156,24 +158,24 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
             case 2:
               {
                 // Fill data for line shape functions
-                if (this->dofs_per_line != 0)
+                if (this->n_dofs_per_line() != 0)
                   {
-                    const unsigned int foffset = this->first_line_index;
+                    const unsigned int foffset = this->get_first_line_index();
                     for (unsigned int line = 0;
                          line < GeometryInfo<dim>::lines_per_face;
                          ++line)
                       {
-                        for (unsigned int k = 0; k < this->dofs_per_line; ++k)
+                        for (unsigned int k = 0; k < this->n_dofs_per_line();
+                             ++k)
                           output_data.shape_values(
                             foffset +
                               GeometryInfo<dim>::face_to_cell_lines(face_no,
                                                                     line) *
-                                this->dofs_per_line +
+                                this->n_dofs_per_line() +
                               k,
-                            i) =
-                            fe_data
-                              .shape_values[k + (line * this->dofs_per_line) +
-                                            this->first_face_line_index][i];
+                            i) = fe_data.shape_values
+                                   [k + (line * this->n_dofs_per_line()) +
+                                    this->get_first_face_line_index()][i];
                       }
                   }
               }

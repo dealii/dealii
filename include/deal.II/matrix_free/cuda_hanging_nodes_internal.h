@@ -141,24 +141,24 @@ namespace CUDAWrappers
       setup_constraint_weigths(unsigned int fe_degree)
       {
         FE_Q<2>            fe_q(fe_degree);
-        FullMatrix<double> interpolation_matrix(fe_q.dofs_per_face,
-                                                fe_q.dofs_per_face);
+        FullMatrix<double> interpolation_matrix(fe_q.n_dofs_per_face(),
+                                                fe_q.n_dofs_per_face());
         fe_q.get_subface_interpolation_matrix(fe_q, 0, interpolation_matrix);
 
         std::vector<unsigned int> mapping =
           FETools::lexicographic_to_hierarchic_numbering<1>(fe_degree);
 
-        FullMatrix<double> mapped_matrix(fe_q.dofs_per_face,
-                                         fe_q.dofs_per_face);
-        for (unsigned int i = 0; i < fe_q.dofs_per_face; ++i)
-          for (unsigned int j = 0; j < fe_q.dofs_per_face; ++j)
+        FullMatrix<double> mapped_matrix(fe_q.n_dofs_per_face(),
+                                         fe_q.n_dofs_per_face());
+        for (unsigned int i = 0; i < fe_q.n_dofs_per_face(); ++i)
+          for (unsigned int j = 0; j < fe_q.n_dofs_per_face(); ++j)
             mapped_matrix(i, j) = interpolation_matrix(mapping[i], mapping[j]);
 
         cudaError_t error_code =
           cudaMemcpyToSymbol(internal::constraint_weights,
                              &mapped_matrix[0][0],
-                             sizeof(double) * fe_q.dofs_per_face *
-                               fe_q.dofs_per_face);
+                             sizeof(double) * fe_q.n_dofs_per_face() *
+                               fe_q.n_dofs_per_face());
         AssertCuda(error_code);
       }
     } // namespace internal

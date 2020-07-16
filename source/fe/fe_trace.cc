@@ -232,11 +232,12 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix) const
 {
   // this is the code from FE_FaceQ
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face()));
+  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+                              x_source_fe.n_dofs_per_face()));
 
   // see if source is a FaceQ element
   if (const FE_TraceQ<dim, spacedim> *source_fe =

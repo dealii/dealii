@@ -364,7 +364,7 @@ void Step3::assemble_system()
   // loops a bit more readable. You will see such shortcuts in many places in
   // larger programs, and `dofs_per_cell` is one that is more or less the
   // conventional name for this kind of object.
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   // Now, we said that we wanted to assemble the global matrix and vector
   // cell-by-cell. We could write the results directly into the global matrix,

@@ -1132,7 +1132,7 @@ namespace Step42
                                      face_quadrature_formula,
                                      update_values | update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1224,7 +1224,7 @@ namespace Step42
                                      face_quadrature,
                                      update_quadrature_points);
 
-    const unsigned int dofs_per_face   = fe.dofs_per_face;
+    const unsigned int dofs_per_face   = fe.n_dofs_per_face();
     const unsigned int n_face_q_points = face_quadrature.size();
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_face);
@@ -1342,7 +1342,7 @@ namespace Step42
                                      update_values | update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
@@ -1495,7 +1495,7 @@ namespace Step42
                                      update_values | update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 

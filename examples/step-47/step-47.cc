@@ -401,7 +401,7 @@ namespace Step47
       const ExactSolution::RightHandSide<dim> right_hand_side;
 
       const unsigned int dofs_per_cell =
-        scratch_data.fe_values.get_fe().dofs_per_cell;
+        scratch_data.fe_values.get_fe().n_dofs_per_cell();
 
       for (unsigned int qpoint = 0; qpoint < fe_values.n_quadrature_points;
            ++qpoint)
@@ -713,7 +713,7 @@ namespace Step47
                                   update_values | update_gradients |
                                     update_hessians | update_quadrature_points |
                                     update_JxW_values | update_normal_vectors);
-    CopyData           copy_data(dof_handler.get_fe().dofs_per_cell);
+    CopyData           copy_data(dof_handler.get_fe().n_dofs_per_cell());
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
                           cell_worker,

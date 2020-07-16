@@ -181,7 +181,7 @@ comes in: it describes a finite dimensional function space of
 functions that are constant zero. A particular property of this
 peculiar linear vector space is that it has no degrees of freedom: it
 isn't just finite dimensional, it is in fact zero dimensional, and
-consequently for objects of this type, FiniteElement::dofs_per_cell
+consequently for objects of this type, FiniteElement::n_dofs_per_cell()
 will return zero. For discussion below, let us give this space a
 proper symbol:
 @f[

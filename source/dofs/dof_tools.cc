@@ -712,12 +712,12 @@ namespace DoFTools
               {
                 const FiniteElement<dim, spacedim> &fe = cell->get_fe();
 
-                const unsigned int dofs_per_face = fe.dofs_per_face;
+                const unsigned int dofs_per_face = fe.n_dofs_per_face();
                 face_dof_indices.resize(dofs_per_face);
                 cell->face(face)->get_dof_indices(face_dof_indices,
                                                   cell->active_fe_index());
 
-                for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+                for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
                   if (!check_vector_component)
                     selected_dofs.add_index(face_dof_indices[i]);
                   else
@@ -737,10 +737,10 @@ namespace DoFTools
                               (dim == 3 ? (i < 4 * fe.n_dofs_per_vertex() ?
                                              i :
                                              (i < 4 * fe.n_dofs_per_vertex() +
-                                                    4 * fe.dofs_per_line ?
+                                                    4 * fe.n_dofs_per_line() ?
                                                 i + 4 * fe.n_dofs_per_vertex() :
                                                 i + 4 * fe.n_dofs_per_vertex() +
-                                                  8 * fe.dofs_per_line)) :
+                                                  8 * fe.n_dofs_per_line())) :
                                           numbers::invalid_unsigned_int)));
                       if (fe.is_primitive(cell_index))
                         {
@@ -1002,7 +1002,7 @@ namespace DoFTools
                         if (cell->neighbor_child_on_subface(face, child)
                               ->is_artificial())
                           continue;
-                        for (unsigned int dof = 0; dof != fe.dofs_per_line;
+                        for (unsigned int dof = 0; dof != fe.n_dofs_per_line();
                              ++dof)
                           selected_dofs.add_index(
                             line->child(child)->dof_index(dof));
@@ -1041,7 +1041,7 @@ namespace DoFTools
                         {
                           // simply take all DoFs that live on this subface
                           std::vector<types::global_dof_index> ldi(
-                            fe.dofs_per_face);
+                            fe.n_dofs_per_face());
                           face->child(child)->get_dof_indices(ldi);
                           selected_dofs.add_indices(ldi.begin(), ldi.end());
                         }
@@ -2111,7 +2111,7 @@ namespace DoFTools
       for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(f))
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face = cell->get_fe().n_dofs_per_face();
             dofs_on_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_face,
                                            cell->active_fe_index());
@@ -2156,7 +2156,7 @@ namespace DoFTools
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face = cell->get_fe().n_dofs_per_face();
             dofs_on_face.resize(dofs_per_face);
             cell->face(f)->get_dof_indices(dofs_on_face,
                                            cell->active_fe_index());
@@ -2533,7 +2533,7 @@ namespace DoFTools
             // Exclude degrees of freedom on faces opposite to the vertex
             exclude.resize(fe.n_dofs_per_cell());
             std::fill(exclude.begin(), exclude.end(), false);
-            const unsigned int dpf = fe.dofs_per_face;
+            const unsigned int dpf = fe.n_dofs_per_face();
 
             for (const unsigned int face : GeometryInfo<dim>::face_indices())
               if (cell->at_boundary(face) ||
@@ -2594,7 +2594,7 @@ namespace DoFTools
               {
                 // Eliminate dofs on faces of the child which are on faces
                 // of the parent
-                const unsigned int dpf = fe.dofs_per_face;
+                const unsigned int dpf = fe.n_dofs_per_face();
 
                 for (unsigned int d = 0; d < dim; ++d)
                   {
@@ -2750,7 +2750,7 @@ namespace DoFTools
                 // vertex
                 exclude.resize(fe.n_dofs_per_cell());
                 std::fill(exclude.begin(), exclude.end(), false);
-                const unsigned int dpf = fe.dofs_per_face;
+                const unsigned int dpf = fe.n_dofs_per_face();
 
                 for (unsigned int d = 0; d < dim; ++d)
                   {

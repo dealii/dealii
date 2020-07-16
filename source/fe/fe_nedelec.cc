@@ -109,7 +109,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
 
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
+    face_embeddings[i].reinit(this->n_dofs_per_face(), this->n_dofs_per_face());
 
   FETools::compute_face_embedding_matrices<dim, double>(
     *this,
@@ -128,31 +128,31 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
       case 2:
         {
-          this->interface_constraints.reinit(2 * this->dofs_per_face,
-                                             this->dofs_per_face);
+          this->interface_constraints.reinit(2 * this->n_dofs_per_face(),
+                                             this->n_dofs_per_face());
 
           for (unsigned int i = 0; i < GeometryInfo<2>::max_children_per_face;
                ++i)
-            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
-                this->interface_constraints(i * this->dofs_per_face + j, k) =
-                  face_embeddings[i](j, k);
+            for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
+                this->interface_constraints(i * this->n_dofs_per_face() + j,
+                                            k) = face_embeddings[i](j, k);
 
           break;
         }
 
       case 3:
         {
-          this->interface_constraints.reinit(4 * (this->dofs_per_face -
+          this->interface_constraints.reinit(4 * (this->n_dofs_per_face() -
                                                   this->degree),
-                                             this->dofs_per_face);
+                                             this->n_dofs_per_face());
 
           unsigned int target_row = 0;
 
           for (unsigned int i = 0; i < 2; ++i)
             for (unsigned int j = this->degree; j < 2 * this->degree;
                  ++j, ++target_row)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
                 this->interface_constraints(target_row, k) =
                   face_embeddings[2 * i](j, k);
 
@@ -160,7 +160,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
             for (unsigned int j = 3 * this->degree;
                  j < GeometryInfo<3>::lines_per_face * this->degree;
                  ++j, ++target_row)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
                 this->interface_constraints(target_row, k) =
                   face_embeddings[i](j, k);
 
@@ -169,7 +169,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
               for (unsigned int k = i * this->degree;
                    k < (i + 1) * this->degree;
                    ++k, ++target_row)
-                for (unsigned int l = 0; l < this->dofs_per_face; ++l)
+                for (unsigned int l = 0; l < this->n_dofs_per_face(); ++l)
                   this->interface_constraints(target_row, l) =
                     face_embeddings[i + 2 * j](k, l);
 
@@ -178,7 +178,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
               for (unsigned int k = (i + 2) * this->degree;
                    k < (i + 3) * this->degree;
                    ++k, ++target_row)
-                for (unsigned int l = 0; l < this->dofs_per_face; ++l)
+                for (unsigned int l = 0; l < this->n_dofs_per_face(); ++l)
                   this->interface_constraints(target_row, l) =
                     face_embeddings[2 * i + j](k, l);
 
@@ -186,9 +186,9 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
                ++i)
             for (unsigned int j =
                    GeometryInfo<3>::lines_per_face * this->degree;
-                 j < this->dofs_per_face;
+                 j < this->n_dofs_per_face();
                  ++j, ++target_row)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
                 this->interface_constraints(target_row, k) =
                   face_embeddings[i](j, k);
 
@@ -2430,10 +2430,12 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
                 (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+  Assert(interpolation_matrix.m() == source.n_dofs_per_face(),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              source.n_dofs_per_face()));
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face()));
 
   // ok, source is a Nedelec element, so
   // we will be able to do the work
@@ -2451,7 +2453,7 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // lead to problems in the
   // hp procedures, which use this
   // method.
-  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
+  Assert(this->n_dofs_per_face() <= source_fe.n_dofs_per_face(),
          (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0;
 
@@ -2533,10 +2535,12 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
                 (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
               typename FiniteElement<dim>::ExcInterpolationNotImplemented());
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+  Assert(interpolation_matrix.m() == source.n_dofs_per_face(),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              source.n_dofs_per_face()));
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face()));
 
   // ok, source is a Nedelec element, so
   // we will be able to do the work
@@ -2554,7 +2558,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // lead to problems in the
   // hp procedures, which use this
   // method.
-  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
+  Assert(this->n_dofs_per_face() <= source_fe.n_dofs_per_face(),
          (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0.0;
   // Perform projection-based interpolation
@@ -2568,7 +2572,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
     {
       case 2:
         {
-          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_face(); ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -2616,7 +2620,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
               Vector<double> solution(source_fe.degree - 1);
               Vector<double> system_rhs(source_fe.degree - 1);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_face(); ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -2663,7 +2667,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                        {0.0, 1.0},
                                        {1.0, 1.0}};
 
-          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_face(); ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -2732,7 +2736,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                             GeometryInfo<dim>::lines_per_face);
               Vector<double>     tmp(GeometryInfo<dim>::lines_per_face);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_face(); ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -2855,7 +2859,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
               system_rhs.reinit(system_matrix_inv.m(), 2);
               tmp.reinit(2);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_face(); ++dof)
                 {
                   system_rhs = 0.0;
 

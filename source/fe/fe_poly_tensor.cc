@@ -83,11 +83,11 @@ namespace internal
                 const unsigned int nn = cell->neighbor_face_no(f);
 
                 if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-                  for (unsigned int j = 0; j < fe.dofs_per_face; ++j)
+                  for (unsigned int j = 0; j < fe.n_dofs_per_face(); ++j)
                     {
                       const unsigned int cell_j = fe.face_to_cell_index(j, f);
 
-                      Assert(f * fe.dofs_per_face + j < face_sign.size(),
+                      Assert(f * fe.n_dofs_per_face() + j < face_sign.size(),
                              ExcInternalError());
                       Assert(mapping_kind.size() == 1 ||
                                cell_j < mapping_kind.size(),
@@ -98,7 +98,7 @@ namespace internal
                       if ((mapping_kind.size() > 1 ?
                              mapping_kind[cell_j] :
                              mapping_kind[0]) == mapping_raviart_thomas)
-                        face_sign[f * fe.dofs_per_face + j] = -1.0;
+                        face_sign[f * fe.n_dofs_per_face() + j] = -1.0;
                     }
               }
           }

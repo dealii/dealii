@@ -390,7 +390,7 @@ following piece of the code:
 @endcode
 where <code>local_dof_indices</code> is declared as
 @code
-  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.n_dofs_per_cell());
 @endcode
 The name of this variable might be a bit of a misnomer -- it stands for "the
 global indices of those degrees of freedom locally defined on the current

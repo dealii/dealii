@@ -111,9 +111,9 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
   const unsigned int                  subface,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+                              x_source_fe.n_dofs_per_face()));
 
   // see if source is a Bernstein element
   if (const FE_Bernstein<dim, spacedim> *source_fe =
@@ -121,9 +121,9 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(interpolation_matrix.n() == this->dofs_per_face,
+      Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
              ExcDimensionMismatch(interpolation_matrix.n(),
-                                  this->dofs_per_face));
+                                  this->n_dofs_per_face()));
 
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
@@ -131,7 +131,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
       // produced in that case might lead to problems in the hp procedures,
       // which use this method.
       Assert(
-        this->dofs_per_face <= source_fe->dofs_per_face,
+        this->n_dofs_per_face() <= source_fe->n_dofs_per_face(),
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
 
@@ -155,10 +155,10 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
           QProjector<dim>::project_to_face(quad_face_support, 0) :
           QProjector<dim>::project_to_subface(quad_face_support, 0, subface);
 
-      for (unsigned int i = 0; i < source_fe->dofs_per_face; ++i)
+      for (unsigned int i = 0; i < source_fe->n_dofs_per_face(); ++i)
         {
           const Point<dim> &p = subface_quadrature.point(i);
-          for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+          for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
             {
               double matrix_entry =
                 this->shape_value(this->face_to_cell_index(j, 0), p);
@@ -177,11 +177,11 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
 
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
+      for (unsigned int j = 0; j < source_fe->n_dofs_per_face(); ++j)
         {
           double sum = 0.;
 
-          for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+          for (unsigned int i = 0; i < this->n_dofs_per_face(); ++i)
             sum += interpolation_matrix(j, i);
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
@@ -228,7 +228,7 @@ FE_Bernstein<dim, spacedim>::hp_vertex_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.dofs_per_face == 0)
+  else if (fe_other.n_dofs_per_face() == 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
