@@ -103,7 +103,7 @@ namespace Step68
     // describe the details of the particle tracking simulation and its
     // discretization. The following parameters are about where output should
     // land, the spatial discretization of the velocity (the default is $Q_1$),
-    // the time step, finally,  the output frequency (how many time steps should
+    // the time step and the output frequency (how many time steps should
     // elapse before we generate graphical output again):
     std::string output_directory = "./";
 
@@ -157,7 +157,7 @@ namespace Step68
 
   // The velocity profile is provided as a Function object. We provide the
   // velocity profile. In the present step, this function is hard-coded within
-  // the example. However, it could have been easily made using a ParsedFunction
+  // the example.
   template <int dim>
   class Vortex : public Function<dim>
   {
@@ -214,12 +214,12 @@ namespace Step68
 
     void interpolate_function_to_field();
 
-    // The next two functions are responsible for carrying out explicit Euler
-    // time integration for the cases where the velocity field is interpolated
-    // at the positions of the particles or calculated analytically,
-    // respectively
-    void euler_interpolated(double dt);
-    void euler_analytical(double dt);
+    // The next two functions are responsible for carrying out step of explicit
+    // Euler time integration for the cases where the velocity field is
+    // interpolated at the positions of the particles or calculated
+    // analytically, respectively
+    void euler_step_interpolated(double dt);
+    void euler_step_analytical(double dt);
 
     // The cell_weight() function indicates to the triangulation how much
     // computational work is expected to happen on this cell, and consequently
@@ -492,7 +492,7 @@ namespace Step68
   // using an analytically defined velocity field. This is a relatively trivial
   // usage of the particles.
   template <int dim>
-  void ParticleTracking<dim>::euler_analytical(double dt)
+  void ParticleTracking<dim>::euler_step_analytical(double dt)
   {
     Vector<double> particle_velocity(dim);
 
@@ -524,7 +524,7 @@ namespace Step68
   // We integrate the particle trajectories by interpolating the value of the
   // velocity field at the degrees of freedom to the position of the particles.
   template <int dim>
-  void ParticleTracking<dim>::euler_interpolated(double dt)
+  void ParticleTracking<dim>::euler_step_interpolated(double dt)
   {
     std::vector<types::global_dof_index> dof_indices(fluid_fe.dofs_per_cell);
     Vector<double> dof_data_per_cell(fluid_fe.dofs_per_cell);
@@ -691,10 +691,10 @@ namespace Step68
     if (interpolated_velocity)
       {
         interpolate_function_to_field();
-        euler_interpolated(0.);
+        euler_step_interpolated(0.);
       }
     else
-      euler_analytical(0.);
+      euler_step_analytical(0.);
 
     output_particles(discrete_time.get_step_number());
     output_background(discrete_time.get_step_number());
@@ -714,10 +714,10 @@ namespace Step68
         if (interpolated_velocity)
           {
             interpolate_function_to_field();
-            euler_interpolated(discrete_time.get_previous_step_size());
+            euler_step_interpolated(discrete_time.get_previous_step_size());
           }
         else
-          euler_analytical(discrete_time.get_previous_step_size());
+          euler_step_analytical(discrete_time.get_previous_step_size());
 
         particle_handler.sort_particles_into_subdomains_and_cells();
 
