@@ -32,6 +32,8 @@ namespace Simplex
   /**
    * This namespace provides a collection of functions to generate simplex
    * triangulations for some basic geometries.
+   *
+   *  @ingroup simplex
    */
   namespace GridGenerator
   {
