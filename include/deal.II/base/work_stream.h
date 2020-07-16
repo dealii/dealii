@@ -849,11 +849,11 @@ namespace WorkStream
           : currently_in_use(false)
         {}
 
-        ScratchAndCopyDataObjects(ScratchData *p,
-                                  CopyData *   q,
-                                  const bool   in_use)
-          : scratch_data(p)
-          , copy_data(q)
+        ScratchAndCopyDataObjects(std::unique_ptr<ScratchData> &&p,
+                                  std::unique_ptr<CopyData> &&   q,
+                                  const bool                     in_use)
+          : scratch_data(std::move(p))
+          , copy_data(std::move(q))
           , currently_in_use(in_use)
         {}
 
@@ -934,12 +934,14 @@ namespace WorkStream
             if (scratch_data == nullptr)
               {
                 Assert(copy_data == nullptr, ExcInternalError());
-                scratch_data = new ScratchData(sample_scratch_data);
-                copy_data    = new CopyData(sample_copy_data);
 
-                scratch_and_copy_data_list.emplace_back(scratch_data,
-                                                        copy_data,
-                                                        true);
+                scratch_and_copy_data_list.emplace_back(
+                  std::make_unique<ScratchData>(sample_scratch_data),
+                  std::make_unique<CopyData>(sample_copy_data),
+                  true);
+                scratch_data =
+                  scratch_and_copy_data_list.back().scratch_data.get();
+                copy_data = scratch_and_copy_data_list.back().copy_data.get();
               }
           }
 
