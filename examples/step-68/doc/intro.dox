@@ -68,7 +68,7 @@ to handle all particles through an entity which agglomerates all particles.
 In deal.II, this is achieved through the use of the Particles::ParticleHandler class.
 
 By default, particles do not have a diameter,
-a mass or any other physical properties which we would generally expect of physical particles. Howevever, through
+a mass or any other physical properties which we would generally expect of physical particles. However, through
 a ParticleHandler, particles have access to a Particles::PropertyPool. This PropertyPool is
 an array which can be used to store any arbitrary number of properties
 associated with the particles. Consequently, users can build their own
@@ -110,7 +110,7 @@ portion of the computational cost. For these occasions, deal.II provides
 convenient Particles::Generators that can globally insert the particles even if
 they are not located on the subdomain from which they are created. The
 generators first locate on which subdomain the particles are situated, identify
-in which cell they are located and exchange the necessary information amongst
+in which cell they are located and exchange the necessary information among
 the processors to ensure that the particle is generated with the right
 properties. Consequently, this type of particle generation can be communication
 intensive. The Particles::Generators::dof_support_points and the
@@ -180,7 +180,7 @@ In the present step, we use particles as massless tracers to illustrate
 the dynamics of a particular vortical flow : the Rayleigh-Kotte Vortex. This flow pattern
 is generally used as a complex test case for interface tracking methods
 (e.g. volume-of-fluid and level set approches) since
-it leads to strong rotation and elongation of the fluid (Blais 2013).
+it leads to strong rotation and elongation of the fluid (Blais, 2013).
 
 The stream function $\Psi$ of this Rayleigh-Kotte vortex is defined as:
 
@@ -192,6 +192,13 @@ where $T$ is the period of the flow. The velocity profile in 2D ($\textbf{u}=[u,
    u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y) \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\
    v &=&  \frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
 @f}
+
+It can be seen that this velocity reverses periodically due to the term 
+$\cos \left( \pi \frac{t}{T} \right)$ and that material will end up at its
+starting position after every period of length $t=2T$. We will run this tutorial
+program for exactly one period and compare the final particle location to the
+initial location to illustrate this flow property.
+
 
 This example uses the testcase to produce two models that handle the particles
 slightly differently. The first model prescribes the exact analytical velocity
