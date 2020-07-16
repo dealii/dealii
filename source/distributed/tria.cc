@@ -3438,7 +3438,8 @@ namespace parallel
       this->save_coarsen_flags(flags_before[0]);
       this->save_refine_flags(flags_before[1]);
 
-      bool mesh_changed = false;
+      bool         mesh_changed = false;
+      unsigned int loop_counter = 0;
       do
         {
           this->dealii::Triangulation<dim, spacedim>::
@@ -3446,6 +3447,17 @@ namespace parallel
           this->update_periodic_face_map();
           // enforce 2:1 mesh balance over periodic boundaries
           mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this);
+
+          // We can't be sure that we won't run into a situation where we can
+          // not reconcile mesh smoothing and balancing of periodic faces. As we
+          // don't know what else to do, at least abort with an error message.
+          ++loop_counter;
+          AssertThrow(
+            loop_counter < 32,
+            ExcMessage(
+              "Infinite loop in "
+              "parallel::distributed::Triangulation::prepare_coarsening_and_refinement() "
+              "for periodic boundaries detected. Aborting."));
         }
       while (mesh_changed);
 
