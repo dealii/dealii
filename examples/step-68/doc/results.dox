@@ -5,7 +5,7 @@ If you do not specify a parameter file as an argument on the command
 line, the program will try to read the file "parameters.prm" by default, and
 will execute the code.
 
-On any number of core, the simulation output will look like:
+On any number of cores, the simulation output will look like:
 
 @code
 bash$ mpirun -np 4 ./step-68 parameters.prm
