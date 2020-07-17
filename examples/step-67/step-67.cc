@@ -565,7 +565,7 @@ namespace Euler_DG
   // \frac{\lambda}{2}\left[\mathbf{w}^--\mathbf{w}^+\right]\otimes
   // \mathbf{n^-}$, where the factor $\lambda =
   // \max\left(\|\mathbf{u}^-\|+c^-, \|\mathbf{u}^+\|+c^+\right)$ gives the
-  // maximal wave speed and $c = \sqrt{\lambda p / \rho}$ is the speed of
+  // maximal wave speed and $c = \sqrt{\gamma p / \rho}$ is the speed of
   // sound. Here, we choose two modifications of that expression for reasons
   // of computational efficiency, given the small impact of the flux on the
   // solution. For the above definition of the factor $\lambda$, we would need
