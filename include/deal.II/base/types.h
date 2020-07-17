@@ -150,6 +150,11 @@ namespace types
    * @ref GlossMaterialId "Glossary entry on material indicators"
    */
   using material_id = unsigned int;
+
+  /**
+   * The type used to denote geometric entity types.
+   */
+  using geometric_entity_type = std::uint8_t;
 } // namespace types
 
 /**
