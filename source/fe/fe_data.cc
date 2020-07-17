@@ -26,28 +26,74 @@ FiniteElementData<dim>::FiniteElementData(
   const unsigned int               degree,
   const Conformity                 conformity,
   const BlockIndices &             block_indices)
+  : FiniteElementData(dofs_per_object,
+                      dim == 0 ?
+                        ReferenceCell::Type::Vertex :
+                        (dim == 1 ? ReferenceCell::Type::Line :
+                                    (dim == 2 ? ReferenceCell::Type::Quad :
+                                                ReferenceCell::Type::Hex)),
+                      n_components,
+                      degree,
+                      conformity,
+                      block_indices)
+{}
+
+template <int dim>
+FiniteElementData<dim>::FiniteElementData(
+  const std::vector<unsigned int> &dofs_per_object,
+  const ReferenceCell::Type        cell_type,
+  const unsigned int               n_components,
+  const unsigned int               degree,
+  const Conformity                 conformity,
+  const BlockIndices &             block_indices)
   : dofs_per_vertex(dofs_per_object[0])
   , dofs_per_line(dofs_per_object[1])
   , dofs_per_quad(dim > 1 ? dofs_per_object[2] : 0)
   , dofs_per_hex(dim > 2 ? dofs_per_object[3] : 0)
-  , first_line_index(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex)
-  , first_quad_index(first_line_index +
-                     GeometryInfo<dim>::lines_per_cell * dofs_per_line)
-  , first_hex_index(first_quad_index +
-                    GeometryInfo<dim>::quads_per_cell * dofs_per_quad)
-  , first_face_line_index(GeometryInfo<dim - 1>::vertices_per_cell *
-                          dofs_per_vertex)
+  , first_line_index(
+      ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
+      dofs_per_vertex)
+  , first_quad_index(
+      first_line_index +
+      ReferenceCell::internal::Info::get_cell(cell_type).n_lines() *
+        dofs_per_line)
+  , first_hex_index(
+      first_quad_index +
+      (dim == 2 ?
+         1 :
+         (dim == 3 ?
+            ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
+            0)) *
+        dofs_per_quad)
+  , first_face_line_index(
+      ReferenceCell::internal::Info::get_face(cell_type, 0).n_vertices() *
+      dofs_per_vertex)
   , first_face_quad_index(
-      (dim == 3 ? GeometryInfo<dim - 1>::vertices_per_cell * dofs_per_vertex :
-                  GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex) +
-      GeometryInfo<dim - 1>::lines_per_cell * dofs_per_line)
-  , dofs_per_face(GeometryInfo<dim>::vertices_per_face * dofs_per_vertex +
-                  GeometryInfo<dim>::lines_per_face * dofs_per_line +
-                  GeometryInfo<dim>::quads_per_face * dofs_per_quad)
-  , dofs_per_cell(GeometryInfo<dim>::vertices_per_cell * dofs_per_vertex +
-                  GeometryInfo<dim>::lines_per_cell * dofs_per_line +
-                  GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
-                  GeometryInfo<dim>::hexes_per_cell * dofs_per_hex)
+      (dim == 3 ?
+         ReferenceCell::internal::Info::get_face(cell_type, 0).n_vertices() *
+           dofs_per_vertex :
+         ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
+           dofs_per_vertex) +
+      ReferenceCell::internal::Info::get_face(cell_type, 0).n_lines() *
+        dofs_per_line)
+  , dofs_per_face(
+      ReferenceCell::internal::Info::get_face(cell_type, 0).n_vertices() *
+        dofs_per_vertex +
+      ReferenceCell::internal::Info::get_face(cell_type, 0).n_lines() *
+        dofs_per_line +
+      (dim == 3 ? 1 : 0) * dofs_per_quad)
+  , dofs_per_cell(
+      ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
+        dofs_per_vertex +
+      ReferenceCell::internal::Info::get_cell(cell_type).n_lines() *
+        dofs_per_line +
+      (dim == 2 ?
+         1 :
+         (dim == 3 ?
+            ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
+            0)) *
+        dofs_per_quad +
+      (dim == 3 ? 1 : 0) * dofs_per_hex)
   , components(n_components)
   , degree(degree)
   , conforming_space(conformity)

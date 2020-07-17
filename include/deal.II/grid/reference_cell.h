@@ -229,6 +229,18 @@ namespace ReferenceCell
 
           return true;
         }
+
+        /**
+         * Return reference-cell type of face @p face_no.
+         */
+        virtual ReferenceCell::Type
+        face_reference_cell_type(const unsigned int face_no) const
+        {
+          Assert(false, ExcNotImplemented());
+          (void)face_no;
+
+          return ReferenceCell::Type::Invalid;
+        }
       };
 
 
@@ -263,7 +275,14 @@ namespace ReferenceCell
        * Vertex.
        */
       struct Vertex : public TensorProductBase<0>
-      {};
+      {
+        ReferenceCell::Type
+        face_reference_cell_type(const unsigned int face_no) const override
+        {
+          (void)face_no;
+          return ReferenceCell::Type::Invalid;
+        }
+      };
 
 
 
@@ -271,7 +290,14 @@ namespace ReferenceCell
        * Line.
        */
       struct Line : public TensorProductBase<1>
-      {};
+      {
+        ReferenceCell::Type
+        face_reference_cell_type(const unsigned int face_no) const override
+        {
+          (void)face_no;
+          return ReferenceCell::Type::Vertex;
+        }
+      };
 
 
 
@@ -298,6 +324,13 @@ namespace ReferenceCell
 
           return GeometryInfo<2>::standard_to_real_line_vertex(
             vertex, line_orientation);
+        }
+
+        ReferenceCell::Type
+        face_reference_cell_type(const unsigned int face_no) const override
+        {
+          (void)face_no;
+          return ReferenceCell::Type::Line;
         }
       };
 
@@ -381,7 +414,52 @@ namespace ReferenceCell
             get_bit(face_orientation, 2),
             get_bit(face_orientation, 1));
         }
+
+        ReferenceCell::Type
+        face_reference_cell_type(const unsigned int face_no) const override
+        {
+          (void)face_no;
+          return ReferenceCell::Type::Quad;
+        }
       };
+
+      /**
+       * Return for a given reference-cell type @p the right Info.
+       */
+      inline const ReferenceCell::internal::Info::Base &
+      get_cell(const ReferenceCell::Type &type)
+      {
+        static ReferenceCell::internal::Info::Base   gei_invalid;
+        static ReferenceCell::internal::Info::Vertex gei_vertex;
+        static ReferenceCell::internal::Info::Line   gei_line;
+        static ReferenceCell::internal::Info::Quad   gei_quad;
+        static ReferenceCell::internal::Info::Hex    gei_hex;
+
+        switch (type)
+          {
+            case ReferenceCell::Type::Vertex:
+              return gei_vertex;
+            case ReferenceCell::Type::Line:
+              return gei_line;
+            case ReferenceCell::Type::Quad:
+              return gei_quad;
+            case ReferenceCell::Type::Hex:
+              return gei_hex;
+            default:
+              Assert(false, StandardExceptions::ExcNotImplemented());
+              return gei_invalid;
+          }
+      }
+
+      /**
+       * Return for a given reference-cell type @p and face number @p face_no the
+       * right Info of the @p face_no-th face.
+       */
+      inline const ReferenceCell::internal::Info::Base &
+      get_face(const ReferenceCell::Type &type, const unsigned int face_no)
+      {
+        return get_cell(get_cell(type).face_reference_cell_type(face_no));
+      }
 
     } // namespace Info
   }   // namespace internal
