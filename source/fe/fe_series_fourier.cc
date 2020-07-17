@@ -97,11 +97,12 @@ namespace
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
-        fourier_transform_matrices[fe].reinit(n_coefficients_per_direction[fe],
-                                              fe_collection[fe].dofs_per_cell);
+        fourier_transform_matrices[fe].reinit(
+          n_coefficients_per_direction[fe],
+          fe_collection[fe].n_dofs_per_cell());
 
         for (unsigned int k = 0; k < n_coefficients_per_direction[fe]; ++k)
-          for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
+          for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell(); ++j)
             fourier_transform_matrices[fe](k, j) =
               integrate(fe_collection[fe], q_collection[fe], k_vectors(k), j);
       }
@@ -123,13 +124,14 @@ namespace
       {
         fourier_transform_matrices[fe].reinit(
           Utilities::fixed_power<2>(n_coefficients_per_direction[fe]),
-          fe_collection[fe].dofs_per_cell);
+          fe_collection[fe].n_dofs_per_cell());
 
         unsigned int k = 0;
         for (unsigned int k1 = 0; k1 < n_coefficients_per_direction[fe]; ++k1)
           for (unsigned int k2 = 0; k2 < n_coefficients_per_direction[fe];
                ++k2, ++k)
-            for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell();
+                 ++j)
               fourier_transform_matrices[fe](k, j) = integrate(
                 fe_collection[fe], q_collection[fe], k_vectors(k1, k2), j);
       }
@@ -151,14 +153,15 @@ namespace
       {
         fourier_transform_matrices[fe].reinit(
           Utilities::fixed_power<3>(n_coefficients_per_direction[fe]),
-          fe_collection[fe].dofs_per_cell);
+          fe_collection[fe].n_dofs_per_cell());
 
         unsigned int k = 0;
         for (unsigned int k1 = 0; k1 < n_coefficients_per_direction[fe]; ++k1)
           for (unsigned int k2 = 0; k2 < n_coefficients_per_direction[fe]; ++k2)
             for (unsigned int k3 = 0; k3 < n_coefficients_per_direction[fe];
                  ++k3, ++k)
-              for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < fe_collection[fe].n_dofs_per_cell();
+                   ++j)
                 fourier_transform_matrices[fe](k, j) =
                   integrate(fe_collection[fe],
                             q_collection[fe],

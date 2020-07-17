@@ -199,8 +199,8 @@ private:
 
   /**
    * A variable storing the number of degrees of freedom on all child cells. It
-   * is <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
-   * less for continuous elements.
+   * is <tt>2<sup>dim</sup>*fe.n_dofs_per_cell()</tt> for DG elements and
+   * somewhat less for continuous elements.
    */
   unsigned int n_child_cell_dofs;
 
@@ -545,10 +545,10 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
       ghosted_vector = dst[level];
       ghosted_vector.update_ghost_values();
 
-      std::vector<Number>                  dof_values_coarse(fe.dofs_per_cell);
-      Vector<Number>                       dof_values_fine(fe.dofs_per_cell);
-      Vector<Number>                       tmp(fe.dofs_per_cell);
-      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
+      std::vector<Number> dof_values_coarse(fe.n_dofs_per_cell());
+      Vector<Number>      dof_values_fine(fe.n_dofs_per_cell());
+      Vector<Number>      tmp(fe.n_dofs_per_cell());
+      std::vector<types::global_dof_index>    dof_indices(fe.n_dofs_per_cell());
       typename DoFHandler<dim>::cell_iterator cell =
         dof_handler.begin(level - 1);
       typename DoFHandler<dim>::cell_iterator endc = dof_handler.end(level - 1);
@@ -565,18 +565,18 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 cell->child(child)->get_mg_dof_indices(dof_indices);
-                for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                   dof_values_fine(i) = ghosted_vector(dof_indices[i]);
                 fe.get_restriction_matrix(child, cell->refinement_case())
                   .vmult(tmp, dof_values_fine);
-                for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                   if (fe.restriction_is_additive(i))
                     dof_values_coarse[i] += tmp[i];
                   else if (tmp(i) != 0.)
                     dof_values_coarse[i] = tmp[i];
               }
             cell->get_mg_dof_indices(dof_indices);
-            for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
               dst[level - 1](dof_indices[i]) = dof_values_coarse[i];
           }
 

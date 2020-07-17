@@ -366,8 +366,8 @@ namespace Step32
         const Mapping<dim> &      mapping,
         const UpdateFlags         update_flags)
         : stokes_fe_values(mapping, stokes_fe, stokes_quadrature, update_flags)
-        , grad_phi_u(stokes_fe.dofs_per_cell)
-        , phi_p(stokes_fe.dofs_per_cell)
+        , grad_phi_u(stokes_fe.n_dofs_per_cell())
+        , phi_p(stokes_fe.n_dofs_per_cell())
       {}
 
 
@@ -434,9 +434,9 @@ namespace Step32
                                 temperature_fe,
                                 stokes_quadrature,
                                 temperature_update_flags)
-        , phi_u(stokes_fe.dofs_per_cell)
-        , grads_phi_u(stokes_fe.dofs_per_cell)
-        , div_phi_u(stokes_fe.dofs_per_cell)
+        , phi_u(stokes_fe.n_dofs_per_cell())
+        , grads_phi_u(stokes_fe.n_dofs_per_cell())
+        , div_phi_u(stokes_fe.n_dofs_per_cell())
         , old_temperature_values(stokes_quadrature.size())
       {}
 
@@ -486,8 +486,8 @@ namespace Step32
                                 temperature_quadrature,
                                 update_values | update_gradients |
                                   update_JxW_values)
-        , phi_T(temperature_fe.dofs_per_cell)
-        , grad_phi_T(temperature_fe.dofs_per_cell)
+        , phi_T(temperature_fe.n_dofs_per_cell())
+        , grad_phi_T(temperature_fe.n_dofs_per_cell())
       {}
 
 
@@ -562,8 +562,8 @@ namespace Step32
                            stokes_fe,
                            quadrature,
                            update_values | update_gradients)
-        , phi_T(temperature_fe.dofs_per_cell)
-        , grad_phi_T(temperature_fe.dofs_per_cell)
+        , phi_T(temperature_fe.n_dofs_per_cell())
+        , grad_phi_T(temperature_fe.n_dofs_per_cell())
         ,
 
         old_velocity_values(quadrature.size())
@@ -637,8 +637,8 @@ namespace Step32
       template <int dim>
       StokesPreconditioner<dim>::StokesPreconditioner(
         const FiniteElement<dim> &stokes_fe)
-        : local_matrix(stokes_fe.dofs_per_cell, stokes_fe.dofs_per_cell)
-        , local_dof_indices(stokes_fe.dofs_per_cell)
+        : local_matrix(stokes_fe.n_dofs_per_cell(), stokes_fe.n_dofs_per_cell())
+        , local_dof_indices(stokes_fe.n_dofs_per_cell())
       {}
 
       template <int dim>
@@ -661,7 +661,7 @@ namespace Step32
       template <int dim>
       StokesSystem<dim>::StokesSystem(const FiniteElement<dim> &stokes_fe)
         : StokesPreconditioner<dim>(stokes_fe)
-        , local_rhs(stokes_fe.dofs_per_cell)
+        , local_rhs(stokes_fe.n_dofs_per_cell())
       {}
 
 
@@ -679,11 +679,11 @@ namespace Step32
       template <int dim>
       TemperatureMatrix<dim>::TemperatureMatrix(
         const FiniteElement<dim> &temperature_fe)
-        : local_mass_matrix(temperature_fe.dofs_per_cell,
-                            temperature_fe.dofs_per_cell)
-        , local_stiffness_matrix(temperature_fe.dofs_per_cell,
-                                 temperature_fe.dofs_per_cell)
-        , local_dof_indices(temperature_fe.dofs_per_cell)
+        : local_mass_matrix(temperature_fe.n_dofs_per_cell(),
+                            temperature_fe.n_dofs_per_cell())
+        , local_stiffness_matrix(temperature_fe.n_dofs_per_cell(),
+                                 temperature_fe.n_dofs_per_cell())
+        , local_dof_indices(temperature_fe.n_dofs_per_cell())
       {}
 
 
@@ -701,10 +701,10 @@ namespace Step32
       template <int dim>
       TemperatureRHS<dim>::TemperatureRHS(
         const FiniteElement<dim> &temperature_fe)
-        : local_rhs(temperature_fe.dofs_per_cell)
-        , local_dof_indices(temperature_fe.dofs_per_cell)
-        , matrix_for_bc(temperature_fe.dofs_per_cell,
-                        temperature_fe.dofs_per_cell)
+        : local_rhs(temperature_fe.n_dofs_per_cell())
+        , local_dof_indices(temperature_fe.n_dofs_per_cell())
+        , matrix_for_bc(temperature_fe.n_dofs_per_cell(),
+                        temperature_fe.n_dofs_per_cell())
       {}
     } // namespace CopyData
   }   // namespace Assembly
@@ -2016,7 +2016,7 @@ namespace Step32
     Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
     Assembly::CopyData::StokesPreconditioner<dim> &       data)
   {
-    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.stokes_fe_values.n_quadrature_points;
 
@@ -2213,7 +2213,7 @@ namespace Step32
     Assembly::CopyData::StokesSystem<dim> &               data)
   {
     const unsigned int dofs_per_cell =
-      scratch.stokes_fe_values.get_fe().dofs_per_cell;
+      scratch.stokes_fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.stokes_fe_values.n_quadrature_points;
 
@@ -2360,7 +2360,7 @@ namespace Step32
     Assembly::CopyData::TemperatureMatrix<dim> &          data)
   {
     const unsigned int dofs_per_cell =
-      scratch.temperature_fe_values.get_fe().dofs_per_cell;
+      scratch.temperature_fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.temperature_fe_values.n_quadrature_points;
 
@@ -2477,7 +2477,7 @@ namespace Step32
     const bool use_bdf2_scheme = (timestep_number != 0);
 
     const unsigned int dofs_per_cell =
-      scratch.temperature_fe_values.get_fe().dofs_per_cell;
+      scratch.temperature_fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch.temperature_fe_values.n_quadrature_points;
 
@@ -3155,11 +3155,11 @@ namespace Step32
 
     {
       std::vector<types::global_dof_index> local_joint_dof_indices(
-        joint_fe.dofs_per_cell);
+        joint_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_stokes_dof_indices(
-        stokes_fe.dofs_per_cell);
+        stokes_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_temperature_dof_indices(
-        temperature_fe.dofs_per_cell);
+        temperature_fe.n_dofs_per_cell());
 
       typename DoFHandler<dim>::active_cell_iterator
         joint_cell       = joint_dof_handler.begin_active(),
@@ -3174,7 +3174,7 @@ namespace Step32
             stokes_cell->get_dof_indices(local_stokes_dof_indices);
             temperature_cell->get_dof_indices(local_temperature_dof_indices);
 
-            for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < joint_fe.n_dofs_per_cell(); ++i)
               if (joint_fe.system_to_base_index(i).first.first == 0)
                 {
                   Assert(joint_fe.system_to_base_index(i).second <

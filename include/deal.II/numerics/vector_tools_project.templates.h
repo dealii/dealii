@@ -83,10 +83,11 @@ namespace VectorTools
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(f))
             {
-              face_dof_indices.resize(cell->get_fe().dofs_per_face);
+              face_dof_indices.resize(cell->get_fe().n_dofs_per_face());
               cell->face(f)->get_dof_indices(face_dof_indices,
                                              cell->active_fe_index());
-              for (unsigned int i = 0; i < cell->get_fe().dofs_per_face; ++i)
+              for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_face();
+                   ++i)
                 // enter zero boundary values
                 // for all boundary nodes
                 //
@@ -639,7 +640,7 @@ namespace VectorTools
                                 quadrature,
                                 update_values | update_JxW_values);
 
-        const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
         const unsigned int n_q_points    = quadrature.size();
         Vector<Number>     cell_rhs(dofs_per_cell);
         std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);

@@ -897,8 +897,8 @@ namespace parallel
           std::unique_ptr<const FiniteElement<dim>>(projection_fe_.clone()))
       , data_size_in_bytes(0)
       , n_q_points(rhs_quadrature.size())
-      , project_to_fe_matrix(projection_fe->dofs_per_cell, n_q_points)
-      , project_to_qp_matrix(n_q_points, projection_fe->dofs_per_cell)
+      , project_to_fe_matrix(projection_fe->n_dofs_per_cell(), n_q_points)
+      , project_to_qp_matrix(n_q_points, projection_fe->n_dofs_per_cell())
       , handle(numbers::invalid_unsigned_int)
       , data_storage(nullptr)
       , triangulation(nullptr)
@@ -1014,7 +1014,7 @@ namespace parallel
         {
           // we need to first use prolongation matrix to get dofvalues on child
           // cells based on dofvalues stored in the parent's data_store
-          matrix_dofs_child.reinit(projection_fe->dofs_per_cell,
+          matrix_dofs_child.reinit(projection_fe->n_dofs_per_cell(),
                                    number_of_values);
           for (unsigned int child = 0; child < cell->n_children(); ++child)
             if (cell->child(child)->is_locally_owned())

@@ -1810,7 +1810,7 @@ public:
    *
    * @param[out] dof_indices The vector into which the indices will be
    * written. It has to have the right size (namely,
-   * <code>fe.dofs_per_cell</code>, <code>fe.dofs_per_face</code>, or
+   * <code>fe.n_dofs_per_cell()</code>, <code>fe.dofs_per_face</code>, or
    * <code>fe.dofs_per_line</code>, depending on which kind of object this
    * function is called) before being passed to this function.
    *
@@ -1827,7 +1827,7 @@ public:
    * argument to this function is called <code>local_dof_indices</code> by
    * convention. The name is not meant to indicate the <i>local</i> numbers of
    * degrees of freedom (which are always between zero and
-   * <code>fe.dofs_per_cell</code>) but instead that the returned values are
+   * <code>fe.n_dofs_per_cell()</code>) but instead that the returned values are
    * the <i>global</i> indices of those degrees of freedom that are located
    * locally on the current cell.
    *

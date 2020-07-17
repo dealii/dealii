@@ -293,7 +293,7 @@ namespace DoFRenumbering
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
 
           dofs_on_this_cell.resize(dofs_per_cell);
 
@@ -756,8 +756,8 @@ namespace DoFRenumbering
     std::vector<std::vector<unsigned int>> component_list(fe_collection.size());
     for (unsigned int f = 0; f < fe_collection.size(); ++f)
       {
-        const FiniteElement<dim, spacedim> &fe            = fe_collection[f];
-        const unsigned int                  dofs_per_cell = fe.dofs_per_cell;
+        const FiniteElement<dim, spacedim> &fe = fe_collection[f];
+        const unsigned int dofs_per_cell       = fe.n_dofs_per_cell();
         component_list[f].resize(dofs_per_cell);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           if (fe.is_primitive(i))
@@ -815,7 +815,7 @@ namespace DoFRenumbering
         // list using their component
         const unsigned int fe_index = cell->active_fe_index();
         const unsigned int dofs_per_cell =
-          fe_collection[fe_index].dofs_per_cell;
+          fe_collection[fe_index].n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
 
@@ -1047,8 +1047,8 @@ namespace DoFRenumbering
     for (unsigned int f = 0; f < fe_collection.size(); ++f)
       {
         const FiniteElement<dim, spacedim> &fe = fe_collection[f];
-        block_list[f].resize(fe.dofs_per_cell);
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        block_list[f].resize(fe.n_dofs_per_cell());
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           block_list[f][i] = fe.system_to_block_index(i).first;
       }
 
@@ -1092,7 +1092,7 @@ namespace DoFRenumbering
         // list using their component
         const unsigned int fe_index = cell->active_fe_index();
         const unsigned int dofs_per_cell =
-          fe_collection[fe_index].dofs_per_cell;
+          fe_collection[fe_index].n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
 
@@ -1255,7 +1255,8 @@ namespace DoFRenumbering
           if (cell->is_locally_owned())
             {
               // first get the existing DoF indices
-              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell =
+                cell->get_fe().n_dofs_per_cell();
               std::vector<types::global_dof_index> local_dof_indices(
                 dofs_per_cell);
               cell->get_dof_indices(local_dof_indices);
@@ -1760,7 +1761,7 @@ namespace DoFRenumbering
 
         for (const auto &cell : dof.active_cell_iterators())
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             local_dof_indices.resize(dofs_per_cell);
             hp_fe_values.reinit(cell);
             const FEValues<dim> &fe_values =
@@ -1854,7 +1855,7 @@ namespace DoFRenumbering
 
         std::vector<bool> already_touched(dof.n_dofs(), false);
 
-        const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
         std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
         typename DoFHandler<dim, spacedim>::level_cell_iterator begin =
           dof.begin(level);

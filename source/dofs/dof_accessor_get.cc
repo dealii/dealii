@@ -73,7 +73,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
           // well, here we need to first get the values from the current
           // cell and then interpolate it to the element requested. this
           // can clearly only happen for hp::DoFHandler objects
-          const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = this->get_fe().n_dofs_per_cell();
           if (dofs_per_cell == 0)
             {
               interpolated_values = 0;
@@ -84,8 +84,8 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
               this->get_dof_values(values, tmp);
 
               FullMatrix<double> interpolation(
-                this->dof_handler->get_fe(fe_index).dofs_per_cell,
-                this->get_fe().dofs_per_cell);
+                this->dof_handler->get_fe(fe_index).n_dofs_per_cell(),
+                this->get_fe().n_dofs_per_cell());
               this->dof_handler->get_fe(fe_index).get_interpolation_matrix(
                 this->get_fe(), interpolation);
               interpolation.vmult(interpolated_values, tmp);
@@ -115,7 +115,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
       Assert(this->dof_handler != nullptr,
              typename BaseClass::ExcInvalidObject());
@@ -130,7 +130,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
       // interpolating FE_Nothing), then simply skip all of the
       // following since the output vector would be of size zero
       // anyway (and in fact is of size zero, see the assertion above)
-      if (fe.dofs_per_cell > 0)
+      if (fe.n_dofs_per_cell() > 0)
         {
           Vector<number> tmp1(dofs_per_cell);
           Vector<number> tmp2(dofs_per_cell);

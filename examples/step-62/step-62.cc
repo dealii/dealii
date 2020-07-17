@@ -794,7 +794,7 @@ namespace step62
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<std::complex<double>> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1228,7 +1228,7 @@ namespace step62
 
     quadrature_cache.resize(triangulation.n_locally_owned_active_cells() *
                               quadrature_formula.size(),
-                            QuadratureCache<dim>(fe.dofs_per_cell));
+                            QuadratureCache<dim>(fe.n_dofs_per_cell()));
     unsigned int cache_index = 0;
     for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())

@@ -261,7 +261,7 @@ namespace CUDAWrappers
       const UpdateFlags &    update_flags)
       : data(data)
       , fe_degree(data->fe_degree)
-      , dofs_per_cell(data->dofs_per_cell)
+      , dofs_per_cell(data->n_dofs_per_cell())
       , q_points_per_cell(data->q_points_per_cell)
       , fe_values(mapping,
                   fe,
@@ -273,7 +273,7 @@ namespace CUDAWrappers
       , padding_length(data->get_padding_length())
       , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
     {
-      local_dof_indices.resize(data->dofs_per_cell);
+      local_dof_indices.resize(data->n_dofs_per_cell());
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
 
@@ -503,7 +503,7 @@ namespace CUDAWrappers
       const AffineConstraints<number> &constraints)
     {
       std::vector<types::global_dof_index> local_dof_indices(
-        cell->get_fe().dofs_per_cell);
+        cell->get_fe().n_dofs_per_cell());
       cell->get_dof_indices(local_dof_indices);
       constraints.resolve_indices(local_dof_indices);
 
@@ -888,7 +888,7 @@ namespace CUDAWrappers
     padding_length = 1 << static_cast<unsigned int>(
                        std::ceil(dim * std::log2(fe_degree + 1.)));
 
-    dofs_per_cell     = fe.dofs_per_cell;
+    dofs_per_cell     = fe.n_dofs_per_cell();
     q_points_per_cell = std::pow(n_q_points_1d, dim);
 
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(

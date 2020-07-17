@@ -1063,7 +1063,7 @@ namespace Step44
        1)
     , // dilatation
     dof_handler(triangulation)
-    , dofs_per_cell(fe.dofs_per_cell)
+    , dofs_per_cell(fe.n_dofs_per_cell())
     , u_fe(first_u_component)
     , p_fe(p_component)
     , J_fe(J_component)
@@ -1196,12 +1196,12 @@ namespace Step44
                   const QGauss<dim> &       qf_cell,
                   const UpdateFlags         uf_cell)
       : fe_values(fe_cell, qf_cell, uf_cell)
-      , Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell))
+      , Nx(qf_cell.size(), std::vector<double>(fe_cell.n_dofs_per_cell()))
       , grad_Nx(qf_cell.size(),
-                std::vector<Tensor<2, dim>>(fe_cell.dofs_per_cell))
+                std::vector<Tensor<2, dim>>(fe_cell.n_dofs_per_cell()))
       , symm_grad_Nx(qf_cell.size(),
                      std::vector<SymmetricTensor<2, dim>>(
-                       fe_cell.dofs_per_cell))
+                       fe_cell.n_dofs_per_cell()))
     {}
 
     ScratchData_K(const ScratchData_K &rhs)
@@ -1271,10 +1271,10 @@ namespace Step44
                     const UpdateFlags         uf_face)
       : fe_values(fe_cell, qf_cell, uf_cell)
       , fe_face_values(fe_cell, qf_face, uf_face)
-      , Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell))
+      , Nx(qf_cell.size(), std::vector<double>(fe_cell.n_dofs_per_cell()))
       , symm_grad_Nx(qf_cell.size(),
                      std::vector<SymmetricTensor<2, dim>>(
-                       fe_cell.dofs_per_cell))
+                       fe_cell.n_dofs_per_cell()))
     {}
 
     ScratchData_RHS(const ScratchData_RHS &rhs)
@@ -1613,7 +1613,7 @@ namespace Step44
     element_indices_p.clear();
     element_indices_J.clear();
 
-    for (unsigned int k = 0; k < fe.dofs_per_cell; ++k)
+    for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
       {
         const unsigned int k_group = fe.system_to_base_index(k).first.first;
         if (k_group == u_dof)

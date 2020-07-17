@@ -7068,7 +7068,7 @@ FEEvaluation<dim,
   Assert(this->mapped_geometry.get() != nullptr, ExcNotInitialized());
   this->mapped_geometry->reinit(
     static_cast<typename Triangulation<dim>::cell_iterator>(cell));
-  this->local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+  this->local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
   if (level_dof_access)
     cell->get_mg_dof_indices(this->local_dof_indices);
   else

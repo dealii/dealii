@@ -864,7 +864,7 @@ namespace Step43
                                        quadrature_formula,
                                        update_values);
 
-    const unsigned int dofs_per_cell = darcy_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = darcy_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     std::vector<Tensor<2, dim>> k_inverse_values(n_q_points);
@@ -1008,7 +1008,7 @@ namespace Step43
                                              update_quadrature_points |
                                              update_JxW_values);
 
-    const unsigned int dofs_per_cell = darcy_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = darcy_fe.n_dofs_per_cell();
 
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
@@ -1198,7 +1198,7 @@ namespace Step43
                                        quadrature_formula,
                                        update_values | update_JxW_values);
 
-    const unsigned int dofs_per_cell = saturation_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = saturation_fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -1282,7 +1282,7 @@ namespace Step43
       saturation_fe, face_quadrature_formula, update_values);
 
     const unsigned int dofs_per_cell =
-      saturation_dof_handler.get_fe().dofs_per_cell;
+      saturation_dof_handler.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const double                    global_max_u_F_prime = get_max_u_F_prime();
@@ -1753,11 +1753,11 @@ namespace Step43
 
     {
       std::vector<types::global_dof_index> local_joint_dof_indices(
-        joint_fe.dofs_per_cell);
+        joint_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_darcy_dof_indices(
-        darcy_fe.dofs_per_cell);
+        darcy_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_saturation_dof_indices(
-        saturation_fe.dofs_per_cell);
+        saturation_fe.n_dofs_per_cell());
 
       auto       joint_cell      = joint_dof_handler.begin_active();
       const auto joint_endc      = joint_dof_handler.end();
@@ -1771,7 +1771,7 @@ namespace Step43
           darcy_cell->get_dof_indices(local_darcy_dof_indices);
           saturation_cell->get_dof_indices(local_saturation_dof_indices);
 
-          for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < joint_fe.n_dofs_per_cell(); ++i)
             if (joint_fe.system_to_base_index(i).first.first == 0)
               {
                 Assert(joint_fe.system_to_base_index(i).second <

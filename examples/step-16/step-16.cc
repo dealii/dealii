@@ -338,7 +338,7 @@ namespace Step16
     FEValues<dim> &fe_values = scratch_data.fe_values;
     fe_values.reinit(cell);
 
-    const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points    = fe_values.get_quadrature().size();
 
     copy_data.reinit(cell, dofs_per_cell);

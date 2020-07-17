@@ -50,7 +50,7 @@ public:
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one. The size of the matrix is then @p dofs_per_cell times
-   * <tt>source.dofs_per_cell</tt>.
+   * <tt>source.n_dofs_per_cell()</tt>.
    *
    * These matrices are only available if the source element is also a @p FE_Q
    * element. Otherwise, an exception of type
@@ -234,10 +234,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(

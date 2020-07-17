@@ -78,7 +78,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
 
   // now get the values of the shift vectors at the vertices
   Vector<typename VectorType::value_type> mapping_values(
-    shiftmap_dof_handler->get_fe().dofs_per_cell);
+    shiftmap_dof_handler->get_fe().n_dofs_per_cell());
   dof_cell->get_dof_values(*euler_transform_vectors, mapping_values);
 
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())

@@ -34,10 +34,12 @@ FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree)
                              degree,
                              FiniteElementData<dim>::L2),
       std::vector<bool>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+          .n_dofs_per_cell(),
         true),
       std::vector<ComponentMask>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
+          .n_dofs_per_cell(),
         std::vector<bool>(1, true)))
 {
   // Reinit the vectors of restriction and prolongation matrices to the right
@@ -272,7 +274,7 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_DGP<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
   constant_modes(0, 0) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));

@@ -609,7 +609,7 @@ namespace Step9
     AssemblyCopyData &                                    copy_data)
   {
     // We define some abbreviations to avoid unnecessarily long lines:
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch_data.fe_values.get_quadrature().size();
     const unsigned int n_face_q_points =

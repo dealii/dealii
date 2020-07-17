@@ -408,7 +408,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                 dof_info[i].start_components[c] + dof_info[i].n_components[c];
             }
           dof_info[i].dofs_per_cell.push_back(
-            dof_handler[i]->get_fe(0).dofs_per_cell);
+            dof_handler[i]->get_fe(0).n_dofs_per_cell());
 
           // if indices are not initialized, the cell_level_index might not be
           // divisible by the vectorization length. But it must be for
@@ -746,7 +746,7 @@ namespace internal
           dof_info[no].cell_active_fe_index.resize(
             n_active_cells, numbers::invalid_unsigned_int);
 
-        is_fe_dg[no] = fes[0].dofs_per_vertex == 0;
+        is_fe_dg[no] = fes[0].n_dofs_per_vertex() == 0;
 
         lexicographic[no].resize(fes.size());
 
@@ -759,8 +759,8 @@ namespace internal
           {
             const FiniteElement<dim> &fe = fes[fe_index];
             // cache number of finite elements and dofs_per_cell
-            dof_info[no].dofs_per_cell.push_back(fe.dofs_per_cell);
-            dof_info[no].dofs_per_face.push_back(fe.dofs_per_face);
+            dof_info[no].dofs_per_cell.push_back(fe.n_dofs_per_cell());
+            dof_info[no].dofs_per_face.push_back(fe.n_dofs_per_face());
             dof_info[no].dimension       = dim;
             dof_info[no].n_base_elements = fe.n_base_elements();
             dof_info[no].n_components.resize(dof_info[no].n_base_elements);
@@ -780,7 +780,7 @@ namespace internal
                       .push_back(dof_info[no]
                                    .component_dof_indices_offset[fe_index]
                                    .back() +
-                                 fe.base_element(c).dofs_per_cell);
+                                 fe.base_element(c).n_dofs_per_cell());
                     dof_info[no].fe_index_conversion[fe_index].push_back(
                       fe.base_element(c).degree);
                   }
@@ -942,7 +942,7 @@ namespace internal
                           dof_indices.resize(
                             cell->neighbor_or_periodic_neighbor(f)
                               ->get_fe()
-                              .dofs_per_cell);
+                              .n_dofs_per_cell());
                           cell->neighbor_or_periodic_neighbor(f)
                             ->get_mg_dof_indices(dof_indices);
                           for (const auto dof_index : dof_indices)

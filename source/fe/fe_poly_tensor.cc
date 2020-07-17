@@ -83,11 +83,11 @@ namespace internal
                 const unsigned int nn = cell->neighbor_face_no(f);
 
                 if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-                  for (unsigned int j = 0; j < fe.dofs_per_face; ++j)
+                  for (unsigned int j = 0; j < fe.n_dofs_per_face(); ++j)
                     {
                       const unsigned int cell_j = fe.face_to_cell_index(j, f);
 
-                      Assert(f * fe.dofs_per_face + j < face_sign.size(),
+                      Assert(f * fe.n_dofs_per_face() + j < face_sign.size(),
                              ExcInternalError());
                       Assert(mapping_kind.size() == 1 ||
                                cell_j < mapping_kind.size(),
@@ -98,7 +98,7 @@ namespace internal
                       if ((mapping_kind.size() > 1 ?
                              mapping_kind[cell_j] :
                              mapping_kind[0]) == mapping_raviart_thomas)
-                        face_sign[f * fe.dofs_per_face + j] = -1.0;
+                        face_sign[f * fe.n_dofs_per_face() + j] = -1.0;
                     }
               }
           }
@@ -243,7 +243,7 @@ FE_PolyTensor<dim, spacedim>::shape_value_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, dim);
 
   std::lock_guard<std::mutex> lock(cache_mutex);
@@ -288,7 +288,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, dim);
 
   std::lock_guard<std::mutex> lock(cache_mutex);
@@ -334,7 +334,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, dim);
 
   std::lock_guard<std::mutex> lock(cache_mutex);
@@ -392,9 +392,9 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
   const unsigned int n_q_points = quadrature.size();
 
   Assert(!(fe_data.update_each & update_values) ||
-           fe_data.shape_values.size()[0] == this->dofs_per_cell,
+           fe_data.shape_values.size()[0] == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size()[0],
-                              this->dofs_per_cell));
+                              this->n_dofs_per_cell()));
   Assert(!(fe_data.update_each & update_values) ||
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
@@ -418,7 +418,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                                                         fe_data.sign_change);
 
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       const MappingKind mapping_kind = get_mapping_kind(i);
 
@@ -996,7 +996,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                                                         this->mapping_kind,
                                                         fe_data.sign_change);
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       const MappingKind mapping_kind = get_mapping_kind(i);
 
@@ -1626,7 +1626,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                                                         this->mapping_kind,
                                                         fe_data.sign_change);
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       const MappingKind mapping_kind = get_mapping_kind(i);
 
@@ -2190,7 +2190,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 {
   UpdateFlags out = update_default;
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       const MappingKind mapping_kind = get_mapping_kind(i);
 

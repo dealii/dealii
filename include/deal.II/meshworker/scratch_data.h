@@ -998,7 +998,8 @@ namespace MeshWorker
     const std::string &global_vector_name,
     Number             dummy) const
   {
-    const unsigned int n_dofs = get_current_fe_values().get_fe().dofs_per_cell;
+    const unsigned int n_dofs =
+      get_current_fe_values().get_fe().n_dofs_per_cell();
 
     const std::string dofs_name =
       get_unique_dofs_name(global_vector_name, n_dofs, dummy);

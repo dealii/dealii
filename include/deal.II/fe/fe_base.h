@@ -459,6 +459,36 @@ public:
    */
   bool
   operator==(const FiniteElementData &) const;
+
+  /**
+   * Return first index of dof on a line.
+   */
+  unsigned int
+  get_first_line_index() const;
+
+  /**
+   * Return first index of dof on a quad.
+   */
+  unsigned int
+  get_first_quad_index() const;
+
+  /**
+   * Return first index of dof on a hexahedron.
+   */
+  unsigned int
+  get_first_hex_index() const;
+
+  /**
+   * Return first index of dof on a line for face data.
+   */
+  unsigned int
+  get_first_face_line_index() const;
+
+  /**
+   * Return first index of dof on a quad for face data.
+   */
+  unsigned int
+  get_first_face_quad_index() const;
 };
 
 
@@ -633,6 +663,43 @@ inline bool
 FiniteElementData<dim>::conforms(const Conformity space) const
 {
   return ((space & conforming_space) == space);
+}
+
+
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_line_index() const
+{
+  return first_line_index;
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_quad_index() const
+{
+  return first_quad_index;
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_hex_index() const
+{
+  return first_hex_index;
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_face_line_index() const
+{
+  return first_face_line_index;
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_face_quad_index() const
+{
+  return first_face_quad_index;
 }
 
 

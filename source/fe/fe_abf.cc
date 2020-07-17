@@ -58,7 +58,7 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
   , rt_order(deg)
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_raviart_thomas};
   // First, initialize the
@@ -92,13 +92,13 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
   // submatrices with an array for each refine case
   std::vector<FullMatrix<double>> face_embeddings(
     1 << (dim - 1),
-    FullMatrix<double>(this->dofs_per_face, this->dofs_per_face));
+    FullMatrix<double>(this->n_dofs_per_face(), this->n_dofs_per_face()));
   // TODO: Something goes wrong there. The error of the least squares fit
   // is to large ...
   // FETools::compute_face_embedding_matrices(*this, face_embeddings.data(), 0,
   // 0);
-  this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
-                                     this->dofs_per_face);
+  this->interface_constraints.reinit((1 << (dim - 1)) * this->n_dofs_per_face(),
+                                     this->n_dofs_per_face());
   unsigned int target_row = 0;
   for (const auto &face_embedding : face_embeddings)
     for (unsigned int i = 0; i < face_embedding.m(); ++i)
@@ -189,7 +189,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
       boundary_weights.reinit(n_face_points, legendre.n());
 
-      //       Assert (face_points.size() == this->dofs_per_face,
+      //       Assert (face_points.size() == this->n_dofs_per_face(),
       //            ExcInternalError());
 
       for (unsigned int k = 0; k < n_face_points; ++k)
@@ -343,9 +343,10 @@ FE_ABF<dim>::initialize_restriction()
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
-      Table<2, double> cached_values_face(this->dofs_per_cell, q_face.size());
+      Table<2, double> cached_values_face(this->n_dofs_per_cell(),
+                                          q_face.size());
       for (unsigned int k = 0; k < q_face.size(); ++k)
-        for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
           cached_values_face(i, k) = this->shape_value_component(
             i, q_face.point(k), GeometryInfo<dim>::unit_normal_direction[face]);
 
@@ -374,9 +375,9 @@ FE_ABF<dim>::initialize_restriction()
           // corresponding shape
           // functions.
           for (unsigned int k = 0; k < n_face_points; ++k)
-            for (unsigned int i_child = 0; i_child < this->dofs_per_cell;
+            for (unsigned int i_child = 0; i_child < this->n_dofs_per_cell();
                  ++i_child)
-              for (unsigned int i_face = 0; i_face < this->dofs_per_face;
+              for (unsigned int i_face = 0; i_face < this->n_dofs_per_face();
                    ++i_face)
                 {
                   // The quadrature
@@ -384,13 +385,13 @@ FE_ABF<dim>::initialize_restriction()
                   // subcell are NOT
                   // transformed, so we
                   // have to do it here.
-                  this->restriction[iso][child](face * this->dofs_per_face +
+                  this->restriction[iso][child](face * this->n_dofs_per_face() +
                                                   i_face,
                                                 i_child) +=
                     Utilities::fixed_power<dim - 1>(.5) * q_sub.weight(k) *
                     cached_values_face(i_child, k) *
                     this->shape_value_component(
-                      face * this->dofs_per_face + i_face,
+                      face * this->n_dofs_per_face() + i_face,
                       q_sub.point(k),
                       GeometryInfo<dim>::unit_normal_direction[face]);
                 }
@@ -416,14 +417,16 @@ FE_ABF<dim>::initialize_restriction()
 
   QGauss<dim>        q_cell(rt_order + 1);
   const unsigned int start_cell_dofs =
-    GeometryInfo<dim>::faces_per_cell * this->dofs_per_face;
+    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face();
 
   // Store shape values, since the
   // evaluation suffers if not
   // ordered by point
-  Table<3, double> cached_values_cell(this->dofs_per_cell, q_cell.size(), dim);
+  Table<3, double> cached_values_cell(this->n_dofs_per_cell(),
+                                      q_cell.size(),
+                                      dim);
   for (unsigned int k = 0; k < q_cell.size(); ++k)
-    for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       for (unsigned int d = 0; d < dim; ++d)
         cached_values_cell(i, k, d) =
           this->shape_value_component(i, q_cell.point(k), d);
@@ -434,7 +437,8 @@ FE_ABF<dim>::initialize_restriction()
       Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
 
       for (unsigned int k = 0; k < q_sub.size(); ++k)
-        for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+        for (unsigned int i_child = 0; i_child < this->n_dofs_per_cell();
+             ++i_child)
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int i_weight = 0; i_weight < polynomials[d]->n();
                  ++i_weight)
@@ -491,7 +495,7 @@ bool
 FE_ABF<dim>::has_support_on_face(const unsigned int shape_index,
                                  const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // Return computed values if we
@@ -540,8 +544,8 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 
@@ -550,14 +554,14 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
     for (unsigned int k = 0; k < n_face_points; ++k)
       for (unsigned int i = 0; i < boundary_weights.size(1); ++i)
         {
-          nodal_values[i + face * this->dofs_per_face] +=
+          nodal_values[i + face * this->n_dofs_per_face()] +=
             boundary_weights(k, i) *
             support_point_values[face * n_face_points + k][GeometryInfo<
               dim>::unit_normal_direction[face]];
         }
 
   const unsigned int start_cell_dofs =
-    GeometryInfo<dim>::faces_per_cell * this->dofs_per_face;
+    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face();
   const unsigned int start_cell_points =
     GeometryInfo<dim>::faces_per_cell * n_face_points;
 

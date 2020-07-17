@@ -1380,7 +1380,7 @@ namespace Step70
                                    update_quadrature_points |
                                    update_JxW_values);
 
-    const unsigned int dofs_per_cell = fluid_fe->dofs_per_cell;
+    const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
     const unsigned int n_q_points    = fluid_quadrature_formula->size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -1473,11 +1473,11 @@ namespace Step70
     SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
 
     std::vector<types::global_dof_index> fluid_dof_indices(
-      fluid_fe->dofs_per_cell);
+      fluid_fe->n_dofs_per_cell());
 
-    FullMatrix<double>     local_matrix(fluid_fe->dofs_per_cell,
-                                    fluid_fe->dofs_per_cell);
-    dealii::Vector<double> local_rhs(fluid_fe->dofs_per_cell);
+    FullMatrix<double>     local_matrix(fluid_fe->n_dofs_per_cell(),
+                                    fluid_fe->n_dofs_per_cell());
+    dealii::Vector<double> local_rhs(fluid_fe->n_dofs_per_cell());
 
     const auto penalty_parameter =
       1.0 / GridTools::minimal_cell_diameter(fluid_tria);
@@ -1527,13 +1527,14 @@ namespace Step70
             const auto &real_q = p.get_location();
             const auto &JxW    = p.get_properties()[0];
 
-            for (unsigned int i = 0; i < fluid_fe->dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
                 const auto comp_i =
                   fluid_fe->system_to_component_index(i).first;
                 if (comp_i < spacedim)
                   {
-                    for (unsigned int j = 0; j < fluid_fe->dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < fluid_fe->n_dofs_per_cell();
+                         ++j)
                       {
                         const auto comp_j =
                           fluid_fe->system_to_component_index(j).first;

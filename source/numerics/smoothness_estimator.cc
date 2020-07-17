@@ -128,7 +128,7 @@ namespace SmoothnessEstimator
                   cell->active_fe_index());
                 resize(expansion_coefficients, n_modes);
 
-                local_dof_values.reinit(cell->get_fe().dofs_per_cell);
+                local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
                 cell->get_dof_values(solution, local_dof_values);
 
                 fe_legendre.calculate(local_dof_values,
@@ -229,7 +229,7 @@ namespace SmoothnessEstimator
                 // at least N=pe+1
                 AssertIndexRange(pe, n_modes);
 
-                local_dof_values.reinit(cell->get_fe().dofs_per_cell);
+                local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
                 cell->get_dof_values(solution, local_dof_values);
 
                 fe_legendre.calculate(local_dof_values,
@@ -396,7 +396,7 @@ namespace SmoothnessEstimator
                 // degrees of freedom and then need to compute the series
                 // expansion by multiplying this vector with the matrix ${\cal
                 // F}$ corresponding to this finite element.
-                local_dof_values.reinit(cell->get_fe().dofs_per_cell);
+                local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
                 cell->get_dof_values(solution, local_dof_values);
 
                 fe_fourier.calculate(local_dof_values,
@@ -510,7 +510,7 @@ namespace SmoothnessEstimator
                 // at least N=pe+1
                 AssertIndexRange(pe, n_modes);
 
-                local_dof_values.reinit(cell->get_fe().dofs_per_cell);
+                local_dof_values.reinit(cell->get_fe().n_dofs_per_cell());
                 cell->get_dof_values(solution, local_dof_values);
 
                 fe_fourier.calculate(local_dof_values,

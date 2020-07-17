@@ -273,13 +273,13 @@ protected:
     // polynomial to put the values and derivatives of shape functions
     // to put there, depending on what the user requested
     std::vector<double> values(
-      update_flags & update_values ? this->dofs_per_cell : 0);
+      update_flags & update_values ? this->n_dofs_per_cell() : 0);
     std::vector<Tensor<1, dim>> grads(
-      update_flags & update_gradients ? this->dofs_per_cell : 0);
+      update_flags & update_gradients ? this->n_dofs_per_cell() : 0);
     std::vector<Tensor<2, dim>> grad_grads(
-      update_flags & update_hessians ? this->dofs_per_cell : 0);
+      update_flags & update_hessians ? this->n_dofs_per_cell() : 0);
     std::vector<Tensor<3, dim>> third_derivatives(
-      update_flags & update_3rd_derivatives ? this->dofs_per_cell : 0);
+      update_flags & update_3rd_derivatives ? this->n_dofs_per_cell() : 0);
     std::vector<Tensor<4, dim>>
       fourth_derivatives; // won't be needed, so leave empty
 
@@ -302,16 +302,16 @@ protected:
     if ((update_flags & update_values) &&
         !((output_data.shape_values.n_rows() > 0) &&
           (output_data.shape_values.n_cols() == n_q_points)))
-      data.shape_values.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_values.reinit(this->n_dofs_per_cell(), n_q_points);
 
     if (update_flags & update_gradients)
-      data.shape_gradients.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_gradients.reinit(this->n_dofs_per_cell(), n_q_points);
 
     if (update_flags & update_hessians)
-      data.shape_hessians.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_hessians.reinit(this->n_dofs_per_cell(), n_q_points);
 
     if (update_flags & update_3rd_derivatives)
-      data.shape_3rd_derivatives.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_3rd_derivatives.reinit(this->n_dofs_per_cell(), n_q_points);
 
     // next already fill those fields of which we have information by
     // now. note that the shape gradients are only those on the unit
@@ -338,10 +338,10 @@ protected:
             if (output_data.shape_values.n_rows() > 0)
               {
                 if (output_data.shape_values.n_cols() == n_q_points)
-                  for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+                  for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
                     output_data.shape_values[k][i] = values[k];
                 else
-                  for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+                  for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
                     data.shape_values[k][i] = values[k];
               }
 
@@ -349,15 +349,15 @@ protected:
           // so we write them into our scratch space and only later
           // copy stuff into where FEValues wants it
           if (update_flags & update_gradients)
-            for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
               data.shape_gradients[k][i] = grads[k];
 
           if (update_flags & update_hessians)
-            for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
               data.shape_hessians[k][i] = grad_grads[k];
 
           if (update_flags & update_3rd_derivatives)
-            for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
               data.shape_3rd_derivatives[k][i] = third_derivatives[k];
         }
     return data_ptr;

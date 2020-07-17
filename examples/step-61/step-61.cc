@@ -412,8 +412,8 @@ namespace Step61
                                             update_quadrature_points |
                                             update_JxW_values);
 
-    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.n_dofs_per_cell();
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.n_dofs_per_cell();
 
     const unsigned int n_q_points      = fe_values.get_quadrature().size();
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
@@ -666,8 +666,8 @@ namespace Step61
                                             update_quadrature_points |
                                             update_JxW_values);
 
-    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.n_dofs_per_cell();
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.n_dofs_per_cell();
 
     const unsigned int n_q_points      = fe_values.get_quadrature().size();
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();

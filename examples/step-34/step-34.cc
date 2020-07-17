@@ -564,7 +564,8 @@ namespace Step34
 
     const unsigned int n_q_points = fe_v.n_quadrature_points;
 
-    std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(
+      fe.n_dofs_per_cell());
 
     std::vector<Vector<double>> cell_wind(n_q_points, Vector<double>(dim));
     double                      normal_wind;
@@ -576,7 +577,7 @@ namespace Step34
     // cell. This is done using a vector of fe.dofs_per_cell elements, which
     // will then be distributed to the matrix in the global row $i$. The
     // following object will hold this information:
-    Vector<double> local_matrix_row_i(fe.dofs_per_cell);
+    Vector<double> local_matrix_row_i(fe.n_dofs_per_cell());
 
     // The index $i$ runs on the collocation points, which are the support
     // points of the $i$th basis function, while $j$ runs on inner integration
@@ -617,7 +618,7 @@ namespace Step34
             bool         is_singular    = false;
             unsigned int singular_index = numbers::invalid_unsigned_int;
 
-            for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
               if (local_dof_indices[j] == i)
                 {
                   singular_index = j;
@@ -642,7 +643,7 @@ namespace Step34
                     system_rhs(i) += (LaplaceKernel::single_layer(R) *
                                       normal_wind * fe_v.JxW(q));
 
-                    for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
 
                       local_matrix_row_i(j) -=
                         ((LaplaceKernel::double_layer(R) * normals[q]) *
@@ -702,7 +703,7 @@ namespace Step34
                     system_rhs(i) += (LaplaceKernel::single_layer(R) *
                                       normal_wind * fe_v_singular.JxW(q));
 
-                    for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
                       {
                         local_matrix_row_i(j) -=
                           ((LaplaceKernel::double_layer(R) *
@@ -715,7 +716,7 @@ namespace Step34
 
             // Finally, we need to add the contributions of the current cell
             // to the global matrix.
-            for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
               system_matrix(i, local_dof_indices[j]) += local_matrix_row_i(j);
           }
       }
@@ -866,11 +867,12 @@ namespace Step34
     const DoFHandler<2, 3>::active_cell_iterator &,
     const unsigned int index) const
   {
-    Assert(index < fe.dofs_per_cell, ExcIndexRange(0, fe.dofs_per_cell, index));
+    Assert(index < fe.n_dofs_per_cell(),
+           ExcIndexRange(0, fe.n_dofs_per_cell(), index));
 
     static std::vector<QGaussOneOverR<2>> quadratures;
     if (quadratures.size() == 0)
-      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
         quadratures.emplace_back(singular_quadrature_order,
                                  fe.get_unit_support_points()[i],
                                  true);
@@ -883,7 +885,8 @@ namespace Step34
     const DoFHandler<1, 2>::active_cell_iterator &cell,
     const unsigned int                            index) const
   {
-    Assert(index < fe.dofs_per_cell, ExcIndexRange(0, fe.dofs_per_cell, index));
+    Assert(index < fe.n_dofs_per_cell(),
+           ExcIndexRange(0, fe.n_dofs_per_cell(), index));
 
     static Quadrature<1> *q_pointer = nullptr;
     if (q_pointer)
@@ -936,7 +939,7 @@ namespace Step34
 
     const unsigned int n_q_points = fe_v.n_quadrature_points;
 
-    std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
 
     std::vector<double>         local_phi(n_q_points);
     std::vector<double>         normal_wind(n_q_points);

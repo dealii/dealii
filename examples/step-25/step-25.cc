@@ -401,7 +401,7 @@ namespace Step25
                             update_values | update_JxW_values |
                               update_quadrature_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double>                       local_nl_term(dofs_per_cell);
@@ -461,7 +461,7 @@ namespace Step25
                             update_values | update_JxW_values |
                               update_quadrature_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);

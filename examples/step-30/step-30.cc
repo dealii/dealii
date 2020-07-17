@@ -376,7 +376,7 @@ namespace Step30
                             (GeometryInfo<dim>::faces_per_cell *
                                GeometryInfo<dim>::max_children_per_face +
                              1) *
-                              fe.dofs_per_cell);
+                              fe.n_dofs_per_cell());
 
     DoFTools::make_flux_sparsity_pattern(dof_handler, sparsity_pattern);
 
@@ -403,7 +403,7 @@ namespace Step30
   template <int dim>
   void DGMethod<dim>::assemble_system()
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_neighbor(dofs_per_cell);
 
@@ -646,7 +646,7 @@ namespace Step30
 
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
-    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
 
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
   }

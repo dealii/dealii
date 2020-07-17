@@ -69,12 +69,12 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
       else
         {
           Assert(local_values.size() ==
-                   this->dof_handler->get_fe(fe_index).dofs_per_cell,
+                   this->dof_handler->get_fe(fe_index).n_dofs_per_cell(),
                  ExcMessage("Incorrect size of local_values vector."));
 
           FullMatrix<double> interpolation(
-            this->get_fe().dofs_per_cell,
-            this->dof_handler->get_fe(fe_index).dofs_per_cell);
+            this->get_fe().n_dofs_per_cell(),
+            this->dof_handler->get_fe(fe_index).n_dofs_per_cell());
 
           this->get_fe().get_interpolation_matrix(
             this->dof_handler->get_fe(fe_index), interpolation);
@@ -82,7 +82,7 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
           // do the interpolation to the target space. for historical
           // reasons, matrices are set to size 0x0 internally even
           // we reinit as 4x0, so we have to treat this case specially
-          Vector<number> tmp(this->get_fe().dofs_per_cell);
+          Vector<number> tmp(this->get_fe().n_dofs_per_cell());
           if ((tmp.size() > 0) && (local_values.size() > 0))
             interpolation.vmult(tmp, local_values);
 
@@ -105,7 +105,7 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
       Assert(this->dof_handler != nullptr,
              typename BaseClass::ExcInvalidObject());

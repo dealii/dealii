@@ -499,7 +499,7 @@ namespace VectorTools
         const std::vector<Point<dim - 1>> &unit_support_points =
           fe_collection[i].get_unit_face_support_points();
 
-        Assert(unit_support_points.size() == fe_collection[i].dofs_per_face,
+        Assert(unit_support_points.size() == fe_collection[i].n_dofs_per_face(),
                ExcInternalError());
 
         face_quadrature_collection.push_back(
@@ -549,7 +549,7 @@ namespace VectorTools
                 cell->face(face_no);
 
               // get the indices of the dofs on this cell...
-              face_dofs.resize(fe.dofs_per_face);
+              face_dofs.resize(fe.n_dofs_per_face());
               face->get_dof_indices(face_dofs, cell->active_fe_index());
 
               x_fe_face_values.reinit(cell, face_no);
@@ -572,7 +572,7 @@ namespace VectorTools
                         "Error: the finite element does not have enough components "
                         "to define a normal direction."));
 
-                    for (unsigned int k = 0; k < fe.dofs_per_face; ++k)
+                    for (unsigned int k = 0; k < fe.n_dofs_per_face(); ++k)
                       if ((k != i) &&
                           (face_quadrature_collection[cell->active_fe_index()]
                              .point(k) ==
@@ -1085,7 +1085,7 @@ namespace VectorTools
         const std::vector<Point<dim - 1>> &unit_support_points =
           fe_collection[i].get_unit_face_support_points();
 
-        Assert(unit_support_points.size() == fe_collection[i].dofs_per_face,
+        Assert(unit_support_points.size() == fe_collection[i].n_dofs_per_face(),
                ExcInternalError());
 
         face_quadrature_collection.push_back(
@@ -1123,7 +1123,7 @@ namespace VectorTools
                 cell->face(face_no);
 
               // get the indices of the dofs on this cell...
-              face_dofs.resize(fe.dofs_per_face);
+              face_dofs.resize(fe.n_dofs_per_face());
               face->get_dof_indices(face_dofs, cell->active_fe_index());
 
               x_fe_face_values.reinit(cell, face_no);
@@ -1133,8 +1133,8 @@ namespace VectorTools
               std::map<types::global_dof_index, double> dof_to_b_value;
 
               unsigned int n_scalar_indices = 0;
-              cell_vector_dofs.resize(fe.dofs_per_face);
-              for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+              cell_vector_dofs.resize(fe.n_dofs_per_face());
+              for (unsigned int i = 0; i < fe.n_dofs_per_face(); ++i)
                 {
                   if (fe.face_system_to_component_index(i).first >=
                         first_vector_component &&

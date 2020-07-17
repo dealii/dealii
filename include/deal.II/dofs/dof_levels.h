@@ -71,7 +71,7 @@ namespace internal
     public:
       /**
        * Cache for the DoF indices on cells. The size of this array equals the
-       * number of cells on a given level times selected_fe.dofs_per_cell.
+       * number of cells on a given level times selected_fe.n_dofs_per_cell().
        */
       std::vector<types::global_dof_index> cell_dof_indices_cache;
 

@@ -1352,7 +1352,7 @@ private:
      * on the various levels this vertex exists on.
      *
      * The starting offset of the DoFs that belong to a @p level are given by
-     * <code>dofs_per_vertex * (level-coarsest_level)</code>. @p dofs_per_vertex
+     * <code>n_dofs_per_vertex() * (level-coarsest_level)</code>. @p n_dofs_per_vertex()
      * must therefore be passed as an argument to the functions that set or
      * read an index.
      */

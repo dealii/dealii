@@ -91,7 +91,7 @@ namespace internal
       IndexSet globally_relevant;
       DoFTools::extract_locally_relevant_dofs(dof_handler, globally_relevant);
 
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
       std::vector<types::global_dof_index> global_dof_indices(dofs_per_cell);
       std::vector<types::global_dof_index> level_dof_indices(dofs_per_cell);
 
@@ -587,37 +587,37 @@ namespace internal
     {
       // currently, we have only FE_Q and FE_DGQ type elements implemented
       elem_info.n_components = dof_handler.get_fe().element_multiplicity(0);
-      AssertDimension(Utilities::fixed_power<dim>(fe.dofs_per_cell) *
+      AssertDimension(Utilities::fixed_power<dim>(fe.n_dofs_per_cell()) *
                         elem_info.n_components,
-                      dof_handler.get_fe().dofs_per_cell);
+                      dof_handler.get_fe().n_dofs_per_cell());
       AssertDimension(fe.degree, dof_handler.get_fe().degree);
       elem_info.fe_degree             = fe.degree;
-      elem_info.element_is_continuous = fe.dofs_per_vertex > 0;
-      Assert(fe.dofs_per_vertex < 2, ExcNotImplemented());
+      elem_info.element_is_continuous = fe.n_dofs_per_vertex() > 0;
+      Assert(fe.n_dofs_per_vertex() < 2, ExcNotImplemented());
 
       // step 1.2: get renumbering of 1D basis functions to lexicographic
-      // numbers. The distinction according to fe.dofs_per_vertex is to support
-      // both continuous and discontinuous bases.
-      std::vector<unsigned int> renumbering(fe.dofs_per_cell);
+      // numbers. The distinction according to fe.n_dofs_per_vertex() is to
+      // support both continuous and discontinuous bases.
+      std::vector<unsigned int> renumbering(fe.n_dofs_per_cell());
       {
-        AssertIndexRange(fe.dofs_per_vertex, 2);
+        AssertIndexRange(fe.n_dofs_per_vertex(), 2);
         renumbering[0] = 0;
-        for (unsigned int i = 0; i < fe.dofs_per_line; ++i)
-          renumbering[i + fe.dofs_per_vertex] =
-            GeometryInfo<1>::vertices_per_cell * fe.dofs_per_vertex + i;
-        if (fe.dofs_per_vertex > 0)
-          renumbering[fe.dofs_per_cell - fe.dofs_per_vertex] =
-            fe.dofs_per_vertex;
+        for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
+          renumbering[i + fe.n_dofs_per_vertex()] =
+            GeometryInfo<1>::vertices_per_cell * fe.n_dofs_per_vertex() + i;
+        if (fe.n_dofs_per_vertex() > 0)
+          renumbering[fe.n_dofs_per_cell() - fe.n_dofs_per_vertex()] =
+            fe.n_dofs_per_vertex();
       }
 
       // step 1.3: create a dummy 1D quadrature formula to extract the
       // lexicographic numbering for the elements
-      Assert(fe.dofs_per_vertex == 0 || fe.dofs_per_vertex == 1,
+      Assert(fe.n_dofs_per_vertex() == 0 || fe.n_dofs_per_vertex() == 1,
              ExcNotImplemented());
-      const unsigned int shift = fe.dofs_per_cell - fe.dofs_per_vertex;
+      const unsigned int shift = fe.n_dofs_per_cell() - fe.n_dofs_per_vertex();
       const unsigned int n_child_dofs_1d =
-        (fe.dofs_per_vertex > 0 ? (2 * fe.dofs_per_cell - 1) :
-                                  (2 * fe.dofs_per_cell));
+        (fe.n_dofs_per_vertex() > 0 ? (2 * fe.n_dofs_per_cell() - 1) :
+                                      (2 * fe.n_dofs_per_cell()));
 
       elem_info.n_child_cell_dofs =
         elem_info.n_components * Utilities::fixed_power<dim>(n_child_dofs_1d);
@@ -628,12 +628,12 @@ namespace internal
       elem_info.lexicographic_numbering = shape_info.lexicographic_numbering;
 
       // step 1.4: get the 1d prolongation matrix and combine from both children
-      elem_info.prolongation_matrix_1d.resize(fe.dofs_per_cell *
+      elem_info.prolongation_matrix_1d.resize(fe.n_dofs_per_cell() *
                                               n_child_dofs_1d);
 
       for (unsigned int c = 0; c < GeometryInfo<1>::max_children_per_cell; ++c)
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-          for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             elem_info
               .prolongation_matrix_1d[i * n_child_dofs_1d + j + c * shift] =
               fe.get_prolongation_matrix(c)(renumbering[j], renumbering[i]);
@@ -737,7 +737,7 @@ namespace internal
         coarse_level_indices[level].resize(tria.n_raw_cells(level),
                                            numbers::invalid_unsigned_int);
       std::vector<types::global_dof_index> local_dof_indices(
-        dof_handler.get_fe().dofs_per_cell);
+        dof_handler.get_fe().n_dofs_per_cell());
       dirichlet_indices.resize(n_levels - 1);
 
       AssertDimension(target_partitioners.max_level(), n_levels - 1);
@@ -818,8 +818,8 @@ namespace internal
                       ghosted_level_dofs.push_back(local_dof_index);
 
                   add_child_indices<dim>(c,
-                                         fe->dofs_per_cell -
-                                           fe->dofs_per_vertex,
+                                         fe->n_dofs_per_cell() -
+                                           fe->n_dofs_per_vertex(),
                                          fe->degree,
                                          elem_info.lexicographic_numbering,
                                          local_dof_indices,
@@ -849,14 +849,14 @@ namespace internal
                           tria.n_cells(level);
                       parent_child_connect[level][child_index] =
                         std::make_pair(parent_index, c);
-                      AssertIndexRange(dof_handler.get_fe().dofs_per_cell,
+                      AssertIndexRange(dof_handler.get_fe().n_dofs_per_cell(),
                                        static_cast<unsigned short>(-1));
 
                       // set Dirichlet boundary conditions (as a list of
                       // constrained DoFs) for the child
                       if (mg_constrained_dofs != nullptr)
                         for (unsigned int i = 0;
-                             i < dof_handler.get_fe().dofs_per_cell;
+                             i < dof_handler.get_fe().n_dofs_per_cell();
                              ++i)
                           if (mg_constrained_dofs->is_boundary_index(
                                 level,
@@ -895,7 +895,7 @@ namespace internal
                     numbers::invalid_dof_index);
                   add_child_indices<dim>(
                     0,
-                    fe->dofs_per_cell - fe->dofs_per_vertex,
+                    fe->n_dofs_per_cell() - fe->n_dofs_per_vertex(),
                     fe->degree,
                     elem_info.lexicographic_numbering,
                     local_dof_indices,
@@ -904,7 +904,7 @@ namespace internal
                   dirichlet_indices[0].emplace_back();
                   if (mg_constrained_dofs != nullptr)
                     for (unsigned int i = 0;
-                         i < dof_handler.get_fe().dofs_per_cell;
+                         i < dof_handler.get_fe().n_dofs_per_cell();
                          ++i)
                       if (mg_constrained_dofs->is_boundary_index(
                             0,
@@ -991,7 +991,7 @@ namespace internal
       // ---------------------- 3. compute weights to make restriction additive
 
       const unsigned int n_child_dofs_1d =
-        fe->degree + 1 + fe->dofs_per_cell - fe->dofs_per_vertex;
+        fe->degree + 1 + fe->n_dofs_per_cell() - fe->n_dofs_per_vertex();
 
       // get the valence of the individual components and compute the weights as
       // the inverse of the valence

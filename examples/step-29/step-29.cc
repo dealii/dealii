@@ -541,7 +541,7 @@ namespace Step29
 
     const unsigned int n_q_points      = quadrature_formula.size(),
                        n_face_q_points = face_quadrature_formula.size(),
-                       dofs_per_cell   = fe.dofs_per_cell;
+                       dofs_per_cell   = fe.n_dofs_per_cell();
 
     // The FEValues objects will evaluate the shape functions for us.  For the
     // part of the bilinear form that involves integration on $\Omega$, we'll

@@ -97,7 +97,7 @@ namespace internal
 
       /**
        * A variable storing the number of degrees of freedom on all child cells.
-       * It is <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and
+       * It is <tt>2<sup>dim</sup>*fe.n_dofs_per_cell()</tt> for DG elements and
        * somewhat less for continuous elements.
        */
       unsigned int n_child_cell_dofs;

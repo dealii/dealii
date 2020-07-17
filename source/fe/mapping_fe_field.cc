@@ -63,10 +63,10 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData::
   InternalData(const FiniteElement<dim, spacedim> &fe,
                const ComponentMask &               mask)
   : unit_tangentials()
-  , n_shape_functions(fe.dofs_per_cell)
+  , n_shape_functions(fe.n_dofs_per_cell())
   , mask(mask)
-  , local_dof_indices(fe.dofs_per_cell)
-  , local_dof_values(fe.dofs_per_cell)
+  , local_dof_indices(fe.n_dofs_per_cell())
+  , local_dof_values(fe.n_dofs_per_cell())
 {}
 
 
@@ -384,7 +384,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
     std::lock_guard<std::mutex> lock(fe_values_mutex);
     fe_values.reinit(dof_cell);
   }
-  const unsigned int dofs_per_cell = euler_dof_handler->get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell =
+    euler_dof_handler->get_fe().n_dofs_per_cell();
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   if (uses_level_dofs)
     dof_cell->get_mg_dof_indices(dof_indices);

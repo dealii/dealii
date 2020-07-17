@@ -343,7 +343,7 @@ namespace parallel
         }
 
       const unsigned int dofs_per_cell =
-        dof_handler->get_fe(fe_index).dofs_per_cell;
+        dof_handler->get_fe(fe_index).n_dofs_per_cell();
 
       if (dofs_per_cell == 0)
         return std::vector<char>(); // nothing to do for FE_Nothing
@@ -418,7 +418,7 @@ namespace parallel
         }
 
       const unsigned int dofs_per_cell =
-        dof_handler->get_fe(fe_index).dofs_per_cell;
+        dof_handler->get_fe(fe_index).n_dofs_per_cell();
 
       if (dofs_per_cell == 0)
         return; // nothing to do for FE_Nothing

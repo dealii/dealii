@@ -484,10 +484,10 @@ class FESystem;
  * following piece of code in the constructor of a class derived from
  * FiniteElement to compute the $M$ matrix:
  * @code
- * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+ * FullMatrix<double> M(this->n_dofs_per_cell(), this->n_dofs_per_cell());
  * FETools::compute_node_matrix(M, *this);
- * this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
- * this->inverse_node_matrix.invert(M);
+ * this->inverse_node_matrix.reinit(this->n_dofs_per_cell(),
+ * this->n_dofs_per_cell()); this->inverse_node_matrix.invert(M);
  * @endcode
  * Don't forget to make sure
  * that #unit_support_points or #generalized_support_points are initialized
@@ -509,8 +509,8 @@ class FESystem;
  * In the latter case, all that is required is the following piece of code:
  * @code
  * for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
- *   this->prolongation[c].reinit (this->dofs_per_cell,
- *                                 this->dofs_per_cell);
+ *   this->prolongation[c].reinit (this->n_dofs_per_cell(),
+ *                                 this->n_dofs_per_cell());
  * FETools::compute_embedding_matrices (*this, this->prolongation);
  * @endcode
  * As in this example, prolongation is almost always implemented via
@@ -824,7 +824,7 @@ public:
    * version hp::DoFHandler, since one can then write code like this:
    * @code
    * dofs_per_cell =
-   *   dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
+   *   dof_handler->get_fe()[cell->active_fe_index()].n_dofs_per_cell();
    * @endcode
    *
    * This code doesn't work in both situations without the present operator
@@ -1321,10 +1321,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
@@ -3205,7 +3205,7 @@ inline std::pair<unsigned int, types::global_dof_index>
 FiniteElement<dim, spacedim>::system_to_block_index(
   const unsigned int index) const
 {
-  AssertIndexRange(index, this->dofs_per_cell);
+  AssertIndexRange(index, this->n_dofs_per_cell());
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
@@ -3222,7 +3222,7 @@ inline bool
 FiniteElement<dim, spacedim>::restriction_is_additive(
   const unsigned int index) const
 {
-  AssertIndexRange(index, this->dofs_per_cell);
+  AssertIndexRange(index, this->n_dofs_per_cell());
   return restriction_is_additive_flags[index];
 }
 
@@ -3232,7 +3232,7 @@ template <int dim, int spacedim>
 inline const ComponentMask &
 FiniteElement<dim, spacedim>::get_nonzero_components(const unsigned int i) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return nonzero_components[i];
 }
 
@@ -3242,7 +3242,7 @@ template <int dim, int spacedim>
 inline unsigned int
 FiniteElement<dim, spacedim>::n_nonzero_components(const unsigned int i) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
   return n_nonzero_components_table[i];
 }
 
@@ -3261,7 +3261,7 @@ template <int dim, int spacedim>
 inline bool
 FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
 {
-  AssertIndexRange(i, this->dofs_per_cell);
+  AssertIndexRange(i, this->n_dofs_per_cell());
 
   // return primitivity of a shape
   // function by checking whether it
@@ -3285,15 +3285,15 @@ inline GeometryPrimitive
 FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
   const unsigned int cell_dof_index) const
 {
-  AssertIndexRange(cell_dof_index, this->dofs_per_cell);
+  AssertIndexRange(cell_dof_index, this->n_dofs_per_cell());
 
   // just go through the usual cases, taking into account how DoFs
   // are enumerated on the reference cell
-  if (cell_dof_index < this->first_line_index)
+  if (cell_dof_index < this->get_first_line_index())
     return GeometryPrimitive::vertex;
-  else if (cell_dof_index < this->first_quad_index)
+  else if (cell_dof_index < this->get_first_quad_index())
     return GeometryPrimitive::line;
-  else if (cell_dof_index < this->first_hex_index)
+  else if (cell_dof_index < this->get_first_hex_index())
     return GeometryPrimitive::quad;
   else
     return GeometryPrimitive::hex;

@@ -392,7 +392,7 @@ namespace LocalIntegrators
                    const double             factor1 = 1.,
                    const double             factor2 = -1.)
     {
-      const unsigned int n_dofs = fe1.dofs_per_cell;
+      const unsigned int n_dofs = fe1.n_dofs_per_cell();
 
       AssertDimension(fe1.get_fe().n_components(), dim);
       AssertDimension(fe2.get_fe().n_components(), dim);

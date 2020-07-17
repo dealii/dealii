@@ -436,7 +436,7 @@ namespace Step51
     {
       DynamicSparsityPattern dsp(dof_handler.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-      sparsity_pattern.copy_from(dsp, fe.dofs_per_face);
+      sparsity_pattern.copy_from(dsp, fe.n_dofs_per_face());
     }
     system_matrix.reinit(sparsity_pattern);
   }
@@ -531,31 +531,31 @@ namespace Step51
                              face_quadrature_formula,
                              local_face_flags)
       , fe_face_values(fe, face_quadrature_formula, flags)
-      , ll_matrix(fe_local.dofs_per_cell, fe_local.dofs_per_cell)
-      , lf_matrix(fe_local.dofs_per_cell, fe.dofs_per_cell)
-      , fl_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell)
-      , tmp_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell)
-      , l_rhs(fe_local.dofs_per_cell)
-      , tmp_rhs(fe_local.dofs_per_cell)
-      , q_phi(fe_local.dofs_per_cell)
-      , q_phi_div(fe_local.dofs_per_cell)
-      , u_phi(fe_local.dofs_per_cell)
-      , u_phi_grad(fe_local.dofs_per_cell)
-      , tr_phi(fe.dofs_per_cell)
+      , ll_matrix(fe_local.n_dofs_per_cell(), fe_local.n_dofs_per_cell())
+      , lf_matrix(fe_local.n_dofs_per_cell(), fe.n_dofs_per_cell())
+      , fl_matrix(fe.n_dofs_per_cell(), fe_local.n_dofs_per_cell())
+      , tmp_matrix(fe.n_dofs_per_cell(), fe_local.n_dofs_per_cell())
+      , l_rhs(fe_local.n_dofs_per_cell())
+      , tmp_rhs(fe_local.n_dofs_per_cell())
+      , q_phi(fe_local.n_dofs_per_cell())
+      , q_phi_div(fe_local.n_dofs_per_cell())
+      , u_phi(fe_local.n_dofs_per_cell())
+      , u_phi_grad(fe_local.n_dofs_per_cell())
+      , tr_phi(fe.n_dofs_per_cell())
       , trace_values(face_quadrature_formula.size())
       , fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , exact_solution()
     {
       for (unsigned int face_no : GeometryInfo<dim>::face_indices())
-        for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe_local.n_dofs_per_cell(); ++i)
           {
             if (fe_local.has_support_on_face(i, face_no))
               fe_local_support_on_face[face_no].push_back(i);
           }
 
       for (unsigned int face_no : GeometryInfo<dim>::face_indices())
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
             if (fe.has_support_on_face(i, face_no))
               fe_support_on_face[face_no].push_back(i);
@@ -618,9 +618,9 @@ namespace Step51
       , fe_values(fe, quadrature_formula, flags)
       , u_values(quadrature_formula.size())
       , u_gradients(quadrature_formula.size())
-      , cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell)
-      , cell_rhs(fe.dofs_per_cell)
-      , cell_sol(fe.dofs_per_cell)
+      , cell_matrix(fe.n_dofs_per_cell(), fe.n_dofs_per_cell())
+      , cell_rhs(fe.n_dofs_per_cell())
+      , cell_sol(fe.n_dofs_per_cell())
     {}
 
     PostProcessScratchData(const PostProcessScratchData &sd)
@@ -670,7 +670,7 @@ namespace Step51
     const UpdateFlags flags(update_values | update_normal_vectors |
                             update_quadrature_points | update_JxW_values);
 
-    PerTaskData task_data(fe.dofs_per_cell, trace_reconstruct);
+    PerTaskData task_data(fe.n_dofs_per_cell(), trace_reconstruct);
     ScratchData scratch(fe,
                         fe_local,
                         quadrature_formula,
@@ -712,7 +712,7 @@ namespace Step51
       scratch.fe_face_values_local.get_quadrature().size();
 
     const unsigned int loc_dofs_per_cell =
-      scratch.fe_values_local.get_fe().dofs_per_cell;
+      scratch.fe_values_local.get_fe().n_dofs_per_cell();
 
     const FEValuesExtractors::Vector fluxes(0);
     const FEValuesExtractors::Scalar scalar(dim);

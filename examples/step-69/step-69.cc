@@ -767,7 +767,8 @@ namespace Step69
 
       DynamicSparsityPattern dsp(n_locally_relevant, n_locally_relevant);
 
-      const auto dofs_per_cell = discretization->finite_element.dofs_per_cell;
+      const auto dofs_per_cell =
+        discretization->finite_element.n_dofs_per_cell();
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
@@ -1016,8 +1017,9 @@ namespace Step69
     for (auto &matrix : nij_matrix)
       matrix = 0.;
 
-    unsigned int dofs_per_cell = discretization->finite_element.dofs_per_cell;
-    unsigned int n_q_points    = discretization->quadrature.size();
+    unsigned int dofs_per_cell =
+      discretization->finite_element.n_dofs_per_cell();
+    unsigned int n_q_points = discretization->quadrature.size();
 
     // What follows is the initialization of the scratch data required by
     // WorkStream

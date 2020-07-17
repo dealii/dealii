@@ -146,8 +146,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   const unsigned int lines_per_cell    = GeometryInfo<dim>::lines_per_cell;
   const unsigned int faces_per_cell    = GeometryInfo<dim>::faces_per_cell;
 
-  const unsigned int n_line_dofs = this->dofs_per_line * lines_per_cell;
-  const unsigned int n_face_dofs = this->dofs_per_quad * faces_per_cell;
+  const unsigned int n_line_dofs = this->n_dofs_per_line() * lines_per_cell;
+  const unsigned int n_face_dofs = this->n_dofs_per_quad() * faces_per_cell;
 
   const UpdateFlags  flags(data.update_each);
   const unsigned int n_q_points = quadrature.size();
@@ -165,13 +165,13 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   // Resize shape function arrays according to update flags:
   if (flags & update_values)
     {
-      data.shape_values.resize(this->dofs_per_cell,
+      data.shape_values.resize(this->n_dofs_per_cell(),
                                std::vector<Tensor<1, dim>>(n_q_points));
     }
 
   if (flags & update_gradients)
     {
-      data.shape_grads.resize(this->dofs_per_cell,
+      data.shape_grads.resize(this->n_dofs_per_cell(),
                               std::vector<DerivativeForm<1, dim, dim>>(
                                 n_q_points));
     }
@@ -1128,9 +1128,9 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const unsigned int n_q_points = quadrature.size();
 
   Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->dofs_per_cell,
+           fe_data.shape_values.size() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
-                              this->dofs_per_cell));
+                              this->n_dofs_per_cell()));
   Assert(!(flags & update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
@@ -1251,7 +1251,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
 
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
-                  const unsigned int shift_m(m * this->dofs_per_line);
+                  const unsigned int shift_m(m * this->n_dofs_per_line());
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // Only compute 1d polynomials if degree>0.
@@ -1440,7 +1440,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                 degree, std::vector<double>(poly_length));
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
-                  const unsigned int shift_m(m * this->dofs_per_line);
+                  const unsigned int shift_m(m * this->n_dofs_per_line());
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // precompute values of all 1d polynomials required:
@@ -1565,9 +1565,9 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
           const unsigned int n_q_points = quadrature.size();
 
           Assert(!(flags & update_values) ||
-                   fe_data.shape_values.size() == this->dofs_per_cell,
+                   fe_data.shape_values.size() == this->n_dofs_per_cell(),
                  ExcDimensionMismatch(fe_data.shape_values.size(),
-                                      this->dofs_per_cell));
+                                      this->n_dofs_per_cell()));
           Assert(!(flags & update_values) ||
                    fe_data.shape_values[0].size() == n_q_points,
                  ExcDimensionMismatch(fe_data.shape_values[0].size(),
@@ -1580,7 +1580,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
 
           // DoF info:
           const unsigned int n_line_dofs =
-            this->dofs_per_line * GeometryInfo<dim>::lines_per_cell;
+            this->n_dofs_per_line() * GeometryInfo<dim>::lines_per_cell;
 
           // First we find the global face orientations on the current cell.
           std::vector<std::vector<unsigned int>> face_orientation(
@@ -1695,7 +1695,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
           // Loop through quad points:
           for (unsigned int m = 0; m < faces_per_cell; ++m)
             {
-              const unsigned int shift_m(m * this->dofs_per_quad);
+              const unsigned int shift_m(m * this->n_dofs_per_quad());
               // Calculate the offsets for each face-based shape function:
               //
               // Type-1 (gradients)
@@ -1939,9 +1939,9 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const unsigned int n_q_points = quadrature.size();
 
   Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->dofs_per_cell,
+           fe_data.shape_values.size() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size(),
-                              this->dofs_per_cell));
+                              this->n_dofs_per_cell()));
   Assert(!(flags & update_values) ||
            fe_data.shape_values[0].size() == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
@@ -1951,7 +1951,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
       // Now have all shape_values stored on the reference cell.
       // Must now transform to the physical cell.
       std::vector<Tensor<1, dim>> transformed_shape_values(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           const unsigned int first =
             data.shape_function_to_row_table[dof * this->n_components() +
@@ -1978,7 +1978,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
       // Must now transform to the physical cell.
       std::vector<Tensor<2, dim>> input(n_q_points);
       std::vector<Tensor<2, dim>> transformed_shape_grads(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
@@ -2079,7 +2079,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
       // Now have all shape_values stored on the reference cell.
       // Must now transform to the physical cell.
       std::vector<Tensor<1, dim>> transformed_shape_values(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           mapping.transform(make_array_view(fe_data.shape_values[dof],
                                             offset,
@@ -2109,7 +2109,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
       // Must now transform to the physical cell.
       std::vector<Tensor<2, dim>> input(n_q_points);
       std::vector<Tensor<2, dim>> transformed_shape_grads(n_q_points);
-      for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
         {
           for (unsigned int q = 0; q < n_q_points; ++q)
             {

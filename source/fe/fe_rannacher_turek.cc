@@ -115,7 +115,7 @@ FE_RannacherTurek<dim>::convert_generalized_support_point_values_to_dof_values(
 {
   AssertDimension(support_point_values.size(),
                   this->generalized_support_points.size());
-  AssertDimension(nodal_values.size(), this->dofs_per_cell);
+  AssertDimension(nodal_values.size(), this->n_dofs_per_cell());
 
   const unsigned int q_points_per_face = this->weights.size();
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);

@@ -63,9 +63,9 @@ namespace Particles
       // the version with the dof_mask, this should be uncommented.
       // // Construct a dof_mask, used to distribute entries to the sparsity
       // Table<2, bool> dof_mask(max_particles_per_cell * n_comps,
-      //                         fe.dofs_per_cell);
+      //                         fe.n_dofs_per_cell());
       // dof_mask.fill(false);
-      // for (unsigned int i = 0; i < space_fe.dofs_per_cell; ++i)
+      // for (unsigned int i = 0; i < space_fe.n_dofs_per_cell(); ++i)
       //   {
       //     const auto comp_i = space_fe.system_to_component_index(i).first;
       //     if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
@@ -73,7 +73,7 @@ namespace Particles
       //         dof_mask(i, j * n_comps + space_gtl[comp_i]) = true;
       //   }
 
-      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
       std::vector<types::particle_index>   particle_indices(
         max_particles_per_cell * n_comps);
 
@@ -91,7 +91,7 @@ namespace Particles
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
             {
               const auto p_id = particle->get_id();
-              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
                 {
                   const auto comp_j =
                     space_gtl[fe.system_to_component_index(j).first];
@@ -154,9 +154,9 @@ namespace Particles
       // the version with the dof_mask, this should be uncommented.
       // // Construct a dof_mask, used to distribute entries to the sparsity
       // Table<2, bool> dof_mask(max_particles_per_cell * n_comps,
-      //                         fe.dofs_per_cell);
+      //                         fe.n_dofs_per_cell());
       // dof_mask.fill(false);
-      // for (unsigned int i = 0; i < space_fe.dofs_per_cell; ++i)
+      // for (unsigned int i = 0; i < space_fe.n_dofs_per_cell(); ++i)
       //   {
       //     const auto comp_i = space_fe.system_to_component_index(i).first;
       //     if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
@@ -164,12 +164,12 @@ namespace Particles
       //         dof_mask(i, j * n_comps + space_gtl[comp_i]) = true;
       //   }
 
-      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
       std::vector<types::particle_index>   particle_indices(
         max_particles_per_cell * n_comps);
 
       FullMatrix<typename MatrixType::value_type> local_matrix(
-        max_particles_per_cell * n_comps, fe.dofs_per_cell);
+        max_particles_per_cell * n_comps, fe.n_dofs_per_cell());
 
       auto particle = particle_handler.begin();
       while (particle != particle_handler.end())
@@ -181,7 +181,7 @@ namespace Particles
           const auto pic         = particle_handler.particles_in_cell(cell);
           const auto n_particles = particle_handler.n_particles_in_cell(cell);
           particle_indices.resize(n_particles * n_comps);
-          local_matrix.reinit({n_particles * n_comps, fe.dofs_per_cell});
+          local_matrix.reinit({n_particles * n_comps, fe.n_dofs_per_cell()});
           Assert(pic.begin() == particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
             {
@@ -192,7 +192,7 @@ namespace Particles
                 particle_indices[i * n_comps + d] =
                   particle->get_id() * n_comps + d;
 
-              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
                 {
                   const auto comp_j =
                     space_gtl[fe.system_to_component_index(j).first];

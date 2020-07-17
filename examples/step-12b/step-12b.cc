@@ -515,7 +515,7 @@ namespace Step12
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
     // then assign the matrix to it and set the right block size:
-    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
 
     // After these preparations we are ready to start the linear solver.
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);

@@ -299,7 +299,7 @@ namespace VectorTools
                                       UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
@@ -358,7 +358,8 @@ namespace VectorTools
                             UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = cell_point.first->get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell =
+      cell_point.first->get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
@@ -400,7 +401,7 @@ namespace VectorTools
                                       UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
@@ -466,7 +467,8 @@ namespace VectorTools
                             UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = cell_point.first->get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell =
+      cell_point.first->get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     cell_point.first->get_dof_indices(local_dof_indices);
