@@ -2163,26 +2163,12 @@ template <int structdim, int dim, int spacedim>
 inline const ReferenceCell::internal::Info::Base &
 TriaAccessor<structdim, dim, spacedim>::reference_cell_info() const
 {
-  static ReferenceCell::internal::Info::Base   gei_invalid;
-  static ReferenceCell::internal::Info::Vertex gei_vertex;
-  static ReferenceCell::internal::Info::Line   gei_line;
-  static ReferenceCell::internal::Info::Quad   gei_quad;
-  static ReferenceCell::internal::Info::Hex    gei_hex;
-
-  switch (structdim) // TODO: use ReferenceCell::Type
-    {
-      case 0:
-        return gei_vertex;
-      case 1:
-        return gei_line;
-      case 2:
-        return gei_quad;
-      case 3:
-        return gei_hex;
-      default:
-        Assert(false, StandardExceptions::ExcNotImplemented());
-        return gei_invalid;
-    }
+  if (structdim == 0)
+    return ReferenceCell::internal::Info::get_cell(ReferenceCell::Type::Vertex);
+  else if (structdim == 1)
+    return ReferenceCell::internal::Info::get_cell(ReferenceCell::Type::Line);
+  else
+    return ReferenceCell::internal::Info::get_cell(this->reference_cell_type());
 }
 
 
