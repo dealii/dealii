@@ -348,15 +348,13 @@ template <int dim>
 void
 LaplaceProblem<dim>::test()
 {
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
-  dirichlet_boundary[0] = &dirichlet_bc;
-
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   MGConstrainedDoFs mg_constrained_dofs_renumbered;
-  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered,
-                                            dirichlet_boundary);
+  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered);
+  mg_constrained_dofs_renumbered.make_zero_boundary_constraints(
+    mg_dof_handler_renumbered, {0});
 
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
   mg_transfer.build(mg_dof_handler);

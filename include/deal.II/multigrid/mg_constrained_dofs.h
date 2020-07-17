@@ -70,23 +70,6 @@ public:
   initialize(const DoFHandler<dim, spacedim> &dof);
 
   /**
-   * Fill the internal data structures with values extracted from the dof
-   * handler object and apply the boundary values provided.
-   *
-   * This function internally calls the initialize() function above and the
-   * constrains degrees on the external boundary of the domain by calling
-   * MGTools::make_boundary_list() with the given second and third argument.
-   *
-   * @deprecated Use initialize() followed by make_zero_boundary_constraints() instead
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  initialize(const DoFHandler<dim, spacedim> &dof,
-             const std::map<types::boundary_id, const Function<spacedim> *>
-               &                  function_map,
-             const ComponentMask &component_mask = ComponentMask());
-
-  /**
    * Fill the internal data structures with information
    * about Dirichlet boundary dofs.
    *
@@ -325,27 +308,6 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
   MGTools::extract_inner_interface_dofs(dof, refinement_edge_indices);
 }
 
-
-template <int dim, int spacedim>
-inline void
-MGConstrainedDoFs::initialize(
-  const DoFHandler<dim, spacedim> &                               dof,
-  const std::map<types::boundary_id, const Function<spacedim> *> &function_map,
-  const ComponentMask &component_mask)
-{
-  initialize(dof);
-
-  // allocate an IndexSet for each global level. Contents will be
-  // overwritten inside make_boundary_list.
-  const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  // At this point boundary_indices is empty.
-  boundary_indices.resize(n_levels);
-
-  MGTools::make_boundary_list(dof,
-                              function_map,
-                              boundary_indices,
-                              component_mask);
-}
 
 
 template <int dim, int spacedim>

@@ -525,7 +525,8 @@ do_test(const DoFHandler<dim> &dof, const bool threaded)
   Functions::ZeroFunction<dim>                        zero_function;
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim>                                          mapping(fe_degree + 1);
   LaplaceOperator<dim, fe_degree, n_q_points_1d, double> fine_matrix;

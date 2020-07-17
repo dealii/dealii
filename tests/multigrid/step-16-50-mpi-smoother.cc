@@ -221,8 +221,8 @@ namespace Step50
 
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
-
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
     const unsigned int n_levels = triangulation.n_global_levels();
 
