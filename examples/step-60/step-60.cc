@@ -772,7 +772,7 @@ namespace Step60
         for (auto &cell : cells)
           {
             cell->set_refine_flag();
-            for (unsigned int face_no : GeometryInfo<spacedim>::face_indices())
+            for (const auto face_no : cell->face_indices())
               if (!cell->at_boundary(face_no))
                 cell->neighbor(face_no)->set_refine_flag();
           }

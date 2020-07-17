@@ -230,9 +230,7 @@ namespace Step65
         for (const auto &face : cell->face_iterators())
           {
             bool face_at_sphere_boundary = true;
-            for (unsigned int v = 0;
-                 v < GeometryInfo<dim - 1>::vertices_per_cell;
-                 ++v)
+            for (const auto v : face->vertex_indices())
               {
                 if (std::abs(face->vertex(v).norm_square() - 0.25) > 1e-12)
                   face_at_sphere_boundary = false;

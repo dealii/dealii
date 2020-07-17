@@ -766,7 +766,7 @@ namespace Step51
     // Face terms are assembled on all faces of all elements. This is in
     // contrast to more traditional DG methods, where each face is only visited
     // once in the assembly procedure.
-    for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const auto face_no : cell->face_indices())
       {
         scratch.fe_face_values_local.reinit(loc_cell, face_no);
         scratch.fe_face_values.reinit(cell, face_no);

@@ -168,7 +168,7 @@ void grid_3()
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
+      for (const auto i : cell->vertex_indices())
         {
           Point<2> &v = cell->vertex(i);
           if (std::abs(v(1) - 1.0) < 1e-5)

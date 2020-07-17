@@ -570,7 +570,7 @@ namespace Step27
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+        for (unsigned int j = 0; j < cell_vertices[i].size(); ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       }

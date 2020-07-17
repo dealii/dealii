@@ -451,7 +451,7 @@ namespace Step30
 
         cell->get_dof_indices(dofs);
 
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           {
             const auto face = cell->face(face_no);
 
@@ -724,7 +724,7 @@ namespace Step30
           Point<dim> jump;
           Point<dim> area;
 
-          for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+          for (const auto face_no : cell->face_indices())
             {
               const auto face = cell->face(face_no);
 
@@ -839,8 +839,7 @@ namespace Step30
                           std::pair<unsigned int, unsigned int>
                             neighbor_face_subface =
                               cell->neighbor_of_coarser_neighbor(face_no);
-                          Assert(neighbor_face_subface.first <
-                                   GeometryInfo<dim>::faces_per_cell,
+                          Assert(neighbor_face_subface.first < cell->n_faces(),
                                  ExcInternalError());
                           Assert(neighbor_face_subface.second <
                                    neighbor->face(neighbor_face_subface.first)

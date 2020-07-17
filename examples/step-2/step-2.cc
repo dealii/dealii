@@ -75,7 +75,7 @@ void make_grid(Triangulation<2> &triangulation)
   for (unsigned int step = 0; step < 3; ++step)
     {
       for (auto &cell : triangulation.active_cell_iterators())
-        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+        for (const auto v : cell->vertex_indices())
           {
             const double distance_from_center =
               center.distance(cell->vertex(v));

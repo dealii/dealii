@@ -851,7 +851,7 @@ namespace Step21
         //
         // All this is a bit tricky, but has been explained in some detail
         // already in step-9. Take a look there how this is supposed to work!
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           {
             fe_face_values.reinit(cell, face_no);
 

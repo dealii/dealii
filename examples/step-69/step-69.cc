@@ -630,7 +630,7 @@ namespace Step69
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const auto v : cell->vertex_indices())
           {
             if (cell->vertex(v)[0] <= -disk_diameter + 1.e-6)
               cell->vertex(v)[0] = -disk_position;
@@ -639,7 +639,7 @@ namespace Step69
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (auto f : GeometryInfo<dim>::face_indices())
+        for (const auto f : cell->face_indices())
           {
             const auto face = cell->face(f);
 
@@ -1090,7 +1090,7 @@ namespace Step69
           // Now we have to compute the boundary normals. Note that the
           // following loop does not do much unless the element has faces on
           // the boundary of the domain.
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : cell->face_indices())
             {
               const auto face = cell->face(f);
               const auto id   = face->boundary_id();
@@ -1126,9 +1126,7 @@ namespace Step69
                   const auto index = copy.local_dof_indices[j];
 
                   Point<dim> position;
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<dim>::vertices_per_cell;
-                       ++v)
+                  for (const auto v : cell->vertex_indices())
                     if (cell->vertex_dof_index(v, 0) ==
                         partitioner->local_to_global(index))
                       {
@@ -1351,7 +1349,7 @@ namespace Step69
           for (auto &matrix : copy.cell_cij_matrix)
             matrix = 0.;
 
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : cell->face_indices())
             {
               const auto face = cell->face(f);
               const auto id   = face->boundary_id();

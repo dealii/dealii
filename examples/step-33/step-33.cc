@@ -1486,7 +1486,7 @@ namespace Step33
         // whether we are working on an external or internal face; if it is an
         // external face, the fourth argument denoting the degrees of freedom
         // indices of the neighbor is ignored, so we pass an empty vector):
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           if (cell->at_boundary(face_no))
             {
               fe_v_face.reinit(cell, face_no);

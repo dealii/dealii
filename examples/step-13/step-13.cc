@@ -221,9 +221,7 @@ namespace Step13
       bool evaluation_point_found = false;
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (!evaluation_point_found)
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const auto vertex : cell->vertex_indices())
             if (cell->vertex(vertex) == evaluation_point)
               {
                 // In order to extract the point value from the global solution

@@ -1929,7 +1929,7 @@ namespace Step42
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const auto v : cell->vertex_indices())
           if (vertex_touched[cell->vertex_index(v)] == false)
             {
               vertex_touched[cell->vertex_index(v)] = true;
