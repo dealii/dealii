@@ -1106,23 +1106,7 @@ namespace WorkStream
       {
         if (MultithreadInfo::n_threads() == 1)
           {
-            // need to copy the sample since it is marked const
-            ScratchData scratch_data = sample_scratch_data;
-            CopyData    copy_data    = sample_copy_data; // NOLINT
-
-            for (Iterator i = begin; i != end; ++i)
-              {
-                // need to check if the function is not the zero function. To
-                // check zero-ness, create a C++ function out of it and check
-                // that
-                if (static_cast<const std::function<void(
-                      const Iterator &, ScratchData &, CopyData &)> &>(worker))
-                  worker(i, scratch_data, copy_data);
-                if (static_cast<const std::function<void(const CopyData &)> &>(
-                      copier))
-                  copier(copy_data);
-              }
-
+            sequential::run(begin,end,worker,copier, sample_scratch_data, sample_copy_data);
             return;
           }
 
