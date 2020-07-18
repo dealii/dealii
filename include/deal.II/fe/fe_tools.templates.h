@@ -229,7 +229,9 @@ namespace FETools
       // one, taking into account multiplicities, and other complications
       unsigned int total_index = 0;
       for (const unsigned int vertex_number :
-           GeometryInfo<dim>::vertex_indices())
+           ReferenceCell::internal::Info::get_cell(
+             fes.front()->reference_cell_type())
+             .vertex_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -249,9 +251,10 @@ namespace FETools
         }
 
       // 2. Lines
-      for (unsigned int line_number = 0;
-           line_number < GeometryInfo<dim>::lines_per_cell;
-           ++line_number)
+      for (const unsigned int line_number :
+           ReferenceCell::internal::Info::get_cell(
+             fes.front()->reference_cell_type())
+             .line_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -272,7 +275,12 @@ namespace FETools
 
       // 3. Quads
       for (unsigned int quad_number = 0;
-           quad_number < GeometryInfo<dim>::quads_per_cell;
+           quad_number < (dim == 2 ?
+                            1 :
+                            (dim == 3 ? ReferenceCell::internal::Info::get_cell(
+                                          fes.front()->reference_cell_type())
+                                          .n_faces() :
+                                        0));
            ++quad_number)
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -293,9 +301,7 @@ namespace FETools
         }
 
       // 4. Hexes
-      for (unsigned int hex_number = 0;
-           hex_number < GeometryInfo<dim>::hexes_per_cell;
-           ++hex_number)
+      if (dim == 3)
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -304,8 +310,7 @@ namespace FETools
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->n_dofs_per_hex() * hex_number + local_index +
-                     fes[base]->get_first_hex_index());
+                    local_index + fes[base]->get_first_hex_index();
 
                   Assert(index_in_base < fes[base]->n_dofs_per_cell(),
                          ExcInternalError());
@@ -418,7 +423,9 @@ namespace FETools
       // base elements, and other complications
       unsigned int total_index = 0;
       for (const unsigned int vertex_number :
-           GeometryInfo<dim>::vertex_indices())
+           ReferenceCell::internal::Info::get_cell(
+             fes.front()->reference_cell_type())
+             .vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -450,9 +457,10 @@ namespace FETools
         }
 
       // 2. Lines
-      for (unsigned int line_number = 0;
-           line_number < GeometryInfo<dim>::lines_per_cell;
-           ++line_number)
+      for (const unsigned int line_number :
+           ReferenceCell::internal::Info::get_cell(
+             fes.front()->reference_cell_type())
+             .line_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -485,7 +493,12 @@ namespace FETools
 
       // 3. Quads
       for (unsigned int quad_number = 0;
-           quad_number < GeometryInfo<dim>::quads_per_cell;
+           quad_number < (dim == 2 ?
+                            1 :
+                            (dim == 3 ? ReferenceCell::internal::Info::get_cell(
+                                          fes.front()->reference_cell_type())
+                                          .n_faces() :
+                                        0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
@@ -518,9 +531,7 @@ namespace FETools
         }
 
       // 4. Hexes
-      for (unsigned int hex_number = 0;
-           hex_number < GeometryInfo<dim>::hexes_per_cell;
-           ++hex_number)
+      if (dim == 3)
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -533,8 +544,7 @@ namespace FETools
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fes[base]->n_dofs_per_hex() * hex_number + local_index +
-                     fes[base]->get_first_hex_index());
+                    local_index + fes[base]->get_first_hex_index();
 
                   Assert(comp_start + fes[base]->n_components() <=
                            retval[total_index].size(),
@@ -659,7 +669,8 @@ namespace FETools
       // vertex, etc
       total_index = 0;
       for (const unsigned int vertex_number :
-           GeometryInfo<dim>::vertex_indices())
+           ReferenceCell::internal::Info::get_cell(fe.reference_cell_type())
+             .vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -700,9 +711,9 @@ namespace FETools
         }
 
       // 2. Lines
-      for (unsigned int line_number = 0;
-           line_number < GeometryInfo<dim>::lines_per_cell;
-           ++line_number)
+      for (const unsigned int line_number :
+           ReferenceCell::internal::Info::get_cell(fe.reference_cell_type())
+             .line_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -745,7 +756,12 @@ namespace FETools
 
       // 3. Quads
       for (unsigned int quad_number = 0;
-           quad_number < GeometryInfo<dim>::quads_per_cell;
+           quad_number < (dim == 2 ?
+                            1 :
+                            (dim == 3 ? ReferenceCell::internal::Info::get_cell(
+                                          fe.reference_cell_type())
+                                          .n_faces() :
+                                        0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
@@ -788,9 +804,7 @@ namespace FETools
         }
 
       // 4. Hexes
-      for (unsigned int hex_number = 0;
-           hex_number < GeometryInfo<dim>::hexes_per_cell;
-           ++hex_number)
+      if (dim == 3)
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -804,8 +818,7 @@ namespace FETools
                    ++local_index, ++total_index)
                 {
                   const unsigned int index_in_base =
-                    (fe.base_element(base).n_dofs_per_hex() * hex_number +
-                     local_index + fe.base_element(base).get_first_hex_index());
+                    local_index + fe.base_element(base).get_first_hex_index();
 
                   system_to_base_table[total_index] =
                     std::make_pair(std::make_pair(base, m), index_in_base);
@@ -853,7 +866,9 @@ namespace FETools
       // 1. Vertices
       unsigned int total_index = 0;
       for (unsigned int vertex_number = 0;
-           vertex_number < GeometryInfo<dim>::vertices_per_face;
+           vertex_number <
+           ReferenceCell::internal::Info::get_face(fe.reference_cell_type(), 0)
+             .n_vertices();
            ++vertex_number)
         {
           unsigned int comp_start = 0;
@@ -908,7 +923,9 @@ namespace FETools
 
       // 2. Lines
       for (unsigned int line_number = 0;
-           line_number < GeometryInfo<dim>::lines_per_face;
+           line_number <
+           ReferenceCell::internal::Info::get_face(fe.reference_cell_type(), 0)
+             .n_lines();
            ++line_number)
         {
           unsigned int comp_start = 0;
@@ -957,9 +974,7 @@ namespace FETools
         }
 
       // 3. Quads
-      for (unsigned int quad_number = 0;
-           quad_number < GeometryInfo<dim>::quads_per_face;
-           ++quad_number)
+      if (dim == 3)
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -974,13 +989,11 @@ namespace FETools
                 {
                   // do everything alike for this type of object
                   const unsigned int index_in_base =
-                    (fe.base_element(base).n_dofs_per_quad() * quad_number +
-                     local_index +
+                    (local_index +
                      fe.base_element(base).get_first_quad_index());
 
                   const unsigned int face_index_in_base =
                     (fe.base_element(base).get_first_face_quad_index() +
-                     fe.base_element(base).n_dofs_per_quad() * quad_number +
                      local_index);
 
                   face_system_to_base_table[total_index] =
@@ -1946,7 +1959,11 @@ namespace FETools
     std::vector<unsigned int> face_f_dofs(n);
     {
       unsigned int face_dof = 0;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
+      for (unsigned int i = 0;
+           i <
+           ReferenceCell::internal::Info::get_face(fe.reference_cell_type(), 0)
+             .n_vertices();
+           ++i)
         {
           const unsigned int offset_c =
             GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i) *
@@ -1961,7 +1978,12 @@ namespace FETools
               ++face_dof;
             }
         }
-      for (unsigned int i = 1; i <= GeometryInfo<dim>::lines_per_face; ++i)
+
+      for (unsigned int i = 1;
+           i <=
+           ReferenceCell::internal::Info::get_face(fe.reference_cell_type(), 0)
+             .n_lines();
+           ++i)
         {
           const unsigned int offset_c =
             fe.get_first_line_index() +
@@ -1978,7 +2000,8 @@ namespace FETools
               ++face_dof;
             }
         }
-      for (unsigned int i = 1; i <= GeometryInfo<dim>::quads_per_face; ++i)
+
+      if (dim == 3)
         {
           const unsigned int offset_c =
             fe.get_first_quad_index() + face_coarse * fe.n_dofs_per_quad();
