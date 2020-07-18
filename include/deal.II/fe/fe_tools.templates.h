@@ -2035,7 +2035,9 @@ namespace FETools
     // hating the anisotropic implementation
     QGauss<dim - 1>       q_gauss(degree + 1);
     const Quadrature<dim> q_fine =
-      QProjector<dim>::project_to_face(q_gauss, face_fine);
+      QProjector<dim>::project_to_face(fe.reference_cell_type(),
+                                       q_gauss,
+                                       face_fine);
     const unsigned int nq = q_fine.size();
 
     FEValues<dim> fine(mapping,
@@ -2084,10 +2086,8 @@ namespace FETools
          cell_number < GeometryInfo<dim>::max_children_per_face;
          ++cell_number)
       {
-        const Quadrature<dim> q_coarse =
-          QProjector<dim>::project_to_subface(q_gauss,
-                                              face_coarse,
-                                              cell_number);
+        const Quadrature<dim> q_coarse = QProjector<dim>::project_to_subface(
+          fe.reference_cell_type(), q_gauss, face_coarse, cell_number);
         FEValues<dim> coarse(mapping, fe, q_coarse, update_values);
 
         typename Triangulation<dim, spacedim>::active_cell_iterator fine_cell =

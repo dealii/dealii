@@ -166,13 +166,19 @@ FE_RaviartThomasNodal<dim>::initialize_support_points(const unsigned int deg)
       for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
         this->generalized_face_support_points[k] = face_points.point(k);
       Quadrature<dim> faces =
-        QProjector<dim>::project_to_all_faces(face_points);
+        QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
+                                              face_points);
       for (unsigned int k = 0;
            k < this->n_dofs_per_face() * GeometryInfo<dim>::faces_per_cell;
            ++k)
-        this->generalized_support_points[k] =
-          faces.point(k + QProjector<dim>::DataSetDescriptor::face(
-                            0, true, false, false, this->n_dofs_per_face()));
+        this->generalized_support_points[k] = faces.point(
+          k +
+          QProjector<dim>::DataSetDescriptor::face(this->reference_cell_type(),
+                                                   0,
+                                                   true,
+                                                   false,
+                                                   false,
+                                                   this->n_dofs_per_face()));
 
       current = this->n_dofs_per_face() * GeometryInfo<dim>::faces_per_cell;
     }
@@ -621,7 +627,9 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   // matrix by simply taking the
   // value at the support points.
   const Quadrature<dim> face_projection =
-    QProjector<dim>::project_to_face(quad_face_support, 0);
+    QProjector<dim>::project_to_face(this->reference_cell_type(),
+                                     quad_face_support,
+                                     0);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(); ++i)
     {
@@ -727,7 +735,10 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // value at the support points.
 
   const Quadrature<dim> subface_projection =
-    QProjector<dim>::project_to_subface(quad_face_support, 0, subface);
+    QProjector<dim>::project_to_subface(this->reference_cell_type(),
+                                        quad_face_support,
+                                        0,
+                                        subface);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(); ++i)
     {

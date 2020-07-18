@@ -191,7 +191,8 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
         }
 
       Quadrature<dim> faces =
-        QProjector<dim>::project_to_all_faces(face_points);
+        QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
+                                              face_points);
       for (; current < GeometryInfo<dim>::faces_per_cell * n_face_points;
            ++current)
         {
@@ -199,7 +200,12 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
           // into the vector
           this->generalized_support_points[current] =
             faces.point(current + QProjector<dim>::DataSetDescriptor::face(
-                                    0, true, false, false, n_face_points));
+                                    this->reference_cell_type(),
+                                    0,
+                                    true,
+                                    false,
+                                    false,
+                                    n_face_points));
         }
     }
 
@@ -276,7 +282,10 @@ FE_RaviartThomas<dim>::initialize_restriction()
       // child cell are evaluated
       // in the quadrature points
       // of a full face.
-      Quadrature<dim> q_face = QProjector<dim>::project_to_face(q_base, face);
+      Quadrature<dim> q_face =
+        QProjector<dim>::project_to_face(this->reference_cell_type(),
+                                         q_base,
+                                         face);
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
@@ -294,8 +303,8 @@ FE_RaviartThomas<dim>::initialize_restriction()
           // the coarse face are
           // evaluated on the subface
           // only.
-          Quadrature<dim> q_sub =
-            QProjector<dim>::project_to_subface(q_base, face, sub);
+          Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
+            this->reference_cell_type(), q_base, face, sub);
           const unsigned int child = GeometryInfo<dim>::child_cell_on_face(
             RefinementCase<dim>::isotropic_refinement, face, sub);
 
@@ -372,7 +381,10 @@ FE_RaviartThomas<dim>::initialize_restriction()
   for (unsigned int child = 0; child < GeometryInfo<dim>::max_children_per_cell;
        ++child)
     {
-      Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
+      Quadrature<dim> q_sub =
+        QProjector<dim>::project_to_child(this->reference_cell_type(),
+                                          q_cell,
+                                          child);
 
       for (unsigned int k = 0; k < q_sub.size(); ++k)
         for (unsigned int i_child = 0; i_child < this->n_dofs_per_cell();

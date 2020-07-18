@@ -116,7 +116,8 @@ MappingCartesian<dim, spacedim>::get_face_data(
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(
-      QProjector<dim>::project_to_all_faces(quadrature));
+      QProjector<dim>::project_to_all_faces(ReferenceCell::get_hypercube(dim),
+                                            quadrature));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -140,8 +141,8 @@ MappingCartesian<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(
-      QProjector<dim>::project_to_all_subfaces(quadrature));
+    std::make_unique<InternalData>(QProjector<dim>::project_to_all_subfaces(
+      ReferenceCell::get_hypercube(dim), quadrature));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -203,8 +204,7 @@ MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
 {
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::cell();
+      const auto offset = QProjector<dim>::DataSetDescriptor::cell();
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
     }
@@ -224,13 +224,13 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
 
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::face(face_no,
-                                                 cell->face_orientation(
-                                                   face_no),
-                                                 cell->face_flip(face_no),
-                                                 cell->face_rotation(face_no),
-                                                 quadrature_points.size());
+      const auto offset = QProjector<dim>::DataSetDescriptor::face(
+        ReferenceCell::get_hypercube(dim),
+        face_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature_points.size());
 
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
@@ -257,15 +257,15 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
 
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::subface(
-          face_no,
-          sub_no,
-          cell->face_orientation(face_no),
-          cell->face_flip(face_no),
-          cell->face_rotation(face_no),
-          quadrature_points.size(),
-          cell->subface_case(face_no));
+      const auto offset = QProjector<dim>::DataSetDescriptor::subface(
+        ReferenceCell::get_hypercube(dim),
+        face_no,
+        sub_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature_points.size(),
+        cell->subface_case(face_no));
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
     }

@@ -45,6 +45,52 @@ namespace ReferenceCell
     Invalid = static_cast<std::uint8_t>(-1)
   };
 
+  /**
+   * Return the correct simplex reference cell type for the given dimension
+   * @p dim.
+   */
+  inline Type
+  get_simplex(const unsigned int dim)
+  {
+    switch (dim)
+      {
+        case 0:
+          return Type::Vertex;
+        case 1:
+          return Type::Line;
+        case 2:
+          return Type::Tri;
+        case 3:
+          return Type::Tet;
+        default:
+          Assert(false, ExcNotImplemented());
+          return Type::Invalid;
+      }
+  }
+
+  /**
+   * Return the correct hypercube reference cell type for the given dimension
+   * @p dim.
+   */
+  inline Type
+  get_hypercube(const unsigned int dim)
+  {
+    switch (dim)
+      {
+        case 0:
+          return Type::Vertex;
+        case 1:
+          return Type::Line;
+        case 2:
+          return Type::Quad;
+        case 3:
+          return Type::Hex;
+        default:
+          Assert(false, ExcNotImplemented());
+          return Type::Invalid;
+      }
+  }
+
   namespace internal
   {
     /**

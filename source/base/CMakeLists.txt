@@ -76,6 +76,7 @@ SET(_unity_include_src
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
   process_grid.cc
+  qprojector.cc
   quadrature.cc
   quadrature_lib.cc
   quadrature_selector.cc

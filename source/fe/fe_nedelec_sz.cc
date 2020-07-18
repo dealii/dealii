@@ -2056,19 +2056,22 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   // This will fill in the missing items in the InternalData
   // (fe_internal/fe_data) which was not filled in by get_data.
   fill_edge_values(cell,
-                   QProjector<dim>::project_to_all_faces(quadrature),
+                   QProjector<dim>::project_to_all_faces(
+                     this->reference_cell_type(), quadrature),
                    fe_data);
   if (dim == 3 && this->degree > 1)
     {
       fill_face_values(cell,
-                       QProjector<dim>::project_to_all_faces(quadrature),
+                       QProjector<dim>::project_to_all_faces(
+                         this->reference_cell_type(), quadrature),
                        fe_data);
     }
 
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
-  const typename QProjector<dim>::DataSetDescriptor offset =
-    QProjector<dim>::DataSetDescriptor::face(face_no,
+  const auto         offset =
+    QProjector<dim>::DataSetDescriptor::face(this->reference_cell_type(),
+                                             face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
                                              cell->face_rotation(face_no),

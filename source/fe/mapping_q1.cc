@@ -16,7 +16,6 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>

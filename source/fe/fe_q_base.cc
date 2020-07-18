@@ -260,19 +260,23 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
         // Add nodes of lines interior in the "mother-face"
 
         // line 5: use line 9
-        QProjector<dim - 1>::project_to_subface(qline, 0, 0, p_line);
+        QProjector<dim - 1>::project_to_subface(
+          ReferenceCell::get_hypercube(dim - 1), qline, 0, 0, p_line);
         for (unsigned int i = 0; i < n; ++i)
           constraint_points.push_back(p_line[i] + Point<dim - 1>(0.5, 0));
         // line 6: use line 10
-        QProjector<dim - 1>::project_to_subface(qline, 0, 1, p_line);
+        QProjector<dim - 1>::project_to_subface(
+          ReferenceCell::get_hypercube(dim - 1), qline, 0, 1, p_line);
         for (unsigned int i = 0; i < n; ++i)
           constraint_points.push_back(p_line[i] + Point<dim - 1>(0.5, 0));
         // line 7: use line 13
-        QProjector<dim - 1>::project_to_subface(qline, 2, 0, p_line);
+        QProjector<dim - 1>::project_to_subface(
+          ReferenceCell::get_hypercube(dim - 1), qline, 2, 0, p_line);
         for (unsigned int i = 0; i < n; ++i)
           constraint_points.push_back(p_line[i] + Point<dim - 1>(0, 0.5));
         // line 8: use line 14
-        QProjector<dim - 1>::project_to_subface(qline, 2, 1, p_line);
+        QProjector<dim - 1>::project_to_subface(
+          ReferenceCell::get_hypercube(dim - 1), qline, 2, 1, p_line);
         for (unsigned int i = 0; i < n; ++i)
           constraint_points.push_back(p_line[i] + Point<dim - 1>(0, 0.5));
 
@@ -284,10 +288,12 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
                subface < GeometryInfo<dim - 1>::max_children_per_face;
                ++subface)
             {
-              QProjector<dim - 1>::project_to_subface(qline,
-                                                      face,
-                                                      subface,
-                                                      p_line);
+              QProjector<dim - 1>::project_to_subface(
+                ReferenceCell::get_hypercube(dim - 1),
+                qline,
+                face,
+                subface,
+                p_line);
               constraint_points.insert(constraint_points.end(),
                                        p_line.begin(),
                                        p_line.end());
@@ -658,8 +664,13 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
       // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature =
         subface == numbers::invalid_unsigned_int ?
-          QProjector<dim>::project_to_face(quad_face_support, 0) :
-          QProjector<dim>::project_to_subface(quad_face_support, 0, subface);
+          QProjector<dim>::project_to_face(this->reference_cell_type(),
+                                           quad_face_support,
+                                           0) :
+          QProjector<dim>::project_to_subface(this->reference_cell_type(),
+                                              quad_face_support,
+                                              0,
+                                              subface);
       for (unsigned int i = 0; i < source_fe->n_dofs_per_face(); ++i)
         {
           const Point<dim> &p = subface_quadrature.point(i);

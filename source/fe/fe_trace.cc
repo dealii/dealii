@@ -15,7 +15,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
