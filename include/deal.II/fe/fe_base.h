@@ -219,6 +219,13 @@ public:
    */
   static const unsigned int dimension = dim;
 
+private:
+  /**
+   * Reference cell type.
+   */
+  const ReferenceCell::Type cell_type;
+
+public:
   /**
    * Number of degrees of freedom on a vertex.
    */
@@ -363,6 +370,12 @@ public:
                     const unsigned int               degree,
                     const Conformity                 conformity = unknown,
                     const BlockIndices &block_indices = BlockIndices());
+
+  /**
+   * Return type of reference cell.
+   */
+  ReferenceCell::Type
+  reference_cell_type() const;
 
   /**
    * Number of dofs per vertex.
@@ -544,6 +557,14 @@ namespace FiniteElementDomination
     return neither_element_dominates;
   }
 } // namespace FiniteElementDomination
+
+
+template <int dim>
+inline ReferenceCell::Type
+FiniteElementData<dim>::reference_cell_type() const
+{
+  return cell_type;
+}
 
 
 template <int dim>
