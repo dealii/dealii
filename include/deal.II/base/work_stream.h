@@ -1106,7 +1106,12 @@ namespace WorkStream
       {
         if (MultithreadInfo::n_threads() == 1)
           {
-            sequential::run(begin,end,worker,copier, sample_scratch_data, sample_copy_data);
+            sequential::run(begin,
+                            end,
+                            worker,
+                            copier,
+                            sample_scratch_data,
+                            sample_copy_data);
             return;
           }
 
@@ -1131,8 +1136,9 @@ namespace WorkStream
         Iterator it = begin;
         while (it != end)
           {
-            unsigned int count  = std::min(remaining_items, real_chunk_size);
-            Iterator     middle = it;
+            const unsigned int count =
+              std::min(remaining_items, real_chunk_size);
+            Iterator middle = it;
             std::advance(middle, count);
 
             chunks.emplace_back();
