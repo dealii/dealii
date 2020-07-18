@@ -470,6 +470,10 @@ Quadrature<1>::Quadrature(const Quadrature<0> &, const Quadrature<1> &);
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &);
 
+template <>
+QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
+                        const unsigned int   n_copies);
+
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE
 
