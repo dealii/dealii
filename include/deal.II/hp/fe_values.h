@@ -23,6 +23,9 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
@@ -477,6 +480,19 @@ namespace hp
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
+     * Reinitialize the object for the given cell and face.
+     *
+     * @note @p face must be one of @p cell's face iterators.
+     */
+    template <bool lda>
+    void
+    reinit(const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+           const typename Triangulation<dim, spacedim>::face_iterator &face,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+
+    /**
      * Like the previous function, but for non-DoFHandler iterators. The reason
      * this function exists is so that one can use this class for
      * Triangulation objects too.
@@ -491,6 +507,18 @@ namespace hp
     void
     reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
            const unsigned int                                          face_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+
+    /**
+     * Reinitialize the object for the given cell and face.
+     *
+     * @note @p face must be one of @p cell's face iterators.
+     */
+    void
+    reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+           const typename Triangulation<dim, spacedim>::face_iterator &face,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);

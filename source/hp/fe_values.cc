@@ -382,6 +382,22 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  template <bool lda>
+  void
+  FEFaceValues<dim, spacedim>::reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const unsigned int                                          q_index,
+    const unsigned int                                          mapping_index,
+    const unsigned int                                          fe_index)
+  {
+    const auto face_n = cell->face_iterator_to_index(face);
+    reinit(cell, face_n, q_index, mapping_index, fe_index);
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   FEFaceValues<dim, spacedim>::reinit(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -414,6 +430,21 @@ namespace hp
     // initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FEFaceValues<dim, spacedim>::reinit(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const unsigned int                                          q_index,
+    const unsigned int                                          mapping_index,
+    const unsigned int                                          fe_index)
+  {
+    const auto face_n = cell->face_iterator_to_index(face);
+    reinit(cell, face_n, q_index, mapping_index, fe_index);
   }
 
 
