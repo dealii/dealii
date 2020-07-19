@@ -64,6 +64,16 @@ main()
   initlog();
 
   {
+    deallog.push("1d-1");
+    test<1>(1);
+    deallog.pop();
+  }
+  {
+    deallog.push("1d-2");
+    test<1>(2);
+    deallog.pop();
+  }
+  {
     deallog.push("2d-1");
     test<2>(1);
     deallog.pop();

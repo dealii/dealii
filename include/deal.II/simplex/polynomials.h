@@ -40,8 +40,6 @@ namespace Simplex
   template <int dim>
   class ScalarPolynomial : public ScalarPolynomialsBase<dim>
   {
-    static_assert(dim == 2 || dim == 3, "Dimension not supported!");
-
   public:
     /**
      * Make the dimension available to the outside.

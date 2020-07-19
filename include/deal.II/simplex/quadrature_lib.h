@@ -28,11 +28,14 @@ namespace Simplex
   /**
    * Integration rule for simplex entities.
    *
-   * Following number of quadrature points are currently supported:
+   * Following number of quadrature points are currently supported for 2D and
+   * 3D:
    *   - 2D: 1, 3, 7
    *   - 3D: 1, 4, 10
    *
-   *  @ingroup simplex
+   * For 1D, the quadrature rule degenerates to a `QGauss<1>(n_points)`.
+   *
+   * @ingroup simplex
    */
   template <int dim>
   class PGauss : public QSimplex<dim>
