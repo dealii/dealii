@@ -13,8 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/qprojector.h>
+
+#include <deal.II/simplex/polynomials.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -519,8 +522,70 @@ QProjector<2>::project_to_all_faces(
   const ReferenceCell::Type reference_cell_type,
   const SubQuadrature &     quadrature)
 {
+  if (reference_cell_type == ReferenceCell::Type::Tri)
+    {
+      // the quadrature rule to be projected ...
+      const auto &sub_quadrature_points  = quadrature.get_points();
+      const auto &sub_quadrature_weights = quadrature.get_weights();
+
+      // ... on to the faces (defined by its support points and arc length)
+      const std::array<std::pair<std::array<Point<2>, 2>, double>, 3> faces = {
+        {{{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0)}, 1.0},
+         {{Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}, std::sqrt(2.0)},
+         {{Point<2>(0.0, 1.0), Point<2>(0.0, 0.0)}, 1.0}}};
+
+      // linear polynomial to map the reference quadrature points correctly
+      // on faces
+      const Simplex::ScalarPolynomial<1> poly(1);
+
+      // new (projected) quadrature points and weights
+      std::vector<Point<2>> points;
+      std::vector<double>   weights;
+
+      // loop over all faces (lines) ...
+      for (const auto &face : faces)
+        // ... and over all possible orientations
+        for (unsigned int orientation = 0; orientation < 2; ++orientation)
+          {
+            std::array<Point<2>, 2> support_points;
+
+            // determine support point of the current line with the correct
+            // orientation
+            switch (orientation)
+              {
+                case 0:
+                  support_points = {face.first[1], face.first[0]};
+                  break;
+                case 1:
+                  support_points = {face.first[0], face.first[1]};
+                  break;
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
+
+            // loop over all quadrature points
+            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
+              {
+                Point<2> mapped_point;
+
+                // map reference quadrature point
+                for (unsigned int i = 0; i < 2; ++i)
+                  mapped_point +=
+                    support_points[i] *
+                    poly.compute_value(i, sub_quadrature_points[j]);
+
+                points.emplace_back(mapped_point);
+
+                // scale weight by arc length
+                weights.emplace_back(sub_quadrature_weights[j] * face.second);
+              }
+          }
+
+      // construct new quadrature rule
+      return {points, weights};
+    }
+
   Assert(reference_cell_type == ReferenceCell::Type::Quad, ExcNotImplemented());
-  (void)reference_cell_type;
 
   const unsigned int dim = 2;
 
@@ -571,8 +636,154 @@ QProjector<3>::project_to_all_faces(
   const ReferenceCell::Type reference_cell_type,
   const SubQuadrature &     quadrature)
 {
+  if (reference_cell_type == ReferenceCell::Type::Tet)
+    {
+      // the quadrature rule to be projected ...
+      const auto &sub_quadrature_points  = quadrature.get_points();
+      const auto &sub_quadrature_weights = quadrature.get_weights();
+
+      // ... on to the faces (defined by its support points and its area)
+      // note: the area is later not used as a scaling factor but recomputed
+      const std::array<std::pair<std::array<Point<3>, 3>, double>, 4> faces = {
+        {{{Point<3>(0.0, 0.0, 0.0),
+           Point<3>(1.0, 0.0, 0.0),
+           Point<3>(0.0, 1.0, 0.0)},
+          0.5},
+         {{Point<3>(1.0, 0.0, 0.0),
+           Point<3>(0.0, 0.0, 0.0),
+           Point<3>(0.0, 0.0, 1.0)},
+          0.5},
+         {{Point<3>(0.0, 0.0, 0.0),
+           Point<3>(0.0, 1.0, 0.0),
+           Point<3>(0.0, 0.0, 1.0)},
+          0.5},
+         {{Point<3>(0.0, 1.0, 0.0),
+           Point<3>(1.0, 0.0, 0.0),
+           Point<3>(0.0, 0.0, 1.0)},
+          0.5 * sqrt(3.0) /*equilateral triangle*/}}};
+
+      // linear polynomial to map the reference quadrature points correctly
+      // on faces
+      const Simplex::ScalarPolynomial<2> poly(1);
+
+      // new (projected) quadrature points and weights
+      std::vector<Point<3>> points;
+      std::vector<double>   weights;
+
+      // loop over all faces (triangles) ...
+      for (const auto &face : faces)
+        // ... and over all possible orientations
+        for (unsigned int orientation = 0; orientation < 6; ++orientation)
+          {
+            std::array<Point<3>, 3> support_points;
+
+            // determine support point of the current line with the correct
+            // orientation
+            switch (orientation)
+              {
+                case 1:
+                  support_points = {face.first[0],
+                                    face.first[1],
+                                    face.first[2]};
+                  break;
+                case 3:
+                  support_points = {face.first[1],
+                                    face.first[0],
+                                    face.first[2]};
+                  break;
+                case 5:
+                  support_points = {face.first[2],
+                                    face.first[0],
+                                    face.first[1]};
+                  break;
+                case 0:
+                  support_points = {face.first[0],
+                                    face.first[2],
+                                    face.first[1]};
+                  break;
+                case 2:
+                  support_points = {face.first[1],
+                                    face.first[2],
+                                    face.first[0]};
+                  break;
+                case 4:
+                  support_points = {face.first[2],
+                                    face.first[1],
+                                    face.first[0]};
+                  break;
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
+
+            // loop over all quadrature points
+            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
+              {
+                Point<3> mapped_point;
+
+                // map reference quadrature point
+                for (unsigned int i = 0; i < 3; ++i)
+                  mapped_point +=
+                    support_points[i] *
+                    poly.compute_value(i, sub_quadrature_points[j]);
+
+                points.push_back(mapped_point);
+
+                // scale quadrature weight
+                const double scaling = [&]() {
+                  const auto &supp_pts = support_points;
+
+                  const unsigned int n_shape_functions = 3;
+                  const unsigned int dim_              = 2;
+                  const unsigned int spacedim          = 3;
+
+                  double result[spacedim][dim_];
+
+                  std::vector<Tensor<1, dim_>> shape_derivatives(
+                    n_shape_functions);
+
+                  for (unsigned int i = 0; i < 3; ++i)
+                    shape_derivatives[i] =
+                      poly.compute_1st_derivative(i, sub_quadrature_points[j]);
+
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
+                  for (unsigned int k = 1; k < n_shape_functions; ++k)
+                    for (unsigned int i = 0; i < spacedim; ++i)
+                      for (unsigned int j = 0; j < dim_; ++j)
+                        result[i][j] +=
+                          shape_derivatives[k][j] * supp_pts[k][i];
+
+                  DerivativeForm<1, dim_, spacedim> contravariant;
+
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      contravariant[i][j] = result[i][j];
+
+
+                  Tensor<1, spacedim> DX_t[dim_];
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      DX_t[j][i] = contravariant[i][j];
+
+                  Tensor<2, dim_> G;
+                  for (unsigned int i = 0; i < dim_; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      G[i][j] = DX_t[i] * DX_t[j];
+
+                  return std::sqrt(determinant(G));
+                }();
+
+                weights.push_back(sub_quadrature_weights[j] * scaling);
+              }
+          }
+
+      // construct new quadrature rule
+      return {points, weights};
+    }
+
+
   Assert(reference_cell_type == ReferenceCell::Type::Hex, ExcNotImplemented());
-  (void)reference_cell_type;
 
   const unsigned int dim = 3;
 
@@ -996,9 +1207,21 @@ QProjector<dim>::DataSetDescriptor::face(
   const bool                face_rotation,
   const unsigned int        n_quadrature_points)
 {
+  if (reference_cell_type == ReferenceCell::Type::Tri ||
+      reference_cell_type == ReferenceCell::Type::Tet)
+    {
+      if (dim == 2)
+        return {(2 * face_no + face_orientation) * n_quadrature_points};
+      else if (dim == 3)
+        {
+          const unsigned int orientation =
+            (face_flip * 2 + face_rotation) * 2 + face_orientation;
+          return {(6 * face_no + orientation) * n_quadrature_points};
+        }
+    }
+
   Assert(reference_cell_type == ReferenceCell::get_hypercube(dim),
          ExcNotImplemented());
-  (void)reference_cell_type;
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
 
