@@ -1624,6 +1624,10 @@ namespace internal
 
             dof_handler.hp_object_fe_ptr[d].push_back(fe_slots_needed);
 
+            // make sure that all entries have been set
+            AssertDimension(dof_handler.hp_object_fe_ptr[d].size(),
+                            dof_handler.tria->n_raw_lines() + 1);
+
             dof_handler.hp_object_fe_indices[d].reserve(fe_slots_needed);
             dof_handler.object_dof_ptr[l][d].reserve(fe_slots_needed + 1);
 
@@ -1649,6 +1653,17 @@ namespace internal
                             numbers::invalid_dof_index);
                       }
                 }
+
+            dof_handler.object_dof_ptr[l][d].push_back(
+              dof_handler.object_dof_indices[l][d].size());
+
+            // make sure that all entries have been set
+            AssertDimension(dof_handler.hp_object_fe_indices[d].size(),
+                            fe_slots_needed);
+            AssertDimension(dof_handler.object_dof_ptr[l][d].size(),
+                            fe_slots_needed + 1);
+            AssertDimension(dof_handler.object_dof_indices[l][d].size(),
+                            line_slots_needed);
           }
 
           // Ensure that everything is done at this point.
