@@ -1,0 +1,17 @@
+
+DEAL:0::number of elements: 70
+DEAL:0::Periodicity constraints are consistent in parallel: 1
+DEAL:0::Hanging nodes constraints are consistent in parallel: 1
+DEAL:0::OK
+
+DEAL:1::number of elements: 70
+DEAL:1::Periodicity constraints are consistent in parallel: 1
+DEAL:1::Hanging nodes constraints are consistent in parallel: 1
+DEAL:1::OK
+
+
+DEAL:2::number of elements: 70
+DEAL:2::Periodicity constraints are consistent in parallel: 1
+DEAL:2::Hanging nodes constraints are consistent in parallel: 1
+DEAL:2::OK
+
