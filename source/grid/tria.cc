@@ -194,7 +194,7 @@ namespace
   // the face will be refined. thus there is an
   // additional third argument @p
   // expected_face_ref_case returning just
-  // that. be aware, that this vriable will
+  // that. be aware, that this variable will
   // only contain useful information if this
   // function is called for an active cell.
   //
@@ -13319,6 +13319,15 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // cycle
                     unsigned int unrefined_neighbors = 0, total_neighbors = 0;
 
+                    // Keep track if this cell is at a periodic boundary or not.
+                    // We do not currently run the algorithm for inner islands
+                    // on these (remains to be implemented), but we also don't
+                    // want to consider them boundary_island cells as this can
+                    // interfere with 2:1 refinement across periodic faces.
+                    // Instead: just ignore those cells for this smoothing
+                    // operation below.
+                    bool at_periodic_boundary = false;
+
                     for (const unsigned int n :
                          GeometryInfo<dim>::face_indices())
                       {
@@ -13329,6 +13338,11 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 
                             if (!face_will_be_refined_by_neighbor(cell, n))
                               ++unrefined_neighbors;
+                          }
+                        else if (cell->has_periodic_neighbor(n))
+                          {
+                            ++total_neighbors;
+                            at_periodic_boundary = true;
                           }
                       }
 
@@ -13344,11 +13358,9 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // on the coarsest grid with one cell, for which,
                     // of course, we do not remove the refine flag.
                     if ((unrefined_neighbors == total_neighbors) &&
-                        (((unrefined_neighbors ==
-                           GeometryInfo<dim>::faces_per_cell) &&
+                        ((!cell->at_boundary() &&
                           (smooth_grid & eliminate_refined_inner_islands)) ||
-                         ((unrefined_neighbors <
-                           GeometryInfo<dim>::faces_per_cell) &&
+                         (cell->at_boundary() && !at_periodic_boundary &&
                           (smooth_grid &
                            eliminate_refined_boundary_islands))) &&
                         (total_neighbors != 0))
