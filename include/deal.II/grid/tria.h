@@ -1269,7 +1269,7 @@ public:
      *
      * Actually there are two versions of this flag,
      * #eliminate_refined_inner_islands and
-     * #eliminate_refined_boundary_islands. There first eliminates islands
+     * #eliminate_refined_boundary_islands. The first eliminates islands
      * defined by the definition above which are in the interior of the
      * domain, while the second eliminates only those islands if the cell is
      * at the boundary. The reason for this split of flags is that one often
