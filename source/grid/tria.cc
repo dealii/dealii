@@ -13319,13 +13319,15 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // cycle
                     unsigned int unrefined_neighbors = 0, total_neighbors = 0;
 
-                    // Keep track if this cell is at a periodic boundary or not.
-                    // We do not currently run the algorithm for inner islands
-                    // on these (remains to be implemented), but we also don't
-                    // want to consider them boundary_island cells as this can
-                    // interfere with 2:1 refinement across periodic faces.
-                    // Instead: just ignore those cells for this smoothing
-                    // operation below.
+                    // Keep track if this cell is at a periodic
+                    // boundary or not.  TODO: We do not currently run
+                    // the algorithm for inner islands at a periodic
+                    // boundary (remains to be implemented), but we
+                    // also don't want to consider them
+                    // boundary_island cells as this can interfere
+                    // with 2:1 refinement across periodic faces.
+                    // Instead: just ignore those cells for this
+                    // smoothing operation below.
                     bool at_periodic_boundary = false;
 
                     for (const unsigned int n :
