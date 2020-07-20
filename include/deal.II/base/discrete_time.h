@@ -350,6 +350,22 @@ public:
   set_desired_next_step_size(const double time_step_size);
 
   /**
+   * Set the *actual* value of the next time step size. By calling this
+   * method, we are indicating the next time advance_time() is called,
+   * @p time_step_size is to be used to advance the simulation time.
+   *
+   * @note The difference between set_next_step_size() and
+   * set_desired_next_step_size() is that the former uses the provided $dt$
+   * exactly without any adjustment, but produces an
+   * error (in debug mode) if $dt$ is not in the acceptable range.
+   * Generally, set_desired_next_step_size() is the preferred method because
+   * it can adjust the $dt$ intelligently, based on $T_{\text{end}}$.
+   * @pre $0 < dt \le T_{\text{end}} - t$.
+   */
+  void
+  set_next_step_size(const double time_step_size);
+
+  /**
    * Advance the current time based on the value of the current step.
    * If you want to adjust the next time step size, call the method
    * set_desired_next_step_size() before calling this method.

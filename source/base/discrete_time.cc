@@ -67,6 +67,20 @@ DiscreteTime::set_desired_next_step_size(const double next_step_size)
 
 
 void
+DiscreteTime::set_next_step_size(const double next_step_size)
+{
+  Assert(next_step_size > 0,
+         ExcMessage("Only positive time step size is allowed."));
+  next_time = current_time + next_step_size;
+  Assert(
+    next_time <= end_time,
+    ExcMessage(
+      "Time step size is too large. The next time cannot exceed the end time."));
+}
+
+
+
+void
 DiscreteTime::advance_time()
 {
   Assert(next_time > current_time,
