@@ -160,6 +160,7 @@ namespace FETools
           block_indices.push_back(fes[base]->n_dofs_per_cell());
 
       return FiniteElementData<dim>(dpo,
+                                    fes.front()->reference_cell_type(),
                                     (do_tensor_product ?
                                        multiplied_n_components :
                                        n_components),
