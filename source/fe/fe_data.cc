@@ -46,7 +46,8 @@ FiniteElementData<dim>::FiniteElementData(
   const unsigned int               degree,
   const Conformity                 conformity,
   const BlockIndices &             block_indices)
-  : dofs_per_vertex(dofs_per_object[0])
+  : cell_type(cell_type)
+  , dofs_per_vertex(dofs_per_object[0])
   , dofs_per_line(dofs_per_object[1])
   , dofs_per_quad(dim > 1 ? dofs_per_object[2] : 0)
   , dofs_per_hex(dim > 2 ? dofs_per_object[3] : 0)
