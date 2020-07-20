@@ -90,6 +90,11 @@ namespace ReferenceCell
       struct Base
       {
         /**
+         * Destructor.
+         */
+        virtual ~Base() = default;
+
+        /**
          * Number of vertices.
          */
         virtual unsigned int
