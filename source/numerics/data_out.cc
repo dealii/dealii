@@ -45,7 +45,7 @@ namespace internal
       const unsigned int               n_datasets,
       const unsigned int               n_subdivisions,
       const std::vector<unsigned int> &n_postprocessor_outputs,
-      const Mapping<dim, spacedim> &   mapping,
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &                                           finite_elements,
@@ -99,24 +99,24 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
     patch;
   patch.n_subdivisions = n_subdivisions;
 
-  // set the vertices of the patch. if the mapping does not preserve locations
-  // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
-  // the graphical output. Otherwise, we can just use the vertex info.
-  for (const unsigned int vertex :
-       GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
-    if (scratch_data.mapping_collection[0].preserves_vertex_locations())
-      patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
-    else
-      patch.vertices[vertex] =
-        scratch_data.mapping_collection[0].transform_unit_to_real_cell(
-          cell_and_index->first,
-          GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex(vertex));
-
   // initialize FEValues
   scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
 
   const FEValuesBase<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
     &fe_patch_values = scratch_data.get_present_fe_values(0);
+
+  // set the vertices of the patch. if the mapping does not preserve locations
+  // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
+  // the graphical output. Otherwise, we can just use the vertex info.
+  for (const unsigned int vertex :
+       GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
+    if (fe_patch_values.get_mapping().preserves_vertex_locations())
+      patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
+    else
+      patch.vertices[vertex] =
+        fe_patch_values.get_mapping().transform_unit_to_real_cell(
+          cell_and_index->first,
+          GeometryInfo<DoFHandlerType::dimension>::unit_cell_vertex(vertex));
 
   const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
@@ -1085,6 +1085,23 @@ DataOut<dim, DoFHandlerType>::build_patches(
     &                    mapping,
   const unsigned int     n_subdivisions_,
   const CurvedCellRegion curved_region)
+{
+  hp::MappingCollection<DoFHandlerType::dimension,
+                        DoFHandlerType::space_dimension>
+    mapping_collection(mapping);
+
+  build_patches(mapping_collection, n_subdivisions_, curved_region);
+}
+
+
+
+template <int dim, typename DoFHandlerType>
+void
+DataOut<dim, DoFHandlerType>::build_patches(
+  const hp::MappingCollection<DoFHandlerType::dimension,
+                              DoFHandlerType::space_dimension> &mapping,
+  const unsigned int                                            n_subdivisions_,
+  const CurvedCellRegion                                        curved_region)
 {
   // Check consistency of redundant template parameter
   Assert(dim == DoFHandlerType::dimension,
