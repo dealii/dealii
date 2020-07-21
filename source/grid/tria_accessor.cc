@@ -1269,7 +1269,8 @@ namespace
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<2>(
-      accessor.get_triangulation().get_vertices(), vertex_indices);
+      accessor.get_triangulation().get_vertices(),
+      ArrayView<unsigned int>(vertex_indices, accessor.n_vertices()));
   }
 
 
@@ -1281,7 +1282,8 @@ namespace
       vertex_indices[i] = accessor.vertex_index(i);
 
     return GridTools::cell_measure<3>(
-      accessor.get_triangulation().get_vertices(), vertex_indices);
+      accessor.get_triangulation().get_vertices(),
+      ArrayView<unsigned int>(vertex_indices, accessor.n_vertices()));
   }
 
 

@@ -1885,14 +1885,26 @@ template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
-  switch (structdim)
+  switch (this->reference_cell_type())
     {
-      case 1:
+      case ReferenceCell::Type::Line:
         return (this->vertex(1) - this->vertex(0)).norm();
-      case 2:
+      case ReferenceCell::Type::Tri:
+        return std::max(std::max((this->vertex(1) - this->vertex(0)).norm(),
+                                 (this->vertex(2) - this->vertex(1)).norm()),
+                        (this->vertex(2) - this->vertex(0)).norm());
+      case ReferenceCell::Type::Quad:
         return std::max((this->vertex(3) - this->vertex(0)).norm(),
                         (this->vertex(2) - this->vertex(1)).norm());
-      case 3:
+      case ReferenceCell::Type::Tet:
+        return std::max(
+          std::max(std::max((this->vertex(1) - this->vertex(0)).norm(),
+                            (this->vertex(2) - this->vertex(0)).norm()),
+                   std::max((this->vertex(2) - this->vertex(1)).norm(),
+                            (this->vertex(3) - this->vertex(0)).norm())),
+          std::max((this->vertex(3) - this->vertex(1)).norm(),
+                   (this->vertex(3) - this->vertex(2)).norm()));
+      case ReferenceCell::Type::Hex:
         return std::max(std::max((this->vertex(7) - this->vertex(0)).norm(),
                                  (this->vertex(6) - this->vertex(1)).norm()),
                         std::max((this->vertex(2) - this->vertex(5)).norm(),

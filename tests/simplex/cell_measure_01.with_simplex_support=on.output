@@ -1,0 +1,9 @@
+
+DEAL::dim=2 spacedim=2:
+DEAL::measure:  0.500000
+DEAL::diameter: 1.41421
+DEAL::
+DEAL::dim=3 spacedim=3:
+DEAL::measure:  0.166667
+DEAL::diameter: 1.41421
+DEAL::

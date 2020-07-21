@@ -1,0 +1,96 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+// Test TriaAccessor::measure() and TriaAccessor::diameter().
+
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
+
+template <int dim, int spacedim>
+void
+process(const std::vector<Point<spacedim>> &vertices,
+        const std::vector<CellData<dim>> &  cells)
+{
+  Triangulation<dim, spacedim> tria;
+  tria.create_triangulation(vertices, cells, SubCellData());
+
+  deallog << "dim=" << dim << " spacedim=" << spacedim << ":" << std::endl;
+  for (const auto &cell : tria.active_cell_iterators())
+    {
+      deallog << "measure:  " << cell->measure() << std::endl;
+      deallog << "diameter: " << cell->diameter() << std::endl;
+    }
+  deallog << std::endl;
+}
+
+template <int dim>
+void
+test()
+{
+  Assert(false, ExcNotImplemented());
+}
+
+template <>
+void
+test<2>()
+{
+  const int dim      = 2;
+  const int spacedim = 2;
+
+  std::vector<Point<spacedim>> vertices;
+  vertices.emplace_back(0, 0);
+  vertices.emplace_back(1, 0);
+  vertices.emplace_back(0, 1);
+
+  std::vector<CellData<dim>> cells;
+  CellData<dim>              cell;
+  cell.vertices = {0, 1, 2};
+  cells.push_back(cell);
+
+  process(vertices, cells);
+}
+
+template <>
+void
+test<3>()
+{
+  const int dim      = 3;
+  const int spacedim = 3;
+
+  std::vector<Point<spacedim>> vertices;
+  vertices.emplace_back(0, 0, 0);
+  vertices.emplace_back(1, 0, 0);
+  vertices.emplace_back(0, 1, 0);
+  vertices.emplace_back(0, 0, 1);
+
+  std::vector<CellData<dim>> cells;
+  CellData<dim>              cell;
+  cell.vertices = {0, 1, 2, 3};
+  cells.push_back(cell);
+
+  process(vertices, cells);
+}
+
+int
+main()
+{
+  initlog();
+
+  test<2>();
+  test<3>();
+}
