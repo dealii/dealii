@@ -2475,18 +2475,7 @@ namespace GridTools
     cell_connectivity.reinit(triangulation.n_active_cells(),
                              triangulation.n_active_cells());
 
-    // create a map pair<lvl,idx> -> SparsityPattern index
-    // TODO: we are no longer using user_indices for this because we can get
-    // pointer/index clashes when saving/restoring them. The following approach
-    // works, but this map can get quite big. Not sure about more efficient
-    // solutions.
-    std::map<std::pair<unsigned int, unsigned int>, unsigned int> indexmap;
-    for (const auto &cell : triangulation.active_cell_iterators())
-      indexmap[std::pair<unsigned int, unsigned int>(cell->level(),
-                                                     cell->index())] =
-        cell->active_cell_index();
-
-    // next loop over all cells and their neighbors to build the sparsity
+    // loop over all cells and their neighbors to build the sparsity
     // pattern. note that it's a bit hard to enter all the connections when a
     // neighbor has children since we would need to find out which of its
     // children is adjacent to the current cell. this problem can be omitted
@@ -2502,10 +2491,7 @@ namespace GridTools
               (cell->neighbor(f)->has_children() == false))
             {
               const unsigned int other_index =
-                indexmap
-                  .find(std::pair<unsigned int, unsigned int>(
-                    cell->neighbor(f)->level(), cell->neighbor(f)->index()))
-                  ->second;
+                cell->neighbor(f)->active_cell_index();
               cell_connectivity.add(index, other_index);
               cell_connectivity.add(other_index, index);
             }
