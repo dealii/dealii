@@ -1514,7 +1514,8 @@ namespace deal_II_exceptions
     {                                                                  \
       if (__builtin_expect(!(cond), false))                            \
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          ::dealii::deal_II_exceptions::internals::                    \
+            abort_or_throw_on_exception,                               \
           __FILE__,                                                    \
           __LINE__,                                                    \
           __PRETTY_FUNCTION__,                                         \
@@ -1527,7 +1528,8 @@ namespace deal_II_exceptions
     {                                                                  \
       if (!(cond))                                                     \
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          ::dealii::deal_II_exceptions::internals::                    \
+            abort_or_throw_on_exception,                               \
           __FILE__,                                                    \
           __LINE__,                                                    \
           __PRETTY_FUNCTION__,                                         \
