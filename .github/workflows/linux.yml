@@ -20,7 +20,7 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Release -D DEAL_II_CXX_FLAGS='-Werror' .
+        cmake -D CMAKE_BUILD_TYPE=Release -D DEAL_II_CXX_FLAGS='-Werror -Wmissing-braces' .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
