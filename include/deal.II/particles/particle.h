@@ -32,7 +32,6 @@ namespace types
 {
   /* Type definitions */
 
-#ifdef DEAL_II_WITH_64BIT_INDICES
   /**
    * The type used for indices of particles. While in
    * sequential computations the 4 billion indices of 32-bit unsigned integers
@@ -44,31 +43,17 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  using particle_index = uint64_t;
+  using particle_index =
+    std::conditional_t<config::with_64bit_indices, uint64_t, unsigned int>;
 
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_64BIT_INDICES
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
 #    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UINT64_T
-#  endif
-
-#else
-  /**
-   * The type used for indices of particles. While in
-   * sequential computations the 4 billion indices of 32-bit unsigned integers
-   * is plenty, parallel computations using hundreds of processes can overflow
-   * this number and we need a bigger index space. We here utilize the same
-   * build variable that controls the dof indices because the number
-   * of degrees of freedom and the number of particles are typically on the same
-   * order of magnitude.
-   *
-   * The data type always indicates an unsigned integer type.
-   */
-  using particle_index = unsigned int;
-
-#  ifdef DEAL_II_WITH_MPI
+#  else
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.

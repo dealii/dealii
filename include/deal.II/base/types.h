@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <cstdint>
+#include <type_traits>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,11 +71,8 @@ namespace types
    * @ref GlobalDoFIndex
    * page for guidance on when this type should or should not be used.
    */
-#ifdef DEAL_II_WITH_64BIT_INDICES
-  using global_dof_index = uint64_t;
-#else
-  using global_dof_index  = unsigned int;
-#endif
+  using global_dof_index =
+    std::conditional_t<config::with_64bit_indices, uint64_t, unsigned int>;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -99,11 +97,8 @@ namespace types
    *
    * The data type always corresponds to an unsigned integer type.
    */
-#ifdef DEAL_II_WITH_64BIT_INDICES
-  using global_cell_index = uint64_t;
-#else
-  using global_cell_index = unsigned int;
-#endif
+  using global_cell_index =
+    std::conditional_t<config::with_64bit_indices, uint64_t, unsigned int>;
 
   /**
    * The type used for coarse-cell ids. See the glossary
@@ -167,17 +162,11 @@ namespace TrilinosWrappers
 {
   namespace types
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    using int_type = long long int;
-#else
-    /**
-     * Declare type of integer used in the Epetra package of Trilinos.
-     */
-    using int_type = int;
-#endif
+    using int_type =
+      std::conditional_t<config::with_64bit_indices, long long int, int>;
   } // namespace types
 } // namespace TrilinosWrappers
 

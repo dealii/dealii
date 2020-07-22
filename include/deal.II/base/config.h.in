@@ -363,6 +363,20 @@
 #define DEAL_II_NAMESPACE_CLOSE }
 
 /***********************************************************************
+ * Store the build configuration in a namespace called config to reduce the
+ * usage of macros in the codebase.
+ */
+DEAL_II_NAMESPACE_OPEN
+namespace config
+{
+  /**
+   * Specifies whether the code is compiled with 64 bit indices.
+   */
+  constexpr bool with_64bit_indices = @DEAL_II_WITH_64BIT_INDICES_BOOL@;
+} // namespace config
+DEAL_II_NAMESPACE_CLOSE
+
+/***********************************************************************
  * Two macros to guard external header includes.
  *
  * Selectively disable diagnostics set by "-Wextra" (and similar flags) for

@@ -371,6 +371,11 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
   OFF
   )
 LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
+IF(DEAL_II_WITH_64BIT_INDICES)
+    SET(DEAL_II_WITH_64BIT_INDICES_BOOL "true")
+ELSE()
+    SET(DEAL_II_WITH_64BIT_INDICES_BOOL "false")
+ENDIF()
 
 OPTION(DEAL_II_WITH_SIMPLEX_SUPPORT
   "If set to ON, triangulations with triangle and tetrahedron cells are supported in addition to quadrilateral- and hexahedra-only triangulations."

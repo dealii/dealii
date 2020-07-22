@@ -1,0 +1,4 @@
+New: Namespace config and the constexpr parameter config::with_64bit_indices
+introduced to replace the DEAL_II_WITH_64BIT_INDICES macro.
+<br>
+(Reza Rastak, 2020/08/07)
