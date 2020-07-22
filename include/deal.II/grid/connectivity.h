@@ -166,7 +166,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 3> table = {2, 1};
+        static std::array<unsigned int, 2> table = {{2, 1}};
         return table[d];
       }
     };
@@ -184,7 +184,7 @@ namespace internal
       {
         if (d == 2)
           {
-            static const std::array<unsigned int, 3> table = {0, 1, 2};
+            static const std::array<unsigned int, 3> table = {{0, 1, 2}};
 
             AssertDimension(e, 0);
 
@@ -194,7 +194,7 @@ namespace internal
         if (d == 1)
           {
             static const std::array<std::array<unsigned int, 2>, 3> table = {
-              {{0, 1}, {1, 2}, {2, 0}}};
+              {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
             return {table[e]};
           }
@@ -223,7 +223,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 3> table = {3, 3, 1};
+        static std::array<unsigned int, 3> table = {{3, 3, 1}};
         return table[d];
       }
     };
@@ -241,7 +241,7 @@ namespace internal
       {
         if (d == 2)
           {
-            static const std::array<unsigned int, 4> table = {0, 1, 2, 3};
+            static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
 
             AssertDimension(e, 0);
 
@@ -251,7 +251,7 @@ namespace internal
         if (d == 1)
           {
             static const std::array<std::array<unsigned int, 2>, 4> table = {
-              {{0, 2}, {1, 3}, {0, 1}, {2, 3}}};
+              {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
 
             return {table[e]};
           }
@@ -280,7 +280,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 3> table = {4, 4, 1};
+        static std::array<unsigned int, 3> table = {{4, 4, 1}};
         return table[d];
       }
     };
@@ -298,7 +298,7 @@ namespace internal
       {
         if (d == 3)
           {
-            static const std::array<unsigned int, 4> table = {0, 1, 2, 3};
+            static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
 
             AssertDimension(e, 0);
 
@@ -308,7 +308,7 @@ namespace internal
         if (d == 2)
           {
             static const std::array<std::array<unsigned int, 3>, 4> table = {
-              {{0, 1, 2}, {1, 0, 3}, {0, 2, 3}, {2, 1, 3}}};
+              {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
             return {table[e]};
           }
@@ -316,7 +316,7 @@ namespace internal
         if (d == 1)
           {
             static const std::array<std::array<unsigned int, 2>, 6> table = {
-              {{0, 1}, {1, 2}, {2, 0}, {0, 3}, {1, 3}, {2, 3}}};
+              {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
 
             return {table[e]};
           }
@@ -348,7 +348,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 4> table = {4, 6, 4, 1};
+        static std::array<unsigned int, 4> table = {{4, 6, 4, 1}};
         return table[d];
       }
 
@@ -364,7 +364,7 @@ namespace internal
                           const unsigned int face) const override
       {
         const static std::array<std::array<unsigned int, 3>, 4> table = {
-          {{0, 1, 2}, {0, 3, 4}, {2, 5, 3}, {1, 4, 5}}};
+          {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
 
         return table[face][line];
       }
@@ -374,10 +374,10 @@ namespace internal
                                       const unsigned int face) const override
       {
         const static std::array<std::array<std::array<unsigned int, 2>, 3>, 4>
-          table = {{{{{0, 1}, {1, 2}, {2, 0}}},
-                    {{{1, 0}, {0, 3}, {3, 1}}},
-                    {{{0, 2}, {2, 3}, {3, 0}}},
-                    {{{2, 1}, {1, 3}, {3, 2}}}}};
+          table = {{{{{{0, 1}}, {{1, 2}}, {{2, 0}}}},
+                    {{{{1, 0}}, {{0, 3}}, {{3, 1}}}},
+                    {{{{0, 2}}, {{2, 3}}, {{3, 0}}}},
+                    {{{{2, 1}}, {{1, 3}}, {{3, 2}}}}}};
 
         return table[face][line];
       }
@@ -396,7 +396,7 @@ namespace internal
       {
         if (d == 3)
           {
-            static const std::array<unsigned int, 5> table = {0, 1, 2, 3, 4};
+            static const std::array<unsigned int, 5> table = {{0, 1, 2, 3, 4}};
 
             AssertDimension(e, 0);
 
@@ -407,12 +407,12 @@ namespace internal
           {
             if (e == 0)
               {
-                static const std::array<unsigned int, 4> table = {0, 1, 2, 3};
+                static const std::array<unsigned int, 4> table = {{0, 1, 2, 3}};
                 return {table};
               }
 
             static const std::array<std::array<unsigned int, 3>, 4> table = {
-              {{0, 2, 4}, {3, 1, 4}, {1, 0, 4}, {2, 3, 4}}};
+              {{{0, 2, 4}}, {{3, 1, 4}}, {{1, 0, 4}}, {{2, 3, 4}}}};
 
             return {table[e - 1]};
           }
@@ -420,7 +420,14 @@ namespace internal
         if (d == 1)
           {
             static const std::array<std::array<unsigned int, 2>, 8> table = {
-              {{0, 2}, {1, 3}, {0, 1}, {2, 3}, {0, 4}, {1, 4}, {2, 4}, {3, 4}}};
+              {{{0, 2}},
+               {{1, 3}},
+               {{0, 1}},
+               {{2, 3}},
+               {{0, 4}},
+               {{1, 4}},
+               {{2, 4}},
+               {{3, 4}}}};
 
             return {table[e]};
           }
@@ -454,7 +461,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 4> table = {5, 8, 5, 1};
+        static std::array<unsigned int, 4> table = {{5, 8, 5, 1}};
         return table[d];
       }
 
@@ -472,11 +479,11 @@ namespace internal
                           const unsigned int face) const override
       {
         const static std::array<std::array<unsigned int, 4>, 5> table = {
-          {{0, 1, 2, 3},
-           {0, 6, 4, numbers::invalid_unsigned_int},
-           {1, 5, 7, numbers::invalid_unsigned_int},
-           {2, 4, 5, numbers::invalid_unsigned_int},
-           {3, 7, 6, numbers::invalid_unsigned_int}}};
+          {{{0, 1, 2, 3}},
+           {{0, 6, 4, numbers::invalid_unsigned_int}},
+           {{1, 5, 7, numbers::invalid_unsigned_int}},
+           {{2, 4, 5, numbers::invalid_unsigned_int}},
+           {{3, 7, 6, numbers::invalid_unsigned_int}}}};
 
         return table[face][line];
       }
@@ -488,11 +495,11 @@ namespace internal
         static const unsigned int X = static_cast<unsigned int>(-1);
 
         const static std::array<std::array<std::array<unsigned int, 2>, 4>, 5>
-          table = {{{{{0, 2}, {1, 3}, {0, 1}, {2, 3}}},
-                    {{{0, 2}, {2, 4}, {4, 0}, {X, X}}},
-                    {{{3, 1}, {1, 4}, {4, 3}, {X, X}}},
-                    {{{1, 0}, {0, 4}, {4, 1}, {X, X}}},
-                    {{{2, 3}, {3, 4}, {4, 2}, {X, X}}}}};
+          table = {{{{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
+                    {{{{0, 2}}, {{2, 4}}, {{4, 0}}, {{X, X}}}},
+                    {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
+                    {{{{1, 0}}, {{0, 4}}, {{4, 1}}, {{X, X}}}},
+                    {{{{2, 3}}, {{3, 4}}, {{4, 2}}, {{X, X}}}}}};
 
         return table[face][line];
       }
@@ -511,7 +518,8 @@ namespace internal
       {
         if (d == 3)
           {
-            static const std::array<unsigned int, 6> table = {0, 1, 2, 3, 4, 5};
+            static const std::array<unsigned int, 6> table = {
+              {0, 1, 2, 3, 4, 5}};
 
             AssertDimension(e, 0);
 
@@ -523,13 +531,13 @@ namespace internal
             if (e == 0 || e == 1)
               {
                 static const std::array<std::array<unsigned int, 3>, 2> table =
-                  {{{1, 0, 2}, {3, 4, 5}}};
+                  {{{{1, 0, 2}}, {{3, 4, 5}}}};
 
                 return {table[e]};
               }
 
             static const std::array<std::array<unsigned int, 4>, 3> table = {
-              {{0, 1, 3, 4}, {1, 2, 4, 5}, {2, 0, 5, 3}}};
+              {{{0, 1, 3, 4}}, {{1, 2, 4, 5}}, {{2, 0, 5, 3}}}};
 
             return {table[e - 2]};
           }
@@ -537,15 +545,15 @@ namespace internal
         if (d == 1)
           {
             static const std::array<std::array<unsigned int, 2>, 9> table = {
-              {{0, 1},
-               {1, 2},
-               {2, 0},
-               {3, 4},
-               {4, 5},
-               {5, 3},
-               {0, 3},
-               {1, 4},
-               {2, 5}}};
+              {{{0, 1}},
+               {{1, 2}},
+               {{2, 0}},
+               {{3, 4}},
+               {{4, 5}},
+               {{5, 3}},
+               {{0, 3}},
+               {{1, 4}},
+               {{2, 5}}}};
 
             return {table[e]};
           }
@@ -579,7 +587,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 4> table = {6, 9, 5, 1};
+        static std::array<unsigned int, 4> table = {{6, 9, 5, 1}};
         return table[d];
       }
 
@@ -599,11 +607,11 @@ namespace internal
         static const unsigned int X = static_cast<unsigned int>(-1);
 
         const static std::array<std::array<unsigned int, 4>, 5> table = {
-          {{0, 2, 1, X},
-           {3, 4, 5, X},
-           {6, 7, 0, 3},
-           {7, 8, 1, 4},
-           {8, 6, 5, 2}}};
+          {{{0, 2, 1, X}},
+           {{3, 4, 5, X}},
+           {{6, 7, 0, 3}},
+           {{7, 8, 1, 4}},
+           {{8, 6, 5, 2}}}};
 
         return table[face][line];
       }
@@ -615,11 +623,11 @@ namespace internal
         static const unsigned int X = static_cast<unsigned int>(-1);
 
         const static std::array<std::array<std::array<unsigned int, 2>, 4>, 5>
-          table = {{{{{1, 0}, {0, 2}, {2, 1}, {X, X}}},
-                    {{{3, 4}, {4, 5}, {5, 3}, {X, X}}},
-                    {{{0, 3}, {1, 4}, {0, 1}, {3, 4}}},
-                    {{{1, 4}, {2, 5}, {1, 2}, {4, 5}}},
-                    {{{2, 5}, {0, 3}, {2, 0}, {5, 3}}}}};
+          table = {{{{{{1, 0}}, {{0, 2}}, {{2, 1}}, {{X, X}}}},
+                    {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}},
+                    {{{{0, 3}}, {{1, 4}}, {{0, 1}}, {{3, 4}}}},
+                    {{{{1, 4}}, {{2, 5}}, {{1, 2}}, {{4, 5}}}},
+                    {{{{2, 5}}, {{0, 3}}, {{2, 0}}, {{5, 3}}}}}};
 
         return table[face][line];
       }
@@ -639,7 +647,7 @@ namespace internal
         if (d == 3)
           {
             static const std::array<unsigned int, 8> table = {
-              0, 1, 2, 3, 4, 5, 6, 7};
+              {0, 1, 2, 3, 4, 5, 6, 7}};
 
             AssertDimension(e, 0);
 
@@ -649,12 +657,12 @@ namespace internal
         if (d == 2)
           {
             static const std::array<std::array<unsigned int, 4>, 6> table = {
-              {{0, 2, 4, 6},
-               {1, 3, 5, 7},
-               {0, 4, 1, 5},
-               {2, 6, 3, 7},
-               {0, 1, 2, 3},
-               {4, 5, 6, 7}}};
+              {{{0, 2, 4, 6}},
+               {{1, 3, 5, 7}},
+               {{0, 4, 1, 5}},
+               {{2, 6, 3, 7}},
+               {{0, 1, 2, 3}},
+               {{4, 5, 6, 7}}}};
 
             return {table[e]};
           }
@@ -662,18 +670,18 @@ namespace internal
         if (d == 1)
           {
             static const std::array<std::array<unsigned int, 2>, 12> table = {
-              {{0, 2},
-               {1, 3},
-               {0, 1},
-               {2, 3},
-               {4, 6},
-               {5, 7},
-               {4, 5},
-               {6, 7},
-               {0, 4},
-               {1, 5},
-               {2, 6},
-               {3, 7}}};
+              {{{0, 2}},
+               {{1, 3}},
+               {{0, 1}},
+               {{2, 3}},
+               {{4, 6}},
+               {{5, 7}},
+               {{4, 5}},
+               {{6, 7}},
+               {{0, 4}},
+               {{1, 5}},
+               {{2, 6}},
+               {{3, 7}}}};
 
             return {table[e]};
           }
@@ -705,7 +713,7 @@ namespace internal
       unsigned int
       n_entities(const unsigned int d) const override
       {
-        static std::array<unsigned int, 4> table = {8, 12, 6, 1};
+        static std::array<unsigned int, 4> table = {{8, 12, 6, 1}};
         return table[d];
       }
 
@@ -721,12 +729,12 @@ namespace internal
                           const unsigned int face) const override
       {
         const static std::array<std::array<unsigned int, 4>, 6> table = {
-          {{8, 10, 0, 4},
-           {9, 11, 1, 5},
-           {2, 6, 8, 9},
-           {3, 7, 10, 11},
-           {0, 1, 2, 3},
-           {4, 5, 6, 7}}};
+          {{{8, 10, 0, 4}},
+           {{9, 11, 1, 5}},
+           {{2, 6, 8, 9}},
+           {{3, 7, 10, 11}},
+           {{0, 1, 2, 3}},
+           {{4, 5, 6, 7}}}};
 
         return table[face][line];
       }
@@ -736,12 +744,12 @@ namespace internal
                                       const unsigned int face) const override
       {
         const static std::array<std::array<std::array<unsigned int, 2>, 4>, 6>
-          table = {{{{{0, 4}, {2, 6}, {0, 2}, {4, 6}}},
-                    {{{1, 5}, {3, 7}, {1, 3}, {5, 7}}},
-                    {{{0, 1}, {4, 5}, {0, 4}, {1, 5}}},
-                    {{{2, 3}, {6, 7}, {2, 6}, {3, 7}}},
-                    {{{0, 2}, {1, 3}, {0, 1}, {2, 3}}},
-                    {{{4, 6}, {5, 7}, {4, 5}, {6, 7}}}}};
+          table = {{{{{{0, 4}}, {{2, 6}}, {{0, 2}}, {{4, 6}}}},
+                    {{{{1, 5}}, {{3, 7}}, {{1, 3}}, {{5, 7}}}},
+                    {{{{0, 1}}, {{4, 5}}, {{0, 4}}, {{1, 5}}}},
+                    {{{{2, 3}}, {{6, 7}}, {{2, 6}}, {{3, 7}}}},
+                    {{{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}},
+                    {{{{4, 6}}, {{5, 7}}, {{4, 5}}, {{6, 7}}}}}};
 
         return table[face][line];
       }
@@ -990,8 +998,8 @@ namespace internal
     {
       if (entity_type == ReferenceCell::Type::Line)
         {
-          const std::array<T, 2> i{vertices_0[0], vertices_0[1]};
-          const std::array<T, 3> j{vertices_1[0], vertices_1[1]};
+          const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};
+          const std::array<T, 3> j{{vertices_1[0], vertices_1[1]}};
 
           // line_orientation=true
           if (i == std::array<T, 2>{{j[0], j[1]}})
@@ -1003,8 +1011,10 @@ namespace internal
         }
       else if (entity_type == ReferenceCell::Type::Tri)
         {
-          const std::array<T, 3> i{vertices_0[0], vertices_0[1], vertices_0[2]};
-          const std::array<T, 3> j{vertices_1[0], vertices_1[1], vertices_1[2]};
+          const std::array<T, 3> i{
+            {vertices_0[0], vertices_0[1], vertices_0[2]}};
+          const std::array<T, 3> j{
+            {vertices_1[0], vertices_1[1], vertices_1[2]}};
 
           // face_orientation=true, face_rotation=false, face_flip=false
           if (i == std::array<T, 3>{{j[0], j[1], j[2]}})
@@ -1032,14 +1042,10 @@ namespace internal
         }
       else if (entity_type == ReferenceCell::Type::Quad)
         {
-          const std::array<T, 4> i{vertices_0[0],
-                                   vertices_0[1],
-                                   vertices_0[2],
-                                   vertices_0[3]};
-          const std::array<T, 4> j{vertices_1[0],
-                                   vertices_1[1],
-                                   vertices_1[2],
-                                   vertices_1[3]};
+          const std::array<T, 4> i{
+            {vertices_0[0], vertices_0[1], vertices_0[2], vertices_0[3]}};
+          const std::array<T, 4> j{
+            {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}};
 
           // face_orientation=true, face_rotation=false, face_flip=false
           if (i == std::array<T, 4>{{j[0], j[1], j[2], j[3]}})
@@ -1567,26 +1573,26 @@ namespace internal
       // jump table to pick the right entity type
       static const ReferenceCell::Type X = ReferenceCell::Type::Invalid;
       static const std::array<const std::array<ReferenceCell::Type, 9>, 4>
-        table = {{{X, ReferenceCell::Type::Vertex, X, X, X, X, X, X, X},
-                  {X, X, ReferenceCell::Type::Line, X, X, X, X, X, X},
-                  {X,
-                   X,
-                   X,
-                   ReferenceCell::Type::Tri,
-                   ReferenceCell::Type::Quad,
-                   X,
-                   X,
-                   X,
-                   X},
-                  {X,
-                   X,
-                   X,
-                   X,
-                   ReferenceCell::Type::Tet,
-                   ReferenceCell::Type::Pyramid,
-                   ReferenceCell::Type::Wedge,
-                   X,
-                   ReferenceCell::Type::Hex}}};
+        table = {{{{X, ReferenceCell::Type::Vertex, X, X, X, X, X, X, X}},
+                  {{X, X, ReferenceCell::Type::Line, X, X, X, X, X, X}},
+                  {{X,
+                    X,
+                    X,
+                    ReferenceCell::Type::Tri,
+                    ReferenceCell::Type::Quad,
+                    X,
+                    X,
+                    X,
+                    X}},
+                  {{X,
+                    X,
+                    X,
+                    X,
+                    ReferenceCell::Type::Tet,
+                    ReferenceCell::Type::Pyramid,
+                    ReferenceCell::Type::Wedge,
+                    X,
+                    ReferenceCell::Type::Hex}}}};
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;

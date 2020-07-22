@@ -336,7 +336,7 @@ namespace ReferenceCell
           AssertIndexRange(vertex, 3);
 
           static const std::array<std::array<unsigned int, 2>, 3> table = {
-            {{0, 0}, {0, 1}, {1, 1}}};
+            {{{0, 0}}, {{0, 1}}, {{1, 1}}}};
 
           return table[vertex];
         }
@@ -350,7 +350,7 @@ namespace ReferenceCell
           (void)face;
 
           static const std::array<std::array<unsigned int, 2>, 2> table = {
-            {{1, 0}, {0, 1}}};
+            {{{1, 0}}, {{0, 1}}}};
 
           return table[line_orientation][vertex];
         }
@@ -431,7 +431,7 @@ namespace ReferenceCell
           const unsigned int line) const override
         {
           static const std::array<unsigned int, 2> table[6] = {
-            {0, 0}, {0, 1}, {0, 2}, {1, 1}, {1, 2}, {2, 1}};
+            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
 
           return table[line];
         }
@@ -445,7 +445,12 @@ namespace ReferenceCell
           (void)face;
 
           static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{2, 1, 0}, {0, 1, 2}, {1, 2, 0}, {0, 2, 1}, {1, 0, 2}, {2, 0, 1}}};
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
@@ -468,10 +473,10 @@ namespace ReferenceCell
         {
           AssertIndexRange(vertex, 4);
 
-          static const std::array<unsigned int, 2> table[4] = {{0, 0},
-                                                               {0, 1},
-                                                               {0, 2},
-                                                               {1, 2}};
+          static const std::array<unsigned int, 2> table[4] = {{{0, 0}},
+                                                               {{0, 1}},
+                                                               {{0, 2}},
+                                                               {{1, 2}}};
 
           return table[vertex];
         }
@@ -486,7 +491,12 @@ namespace ReferenceCell
           (void)face;
 
           static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{0, 2, 1}, {0, 1, 2}, {1, 2, 0}, {1, 0, 2}, {2, 1, 0}, {2, 0, 1}}};
+            {{{0, 2, 1}},
+             {{0, 1, 2}},
+             {{1, 2, 0}},
+             {{1, 0, 2}},
+             {{2, 1, 0}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][vertex];
         }
@@ -534,7 +544,7 @@ namespace ReferenceCell
           Assert(false, ExcNotImplemented());
 
           static const std::array<unsigned int, 2> table[6] = {
-            {0, 0}, {0, 1}, {0, 2}, {1, 1}, {1, 2}, {2, 1}};
+            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
 
           return table[line];
         }
@@ -550,7 +560,12 @@ namespace ReferenceCell
           (void)face;
 
           static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{2, 1, 0}, {0, 1, 2}, {1, 2, 0}, {0, 2, 1}, {1, 0, 2}, {2, 0, 1}}};
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
@@ -572,7 +587,7 @@ namespace ReferenceCell
           const unsigned int vertex) const override
         {
           static const std::array<unsigned int, 2> table[5] = {
-            {0, 0}, {0, 1}, {0, 2}, {0, 3}, {1, 2}};
+            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}};
 
           return table[vertex];
         }
@@ -594,12 +609,12 @@ namespace ReferenceCell
           else // Tri
             {
               static const std::array<std::array<unsigned int, 3>, 6> table = {
-                {{0, 2, 1},
-                 {0, 1, 2},
-                 {1, 2, 0},
-                 {1, 0, 2},
-                 {2, 1, 0},
-                 {2, 0, 1}}};
+                {{{0, 2, 1}},
+                 {{0, 1, 2}},
+                 {{1, 2, 0}},
+                 {{1, 0, 2}},
+                 {{2, 1, 0}},
+                 {{2, 0, 1}}}};
 
               return table[face_orientation][vertex];
             }
@@ -649,7 +664,7 @@ namespace ReferenceCell
           Assert(false, ExcNotImplemented());
 
           static const std::array<unsigned int, 2> table[6] = {
-            {0, 0}, {0, 1}, {0, 2}, {1, 1}, {1, 2}, {2, 1}};
+            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
 
           return table[line];
         }
@@ -665,7 +680,12 @@ namespace ReferenceCell
           (void)face;
 
           static const std::array<std::array<unsigned int, 3>, 6> table = {
-            {{2, 1, 0}, {0, 1, 2}, {1, 2, 0}, {0, 2, 1}, {1, 0, 2}, {2, 0, 1}}};
+            {{{2, 1, 0}},
+             {{0, 1, 2}},
+             {{1, 2, 0}},
+             {{0, 2, 1}},
+             {{1, 0, 2}},
+             {{2, 0, 1}}}};
 
           return table[face_orientation][line];
         }
@@ -687,7 +707,7 @@ namespace ReferenceCell
           const unsigned int vertex) const override
         {
           static const std::array<std::array<unsigned int, 2>, 6> table = {
-            {{0, 1}, {0, 0}, {0, 2}, {1, 0}, {1, 1}, {1, 2}}};
+            {{{0, 1}}, {{0, 0}}, {{0, 2}}, {{1, 0}}, {{1, 1}}, {{1, 2}}}};
 
           return table[vertex];
         }
@@ -709,12 +729,12 @@ namespace ReferenceCell
           else // TRI
             {
               static const std::array<std::array<unsigned int, 3>, 6> table = {
-                {{0, 2, 1},
-                 {0, 1, 2},
-                 {1, 2, 0},
-                 {1, 0, 2},
-                 {2, 1, 0},
-                 {2, 0, 1}}};
+                {{{0, 2, 1}},
+                 {{0, 1, 2}},
+                 {{1, 2, 0}},
+                 {{1, 0, 2}},
+                 {{2, 1, 0}},
+                 {{2, 0, 1}}}};
 
               return table[face_orientation][vertex];
             }
