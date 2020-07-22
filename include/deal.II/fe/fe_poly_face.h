@@ -167,7 +167,7 @@ protected:
     return get_face_data(update_flags,
                          mapping,
                          QProjector<dim - 1>::project_to_all_children(
-                           quadrature),
+                           ReferenceCell::get_hypercube(dim - 1), quadrature),
                          output_data);
   }
 

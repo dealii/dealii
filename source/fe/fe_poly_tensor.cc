@@ -969,8 +969,9 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   // to take (all data sets for all
   // faces are stored contiguously)
 
-  const typename QProjector<dim>::DataSetDescriptor offset =
-    QProjector<dim>::DataSetDescriptor::face(face_no,
+  const auto offset =
+    QProjector<dim>::DataSetDescriptor::face(this->reference_cell_type(),
+                                             face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
                                              cell->face_rotation(face_no),
@@ -1595,8 +1596,9 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
   // offset determines which data set
   // to take (all data sets for all
   // sub-faces are stored contiguously)
-  const typename QProjector<dim>::DataSetDescriptor offset =
-    QProjector<dim>::DataSetDescriptor::subface(face_no,
+  const auto offset =
+    QProjector<dim>::DataSetDescriptor::subface(this->reference_cell_type(),
+                                                face_no,
                                                 sub_no,
                                                 cell->face_orientation(face_no),
                                                 cell->face_flip(face_no),

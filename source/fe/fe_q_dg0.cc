@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/template_constraints.h>

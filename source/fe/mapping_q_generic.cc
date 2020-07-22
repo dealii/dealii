@@ -2695,7 +2695,8 @@ MappingQGeneric<dim, spacedim>::get_face_data(
     std::make_unique<InternalData>(polynomial_degree);
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
-                       QProjector<dim>::project_to_all_faces(quadrature),
+                       QProjector<dim>::project_to_all_faces(
+                         ReferenceCell::get_hypercube(dim), quadrature),
                        quadrature.size());
 
   return data_ptr;
@@ -2713,7 +2714,8 @@ MappingQGeneric<dim, spacedim>::get_subface_data(
     std::make_unique<InternalData>(polynomial_degree);
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
-                       QProjector<dim>::project_to_all_subfaces(quadrature),
+                       QProjector<dim>::project_to_all_subfaces(
+                         ReferenceCell::get_hypercube(dim), quadrature),
                        quadrature.size());
 
   return data_ptr;
@@ -3235,7 +3237,8 @@ MappingQGeneric<dim, spacedim>::fill_fe_face_values(
     cell,
     face_no,
     numbers::invalid_unsigned_int,
-    QProjector<dim>::DataSetDescriptor::face(face_no,
+    QProjector<dim>::DataSetDescriptor::face(ReferenceCell::get_hypercube(dim),
+                                             face_no,
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
                                              cell->face_rotation(face_no),
@@ -3281,7 +3284,9 @@ MappingQGeneric<dim, spacedim>::fill_fe_subface_values(
     cell,
     face_no,
     subface_no,
-    QProjector<dim>::DataSetDescriptor::subface(face_no,
+    QProjector<dim>::DataSetDescriptor::subface(ReferenceCell::get_hypercube(
+                                                  dim),
+                                                face_no,
                                                 subface_no,
                                                 cell->face_orientation(face_no),
                                                 cell->face_flip(face_no),

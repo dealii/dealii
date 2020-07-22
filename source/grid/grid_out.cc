@@ -4031,7 +4031,9 @@ namespace internal
           std::vector<double> dummy_weights(n_points, 1. / n_points);
           Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
 
-          q_projector = QProjector<dim>::project_to_all_faces(quadrature);
+          q_projector =
+            QProjector<dim>::project_to_all_faces(ReferenceCell::Type::Quad,
+                                                  quadrature);
         }
 
       for (const auto &cell : tria.active_cell_iterators())

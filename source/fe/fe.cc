@@ -1218,7 +1218,8 @@ FiniteElement<dim, spacedim>::get_face_data(
 {
   return get_data(flags,
                   mapping,
-                  QProjector<dim>::project_to_all_faces(quadrature),
+                  QProjector<dim>::project_to_all_faces(
+                    this->reference_cell_type(), quadrature),
                   output_data);
 }
 
@@ -1236,7 +1237,8 @@ FiniteElement<dim, spacedim>::get_subface_data(
 {
   return get_data(flags,
                   mapping,
-                  QProjector<dim>::project_to_all_subfaces(quadrature),
+                  QProjector<dim>::project_to_all_subfaces(
+                    this->reference_cell_type(), quadrature),
                   output_data);
 }
 
