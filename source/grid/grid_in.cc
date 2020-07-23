@@ -176,8 +176,33 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
   unsigned int n_geometric_objects = 0;
   unsigned int n_ints;
 
+  bool is_quad_or_hex_mesh = false;
+  bool is_tria_or_tet_mesh = false;
+
   if (keyword == "CELLS")
     {
+      // jump to the `CELL_TYPES` section and read in cell types
+      std::vector<unsigned int> cell_types;
+      {
+        std::streampos oldpos = in.tellg();
+
+
+        while (in >> keyword)
+          if (keyword == "CELL_TYPES")
+            {
+              in >> n_ints;
+
+              cell_types.resize(n_ints);
+
+              for (unsigned int i = 0; i < n_ints; ++i)
+                in >> cell_types[i];
+
+              break;
+            }
+
+        in.seekg(oldpos);
+      }
+
       in >> n_geometric_objects;
       in >> n_ints; // Ignore this, since we don't need it.
 
@@ -188,15 +213,20 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               unsigned int type;
               in >> type;
 
-              if (type == 8)
+              if (cell_types[count] == 10 || cell_types[count] == 12)
                 {
+                  if (cell_types[count] == 10)
+                    is_tria_or_tet_mesh = true;
+                  if (cell_types[count] == 12)
+                    is_quad_or_hex_mesh = true;
+
                   // we assume that the file contains first all cells,
                   // and only then any faces or lines
                   AssertThrow(subcelldata.boundary_quads.size() == 0 &&
                                 subcelldata.boundary_lines.size() == 0,
                               ExcNotImplemented());
 
-                  cells.emplace_back();
+                  cells.emplace_back(type);
 
                   for (unsigned int j = 0; j < type; j++) // loop to feed data
                     in >> cells.back().vertices[j];
@@ -204,14 +234,19 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   cells.back().material_id = 0;
                 }
 
-              else if (type == 4)
+              else if (cell_types[count] == 5 || cell_types[count] == 9)
                 {
+                  if (cell_types[count] == 5)
+                    is_tria_or_tet_mesh = true;
+                  if (cell_types[count] == 9)
+                    is_quad_or_hex_mesh = true;
+
                   // we assume that the file contains first all cells,
                   // then all faces, and finally all lines
                   AssertThrow(subcelldata.boundary_lines.size() == 0,
                               ExcNotImplemented());
 
-                  subcelldata.boundary_quads.emplace_back();
+                  subcelldata.boundary_quads.emplace_back(type);
 
                   for (unsigned int j = 0; j < type;
                        j++) // loop to feed the data to the boundary
@@ -219,9 +254,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                   subcelldata.boundary_quads.back().material_id = 0;
                 }
-              else if (type == 2)
+              else if (cell_types[count] == 3)
                 {
-                  subcelldata.boundary_lines.emplace_back();
+                  subcelldata.boundary_lines.emplace_back(type);
 
                   for (unsigned int j = 0; j < type;
                        j++) // loop to feed the data to the boundary
@@ -237,7 +272,6 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     "While reading VTK file, unknown file type encountered"));
             }
         }
-
       else if (dim == 2)
         {
           for (unsigned int count = 0; count < n_geometric_objects; count++)
@@ -245,14 +279,19 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               unsigned int type;
               in >> type;
 
-              if (type == 4)
+              if (cell_types[count] == 5 || cell_types[count] == 9)
                 {
                   // we assume that the file contains first all cells,
                   // and only then any faces
                   AssertThrow(subcelldata.boundary_lines.size() == 0,
                               ExcNotImplemented());
 
-                  cells.emplace_back();
+                  if (cell_types[count] == 5)
+                    is_tria_or_tet_mesh = true;
+                  if (cell_types[count] == 9)
+                    is_quad_or_hex_mesh = true;
+
+                  cells.emplace_back(type);
 
                   for (unsigned int j = 0; j < type; j++) // loop to feed data
                     in >> cells.back().vertices[j];
@@ -260,11 +299,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   cells.back().material_id = 0;
                 }
 
-              else if (type == 2)
+              else if (cell_types[count] == 3)
                 {
                   // If this is encountered, the pointer comes out of the loop
                   // and starts processing boundaries.
-                  subcelldata.boundary_lines.emplace_back();
+                  subcelldata.boundary_lines.emplace_back(type);
 
                   for (unsigned int j = 0; j < type;
                        j++) // loop to feed the data to the boundary
@@ -290,10 +329,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               in >> type;
 
               AssertThrow(
-                type == 2,
+                cell_types[count] == 3 && type == 2,
                 ExcMessage(
                   "While reading VTK file, unknown cell type encountered"));
-              cells.emplace_back();
+              cells.emplace_back(type);
 
               for (unsigned int j = 0; j < type; j++) // loop to feed data
                 in >> cells.back().vertices[j];
@@ -476,16 +515,36 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-      GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
-      if (dim == spacedim)
-        GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
-          vertices, cells);
+      // make sure that only either simplex or hypercube cells are available
+      //
+      // TODO: the functions below (GridTools::delete_unused_vertices(),
+      // GridTools::invert_all_cells_of_negative_grid(),
+      // GridReordering::reorder_cells(),
+      // Triangulation::create_triangulation_compatibility()) need to be
+      // revisited for simplex meshes
+      AssertThrow(dim == 1 || (is_tria_or_tet_mesh ^ is_quad_or_hex_mesh),
+                  ExcNotImplemented());
 
-      GridReordering<dim, spacedim>::reorder_cells(cells);
-      tria->create_triangulation_compatibility(vertices, cells, subcelldata);
+      if (dim == 1 || is_quad_or_hex_mesh)
+        {
+          GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
-      return;
+          if (dim == spacedim)
+            GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(
+              vertices, cells);
+
+          GridReordering<dim, spacedim>::reorder_cells(cells);
+          tria->create_triangulation_compatibility(vertices,
+                                                   cells,
+                                                   subcelldata);
+
+          return;
+        }
+      else
+        {
+          tria->create_triangulation(vertices, cells, subcelldata);
+        }
     }
   else
     AssertThrow(false,
