@@ -292,6 +292,38 @@ namespace ReferenceCell
 
           return ReferenceCell::Type::Invalid;
         }
+
+        /**
+         * Map face line number to cell line number.
+         */
+        virtual unsigned int
+        face_to_cell_lines(const unsigned int  face,
+                           const unsigned int  line,
+                           const unsigned char face_orientation) const
+        {
+          Assert(false, ExcNotImplemented());
+          (void)face;
+          (void)line;
+          (void)face_orientation;
+
+          return 0;
+        }
+
+        /**
+         * Map face vertex number to cell vertex number.
+         */
+        virtual unsigned int
+        face_to_cell_vertices(const unsigned int  face,
+                              const unsigned int  vertex,
+                              const unsigned char face_orientation) const
+        {
+          Assert(false, ExcNotImplemented());
+          (void)face;
+          (void)vertex;
+          (void)face_orientation;
+
+          return 0;
+        }
       };
 
 
@@ -317,6 +349,33 @@ namespace ReferenceCell
         n_faces() const override
         {
           return GeometryInfo<dim>::faces_per_cell;
+        }
+
+        unsigned int
+        face_to_cell_lines(const unsigned int  face,
+                           const unsigned int  line,
+                           const unsigned char face_orientation) const override
+        {
+          return GeometryInfo<dim>::face_to_cell_lines(
+            face,
+            line,
+            get_bit(face_orientation, 0),
+            get_bit(face_orientation, 2),
+            get_bit(face_orientation, 1));
+        }
+
+        unsigned int
+        face_to_cell_vertices(
+          const unsigned int  face,
+          const unsigned int  vertex,
+          const unsigned char face_orientation) const override
+        {
+          return GeometryInfo<dim>::face_to_cell_vertices(
+            face,
+            vertex,
+            get_bit(face_orientation, 0),
+            get_bit(face_orientation, 2),
+            get_bit(face_orientation, 1));
         }
       };
 
@@ -409,6 +468,32 @@ namespace ReferenceCell
           AssertIndexRange(face_no, n_faces());
 
           return ReferenceCell::Type::Line;
+        }
+
+        unsigned int
+        face_to_cell_lines(const unsigned int  face,
+                           const unsigned int  line,
+                           const unsigned char face_orientation) const override
+        {
+          AssertIndexRange(face, n_faces());
+          AssertDimension(line, 0);
+
+          (void)line;
+          (void)face_orientation;
+
+          return face;
+        }
+
+        unsigned int
+        face_to_cell_vertices(
+          const unsigned int  face,
+          const unsigned int  vertex,
+          const unsigned char face_orientation) const override
+        {
+          static const std::array<std::array<unsigned int, 2>, 3> table = {
+            {{0, 1}, {1, 2}, {2, 0}}};
+
+          return table[face][face_orientation ? vertex : (1 - vertex)];
         }
       };
 
@@ -545,6 +630,33 @@ namespace ReferenceCell
           AssertIndexRange(face_no, n_faces());
 
           return ReferenceCell::Type::Tri;
+        }
+
+        unsigned int
+        face_to_cell_lines(const unsigned int  face,
+                           const unsigned int  line,
+                           const unsigned char face_orientation) const override
+        {
+          AssertIndexRange(face, n_faces());
+
+          const static std::array<std::array<unsigned int, 3>, 4> table = {
+            {{0, 1, 2}, {0, 3, 4}, {2, 5, 3}, {1, 4, 5}}};
+
+          return table[face][standard_to_real_face_line(
+            line, face, face_orientation)];
+        }
+
+        unsigned int
+        face_to_cell_vertices(
+          const unsigned int  face,
+          const unsigned int  vertex,
+          const unsigned char face_orientation) const override
+        {
+          static const std::array<std::array<unsigned int, 3>, 4> table = {
+            {{0, 1, 2}, {1, 0, 3}, {0, 2, 3}, {2, 1, 3}}};
+
+          return table[face][standard_to_real_face_vertex(
+            vertex, face, face_orientation)];
         }
       };
 

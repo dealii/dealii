@@ -544,8 +544,11 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                                                  const bool face_flip,
                                                  const bool face_rotation) const
 {
+  const auto &refence_cell =
+    ReferenceCell::internal::Info::get_cell(this->reference_cell_type());
+
   AssertIndexRange(face_index, this->n_dofs_per_face());
-  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face, refence_cell.n_faces());
 
   // TODO: we could presumably solve the 3d case below using the
   // adjust_quad_dof_index_for_face_orientation_table field. for the
@@ -582,8 +585,11 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
 
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
-      return (GeometryInfo<dim>::face_to_cell_vertices(
-                face, face_vertex, face_orientation, face_flip, face_rotation) *
+      return (refence_cell.face_to_cell_vertices(face,
+                                                 face_vertex,
+                                                 face_orientation +
+                                                   2 * face_rotation +
+                                                   4 * face_flip) *
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
@@ -598,8 +604,11 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
 
       return (this->get_first_line_index() +
-              GeometryInfo<dim>::face_to_cell_lines(
-                face, face_line, face_orientation, face_flip, face_rotation) *
+              refence_cell.face_to_cell_lines(face,
+                                              face_line,
+                                              face_orientation +
+                                                2 * face_rotation +
+                                                4 * face_flip) *
                 this->n_dofs_per_line() +
               dof_index_on_line);
     }

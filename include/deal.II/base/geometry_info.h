@@ -1308,6 +1308,57 @@ struct GeometryInfo<0>
   vertex_indices();
 
   /**
+   * Map face vertex number to cell vertex number, i.e. give the cell vertex
+   * number of the <tt>vertex</tt>th vertex of face <tt>face</tt>, e.g.
+   * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>, see the image
+   * under point N4 in the 2d section of this class's documentation.
+   *
+   * Through the <tt>face_orientation</tt>, <tt>face_flip</tt> and
+   * <tt>face_rotation</tt> arguments this function handles faces oriented in
+   * the standard and non-standard orientation. <tt>face_orientation</tt>
+   * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
+   * default to <tt>false</tt> (standard orientation). In 2d only
+   * <tt>face_flip</tt> is considered. See this
+   * @ref GlossFaceOrientation "glossary"
+   * article for more information.
+   *
+   * As the children of a cell are ordered according to the vertices of the
+   * cell, this call is passed down to the child_cell_on_face() function.
+   * Hence this function is simply a wrapper of child_cell_on_face() giving it
+   * a suggestive name.
+   *
+   * Of course, since this class is for the case `dim==0`, this function
+   * is not implemented.
+   */
+  static unsigned int
+  face_to_cell_vertices(const unsigned int face,
+                        const unsigned int vertex,
+                        const bool         face_orientation = true,
+                        const bool         face_flip        = false,
+                        const bool         face_rotation    = false);
+
+  /**
+   * Map face line number to cell line number, i.e. give the cell line number
+   * of the <tt>line</tt>th line of face <tt>face</tt>, e.g.
+   * <tt>GeometryInfo<3>::face_to_cell_lines(5,0)=4</tt>.
+   *
+   * Through the <tt>face_orientation</tt>, <tt>face_flip</tt> and
+   * <tt>face_rotation</tt> arguments this function handles faces oriented in
+   * the standard and non-standard orientation. <tt>face_orientation</tt>
+   * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
+   * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
+   *
+   * Of course, since this class is for the case `dim==0`, this function
+   * is not implemented.
+   */
+  static unsigned int
+  face_to_cell_lines(const unsigned int face,
+                     const unsigned int line,
+                     const bool         face_orientation = true,
+                     const bool         face_flip        = false,
+                     const bool         face_rotation    = false);
+
+  /**
    * Number of vertices each face has. Since this is not useful in one
    * dimension, we provide a useless number (in the hope that a compiler may
    * warn when it sees constructs like <tt>for (i=0; i<vertices_per_face;
@@ -4592,6 +4643,19 @@ GeometryInfo<3>::face_to_cell_lines(const unsigned int face,
 
 
 
+inline unsigned int
+GeometryInfo<0>::face_to_cell_lines(const unsigned int,
+                                    const unsigned int,
+                                    const bool,
+                                    const bool,
+                                    const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
 template <int dim>
 inline unsigned int
 GeometryInfo<dim>::face_to_cell_lines(const unsigned int,
@@ -4620,6 +4684,19 @@ GeometryInfo<dim>::face_to_cell_vertices(const unsigned int face,
                             face_orientation,
                             face_flip,
                             face_rotation);
+}
+
+
+
+inline unsigned int
+GeometryInfo<0>::face_to_cell_vertices(const unsigned int,
+                                       const unsigned int,
+                                       const bool,
+                                       const bool,
+                                       const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
 }
 
 
