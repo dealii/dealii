@@ -739,7 +739,7 @@ namespace VectorTools
    * <h4>Computing constraints</h4>
    *
    * To compute the constraints we use interpolation operator proposed in
-   * Brezzi, Fortin (Mixed and Hybrid (Finite Element Methods, Springer, 1991)
+   * Brezzi, Fortin (Mixed and Hybrid Finite Element Methods, Springer, 1991)
    * on every face located at the boundary.
    *
    * @ingroup constraints
