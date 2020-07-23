@@ -88,7 +88,7 @@ void
 test2()
 {
   deallog << "test2:" << std::endl;
-  std::vector<std::array<std::uint64_t, 3>> points = {{5, 10, 20}};
+  std::vector<std::array<std::uint64_t, 3>> points = {{{5, 10, 20}}};
 
   const auto res = Utilities::inverse_Hilbert_space_filling_curve<3>(points, 5);
 
