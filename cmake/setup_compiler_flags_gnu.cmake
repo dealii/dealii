@@ -83,6 +83,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsuggest-override")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wwrite-strings")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wmissing-braces")
 
 #
 # Disable Wplacement-new that will trigger a lot of warnings
