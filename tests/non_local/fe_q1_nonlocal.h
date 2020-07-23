@@ -36,11 +36,45 @@ get_dpo_vector()
   return dpo;
 }
 
+
+/**
+ * Associates non local dofs according to the vertex index.
+ */
+template <int dim>
+class NonLocalQ1DoFHandler : public NonLocalDoFHandler<dim>
+{
+public:
+  virtual std::vector<types::global_dof_index>
+  get_non_local_dof_indices(
+    const DoFCellAccessor<dim, dim, false> &accessor) const override
+  {
+    if (!tria)
+      tria = &(accessor.get_triangulation());
+    std::vector<types::global_dof_index> dofs(accessor.n_vertices());
+    for (unsigned int i = 0; i < dofs.size(); ++i)
+      dofs[i] = accessor.vertex_index(i);
+    return dofs;
+  }
+
+  virtual types::global_dof_index
+  n_additional_non_local_dofs() const override
+  {
+    Assert(tria, ExcInternalError());
+    return tria->n_vertices();
+  }
+
+private:
+  mutable SmartPointer<const Triangulation<dim>> tria = nullptr;
+};
+
+
+
 template <int dim>
 class FE_Q1_Nonlocal : public FE_Q_Base<TensorProductPolynomials<dim>, dim, dim>
 {
 public:
-  FE_Q1_Nonlocal()
+  FE_Q1_Nonlocal(const std::shared_ptr<NonLocalQ1DoFHandler<dim>> &ptr =
+                   std::shared_ptr<NonLocalQ1DoFHandler<dim>>())
     : FE_Q_Base<TensorProductPolynomials<dim>, dim, dim>(
         TensorProductPolynomials<dim>(
           Polynomials::generate_complete_Lagrange_basis(
@@ -50,6 +84,7 @@ public:
                                1,
                                FiniteElementData<dim>::H1),
         std::vector<bool>(1, false))
+    , non_local_dh(ptr ? ptr : std::make_shared<NonLocalQ1DoFHandler<dim>>())
   {
     this->unit_support_points = QTrapez<dim>().get_points();
   }
@@ -57,7 +92,7 @@ public:
   virtual std::unique_ptr<FiniteElement<dim>>
   clone() const override
   {
-    return std::make_unique<FE_Q1_Nonlocal<dim>>();
+    return std::make_unique<FE_Q1_Nonlocal<dim>>(non_local_dh);
   }
 
   virtual std::string
@@ -65,4 +100,30 @@ public:
   {
     return "FE_Q_Nonlocal<dim>";
   }
+
+  virtual std::shared_ptr<const NonLocalDoFHandler<dim>>
+  get_non_local_dof_handler() const override
+  {
+    return non_local_dh;
+  }
+
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override
+  {
+    AssertDimension(support_point_values.size(),
+                    this->get_unit_support_points().size());
+    AssertDimension(support_point_values.size(), nodal_values.size());
+    AssertDimension(this->n_dofs_per_cell(), nodal_values.size());
+
+    for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+      {
+        AssertDimension(support_point_values[i].size(), 1);
+        nodal_values[i] = support_point_values[i](0);
+      }
+  }
+
+private:
+  std::shared_ptr<NonLocalQ1DoFHandler<dim>> non_local_dh;
 };
