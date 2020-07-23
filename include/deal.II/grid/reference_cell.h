@@ -491,7 +491,7 @@ namespace ReferenceCell
           const unsigned char face_orientation) const override
         {
           static const std::array<std::array<unsigned int, 2>, 3> table = {
-            {{0, 1}, {1, 2}, {2, 0}}};
+            {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
           return table[face][face_orientation ? vertex : (1 - vertex)];
         }
@@ -650,7 +650,7 @@ namespace ReferenceCell
           AssertIndexRange(face, n_faces());
 
           const static std::array<std::array<unsigned int, 3>, 4> table = {
-            {{0, 1, 2}, {0, 3, 4}, {2, 5, 3}, {1, 4, 5}}};
+            {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
 
           return table[face][standard_to_real_face_line(
             line, face, face_orientation)];
@@ -663,7 +663,7 @@ namespace ReferenceCell
           const unsigned char face_orientation) const override
         {
           static const std::array<std::array<unsigned int, 3>, 4> table = {
-            {{0, 1, 2}, {1, 0, 3}, {0, 2, 3}, {2, 1, 3}}};
+            {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
           return table[face][standard_to_real_face_vertex(
             vertex, face, face_orientation)];

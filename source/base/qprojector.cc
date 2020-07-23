@@ -530,9 +530,9 @@ QProjector<2>::project_to_all_faces(
 
       // ... on to the faces (defined by its support points and arc length)
       const std::array<std::pair<std::array<Point<2>, 2>, double>, 3> faces = {
-        {{{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0)}, 1.0},
-         {{Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}, std::sqrt(2.0)},
-         {{Point<2>(0.0, 1.0), Point<2>(0.0, 0.0)}, 1.0}}};
+        {{{{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0)}}, 1.0},
+         {{{Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}}, std::sqrt(2.0)},
+         {{{Point<2>(0.0, 1.0), Point<2>(0.0, 0.0)}}, 1.0}}};
 
       // linear polynomial to map the reference quadrature points correctly
       // on faces
@@ -554,10 +554,10 @@ QProjector<2>::project_to_all_faces(
             switch (orientation)
               {
                 case 0:
-                  support_points = {face.first[1], face.first[0]};
+                  support_points = {{face.first[1], face.first[0]}};
                   break;
                 case 1:
-                  support_points = {face.first[0], face.first[1]};
+                  support_points = {{face.first[0], face.first[1]}};
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
@@ -645,21 +645,21 @@ QProjector<3>::project_to_all_faces(
       // ... on to the faces (defined by its support points and its area)
       // note: the area is later not used as a scaling factor but recomputed
       const std::array<std::pair<std::array<Point<3>, 3>, double>, 4> faces = {
-        {{{Point<3>(0.0, 0.0, 0.0),
-           Point<3>(1.0, 0.0, 0.0),
-           Point<3>(0.0, 1.0, 0.0)},
+        {{{{Point<3>(0.0, 0.0, 0.0),
+            Point<3>(1.0, 0.0, 0.0),
+            Point<3>(0.0, 1.0, 0.0)}},
           0.5},
-         {{Point<3>(1.0, 0.0, 0.0),
-           Point<3>(0.0, 0.0, 0.0),
-           Point<3>(0.0, 0.0, 1.0)},
+         {{{Point<3>(1.0, 0.0, 0.0),
+            Point<3>(0.0, 0.0, 0.0),
+            Point<3>(0.0, 0.0, 1.0)}},
           0.5},
-         {{Point<3>(0.0, 0.0, 0.0),
-           Point<3>(0.0, 1.0, 0.0),
-           Point<3>(0.0, 0.0, 1.0)},
+         {{{Point<3>(0.0, 0.0, 0.0),
+            Point<3>(0.0, 1.0, 0.0),
+            Point<3>(0.0, 0.0, 1.0)}},
           0.5},
-         {{Point<3>(0.0, 1.0, 0.0),
-           Point<3>(1.0, 0.0, 0.0),
-           Point<3>(0.0, 0.0, 1.0)},
+         {{{Point<3>(0.0, 1.0, 0.0),
+            Point<3>(1.0, 0.0, 0.0),
+            Point<3>(0.0, 0.0, 1.0)}},
           0.5 * sqrt(3.0) /*equilateral triangle*/}}};
 
       // linear polynomial to map the reference quadrature points correctly
@@ -682,34 +682,28 @@ QProjector<3>::project_to_all_faces(
             switch (orientation)
               {
                 case 1:
-                  support_points = {face.first[0],
-                                    face.first[1],
-                                    face.first[2]};
+                  support_points = {
+                    {face.first[0], face.first[1], face.first[2]}};
                   break;
                 case 3:
-                  support_points = {face.first[1],
-                                    face.first[0],
-                                    face.first[2]};
+                  support_points = {
+                    {face.first[1], face.first[0], face.first[2]}};
                   break;
                 case 5:
-                  support_points = {face.first[2],
-                                    face.first[0],
-                                    face.first[1]};
+                  support_points = {
+                    {face.first[2], face.first[0], face.first[1]}};
                   break;
                 case 0:
-                  support_points = {face.first[0],
-                                    face.first[2],
-                                    face.first[1]};
+                  support_points = {
+                    {face.first[0], face.first[2], face.first[1]}};
                   break;
                 case 2:
-                  support_points = {face.first[1],
-                                    face.first[2],
-                                    face.first[0]};
+                  support_points = {
+                    {face.first[1], face.first[2], face.first[0]}};
                   break;
                 case 4:
-                  support_points = {face.first[2],
-                                    face.first[1],
-                                    face.first[0]};
+                  support_points = {
+                    {face.first[2], face.first[1], face.first[0]}};
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
