@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/dofs/non_local_dof_handler.h>
+
 #include <deal.II/fe/block_mask.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_base.h>
@@ -2261,6 +2263,17 @@ public:
   //@}
 
   /**
+   * @name Non local dofs support
+   * @{
+   */
+  /**
+   * Return an object that knows how to handle non local dof indices.
+   */
+  virtual std::shared_ptr<const NonLocalDoFHandler<dim, spacedim>>
+  get_non_local_dof_handler() const;
+  //@}
+
+  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    *
@@ -3299,6 +3312,14 @@ FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
     return GeometryPrimitive::hex;
 }
 
+
+
+template <int dim, int spacedim>
+inline std::shared_ptr<const NonLocalDoFHandler<dim, spacedim>>
+FiniteElement<dim, spacedim>::get_non_local_dof_handler() const
+{
+  return std::make_shared<const NonLocalDoFHandler<dim, spacedim>>();
+}
 
 
 DEAL_II_NAMESPACE_CLOSE
