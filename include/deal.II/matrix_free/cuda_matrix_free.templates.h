@@ -261,7 +261,7 @@ namespace CUDAWrappers
       const UpdateFlags &    update_flags)
       : data(data)
       , fe_degree(data->fe_degree)
-      , dofs_per_cell(data->n_dofs_per_cell())
+      , dofs_per_cell(data->dofs_per_cell)
       , q_points_per_cell(data->q_points_per_cell)
       , fe_values(mapping,
                   fe,
@@ -273,7 +273,7 @@ namespace CUDAWrappers
       , padding_length(data->get_padding_length())
       , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
     {
-      local_dof_indices.resize(data->n_dofs_per_cell());
+      local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
 
@@ -990,8 +990,7 @@ namespace CUDAWrappers
                       ghost_vertices[cell->vertex_index(i)] = true;
 
                 std::vector<dealii::FilteredIterator<dealii::TriaActiveIterator<
-                  dealii::DoFCellAccessor<dealii::DoFHandler<dim, dim>,
-                                          false>>>>
+                  dealii::DoFCellAccessor<dim, dim, false>>>>
                   inner_cells;
 
                 for (auto cell = begin; cell != end; ++cell)
