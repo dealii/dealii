@@ -82,12 +82,23 @@ ENDIF()
 # If CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES is not available, do it
 # unconditionally for the most common case (gfortran).
 #
-SET(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
-SET_IF_EMPTY(_fortran_libs gfortran m quadmath c)
-FOREACH(_lib ${_fortran_libs})
-  FIND_SYSTEM_LIBRARY(${_lib}_LIBRARY NAMES ${_lib})
-  LIST(APPEND _additional_libraries ${_lib}_LIBRARY)
-ENDFOREACH()
+IF(NOT BUILD_SHARED_LIBS)
+  SET(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
+  #
+  # Since CMake 3.9 the gcc runtime libraries libgcc.a and libgcc_s.so.1
+  # have been added to the CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES variable.
+  # We thus have to remove the shared low-level runtime library
+  # libgcc_s.so.1 from the link interface; otherwise completely static
+  # linkage is broken.
+  #
+  LIST(REMOVE_ITEM _fortran_libs gcc_s)
+  SET_IF_EMPTY(_fortran_libs gfortran quadmath m)
+
+  FOREACH(_lib ${_fortran_libs})
+    FIND_SYSTEM_LIBRARY(${_lib}_LIBRARY NAMES ${_lib})
+    LIST(APPEND _additional_libraries ${_lib}_LIBRARY)
+  ENDFOREACH()
+ENDIF()
 
 
 SET(_lapack_include_dirs ${LAPACK_INCLUDE_DIRS})
