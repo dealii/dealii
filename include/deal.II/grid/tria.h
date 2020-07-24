@@ -46,6 +46,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef signals
+#  error \
+    "The data type signals is already defined. You are most likely using the QT library \
+and using the signals keyword. You can either #include the Qt headers (or any conflicting headers) \
+after the deal.ii headers or you can define the QT_NO_KEYWORDS marco and use the Q_SIGNALS macro."
+#endif
+
 // Forward declarations
 #ifndef DOXYGEN
 template <int dim, int spacedim>
