@@ -112,7 +112,7 @@ main()
   auto op_b11 = linear_operator(a.block(1, 1));
 
   std::array<std::array<decltype(op_b00), 2>, 2> temp{
-    {{op_b00, op_b01}, {op_b10, op_b11}}};
+    {{{op_b00, op_b01}}, {{op_b10, op_b11}}}};
   auto op_b = block_operator<2, 2, BlockVector<double>>(temp);
 
   // vmult:
