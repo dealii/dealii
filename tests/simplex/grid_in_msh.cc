@@ -27,7 +27,7 @@
 
 template <int dim, int spacedim>
 void
-check_file(const std::string &file_name, const unsigned int vertices_per_cell)
+check_file(const std::string &file_name)
 {
   Triangulation<dim, spacedim> tria;
 
@@ -55,12 +55,12 @@ main()
   // TRIANGULAR ELEMENTS
   // dim = spacedim = 2
   deallog.push("triangluar_elements_dim2_spacedim2: ");
-  check_file<2, 2>(std::string(SOURCE_DIR "/grid_in_msh/tri.msh"), 3);
+  check_file<2, 2>(std::string(SOURCE_DIR "/grid_in_msh/tri.msh"));
   deallog.pop();
 
   // dim = 2, spacedim = 3
   deallog.push("triangluar_elements_dim2_spacedim3: ");
-  check_file<2, 3>(std::string(SOURCE_DIR "/grid_in_msh/tri.msh"), 3);
+  check_file<2, 3>(std::string(SOURCE_DIR "/grid_in_msh/tri.msh"));
   deallog.pop();
 
 
@@ -68,6 +68,6 @@ main()
   // TETRAHEDRAL ELEMENTS
   // dim = spacedim = 3
   deallog.push("tetrahedral_elements_dim3_spacedim3: ");
-  check_file<3, 3>(std::string(SOURCE_DIR "/grid_in_msh/tet.msh"), 4);
+  check_file<3, 3>(std::string(SOURCE_DIR "/grid_in_msh/tet.msh"));
   deallog.pop();
 }

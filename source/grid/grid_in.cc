@@ -1731,8 +1731,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   std::vector<CellData<dim>>                 cells;
   SubCellData                                subcelldata;
   std::map<unsigned int, types::boundary_id> boundary_ids_1d;
-  bool                                       is_hex_mesh = false;
-  bool                                       is_tet_mesh = false;
+  bool                                       is_quad_or_hex_mesh = false;
+  bool                                       is_tria_or_tet_mesh = false;
 
   {
     unsigned int global_cell = 0;
@@ -1883,23 +1883,23 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                   vertices_per_cell = 2;
                 else if (cell_type == 2) // tri
                   {
-                    vertices_per_cell = 3;
-                    is_tet_mesh       = true;
+                    vertices_per_cell   = 3;
+                    is_tria_or_tet_mesh = true;
                   }
                 else if (cell_type == 3) // quad
                   {
-                    vertices_per_cell = 4;
-                    is_hex_mesh       = true;
+                    vertices_per_cell   = 4;
+                    is_quad_or_hex_mesh = true;
                   }
                 else if (cell_type == 4) // tet
                   {
-                    vertices_per_cell = 4;
-                    is_tet_mesh       = true;
+                    vertices_per_cell   = 4;
+                    is_tria_or_tet_mesh = true;
                   }
                 else if (cell_type == 5) // hex
                   {
-                    vertices_per_cell = 8;
-                    is_hex_mesh       = true;
+                    vertices_per_cell   = 8;
+                    is_quad_or_hex_mesh = true;
                   }
 
                 AssertThrow(nod_num == vertices_per_cell,
@@ -1987,13 +1987,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 // check cell type
                 if (cell_type == 2) // tri
                   {
-                    vertices_per_cell = 3;
-                    is_tet_mesh       = true;
+                    vertices_per_cell   = 3;
+                    is_tria_or_tet_mesh = true;
                   }
                 else if (cell_type == 3) // quad
                   {
-                    vertices_per_cell = 4;
-                    is_hex_mesh       = true;
+                    vertices_per_cell   = 4;
+                    is_quad_or_hex_mesh = true;
                   }
 
                 subcelldata.boundary_quads.emplace_back();
@@ -2085,9 +2085,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // GridReordering::reorder_cells(),
   // Triangulation::create_triangulation_compatibility()) need to be revisited
   // for simplex meshes
-  AssertThrow(dim == 1 || (is_tet_mesh ^ is_hex_mesh), ExcNotImplemented());
+  AssertThrow(dim == 1 || (is_tria_or_tet_mesh ^ is_quad_or_hex_mesh),
+              ExcNotImplemented());
 
-  if (dim == 1 || is_hex_mesh)
+  if (dim == 1 || is_quad_or_hex_mesh)
     {
       // do some clean-up on vertices...
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
