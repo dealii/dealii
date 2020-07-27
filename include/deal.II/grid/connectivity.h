@@ -1545,6 +1545,8 @@ namespace internal
     Connectivity<T>
     build_connectivity(const std::vector<CellData<dim>> &cells)
     {
+      AssertThrow(cells.size() > 0, ExcMessage("No cells have been provided!"));
+
       // vector of possible cell entity types
       std::vector<std::shared_ptr<CellTypeBase>> cell_types_impl(8);
 
