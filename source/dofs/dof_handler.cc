@@ -1412,13 +1412,6 @@ namespace internal
                           dof_handler.object_dof_ptr[l][d].push_back(
                             dof_handler.object_dof_indices[l][d].size());
 
-                          for (unsigned int i = 0;
-                               i < dof_handler.get_fe(cell->active_fe_index())
-                                     .template n_dofs_per_object<dim - 1>();
-                               i++)
-                            dof_handler.object_dof_indices[l][d].push_back(
-                              numbers::invalid_dof_index);
-
                           dof_handler.hp_object_fe_indices[d][offset + 0] =
                             fe_1;
                           dof_handler.hp_object_fe_indices[d][offset + 1] =
