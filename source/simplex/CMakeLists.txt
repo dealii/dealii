@@ -16,6 +16,7 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
+  fe_lib.cc
   polynomials.cc
   quadrature_lib.cc
   )
@@ -33,6 +34,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
   )
 
 SET(_inst
+  fe_lib.inst.in
 )
 
 FILE(GLOB _header
