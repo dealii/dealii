@@ -238,6 +238,22 @@
 #  define DEAL_II_GMSH_EXECUTABLE_PATH "@GMSH_EXECUTABLE@"
 #endif
 
+
+/*
+ * CUDA:
+ */
+
+#ifdef DEAL_II_WITH_CUDA
+#  define DEAL_II_CUDA_VERSION_MAJOR @CUDA_VERSION_MAJOR@
+#  define DEAL_II_CUDA_VERSION_MINOR @CUDA_VERSION_MINOR@
+
+#  define DEAL_II_CUDA_VERSION_GTE(major,minor) \
+ ((DEAL_II_CUDA_VERSION_MAJOR * 100 + DEAL_II_CUDA_VERSION_MINOR) \
+    >=  \
+    (major)*100 + (patch))
+#endif
+
+
 /*
  * p4est:
  */

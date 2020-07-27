@@ -57,6 +57,21 @@ namespace CUDAWrappers
           bool                     add,
           float *                  y)
     {
+#  if DEAL_II_CUDA_VERSION_GTE(11, 0)
+      (void)handle;
+      (void)transpose;
+      (void)m;
+      (void)n;
+      (void)nnz;
+      (void)descr;
+      (void)A_val_dev;
+      (void)A_row_ptr_dev;
+      (void)A_column_index_dev;
+      (void)x;
+      (void)add;
+      (void)y;
+      AssertThrow(false, ExcNotImplemented());
+#  else
       float               alpha = 1.;
       float               beta  = add ? 1. : 0.;
       cusparseOperation_t cusparse_operation =
@@ -78,6 +93,7 @@ namespace CUDAWrappers
                                                    &beta,
                                                    y);
       AssertCusparse(error_code);
+#  endif
     }
 
 
@@ -96,6 +112,21 @@ namespace CUDAWrappers
           bool                     add,
           double *                 y)
     {
+#  if DEAL_II_CUDA_VERSION_GTE(11, 0)
+      (void)handle;
+      (void)transpose;
+      (void)m;
+      (void)n;
+      (void)nnz;
+      (void)descr;
+      (void)A_val_dev;
+      (void)A_row_ptr_dev;
+      (void)A_column_index_dev;
+      (void)x;
+      (void)add;
+      (void)y;
+      AssertThrow(false, ExcNotImplemented());
+#  else
       double              alpha = 1.;
       double              beta  = add ? 1. : 0.;
       cusparseOperation_t cusparse_operation =
@@ -117,6 +148,7 @@ namespace CUDAWrappers
                                                    &beta,
                                                    y);
       AssertCusparse(error_code);
+#  endif
     }
 
 
