@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,6 +51,8 @@ FiniteElementData<dim>::FiniteElementData(
   , dofs_per_line(dofs_per_object[1])
   , dofs_per_quad(dim > 1 ? dofs_per_object[2] : 0)
   , dofs_per_hex(dim > 2 ? dofs_per_object[3] : 0)
+  , non_local_dofs_per_cell(
+      dofs_per_object.size() == dim + 2 ? dofs_per_object[dim + 1] : 0)
   , first_line_index(
       ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
       dofs_per_vertex)
@@ -94,7 +96,7 @@ FiniteElementData<dim>::FiniteElementData(
             ReferenceCell::internal::Info::get_cell(cell_type).n_faces() :
             0)) *
         dofs_per_quad +
-      (dim == 3 ? 1 : 0) * dofs_per_hex)
+      (dim == 3 ? 1 : 0) * dofs_per_hex + non_local_dofs_per_cell)
   , components(n_components)
   , degree(degree)
   , conforming_space(conformity)
@@ -102,8 +104,10 @@ FiniteElementData<dim>::FiniteElementData(
                          BlockIndices(1, dofs_per_cell) :
                          block_indices)
 {
-  Assert(dofs_per_object.size() == dim + 1,
-         ExcDimensionMismatch(dofs_per_object.size() - 1, dim));
+  Assert(dofs_per_object.size() == dim + 1 || dofs_per_object.size() == dim + 2,
+         ExcMessage("dofs_per_object should have size of either " +
+                    std::to_string(dim + 1) + " or " +
+                    std::to_string(dim + 2)));
 }
 
 
@@ -116,7 +120,8 @@ FiniteElementData<dim>::operator==(const FiniteElementData<dim> &f) const
           (dofs_per_line == f.dofs_per_line) &&
           (dofs_per_quad == f.dofs_per_quad) &&
           (dofs_per_hex == f.dofs_per_hex) && (components == f.components) &&
-          (degree == f.degree) && (conforming_space == f.conforming_space));
+          (degree == f.degree) && (conforming_space == f.conforming_space) &&
+          (non_local_dofs_per_cell == f.non_local_dofs_per_cell));
 }
 
 

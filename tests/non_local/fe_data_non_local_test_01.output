@@ -1,0 +1,11 @@
+
+DEAL::2d elements: 
+DEAL::total number of dofs per cell is 4 and number of non-local dofs per cell is 4
+DEAL::total number of dofs per cell is 14 and number of non-local dofs per cell is 10
+DEAL::total number of dofs per cell is 4 and number of non-local dofs per cell is 4
+DEAL::total number of dofs per cell is 16 and number of non-local dofs per cell is 4
+DEAL::3d elements: 
+DEAL::total number of dofs per cell is 8 and number of non-local dofs per cell is 8
+DEAL::total number of dofs per cell is 35 and number of non-local dofs per cell is 10
+DEAL::total number of dofs per cell is 6 and number of non-local dofs per cell is 4
+DEAL::total number of dofs per cell is 51 and number of non-local dofs per cell is 4
