@@ -504,6 +504,8 @@ public:
    * @note The input function of deal.II does not distinguish between newline
    * and other whitespace. Therefore, deal.II will be able to read files in a
    * slightly more general format than %Gmsh.
+   *
+   * @ingroup simplex
    */
   void
   read_msh(std::istream &in);
