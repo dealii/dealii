@@ -628,16 +628,18 @@ MappingFEField<dim, spacedim, VectorType, void>::get_data(
 template <int dim, int spacedim, typename VectorType>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingFEField<dim, spacedim, VectorType, void>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(
     QProjector<dim>::project_to_all_faces(ReferenceCell::get_hypercube(dim),
-                                          quadrature));
-  this->compute_face_data(update_flags, q, quadrature.size(), data);
+                                          quadrature[0]));
+  this->compute_face_data(update_flags, q, quadrature[0].size(), data);
 
   return data_ptr;
 }
@@ -1694,11 +1696,13 @@ void
 MappingFEField<dim, spacedim, VectorType, void>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
@@ -1719,8 +1723,8 @@ MappingFEField<dim, spacedim, VectorType, void>::fill_fe_face_values(
                                              cell->face_orientation(face_no),
                                              cell->face_flip(face_no),
                                              cell->face_rotation(face_no),
-                                             quadrature.size()),
-    quadrature,
+                                             quadrature[0].size()),
+    quadrature[0],
     data,
     euler_dof_handler->get_fe(),
     fe_mask,

@@ -2767,11 +2767,22 @@ protected:
    * it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
-  get_face_data(const UpdateFlags             update_flags,
-                const Mapping<dim, spacedim> &mapping,
-                const Quadrature<dim - 1> &   quadrature,
+  get_face_data(const UpdateFlags               update_flags,
+                const Mapping<dim, spacedim> &  mapping,
+                const hp::QCollection<dim - 1> &quadrature,
                 dealii::internal::FEValuesImplementation::
                   FiniteElementRelatedData<dim, spacedim> &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual std::unique_ptr<InternalDataBase>
+  get_face_data(
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim - 1> &   quadrature,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2964,7 +2975,7 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -2973,7 +2984,23 @@ protected:
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
-      &output_data) const = 0;
+      &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &                     mapping_data,
+    const InternalDataBase &fe_internal,
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but

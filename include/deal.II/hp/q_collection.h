@@ -22,8 +22,6 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/subscriptor.h>
 
-#include <deal.II/fe/fe.h>
-
 #include <memory>
 #include <vector>
 

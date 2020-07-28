@@ -179,21 +179,25 @@ MappingQ<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 template <int dim, int spacedim>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingQ<dim, spacedim>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>();
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
+  std::unique_ptr<typename MappingQGeneric<dim, spacedim>::InternalDataBase> (
+    MappingQGeneric<dim, spacedim>::*mapping_get_face_data)(
+    const UpdateFlags, const hp::QCollection<dim - 1> &) const =
+    &MappingQGeneric<dim, spacedim>::get_face_data;
+
   // build the Q1 and Qp internal data objects in parallel
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
-    do_get_data =
-      Threads::new_task(&MappingQGeneric<dim, spacedim>::get_face_data,
-                        *qp_mapping,
-                        update_flags,
-                        quadrature);
+    do_get_data = Threads::new_task(mapping_get_face_data,
+                                    *qp_mapping,
+                                    update_flags,
+                                    quadrature);
 
   if (!use_mapping_q_on_all_cells)
     data.mapping_q1_data = Utilities::dynamic_unique_cast<
@@ -302,7 +306,7 @@ void
 MappingQ<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const

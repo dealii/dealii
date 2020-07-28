@@ -81,6 +81,18 @@ namespace hp
       const UpdateFlags                                       update_flags);
 
     /**
+     * Like the above function but taking a vector of quadrature collections.
+     * For hp::FEFaceValues, the ith entry of the quadrature collections are
+     * interpreted as the face quadrature rules to be applied the ith face.
+     */
+    FEValuesBase(
+      const MappingCollection<dim, FEValuesType::space_dimension>
+        &mapping_collection,
+      const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+      const std::vector<QCollection<q_dim>> &                 q_collection,
+      const UpdateFlags                                       update_flags);
+
+    /**
      * Constructor. This constructor is equivalent to the other one except
      * that it makes the object use a $Q_1$ mapping (i.e., an object of type
      * MappingQGeneric(1)) implicitly.
@@ -88,6 +100,16 @@ namespace hp
     FEValuesBase(
       const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
       const QCollection<q_dim> &                              q_collection,
+      const UpdateFlags                                       update_flags);
+
+    /**
+     * Like the above function but taking a vector quadrature collections.
+     * For hp::FEFaceValues, the ith entry of the quadrature collections are
+     * interpreted as the face quadrature rules to be applied the ith face.
+     */
+    FEValuesBase(
+      const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+      const std::vector<QCollection<q_dim>> &                 q_collection,
       const UpdateFlags                                       update_flags);
 
     /**
@@ -198,6 +220,16 @@ namespace hp
      * Copy of the quadrature collection object provided to the constructor.
      */
     const QCollection<q_dim> q_collection;
+
+    /**
+     * Vector of quadrature collections. For hp::FEFaceValues, the ith entry of
+     * the quadrature collections are interpreted as the face quadrature rules
+     * to be applied the ith face.
+     *
+     * The variable q_collection collects the first quadrature rule of each
+     * quadrature collection of the vector.
+     */
+    const std::vector<QCollection<q_dim>> q_collections;
 
   private:
     /**
@@ -416,6 +448,20 @@ namespace hp
                  const hp::QCollection<dim - 1> &            q_collection,
                  const UpdateFlags                           update_flags);
 
+    /**
+     * Like the function above, but taking a vector of collection of quadrature
+     * rules. This allows to assign each face a different quadrature rule: the
+     * ith entry of a collection is used as the face quadrature rule on the ith
+     * face.
+     *
+     * In the case that the collections only contains a single face quadrature,
+     * this quadrature rule is use on all faces.
+     */
+    FEFaceValues(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                 const hp::FECollection<dim, spacedim> &     fe_collection,
+                 const std::vector<hp::QCollection<dim - 1>> &q_collections,
+                 const UpdateFlags                            update_flags);
+
 
     /**
      * Constructor. This constructor is equivalent to the other one except
@@ -425,6 +471,19 @@ namespace hp
     FEFaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                  const hp::QCollection<dim - 1> &       q_collection,
                  const UpdateFlags                      update_flags);
+
+    /**
+     * Like the function above, but taking a vector of collection of quadrature
+     * rules. This allows to assign each face a different quadrature rule: the
+     * ith entry of a collection is used as the face quadrature rule on the ith
+     * face.
+     *
+     * In the case that the collections only contains a single face quadrature,
+     * this quadrature rule is use on all faces.
+     */
+    FEFaceValues(const hp::FECollection<dim, spacedim> &      fe_collection,
+                 const std::vector<hp::QCollection<dim - 1>> &q_collections,
+                 const UpdateFlags                            update_flags);
 
     /**
      * Reinitialize the object for the given cell and face.

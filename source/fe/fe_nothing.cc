@@ -135,7 +135,7 @@ void
 FE_Nothing<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
   const unsigned int,
-  const Quadrature<dim - 1> &,
+  const hp::QCollection<dim - 1> &,
   const Mapping<dim, spacedim> &,
   const typename Mapping<dim, spacedim>::InternalDataBase &,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
