@@ -210,15 +210,14 @@ MGTransferMatrixFree<dim, Number>::prolongate(
           this->vector_partitioners[to_level]);
       AssertDimension(this->ghosted_level_vector[to_level].local_size(),
                       dst.local_size());
-      this->ghosted_level_vector[to_level] = 0.;
     }
-  else
-    dst = 0;
 
   const LinearAlgebra::distributed::Vector<Number> &src_vec =
     src_inplace ? src : this->ghosted_level_vector[to_level - 1];
   LinearAlgebra::distributed::Vector<Number> &dst_vec =
     dst_inplace ? dst : this->ghosted_level_vector[to_level];
+
+  dst_vec = 0.;
 
   src_vec.update_ghost_values();
   // the implementation in do_prolongate_add is templated in the degree of the
@@ -251,7 +250,7 @@ MGTransferMatrixFree<dim, Number>::prolongate(
 
   dst_vec.compress(VectorOperation::add);
   if (dst_inplace == false)
-    dst = dst_vec;
+    dst.copy_locally_owned_data_from(this->ghosted_level_vector[to_level]);
 
   if (src_inplace == true)
     src.zero_out_ghosts();
