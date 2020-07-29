@@ -595,7 +595,7 @@ tend to be smooth on length-scales of a cell (i.e., they have
 small coefficients in the higher polynomial degrees that are missed by
 too few quadrature points, whereas the main solution contribution in the lower
 polynomial degrees is still well-captured -- this is simply a consequence of Taylor's
-theorem. To address this topic, various approaches have been proposed in the
+theorem). To address this topic, various approaches have been proposed in the
 DG literature. One technique is filtering which damps the solution components
 pertaining to higher polynomial degrees. As the chosen nodal basis is not
 hierarchical, this would mean to transform from the nodal basis into a
