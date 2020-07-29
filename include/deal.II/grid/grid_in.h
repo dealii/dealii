@@ -364,20 +364,22 @@ public:
 
   /**
    * Read grid data from a unstructured vtk file. The vtk file may contain
-   * the following VTK cell types: VTK_HEXAHEDRON, VTK_QUAD, and VTK_LINE.
+   * the following VTK cell types: VTK_HEXAHEDRON (12), VTK_TETRA (10),
+   * VTK_QUAD (9), VTK_TRIANGLE (5), and VTK_LINE (3).
    *
    * Depending on the template dimension, only some of the above are accepted.
    *
    * In particular, in three dimensions, this function expects the file to
    * contain
    *
-   * - VTK_HEXAHEDRON cell types
-   * - VTK_QUAD cell types, to specify optional boundary or interior quad faces
+   * - VTK_HEXAHEDRON/VTK_TETRA cell types
+   * - VTK_QUAD/VTK_TRIANGLE cell types, to specify optional boundary or
+   *   interior quad faces
    * - VTK_LINE cell types, to specify optional boundary or interior edges
    *
    * In two dimensions:
    *
-   * - VTK_QUAD cell types
+   * - VTK_QUAD/VTK_TRIANGLE cell types
    * - VTK_LINE cell types, to specify optional boundary or interior edges
    *
    * In one dimension
@@ -396,6 +398,8 @@ public:
    *
    * The companion GridOut::write_vtk function can be used to write VTK files
    * compatible with this method.
+   *
+   * @ingroup simplex
    */
   void
   read_vtk(std::istream &in);
