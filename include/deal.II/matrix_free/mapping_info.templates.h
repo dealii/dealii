@@ -3038,7 +3038,7 @@ namespace internal
                                     reorder_face_derivative_indices<dim>(face,
                                                                          e);
                                   face_data_by_cells[my_q]
-                                    .jacobians[1][offset + q][d][e][v] =
+                                    .jacobians[1][offset][d][e][v] =
                                     inv_jac[d][ee];
                                 }
                           }
