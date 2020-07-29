@@ -380,7 +380,7 @@ namespace Step47
     // We use the same technique as used in the assembly of step-22
     // to accelerate the function: Instead of calling
     // `fe_values.shape_hessian(i, qpoint)` in the innermost loop,
-    // we instead create a variable `hessian_i` that evaluates this
+    // we create a variable `hessian_i` that evaluates this
     // value once in the loop over `i` and re-use the so-evaluated
     // value in the loop over `j`. For symmetry, we do the same with a
     // variable `hessian_j`, although it is indeed only used once and
