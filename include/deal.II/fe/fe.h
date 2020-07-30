@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/dofs/non_local_dof_handler.h>
-
 #include <deal.II/fe/block_mask.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_base.h>
