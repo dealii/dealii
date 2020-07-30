@@ -2612,18 +2612,22 @@ DoFHandler<dim, spacedim>::distribute_non_local_dofs()
     ExcMessage(
       "Distribute active DoFs using distribute_dofs() before calling distribute_non_local_dofs()."));
 
-  auto non_local_dh = begin()->get_fe().get_non_local_dof_handler();
+  const auto non_local_id = begin()->get_fe().get_non_local_id();
+  const auto n_global_non_local_dofs =
+    begin()->get_fe().n_global_non_local_dofs();
+
   for (auto cell : active_cell_iterators())
     {
-      // Make sure all cells use the same NonLocalDoFHandler.
-      Assert(non_local_dh == cell->get_fe().get_non_local_dof_handler(),
-             ExcMessage(
-               "You are trying to use different NonLocalDoFHandler objects"));
-      cell->set_non_local_dof_indices(
-        non_local_dh->get_non_local_dof_indices(*cell));
+      const auto &fe = cell->get_fe();
+      // Make sure all cells handle non local dofs in the same way.
+      Assert(
+        non_local_id == fe.get_non_local_id(),
+        ExcMessage(
+          "You are trying to use different non local finite element spaces"));
+      AssertDimension(n_global_non_local_dofs, fe.n_global_non_local_dofs());
+      cell->set_non_local_dof_indices(fe.get_non_local_dof_indices(*cell));
     }
-  this->number_cache.n_global_dofs +=
-    non_local_dh->n_additional_non_local_dofs();
+  this->number_cache.n_global_dofs += n_global_non_local_dofs;
 }
 
 

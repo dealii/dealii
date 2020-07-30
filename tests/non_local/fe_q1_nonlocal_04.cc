@@ -35,9 +35,9 @@ template <int dim>
 void
 test()
 {
-  FE_Q1_Nonlocal<dim> fe;
-  Triangulation<dim>  tria;
+  Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
+  FE_Q1_Nonlocal<dim> fe(tria);
   tria.refine_global(1);
   DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);

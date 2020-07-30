@@ -21,6 +21,8 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
+#include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/fe/fe_q_base.h>
 
 #include <iostream>
@@ -36,45 +38,11 @@ get_dpo_vector()
   return dpo;
 }
 
-
-/**
- * Associates non local dofs according to the vertex index.
- */
-template <int dim>
-class NonLocalQ1DoFHandler : public NonLocalDoFHandler<dim>
-{
-public:
-  virtual std::vector<types::global_dof_index>
-  get_non_local_dof_indices(
-    const DoFCellAccessor<dim, dim, false> &accessor) const override
-  {
-    if (!tria)
-      tria = &(accessor.get_triangulation());
-    std::vector<types::global_dof_index> dofs(accessor.n_vertices());
-    for (unsigned int i = 0; i < dofs.size(); ++i)
-      dofs[i] = accessor.vertex_index(i);
-    return dofs;
-  }
-
-  virtual types::global_dof_index
-  n_additional_non_local_dofs() const override
-  {
-    Assert(tria, ExcInternalError());
-    return tria->n_vertices();
-  }
-
-private:
-  mutable SmartPointer<const Triangulation<dim>> tria = nullptr;
-};
-
-
-
 template <int dim>
 class FE_Q1_Nonlocal : public FE_Q_Base<TensorProductPolynomials<dim>, dim, dim>
 {
 public:
-  FE_Q1_Nonlocal(const std::shared_ptr<NonLocalQ1DoFHandler<dim>> &ptr =
-                   std::shared_ptr<NonLocalQ1DoFHandler<dim>>())
+  FE_Q1_Nonlocal(const Triangulation<dim> &tria)
     : FE_Q_Base<TensorProductPolynomials<dim>, dim, dim>(
         TensorProductPolynomials<dim>(
           Polynomials::generate_complete_Lagrange_basis(
@@ -84,7 +52,7 @@ public:
                                1,
                                FiniteElementData<dim>::H1),
         std::vector<bool>(1, false))
-    , non_local_dh(ptr ? ptr : std::make_shared<NonLocalQ1DoFHandler<dim>>())
+    , tria(&tria)
   {
     this->unit_support_points = QTrapez<dim>().get_points();
   }
@@ -92,19 +60,13 @@ public:
   virtual std::unique_ptr<FiniteElement<dim>>
   clone() const override
   {
-    return std::make_unique<FE_Q1_Nonlocal<dim>>(non_local_dh);
+    return std::make_unique<FE_Q1_Nonlocal<dim>>(*tria);
   }
 
   virtual std::string
   get_name() const override
   {
     return "FE_Q_Nonlocal<dim>";
-  }
-
-  virtual std::shared_ptr<const NonLocalDoFHandler<dim>>
-  get_non_local_dof_handler() const override
-  {
-    return non_local_dh;
   }
 
   virtual void
@@ -124,6 +86,31 @@ public:
       }
   }
 
+
+  virtual std::vector<types::global_dof_index>
+  get_non_local_dof_indices(
+    const DoFCellAccessor<dim, dim, false> &accessor) const override
+  {
+    std::vector<types::global_dof_index> dofs(accessor.n_vertices());
+    for (unsigned int i = 0; i < dofs.size(); ++i)
+      dofs[i] = accessor.vertex_index(i);
+    return dofs;
+  }
+
+
+  virtual types::global_dof_index
+  n_global_non_local_dofs() const override
+  {
+    Assert(tria, ExcInternalError());
+    return tria->n_vertices();
+  }
+
+  virtual std::string
+  get_non_local_id() const override
+  {
+    return "NonLocal FEQ1";
+  }
+
 private:
-  std::shared_ptr<NonLocalQ1DoFHandler<dim>> non_local_dh;
+  mutable SmartPointer<const Triangulation<dim>> tria = nullptr;
 };

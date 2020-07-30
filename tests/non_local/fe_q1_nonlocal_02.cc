@@ -31,7 +31,8 @@ void
 test()
 {
   deallog << "DIM: " << dim << std::endl << std::endl;
-  FE_Q1_Nonlocal<dim> fe;
+  Triangulation<dim>  tria;
+  FE_Q1_Nonlocal<dim> fe(tria);
   // Check that the basis functions are what we expect
   const auto &quad = fe.get_unit_support_points();
 

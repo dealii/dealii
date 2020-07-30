@@ -31,7 +31,8 @@ template <int dim>
 void
 test()
 {
-  FE_Q1_Nonlocal<dim> fe;
+  Triangulation<dim>  tria;
+  FE_Q1_Nonlocal<dim> fe(tria);
   if (fe.n_dofs_per_cell() != GeometryInfo<dim>::vertices_per_cell)
     deallog << "Not OK" << std::endl;
   else

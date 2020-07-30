@@ -822,11 +822,12 @@ namespace internal
           {
             const auto &fe = accessor.get_fe(fe_index_);
 
-            const unsigned int                          //
-              dofs_per_vertex = fe.n_dofs_per_vertex(), //
-              dofs_per_line   = fe.n_dofs_per_line(),   //
-              dofs_per_quad   = fe.n_dofs_per_quad(),   //
-              dofs_per_hex    = fe.n_dofs_per_hex();    //
+            const unsigned int                                  //
+              dofs_per_vertex = fe.n_dofs_per_vertex(),         //
+              dofs_per_line   = fe.n_dofs_per_line(),           //
+              dofs_per_quad   = fe.n_dofs_per_quad(),           //
+              dofs_per_hex    = fe.n_dofs_per_hex(),            //
+              non_local_dofs  = fe.n_non_local_dofs_per_cell(); //
 
             const unsigned int inner_dofs =
               structdim == 1 ? dofs_per_line :
@@ -860,6 +861,10 @@ namespace internal
             // 4) INNER dofs
             index += inner_dofs;
 
+            // 5) non local dofs
+            if (dim == structdim)
+              index += non_local_dofs;
+
             return index;
           }
         else
@@ -873,6 +878,9 @@ namespace internal
             unsigned int index = 0;
 
             const auto diff = [](const auto &p) { return p.second - p.first; };
+
+            const unsigned int non_local_dofs =
+              accessor.get_fe(fe_index).n_non_local_dofs_per_cell();
 
             // 1) VERTEX dofs
             for (const auto vertex : accessor.vertex_indices())
@@ -897,6 +905,10 @@ namespace internal
 
             // 4) INNER dofs
             index += diff(process_object_range(accessor, fe_index));
+
+            // 5) non local dofs
+            if (dim == structdim)
+              index += non_local_dofs;
 
             return index;
           }
@@ -926,7 +938,7 @@ namespace internal
         AssertDimension(dof_indices.size(), n_dof_indices(accessor, fe_index));
 
         const auto &fe                      = accessor.get_fe(fe_index);
-        const auto  non_local_dofs_per_cell = fe.n_non_local_dofs();
+        const auto  non_local_dofs_per_cell = fe.n_non_local_dofs_per_cell();
 
         unsigned int index = 0;
 
