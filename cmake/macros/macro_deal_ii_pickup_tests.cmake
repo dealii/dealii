@@ -82,6 +82,13 @@ MACRO(DEAL_II_PICKUP_TESTS)
   #
   # Necessary external interpreters and programs:
   #
+  IF(${DEAL_II_WITH_MPI})
+    IF( "${MPIEXEC_EXECUTABLE}" STREQUAL "")
+      MESSAGE(FATAL_ERROR "Could not find an MPI launcher program, which is required "
+"for running the testsuite. Please explicitly specify MPIEXEC_EXECUTABLE to CMake "
+"as a full path to the MPI launcher program.")
+    ENDIF()
+  ENDIF()
 
   IF(DEAL_II_WITH_CUDA)
     FIND_PACKAGE(CUDA)
