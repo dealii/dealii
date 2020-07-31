@@ -87,8 +87,10 @@ namespace Exceptions
                    << " but the DoFHandler object says that there are " << arg2
                    << " degrees of freedom and there are " << arg3
                    << " active cells. The size of your vector needs to be"
-                   << " either equal to the number of degrees of freedom, or"
-                   << " equal to the number of active cells.");
+                   << " either equal to the number of degrees of freedom (when"
+                   << " the data is of type type_dof_data), or equal to the"
+                   << " number of active cells (when the data is of type "
+                   << " type_cell_data).");
     /**
      * Exception
      */
