@@ -155,7 +155,7 @@ In other words, we end up with what is in essence a system of two
 coupled Laplace equations for $u,v$, each with Dirichlet-type boundary
 conditions. We know how to solve such problems, and it should not be
 very difficult to construct good solvers and preconditioners for this
-system either using the techniques of step-20 and step-22. So this
+system either using the techniques of step-20 or step-22. So this
 case is pretty simple to deal with.
 
 @note It is worth pointing out that this only works for domains whose
