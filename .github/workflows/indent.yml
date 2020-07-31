@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        fetch-depth: 100
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
