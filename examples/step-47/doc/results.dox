@@ -263,10 +263,6 @@ make sense:
   @f}
   where
   @f{align*}{
-  \mathcal{A}(v_h,u_h)&=\mathcal{F}(v_h) \quad \text{holds for all test functions } v_h,
-  @f}
-  where
-  @f{align*}{
   \mathcal{A}(v_h,u_h):=&\sum_{K \in \mathbb{T}}\int_K D^2v_h:D^2u_h \ dx
   \\
   &
@@ -290,6 +286,6 @@ make sense:
   \sum_{e\subset\partial\Omega}
   \int_e \jump{\frac{\partial v_h}{\partial \mathbf n}} h \ ds.
   @f}
-  The implementation of this boundary case is similar to "clamped" version
+  The implementation of this boundary case is similar to the "clamped" version
   except for `boundary_worker` is no longer needed for system assembling
   and the right hand side is changed according to the formulation.
