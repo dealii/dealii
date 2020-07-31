@@ -273,11 +273,11 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
     QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
                                           reference_edge_quadrature);
 
-  this->generalized_face_support_points.resize(n_edge_points);
+  this->generalized_face_support_points[0].resize(n_edge_points);
 
   // Create face support points.
   for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
-    this->generalized_face_support_points[q_point] =
+    this->generalized_face_support_points[0][q_point] =
       reference_edge_quadrature.point(q_point);
 
   if (order > 0)
@@ -310,7 +310,7 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
             boundary_weights(q_point, i) =
               reference_edge_quadrature.weight(q_point) *
               lobatto_polynomials_grad[i + 1].value(
-                this->generalized_face_support_points[q_point](0));
+                this->generalized_face_support_points[0][q_point](0));
         }
 
       for (unsigned int q_point = 0; q_point < n_interior_points; ++q_point)
@@ -380,8 +380,8 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
 
       boundary_weights.reinit(n_edge_points + n_face_points,
                               2 * (order + 1) * order);
-      this->generalized_face_support_points.resize(4 * n_edge_points +
-                                                   n_face_points);
+      this->generalized_face_support_points[0].resize(4 * n_edge_points +
+                                                      n_face_points);
       this->generalized_support_points.resize(n_boundary_points +
                                               n_interior_points);
 
@@ -391,8 +391,8 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0;
                line < GeometryInfo<dim - 1>::lines_per_cell;
                ++line)
-            this->generalized_face_support_points[line * n_edge_points +
-                                                  q_point] =
+            this->generalized_face_support_points[0][line * n_edge_points +
+                                                     q_point] =
               edge_quadrature.point(
                 QProjector<dim - 1>::DataSetDescriptor::face(
                   ReferenceCell::get_hypercube(dim - 1),
@@ -421,13 +421,14 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
             boundary_weights(q_point, i) =
               reference_edge_quadrature.weight(q_point) *
               lobatto_polynomials_grad[i + 1].value(
-                this->generalized_face_support_points[q_point](1));
+                this->generalized_face_support_points[0][q_point](1));
         }
 
       // Create support points on faces.
       for (unsigned int q_point = 0; q_point < n_face_points; ++q_point)
         {
-          this->generalized_face_support_points[q_point + 4 * n_edge_points] =
+          this
+            ->generalized_face_support_points[0][q_point + 4 * n_edge_points] =
             reference_face_quadrature.point(q_point);
 
           for (unsigned int i = 0; i <= order; ++i)
@@ -436,23 +437,23 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
                 boundary_weights(q_point + n_edge_points, 2 * (i * order + j)) =
                   reference_face_quadrature.weight(q_point) *
                   lobatto_polynomials_grad[i].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
+                    this->generalized_face_support_points[0][q_point +
+                                                             4 * n_edge_points](
                       0)) *
                   lobatto_polynomials[j + 2].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
+                    this->generalized_face_support_points[0][q_point +
+                                                             4 * n_edge_points](
                       1));
                 boundary_weights(q_point + n_edge_points,
                                  2 * (i * order + j) + 1) =
                   reference_face_quadrature.weight(q_point) *
                   lobatto_polynomials_grad[i].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
+                    this->generalized_face_support_points[0][q_point +
+                                                             4 * n_edge_points](
                       1)) *
                   lobatto_polynomials[j + 2].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
+                    this->generalized_face_support_points[0][q_point +
+                                                             4 * n_edge_points](
                       0));
               }
         }
@@ -485,7 +486,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
 
   else
     {
-      this->generalized_face_support_points.resize(4 * n_edge_points);
+      this->generalized_face_support_points[0].resize(4 * n_edge_points);
       this->generalized_support_points.resize(
         GeometryInfo<dim>::lines_per_cell * n_edge_points);
 
@@ -494,8 +495,8 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0;
                line < GeometryInfo<dim - 1>::lines_per_cell;
                ++line)
-            this->generalized_face_support_points[line * n_edge_points +
-                                                  q_point] =
+            this->generalized_face_support_points[0][line * n_edge_points +
+                                                     q_point] =
               edge_quadrature.point(
                 QProjector<dim - 1>::DataSetDescriptor::face(
                   ReferenceCell::get_hypercube(dim - 1),
@@ -3182,7 +3183,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                     system_matrix(i, j) +=
                       boundary_weights(q_point, j) *
                       lobatto_polynomials_grad[i + 1].value(
-                        this->generalized_face_support_points[q_point](0));
+                        this->generalized_face_support_points[0][q_point](0));
 
               FullMatrix<double> system_matrix_inv(this->degree - 1,
                                                    this->degree - 1);
@@ -3461,7 +3462,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                     system_matrix(i, j) +=
                       boundary_weights(q_point, j) *
                       lobatto_polynomials_grad[i + 1].value(
-                        this->generalized_face_support_points[q_point](1));
+                        this->generalized_face_support_points[0][q_point](1));
 
               FullMatrix<double> system_matrix_inv(this->degree - 1,
                                                    this->degree - 1);
@@ -3540,10 +3541,10 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                                            2 * (k * (this->degree - 1) + l)) *
                           legendre_polynomials[i].value(
                             this->generalized_face_support_points
-                              [q_point + 4 * n_edge_points](0)) *
+                              [0][q_point + 4 * n_edge_points](0)) *
                           lobatto_polynomials[j + 2].value(
                             this->generalized_face_support_points
-                              [q_point + 4 * n_edge_points](1));
+                              [0][q_point + 4 * n_edge_points](1));
 
               system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
               system_matrix_inv.invert(system_matrix);

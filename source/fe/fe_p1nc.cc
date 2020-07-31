@@ -28,9 +28,9 @@ FE_P1NC::FE_P1NC()
       std::vector<ComponentMask>(4, ComponentMask(1, true)))
 {
   // face support points: 2 end vertices
-  unit_face_support_points.resize(2);
-  unit_face_support_points[0][0] = 0.0;
-  unit_face_support_points[1][0] = 1.0;
+  unit_face_support_points[0].resize(2);
+  unit_face_support_points[0][0][0] = 0.0;
+  unit_face_support_points[0][1][0] = 1.0;
 
   // initialize constraints matrix
   initialize_constraints();

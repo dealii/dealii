@@ -160,7 +160,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 
   this->generalized_support_points.resize(
     GeometryInfo<dim>::faces_per_cell * n_face_points + n_interior_points);
-  this->generalized_face_support_points.resize(n_face_points);
+  this->generalized_face_support_points[0].resize(n_face_points);
 
   // Number of the point being entered
   unsigned int current = 0;
@@ -178,7 +178,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 
       for (unsigned int k = 0; k < n_face_points; ++k)
         {
-          this->generalized_face_support_points[k] = face_points.point(k);
+          this->generalized_face_support_points[0][k] = face_points.point(k);
           // Compute its quadrature
           // contribution for each
           // moment.

@@ -440,7 +440,7 @@ FE_Enriched<dim, spacedim>::initialize(
     // If the system is not primitive, these have not been initialized by
     // FiniteElement
     this->system_to_component_table.resize(this->n_dofs_per_cell());
-    this->face_system_to_component_table.resize(this->n_dofs_per_face());
+    this->face_system_to_component_table[0].resize(this->n_dofs_per_face());
 
     FETools::Compositing::build_cell_tables(this->system_to_base_table,
                                             this->system_to_component_table,
@@ -449,8 +449,8 @@ FE_Enriched<dim, spacedim>::initialize(
                                             false);
 
     FETools::Compositing::build_face_tables(
-      this->face_system_to_base_table,
-      this->face_system_to_component_table,
+      this->face_system_to_base_table[0],
+      this->face_system_to_component_table[0],
       *this,
       false);
   }
@@ -468,8 +468,8 @@ FE_Enriched<dim, spacedim>::initialize(
   // this FE sits on the boundary or not. Thus for moment just copy support
   // points from fe system:
   {
-    this->unit_support_points      = fe_system->unit_support_points;
-    this->unit_face_support_points = fe_system->unit_face_support_points;
+    this->unit_support_points         = fe_system->unit_support_points;
+    this->unit_face_support_points[0] = fe_system->unit_face_support_points[0];
   }
 
   // take adjust_quad_dof_index_for_face_orientation_table from FESystem:

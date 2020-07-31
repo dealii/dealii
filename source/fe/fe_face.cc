@@ -61,12 +61,12 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
 {
   // initialize unit face support points
   const unsigned int codim = dim - 1;
-  this->unit_face_support_points.resize(
+  this->unit_face_support_points[0].resize(
     Utilities::fixed_power<codim>(this->degree + 1));
 
   if (this->degree == 0)
     for (unsigned int d = 0; d < codim; ++d)
-      this->unit_face_support_points[0][d] = 0.5;
+      this->unit_face_support_points[0][0][d] = 0.5;
   else
     {
       std::vector<Point<1>> points =
@@ -85,16 +85,16 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
               if (codim > 2)
                 p(2) = points[iz][0];
 
-              this->unit_face_support_points[k++] = p;
+              this->unit_face_support_points[0][k++] = p;
             }
-      AssertDimension(k, this->unit_face_support_points.size());
+      AssertDimension(k, this->unit_face_support_points[0].size());
     }
 
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_FaceQ)
   this->unit_support_points.resize(GeometryInfo<dim>::faces_per_cell *
-                                   this->unit_face_support_points.size());
-  const unsigned int n_face_dofs = this->unit_face_support_points.size();
+                                   this->unit_face_support_points[0].size());
+  const unsigned int n_face_dofs = this->unit_face_support_points[0].size();
   for (unsigned int i = 0; i < n_face_dofs; ++i)
     for (unsigned int d = 0; d < dim; ++d)
       {
@@ -106,9 +106,9 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
               if (dim == 3 && d == 1)
                 renumber = i / (degree + 1) + (degree + 1) * (i % (degree + 1));
               this->unit_support_points[n_face_dofs * 2 * d + i][e] =
-                this->unit_face_support_points[renumber][c];
+                this->unit_face_support_points[0][renumber][c];
               this->unit_support_points[n_face_dofs * (2 * d + 1) + i][e] =
-                this->unit_face_support_points[renumber][c];
+                this->unit_face_support_points[0][renumber][c];
               this->unit_support_points[n_face_dofs * (2 * d + 1) + i][d] = 1;
               ++c;
             }
@@ -514,7 +514,7 @@ FE_FaceQ<1, spacedim>::FE_FaceQ(const unsigned int degree)
       std::vector<bool>(1, true),
       std::vector<ComponentMask>(1, ComponentMask(1, true)))
 {
-  this->unit_face_support_points.resize(1);
+  this->unit_face_support_points[0].resize(1);
 
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_FaceQ)

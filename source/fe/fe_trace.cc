@@ -53,7 +53,7 @@ FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree)
     FETools::hierarchic_to_lexicographic_numbering<dim - 1>(degree));
 
   // Initialize face support points
-  this->unit_face_support_points = fe_q.get_unit_face_support_points();
+  this->unit_face_support_points[0] = fe_q.get_unit_face_support_points();
 
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_TraceQ). Note that we simply take the points of fe_q but

@@ -132,7 +132,7 @@ void
 FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
 {
   this->generalized_support_points.resize(this->n_dofs_per_cell());
-  this->generalized_face_support_points.resize(this->n_dofs_per_face());
+  this->generalized_face_support_points[0].resize(this->n_dofs_per_face());
 
   // Index of the point being entered
   unsigned int current = 0;
@@ -145,7 +145,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       QGaussLobatto<dim - 1> face_points(deg + 1);
       Assert(face_points.size() == this->n_dofs_per_face(), ExcInternalError());
       for (unsigned int k = 0; k < this->n_dofs_per_face(); ++k)
-        this->generalized_face_support_points[k] = face_points.point(k);
+        this->generalized_face_support_points[0][k] = face_points.point(k);
       Quadrature<dim> faces =
         QProjector<dim>::project_to_all_faces(this->reference_cell_type(),
                                               face_points);
