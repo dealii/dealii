@@ -40,17 +40,17 @@ jobs:
     - uses: actions/checkout@v2
     - name: modules
       run: |
-        sudo apt-get install libopenmpi-dev numdiff
-    - name: setup
-      run: |
-        ./contrib/utilities/download_clang_format
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
+        sudo apt-get update
+        sudo apt-get install -yq --no-install-recommends numdiff  libp4est-dev trilinos-all-dev petsc-dev
     - name: info
       run: |
         mpicc -v
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D CMAKE_CXX_COMPILER="mpic++"  -D DEAL_II_WITH_MPI="ON" -D DEAL_II_WITH_SIMPLEX_SUPPORT="ON" -D DEAL_II_COMPONENT_EXAMPLES="OFF" .
+        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_WITH_MPI="ON" -D DEAL_II_WITH_SIMPLEX_SUPPORT="ON" -D DEAL_II_WITH_TRILINOS="ON" -D DEAL_II_WITH_PETSC="ON" -D DEAL_II_COMPONENT_EXAMPLES="OFF" .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
@@ -61,5 +61,5 @@ jobs:
         make -j 2
     - name: test
       run: |
-        make -j 2 setup_tests
-        ctest -j 2 -R simplex/
+        make -j 2 setup_tests_simplex
+        ctest -j 2 
