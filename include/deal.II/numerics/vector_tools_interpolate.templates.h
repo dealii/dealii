@@ -215,11 +215,11 @@ namespace VectorTools
     // A given cell is skipped if function(cell) == nullptr
     template <int dim, int spacedim, typename VectorType, typename T>
     void
-    interpolate(const Mapping<dim, spacedim> &   mapping,
-                const DoFHandler<dim, spacedim> &dof_handler,
-                T &                              function,
-                VectorType &                     vec,
-                const ComponentMask &            component_mask)
+    interpolate(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                const DoFHandler<dim, spacedim> &           dof_handler,
+                T &                                         function,
+                VectorType &                                vec,
+                const ComponentMask &                       component_mask)
     {
       Assert(component_mask.represents_n_components(
                dof_handler.get_fe_collection().n_components()),
@@ -307,8 +307,6 @@ namespace VectorTools
           const auto &points = fe[fe_index].get_generalized_support_points();
           support_quadrature.push_back(Quadrature<dim>(points));
         }
-
-      const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
       // An FEValues object to evaluate (generalized) support point
       // locations as well as Jacobians and their inverses.
@@ -481,7 +479,7 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   void
   interpolate(
-    const Mapping<dim, spacedim> &                             mapping,
+    const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
@@ -503,6 +501,24 @@ namespace VectorTools
 
     internal::interpolate(
       mapping, dof_handler, function_map, vec, component_mask);
+  }
+
+
+
+  template <int dim, int spacedim, typename VectorType>
+  void
+  interpolate(
+    const Mapping<dim, spacedim> &                             mapping,
+    const DoFHandler<dim, spacedim> &                          dof_handler,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const ComponentMask &                                      component_mask)
+  {
+    interpolate(hp::MappingCollection<dim, spacedim>(mapping),
+                dof_handler,
+                function,
+                vec,
+                component_mask);
   }
 
 
@@ -801,8 +817,11 @@ namespace VectorTools
         return nullptr;
     };
 
-    internal::interpolate(
-      mapping, dof_handler, function_map, vec, component_mask);
+    internal::interpolate(hp::MappingCollection<dim, spacedim>(mapping),
+                          dof_handler,
+                          function_map,
+                          vec,
+                          component_mask);
   }
 
   namespace internal

@@ -24,6 +24,15 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
 
       template void
       interpolate(
+        const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
+          &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const ComponentMask &);
+
+      template void
+      interpolate(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,

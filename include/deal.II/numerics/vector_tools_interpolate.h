@@ -37,6 +37,12 @@ class InterGridMap;
 template <int dim, int spacedim>
 class Mapping;
 
+namespace hp
+{
+  template <int dim, int spacedim>
+  class MappingCollection;
+}
+
 namespace VectorTools
 {
   /**
@@ -56,9 +62,6 @@ namespace VectorTools
    * continuous again.
    *
    * See the general documentation of this namespace for further information.
-   *
-   * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -68,6 +71,19 @@ namespace VectorTools
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
     const ComponentMask &component_mask = ComponentMask());
+
+  /**
+   * Same as above but in an hp context.
+   */
+  template <int dim, int spacedim, typename VectorType>
+  void
+  interpolate(
+    const hp::MappingCollection<dim, spacedim> &               mapping,
+    const DoFHandler<dim, spacedim> &                          dof,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const ComponentMask &component_mask = ComponentMask());
+
 
   /**
    * Call the @p interpolate() function above with
