@@ -287,5 +287,5 @@ make sense:
   \int_e \jump{\frac{\partial v_h}{\partial \mathbf n}} h \ ds.
   @f}
   The implementation of this boundary case is similar to the "clamped" version
-  except for `boundary_worker` is no longer needed for system assembling
+  except that `boundary_worker` is no longer needed for system assembling
   and the right hand side is changed according to the formulation.
