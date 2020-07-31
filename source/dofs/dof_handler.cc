@@ -357,6 +357,8 @@ namespace internal
       template <int spacedim>
       static void reserve_space(DoFHandler<3, spacedim> &dof_handler)
       {
+        const unsigned int dim = 3;
+
         dof_handler.object_dof_indices[0][0].resize(
           dof_handler.tria->n_vertices() *
             dof_handler.get_fe().n_dofs_per_vertex(),
@@ -410,17 +412,53 @@ namespace internal
               numbers::invalid_dof_index);
 
             // faces
-            dof_handler.object_dof_ptr[0][2].reserve(
-              dof_handler.tria->n_raw_quads() + 1);
-            for (unsigned int i = 0; i < dof_handler.tria->n_raw_quads() + 1;
-                 i++)
-              dof_handler.object_dof_ptr[0][2].push_back(
-                i * dof_handler.get_fe().n_dofs_per_quad());
+            {
+              dof_handler.object_dof_ptr[0][2].assign(
+                dof_handler.tria->n_raw_quads() + 1, -1);
+              // determine for each face the number of dofs
+              for (const auto &cell : dof_handler.tria->cell_iterators())
+                for (const auto face_index : cell->face_indices())
+                  {
+                    const auto &face = cell->face(face_index);
+                    const auto  n_dofs_per_quad =
+                      dof_handler.get_fe().n_dofs_per_quad(/*face_index*/);
 
-            dof_handler.object_dof_indices[0][2].resize(
-              dof_handler.tria->n_raw_quads() *
-                dof_handler.get_fe().n_dofs_per_quad(),
-              numbers::invalid_dof_index);
+                    auto &n_dofs_per_quad_target =
+                      dof_handler.object_dof_ptr[0][2][face->index() + 1];
+
+                    // make sure that either the face has not been visited or
+                    // the face has the same number of dofs assigned
+                    Assert(
+                      (n_dofs_per_quad_target ==
+                         static_cast<
+                           typename DoFHandler<dim, spacedim>::offset_type>(
+                           -1) ||
+                       n_dofs_per_quad_target == n_dofs_per_quad),
+                      ExcNotImplemented());
+
+                    n_dofs_per_quad_target = n_dofs_per_quad;
+                  }
+
+              // convert the absolute numbers to CRS
+              dof_handler.object_dof_ptr[0][2][0] = 0;
+              for (unsigned int i = 1; i < dof_handler.tria->n_raw_quads() + 1;
+                   i++)
+                {
+                  if (dof_handler.object_dof_ptr[0][2][i] ==
+                      static_cast<
+                        typename DoFHandler<dim, spacedim>::offset_type>(-1))
+                    dof_handler.object_dof_ptr[0][2][i] =
+                      dof_handler.object_dof_ptr[0][2][i - 1];
+                  else
+                    dof_handler.object_dof_ptr[0][2][i] +=
+                      dof_handler.object_dof_ptr[0][2][i - 1];
+                }
+
+              // allocate memory for indices
+              dof_handler.object_dof_indices[0][2].resize(
+                dof_handler.object_dof_ptr[0][2].back(),
+                numbers::invalid_dof_index);
+            }
           }
       }
 
