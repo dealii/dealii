@@ -27,223 +27,57 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Simplex
+#ifdef DEAL_II_WITH_SIMPLEX_SUPPORT
+
+namespace GridGenerator
 {
   /**
-   * This namespace provides a collection of functions to generate simplex
-   * triangulations for some basic geometries.
+   * Create a coordinate-parallel brick from the two diagonally opposite
+   * corner points @p p1 and @p p2. The number of vertices in coordinate
+   * direction @p i is given by <tt>repetitions[i]+1</tt>.
    *
-   *  @ingroup simplex
+   * @note This function connects internally 4/8 vertices to
+   *   quadrilateral/hexahedral cells and subdivides these into 2/5
+   * triangular/tetrahedral cells.
+   *
+   * @note Currently, this function only works for `dim==spacedim`.
+   *
+   * @ingroup simplex
    */
-  namespace GridGenerator
-  {
-    /**
-     * Create a coordinate-parallel brick from the two diagonally opposite
-     * corner points @p p1 and @p p2. The number of vertices in coordinate
-     * direction @p i is given by <tt>repetitions[i]+1</tt>.
-     *
-     * @note This function connects internally 4/8 vertices to quadrilateral/
-     *   hexahedral cells and subdivides these into 2/5 triangular/
-     *   tetrahedral cells.
-     *
-     * @note Currently, this function only works for `dim==spacedim`.
-     */
-    template <int dim, int spacedim>
-    void
-    subdivided_hyper_rectangle(Triangulation<dim, spacedim> &   tria,
-                               const std::vector<unsigned int> &repetitions,
-                               const Point<dim> &               p1,
-                               const Point<dim> &               p2,
-                               const bool colorize = false)
-    {
-      AssertDimension(dim, spacedim);
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_rectangle_with_simplices(
+    Triangulation<dim, spacedim> &   tria,
+    const std::vector<unsigned int> &repetitions,
+    const Point<dim> &               p1,
+    const Point<dim> &               p2,
+    const bool                       colorize = false);
 
-      AssertThrow(colorize == false, ExcNotImplemented());
+  /**
+   * Initialize the given triangulation with a hypercube (square in 2D and
+   * cube in 3D) consisting of @p repetitions cells in each direction.
+   * The hypercube volume is the tensor product interval
+   * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
+   * the limits are given as arguments. They default to zero and unity, then
+   * producing the unit hypercube.
+   *
+   * @note This function connects internally 4/8 vertices to
+   * quadrilateral/hexahedral cells and subdivides these into 2/5
+   * triangular/tetrahedral cells.
+   *
+   * @ingroup simplex
+   */
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_cube_with_simplices(Triangulation<dim, spacedim> &tria,
+                                       const unsigned int repetitions,
+                                       const double       p1       = 0.0,
+                                       const double       p2       = 1.0,
+                                       const bool         colorize = false);
 
-      std::vector<Point<spacedim>> vertices;
-      std::vector<CellData<dim>>   cells;
+} // namespace GridGenerator
 
-      if (dim == 2)
-        {
-          // determine cell sizes
-          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
-                              (p2[1] - p1[1]) / repetitions[1]);
-
-          // create vertices
-          for (unsigned int j = 0; j <= repetitions[1]; ++j)
-            for (unsigned int i = 0; i <= repetitions[0]; ++i)
-              vertices.push_back(
-                Point<spacedim>(p1[0] + dx[0] * i, p1[1] + dx[1] * j));
-
-          // create cells
-          for (unsigned int j = 0; j < repetitions[1]; ++j)
-            for (unsigned int i = 0; i < repetitions[0]; ++i)
-              {
-                // create reference QUAD cell
-                std::array<unsigned int, 4> quad{
-                  (j + 0) * (repetitions[0] + 1) + i + 0, //
-                  (j + 0) * (repetitions[0] + 1) + i + 1, //
-                  (j + 1) * (repetitions[0] + 1) + i + 0, //
-                  (j + 1) * (repetitions[0] + 1) + i + 1  //
-                };                                        //
-
-                // TRI cell 0
-                {
-                  CellData<dim> tri;
-                  tri.vertices = {quad[0], quad[1], quad[2]};
-                  cells.push_back(tri);
-                }
-
-                // TRI cell 1
-                {
-                  CellData<dim> tri;
-                  tri.vertices = {quad[3], quad[2], quad[1]};
-                  cells.push_back(tri);
-                }
-              }
-        }
-      else if (dim == 3)
-        {
-          // determine cell sizes
-          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
-                              (p2[1] - p1[1]) / repetitions[1],
-                              (p2[2] - p1[2]) / repetitions[2]);
-
-          // create vertices
-          for (unsigned int k = 0; k <= repetitions[2]; ++k)
-            for (unsigned int j = 0; j <= repetitions[1]; ++j)
-              for (unsigned int i = 0; i <= repetitions[0]; ++i)
-                vertices.push_back(Point<spacedim>(p1[0] + dx[0] * i,
-                                                   p1[1] + dx[1] * j,
-                                                   p1[2] + dx[2] * k));
-
-          // create cells
-          for (unsigned int k = 0; k < repetitions[2]; ++k)
-            for (unsigned int j = 0; j < repetitions[1]; ++j)
-              for (unsigned int i = 0; i < repetitions[0]; ++i)
-                {
-                  // create reference HEX cell
-                  std::array<unsigned int, 8> quad{
-                    (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 0) * (repetitions[0] + 1) + i + 0,
-                    (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 0) * (repetitions[0] + 1) + i + 1,
-                    (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 1) * (repetitions[0] + 1) + i + 0,
-                    (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 1) * (repetitions[0] + 1) + i + 1,
-                    (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 0) * (repetitions[0] + 1) + i + 0,
-                    (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 0) * (repetitions[0] + 1) + i + 1,
-                    (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 1) * (repetitions[0] + 1) + i + 0,
-                    (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                      (j + 1) * (repetitions[0] + 1) + i + 1};
-
-                  // TET cell 0
-                  {
-                    CellData<dim> cell;
-                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                      cell.vertices = {quad[0], quad[1], quad[2], quad[4]};
-                    else
-                      cell.vertices = {quad[0], quad[1], quad[3], quad[5]};
-
-                    cells.push_back(cell);
-                  }
-
-                  // TET cell 1
-                  {
-                    CellData<dim> cell;
-                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                      cell.vertices = {quad[2], quad[1], quad[3], quad[7]};
-                    else
-                      cell.vertices = {quad[0], quad[3], quad[2], quad[6]};
-                    cells.push_back(cell);
-                  }
-
-                  // TET cell 2
-                  {
-                    CellData<dim> cell;
-                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                      cell.vertices = {quad[1], quad[4], quad[5], quad[7]};
-                    else
-                      cell.vertices = {quad[0], quad[4], quad[5], quad[6]};
-                    cells.push_back(cell);
-                  }
-
-                  // TET cell 3
-                  {
-                    CellData<dim> cell;
-                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                      cell.vertices = {quad[2], quad[4], quad[7], quad[6]};
-                    else
-                      cell.vertices = {quad[3], quad[5], quad[7], quad[6]};
-                    cells.push_back(cell);
-                  }
-
-                  // TET cell 4
-                  {
-                    CellData<dim> cell;
-                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                      cell.vertices = {quad[1], quad[2], quad[4], quad[7]};
-                    else
-                      cell.vertices = {quad[0], quad[3], quad[6], quad[5]};
-                    cells.push_back(cell);
-                  }
-                }
-        }
-      else
-        {
-          AssertThrow(colorize == false, ExcNotImplemented());
-        }
-
-      // actually create triangulation
-      tria.create_triangulation(vertices, cells, SubCellData());
-    }
-
-    /**
-     * Initialize the given triangulation with a hypercube (square in 2D and
-     * cube in 3D) consisting of @p repetitions cells in each direction.
-     * The hypercube volume is the tensor product interval
-     * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
-     * the limits are given as arguments. They default to zero and unity, then
-     * producing the unit hypercube.
-     *
-     * @note This function connects internally 4/8 vertices to quadrilateral/
-     *   hexahedral cells and subdivides these into 2/5 triangular/
-     *   tetrahedral cells.
-     */
-    template <int dim, int spacedim>
-    void
-    subdivided_hyper_cube(Triangulation<dim, spacedim> &tria,
-                          const unsigned int            repetitions,
-                          const double                  p1       = 0.0,
-                          const double                  p2       = 1.0,
-                          const bool                    colorize = false)
-    {
-      if (dim == 2)
-        {
-          subdivided_hyper_rectangle(
-            tria, {repetitions, repetitions}, {p1, p1}, {p2, p2}, colorize);
-        }
-      else if (dim == 3)
-        {
-          subdivided_hyper_rectangle(tria,
-                                     {repetitions, repetitions, repetitions},
-                                     {p1, p1, p1},
-                                     {p2, p2, p2},
-                                     colorize);
-        }
-      else
-        {
-          AssertThrow(false, ExcNotImplemented())
-        }
-    }
-  } // namespace GridGenerator
-} // namespace Simplex
-
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
