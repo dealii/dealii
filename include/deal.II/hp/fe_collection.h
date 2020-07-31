@@ -884,8 +884,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->n_dofs_per_vertex() > max)
-        max = finite_elements[i]->n_dofs_per_vertex();
+      max = std::max(max, finite_elements[i]->n_dofs_per_vertex());
 
     return max;
   }
@@ -900,8 +899,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->n_dofs_per_line() > max)
-        max = finite_elements[i]->n_dofs_per_line();
+      max = std::max(max, finite_elements[i]->n_dofs_per_line());
 
     return max;
   }
@@ -916,8 +914,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->n_dofs_per_quad() > max)
-        max = finite_elements[i]->n_dofs_per_quad();
+      max = std::max(max, finite_elements[i]->max_dofs_per_quad());
 
     return max;
   }
@@ -932,8 +929,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->n_dofs_per_hex() > max)
-        max = finite_elements[i]->n_dofs_per_hex();
+      max = std::max(max, finite_elements[i]->n_dofs_per_hex());
 
     return max;
   }
@@ -948,8 +944,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->n_dofs_per_face() > max)
-        max = finite_elements[i]->n_dofs_per_face();
+      max = std::max(max, finite_elements[i]->max_dofs_per_face());
 
     return max;
   }
@@ -964,8 +959,7 @@ namespace hp
 
     unsigned int max = 0;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      if (finite_elements[i]->n_dofs_per_cell() > max)
-        max = finite_elements[i]->n_dofs_per_cell();
+      max = std::max(max, finite_elements[i]->n_dofs_per_cell());
 
     return max;
   }

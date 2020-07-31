@@ -2619,7 +2619,7 @@ namespace internal
           const bool               check_validity)
         {
           if (dof_handler.get_fe().n_dofs_per_line() > 0 ||
-              dof_handler.get_fe().n_dofs_per_quad() > 0)
+              dof_handler.get_fe().max_dofs_per_quad() > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
