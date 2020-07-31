@@ -397,7 +397,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the
@@ -412,9 +413,11 @@ public:
    * will get propagated out from this element.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                   const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &source,
+    const unsigned int                  subface,
+    FullMatrix<double> &                matrix,
+    const unsigned int                  face_no = 0) const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -448,8 +451,8 @@ public:
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()

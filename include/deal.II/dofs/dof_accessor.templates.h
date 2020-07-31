@@ -968,6 +968,7 @@ namespace internal
               [&](const auto d) {
                 return fe.adjust_quad_dof_index_for_face_orientation(
                   d,
+                  quad,
                   accessor.face_orientation(quad),
                   accessor.face_flip(quad),
                   accessor.face_rotation(quad));

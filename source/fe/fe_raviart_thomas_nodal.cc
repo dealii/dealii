@@ -462,7 +462,8 @@ FE_RaviartThomasNodal<dim>::hp_line_dof_identities(
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_RaviartThomasNodal<dim>::hp_quad_dof_identities(
-  const FiniteElement<dim> &fe_other) const
+  const FiniteElement<dim> &fe_other,
+  const unsigned int) const
 {
   // we can presently only compute
   // these identities if both FEs are
@@ -549,7 +550,8 @@ template <>
 void
 FE_RaviartThomasNodal<1>::get_face_interpolation_matrix(
   const FiniteElement<1, 1> & /*x_source_fe*/,
-  FullMatrix<double> & /*interpolation_matrix*/) const
+  FullMatrix<double> & /*interpolation_matrix*/,
+  const unsigned int) const
 {
   Assert(false, ExcImpossibleInDim(1));
 }
@@ -560,7 +562,8 @@ void
 FE_RaviartThomasNodal<1>::get_subface_interpolation_matrix(
   const FiniteElement<1, 1> & /*x_source_fe*/,
   const unsigned int /*subface*/,
-  FullMatrix<double> & /*interpolation_matrix*/) const
+  FullMatrix<double> & /*interpolation_matrix*/,
+  const unsigned int) const
 {
   Assert(false, ExcImpossibleInDim(1));
 }
@@ -571,7 +574,8 @@ template <int dim>
 void
 FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the
   // source FE is also a
@@ -678,7 +682,8 @@ void
 FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
   const unsigned int        subface,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the
   // source FE is also a

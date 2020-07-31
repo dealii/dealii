@@ -1879,7 +1879,8 @@ template <int dim, int spacedim>
 void
 FESystem<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
          ExcDimensionMismatch(interpolation_matrix.n(),
@@ -1925,7 +1926,8 @@ FESystem<dim, spacedim>::get_face_interpolation_matrix(
           base_to_base_interpolation.reinit(base_other.n_dofs_per_face(),
                                             base.n_dofs_per_face());
           base.get_face_interpolation_matrix(base_other,
-                                             base_to_base_interpolation);
+                                             base_to_base_interpolation,
+                                             face_no);
 
           // now translate entries. we'd like to have something like
           // face_base_to_system_index, but that doesn't exist. rather, all we
@@ -1991,7 +1993,8 @@ void
 FESystem<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   AssertThrow(
     (x_source_fe.get_name().find("FESystem<") == 0) ||
@@ -2044,7 +2047,8 @@ FESystem<dim, spacedim>::get_subface_interpolation_matrix(
                                             base.n_dofs_per_face());
           base.get_subface_interpolation_matrix(base_other,
                                                 subface,
-                                                base_to_base_interpolation);
+                                                base_to_base_interpolation,
+                                                face_no);
 
           // now translate entries. we'd like to have something like
           // face_base_to_system_index, but that doesn't exist. rather, all we
@@ -2237,7 +2241,8 @@ FESystem<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FESystem<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int) const
 {
   return hp_object_dof_identities<2>(fe_other);
 }
@@ -2340,7 +2345,9 @@ FESystem<dim, spacedim>::unit_support_point(const unsigned int index) const
 
 template <int dim, int spacedim>
 Point<dim - 1>
-FESystem<dim, spacedim>::unit_face_support_point(const unsigned int index) const
+FESystem<dim, spacedim>::unit_face_support_point(
+  const unsigned int index,
+  const unsigned int face_no) const
 {
   AssertIndexRange(index, this->n_dofs_per_face());
   Assert((this->unit_face_support_points.size() == this->n_dofs_per_face()) ||
@@ -2353,9 +2360,10 @@ FESystem<dim, spacedim>::unit_face_support_point(const unsigned int index) const
   else
     // no. ask the base element whether it would like to provide this
     // information
-    return (base_element(this->face_system_to_base_index(index).first.first)
-              .unit_face_support_point(
-                this->face_system_to_base_index(index).second));
+    return (
+      base_element(this->face_system_to_base_index(index).first.first)
+        .unit_face_support_point(this->face_system_to_base_index(index).second,
+                                 face_no));
 }
 
 

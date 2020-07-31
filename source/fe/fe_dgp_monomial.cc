@@ -280,7 +280,8 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source
   // FE is also a DGPMonomial element. in that case,
@@ -307,7 +308,8 @@ void
 FE_DGPMonomial<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
   const unsigned int,
-  FullMatrix<double> &interpolation_matrix) const
+  FullMatrix<double> &interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source
   // FE is also a DGPMonomial element. in that case,
@@ -376,8 +378,8 @@ FE_DGPMonomial<dim>::hp_line_dof_identities(
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_DGPMonomial<dim>::hp_quad_dof_identities(
-  const FiniteElement<dim> &fe_other) const
+FE_DGPMonomial<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                                            const unsigned int) const
 {
   // there are no such constraints for DGPMonomial
   // elements at all
