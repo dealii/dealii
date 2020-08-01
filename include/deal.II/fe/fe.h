@@ -1285,7 +1285,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const;
 
 
   /**
@@ -1302,7 +1303,8 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const;
+                                   FullMatrix<double> &                matrix,
+                                   const unsigned int face_no = 0) const;
   //@}
 
 
@@ -1341,7 +1343,8 @@ public:
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int                  face_no = 0) const;
 
   /**
    * Return whether this element dominates another one given as argument
@@ -1465,7 +1468,8 @@ public:
    * indices. The function is mainly there for use inside the library.
    */
   std::pair<unsigned int, unsigned int>
-  face_system_to_component_index(const unsigned int index) const;
+  face_system_to_component_index(const unsigned int index,
+                                 const unsigned int face_no = 0) const;
 
   /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
@@ -1477,6 +1481,7 @@ public:
    */
   unsigned int
   adjust_quad_dof_index_for_face_orientation(const unsigned int index,
+                                             const unsigned int face_no,
                                              const bool face_orientation,
                                              const bool face_flip,
                                              const bool face_rotation) const;
@@ -1760,7 +1765,8 @@ public:
    * indices. The function is mainly there for use inside the library.
    */
   std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-  face_system_to_base_index(const unsigned int index) const;
+  face_system_to_base_index(const unsigned int index,
+                            const unsigned int face_no = 0) const;
 
   /**
    * Given a base element number, return the first block of a BlockVector it
@@ -2082,7 +2088,7 @@ public:
    * See the class documentation for details on support points.
    */
   const std::vector<Point<dim - 1>> &
-  get_unit_face_support_points() const;
+  get_unit_face_support_points(const unsigned int face_no = 0) const;
 
   /**
    * Return whether a finite element has defined support points on faces. If
@@ -2093,14 +2099,15 @@ public:
    * function.
    */
   bool
-  has_face_support_points() const;
+  has_face_support_points(const unsigned int face_no = 0) const;
 
   /**
    * The function corresponding to the unit_support_point() function, but for
    * faces. See there for more information.
    */
   virtual Point<dim - 1>
-  unit_face_support_point(const unsigned int index) const;
+  unit_face_support_point(const unsigned int index,
+                          const unsigned int face_no = 0) const;
 
   /**
    * Return a vector of generalized support points.
@@ -3120,7 +3127,8 @@ FiniteElement<dim, spacedim>::component_to_system_index(
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_component_index(
-  const unsigned int index) const
+  const unsigned int index,
+  const unsigned int) const
 {
   AssertIndexRange(index, face_system_to_component_table.size());
 
@@ -3160,7 +3168,8 @@ FiniteElement<dim, spacedim>::system_to_base_index(
 template <int dim, int spacedim>
 inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_base_index(
-  const unsigned int index) const
+  const unsigned int index,
+  const unsigned int) const
 {
   AssertIndexRange(index, face_system_to_base_table.size());
   return face_system_to_base_table[index];

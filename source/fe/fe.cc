@@ -631,10 +631,13 @@ template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   const unsigned int index,
+  const unsigned int face_no,
   const bool         face_orientation,
   const bool         face_flip,
   const bool         face_rotation) const
 {
+  (void)face_no;
+
   // general template for 1D and 2D: not
   // implemented. in fact, the function
   // shouldn't even be called unless we are
@@ -891,7 +894,8 @@ template <int dim, int spacedim>
 void
 FiniteElement<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &,
-  FullMatrix<double> &) const
+  FullMatrix<double> &,
+  const unsigned int) const
 {
   // by default, no interpolation
   // implemented. so throw exception,
@@ -908,7 +912,8 @@ void
 FiniteElement<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &,
   const unsigned int,
-  FullMatrix<double> &) const
+  FullMatrix<double> &,
+  const unsigned int) const
 {
   // by default, no interpolation
   // implemented. so throw exception,
@@ -945,7 +950,8 @@ FiniteElement<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FiniteElement<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &) const
+  const FiniteElement<dim, spacedim> &,
+  const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
   return std::vector<std::pair<unsigned int, unsigned int>>();
@@ -1051,7 +1057,8 @@ FiniteElement<dim, spacedim>::unit_support_point(const unsigned int index) const
 
 template <int dim, int spacedim>
 const std::vector<Point<dim - 1>> &
-FiniteElement<dim, spacedim>::get_unit_face_support_points() const
+FiniteElement<dim, spacedim>::get_unit_face_support_points(
+  const unsigned int) const
 {
   // a finite element may define
   // support points, but only if
@@ -1067,7 +1074,7 @@ FiniteElement<dim, spacedim>::get_unit_face_support_points() const
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::has_face_support_points() const
+FiniteElement<dim, spacedim>::has_face_support_points(const unsigned int) const
 {
   return (unit_face_support_points.size() != 0);
 }
@@ -1076,8 +1083,8 @@ FiniteElement<dim, spacedim>::has_face_support_points() const
 
 template <int dim, int spacedim>
 Point<dim - 1>
-FiniteElement<dim, spacedim>::unit_face_support_point(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::unit_face_support_point(const unsigned int index,
+                                                      const unsigned int) const
 {
   AssertIndexRange(index, this->n_dofs_per_face());
   Assert(unit_face_support_points.size() == this->n_dofs_per_face(),

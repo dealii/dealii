@@ -290,12 +290,15 @@ public:
 
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix,
+                                const unsigned int face_no = 0) const override;
 
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
-                                   const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim> &source,
+    const unsigned int        subface,
+    FullMatrix<double> &      matrix,
+    const unsigned int        face_no = 0) const override;
   virtual bool
   hp_constraints_are_implemented() const override;
 
@@ -306,7 +309,8 @@ public:
   hp_line_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                         const unsigned int        face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()

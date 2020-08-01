@@ -624,7 +624,8 @@ public:
    * Same as above but for faces.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                         const unsigned int        face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()
@@ -648,7 +649,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -662,9 +664,11 @@ public:
    * <tt>ExcInterpolationNotImplemented</tt>.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
-                                   const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim> &source,
+    const unsigned int        subface,
+    FullMatrix<double> &      matrix,
+    const unsigned int        face_no = 0) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this

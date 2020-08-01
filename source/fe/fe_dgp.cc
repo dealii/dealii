@@ -106,7 +106,8 @@ template <int dim, int spacedim>
 void
 FE_DGP<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source FE is also a DGP element. in that
   // case, both elements have no dofs on their faces and the face
@@ -132,7 +133,8 @@ void
 FE_DGP<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int,
-  FullMatrix<double> &interpolation_matrix) const
+  FullMatrix<double> &interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the source FE is also a DGP element. in that
   // case, both elements have no dofs on their faces and the face
@@ -199,7 +201,8 @@ FE_DGP<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_DGP<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int) const
 {
   // there are no such constraints for DGP elements at all
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)

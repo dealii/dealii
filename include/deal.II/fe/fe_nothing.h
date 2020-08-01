@@ -206,8 +206,8 @@ public:
     const FiniteElement<dim, spacedim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   virtual bool
   hp_constraints_are_implemented() const override;
@@ -232,9 +232,9 @@ public:
    */
 
   virtual void
-  get_face_interpolation_matrix(
-    const FiniteElement<dim, spacedim> &source_fe,
-    FullMatrix<double> &                interpolation_matrix) const override;
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source_fe,
+                                FullMatrix<double> &interpolation_matrix,
+                                const unsigned int  face_no = 0) const override;
 
 
   /**
@@ -250,7 +250,8 @@ public:
   get_subface_interpolation_matrix(
     const FiniteElement<dim, spacedim> &source_fe,
     const unsigned int                  index,
-    FullMatrix<double> &                interpolation_matrix) const override;
+    FullMatrix<double> &                interpolation_matrix,
+    const unsigned int                  face_no = 0) const override;
 
   /**
    * @return true if the FE dominates any other.

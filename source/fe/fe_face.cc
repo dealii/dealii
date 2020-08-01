@@ -146,11 +146,13 @@ template <int dim, int spacedim>
 void
 FE_FaceQ<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
-                                   interpolation_matrix);
+                                   interpolation_matrix,
+                                   face_no);
 }
 
 
@@ -160,7 +162,8 @@ void
 FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int) const
 {
   // this function is similar to the respective method in FE_Q
 
@@ -361,7 +364,8 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int) const
 {
   Assert(dim >= 3, ExcInternalError());
 
@@ -553,11 +557,13 @@ template <int spacedim>
 void
 FE_FaceQ<1, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<1, spacedim> &source_fe,
-  FullMatrix<double> &              interpolation_matrix) const
+  FullMatrix<double> &              interpolation_matrix,
+  const unsigned int                face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
-                                   interpolation_matrix);
+                                   interpolation_matrix,
+                                   face_no);
 }
 
 
@@ -567,7 +573,8 @@ void
 FE_FaceQ<1, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<1, spacedim> &x_source_fe,
   const unsigned int /*subface*/,
-  FullMatrix<double> &interpolation_matrix) const
+  FullMatrix<double> &interpolation_matrix,
+  const unsigned int) const
 {
   (void)x_source_fe;
   Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
@@ -637,7 +644,8 @@ FE_FaceQ<1, spacedim>::hp_line_dof_identities(
 template <int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_FaceQ<1, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<1, spacedim> &) const
+  const FiniteElement<1, spacedim> &,
+  const unsigned int) const
 {
   // this element is continuous only for the highest dimensional bounding object
   return std::vector<std::pair<unsigned int, unsigned int>>();
@@ -863,11 +871,13 @@ template <int dim, int spacedim>
 void
 FE_FaceP<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
-                                   interpolation_matrix);
+                                   interpolation_matrix,
+                                   face_no);
 }
 
 
@@ -877,7 +887,8 @@ void
 FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int) const
 {
   // this function is similar to the respective method in FE_Q
 

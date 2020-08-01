@@ -2395,8 +2395,8 @@ FE_Nedelec<dim>::hp_line_dof_identities(
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_Nedelec<dim>::hp_quad_dof_identities(
-  const FiniteElement<dim> &fe_other) const
+FE_Nedelec<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                                        const unsigned int) const
 {
   // we can presently only compute
   // these identities if both FEs are
@@ -2451,7 +2451,8 @@ template <int dim>
 void
 FE_Nedelec<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &source,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the
   // source FE is also a
@@ -2528,7 +2529,8 @@ template <>
 void
 FE_Nedelec<1>::get_subface_interpolation_matrix(const FiniteElement<1, 1> &,
                                                 const unsigned int,
-                                                FullMatrix<double> &) const
+                                                FullMatrix<double> &,
+                                                const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -2556,7 +2558,8 @@ void
 FE_Nedelec<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &source,
   const unsigned int        subface,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int) const
 {
   // this is only implemented, if the
   // source FE is also a
