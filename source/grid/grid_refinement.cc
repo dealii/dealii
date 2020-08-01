@@ -16,6 +16,8 @@
 
 #include <deal.II/base/template_constraints.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -71,7 +73,9 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
 
   unsigned int marked = 0;
   for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned() &&
+    if ((dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+           &tria) == nullptr ||
+         cell->is_locally_owned()) &&
         std::fabs(criteria(cell->active_cell_index())) >= new_threshold)
       {
         if (max_to_mark != numbers::invalid_unsigned_int &&
@@ -95,7 +99,9 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned() &&
+    if ((dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+           &tria) == nullptr ||
+         cell->is_locally_owned()) &&
         std::fabs(criteria(cell->active_cell_index())) <= threshold)
       if (!cell->refine_flag_set())
         cell->set_coarsen_flag();
