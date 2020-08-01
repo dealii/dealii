@@ -281,29 +281,26 @@ namespace internal
         AssertIndexRange(obj_level, dof_handler.object_dof_indices.size());
         AssertIndexRange(d, dof_handler.object_dof_indices[obj_level].size());
 
-        unsigned int fe_index_;
         Assert(dof_handler.hp_capability_enabled, ExcInternalError());
 
-        {
-          AssertIndexRange(d, dof_handler.hp_object_fe_ptr.size());
-          AssertIndexRange(obj_index, dof_handler.hp_object_fe_ptr[d].size());
+        AssertIndexRange(d, dof_handler.hp_object_fe_ptr.size());
+        AssertIndexRange(obj_index, dof_handler.hp_object_fe_ptr[d].size());
 
-          const auto ptr =
-            std::find(dof_handler.hp_object_fe_indices[d].begin() +
-                        dof_handler.hp_object_fe_ptr[d][obj_index],
-                      dof_handler.hp_object_fe_indices[d].begin() +
+        const auto ptr =
+          std::find(dof_handler.hp_object_fe_indices[d].begin() +
+                      dof_handler.hp_object_fe_ptr[d][obj_index],
+                    dof_handler.hp_object_fe_indices[d].begin() +
+                      dof_handler.hp_object_fe_ptr[d][obj_index + 1],
+                    fe_index);
+
+        Assert(ptr != dof_handler.hp_object_fe_indices[d].begin() +
                         dof_handler.hp_object_fe_ptr[d][obj_index + 1],
-                      fe_index);
+               ExcNotImplemented());
 
-          Assert(ptr != dof_handler.hp_object_fe_indices[d].begin() +
-                          dof_handler.hp_object_fe_ptr[d][obj_index + 1],
-                 ExcNotImplemented());
-
-          fe_index_ =
-            std::distance(dof_handler.hp_object_fe_indices[d].begin() +
-                            dof_handler.hp_object_fe_ptr[d][obj_index],
-                          ptr);
-        }
+        const unsigned int fe_index_ =
+          std::distance(dof_handler.hp_object_fe_indices[d].begin() +
+                          dof_handler.hp_object_fe_ptr[d][obj_index],
+                        ptr);
 
         AssertIndexRange(dof_handler.hp_capability_enabled ?
                            (dof_handler.hp_object_fe_ptr[d][obj_index] +
