@@ -946,7 +946,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
   if (dim == 1)
     return;
 
-  this->unit_face_support_points.resize(
+  this->unit_face_support_points[0].resize(
     Utilities::fixed_power<dim - 1>(q_degree + 1));
 
   // find renumbering of faces and assign from values of quadrature
@@ -962,9 +962,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
 
   // The only thing we have to do is reorder the points from tensor
   // product order to the order in which we enumerate DoFs on cells
-  this->unit_face_support_points.resize(support_quadrature.size());
+  this->unit_face_support_points[0].resize(support_quadrature.size());
   for (unsigned int k = 0; k < support_quadrature.size(); ++k)
-    this->unit_face_support_points[face_index_map[k]] =
+    this->unit_face_support_points[0][face_index_map[k]] =
       support_quadrature.point(k);
 }
 
@@ -979,8 +979,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::
   if (dim < 3)
     return;
 
-  Assert(this->adjust_quad_dof_index_for_face_orientation_table.n_elements() ==
-           8 * this->n_dofs_per_quad(),
+  Assert(this->adjust_quad_dof_index_for_face_orientation_table[0]
+             .n_elements() == 8 * this->n_dofs_per_quad(),
          ExcInternalError());
 
   const unsigned int n = q_degree - 1;
@@ -1011,27 +1011,27 @@ FE_Q_Base<PolynomialType, dim, spacedim>::
       unsigned int i = local % n, j = local / n;
 
       // face_orientation=false, face_flip=false, face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 0) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 0) =
         j + i * n - local;
       // face_orientation=false, face_flip=false, face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 1) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 1) =
         i + (n - 1 - j) * n - local;
       // face_orientation=false, face_flip=true,  face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 2) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 2) =
         (n - 1 - j) + (n - 1 - i) * n - local;
       // face_orientation=false, face_flip=true,  face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 3) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 3) =
         (n - 1 - i) + j * n - local;
       // face_orientation=true,  face_flip=false, face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 4) = 0;
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 4) = 0;
       // face_orientation=true,  face_flip=false, face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 5) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 5) =
         j + (n - 1 - i) * n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 6) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 6) =
         (n - 1 - i) + (n - 1 - j) * n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table(local, 7) =
+      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 7) =
         (n - 1 - j) + i * n - local;
     }
 

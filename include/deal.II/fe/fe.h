@@ -2443,7 +2443,7 @@ protected:
    * get_unit_face_support_points() function for a discussion of what
    * contributes a face support point.
    */
-  std::vector<Point<dim - 1>> unit_face_support_points;
+  std::vector<std::vector<Point<dim - 1>>> unit_face_support_points;
 
   /**
    * Support points used for interpolation functions of non-Lagrangian
@@ -2455,7 +2455,7 @@ protected:
    * Face support points used for interpolation functions of non-Lagrangian
    * elements.
    */
-  std::vector<Point<dim - 1>> generalized_face_support_points;
+  std::vector<std::vector<Point<dim - 1>>> generalized_face_support_points;
 
   /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
@@ -2472,7 +2472,7 @@ protected:
    * no permutation at all. Derived finite element classes have to
    * fill this Table with the correct values.
    */
-  Table<2, int> adjust_quad_dof_index_for_face_orientation_table;
+  std::vector<Table<2, int>> adjust_quad_dof_index_for_face_orientation_table;
 
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
@@ -2503,7 +2503,7 @@ protected:
    * information thus makes only sense if a shape function is non-zero in only
    * one component.
    */
-  std::vector<std::pair<unsigned int, unsigned int>>
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
     face_system_to_component_table;
 
   /**
@@ -2528,7 +2528,8 @@ protected:
   /**
    * Likewise for the indices on faces.
    */
-  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
+  std::vector<
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>>
     face_system_to_base_table;
 
   /**
@@ -3130,7 +3131,7 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
   const unsigned int index,
   const unsigned int) const
 {
-  AssertIndexRange(index, face_system_to_component_table.size());
+  AssertIndexRange(index, face_system_to_component_table[0].size());
 
   // in debug mode, check whether the
   // function is primitive, since
@@ -3149,7 +3150,7 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            index)));
 
-  return face_system_to_component_table[index];
+  return face_system_to_component_table[0][index];
 }
 
 
@@ -3171,8 +3172,8 @@ FiniteElement<dim, spacedim>::face_system_to_base_index(
   const unsigned int index,
   const unsigned int) const
 {
-  AssertIndexRange(index, face_system_to_base_table.size());
-  return face_system_to_base_table[index];
+  AssertIndexRange(index, face_system_to_base_table[0].size());
+  return face_system_to_base_table[0][index];
 }
 
 

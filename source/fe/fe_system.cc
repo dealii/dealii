@@ -1422,7 +1422,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
         // data type, first value in pair is (base element,instance of base
         // element), second is index within this instance
         const std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-          n_index = this->face_system_to_base_table[n];
+          n_index = this->face_system_to_base_table[0][n];
 
         // likewise for the m index. this is more complicated due to the
         // strange ordering we have for the dofs on the refined faces.
@@ -1460,7 +1460,8 @@ FESystem<dim, spacedim>::build_interface_constraints()
                     // then use face_system_to_base_table
                     const unsigned int tmp1 =
                       2 * this->n_dofs_per_vertex() + index_in_line;
-                    m_index.first = this->face_system_to_base_table[tmp1].first;
+                    m_index.first =
+                      this->face_system_to_base_table[0][tmp1].first;
 
                     // what we are still missing is the index of m within the
                     // base elements interface_constraints table
@@ -1471,12 +1472,12 @@ FESystem<dim, spacedim>::build_interface_constraints()
                     // dof, we can construct the rest: tmp2 will denote the
                     // index of this shape function among the line shape
                     // functions:
-                    Assert(this->face_system_to_base_table[tmp1].second >=
+                    Assert(this->face_system_to_base_table[0][tmp1].second >=
                              2 * base_element(m_index.first.first)
                                    .n_dofs_per_vertex(),
                            ExcInternalError());
                     const unsigned int tmp2 =
-                      this->face_system_to_base_table[tmp1].second -
+                      this->face_system_to_base_table[0][tmp1].second -
                       2 * base_element(m_index.first.first).n_dofs_per_vertex();
                     Assert(tmp2 < base_element(m_index.first.first)
                                     .n_dofs_per_line(),
@@ -1515,14 +1516,15 @@ FESystem<dim, spacedim>::build_interface_constraints()
 
                     const unsigned int tmp1 =
                       4 * this->n_dofs_per_vertex() + index_in_line;
-                    m_index.first = this->face_system_to_base_table[tmp1].first;
+                    m_index.first =
+                      this->face_system_to_base_table[0][tmp1].first;
 
-                    Assert(this->face_system_to_base_table[tmp1].second >=
+                    Assert(this->face_system_to_base_table[0][tmp1].second >=
                              4 * base_element(m_index.first.first)
                                    .n_dofs_per_vertex(),
                            ExcInternalError());
                     const unsigned int tmp2 =
-                      this->face_system_to_base_table[tmp1].second -
+                      this->face_system_to_base_table[0][tmp1].second -
                       4 * base_element(m_index.first.first).n_dofs_per_vertex();
                     Assert(tmp2 < base_element(m_index.first.first)
                                     .n_dofs_per_line(),
@@ -1553,18 +1555,19 @@ FESystem<dim, spacedim>::build_interface_constraints()
                     const unsigned int tmp1 = 4 * this->n_dofs_per_vertex() +
                                               4 * this->n_dofs_per_line() +
                                               index_in_quad;
-                    Assert(tmp1 < this->face_system_to_base_table.size(),
+                    Assert(tmp1 < this->face_system_to_base_table[0].size(),
                            ExcInternalError());
-                    m_index.first = this->face_system_to_base_table[tmp1].first;
+                    m_index.first =
+                      this->face_system_to_base_table[0][tmp1].first;
 
-                    Assert(this->face_system_to_base_table[tmp1].second >=
+                    Assert(this->face_system_to_base_table[0][tmp1].second >=
                              4 * base_element(m_index.first.first)
                                    .n_dofs_per_vertex() +
                                4 * base_element(m_index.first.first)
                                      .n_dofs_per_line(),
                            ExcInternalError());
                     const unsigned int tmp2 =
-                      this->face_system_to_base_table[tmp1].second -
+                      this->face_system_to_base_table[0][tmp1].second -
                       4 *
                         base_element(m_index.first.first).n_dofs_per_vertex() -
                       4 * base_element(m_index.first.first).n_dofs_per_line();
@@ -1644,7 +1647,9 @@ FESystem<dim, spacedim>::initialize(
     // If the system is not primitive, these have not been initialized by
     // FiniteElement
     this->system_to_component_table.resize(this->n_dofs_per_cell());
-    this->face_system_to_component_table.resize(this->n_dofs_per_face());
+
+    this->face_system_to_component_table.resize(1);
+    this->face_system_to_component_table[0].resize(this->n_dofs_per_face());
 
     FETools::Compositing::build_cell_tables(this->system_to_base_table,
                                             this->system_to_component_table,
@@ -1652,8 +1657,8 @@ FESystem<dim, spacedim>::initialize(
                                             *this);
 
     FETools::Compositing::build_face_tables(
-      this->face_system_to_base_table,
-      this->face_system_to_component_table,
+      this->face_system_to_base_table[0],
+      this->face_system_to_component_table[0],
       *this);
   }
 
@@ -1712,28 +1717,28 @@ FESystem<dim, spacedim>::initialize(
         if (!base_element(base_el).has_support_points() &&
             (base_element(base_el).n_dofs_per_face() > 0))
           {
-            this->unit_face_support_points.resize(0);
+            this->unit_face_support_points[0].resize(0);
             return;
           }
 
 
       // generate unit face support points from unit support points of sub
       // elements
-      this->unit_face_support_points.resize(this->n_dofs_per_face());
+      this->unit_face_support_points[0].resize(this->n_dofs_per_face());
 
       for (unsigned int i = 0; i < this->n_dofs_per_face(); ++i)
         {
           const unsigned int base_i =
-            this->face_system_to_base_table[i].first.first;
+            this->face_system_to_base_table[0][i].first.first;
           const unsigned int index_in_base =
-            this->face_system_to_base_table[i].second;
+            this->face_system_to_base_table[0][i].second;
 
           Assert(index_in_base <
-                   base_element(base_i).unit_face_support_points.size(),
+                   base_element(base_i).unit_face_support_points[0].size(),
                  ExcInternalError());
 
-          this->unit_face_support_points[i] =
-            base_element(base_i).unit_face_support_points[index_in_base];
+          this->unit_face_support_points[0][i] =
+            base_element(base_i).unit_face_support_points[0][index_in_base];
         }
     });
 
@@ -1810,7 +1815,7 @@ FESystem<dim, spacedim>::initialize(
     init_tasks += Threads::new_task([&]() {
       // the array into which we want to write should have the correct size
       // already.
-      Assert(this->adjust_quad_dof_index_for_face_orientation_table
+      Assert(this->adjust_quad_dof_index_for_face_orientation_table[0]
                  .n_elements() == 8 * this->n_dofs_per_quad(),
              ExcInternalError());
 
@@ -1821,12 +1826,12 @@ FESystem<dim, spacedim>::initialize(
         {
           const Table<2, int> &temp =
             this->base_element(b)
-              .adjust_quad_dof_index_for_face_orientation_table;
+              .adjust_quad_dof_index_for_face_orientation_table[0];
           for (unsigned int c = 0; c < this->element_multiplicity(b); ++c)
             {
               for (unsigned int i = 0; i < temp.size(0); ++i)
                 for (unsigned int j = 0; j < 8; ++j)
-                  this->adjust_quad_dof_index_for_face_orientation_table(
+                  this->adjust_quad_dof_index_for_face_orientation_table[0](
                     index + i, j) = temp(i, j);
               index += temp.size(0);
             }
@@ -2350,13 +2355,14 @@ FESystem<dim, spacedim>::unit_face_support_point(
   const unsigned int face_no) const
 {
   AssertIndexRange(index, this->n_dofs_per_face());
-  Assert((this->unit_face_support_points.size() == this->n_dofs_per_face()) ||
-           (this->unit_face_support_points.size() == 0),
+  Assert((this->unit_face_support_points[0].size() ==
+          this->n_dofs_per_face()) ||
+           (this->unit_face_support_points[0].size() == 0),
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
   // let's see whether we have the information pre-computed
-  if (this->unit_face_support_points.size() != 0)
-    return this->unit_face_support_points[index];
+  if (this->unit_face_support_points[0].size() != 0)
+    return this->unit_face_support_points[0][index];
   else
     // no. ask the base element whether it would like to provide this
     // information

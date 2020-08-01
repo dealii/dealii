@@ -1908,7 +1908,7 @@ FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points()
   for (unsigned int i = 1; i < codim; ++i)
     n *= this->degree + 1;
 
-  this->generalized_face_support_points.resize(n);
+  this->generalized_face_support_points[0].resize(n);
 
   Point<codim> p;
 
@@ -1941,7 +1941,7 @@ FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points()
               else
                 p(2) = .5;
             }
-          this->generalized_face_support_points[face_renumber[k++]] = p;
+          this->generalized_face_support_points[0][face_renumber[k++]] = p;
         }
 }
 

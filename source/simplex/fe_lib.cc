@@ -120,8 +120,8 @@ namespace Simplex
             this->unit_support_points.emplace_back(0.0, 0.0);
 
             // TODO
-            this->unit_face_support_points.emplace_back(0.0);
-            this->unit_face_support_points.emplace_back(1.0);
+            this->unit_face_support_points[0].emplace_back(0.0);
+            this->unit_face_support_points[0].emplace_back(1.0);
           }
         else if (degree == 2)
           {
@@ -133,9 +133,9 @@ namespace Simplex
             this->unit_support_points.emplace_back(0.5, 0.0);
 
             // TODO
-            this->unit_face_support_points.emplace_back(0.0);
-            this->unit_face_support_points.emplace_back(1.0);
-            this->unit_face_support_points.emplace_back(0.5);
+            this->unit_face_support_points[0].emplace_back(0.0);
+            this->unit_face_support_points[0].emplace_back(1.0);
+            this->unit_face_support_points[0].emplace_back(0.5);
           }
         else
           {
@@ -152,9 +152,9 @@ namespace Simplex
             this->unit_support_points.emplace_back(0.0, 0.0, 1.0);
 
             // TODO
-            this->unit_face_support_points.emplace_back(1.0, 0.0);
-            this->unit_face_support_points.emplace_back(0.0, 1.0);
-            this->unit_face_support_points.emplace_back(0.0, 0.0);
+            this->unit_face_support_points[0].emplace_back(1.0, 0.0);
+            this->unit_face_support_points[0].emplace_back(0.0, 1.0);
+            this->unit_face_support_points[0].emplace_back(0.0, 0.0);
           }
         else if (degree == 2)
           {
@@ -170,12 +170,12 @@ namespace Simplex
             this->unit_support_points.emplace_back(0.0, 0.5, 0.5);
 
             // TODO
-            this->unit_face_support_points.emplace_back(1.0, 0.0);
-            this->unit_face_support_points.emplace_back(0.0, 1.0);
-            this->unit_face_support_points.emplace_back(0.0, 0.0);
-            this->unit_face_support_points.emplace_back(0.5, 0.5);
-            this->unit_face_support_points.emplace_back(0.0, 0.5);
-            this->unit_face_support_points.emplace_back(0.5, 0.0);
+            this->unit_face_support_points[0].emplace_back(1.0, 0.0);
+            this->unit_face_support_points[0].emplace_back(0.0, 1.0);
+            this->unit_face_support_points[0].emplace_back(0.0, 0.0);
+            this->unit_face_support_points[0].emplace_back(0.5, 0.5);
+            this->unit_face_support_points[0].emplace_back(0.0, 0.5);
+            this->unit_face_support_points[0].emplace_back(0.5, 0.0);
           }
         else
           {
