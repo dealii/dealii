@@ -188,7 +188,7 @@ public:
 
 protected:
   /**
-   * Auxiliary vector.
+   * A pointer to the solution vector passed to solve().
    */
   VectorType *Vx;
 
@@ -228,7 +228,7 @@ protected:
   typename VectorMemory<VectorType>::Pointer Vv;
 
   /**
-   * Right hand side vector.
+   * A pointer to the right hand side vector passed to solve().
    */
   const VectorType *Vb;
 
@@ -456,8 +456,10 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
+
   return IterationResult(false, state, step, res);
 }
+
 
 
 template <typename VectorType>
@@ -469,6 +471,8 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
                                   const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("Bicgstab");
+
+  // Allocate temporary memory.
   Vr    = typename VectorMemory<VectorType>::Pointer(this->memory);
   Vrbar = typename VectorMemory<VectorType>::Pointer(this->memory);
   Vp    = typename VectorMemory<VectorType>::Pointer(this->memory);
@@ -492,7 +496,8 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
 
   IterationResult state(false, SolverControl::failure, 0, 0);
 
-  // iterate while the inner iteration returns a breakdown
+  // Iterate while the inner iteration returns a breakdown, i.e., try and try
+  // until we succeed.
   do
     {
       if (step != 0)
@@ -507,11 +512,20 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
     }
   while (state.breakdown == true);
 
-  // in case of failure: throw exception
+  // Release the temporary memory again.
+  Vr.reset();
+  Vrbar.reset();
+  Vp.reset();
+  Vy.reset();
+  Vz.reset();
+  Vt.reset();
+  Vv.reset();
+
+  // In case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,
               SolverControl::NoConvergence(state.last_step,
                                            state.last_residual));
-  // otherwise exit as normal
+  // Otherwise exit as normal
 }
 
 #endif // DOXYGEN
