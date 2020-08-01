@@ -760,7 +760,8 @@ namespace internal
             const FiniteElement<dim> &fe = fes[fe_index];
             // cache number of finite elements and dofs_per_cell
             dof_info[no].dofs_per_cell.push_back(fe.n_dofs_per_cell());
-            dof_info[no].dofs_per_face.push_back(fe.n_dofs_per_face());
+            dof_info[no].dofs_per_face.push_back(fe.n_dofs_per_face(
+              0)); // we assume that all faces have the same number of dofs
             dof_info[no].dimension       = dim;
             dof_info[no].n_base_elements = fe.n_base_elements();
             dof_info[no].n_components.resize(dof_info[no].n_base_elements);

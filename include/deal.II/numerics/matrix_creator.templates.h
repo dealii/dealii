@@ -948,8 +948,6 @@ namespace MatrixCreator
       const bool fe_is_system    = (n_components != 1);
       const bool fe_is_primitive = fe.is_primitive();
 
-      const unsigned int dofs_per_face = fe.n_dofs_per_face();
-
       copy_data.cell          = cell;
       copy_data.dofs_per_cell = fe.n_dofs_per_cell();
 
@@ -973,7 +971,7 @@ namespace MatrixCreator
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices(copy_data.dofs);
 
-      std::vector<types::global_dof_index> dofs_on_face_vector(dofs_per_face);
+      std::vector<types::global_dof_index> dofs_on_face_vector;
 
       // Because CopyData objects are reused and emplace_back is
       // used, dof_is_on_face, cell_matrix, and cell_vector must be
@@ -1147,6 +1145,7 @@ namespace MatrixCreator
               }
 
 
+            dofs_on_face_vector.resize(fe.n_dofs_per_face(face));
             cell->face(face)->get_dof_indices(dofs_on_face_vector);
             // for each dof on the cell, have a flag whether it is on
             // the face
@@ -1379,7 +1378,6 @@ namespace MatrixCreator
       const FiniteElement<dim, spacedim> &fe              = cell->get_fe();
       const bool                          fe_is_system    = (n_components != 1);
       const bool                          fe_is_primitive = fe.is_primitive();
-      const unsigned int                  dofs_per_face = fe.n_dofs_per_face();
 
       copy_data.cell          = cell;
       copy_data.dofs_per_cell = fe.n_dofs_per_cell();
@@ -1407,7 +1405,7 @@ namespace MatrixCreator
       std::vector<number>         rhs_values_scalar;
       std::vector<Vector<number>> rhs_values_system;
 
-      std::vector<types::global_dof_index> dofs_on_face_vector(dofs_per_face);
+      std::vector<types::global_dof_index> dofs_on_face_vector;
 
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices(copy_data.dofs);
@@ -1599,6 +1597,7 @@ namespace MatrixCreator
                   }
               }
 
+            dofs_on_face_vector.resize(fe.n_dofs_per_face(face));
             cell->face(face)->get_dof_indices(dofs_on_face_vector,
                                               cell->active_fe_index());
             // for each dof on the cell, have a
