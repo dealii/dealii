@@ -38,12 +38,12 @@ pipeline
         {
           // skip permission check on master and release branches
           when {
-              not {
-	        anyOf {
-	          branch 'master'
-		  branch pattern: "dealii-*", comparator: "GLOB"
-		}
-	      }
+            not {
+              anyOf {
+                branch 'master'
+                branch pattern: "dealii-*", comparator: "GLOB"
+              }
+            }
           }
           steps
           {
