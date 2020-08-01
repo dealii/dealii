@@ -69,7 +69,8 @@ class istream_iterator :
     Elem m_current_value;
 public:
     istream_iterator(istream_type & is) :
-        m_istream(& is)
+        m_istream(& is),
+        m_current_value()
     {
         //increment();
     }
