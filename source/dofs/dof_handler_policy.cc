@@ -141,8 +141,8 @@ namespace internal
          * one for lines, etc.
          */
         template <int structdim, int dim, int spacedim>
-        void
-        ensure_existence_of_dof_identities(
+        const std::unique_ptr<DoFIdentities> &
+        ensure_existence_and_return_dof_identities(
           const FiniteElement<dim, spacedim> &fe1,
           const FiniteElement<dim, spacedim> &fe2,
           std::unique_ptr<DoFIdentities> &    identities)
@@ -190,6 +190,8 @@ namespace internal
                          ExcInternalError());
                 }
             }
+
+          return identities;
         }
       } // namespace
 
@@ -278,11 +280,12 @@ namespace internal
                         {
                           // make sure the entry in the equivalence
                           // table exists
-                          ensure_existence_of_dof_identities<0>(
-                            dof_handler.get_fe(most_dominating_fe_index),
-                            dof_handler.get_fe(other_fe_index),
-                            vertex_dof_identities[most_dominating_fe_index]
-                                                 [other_fe_index]);
+                          const auto &identities =
+                            *ensure_existence_and_return_dof_identities<0>(
+                              dof_handler.get_fe(most_dominating_fe_index),
+                              dof_handler.get_fe(other_fe_index),
+                              vertex_dof_identities[most_dominating_fe_index]
+                                                   [other_fe_index]);
 
                           // then loop through the identities we
                           // have. first get the global numbers of the
@@ -292,9 +295,6 @@ namespace internal
                           // we will always constrain the dof with the
                           // higher fe index to the one with the lower,
                           // to avoid circular reasoning.
-                          DoFIdentities &identities =
-                            *vertex_dof_identities[most_dominating_fe_index]
-                                                  [other_fe_index];
                           for (const auto &identity : identities)
                             {
                               const types::global_dof_index primary_dof_index =
@@ -468,24 +468,20 @@ namespace internal
                             const unsigned int dofs_per_line =
                               dof_handler.get_fe(fe_index_1).n_dofs_per_line();
 
-                            ensure_existence_of_dof_identities<1>(
-                              dof_handler.get_fe(fe_index_1),
-                              dof_handler.get_fe(fe_index_2),
-                              line_dof_identities[fe_index_1][fe_index_2]);
+                            const auto &identities =
+                              *ensure_existence_and_return_dof_identities<1>(
+                                dof_handler.get_fe(fe_index_1),
+                                dof_handler.get_fe(fe_index_2),
+                                line_dof_identities[fe_index_1][fe_index_2]);
                             // see if these sets of dofs are identical. the
                             // first condition for this is that indeed there are
                             // n identities
-                            if (line_dof_identities[fe_index_1][fe_index_2]
-                                  ->size() == dofs_per_line)
+                            if (identities.size() == dofs_per_line)
                               {
                                 unsigned int i = 0;
                                 for (; i < dofs_per_line; ++i)
-                                  if (((*(line_dof_identities[fe_index_1]
-                                                             [fe_index_2]))[i]
-                                         .first != i) &&
-                                      ((*(line_dof_identities[fe_index_1]
-                                                             [fe_index_2]))[i]
-                                         .second != i))
+                                  if ((identities[i].first != i) &&
+                                      (identities[i].second != i))
                                     // not an identity
                                     break;
 
@@ -659,15 +655,15 @@ namespace internal
                           for (const auto &other_fe_index : fe_indices)
                             if (other_fe_index != most_dominating_fe_index)
                               {
-                                ensure_existence_of_dof_identities<1>(
-                                  dof_handler.get_fe(most_dominating_fe_index),
-                                  dof_handler.get_fe(other_fe_index),
-                                  line_dof_identities[most_dominating_fe_index]
-                                                     [other_fe_index]);
+                                const auto &identities =
+                                  *ensure_existence_and_return_dof_identities<
+                                    1>(dof_handler.get_fe(
+                                         most_dominating_fe_index),
+                                       dof_handler.get_fe(other_fe_index),
+                                       line_dof_identities
+                                         [most_dominating_fe_index]
+                                         [other_fe_index]);
 
-                                DoFIdentities &identities =
-                                  *line_dof_identities[most_dominating_fe_index]
-                                                      [other_fe_index];
                                 for (const auto &identity : identities)
                                   {
                                     const types::global_dof_index
@@ -824,15 +820,13 @@ namespace internal
                       for (const auto &other_fe_index : fe_indices)
                         if (other_fe_index != most_dominating_fe_index)
                           {
-                            ensure_existence_of_dof_identities<2>(
-                              dof_handler.get_fe(most_dominating_fe_index),
-                              dof_handler.get_fe(other_fe_index),
-                              quad_dof_identities[most_dominating_fe_index]
-                                                 [other_fe_index]);
+                            const auto &identities =
+                              *ensure_existence_and_return_dof_identities<2>(
+                                dof_handler.get_fe(most_dominating_fe_index),
+                                dof_handler.get_fe(other_fe_index),
+                                quad_dof_identities[most_dominating_fe_index]
+                                                   [other_fe_index]);
 
-                            DoFIdentities &identities =
-                              *quad_dof_identities[most_dominating_fe_index]
-                                                  [other_fe_index];
                             for (const auto &identity : identities)
                               {
                                 const types::global_dof_index
@@ -1136,11 +1130,12 @@ namespace internal
                         {
                           // make sure the entry in the equivalence
                           // table exists
-                          ensure_existence_of_dof_identities<0>(
-                            dof_handler.get_fe(most_dominating_fe_index),
-                            dof_handler.get_fe(other_fe_index),
-                            vertex_dof_identities[most_dominating_fe_index]
-                                                 [other_fe_index]);
+                          const auto &identities =
+                            *ensure_existence_and_return_dof_identities<0>(
+                              dof_handler.get_fe(most_dominating_fe_index),
+                              dof_handler.get_fe(other_fe_index),
+                              vertex_dof_identities[most_dominating_fe_index]
+                                                   [other_fe_index]);
 
                           // then loop through the identities we
                           // have. first get the global numbers of the
@@ -1150,9 +1145,6 @@ namespace internal
                           // we will always constrain the dof with the
                           // higher fe index to the one with the lower,
                           // to avoid circular reasoning.
-                          DoFIdentities &identities =
-                            *vertex_dof_identities[most_dominating_fe_index]
-                                                  [other_fe_index];
                           for (const auto &identity : identities)
                             {
                               const types::global_dof_index primary_dof_index =
@@ -1301,24 +1293,20 @@ namespace internal
                             const unsigned int dofs_per_line =
                               dof_handler.get_fe(fe_index_1).n_dofs_per_line();
 
-                            ensure_existence_of_dof_identities<1>(
-                              dof_handler.get_fe(fe_index_1),
-                              dof_handler.get_fe(fe_index_2),
-                              line_dof_identities[fe_index_1][fe_index_2]);
+                            const auto &identities =
+                              *ensure_existence_and_return_dof_identities<1>(
+                                dof_handler.get_fe(fe_index_1),
+                                dof_handler.get_fe(fe_index_2),
+                                line_dof_identities[fe_index_1][fe_index_2]);
                             // see if these sets of dofs are identical. the
                             // first condition for this is that indeed there are
                             // n identities
-                            if (line_dof_identities[fe_index_1][fe_index_2]
-                                  ->size() == dofs_per_line)
+                            if (identities.size() == dofs_per_line)
                               {
                                 unsigned int i = 0;
                                 for (; i < dofs_per_line; ++i)
-                                  if (((*(line_dof_identities[fe_index_1]
-                                                             [fe_index_2]))[i]
-                                         .first != i) &&
-                                      ((*(line_dof_identities[fe_index_1]
-                                                             [fe_index_2]))[i]
-                                         .second != i))
+                                  if ((identities[i].first != i) &&
+                                      (identities[i].second != i))
                                     // not an identity
                                     break;
 
@@ -1432,15 +1420,15 @@ namespace internal
                           for (const auto &other_fe_index : fe_indices)
                             if (other_fe_index != most_dominating_fe_index)
                               {
-                                ensure_existence_of_dof_identities<1>(
-                                  dof_handler.get_fe(most_dominating_fe_index),
-                                  dof_handler.get_fe(other_fe_index),
-                                  line_dof_identities[most_dominating_fe_index]
-                                                     [other_fe_index]);
+                                const auto &identities =
+                                  *ensure_existence_and_return_dof_identities<
+                                    1>(dof_handler.get_fe(
+                                         most_dominating_fe_index),
+                                       dof_handler.get_fe(other_fe_index),
+                                       line_dof_identities
+                                         [most_dominating_fe_index]
+                                         [other_fe_index]);
 
-                                DoFIdentities &identities =
-                                  *line_dof_identities[most_dominating_fe_index]
-                                                      [other_fe_index];
                                 for (const auto &identity : identities)
                                   {
                                     const types::global_dof_index
@@ -1579,15 +1567,13 @@ namespace internal
                       for (const auto &other_fe_index : fe_indices)
                         if (other_fe_index != most_dominating_fe_index)
                           {
-                            ensure_existence_of_dof_identities<2>(
-                              dof_handler.get_fe(most_dominating_fe_index),
-                              dof_handler.get_fe(other_fe_index),
-                              quad_dof_identities[most_dominating_fe_index]
-                                                 [other_fe_index]);
+                            const auto &identities =
+                              *ensure_existence_and_return_dof_identities<2>(
+                                dof_handler.get_fe(most_dominating_fe_index),
+                                dof_handler.get_fe(other_fe_index),
+                                quad_dof_identities[most_dominating_fe_index]
+                                                   [other_fe_index]);
 
-                            DoFIdentities &identities =
-                              *quad_dof_identities[most_dominating_fe_index]
-                                                  [other_fe_index];
                             for (const auto &identity : identities)
                               {
                                 const types::global_dof_index
