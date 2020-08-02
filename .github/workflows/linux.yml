@@ -43,14 +43,27 @@ jobs:
         sudo apt-get install -y software-properties-common
         sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
         sudo apt-get update
-        sudo apt-get install -yq --no-install-recommends numdiff  libp4est-dev trilinos-all-dev petsc-dev
+        sudo apt-get install -yq --no-install-recommends \
+            numdiff \
+            libp4est-dev \
+            trilinos-all-dev \
+            petsc-dev \
+            libmetis-dev
     - name: info
       run: |
         mpicc -v
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_WITH_MPI="ON" -D DEAL_II_WITH_SIMPLEX_SUPPORT="ON" -D DEAL_II_WITH_TRILINOS="ON" -D DEAL_II_WITH_PETSC="ON" -D DEAL_II_COMPONENT_EXAMPLES="OFF" .
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_WITH_SIMPLEX_SUPPORT="ON" \
+              -D DEAL_II_WITH_TRILINOS="ON" \
+              -D DEAL_II_WITH_PETSC="ON" \
+              -D DEAL_II_WITH_METIS="ON" \
+              -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
+              .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
@@ -62,4 +75,4 @@ jobs:
     - name: test
       run: |
         make -j 2 setup_tests_simplex
-        ctest -j 2 
+        ctest --output-on-failure -j 2 
