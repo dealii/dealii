@@ -56,7 +56,7 @@ void
 test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 {
   Triangulation<dim, spacedim> tria;
-  Simplex::GridGenerator::subdivided_hyper_cube(tria, dim == 2 ? 4 : 2);
+  GridGenerator::subdivided_hyper_cube_with_simplices(tria, dim == 2 ? 4 : 2);
 
   DoFHandler<dim> dof_handler(tria);
 
