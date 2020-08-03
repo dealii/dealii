@@ -906,8 +906,11 @@ QProjector<2>::project_to_all_subfaces(
   const ReferenceCell::Type reference_cell_type,
   const SubQuadrature &     quadrature)
 {
+  if (reference_cell_type == ReferenceCell::Type::Tri ||
+      reference_cell_type == ReferenceCell::Type::Tet)
+    return Quadrature<2>(); // nothing to do
+
   Assert(reference_cell_type == ReferenceCell::Type::Quad, ExcNotImplemented());
-  (void)reference_cell_type;
 
   const unsigned int dim = 2;
 
@@ -964,8 +967,11 @@ QProjector<3>::project_to_all_subfaces(
   const ReferenceCell::Type reference_cell_type,
   const SubQuadrature &     quadrature)
 {
+  if (reference_cell_type == ReferenceCell::Type::Tri ||
+      reference_cell_type == ReferenceCell::Type::Tet)
+    return Quadrature<3>(); // nothing to do
+
   Assert(reference_cell_type == ReferenceCell::Type::Hex, ExcNotImplemented());
-  (void)reference_cell_type;
 
   const unsigned int dim         = 3;
   SubQuadrature      q_reflected = reflect(quadrature);
