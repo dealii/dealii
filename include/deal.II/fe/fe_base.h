@@ -243,6 +243,13 @@ public:
    */
   const unsigned int dofs_per_quad;
 
+private:
+  /**
+   * Maximum number of degrees of freedom on any quad.
+   */
+  const unsigned int dofs_per_quad_max;
+
+public:
   /**
    * Number of degrees of freedom in a hexahedron; not including the degrees
    * of freedom on the quadrilaterals, lines and vertices of the hexahedron.
@@ -281,6 +288,13 @@ public:
    */
   const unsigned int dofs_per_face;
 
+private:
+  /**
+   * Maximum number of degrees of freedom on any face.
+   */
+  const unsigned int dofs_per_face_max;
+
+public:
   /**
    * Total number of degrees of freedom on a cell. This is the accumulated
    * number of degrees of freedom on all the objects of dimension up to
@@ -396,6 +410,13 @@ public:
   n_dofs_per_quad() const;
 
   /**
+   * Maximum number of dofs per quad. Not including dofs on lower dimensional
+   * objects.
+   */
+  unsigned int
+  max_dofs_per_quad() const;
+
+  /**
    * Number of dofs per hex. Not including dofs on lower dimensional objects.
    */
   unsigned int
@@ -407,6 +428,13 @@ public:
    */
   unsigned int
   n_dofs_per_face() const;
+
+  /**
+   * Maximum number of dofs per face, accumulating degrees of freedom of all
+   * lower dimensional objects.
+   */
+  unsigned int
+  max_dofs_per_face() const;
 
   /**
    * Number of dofs per cell, accumulating degrees of freedom of all lower
@@ -596,6 +624,15 @@ FiniteElementData<dim>::n_dofs_per_quad() const
 
 template <int dim>
 inline unsigned int
+FiniteElementData<dim>::max_dofs_per_quad() const
+{
+  return dofs_per_quad_max;
+}
+
+
+
+template <int dim>
+inline unsigned int
 FiniteElementData<dim>::n_dofs_per_hex() const
 {
   return dofs_per_hex;
@@ -608,6 +645,15 @@ inline unsigned int
 FiniteElementData<dim>::n_dofs_per_face() const
 {
   return dofs_per_face;
+}
+
+
+
+template <int dim>
+inline unsigned int
+FiniteElementData<dim>::max_dofs_per_face() const
+{
+  return dofs_per_face_max;
 }
 
 

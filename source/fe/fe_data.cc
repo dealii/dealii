@@ -50,6 +50,7 @@ FiniteElementData<dim>::FiniteElementData(
   , dofs_per_vertex(dofs_per_object[0])
   , dofs_per_line(dofs_per_object[1])
   , dofs_per_quad(dim > 1 ? dofs_per_object[2] : 0)
+  , dofs_per_quad_max(dofs_per_quad)
   , dofs_per_hex(dim > 2 ? dofs_per_object[3] : 0)
   , first_line_index(
       ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
@@ -83,6 +84,7 @@ FiniteElementData<dim>::FiniteElementData(
       ReferenceCell::internal::Info::get_face(cell_type, 0).n_lines() *
         dofs_per_line +
       (dim == 3 ? 1 : 0) * dofs_per_quad)
+  , dofs_per_face_max(dofs_per_face)
   , dofs_per_cell(
       ReferenceCell::internal::Info::get_cell(cell_type).n_vertices() *
         dofs_per_vertex +
