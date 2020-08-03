@@ -3267,9 +3267,9 @@ namespace internal
         {
           number average_diagonal = 0.;
 
-          for (size_type i = 0; i < local_matrix.m(); ++i)
-            average_diagonal += std::abs(local_matrix(i, i));
-          // average_diagonal /= static_cast<number>(local_matrix.m());
+          // for (size_type i = 0; i < local_matrix.m(); ++i)
+          //  average_diagonal += std::abs(local_matrix(i, i));
+          average_diagonal = static_cast<number>(local_matrix.m());
 
           /*
                               // handle the case that all diagonal elements are
