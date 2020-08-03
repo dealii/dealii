@@ -3266,19 +3266,23 @@ namespace internal
       if (global_rows.n_constraints() > 0)
         {
           number average_diagonal = 0.;
-          for (size_type i = 0; i < local_matrix.m(); ++i)
-            average_diagonal += std::abs(local_matrix(i, i));
-          average_diagonal /= static_cast<number>(local_matrix.m());
 
-          // handle the case that all diagonal elements are zero
-          if (average_diagonal == static_cast<number>(0.))
-            {
-              average_diagonal = static_cast<number>(local_matrix.l1_norm()) /
-                                 static_cast<number>(local_matrix.m());
-              // if the entire matrix is zero, use 1. for the diagonal
-              if (average_diagonal == static_cast<number>(0.))
-                average_diagonal = static_cast<number>(1.);
-            }
+          /*
+                    for (size_type i = 0; i < local_matrix.m(); ++i)
+                      average_diagonal += std::abs(local_matrix(i, i));
+                    average_diagonal /= static_cast<number>(local_matrix.m());
+
+                    // handle the case that all diagonal elements are zero
+                    if (average_diagonal == static_cast<number>(0.))
+                      {
+                        average_diagonal =
+             static_cast<number>(local_matrix.l1_norm()) /
+                                           static_cast<number>(local_matrix.m());
+                        // if the entire matrix is zero, use 1. for the diagonal
+                        if (average_diagonal == static_cast<number>(0.))
+                          average_diagonal = static_cast<number>(1.);
+                      }
+          */
 
           for (size_type i = 0; i < global_rows.n_constraints(); i++)
             {
