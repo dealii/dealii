@@ -24,6 +24,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include <deal.II/numerics/data_component_interpretation.h>
 
 // To be able to serialize XDMFEntry
@@ -320,6 +322,11 @@ namespace DataOutBase
     bool points_are_available;
 
     /**
+     * Reference-cell type of the underlying cell of this patch.
+     */
+    ReferenceCell::Type reference_cell_type;
+
+    /**
      * Default constructor. Sets #n_subdivisions to one, #points_are_available
      * to false, and #patch_index to #no_neighbor.
      */
@@ -463,6 +470,11 @@ namespace DataOutBase
      * in the Patch structure.
      */
     bool points_are_available;
+
+    /**
+     * Reference-cell type of the underlying cell of this patch.
+     */
+    ReferenceCell::Type reference_cell_type;
 
     /**
      * Default constructor. Sets #points_are_available
@@ -1349,6 +1361,15 @@ namespace DataOutBase
                const unsigned int d1,
                const unsigned int d2,
                const unsigned int d3);
+
+    /**
+     * Record a single deal.II cell without subdivisions (e.g. simplex) in the
+     * internal reordered format.
+     */
+    void
+    write_cell_single(const unsigned int index,
+                      const unsigned int start,
+                      const unsigned int n_points);
 
     /**
      * Filter and record a data set. If there are multiple values at a given

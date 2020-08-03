@@ -97,7 +97,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   ::dealii::DataOutBase::Patch<DoFHandlerType::dimension,
                                DoFHandlerType::space_dimension>
     patch;
-  patch.n_subdivisions = n_subdivisions;
+  patch.n_subdivisions      = n_subdivisions;
+  patch.reference_cell_type = cell_and_index->first->reference_cell_type();
 
   // initialize FEValues
   scratch_data.reinit_all_fe_values(this->dof_data, cell_and_index->first);
@@ -108,8 +109,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   // set the vertices of the patch. if the mapping does not preserve locations
   // (e.g. MappingQEulerian), we need to compute the offset of the vertex for
   // the graphical output. Otherwise, we can just use the vertex info.
-  for (const unsigned int vertex :
-       GeometryInfo<DoFHandlerType::dimension>::vertex_indices())
+  for (const unsigned int vertex : cell_and_index->first->vertex_indices())
     if (fe_patch_values.get_mapping().preserves_vertex_locations())
       patch.vertices[vertex] = cell_and_index->first->vertex(vertex);
     else
@@ -133,7 +133,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
   if (curved_cell_region == curved_inner_cells ||
       (curved_cell_region == curved_boundary &&
        (cell_and_index->first->at_boundary() ||
-        (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
+        (DoFHandlerType::dimension != DoFHandlerType::space_dimension))) ||
+      (cell_and_index->first->reference_cell_type() !=
+       ReferenceCell::get_hypercube(dim)))
     {
       Assert(patch.space_dim == DoFHandlerType::space_dimension,
              ExcInternalError());
@@ -1009,8 +1011,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
     }
 
 
-  for (const unsigned int f :
-       GeometryInfo<DoFHandlerType::dimension>::face_indices())
+  for (const unsigned int f : cell_and_index->first->face_indices())
     {
       // let's look up whether the neighbor behind that face is noted in the
       // table of cells which we treat. this can only happen if the neighbor
