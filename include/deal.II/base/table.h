@@ -2333,7 +2333,7 @@ TableBase<N, T>::reinit(const TableIndices<N> &new_sizes,
   // memory also in resize_fast.)
   if (true || !omit_default_initialization)
     {
-      if (values.empty())
+      if (true || values.empty())
         values.resize(new_size);
       else
         {
