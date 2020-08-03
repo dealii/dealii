@@ -2603,6 +2603,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
             &*this->tria) == nullptr)
         this->block_info_object.initialize(*this, false, true);
     }
+  // now distribute non_local_dofs.
+  distribute_non_local_dofs();
 }
 
 
@@ -2635,6 +2637,35 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
   if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*this->tria) == nullptr)
     this->block_info_object.initialize(*this, true, false);
+}
+
+
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim, spacedim>::distribute_non_local_dofs()
+{
+  Assert(
+    this->object_dof_indices.size() > 0,
+    ExcMessage(
+      "Distribute active DoFs using distribute_dofs() before calling distribute_non_local_dofs()."));
+
+  const auto non_local_id = begin()->get_fe().get_non_local_id();
+  const auto n_global_non_local_dofs =
+    begin()->get_fe().n_global_non_local_dofs();
+
+  for (auto cell : active_cell_iterators())
+    {
+      const auto &fe = cell->get_fe();
+      // Make sure all cells handle non local dofs in the same way.
+      Assert(
+        non_local_id == fe.get_non_local_id(),
+        ExcMessage(
+          "You are trying to use different non local finite element spaces"));
+      AssertDimension(n_global_non_local_dofs, fe.n_global_non_local_dofs());
+      cell->set_non_local_dof_indices(fe.get_non_local_dof_indices(*cell));
+    }
+  this->number_cache.n_global_dofs += n_global_non_local_dofs;
 }
 
 

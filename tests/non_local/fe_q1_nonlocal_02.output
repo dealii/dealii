@@ -1,0 +1,21 @@
+
+DEAL::DIM: 1
+DEAL::
+DEAL::Shape[0]: 1 0 
+DEAL::Shape[1]: 0 1 
+DEAL::DIM: 2
+DEAL::
+DEAL::Shape[0]: 1 0 0 0 
+DEAL::Shape[1]: 0 1 0 0 
+DEAL::Shape[2]: 0 0 1 0 
+DEAL::Shape[3]: 0 0 0 1 
+DEAL::DIM: 3
+DEAL::
+DEAL::Shape[0]: 1 0 0 0 0 0 0 0 
+DEAL::Shape[1]: 0 1 0 0 0 0 0 0 
+DEAL::Shape[2]: 0 0 1 0 0 0 0 0 
+DEAL::Shape[3]: 0 0 0 1 0 0 0 0 
+DEAL::Shape[4]: 0 0 0 0 1 0 0 0 
+DEAL::Shape[5]: 0 0 0 0 0 1 0 0 
+DEAL::Shape[6]: 0 0 0 0 0 0 1 0 
+DEAL::Shape[7]: 0 0 0 0 0 0 0 1 
