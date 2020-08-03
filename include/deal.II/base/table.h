@@ -2331,7 +2331,7 @@ TableBase<N, T>::reinit(const TableIndices<N> &new_sizes,
   // class. (Selecting another code for the empty case ensures that we touch
   // the memory only once for non-trivial classes that need to initialize the
   // memory also in resize_fast.)
-  if (!omit_default_initialization)
+  if (true || !omit_default_initialization)
     {
       if (values.empty())
         values.resize(new_size);
