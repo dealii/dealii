@@ -991,8 +991,7 @@ namespace MatrixFreeOperators
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));
 
-    // temporarily reduce size of inverse_jxw to dofs_per_cell to get JxW values
-    // from fe_eval (will not reallocate any memory)
+    // compute values for the first component
     for (unsigned int q = 0; q < dofs_per_component_on_cell; ++q)
       inverse_jxw[q] = 1. / fe_eval.JxW(q);
     // copy values to rest of vector
