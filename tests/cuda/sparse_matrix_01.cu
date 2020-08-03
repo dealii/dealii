@@ -35,7 +35,7 @@ check_matrix(SparseMatrix<double> const &        A,
   double *    val_dev          = nullptr;
   int *       column_index_dev = nullptr;
   int *       row_ptr_dev      = nullptr;
-  std::tie(val_dev, column_index_dev, row_ptr_dev, std::ignore) =
+  std::tie(val_dev, column_index_dev, row_ptr_dev, std::ignore, std::ignore) =
     A_dev.get_cusparse_matrix();
 
   int                 nnz = A_dev.n_nonzero_elements();
