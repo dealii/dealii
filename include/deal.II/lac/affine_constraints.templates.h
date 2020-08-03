@@ -3285,7 +3285,7 @@ namespace internal
               const size_type local_row  = global_rows.constraint_origin(i);
               const size_type global_row = local_dof_indices[local_row];
               const number    new_diagonal =
-                (std::abs(local_matrix(local_row, local_row)) != 0. ?
+                ((true || std::abs(local_matrix(local_row, local_row)) != 0.) ?
                    std::abs(local_matrix(local_row, local_row)) :
                    average_diagonal);
               global_matrix.add(global_row, global_row, new_diagonal);
