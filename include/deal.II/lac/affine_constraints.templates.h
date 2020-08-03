@@ -3265,7 +3265,7 @@ namespace internal
     {
       if (global_rows.n_constraints() > 0)
         {
-          number average_diagonal = number();
+          number average_diagonal = 0.;
           for (size_type i = 0; i < local_matrix.m(); ++i)
             average_diagonal += std::abs(local_matrix(i, i));
           average_diagonal /= static_cast<number>(local_matrix.m());
