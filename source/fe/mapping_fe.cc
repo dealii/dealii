@@ -175,68 +175,74 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
       else if (this->fe.reference_cell_type() == ReferenceCell::Type::Tri)
         {
           Tensor<1, dim> t1;
-          t1[0] = 1;
-          t1[1] = 0;
+          constexpr int  d0 = 0;
+          constexpr int  d1 = 1 % dim;
+
+          t1[d0] = 1;
+          t1[d1] = 0;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[0].emplace_back(t1);
-          t1[0] = -std::sqrt(0.5);
-          t1[1] = +std::sqrt(0.5);
+          t1[d0] = -std::sqrt(0.5);
+          t1[d1] = +std::sqrt(0.5);
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[1].emplace_back(t1);
-          t1[0] = 0;
-          t1[1] = -1;
+          t1[d0] = 0;
+          t1[d1] = -1;
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[2].emplace_back(t1);
         }
       else if (this->fe.reference_cell_type() == ReferenceCell::Type::Tet)
         {
           Tensor<1, dim> t1;
+          constexpr int  d0 = 0;
+          constexpr int  d1 = 1 % dim;
+          constexpr int  d2 = 2 % dim;
 
-          t1[0] = 0;
-          t1[1] = 1;
-          t1[2] = 0; // face 0
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0; // face 0
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[0].emplace_back(t1);
 
-          t1[0] = 1;
-          t1[1] = 0;
-          t1[2] = 0; // face 0
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0; // face 0
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[4].emplace_back(t1);
 
-          t1[0] = 1;
-          t1[1] = 0;
-          t1[2] = 0; // face 1
+          t1[d0] = 1;
+          t1[d1] = 0;
+          t1[d2] = 0; // face 1
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[1].emplace_back(t1);
 
-          t1[0] = 0;
-          t1[1] = 0;
-          t1[2] = 1; // face 1
+          t1[d0] = 0;
+          t1[d1] = 0;
+          t1[d2] = 1; // face 1
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[5].emplace_back(t1);
 
-          t1[0] = 0;
-          t1[1] = 0;
-          t1[2] = 1; // face 2
+          t1[d0] = 0;
+          t1[d1] = 0;
+          t1[d2] = 1; // face 2
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[2].emplace_back(t1);
 
-          t1[0] = 0;
-          t1[1] = 1;
-          t1[2] = 0; // face 2
+          t1[d0] = 0;
+          t1[d1] = 1;
+          t1[d2] = 0; // face 2
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[6].emplace_back(t1);
 
-          t1[0] = -std::pow(1.0 / 3.0, 1.0 / 4.0);
-          t1[1] = +std::pow(1.0 / 3.0, 1.0 / 4.0);
-          t1[2] = +0; // face 3
+          t1[d0] = -std::pow(1.0 / 3.0, 1.0 / 4.0);
+          t1[d1] = +std::pow(1.0 / 3.0, 1.0 / 4.0);
+          t1[d2] = +0; // face 3
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[3].emplace_back(t1);
 
-          t1[0] = -std::pow(1.0 / 3.0, 1.0 / 4.0);
-          t1[1] = +0;
-          t1[2] = +std::pow(1.0 / 3.0, 1.0 / 4.0); // face 3
+          t1[d0] = -std::pow(1.0 / 3.0, 1.0 / 4.0);
+          t1[d1] = +0;
+          t1[d2] = +std::pow(1.0 / 3.0, 1.0 / 4.0); // face 3
           for (unsigned int i = 0; i < n_original_q_points; i++)
             unit_tangentials[7].emplace_back(t1);
         }
