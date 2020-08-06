@@ -256,8 +256,8 @@ namespace Step64
   // We can ask the parallel triangulation for the number of active, locally
   // owned cells but only have a DoFHandler object at hand. Since
   // DoFHandler::get_triangulation() returns a Triangulation object, not a
-  // parallel::Triangulation object, we have to downcast the return value. This
-  // is safe to do here because we know that the triangulation is a
+  // parallel::TriangulationBase object, we have to downcast the return value.
+  // This is safe to do here because we know that the triangulation is a
   // parallel:distributed::Triangulation object in fact.
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
@@ -275,7 +275,7 @@ namespace Step64
 
 
     const unsigned int n_owned_cells =
-      dynamic_cast<const parallel::Triangulation<dim> *>(
+      dynamic_cast<const parallel::TriangulationBase<dim> *>(
         &dof_handler.get_triangulation())
         ->n_locally_owned_active_cells();
     coef.reinit(Utilities::pow(fe_degree + 1, dim) * n_owned_cells);

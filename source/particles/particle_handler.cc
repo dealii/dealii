@@ -195,7 +195,7 @@ namespace Particles
       }
 
     if (const auto parallel_triangulation =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &*triangulation))
       {
         global_number_of_particles = dealii::Utilities::MPI::sum(
@@ -439,7 +439,7 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
     if (const auto parallel_triangulation =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &*triangulation))
       {
         types::particle_index particles_to_add_locally = positions.size();
@@ -1003,7 +1003,7 @@ namespace Particles
 
     std::set<types::subdomain_id> ghost_owners;
     if (const auto parallel_triangulation =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &*triangulation))
       ghost_owners = parallel_triangulation->ghost_owners();
 
@@ -1152,7 +1152,7 @@ namespace Particles
     // Exchange particles between processors if we have more than one process
 #ifdef DEAL_II_WITH_MPI
     if (const auto parallel_triangulation =
-          dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &*triangulation))
       {
         if (dealii::Utilities::MPI::n_mpi_processes(
@@ -1181,7 +1181,7 @@ namespace Particles
   {
     // Nothing to do in serial computations
     const auto parallel_triangulation =
-      dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*triangulation);
     if (parallel_triangulation != nullptr)
       {
@@ -1266,12 +1266,12 @@ namespace Particles
       &send_cells)
   {
     const auto parallel_triangulation =
-      dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &*triangulation);
     Assert(
       parallel_triangulation,
       ExcMessage(
-        "This function is only implemented for parallel::Triangulation objects."));
+        "This function is only implemented for parallel::TriangulationBase objects."));
 
     // Determine the communication pattern
     const std::set<types::subdomain_id> ghost_owners =
