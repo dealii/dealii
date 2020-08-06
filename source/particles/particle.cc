@@ -303,16 +303,14 @@ namespace Particles
     const ArrayView<double> old_properties =
       property_pool->get_properties(properties);
 
-    Assert(
-      new_properties.size() == old_properties.size(),
-      ExcMessage(
-        std::string(
-          "You are trying to assign properties with an incompatible length. ") +
-        "The particle has space to store " +
-        std::to_string(old_properties.size()) + " properties, " +
-        "and this function tries to assign" +
-        std::to_string(new_properties.size()) + " properties. " +
-        "This is not allowed."));
+    Assert(new_properties.size() == old_properties.size(),
+           ExcMessage(
+             "You are trying to assign properties with an incompatible length. "
+             "The particle has space to store " +
+             std::to_string(old_properties.size()) +
+             " properties, but you are trying to assign " +
+             std::to_string(new_properties.size()) +
+             " properties. This is not allowed."));
 
     if (old_properties.size() > 0)
       std::copy(new_properties.begin(),
