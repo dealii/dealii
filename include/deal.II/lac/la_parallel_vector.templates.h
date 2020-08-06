@@ -486,11 +486,8 @@ namespace LinearAlgebra
       const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
-      std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner(
-        new Utilities::MPI::Partitioner(locally_owned_indices,
-                                        ghost_indices,
-                                        communicator));
-      reinit(new_partitioner);
+      reinit(std::make_shared<Utilities::MPI::Partitioner>(
+        locally_owned_indices, ghost_indices, communicator));
     }
 
 
@@ -502,9 +499,9 @@ namespace LinearAlgebra
       const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
-      std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner(
-        new Utilities::MPI::Partitioner(locally_owned_indices, communicator));
-      reinit(new_partitioner);
+      reinit(
+        std::make_shared<Utilities::MPI::Partitioner>(locally_owned_indices,
+                                                      communicator));
     }
 
 
@@ -523,7 +520,7 @@ namespace LinearAlgebra
       resize_val(new_allocated_size);
 
       // initialize to zero
-      this->operator=(Number());
+      *this = Number();
 
 
       // do not reallocate import_data directly, but only upon request. It
@@ -540,7 +537,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector()
-      : partitioner(new Utilities::MPI::Partitioner())
+      : partitioner(std::make_shared<Utilities::MPI::Partitioner>())
       , allocated_size(0)
     {
       reinit(0);
