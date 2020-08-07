@@ -10,7 +10,7 @@ DEAL:cg::Convergence step 11 value 3.55007e-13
 #
 # For a description of the GNUPLOT format see the GNUPLOT manual.
 #
-# <x> <y> <displacement> <displacement> <strain_xx> <strain_xy> <strain_yx> <strain_yy> 
+# <x> <y> <displacement> <displacement> <strain> <strain> <strain> <strain> 
 -1.00000 -1.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 
 -0.500000 -1.00000 0.00000 0.00000 0.00000 0.0158134 0.0158134 0.0248929 
 
