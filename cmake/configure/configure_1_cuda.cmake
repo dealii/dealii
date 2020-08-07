@@ -57,16 +57,16 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # disable CUDA support older than 9.0:
+    # disable CUDA support older than 10.2:
     #
-    IF(CUDA_VERSION_MAJOR VERSION_LESS 9.0)
+    IF(CUDA_VERSION VERSION_LESS 10.2)
       MESSAGE(FATAL_ERROR "\n"
-        "deal.II requires CUDA version 9 or newer."
+        "deal.II requires CUDA version 10.2 or newer."
       )
     ENDIF()
 
     #
-    # CUDA Toolkit 9 and CUDA Toolkit 10 are incompatible with C++17.
+    # CUDA Toolkit 10 is incompatible with C++17.
     # Make sure that deal.II is configured appropriately
     #
     MACRO(_cuda_ensure_feature_off _version _cpp_version_bad _cpp_version_good)
@@ -84,7 +84,6 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       ENDIF()
     ENDMACRO()
 
-    _cuda_ensure_feature_off(9 17 14)
     _cuda_ensure_feature_off(10 17 14)
 
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
