@@ -166,7 +166,7 @@ std::vector<DataComponentInterpretation::DataComponentInterpretation>
 DataPostprocessorTensor<dim>::get_data_component_interpretation() const
 {
   return std::vector<DataComponentInterpretation::DataComponentInterpretation>(
-    dim * dim, DataComponentInterpretation::component_is_scalar);
+    dim * dim, DataComponentInterpretation::component_is_part_of_tensor);
 }
 
 
