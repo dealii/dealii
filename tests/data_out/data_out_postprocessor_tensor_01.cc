@@ -387,7 +387,7 @@ namespace Step8
         if (cycle == 0)
           {
             GridGenerator::hyper_cube(triangulation, -1, 1);
-            triangulation.refine_global(6);
+            triangulation.refine_global(2);
           }
         else
           refine_grid();
