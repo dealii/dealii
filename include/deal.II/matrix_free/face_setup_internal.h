@@ -973,22 +973,22 @@ namespace internal
         }
 
       info.face_orientation = 0;
-      const unsigned int left_face_orientation =
+      const unsigned int interior_face_orientation =
         !cell->face_orientation(face_no) + 2 * cell->face_flip(face_no) +
         4 * cell->face_rotation(face_no);
-      const unsigned int right_face_orientation =
+      const unsigned int exterior_face_orientation =
         !neighbor->face_orientation(info.exterior_face_no) +
         2 * neighbor->face_flip(info.exterior_face_no) +
         4 * neighbor->face_rotation(info.exterior_face_no);
-      if (left_face_orientation != 0)
+      if (interior_face_orientation != 0)
         {
-          info.face_orientation = 8 + left_face_orientation;
-          Assert(right_face_orientation == 0,
+          info.face_orientation = 8 + interior_face_orientation;
+          Assert(exterior_face_orientation == 0,
                  ExcMessage(
                    "Face seems to be wrongly oriented from both sides"));
         }
       else
-        info.face_orientation = right_face_orientation;
+        info.face_orientation = exterior_face_orientation;
       return info;
     }
 
