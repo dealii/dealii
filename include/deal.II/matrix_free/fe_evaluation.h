@@ -7722,22 +7722,19 @@ FEFaceEvaluation<dim,
 
   this->face_no =
     (this->is_interior_face ? faces.interior_face_no : faces.exterior_face_no);
-  this->subface_index = faces.subface_index;
-  if (this->is_interior_face == true)
-    {
-      this->subface_index = GeometryInfo<dim>::max_children_per_cell;
-      if (faces.face_orientation > 8)
-        this->face_orientation = faces.face_orientation - 8;
-      else
-        this->face_orientation = 0;
-    }
-  else
-    {
-      if (faces.face_orientation < 8)
-        this->face_orientation = faces.face_orientation;
-      else
-        this->face_orientation = 0;
-    }
+  this->subface_index = this->is_interior_face == true ?
+                          GeometryInfo<dim>::max_children_per_cell :
+                          faces.subface_index;
+
+  // First check if interior or exterior cell has non-standard orientation
+  // (i.e. the third bit is one or not). Then set zero if this cell has
+  // standard-orientation else copy the first three bits
+  // (which is equivalent to modulo 8). See also the documentation of
+  // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
+  this->face_orientation =
+    (this->is_interior_face == (faces.face_orientation >= 8)) ?
+      (faces.face_orientation % 8) :
+      0;
 
   this->cell_type = this->matrix_info->get_mapping_info().face_type[face_index];
   const unsigned int offsets =
