@@ -2056,6 +2056,7 @@ namespace internal
           data, temp1, values_array, integrate_gradients, face_no);
     }
 
+    template <std::size_t n_face_orientations>
     static bool
     gather_evaluate(
       const Number2 *                                            src_ptr,
@@ -2069,11 +2070,11 @@ namespace internal
       const unsigned int active_fe_index,
       const unsigned int first_selected_component,
       const unsigned int cell,
-      const unsigned int face_no,
-      const unsigned int subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-      const unsigned int                                 face_orientation,
-      const Table<2, unsigned int> &                     orientation_map)
+      const std::array<unsigned int, n_face_orientations> face_no,
+      const unsigned int                                  subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex  dof_access_index,
+      const std::array<unsigned int, n_face_orientations> face_orientation,
+      const Table<2, unsigned int> &                      orientation_map)
     {
       return process_and_io( //
         false /*=evaluate*/,
@@ -2179,6 +2180,7 @@ namespace internal
         });
     }
 
+    template <std::size_t n_face_orientations>
     static bool
     integrate_scatter(
       Number2 *                                                  dst_ptr,
@@ -2193,11 +2195,11 @@ namespace internal
       const unsigned int active_fe_index,
       const unsigned int first_selected_component,
       const unsigned int cell,
-      const unsigned int face_no,
-      const unsigned int subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-      const unsigned int                                 face_orientation,
-      const Table<2, unsigned int> &                     orientation_map)
+      const std::array<unsigned int, n_face_orientations> face_no,
+      const unsigned int                                  subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex  dof_access_index,
+      const std::array<unsigned int, n_face_orientations> face_orientation,
+      const Table<2, unsigned int> &                      orientation_map)
     {
       return process_and_io( //
         true /*=integrate*/,
@@ -2267,12 +2269,15 @@ namespace internal
         [&](const auto &temp1) {
           // case 5: default vector access, must be handled separately, just do
           // the face-normal interpolation
+
+          AssertDimension(face_no.size(), 1);
+
           FEFaceNormalEvaluationImpl<dim,
                                      fe_degree,
                                      n_components,
                                      VectorizedArrayType>::
             template interpolate<false, false>(
-              data, temp1, values_array, integrate_gradients, face_no);
+              data, temp1, values_array, integrate_gradients, face_no[0]);
         },
         [&](auto &temp1, const auto &dofs_per_face) {
           if (fe_degree > -1 &&
@@ -2316,7 +2321,8 @@ namespace internal
     }
 
   private:
-    template <typename Number2_,
+    template <std::size_t n_face_orientations,
+              typename Number2_,
               typename Function1a,
               typename Function1b,
               typename Function2a,
@@ -2339,38 +2345,49 @@ namespace internal
       const unsigned int active_fe_index,
       const unsigned int first_selected_component,
       const unsigned int cell,
-      const unsigned int face_no,
-      const unsigned int subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index,
-      const unsigned int                                 face_orientation,
-      const Table<2, unsigned int> &                     orientation_map,
-      const Function1a &                                 function_1a,
-      const Function1b &                                 function_1b,
-      const Function2a &                                 function_2a,
-      const Function2b &                                 function_2b,
-      const Function3a &                                 function_3a,
-      const Function3b &                                 function_3b,
-      const Function5 &                                  function_5,
-      const Function0 &                                  function_0)
+      const std::array<unsigned int, n_face_orientations> face_no,
+      const unsigned int                                  subface_index,
+      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex  dof_access_index,
+      const std::array<unsigned int, n_face_orientations> face_orientation,
+      const Table<2, unsigned int> &                      orientation_map,
+      const Function1a &                                  function_1a,
+      const Function1b &                                  function_1b,
+      const Function2a &                                  function_2a,
+      const Function2b &                                  function_2b,
+      const Function3a &                                  function_3a,
+      const Function3b &                                  function_3b,
+      const Function5 &                                   function_5,
+      const Function0 &                                   function_0)
     {
       (void)subface_index;
 
       if (integrate &&
-          (face_orientation > 0 &&
+          (face_orientation[0] > 0 &&
            subface_index < GeometryInfo<dim>::max_children_per_cell))
-        adjust_for_face_orientation(face_orientation,
-                                    orientation_map,
-                                    true,
-                                    do_values,
-                                    do_gradients,
-                                    data.n_q_points_face,
-                                    scratch_data,
-                                    values_quad,
-                                    gradients_quad);
+        {
+          AssertDimension(face_orientation.size(), 1);
+          adjust_for_face_orientation(face_orientation[0],
+                                      orientation_map,
+                                      true,
+                                      do_values,
+                                      do_gradients,
+                                      data.n_q_points_face,
+                                      scratch_data,
+                                      values_quad,
+                                      gradients_quad);
+        }
 
-      const unsigned int side = face_no % 2;
-
-      const unsigned int side_ = integrate ? (2 - side) : (1 + side);
+      // we know that the gradient weights for the Hermite case on the
+      // right (side==1) are the negative from the value at the left
+      // (side==0), so we only read out one of them.
+      VectorizedArrayType grad_weight =
+        (data.data.front().nodal_at_cell_boundaries == true && fe_degree > 1 &&
+         data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite) ?
+          data.data.front()
+            .shape_data_on_face[0][fe_degree + (integrate ?
+                                                  (2 - (face_no[0] % 2)) :
+                                                  (1 + (face_no[0] % 2)))] :
+          VectorizedArrayType(0.0 /*dummy*/);
 
       constexpr unsigned int static_dofs_per_component =
         fe_degree > -1 ? Utilities::pow(fe_degree + 1, dim) :
@@ -2398,16 +2415,66 @@ namespace internal
       if (integrate)
         function_0(temp1, dofs_per_face);
 
-      const unsigned int  dummy = 0;
-      const unsigned int *orientation =
-        (data.data.front().nodal_at_cell_boundaries == true) ?
-          &data.face_orientations[face_orientation][0] :
+      const unsigned int dummy = 0;
+
+      // re-orientation
+      std::array<const unsigned int *, n_face_orientations> orientation;
+      orientation[0] = (data.data.front().nodal_at_cell_boundaries == true) ?
+                         &data.face_orientations[face_orientation[0]][0] :
+                         &dummy;
+
+      // face_to_cell_index_hermite
+      std::array<const unsigned int *, n_face_orientations> index_array_hermite;
+
+      index_array_hermite[0] =
+        (data.data.front().nodal_at_cell_boundaries == true && fe_degree > 1 &&
+         data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite) ?
+          &data.face_to_cell_index_hermite(face_no[0], 0) :
           &dummy;
-      const auto reorientate = [&](const unsigned int i) {
-        return (dim < 3 || face_orientation == 0 ||
+
+      if (n_face_orientations > 1 &&
+          data.data.front().nodal_at_cell_boundaries == true && fe_degree > 1 &&
+          data.element_type == MatrixFreeFunctions::tensor_symmetric_hermite)
+        {
+          const unsigned int n_filled_lanes =
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
+
+          for (unsigned int v = 1; v < n_filled_lanes; ++v)
+            {
+              grad_weight[v] =
+                data.data.front().shape_data_on_face
+                  [0][fe_degree + (integrate ? (2 - (face_no[v] % 2)) :
+                                               (1 + (face_no[v] % 2)))][v];
+
+              index_array_hermite[v] =
+                &data.face_to_cell_index_hermite(face_no[v], 0);
+            }
+        }
+
+      // face_to_cell_index_nodal
+      std::array<const unsigned int *, n_face_orientations> index_array_nodal;
+
+      index_array_nodal[0] =
+        (data.data.front().nodal_at_cell_boundaries == true) ?
+          &data.face_to_cell_index_nodal(face_no[0], 0) :
+          &dummy;
+
+      if (n_face_orientations > 1 &&
+          (data.data.front().nodal_at_cell_boundaries == true))
+        {
+          const unsigned int n_filled_lanes =
+            dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
+
+          for (unsigned int v = 1; v < n_filled_lanes; ++v)
+            index_array_nodal[v] =
+              &data.face_to_cell_index_nodal(face_no[v], 0);
+        }
+
+      const auto reorientate = [&](const unsigned int v, const unsigned int i) {
+        return (dim < 3 || face_orientation[0] == 0 ||
                 subface_index < GeometryInfo<dim>::max_children_per_cell) ?
                  i :
-                 orientation[i];
+                 orientation[v][i];
       };
 
       // case 1: contiguous and interleaved indices
@@ -2433,50 +2500,93 @@ namespace internal
 
           if (fe_degree > 1 && do_gradients == true)
             {
-              // we know that the gradient weights for the Hermite case on the
-              // right (side==1) are the negative from the value at the left
-              // (side==0), so we only read out one of them.
-              const VectorizedArrayType grad_weight =
-                data.data.front().shape_data_on_face[0][fe_degree + side_];
-              AssertDimension(data.face_to_cell_index_hermite.size(1),
-                              2 * dofs_per_face);
-              const unsigned int *index_array =
-                &data.face_to_cell_index_hermite(face_no, 0);
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
-                  const unsigned int ind1 = index_array[2 * i];
-                  const unsigned int ind2 = index_array[2 * i + 1];
-                  AssertIndexRange(ind1, data.dofs_per_component_on_cell);
-                  AssertIndexRange(ind2, data.dofs_per_component_on_cell);
-                  const unsigned int i_ = reorientate(i);
-                  for (unsigned int comp = 0; comp < n_components; ++comp)
-                    function_1a(
-                      temp1[i_ + 2 * comp * dofs_per_face],
-                      temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
-                      global_vector_ptr + dof_index +
-                        (ind1 + comp * static_dofs_per_component) *
-                          VectorizedArrayType::size(),
-                      global_vector_ptr + dof_index +
-                        (ind2 + comp * static_dofs_per_component) *
-                          VectorizedArrayType::size(),
-                      grad_weight);
+                  if (n_face_orientations == 1)
+                    {
+                      const unsigned int ind1 = index_array_hermite[0][2 * i];
+                      const unsigned int ind2 =
+                        index_array_hermite[0][2 * i + 1];
+                      AssertIndexRange(ind1, data.dofs_per_component_on_cell);
+                      AssertIndexRange(ind2, data.dofs_per_component_on_cell);
+                      const unsigned int i_ = reorientate(0, i);
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        function_1a(
+                          temp1[i_ + 2 * comp * dofs_per_face],
+                          temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
+                          global_vector_ptr + dof_index +
+                            (ind1 + comp * static_dofs_per_component) *
+                              VectorizedArrayType::size(),
+                          global_vector_ptr + dof_index +
+                            (ind2 + comp * static_dofs_per_component) *
+                              VectorizedArrayType::size(),
+                          grad_weight);
+                    }
+                  else
+                    {
+                      Assert(false, ExcNotImplemented());
+
+                      const unsigned int n_filled_lanes =
+                        dof_info
+                          .n_vectorization_lanes_filled[dof_access_index][cell];
+
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                          function_3a(
+                            temp1[reorientate(v, i) + 2 * comp * dofs_per_face]
+                                 [v],
+                            temp1[reorientate(v, i) + dofs_per_face +
+                                  2 * comp * dofs_per_face][v],
+                            global_vector_ptr[dof_index +
+                                              (index_array_hermite[v][2 * i] +
+                                               comp *
+                                                 static_dofs_per_component) *
+                                                VectorizedArrayType::size() +
+                                              v],
+                            global_vector_ptr
+                              [dof_index +
+                               (index_array_hermite[v][2 * i + 1] +
+                                comp * static_dofs_per_component) *
+                                 VectorizedArrayType::size() +
+                               v],
+                            grad_weight[v]);
+                    }
                 }
             }
           else
             {
-              AssertDimension(data.face_to_cell_index_nodal.size(1),
-                              dofs_per_face);
-              const unsigned int *index_array =
-                &data.face_to_cell_index_nodal(face_no, 0);
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
-                  const unsigned int i_  = reorientate(i);
-                  const unsigned int ind = index_array[i];
-                  for (unsigned int comp = 0; comp < n_components; ++comp)
-                    function_1b(temp1[i_ + 2 * comp * dofs_per_face],
-                                global_vector_ptr + dof_index +
-                                  (ind + comp * static_dofs_per_component) *
-                                    VectorizedArrayType::size());
+                  if (n_face_orientations == 1)
+                    {
+                      const unsigned int i_  = reorientate(0, i);
+                      const unsigned int ind = index_array_nodal[0][i];
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        function_1b(temp1[i_ + 2 * comp * dofs_per_face],
+                                    global_vector_ptr + dof_index +
+                                      (ind + comp * static_dofs_per_component) *
+                                        VectorizedArrayType::size());
+                    }
+                  else
+                    {
+                      Assert(false, ExcNotImplemented());
+
+                      const unsigned int n_filled_lanes =
+                        dof_info
+                          .n_vectorization_lanes_filled[dof_access_index][cell];
+
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                          function_3b(
+                            temp1[reorientate(v, i) + 2 * comp * dofs_per_face]
+                                 [v],
+                            global_vector_ptr[dof_index +
+                                              (index_array_nodal[v][i] +
+                                               comp *
+                                                 static_dofs_per_component) *
+                                                VectorizedArrayType::size() +
+                                              v]);
+                    }
                 }
             }
         }
@@ -2500,67 +2610,120 @@ namespace internal
                                       [cell * VectorizedArrayType::size()];
           if (fe_degree > 1 && do_gradients == true)
             {
-              // we know that the gradient weights for the Hermite case on the
-              // right (side==1) are the negative from the value at the left
-              // (side==0), so we only read out one of them.
-              const VectorizedArrayType grad_weight =
-                data.data.front().shape_data_on_face[0][fe_degree + side_];
-              AssertDimension(data.face_to_cell_index_hermite.size(1),
-                              2 * dofs_per_face);
-
-              const unsigned int *index_array =
-                &data.face_to_cell_index_hermite(face_no, 0);
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
-                  const unsigned int i_ = reorientate(i);
+                  if (n_face_orientations == 1)
+                    {
+                      const unsigned int i_ = reorientate(0, i);
 
-                  const unsigned int ind1 =
-                    index_array[2 * i] * VectorizedArrayType::size();
-                  const unsigned int ind2 =
-                    index_array[2 * i + 1] * VectorizedArrayType::size();
-                  for (unsigned int comp = 0; comp < n_components; ++comp)
-                    function_2a(
-                      temp1[i_ + 2 * comp * dofs_per_face],
-                      temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
-                      global_vector_ptr + ind1 +
-                        comp * static_dofs_per_component *
-                          VectorizedArrayType::size() +
-                        dof_info.component_dof_indices_offset
-                            [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::size(),
-                      global_vector_ptr + ind2 +
-                        comp * static_dofs_per_component *
-                          VectorizedArrayType::size() +
-                        dof_info.component_dof_indices_offset
-                            [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::size(),
-                      grad_weight,
-                      indices,
-                      indices);
+                      const unsigned int ind1 = index_array_hermite[0][2 * i] *
+                                                VectorizedArrayType::size();
+                      const unsigned int ind2 =
+                        index_array_hermite[0][2 * i + 1] *
+                        VectorizedArrayType::size();
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        function_2a(
+                          temp1[i_ + 2 * comp * dofs_per_face],
+                          temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
+                          global_vector_ptr + ind1 +
+                            comp * static_dofs_per_component *
+                              VectorizedArrayType::size() +
+                            dof_info.component_dof_indices_offset
+                                [active_fe_index][first_selected_component] *
+                              VectorizedArrayType::size(),
+                          global_vector_ptr + ind2 +
+                            comp * static_dofs_per_component *
+                              VectorizedArrayType::size() +
+                            dof_info.component_dof_indices_offset
+                                [active_fe_index][first_selected_component] *
+                              VectorizedArrayType::size(),
+                          grad_weight,
+                          indices,
+                          indices);
+                    }
+                  else
+                    {
+                      Assert(false, ExcNotImplemented());
+
+                      const unsigned int n_filled_lanes =
+                        dof_info
+                          .n_vectorization_lanes_filled[dof_access_index][cell];
+
+                      for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                        for (unsigned int comp = 0; comp < n_components; ++comp)
+                          {
+                            const unsigned int i_ = reorientate(0, i);
+                            function_3a(temp1[i_ + 2 * comp * dofs_per_face][v],
+                                        temp1[i_ + dofs_per_face +
+                                              2 * comp * dofs_per_face][v],
+                                        global_vector_ptr
+                                          [index_array_hermite[v][2 * i] *
+                                             VectorizedArrayType::size() +
+                                           comp * static_dofs_per_component *
+                                             VectorizedArrayType::size() +
+                                           dof_info.component_dof_indices_offset
+                                               [active_fe_index]
+                                               [first_selected_component] *
+                                             VectorizedArrayType::size() +
+                                           indices[v] + v],
+                                        global_vector_ptr
+                                          [index_array_hermite[v][2 * i + 1] *
+                                             VectorizedArrayType::size() +
+                                           comp * static_dofs_per_component *
+                                             VectorizedArrayType::size() +
+                                           dof_info.component_dof_indices_offset
+                                               [active_fe_index]
+                                               [first_selected_component] *
+                                             VectorizedArrayType::size() +
+                                           indices[v] + v],
+                                        grad_weight[v]);
+                          }
+                    }
                 }
             }
           else
             {
-              AssertDimension(data.face_to_cell_index_nodal.size(1),
-                              dofs_per_face);
-              const unsigned int *index_array =
-                &data.face_to_cell_index_nodal(face_no, 0);
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
-                  const unsigned int i_ = reorientate(i);
+                  if (n_face_orientations == 1)
+                    {
+                      const unsigned int i_ = reorientate(0, i);
 
-                  const unsigned int ind =
-                    index_array[i] * VectorizedArrayType::size();
-                  for (unsigned int comp = 0; comp < n_components; ++comp)
-                    function_2b(
-                      temp1[i_ + 2 * comp * dofs_per_face],
-                      global_vector_ptr + ind +
-                        comp * static_dofs_per_component *
-                          VectorizedArrayType::size() +
-                        dof_info.component_dof_indices_offset
-                            [active_fe_index][first_selected_component] *
-                          VectorizedArrayType::size(),
-                      indices);
+                      const unsigned int ind =
+                        index_array_nodal[0][i] * VectorizedArrayType::size();
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        function_2b(
+                          temp1[i_ + 2 * comp * dofs_per_face],
+                          global_vector_ptr + ind +
+                            comp * static_dofs_per_component *
+                              VectorizedArrayType::size() +
+                            dof_info.component_dof_indices_offset
+                                [active_fe_index][first_selected_component] *
+                              VectorizedArrayType::size(),
+                          indices);
+                    }
+                  else
+                    {
+                      Assert(false, ExcNotImplemented());
+
+                      const unsigned int n_filled_lanes =
+                        dof_info
+                          .n_vectorization_lanes_filled[dof_access_index][cell];
+
+                      for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                        for (unsigned int comp = 0; comp < n_components; ++comp)
+                          function_3b(
+                            temp1[reorientate(v, i) + 2 * comp * dofs_per_face]
+                                 [v],
+                            global_vector_ptr
+                              [index_array_nodal[v][i] +
+                               comp * static_dofs_per_component *
+                                 VectorizedArrayType::size() +
+                               dof_info.component_dof_indices_offset
+                                   [active_fe_index][first_selected_component] *
+                                 VectorizedArrayType::size() +
+                               indices[v] + v]);
+                    }
                 }
             }
         }
@@ -2591,45 +2754,70 @@ namespace internal
 
           if (fe_degree > 1 && do_gradients == true)
             {
-              // we know that the gradient weights for the Hermite case on the
-              // right (side==1) are the negative from the value at the left
-              // (side==0), so we only read out one of them.
-              const VectorizedArrayType grad_weight =
-                data.data.front().shape_data_on_face[0][fe_degree + side_];
-              AssertDimension(data.face_to_cell_index_hermite.size(1),
-                              2 * dofs_per_face);
-
-              const unsigned int *index_array =
-                &data.face_to_cell_index_hermite(face_no, 0);
               if (n_filled_lanes == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      const unsigned int i_ = reorientate(i);
-                      unsigned int       ind1[VectorizedArrayType::size()];
-                      DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0; v < VectorizedArrayType::size();
-                           ++v)
-                        ind1[v] =
-                          indices[v] + (comp * static_dofs_per_component +
-                                        index_array[2 * i]) *
-                                         strides[v];
-                      unsigned int ind2[VectorizedArrayType::size()];
-                      DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0; v < VectorizedArrayType::size();
-                           ++v)
-                        ind2[v] =
-                          indices[v] + (comp * static_dofs_per_component +
-                                        index_array[2 * i + 1]) *
-                                         strides[v];
-                      function_2a(
-                        temp1[i_ + 2 * comp * dofs_per_face],
-                        temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
-                        global_vector_ptr,
-                        global_vector_ptr,
-                        grad_weight,
-                        ind1,
-                        ind2);
+                      if (n_face_orientations == 1)
+                        {
+                          const unsigned int i_ = reorientate(0, i);
+                          unsigned int       ind1[VectorizedArrayType::size()];
+                          DEAL_II_OPENMP_SIMD_PRAGMA
+                          for (unsigned int v = 0;
+                               v < VectorizedArrayType::size();
+                               ++v)
+                            ind1[v] = indices[v] +
+                                      (comp * static_dofs_per_component +
+                                       index_array_hermite[0 /*TODO*/][2 * i]) *
+                                        strides[v];
+                          unsigned int ind2[VectorizedArrayType::size()];
+                          DEAL_II_OPENMP_SIMD_PRAGMA
+                          for (unsigned int v = 0;
+                               v < VectorizedArrayType::size();
+                               ++v)
+                            ind2[v] =
+                              indices[v] +
+                              (comp * static_dofs_per_component +
+                               index_array_hermite[0 /*TODO*/][2 * i + 1]) *
+                                strides[v];
+                          function_2a(temp1[i_ + 2 * comp * dofs_per_face],
+                                      temp1[i_ + dofs_per_face +
+                                            2 * comp * dofs_per_face],
+                                      global_vector_ptr,
+                                      global_vector_ptr,
+                                      grad_weight,
+                                      ind1,
+                                      ind2);
+                        }
+                      else
+                        {
+                          Assert(false, ExcNotImplemented());
+
+                          const unsigned int n_filled_lanes =
+                            dof_info
+                              .n_vectorization_lanes_filled[dof_access_index]
+                                                           [cell];
+
+                          for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                            {
+                              const unsigned int i_ = reorientate(v, i);
+                              function_3a(
+                                temp1[i_ + 2 * comp * dofs_per_face][v],
+                                temp1[i_ + dofs_per_face +
+                                      2 * comp * dofs_per_face][v],
+                                global_vector_ptr
+                                  [indices[v] +
+                                   (comp * static_dofs_per_component +
+                                    index_array_hermite[v][2 * i]) *
+                                     strides[v]],
+                                global_vector_ptr
+                                  [indices[v] +
+                                   (comp * static_dofs_per_component +
+                                    index_array_hermite[v][2 * i + 1]) *
+                                     strides[v]],
+                                grad_weight[v]);
+                            }
+                        }
                     }
               else
                 {
@@ -2643,46 +2831,71 @@ namespace internal
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
                         {
-                          const unsigned int i_ = reorientate(i);
-                          const unsigned int ind1 =
-                            indices[v] + (comp * static_dofs_per_component +
-                                          index_array[2 * i]) *
-                                           strides[v];
-                          const unsigned int ind2 =
-                            indices[v] + (comp * static_dofs_per_component +
-                                          index_array[2 * i + 1]) *
-                                           strides[v];
-                          function_3a(temp1[i_ + 2 * comp * dofs_per_face][v],
-                                      temp1[i_ + dofs_per_face +
-                                            2 * comp * dofs_per_face][v],
-                                      global_vector_ptr[ind1],
-                                      global_vector_ptr[ind2],
-                                      grad_weight[0]);
+                          const unsigned int i_ =
+                            reorientate(n_face_orientations == 1 ? 0 : v, i);
+                          function_3a(
+                            temp1[i_ + 2 * comp * dofs_per_face][v],
+                            temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face]
+                                 [v],
+                            global_vector_ptr
+                              [indices[v] +
+                               (comp * static_dofs_per_component +
+                                index_array_hermite
+                                  [n_face_orientations == 1 ? 0 : v][2 * i]) *
+                                 strides[v]],
+                            global_vector_ptr
+                              [indices[v] +
+                               (comp * static_dofs_per_component +
+                                index_array_hermite[n_face_orientations == 1 ?
+                                                      0 :
+                                                      v][2 * i + 1]) *
+                                 strides[v]],
+                            grad_weight[n_face_orientations == 1 ? 0 : v]);
                         }
                 }
             }
           else
             {
-              AssertDimension(data.face_to_cell_index_nodal.size(1),
-                              dofs_per_face);
-              const unsigned int *index_array =
-                &data.face_to_cell_index_nodal(face_no, 0);
               if (n_filled_lanes == VectorizedArrayType::size())
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
                     {
-                      unsigned int ind[VectorizedArrayType::size()];
-                      DEAL_II_OPENMP_SIMD_PRAGMA
-                      for (unsigned int v = 0; v < VectorizedArrayType::size();
-                           ++v)
-                        ind[v] =
-                          indices[v] +
-                          (comp * static_dofs_per_component + index_array[i]) *
-                            strides[v];
-                      const unsigned int i_ = reorientate(i);
-                      function_2b(temp1[i_ + 2 * comp * dofs_per_face],
-                                  global_vector_ptr,
-                                  ind);
+                      if (n_face_orientations == 1)
+                        {
+                          unsigned int ind[VectorizedArrayType::size()];
+                          DEAL_II_OPENMP_SIMD_PRAGMA
+                          for (unsigned int v = 0;
+                               v < VectorizedArrayType::size();
+                               ++v)
+                            ind[v] =
+                              indices[v] + (comp * static_dofs_per_component +
+                                            index_array_nodal[0 /*TODO*/][i]) *
+                                             strides[v];
+                          const unsigned int i_ = reorientate(0, i);
+                          function_2b(temp1[i_ + 2 * comp * dofs_per_face],
+                                      global_vector_ptr,
+                                      ind);
+                        }
+                      else
+                        {
+                          Assert(false, ExcNotImplemented());
+
+
+                          const unsigned int n_filled_lanes =
+                            dof_info
+                              .n_vectorization_lanes_filled[dof_access_index]
+                                                           [cell];
+
+                          for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                            function_3b(
+                              temp1[reorientate(v, i) +
+                                    2 * comp * dofs_per_face][v],
+                              global_vector_ptr[indices[v] +
+                                                (comp *
+                                                   static_dofs_per_component +
+                                                 index_array_nodal[v][i]) *
+                                                  strides[v]]);
+                        }
                     }
               else
                 {
@@ -2694,15 +2907,16 @@ namespace internal
                   for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
-                        {
-                          const unsigned int ind1 =
-                            indices[v] + (comp * static_dofs_per_component +
-                                          index_array[i]) *
-                                           strides[v];
-                          const unsigned int i_ = reorientate(i);
-                          function_3b(temp1[i_ + 2 * comp * dofs_per_face][v],
-                                      global_vector_ptr[ind1]);
-                        }
+                        function_3b(
+                          temp1[reorientate(n_face_orientations == 1 ? 0 : v,
+                                            i) +
+                                2 * comp * dofs_per_face][v],
+                          global_vector_ptr
+                            [indices[v] +
+                             (comp * static_dofs_per_component +
+                              index_array_nodal
+                                [n_face_orientations == 1 ? 0 : v][i]) *
+                               strides[v]]);
                 }
             }
         }
@@ -2728,57 +2942,100 @@ namespace internal
               data.element_type ==
                 MatrixFreeFunctions::tensor_symmetric_hermite)
             {
-              // we know that the gradient weights for the Hermite case on the
-              // right (side==1) are the negative from the value at the left
-              // (side==0), so we only read out one of them.
-              const VectorizedArrayType grad_weight =
-                data.data.front().shape_data_on_face[0][fe_degree + side_];
-              AssertDimension(data.face_to_cell_index_hermite.size(1),
-                              2 * dofs_per_face);
-
-              const unsigned int *index_array =
-                &data.face_to_cell_index_hermite(face_no, 0);
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 {
-                  const unsigned int ind1 = index_array[2 * i];
-                  const unsigned int ind2 = index_array[2 * i + 1];
-                  const unsigned int i_   = reorientate(i);
+                  if (n_face_orientations == 1)
+                    {
+                      const unsigned int ind1 = index_array_hermite[0][2 * i];
+                      const unsigned int ind2 =
+                        index_array_hermite[0][2 * i + 1];
+                      const unsigned int i_ = reorientate(0, i);
 
-                  for (unsigned int comp = 0; comp < n_components; ++comp)
-                    function_2a(
-                      temp1[i_ + 2 * comp * dofs_per_face],
-                      temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
-                      global_vector_ptr + comp * static_dofs_per_component +
-                        ind1 +
-                        dof_info.component_dof_indices_offset
-                          [active_fe_index][first_selected_component],
-                      global_vector_ptr + comp * static_dofs_per_component +
-                        ind2 +
-                        dof_info.component_dof_indices_offset
-                          [active_fe_index][first_selected_component],
-                      grad_weight,
-                      indices,
-                      indices);
+                      for (unsigned int comp = 0; comp < n_components; ++comp)
+                        function_2a(
+                          temp1[i_ + 2 * comp * dofs_per_face],
+                          temp1[i_ + dofs_per_face + 2 * comp * dofs_per_face],
+                          global_vector_ptr + comp * static_dofs_per_component +
+                            ind1 +
+                            dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component],
+                          global_vector_ptr + comp * static_dofs_per_component +
+                            ind2 +
+                            dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component],
+                          grad_weight,
+                          indices,
+                          indices);
+                    }
+                  else
+                    {
+                      Assert(false, ExcNotImplemented());
+
+                      const unsigned int n_filled_lanes =
+                        dof_info
+                          .n_vectorization_lanes_filled[dof_access_index][cell];
+
+                      for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                        for (unsigned int comp = 0; comp < n_components; ++comp)
+                          function_3a(
+                            temp1[reorientate(v, i) + 2 * comp * dofs_per_face]
+                                 [v],
+                            temp1[reorientate(v, i) + dofs_per_face +
+                                  2 * comp * dofs_per_face][v],
+                            global_vector_ptr
+                              [comp * static_dofs_per_component +
+                               index_array_hermite[v][2 * i] +
+                               dof_info.component_dof_indices_offset
+                                 [active_fe_index][first_selected_component] +
+                               indices[v]],
+                            global_vector_ptr
+                              [comp * static_dofs_per_component +
+                               index_array_hermite[v][2 * i + 1] +
+                               dof_info.component_dof_indices_offset
+                                 [active_fe_index][first_selected_component] +
+                               indices[v]],
+                            grad_weight[v]);
+                    }
                 }
             }
           else
             {
-              AssertDimension(data.face_to_cell_index_nodal.size(1),
-                              dofs_per_face);
-              const unsigned int *index_array =
-                &data.face_to_cell_index_nodal(face_no, 0);
               for (unsigned int i = 0; i < dofs_per_face; ++i)
                 for (unsigned int comp = 0; comp < n_components; ++comp)
                   {
-                    const unsigned int ind = index_array[i];
-                    const unsigned int i_  = reorientate(i);
+                    if (n_face_orientations == 1)
+                      {
+                        const unsigned int ind = index_array_nodal[0][i];
+                        const unsigned int i_  = reorientate(0, i);
 
-                    function_2b(temp1[i_ + 2 * comp * dofs_per_face],
-                                global_vector_ptr +
-                                  comp * static_dofs_per_component + ind +
-                                  dof_info.component_dof_indices_offset
-                                    [active_fe_index][first_selected_component],
-                                indices);
+                        function_2b(
+                          temp1[i_ + 2 * comp * dofs_per_face],
+                          global_vector_ptr + comp * static_dofs_per_component +
+                            ind +
+                            dof_info.component_dof_indices_offset
+                              [active_fe_index][first_selected_component],
+                          indices);
+                      }
+                    else
+                      {
+                        Assert(false, ExcNotImplemented());
+
+                        const unsigned int n_filled_lanes =
+                          dof_info
+                            .n_vectorization_lanes_filled[dof_access_index]
+                                                         [cell];
+
+                        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                          function_3b(
+                            temp1[reorientate(v, i) + 2 * comp * dofs_per_face]
+                                 [v],
+                            global_vector_ptr
+                              [comp * static_dofs_per_component +
+                               index_array_nodal[v][i] +
+                               dof_info.component_dof_indices_offset
+                                 [active_fe_index][first_selected_component] +
+                               indices[v]]);
+                      }
                   }
             }
         }
@@ -2794,17 +3051,20 @@ namespace internal
         function_0(temp1, dofs_per_face);
 
       if (!integrate &&
-          (face_orientation > 0 &&
+          (face_orientation[0] > 0 &&
            subface_index < GeometryInfo<dim>::max_children_per_cell))
-        adjust_for_face_orientation(face_orientation,
-                                    orientation_map,
-                                    false,
-                                    do_values,
-                                    do_gradients,
-                                    data.n_q_points_face,
-                                    scratch_data,
-                                    values_quad,
-                                    gradients_quad);
+        {
+          AssertDimension(face_orientation.size(), 1);
+          adjust_for_face_orientation(face_orientation[0],
+                                      orientation_map,
+                                      false,
+                                      do_values,
+                                      do_gradients,
+                                      data.n_q_points_face,
+                                      scratch_data,
+                                      values_quad,
+                                      gradients_quad);
+        }
 
       return true;
     }
