@@ -2183,6 +2183,31 @@ namespace internal
                            const SubCellData &                 subcelldata,
                            Triangulation<dim, spacedim> &      tria)
       {
+        AssertThrow(vertices.size() > 0, ExcMessage("No vertices given"));
+        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+
+        // Check that all cells have positive volume.
+#ifndef _MSC_VER
+        // TODO: The following code does not compile with MSVC. Find a way
+        // around it
+        if (dim == spacedim)
+          for (unsigned int cell_no = 0; cell_no < cells.size(); ++cell_no)
+            {
+              // If we should check for distorted cells, then we permit them
+              // to exist. If a cell has negative measure, then it must be
+              // distorted (the converse is not necessarily true); hence
+              // throw an exception if no such cells should exist.
+              if (!tria.check_for_distorted_cells)
+                {
+                  const double cell_measure =
+                    GridTools::cell_measure<dim>(vertices,
+                                                 ArrayView<const unsigned int>(
+                                                   cells[cell_no].vertices));
+                  AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                }
+            }
+#endif
+
         // clear old content
         tria.levels.clear();
         tria.levels.push_back(
