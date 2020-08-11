@@ -467,6 +467,14 @@ namespace internal
        */
       dealii::Table<2, unsigned int> face_to_cell_index_hermite;
 
+      /**
+       * For degrees on faces, the basis functions are not
+       * in the correct order if a face is not in the standard orientation
+       * to a given element. This data structure is used to re-order the
+       * basis functions to represent the correct order.
+       */
+      dealii::Table<2, unsigned int> face_orientations;
+
     private:
       /**
        * Check whether we have symmetries in the shape values. In that case,
