@@ -784,8 +784,10 @@ namespace internal
           // trouble. note that this only happens for lines in 3d and
           // higher, and for quads only in 4d and higher, so this
           // isn't a particularly frequent case
-          dealii::Table<2, std::unique_ptr<DoFIdentities>> quad_dof_identities(
-            dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
+          dealii::Table<3, std::unique_ptr<DoFIdentities>> quad_dof_identities(
+            dof_handler.fe_collection.size(),
+            dof_handler.fe_collection.size(),
+            2 /*triangle (0) or quadrilateral (1)*/);
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto q : cell->face_indices())
@@ -824,8 +826,10 @@ namespace internal
                               *ensure_existence_and_return_dof_identities<2>(
                                 dof_handler.get_fe(most_dominating_fe_index),
                                 dof_handler.get_fe(other_fe_index),
-                                quad_dof_identities[most_dominating_fe_index]
-                                                   [other_fe_index]);
+                                quad_dof_identities
+                                  [most_dominating_fe_index][other_fe_index]
+                                  [cell->quad(q)->reference_cell_type() ==
+                                   ReferenceCell::Type::Quad]);
 
                             for (const auto &identity : identities)
                               {
@@ -1530,8 +1534,10 @@ namespace internal
           // trouble. note that this only happens for lines in 3d and
           // higher, and for quads only in 4d and higher, so this
           // isn't a particularly frequent case
-          dealii::Table<2, std::unique_ptr<DoFIdentities>> quad_dof_identities(
-            dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
+          dealii::Table<3, std::unique_ptr<DoFIdentities>> quad_dof_identities(
+            dof_handler.fe_collection.size(),
+            dof_handler.fe_collection.size(),
+            2 /*triangle (0) or quadrilateral (1)*/);
 
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto q : cell->face_indices())
@@ -1571,8 +1577,10 @@ namespace internal
                               *ensure_existence_and_return_dof_identities<2>(
                                 dof_handler.get_fe(most_dominating_fe_index),
                                 dof_handler.get_fe(other_fe_index),
-                                quad_dof_identities[most_dominating_fe_index]
-                                                   [other_fe_index]);
+                                quad_dof_identities
+                                  [most_dominating_fe_index][other_fe_index]
+                                  [cell->quad(q)->reference_cell_type() ==
+                                   ReferenceCell::Type::Quad]);
 
                             for (const auto &identity : identities)
                               {
