@@ -120,7 +120,7 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
       if (const auto tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &triangulation))
         {
           const types::particle_index n_particles_to_generate =
@@ -236,7 +236,7 @@ namespace Particles
     {
       unsigned int combined_seed = random_number_seed;
       if (const auto tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &triangulation))
         {
           const unsigned int my_rank =
@@ -264,7 +264,7 @@ namespace Particles
         double global_weight_integral;
 
         if (const auto tria =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
             global_weight_integral =
@@ -292,7 +292,7 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
         if (const auto tria =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
             MPI_Exscan(&local_weight_integral,

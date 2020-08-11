@@ -29,7 +29,7 @@ jobs:
     - name: build
       run: |
         make -j 2
-        
+
   linux-debug-parallel-simplex:
     # simple parallel debug build using g++ with simplex configuration enabled
 
@@ -75,4 +75,51 @@ jobs:
     - name: test
       run: |
         make -j 2 setup_tests_simplex
-        ctest --output-on-failure -j 2 
+        ctest --output-on-failure -j 2
+
+  linux-debug-cuda-10:
+    # simple parallel debug build using cuda-10
+
+    name: linux debug cuda-10
+    runs-on: [ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: modules
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+        sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
+        sudo dpkg -i cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
+        sudo apt-key add /var/cuda-repo-10-2-local-10.2.89-440.33.01/7fa2af80.pub
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
+        sudo apt-get update
+        apt search cuda
+        sudo apt-get install -yq --no-install-recommends \
+            cuda-toolkit-10-2 \
+            libp4est-dev \
+            libopenmpi-dev \
+            openmpi-bin
+    - name: info
+      run: |
+        mpicc -v
+        cmake --version
+    - name: configure
+      run: |
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CUDA_FLAGS='-arch=sm_70' \
+              -D DEAL_II_CXX_FLAGS='-Werror -Wno-non-template-friend' \
+              -D DEAL_II_WITH_CUDA="ON" \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_WITH_P4EST="ON" \
+              -D DEAL_II_COMPONENT_EXAMPLES="ON" \
+              .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-cuda-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        make -j 2
