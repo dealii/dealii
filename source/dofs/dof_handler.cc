@@ -2612,9 +2612,10 @@ DoFHandler<dim, spacedim>::distribute_non_local_dofs()
     ExcMessage(
       "Distribute active DoFs using distribute_dofs() before calling distribute_non_local_dofs()."));
 
-  const auto non_local_id = begin()->get_fe().get_non_local_id();
+  // compatable for hp-elements
+  const auto non_local_id = this->get_fe(0).get_non_local_id();
   const auto n_global_non_local_dofs =
-    begin()->get_fe().n_global_non_local_dofs();
+    this->get_fe(0).n_global_non_local_dofs();
 
   for (auto cell : active_cell_iterators())
     {
