@@ -204,7 +204,7 @@ public:
   /*
    * @copydoc Triangulation::create_triangulation()
    *
-   * @note Not inmplemented yet.
+   * @note Not implemented yet.
    */
   virtual void
   create_triangulation(
