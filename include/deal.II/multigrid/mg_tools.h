@@ -75,16 +75,25 @@ namespace MGTools
    * Write the sparsity structure of the matrix belonging to the specified @p
    * level. The sparsity pattern is not compressed, so before creating the
    * actual matrix you have to compress the matrix yourself, using
-   * <tt>SparseMatrixStruct::compress()</tt>.
+   * <tt>SparsityPatternType::compress()</tt>.
    *
-   * There is no need to consider hanging nodes here, since only one level is
-   * considered.
+   * The optional AffineConstraints argument allows to define constraints of
+   * the level matrices like Dirichlet boundary conditions. Note that there is
+   * need to consider hanging nodes on the typical level matrices, since only
+   * one level is considered. See DoFTools::make_sparsity_pattern() for more
+   * details about the arguments.
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim,
+            int spacedim,
+            typename SparsityPatternType,
+            typename number = double>
   void
-  make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
-                        SparsityPatternType &            sparsity,
-                        const unsigned int               level);
+  make_sparsity_pattern(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    SparsityPatternType &            sparsity,
+    const unsigned int               level,
+    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const bool                       keep_constrained_dofs = true);
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin

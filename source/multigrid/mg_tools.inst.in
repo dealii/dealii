@@ -25,10 +25,24 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_sparsity_pattern<deal_II_dimension,
                             deal_II_space_dimension,
-                            PATTERN>(
+                            PATTERN,
+                            double>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         PATTERN &,
-        const unsigned int);
+        const unsigned int,
+        const AffineConstraints<double> &,
+        const bool);
+
+      template void
+      make_sparsity_pattern<deal_II_dimension,
+                            deal_II_space_dimension,
+                            PATTERN,
+                            float>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        PATTERN &,
+        const unsigned int,
+        const AffineConstraints<float> &,
+        const bool);
 #endif
     \}
   }
