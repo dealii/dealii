@@ -88,17 +88,24 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
 
   initialize_restriction();
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   // TODO[TL]: for anisotropic refinement we will probably need a table of
   // submatrices with an array for each refine case
   std::vector<FullMatrix<double>> face_embeddings(
     1 << (dim - 1),
-    FullMatrix<double>(this->n_dofs_per_face(), this->n_dofs_per_face()));
+    FullMatrix<double>(this->n_dofs_per_face(face_no),
+                       this->n_dofs_per_face(face_no)));
   // TODO: Something goes wrong there. The error of the least squares fit
   // is to large ...
   // FETools::compute_face_embedding_matrices(*this, face_embeddings.data(), 0,
   // 0);
-  this->interface_constraints.reinit((1 << (dim - 1)) * this->n_dofs_per_face(),
-                                     this->n_dofs_per_face());
+  this->interface_constraints.reinit((1 << (dim - 1)) *
+                                       this->n_dofs_per_face(face_no),
+                                     this->n_dofs_per_face(face_no));
   unsigned int target_row = 0;
   for (const auto &face_embedding : face_embeddings)
     for (unsigned int i = 0; i < face_embedding.m(); ++i)
@@ -153,6 +160,11 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
   QGauss<dim>        cell_quadrature(deg + 2);
   const unsigned int n_interior_points = cell_quadrature.size();
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   unsigned int n_face_points = (dim > 1) ? 1 : 0;
   // compute (deg+1)^(dim-1)
   for (unsigned int d = 1; d < dim; ++d)
@@ -160,7 +172,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
   this->generalized_support_points.resize(
     GeometryInfo<dim>::faces_per_cell * n_face_points + n_interior_points);
-  this->generalized_face_support_points[0].resize(n_face_points);
+  this->generalized_face_support_points[face_no].resize(n_face_points);
 
 
   // These might be required when the faces contribution is computed
@@ -194,7 +206,8 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
       for (unsigned int k = 0; k < n_face_points; ++k)
         {
-          this->generalized_face_support_points[0][k] = face_points.point(k);
+          this->generalized_face_support_points[face_no][k] =
+            face_points.point(k);
           // Compute its quadrature
           // contribution for each
           // moment.
@@ -381,7 +394,8 @@ FE_ABF<dim>::initialize_restriction()
           for (unsigned int k = 0; k < n_face_points; ++k)
             for (unsigned int i_child = 0; i_child < this->n_dofs_per_cell();
                  ++i_child)
-              for (unsigned int i_face = 0; i_face < this->n_dofs_per_face();
+              for (unsigned int i_face = 0;
+                   i_face < this->n_dofs_per_face(face);
                    ++i_face)
                 {
                   // The quadrature
@@ -389,13 +403,12 @@ FE_ABF<dim>::initialize_restriction()
                   // subcell are NOT
                   // transformed, so we
                   // have to do it here.
-                  this->restriction[iso][child](face * this->n_dofs_per_face() +
-                                                  i_face,
-                                                i_child) +=
+                  this->restriction[iso][child](
+                    face * this->n_dofs_per_face(face) + i_face, i_child) +=
                     Utilities::fixed_power<dim - 1>(.5) * q_sub.weight(k) *
                     cached_values_face(i_child, k) *
                     this->shape_value_component(
-                      face * this->n_dofs_per_face() + i_face,
+                      face * this->n_dofs_per_face(face) + i_face,
                       q_sub.point(k),
                       GeometryInfo<dim>::unit_normal_direction[face]);
                 }
@@ -419,9 +432,14 @@ FE_ABF<dim>::initialize_restriction()
       polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
     }
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   QGauss<dim>        q_cell(rt_order + 1);
   const unsigned int start_cell_dofs =
-    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face();
+    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
 
   // Store shape values, since the
   // evaluation suffers if not
@@ -561,14 +579,19 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
     for (unsigned int k = 0; k < n_face_points; ++k)
       for (unsigned int i = 0; i < boundary_weights.size(1); ++i)
         {
-          nodal_values[i + face * this->n_dofs_per_face()] +=
+          nodal_values[i + face * this->n_dofs_per_face(face)] +=
             boundary_weights(k, i) *
             support_point_values[face * n_face_points + k][GeometryInfo<
               dim>::unit_normal_direction[face]];
         }
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   const unsigned int start_cell_dofs =
-    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face();
+    GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
   const unsigned int start_cell_points =
     GeometryInfo<dim>::faces_per_cell * n_face_points;
 

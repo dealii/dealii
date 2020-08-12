@@ -1246,7 +1246,8 @@ namespace FETools
       std::vector<std::pair<unsigned int, unsigned int>>
         &                                 face_system_to_component_table,
       const FiniteElement<dim, spacedim> &finite_element,
-      const bool                          do_tensor_product = true);
+      const bool                          do_tensor_product = true,
+      const unsigned int                  face_no           = 0 /*TODO*/);
 
   } // namespace Compositing
 

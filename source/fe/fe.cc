@@ -107,20 +107,27 @@ FiniteElement<dim, spacedim>::FiniteElement(
       for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
         system_to_component_table[j] = std::pair<unsigned, unsigned>(0, j);
 
-      face_system_to_component_table.resize(1);
-      face_system_to_component_table[0].resize(this->n_dofs_per_face());
-      for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
-        face_system_to_component_table[0][j] =
-          std::pair<unsigned, unsigned>(0, j);
+      face_system_to_component_table.resize(this->n_unique_faces());
+      for (unsigned int f = 0; f < this->n_unique_faces(); ++f)
+        {
+          face_system_to_component_table[f].resize(this->n_dofs_per_face(f));
+          for (unsigned int j = 0; j < this->n_dofs_per_face(f); ++j)
+            face_system_to_component_table[f][j] =
+              std::pair<unsigned, unsigned>(0, j);
+        }
     }
 
   for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
     system_to_base_table[j] = std::make_pair(std::make_pair(0U, 0U), j);
 
-  face_system_to_base_table.resize(1);
-  face_system_to_base_table[0].resize(this->n_dofs_per_face());
-  for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
-    face_system_to_base_table[0][j] = std::make_pair(std::make_pair(0U, 0U), j);
+  face_system_to_base_table.resize(this->n_unique_faces());
+  for (unsigned int f = 0; f < this->n_unique_faces(); ++f)
+    {
+      face_system_to_base_table[f].resize(this->n_dofs_per_face(f));
+      for (unsigned int j = 0; j < this->n_dofs_per_face(f); ++j)
+        face_system_to_base_table[f][j] =
+          std::make_pair(std::make_pair(0U, 0U), j);
+    }
 
   // Fill with default value; may be changed by constructor of derived class.
   base_to_block_indices.reinit(1, 1);
@@ -141,17 +148,26 @@ FiniteElement<dim, spacedim>::FiniteElement(
                                   FullMatrix<double>());
     }
 
+
   if (dim == 3)
     {
-      adjust_quad_dof_index_for_face_orientation_table.resize(1);
+      adjust_quad_dof_index_for_face_orientation_table.resize(
+        this->n_unique_quads());
 
-      adjust_quad_dof_index_for_face_orientation_table[0] =
-        Table<2, int>(this->n_dofs_per_quad(), 8);
-      adjust_quad_dof_index_for_face_orientation_table[0].fill(0);
+      for (unsigned int f = 0; f < this->n_unique_quads(); ++f)
+        {
+          adjust_quad_dof_index_for_face_orientation_table[f] = Table<2, int>(
+            this->n_dofs_per_quad(f),
+            ReferenceCell::internal::Info::get_cell(this->reference_cell_type())
+                  .face_reference_cell_type(f) == ReferenceCell::Type::Quad ?
+              8 :
+              6);
+          adjust_quad_dof_index_for_face_orientation_table[f].fill(0);
+        }
     }
 
-  unit_face_support_points.resize(1);
-  generalized_face_support_points.resize(1);
+  unit_face_support_points.resize(this->n_unique_faces());
+  generalized_face_support_points.resize(this->n_unique_faces());
 }
 
 
@@ -558,7 +574,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   const auto &refence_cell =
     ReferenceCell::internal::Info::get_cell(this->reference_cell_type());
 
-  AssertIndexRange(face_index, this->n_dofs_per_face());
+  AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, refence_cell.n_faces());
 
   // TODO: we could presumably solve the 3d case below using the
@@ -576,7 +592,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   // other than standard orientation
   if ((face_orientation != true) || (face_flip != false) ||
       (face_rotation != false))
-    Assert((this->n_dofs_per_line() <= 1) && (this->n_dofs_per_quad() <= 1),
+    Assert((this->n_dofs_per_line() <= 1) && (this->n_dofs_per_quad(face) <= 1),
            ExcMessage(
              "The function in this base class can not handle this case. "
              "Rather, the derived class you are using must provide "
@@ -585,7 +601,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
-  if (face_index < this->get_first_face_line_index())
+  if (face_index < this->get_first_face_line_index(face))
     // DoF is on a vertex
     {
       // get the number of the vertex on the face that corresponds to this DoF,
@@ -604,12 +620,13 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
-  else if (face_index < this->get_first_face_quad_index())
+  else if (face_index < this->get_first_face_quad_index(face))
     // DoF is on a face
     {
       // do the same kind of translation as before. we need to only consider
       // DoFs on the lines, i.e., ignoring those on the vertices
-      const unsigned int index = face_index - this->get_first_face_line_index();
+      const unsigned int index =
+        face_index - this->get_first_face_line_index(face);
 
       const unsigned int face_line         = index / this->n_dofs_per_line();
       const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
@@ -629,10 +646,10 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       Assert(dim >= 3, ExcInternalError());
 
       // ignore vertex and line dofs
-      const unsigned int index = face_index - this->get_first_face_quad_index();
+      const unsigned int index =
+        face_index - this->get_first_face_quad_index(face);
 
-      return (this->get_first_quad_index() + face * this->n_dofs_per_quad() +
-              index);
+      return (this->get_first_quad_index(face) + index);
     }
 }
 
@@ -642,13 +659,11 @@ template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   const unsigned int index,
-  const unsigned int face_no,
+  const unsigned int face,
   const bool         face_orientation,
   const bool         face_flip,
   const bool         face_rotation) const
 {
-  (void)face_no;
-
   // general template for 1D and 2D: not
   // implemented. in fact, the function
   // shouldn't even be called unless we are
@@ -666,12 +681,20 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // in 3d), so we don't need the table, but
   // the function should also not have been
   // called
-  AssertIndexRange(index, this->n_dofs_per_quad());
-  Assert(adjust_quad_dof_index_for_face_orientation_table[0].n_elements() ==
-           8 * this->n_dofs_per_quad(),
+  AssertIndexRange(index, this->n_dofs_per_quad(face));
+  Assert(adjust_quad_dof_index_for_face_orientation_table
+             [this->n_unique_quads() == 1 ? 0 : face]
+               .n_elements() ==
+           (ReferenceCell::internal::Info::get_cell(this->reference_cell_type())
+                  .face_reference_cell_type(face) == ReferenceCell::Type::Quad ?
+              8 :
+              6) *
+             this->n_dofs_per_quad(face),
          ExcInternalError());
-  return index + adjust_quad_dof_index_for_face_orientation_table[0](
-                   index, 4 * face_orientation + 2 * face_flip + face_rotation);
+  return index +
+         adjust_quad_dof_index_for_face_orientation_table
+           [this->n_unique_quads() == 1 ? 0 : face](
+             index, 4 * face_orientation + 2 * face_flip + face_rotation);
 }
 
 
@@ -818,8 +841,14 @@ bool
 FiniteElement<dim, spacedim>::constraints_are_implemented(
   const internal::SubfaceCase<dim> &subface_case) const
 {
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   if (subface_case == internal::SubfaceCase<dim>::case_isotropic)
-    return (this->n_dofs_per_face() == 0) || (interface_constraints.m() != 0);
+    return (this->n_dofs_per_face(face_no) == 0) ||
+           (interface_constraints.m() != 0);
   else
     return false;
 }
@@ -840,6 +869,12 @@ const FullMatrix<double> &
 FiniteElement<dim, spacedim>::constraints(
   const internal::SubfaceCase<dim> &subface_case) const
 {
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+  (void)face_no;
+
   (void)subface_case;
   Assert(subface_case == internal::SubfaceCase<dim>::case_isotropic,
          ExcMessage("Constraints for this element are only implemented "
@@ -847,7 +882,8 @@ FiniteElement<dim, spacedim>::constraints(
                     "(which is always the case in 2d, and in 3d requires "
                     "that the neighboring cell of a coarse cell presents "
                     "exactly four children on the common face)."));
-  Assert((this->n_dofs_per_face() == 0) || (interface_constraints.m() != 0),
+  Assert((this->n_dofs_per_face(face_no) == 0) ||
+           (interface_constraints.m() != 0),
          ExcMessage("The finite element for which you try to obtain "
                     "hanging node constraints does not appear to "
                     "implement them."));
@@ -866,17 +902,22 @@ template <int dim, int spacedim>
 TableIndices<2>
 FiniteElement<dim, spacedim>::interface_constraints_size() const
 {
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   switch (dim)
     {
       case 1:
         return {0U, 0U};
       case 2:
         return {this->n_dofs_per_vertex() + 2 * this->n_dofs_per_line(),
-                this->n_dofs_per_face()};
+                this->n_dofs_per_face(face_no)};
       case 3:
         return {5 * this->n_dofs_per_vertex() + 12 * this->n_dofs_per_line() +
-                  4 * this->n_dofs_per_quad(),
-                this->n_dofs_per_face()};
+                  4 * this->n_dofs_per_quad(face_no),
+                this->n_dofs_per_face(face_no)};
       default:
         Assert(false, ExcNotImplemented());
     }
@@ -1069,38 +1110,45 @@ FiniteElement<dim, spacedim>::unit_support_point(const unsigned int index) const
 template <int dim, int spacedim>
 const std::vector<Point<dim - 1>> &
 FiniteElement<dim, spacedim>::get_unit_face_support_points(
-  const unsigned int) const
+  const unsigned int face_no) const
 {
   // a finite element may define
   // support points, but only if
   // there are as many as there are
   // degrees of freedom on a face
-  Assert((unit_face_support_points[0].size() == 0) ||
-           (unit_face_support_points[0].size() == this->n_dofs_per_face()),
+  Assert((unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
+            .size() == 0) ||
+           (unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
+              .size() == this->n_dofs_per_face(face_no)),
          ExcInternalError());
-  return unit_face_support_points[0];
+  return unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no];
 }
 
 
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::has_face_support_points(const unsigned int) const
+FiniteElement<dim, spacedim>::has_face_support_points(
+  const unsigned int face_no) const
 {
-  return (unit_face_support_points[0].size() != 0);
+  return (unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
+            .size() != 0);
 }
 
 
 
 template <int dim, int spacedim>
 Point<dim - 1>
-FiniteElement<dim, spacedim>::unit_face_support_point(const unsigned int index,
-                                                      const unsigned int) const
+FiniteElement<dim, spacedim>::unit_face_support_point(
+  const unsigned int index,
+  const unsigned int face_no) const
 {
-  AssertIndexRange(index, this->n_dofs_per_face());
-  Assert(unit_face_support_points[0].size() == this->n_dofs_per_face(),
+  AssertIndexRange(index, this->n_dofs_per_face(face_no));
+  Assert(unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
+             .size() == this->n_dofs_per_face(face_no),
          ExcFEHasNoSupportPoints());
-  return unit_face_support_points[0][index];
+  return unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
+                                 [index];
 }
 
 

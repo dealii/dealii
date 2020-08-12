@@ -3129,9 +3129,12 @@ template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_component_index(
   const unsigned int index,
-  const unsigned int) const
+  const unsigned int face_no) const
 {
-  AssertIndexRange(index, face_system_to_component_table[0].size());
+  AssertIndexRange(
+    index,
+    face_system_to_component_table[this->n_unique_faces() == 1 ? 0 : face_no]
+      .size());
 
   // in debug mode, check whether the
   // function is primitive, since
@@ -3146,11 +3149,13 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
   //
   // in 1d, the face index is equal
   // to the cell index
-  Assert(is_primitive(this->face_to_cell_index(index, 0)),
+  Assert(is_primitive(this->face_to_cell_index(index, face_no)),
          (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
            index)));
 
-  return face_system_to_component_table[0][index];
+  return face_system_to_component_table[this->n_unique_faces() == 1 ?
+                                          0 :
+                                          face_no][index];
 }
 
 
@@ -3170,10 +3175,14 @@ template <int dim, int spacedim>
 inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_base_index(
   const unsigned int index,
-  const unsigned int) const
+  const unsigned int face_no) const
 {
-  AssertIndexRange(index, face_system_to_base_table[0].size());
-  return face_system_to_base_table[0][index];
+  AssertIndexRange(
+    index,
+    face_system_to_base_table[this->n_unique_faces() == 1 ? 0 : face_no]
+      .size());
+  return face_system_to_base_table[this->n_unique_faces() == 1 ? 0 : face_no]
+                                  [index];
 }
 
 
@@ -3301,7 +3310,7 @@ FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
   // are enumerated on the reference cell
   if (cell_dof_index < this->get_first_line_index())
     return GeometryPrimitive::vertex;
-  else if (cell_dof_index < this->get_first_quad_index())
+  else if (cell_dof_index < this->get_first_quad_index(0))
     return GeometryPrimitive::line;
   else if (cell_dof_index < this->get_first_hex_index())
     return GeometryPrimitive::quad;

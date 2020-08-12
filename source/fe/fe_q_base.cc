@@ -624,11 +624,11 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
   FullMatrix<double> &                interpolation_matrix,
-  const unsigned int) const
+  const unsigned int                  face_no) const
 {
-  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(),
+  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.n_dofs_per_face()));
+                              x_source_fe.n_dofs_per_face(face_no)));
 
   // see if source is a Q element
   if (const FE_Q_Base<PolynomialType, dim, spacedim> *source_fe =
@@ -637,9 +637,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(interpolation_matrix.n() == this->n_dofs_per_face(),
+      Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
              ExcDimensionMismatch(interpolation_matrix.n(),
-                                  this->n_dofs_per_face()));
+                                  this->n_dofs_per_face(face_no)));
 
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
@@ -647,13 +647,13 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
       // produced in that case might lead to problems in the hp procedures,
       // which use this method.
       Assert(
-        this->n_dofs_per_face() <= source_fe->n_dofs_per_face(),
+        this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
 
       // generate a point on this cell and evaluate the shape functions there
       const Quadrature<dim - 1> quad_face_support(
-        source_fe->get_unit_face_support_points());
+        source_fe->get_unit_face_support_points(face_no));
 
       // Rule of thumb for FP accuracy, that can be expected for a given
       // polynomial degree.  This value is used to cut off values close to
@@ -674,11 +674,11 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
                                               quad_face_support,
                                               0,
                                               subface);
-      for (unsigned int i = 0; i < source_fe->n_dofs_per_face(); ++i)
+      for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
         {
           const Point<dim> &p = subface_quadrature.point(i);
 
-          for (unsigned int j = 0; j < this->n_dofs_per_face(); ++j)
+          for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
             {
               double matrix_entry =
                 this->shape_value(this->face_to_cell_index(j, 0), p);
@@ -697,11 +697,11 @@ FE_Q_Base<PolynomialType, dim, spacedim>::get_subface_interpolation_matrix(
 
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j = 0; j < source_fe->n_dofs_per_face(); ++j)
+      for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
         {
           double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(); ++i)
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
             sum += interpolation_matrix(j, i);
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
@@ -750,7 +750,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_vertex_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_dofs_per_face() == 0)
+  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -815,7 +815,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_line_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_dofs_per_face() == 0)
+  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -886,7 +886,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::hp_quad_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (fe_other.n_dofs_per_face() == 0)
+  else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {
       // if the other element has no elements on faces at all,
       // then it would be impossible to enforce any kind of
@@ -946,7 +946,12 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
   if (dim == 1)
     return;
 
-  this->unit_face_support_points[0].resize(
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
+  this->unit_face_support_points[face_no].resize(
     Utilities::fixed_power<dim - 1>(q_degree + 1));
 
   // find renumbering of faces and assign from values of quadrature
@@ -962,9 +967,9 @@ FE_Q_Base<PolynomialType, dim, spacedim>::initialize_unit_face_support_points(
 
   // The only thing we have to do is reorder the points from tensor
   // product order to the order in which we enumerate DoFs on cells
-  this->unit_face_support_points[0].resize(support_quadrature.size());
+  this->unit_face_support_points[face_no].resize(support_quadrature.size());
   for (unsigned int k = 0; k < support_quadrature.size(); ++k)
-    this->unit_face_support_points[0][face_index_map[k]] =
+    this->unit_face_support_points[face_no][face_index_map[k]] =
       support_quadrature.point(k);
 }
 
@@ -979,12 +984,17 @@ FE_Q_Base<PolynomialType, dim, spacedim>::
   if (dim < 3)
     return;
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   Assert(this->adjust_quad_dof_index_for_face_orientation_table[0]
-             .n_elements() == 8 * this->n_dofs_per_quad(),
+             .n_elements() == 8 * this->n_dofs_per_quad(face_no),
          ExcInternalError());
 
   const unsigned int n = q_degree - 1;
-  Assert(n * n == this->n_dofs_per_quad(), ExcInternalError());
+  Assert(n * n == this->n_dofs_per_quad(face_no), ExcInternalError());
 
   // the dofs on a face are connected to a n x n matrix. for example, for
   // degree==4 we have the following dofs on a quad
@@ -1004,34 +1014,42 @@ FE_Q_Base<PolynomialType, dim, spacedim>::
   // rotated and mirrored numbers.
 
 
-  for (unsigned int local = 0; local < this->n_dofs_per_quad(); ++local)
+  for (unsigned int local = 0; local < this->n_dofs_per_quad(face_no); ++local)
     // face support points are in lexicographic ordering with x running
     // fastest. invert that (y running fastest)
     {
       unsigned int i = local % n, j = local / n;
 
       // face_orientation=false, face_flip=false, face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 0) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      0) =
         j + i * n - local;
       // face_orientation=false, face_flip=false, face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 1) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      1) =
         i + (n - 1 - j) * n - local;
       // face_orientation=false, face_flip=true,  face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 2) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      2) =
         (n - 1 - j) + (n - 1 - i) * n - local;
       // face_orientation=false, face_flip=true,  face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 3) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      3) =
         (n - 1 - i) + j * n - local;
       // face_orientation=true,  face_flip=false, face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 4) = 0;
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      4) = 0;
       // face_orientation=true,  face_flip=false, face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 5) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      5) =
         j + (n - 1 - i) * n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 6) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      6) =
         (n - 1 - i) + (n - 1 - j) * n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[0](local, 7) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
+                                                                      7) =
         (n - 1 - j) + i * n - local;
     }
 
@@ -1052,7 +1070,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
   const bool         face_flip,
   const bool         face_rotation) const
 {
-  AssertIndexRange(face_index, this->n_dofs_per_face());
+  AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
 
   // TODO: we could presumably solve the 3d case below using the
@@ -1066,7 +1084,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
-  if (face_index < this->get_first_face_line_index())
+  if (face_index < this->get_first_face_line_index(face))
     // DoF is on a vertex
     {
       // get the number of the vertex on the face that corresponds to this DoF,
@@ -1082,12 +1100,13 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
-  else if (face_index < this->get_first_face_quad_index())
+  else if (face_index < this->get_first_face_quad_index(face))
     // DoF is on a face
     {
       // do the same kind of translation as before. we need to only consider
       // DoFs on the lines, i.e., ignoring those on the vertices
-      const unsigned int index = face_index - this->get_first_face_line_index();
+      const unsigned int index =
+        face_index - this->get_first_face_line_index(face);
 
       const unsigned int face_line         = index / this->n_dofs_per_line();
       const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
@@ -1142,17 +1161,17 @@ FE_Q_Base<PolynomialType, dim, spacedim>::face_to_cell_index(
       Assert(dim >= 3, ExcInternalError());
 
       // ignore vertex and line dofs
-      const unsigned int index = face_index - this->get_first_face_quad_index();
+      const unsigned int index =
+        face_index - this->get_first_face_quad_index(face);
 
       // the same is true here as above for the 3d case -- someone will
       // just have to draw a bunch of pictures. in the meantime,
       // we can implement the Q2 case in which it is simple
-      Assert((this->n_dofs_per_quad() <= 1) ||
+      Assert((this->n_dofs_per_quad(face) <= 1) ||
                ((face_orientation == true) && (face_flip == false) &&
                 (face_rotation == false)),
              ExcNotImplemented());
-      return (this->get_first_quad_index() + face * this->n_dofs_per_quad() +
-              index);
+      return (this->get_first_quad_index(face) + index);
     }
 }
 
@@ -1544,7 +1563,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
 
   // first, special-case interior shape functions, since they have no support
   // no-where on the boundary
-  if (((dim == 2) && (shape_index >= this->get_first_quad_index())) ||
+  if (((dim == 2) &&
+       (shape_index >= this->get_first_quad_index(0 /*first quad*/))) ||
       ((dim == 3) && (shape_index >= this->get_first_hex_index())))
     return false;
 
@@ -1565,7 +1585,7 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
 
       return false;
     }
-  else if (shape_index < this->get_first_quad_index())
+  else if (shape_index < this->get_first_quad_index(0 /*first quad*/))
     // ok, dof is on a line
     {
       const unsigned int line_index =
@@ -1596,7 +1616,8 @@ FE_Q_Base<PolynomialType, dim, spacedim>::has_support_on_face(
     // dof is on a quad
     {
       const unsigned int quad_index =
-        (shape_index - this->get_first_quad_index()) / this->n_dofs_per_quad();
+        (shape_index - this->get_first_quad_index(0)) /
+        this->n_dofs_per_quad(face_index); // this won't work
       Assert(static_cast<signed int>(quad_index) <
                static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
              ExcInternalError());
