@@ -83,6 +83,11 @@ check(const unsigned int testcase)
       Assert(dcv.distorted_cells.front() == coarse_grid.begin(0),
              ExcInternalError());
     }
+  catch (ExceptionBase &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      flag = true;
+    }
 
   Assert(flag == true, ExcInternalError());
 }
