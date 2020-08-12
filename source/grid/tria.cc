@@ -2197,7 +2197,7 @@ namespace internal
               // to exist. If a cell has negative measure, then it must be
               // distorted (the converse is not necessarily true); hence
               // throw an exception if no such cells should exist.
-              if (!tria.check_for_distorted_cells)
+              if (tria.check_for_distorted_cells)
                 {
                   const double cell_measure =
                     GridTools::cell_measure<dim>(vertices,
@@ -4453,7 +4453,7 @@ namespace internal
                                   next_unused_cell,
                                   cell);
 
-                  if ((check_for_distorted_cells == true) &&
+                  if (check_for_distorted_cells &&
                       has_distorted_children(
                         cell,
                         std::integral_constant<int, dim>(),
@@ -8820,7 +8820,7 @@ namespace internal
 
                   // now see if we have created cells that are
                   // distorted and if so add them to our list
-                  if ((check_for_distorted_cells == true) &&
+                  if (check_for_distorted_cells &&
                       has_distorted_children(
                         hex,
                         std::integral_constant<int, dim>(),
@@ -9685,7 +9685,7 @@ Triangulation<dim, spacedim>::create_triangulation(
   // now verify that there are indeed no distorted cells. as per the
   // documentation of this class, we first collect all distorted cells
   // and then throw an exception if there are any
-  if (check_for_distorted_cells == true)
+  if (check_for_distorted_cells)
     {
       DistortedCellList distorted_cells = collect_distorted_coarse_cells(*this);
       // throw the array (and fill the various location fields) if
