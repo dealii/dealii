@@ -8159,10 +8159,10 @@ FEFaceEvaluation<dim,
                         this->active_fe_index,
                         this->first_selected_component,
                         this->cell,
-                        this->face_no,
+                        std::array<unsigned int, 1>{{this->face_no}},
                         this->subface_index,
                         this->dof_access_index,
-                        this->face_orientation,
+                        std::array<unsigned int, 1>{{this->face_orientation}},
                         this->mapping_data->descriptor[this->active_fe_index]
                           .face_orientations))
     {
@@ -8253,10 +8253,10 @@ FEFaceEvaluation<dim,
                           this->active_fe_index,
                           this->first_selected_component,
                           this->cell,
-                          this->face_no,
+                          std::array<unsigned int, 1>{{this->face_no}},
                           this->subface_index,
                           this->dof_access_index,
-                          this->face_orientation,
+                          std::array<unsigned int, 1>{{this->face_orientation}},
                           this->mapping_data->descriptor[this->active_fe_index]
                             .face_orientations))
     {
