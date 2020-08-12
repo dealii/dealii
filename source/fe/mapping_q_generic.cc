@@ -1477,27 +1477,36 @@ namespace internal
         constexpr unsigned int n_comp         = 1 + (spacedim - 1) / n_lanes;
         constexpr unsigned int n_hessians     = (dim * (dim + 1)) / 2;
 
-        const bool evaluate_values = update_flags & update_quadrature_points;
-        const bool evaluate_gradients =
-          (cell_similarity != CellSimilarity::translation) &&
-          (update_flags & update_contravariant_transformation);
-        const bool evaluate_hessians =
-          (cell_similarity != CellSimilarity::translation) &&
-          (update_flags & update_jacobian_grads);
+        EvaluationFlags::EvaluationFlags evaluation_flag =
+          (update_flags & update_quadrature_points ? EvaluationFlags::values :
+                                                     EvaluationFlags::nothing) |
+          ((cell_similarity != CellSimilarity::translation) &&
+               (update_flags & update_contravariant_transformation) ?
+             EvaluationFlags::gradients :
+             EvaluationFlags::nothing) |
+          ((cell_similarity != CellSimilarity::translation) &&
+               (update_flags & update_jacobian_grads) ?
+             EvaluationFlags::hessians :
+             EvaluationFlags::nothing);
 
-        Assert(!evaluate_values || n_q_points > 0, ExcInternalError());
-        Assert(!evaluate_values || n_q_points == quadrature_points.size(),
-               ExcDimensionMismatch(n_q_points, quadrature_points.size()));
-        Assert(!evaluate_gradients || data.n_shape_functions > 0,
+        Assert(!(evaluation_flag & EvaluationFlags::values) || n_q_points > 0,
                ExcInternalError());
-        Assert(!evaluate_gradients || n_q_points == data.contravariant.size(),
+        Assert(!(evaluation_flag & EvaluationFlags::values) ||
+                 n_q_points == quadrature_points.size(),
+               ExcDimensionMismatch(n_q_points, quadrature_points.size()));
+        Assert(!(evaluation_flag & EvaluationFlags::gradients) ||
+                 data.n_shape_functions > 0,
+               ExcInternalError());
+        Assert(!(evaluation_flag & EvaluationFlags::gradients) ||
+                 n_q_points == data.contravariant.size(),
                ExcDimensionMismatch(n_q_points, data.contravariant.size()));
-        Assert(!evaluate_hessians || n_q_points == jacobian_grads.size(),
+        Assert(!(evaluation_flag & EvaluationFlags::hessians) ||
+                 n_q_points == jacobian_grads.size(),
                ExcDimensionMismatch(n_q_points, jacobian_grads.size()));
 
         // shortcut in case we have an identity interpolation and only request
         // the quadrature points
-        if (evaluate_values && !evaluate_gradients & !evaluate_hessians &&
+        if (evaluation_flag == EvaluationFlags::values &&
             data.shape_info.element_type ==
               internal::MatrixFreeFunctions::tensor_symmetric_collocation)
           {
@@ -1509,14 +1518,14 @@ namespace internal
           }
 
         // prepare arrays
-        if (evaluate_values || evaluate_gradients || evaluate_hessians)
+        if (evaluation_flag != EvaluationFlags::nothing)
           {
             data.values_dofs.resize(n_comp * n_shape_values);
             data.values_quad.resize(n_comp * n_q_points);
             data.gradients_quad.resize(n_comp * n_q_points * dim);
             data.scratch.resize(2 * std::max(n_q_points, n_shape_values));
 
-            if (evaluate_hessians)
+            if (evaluation_flag & EvaluationFlags::hessians)
               data.hessians_quad.resize(n_comp * n_q_points * n_hessians);
 
             const std::vector<unsigned int> &renumber_to_lexicographic =
@@ -1532,20 +1541,19 @@ namespace internal
                 }
 
             // do the actual tensorized evaluation
-            SelectEvaluator<dim, -1, 0, n_comp, VectorizedArray<double>>::
-              evaluate(data.shape_info,
-                       data.values_dofs.begin(),
-                       data.values_quad.begin(),
-                       data.gradients_quad.begin(),
-                       data.hessians_quad.begin(),
-                       data.scratch.begin(),
-                       evaluate_values,
-                       evaluate_gradients,
-                       evaluate_hessians);
+            SelectEvaluator<dim, -1, 0, VectorizedArray<double>>::evaluate(
+              n_comp,
+              evaluation_flag,
+              data.shape_info,
+              data.values_dofs.begin(),
+              data.values_quad.begin(),
+              data.gradients_quad.begin(),
+              data.hessians_quad.begin(),
+              data.scratch.begin());
           }
 
         // do the postprocessing
-        if (evaluate_values)
+        if (evaluation_flag & EvaluationFlags::values)
           {
             for (unsigned int out_comp = 0; out_comp < n_comp; ++out_comp)
               for (unsigned int i = 0; i < n_q_points; ++i)
@@ -1557,7 +1565,7 @@ namespace internal
                     data.values_quad[out_comp * n_q_points + i][in_comp];
           }
 
-        if (evaluate_gradients)
+        if (evaluation_flag & EvaluationFlags::gradients)
           {
             std::fill(data.contravariant.begin(),
                       data.contravariant.end(),
@@ -1593,7 +1601,7 @@ namespace internal
               data.volume_elements[point] =
                 data.contravariant[point].determinant();
 
-        if (evaluate_hessians)
+        if (evaluation_flag & EvaluationFlags::hessians)
           {
             constexpr int desymmetrize_3d[6][2] = {
               {0, 0}, {1, 1}, {2, 2}, {0, 1}, {0, 2}, {1, 2}};

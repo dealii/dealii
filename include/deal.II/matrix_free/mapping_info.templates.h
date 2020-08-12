@@ -1302,16 +1302,18 @@ namespace internal
                                                 start_indices,
                                                 cell_points.data());
 
-                  SelectEvaluator<dim, -1, 0, dim, VectorizedDouble>::evaluate(
+                  SelectEvaluator<dim, -1, 0, VectorizedDouble>::evaluate(
+                    dim,
+                    EvaluationFlags::values | EvaluationFlags::gradients |
+                      (update_flags_cells & update_jacobian_grads ?
+                         EvaluationFlags::hessians :
+                         EvaluationFlags::nothing),
                     shape_info,
                     cell_points.data(),
                     cell_quads.data(),
                     cell_grads.data(),
                     cell_grad_grads.data(),
-                    scratch_data.data(),
-                    true,
-                    true,
-                    update_flags_cells & update_jacobian_grads);
+                    scratch_data.data());
                 }
               if (update_flags_cells & update_quadrature_points)
                 {
