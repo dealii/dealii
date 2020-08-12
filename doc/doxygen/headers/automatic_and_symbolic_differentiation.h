@@ -300,7 +300,7 @@
  *  - Forward-mode Sacado with dynamic memory allocation using expression templates (once differentiable)
  *  - Nested forward-mode Sacado using expression templates (twice differentiable)
  *  - Reverse-mode Sacado (once differentiable)
- *  - Nested reverse and dynamically-allocated forward-mode Sacado (twice differentiable)
+ *  - Nested reverse and dynamically-allocated forward-mode Sacado (twice differentiable, but results memory leak described in Differentiation::AD::NumberTypes)
  *
  * Note that in the above, "dynamic memory allocation" refers to the fact that the number of
  * independent variables need not be specified at compile time.
