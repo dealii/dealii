@@ -670,7 +670,7 @@ namespace GridGenerator
    * dimensions, but throws an error if called in 1d.
    *
    * By default, the manifold_id is set to 0 on the boundary faces, 1 on the
-   * boundary cells, and types::flat_manifold_id on the central cell and on
+   * boundary cells, and numbers::flat_manifold_id on the central cell and on
    * internal faces.
    *
    * A SphericalManifold is attached by default to the boundary faces for
@@ -756,7 +756,7 @@ namespace GridGenerator
    * </table>
    *
    * By default, the manifold_id is set to 0 on the boundary faces, 1 on the
-   * boundary cells, and types::flat_manifold_id on the central cell and on
+   * boundary cells, and numbers::flat_manifold_id on the central cell and on
    * internal faces.
    *
    * @pre The triangulation passed as argument needs to be empty when calling
