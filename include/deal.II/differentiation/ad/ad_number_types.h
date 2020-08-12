@@ -84,6 +84,11 @@ namespace Differentiation
        *
        * First derivatives will be computed using reverse mode, while the second
        * derivatives will be computed using forward mode.
+       *
+       * Note that the repeated use of the nested reverse-forward mode results
+       * in a memory leak described in this <a
+       * href="https://github.com/trilinos/Trilinos/issues/7741"> Trilinos
+       * issue.</a>
        */
       sacado_rad_dfad
     };
