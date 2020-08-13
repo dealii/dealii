@@ -972,6 +972,28 @@ namespace internal
               cell->neighbor_of_coarser_neighbor(face_no).second;
         }
 
+      // special treatment of periodic boundaries
+      if (dim == 3 && cell->has_periodic_neighbor(face_no))
+        {
+          const unsigned int exterior_face_orientation =
+            !cell->get_triangulation()
+               .get_periodic_face_map()
+               .at({cell, face_no})
+               .second[0] +
+            2 * cell->get_triangulation()
+                  .get_periodic_face_map()
+                  .at({cell, face_no})
+                  .second[1] +
+            4 * cell->get_triangulation()
+                  .get_periodic_face_map()
+                  .at({cell, face_no})
+                  .second[2];
+
+          info.face_orientation = exterior_face_orientation;
+
+          return info;
+        }
+
       info.face_orientation = 0;
       const unsigned int interior_face_orientation =
         !cell->face_orientation(face_no) + 2 * cell->face_flip(face_no) +
