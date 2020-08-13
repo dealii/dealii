@@ -1000,43 +1000,23 @@ namespace ReferenceCell
       };
 
       /**
-       * Return for a given reference-cell type @p the right Info.
+       * Return for a given reference-cell type the right Info.
        */
       inline const ReferenceCell::internal::Info::Base &
       get_cell(const ReferenceCell::Type &type)
       {
-        static ReferenceCell::internal::Info::Base    gei_invalid;
-        static ReferenceCell::internal::Info::Vertex  gei_vertex;
-        static ReferenceCell::internal::Info::Line    gei_line;
-        static ReferenceCell::internal::Info::Tri     gei_tri;
-        static ReferenceCell::internal::Info::Quad    gei_quad;
-        static ReferenceCell::internal::Info::Tet     gei_tet;
-        static ReferenceCell::internal::Info::Pyramid gei_pyramid;
-        static ReferenceCell::internal::Info::Wedge   gei_wedge;
-        static ReferenceCell::internal::Info::Hex     gei_hex;
-
-        switch (type)
-          {
-            case ReferenceCell::Type::Vertex:
-              return gei_vertex;
-            case ReferenceCell::Type::Line:
-              return gei_line;
-            case ReferenceCell::Type::Tri:
-              return gei_tri;
-            case ReferenceCell::Type::Quad:
-              return gei_quad;
-            case ReferenceCell::Type::Tet:
-              return gei_tet;
-            case ReferenceCell::Type::Pyramid:
-              return gei_pyramid;
-            case ReferenceCell::Type::Wedge:
-              return gei_wedge;
-            case ReferenceCell::Type::Hex:
-              return gei_hex;
-            default:
-              Assert(false, StandardExceptions::ExcNotImplemented());
-              return gei_invalid;
-          }
+        static const std::
+          array<std::unique_ptr<ReferenceCell::internal::Info::Base>, 8>
+            gei{{std::make_unique<ReferenceCell::internal::Info::Vertex>(),
+                 std::make_unique<ReferenceCell::internal::Info::Line>(),
+                 std::make_unique<ReferenceCell::internal::Info::Tri>(),
+                 std::make_unique<ReferenceCell::internal::Info::Quad>(),
+                 std::make_unique<ReferenceCell::internal::Info::Tet>(),
+                 std::make_unique<ReferenceCell::internal::Info::Pyramid>(),
+                 std::make_unique<ReferenceCell::internal::Info::Wedge>(),
+                 std::make_unique<ReferenceCell::internal::Info::Hex>()}};
+        AssertIndexRange(static_cast<std::uint8_t>(type), 8);
+        return *gei[static_cast<std::uint8_t>(type)];
       }
 
       /**
