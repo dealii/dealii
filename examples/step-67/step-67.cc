@@ -54,8 +54,9 @@
 // that we will use for the mass matrix inversion, the only new include
 // file for this tutorial program:
 #include <deal.II/matrix_free/operators.h>
+#include <deal.II/matrix_free/tools.h>
 
-
+#define USE_ECL
 
 namespace Euler_DG
 {
@@ -73,7 +74,7 @@ namespace Euler_DG
   // the final time up to which we run the simulation, and a variable
   // `output_tick` that specifies in which intervals we want to write output
   // (assuming that the tick is larger than the time step size).
-  constexpr unsigned int testcase             = 0;
+  constexpr unsigned int testcase             = 1;
   constexpr unsigned int dimension            = 2;
   constexpr unsigned int n_global_refinements = 3;
   constexpr unsigned int fe_degree            = 5;
@@ -374,38 +375,70 @@ namespace Euler_DG
                            const double    current_time,
                            const double    time_step,
                            VectorType &    solution,
-                           VectorType &    vec_ri,
-                           VectorType &    vec_ki) const
+                           VectorType &    vec_Ti,
+                           VectorType &    vec_Ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
-      pde_operator.perform_stage(current_time,
-                                 bi[0] * time_step,
-                                 ai[0] * time_step,
-                                 solution,
-                                 vec_ri,
-                                 solution,
-                                 vec_ri);
-      double sum_previous_bi = 0;
-      for (unsigned int stage = 1; stage < bi.size(); ++stage)
+#ifdef USE_ECL
+      if (true)
         {
-          const double c_i = sum_previous_bi + ai[stage - 1];
-          pde_operator.perform_stage(current_time + c_i * time_step,
-                                     bi[stage] * time_step,
-                                     (stage == bi.size() - 1 ?
-                                        0 :
-                                        ai[stage] * time_step),
-                                     vec_ri,
-                                     vec_ki,
-                                     solution,
-                                     vec_ri);
-          sum_previous_bi += bi[stage - 1];
+          double sum_previous_bi = 0;
+          for (unsigned int stage = 0; stage < bi.size(); ++stage)
+            {
+              const double c_i =
+                stage == 0 ? 0 : sum_previous_bi + ai[stage - 1];
+
+              // Source and destination registers are swapped after each stage
+              pde_operator.perform_stage(
+                current_time + c_i * time_step,
+                bi[stage] * time_step,
+                (stage == bi.size() - 1 ? 0 : ai[stage] * time_step),
+                ((stage + sw) % 2 == 0 ? vec_Ki : vec_Ti),
+                ((stage + sw) % 2 == 0 ? vec_Ti : vec_Ki),
+                solution,
+                vec_Ti /*dummy*/);
+
+              if (stage > 0)
+                sum_previous_bi += bi[stage - 1];
+            }
+          // Switch for odd stages
+          sw = sw == 0;
         }
+#else
+      if (true)
+        {
+          pde_operator.perform_stage(current_time,
+                                     bi[0] * time_step,
+                                     ai[0] * time_step,
+                                     solution,
+                                     vec_Ti,
+                                     solution,
+                                     vec_Ti);
+          double sum_previous_bi = 0;
+          for (unsigned int stage = 1; stage < bi.size(); ++stage)
+            {
+              const double c_i = sum_previous_bi + ai[stage - 1];
+              pde_operator.perform_stage(current_time + c_i * time_step,
+                                         bi[stage] * time_step,
+                                         (stage == bi.size() - 1 ?
+                                            0 :
+                                            ai[stage] * time_step),
+                                         vec_Ti,
+                                         vec_Ki,
+                                         solution,
+                                         vec_Ti);
+              sum_previous_bi += bi[stage - 1];
+            }
+        }
+#endif
     }
 
   private:
     std::vector<double> bi;
     std::vector<double> ai;
+
+    mutable unsigned int sw = 0;
   };
 
 
@@ -865,6 +898,11 @@ namespace Euler_DG
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim, Number>::AdditionalData::none;
 
+#ifdef USE_ECL
+    MatrixFreeTools::categorize_by_boundary_ids(dof_handler.get_triangulation(),
+                                                additional_data);
+#endif
+
     data.reinit(
       mapping, dof_handlers, constraints, quadratures, additional_data);
   }
@@ -964,8 +1002,6 @@ namespace Euler_DG
 
     this->body_force = std::move(body_force);
   }
-
-
 
   // @sect4{Local evaluators}
 
@@ -1465,6 +1501,289 @@ namespace Euler_DG
     LinearAlgebra::distributed::Vector<Number> &      solution,
     LinearAlgebra::distributed::Vector<Number> &      next_ri) const
   {
+#ifdef USE_ECL
+    {
+      (void)next_ri; // not needed in the case of ECL
+
+      TimerOutput::Scope t(timer, "rk_stage - integrals L_h");
+
+      for (auto &i : inflow_boundaries)
+        i.second->set_time(current_time);
+      for (auto &i : subsonic_outflow_boundaries)
+        i.second->set_time(current_time);
+
+      FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data);
+      FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_(data);
+
+      FEFaceEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_m(data,
+                                                                        true);
+      FEFaceEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_p(data,
+                                                                        false);
+
+      Tensor<1, dim, VectorizedArray<Number>> constant_body_force;
+      const Functions::ConstantFunction<dim> *constant_function =
+        dynamic_cast<Functions::ConstantFunction<dim> *>(body_force.get());
+
+      if (constant_function)
+        constant_body_force = evaluate_function<dim, Number, dim>(
+          *constant_function, Point<dim, VectorizedArray<Number>>());
+
+      const dealii::internal::EvaluatorTensorProduct<
+        dealii::internal::EvaluatorVariant::evaluate_evenodd,
+        dim,
+        n_points_1d,
+        n_points_1d,
+        VectorizedArray<Number>>
+        eval(AlignedVector<VectorizedArray<Number>>(),
+             data.get_shape_info().data[0].shape_gradients_collocation_eo,
+             AlignedVector<VectorizedArray<Number>>());
+
+      AlignedVector<VectorizedArray<Number>> buffer(phi.static_n_q_points *
+                                                    phi.n_components);
+
+      data.template loop_cell_centric<
+        LinearAlgebra::distributed::Vector<Number>,
+        LinearAlgebra::distributed::Vector<Number>>(
+        [&](const auto &, auto &dst, const auto &src, const auto cell_range) {
+          for (unsigned int cell = cell_range.first; cell < cell_range.second;
+               ++cell)
+            {
+              phi.reinit(cell);
+              phi.gather_evaluate(src, EvaluationFlags::values);
+
+              for (unsigned int i = 0; i < phi.static_n_q_points * (dim + 2);
+                   ++i)
+                buffer[i] = phi.begin_values()[i];
+
+              for (unsigned int q = 0; q < phi.n_q_points; ++q)
+                {
+                  const auto w_q = phi.get_value(q);
+                  phi.submit_gradient(euler_flux<dim>(w_q), q);
+                  if (body_force.get() != nullptr)
+                    {
+                      const Tensor<1, dim, VectorizedArray<Number>> force =
+                        constant_function ?
+                          constant_body_force :
+                          evaluate_function<dim, Number, dim>(
+                            *body_force, phi.quadrature_point(q));
+
+                      Tensor<1, dim + 2, VectorizedArray<Number>> forcing;
+                      for (unsigned int d = 0; d < dim; ++d)
+                        forcing[d + 1] = w_q[0] * force[d];
+                      for (unsigned int d = 0; d < dim; ++d)
+                        forcing[dim + 1] += force[d] * w_q[d + 1];
+
+                      phi.submit_value(forcing, q);
+                    }
+                }
+
+              if (body_force.get() == nullptr)
+                {
+                  for (unsigned int i = 0;
+                       i < phi.static_n_q_points * (dim + 2);
+                       ++i)
+                    phi.begin_values()[i] = 0.0;
+                }
+
+              VectorizedArray<Number> *values_ptr  = phi.begin_values();
+              VectorizedArray<Number> *grdient_ptr = phi.begin_gradients();
+
+              for (unsigned int c = 0; c < dim + 2; ++c)
+                {
+                  if (dim >= 1)
+                    eval.template gradients<0, false, true>(
+                      grdient_ptr + phi.static_n_q_points * 0, values_ptr);
+                  if (dim >= 2)
+                    eval.template gradients<1, false, true>(
+                      grdient_ptr + phi.static_n_q_points * 1, values_ptr);
+                  if (dim >= 3)
+                    eval.template gradients<2, false, true>(
+                      grdient_ptr + phi.static_n_q_points * 2, values_ptr);
+
+                  values_ptr += phi.static_n_q_points;
+                  grdient_ptr += phi.static_n_q_points * dim;
+                }
+
+              for (unsigned int face = 0;
+                   face < GeometryInfo<dim>::faces_per_cell;
+                   ++face)
+                {
+                  const auto boundary_id =
+                    data.get_faces_by_cells_boundary_id(cell, face)[0];
+
+                  phi_m.reinit(cell, face);
+
+                  internal::FEFaceNormalEvaluationImpl<
+                    dim,
+                    n_points_1d - 1,
+                    dim + 2,
+                    VectorizedArray<Number>>::
+                    template interpolate_quadrature<true, false>(
+                      data.get_shape_info(),
+                      buffer.data(),
+                      phi_m.begin_values(),
+                      false,
+                      face);
+
+                  if (boundary_id == numbers::internal_face_boundary_id)
+                    {
+                      phi_p.reinit(cell, face);
+                      phi_p.gather_evaluate(src, EvaluationFlags::values);
+
+                      for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                        {
+                          const auto numerical_flux =
+                            euler_numerical_flux<dim>(phi_m.get_value(q),
+                                                      phi_p.get_value(q),
+                                                      phi_m.get_normal_vector(
+                                                        q));
+                          phi_m.submit_value(-numerical_flux, q);
+                        }
+                    }
+                  else
+                    {
+                      for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                        {
+                          const auto w_m    = phi_m.get_value(q);
+                          const auto normal = phi_m.get_normal_vector(q);
+
+                          auto rho_u_dot_n = w_m[1] * normal[0];
+                          for (unsigned int d = 1; d < dim; ++d)
+                            rho_u_dot_n += w_m[1 + d] * normal[d];
+
+                          bool at_outflow = false;
+
+                          Tensor<1, dim + 2, VectorizedArray<Number>> w_p;
+
+                          if (wall_boundaries.find(boundary_id) !=
+                              wall_boundaries.end())
+                            {
+                              w_p[0] = w_m[0];
+                              for (unsigned int d = 0; d < dim; ++d)
+                                w_p[d + 1] =
+                                  w_m[d + 1] - 2. * rho_u_dot_n * normal[d];
+                              w_p[dim + 1] = w_m[dim + 1];
+                            }
+                          else if (inflow_boundaries.find(boundary_id) !=
+                                   inflow_boundaries.end())
+                            w_p = evaluate_function(
+                              *inflow_boundaries.find(boundary_id)->second,
+                              phi_m.quadrature_point(q));
+                          else if (subsonic_outflow_boundaries.find(
+                                     boundary_id) !=
+                                   subsonic_outflow_boundaries.end())
+                            {
+                              w_p = w_m;
+                              w_p[dim + 1] =
+                                evaluate_function(*subsonic_outflow_boundaries
+                                                     .find(boundary_id)
+                                                     ->second,
+                                                  phi_m.quadrature_point(q),
+                                                  dim + 1);
+                              at_outflow = true;
+                            }
+                          else
+                            AssertThrow(false,
+                                        ExcMessage(
+                                          "Unknown boundary id, did "
+                                          "you set a boundary condition for "
+                                          "this part of the domain boundary?"));
+
+                          auto flux =
+                            euler_numerical_flux<dim>(w_m, w_p, normal);
+
+                          if (at_outflow)
+                            for (unsigned int v = 0;
+                                 v < VectorizedArray<Number>::size();
+                                 ++v)
+                              {
+                                if (rho_u_dot_n[v] < -1e-12)
+                                  for (unsigned int d = 0; d < dim; ++d)
+                                    flux[d + 1][v] = 0.;
+                              }
+
+                          phi_m.submit_value(-flux, q);
+                        }
+                    }
+
+                  internal::FEFaceNormalEvaluationImpl<
+                    dim,
+                    n_points_1d - 1,
+                    dim + 2,
+                    VectorizedArray<Number>>::
+                    template interpolate_quadrature<false, true>(
+                      data.get_shape_info(),
+                      phi_m.begin_values(),
+                      phi.begin_values(),
+                      false,
+                      face);
+                }
+
+              for (unsigned int q = 0; q < phi.static_n_q_points; ++q)
+                {
+                  const auto factor = VectorizedArray<Number>(1.0) / phi.JxW(q);
+                  for (unsigned int c = 0; c < dim + 2; ++c)
+                    phi.begin_values()[c * phi.static_n_q_points + q] =
+                      phi.begin_values()[c * phi.static_n_q_points + q] *
+                      factor;
+                }
+
+              internal::FEEvaluationImplBasisChange<
+                dealii::internal::EvaluatorVariant::evaluate_evenodd,
+                internal::EvaluatorQuantity::hessian,
+                dim,
+                degree + 1,
+                n_points_1d,
+                VectorizedArray<Number>,
+                VectorizedArray<Number>>::
+                do_backward(
+                  dim + 2,
+                  data.get_shape_info().data[0].inverse_shape_values_eo,
+                  false,
+                  phi.begin_values(),
+                  phi.begin_dof_values());
+
+              // RK Stage
+              {
+                const Number ai = factor_ai;
+                const Number bi = factor_solution;
+
+                phi_.reinit(cell);
+                phi_.read_dof_values(solution);
+
+                if (ai == Number())
+                  {
+                    for (unsigned int q = 0; q < phi.static_dofs_per_cell; ++q)
+                      {
+                        phi_.begin_dof_values()[q] +=
+                          bi * phi.begin_dof_values()[q];
+                        phi.begin_dof_values()[q] = phi_.begin_dof_values()[q];
+                      }
+                  }
+                else
+                  {
+                    for (unsigned int q = 0; q < phi.static_dofs_per_cell; ++q)
+                      {
+                        const auto K_i = phi.begin_dof_values()[q];
+
+                        phi.begin_dof_values()[q] =
+                          phi_.begin_dof_values()[q] + (ai * K_i);
+
+                        phi_.begin_dof_values()[q] += bi * K_i;
+                      }
+                  }
+
+                phi.set_dof_values(dst);
+                phi_.set_dof_values(solution);
+              }
+            }
+        },
+        vec_ki,
+        current_ri,
+        true,
+        MatrixFree<dim, Number>::DataAccessOnFaces::values);
+    }
+#else
     {
       TimerOutput::Scope t(timer, "rk_stage - integrals L_h");
 
@@ -1484,7 +1803,6 @@ namespace Euler_DG
                 MatrixFree<dim, Number>::DataAccessOnFaces::values);
     }
 
-
     {
       TimerOutput::Scope t(timer, "rk_stage - inv mass + vec upd");
       data.cell_loop(
@@ -1501,8 +1819,8 @@ namespace Euler_DG
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (unsigned int i = start_range; i < end_range; ++i)
                 {
-                  const Number k_i          = next_ri.local_element(i);
-                  const Number sol_i        = solution.local_element(i);
+                  const Number k_i = next_ri.local_element(i);
+                  const Number sol_i = solution.local_element(i);
                   solution.local_element(i) = sol_i + bi * k_i;
                 }
             }
@@ -1511,14 +1829,15 @@ namespace Euler_DG
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (unsigned int i = start_range; i < end_range; ++i)
                 {
-                  const Number k_i          = next_ri.local_element(i);
-                  const Number sol_i        = solution.local_element(i);
+                  const Number k_i = next_ri.local_element(i);
+                  const Number sol_i = solution.local_element(i);
                   solution.local_element(i) = sol_i + bi * k_i;
-                  next_ri.local_element(i)  = sol_i + ai * k_i;
+                  next_ri.local_element(i) = sol_i + ai * k_i;
                 }
             }
         });
     }
+#endif
   }
 
 
@@ -2242,6 +2561,10 @@ namespace Euler_DG
     rk_register_2.reinit(solution);
 
     euler_operator.project(ExactSolution<dim>(time), solution);
+
+#ifdef USE_ECL
+    rk_register_2 = solution;
+#endif
 
     double min_vertex_distance = std::numeric_limits<double>::max();
     for (const auto &cell : triangulation.active_cell_iterators())
