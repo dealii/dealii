@@ -1106,21 +1106,145 @@ namespace HDF5
          const MPI_Comm       mpi_communicator);
   };
 
+  namespace internal
+  {
+    /** This function returns the HDF5 datatype corresponding to the C++ type.
+     * In the case of std::complex types the HDF5 handlers are automatically
+     * freed using the destructor of `std::shared_ptr`. `std::shared_ptr` is
+     * used instead of `std::unique_ptr` because the destructor of
+     * `std::shared_ptr` doesn't have to be defined in the template argument. In
+     * the other hand, the destructor of `std::unique` has to be defined in the
+     * template argument. Native types such as `H5T_NATIVE_DOUBLE` do not
+     * require a destructor, but compound types such as std::complex<double>
+     * require a destructor to free the HDF5 resources.
+     */
+    template <typename number>
+    std::shared_ptr<hid_t>
+    get_hdf5_datatype();
+
+    /** Return the dimensions of `data`. For a std::vector this function returns
+     * `std::vector<hsize_t>{vector_size}`.
+     *
+     * Several HDF5 functions such as H5Screate_simple() require a
+     * one-dimensional array that specifies the size of each dimension of the
+     * container, see:
+     * https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-CreateSimple
+     */
+    template <typename number>
+    std::vector<hsize_t>
+    get_container_dimensions(const std::vector<number> &data);
+
+    /** Return the dimensions of `data`. For a Vector this function returns
+     * `std::vector<hsize_t>{vector_size}`.
+     */
+    template <typename number>
+    std::vector<hsize_t>
+    get_container_dimensions(const Vector<number> &data);
+
+    /** Return the dimensions of `data`. For a FullMatrix the function returns
+     * `std::vector<hsize_t>{rows, columns}`.
+     */
+    template <typename number>
+    std::vector<hsize_t>
+    get_container_dimensions(const FullMatrix<number> &data);
+
+    /** This function returns the total size of the container. For a std::vector
+     * the function returns `int(vector_size)`.
+     */
+    template <typename number>
+    unsigned int
+    get_container_size(const std::vector<number> &data);
+
+    /** This function returns the total size of the container. For a Vector the
+     * function returns `int(vector_size)`.
+     */
+    template <typename number>
+    unsigned int
+    get_container_size(const Vector<number> &data);
+
+    /** This function returns the total size of the container. For a FullMatrix
+     * the function returns `int(rows*columns)`.
+     */
+    template <typename number>
+    unsigned int
+    get_container_size(const FullMatrix<number> &data);
+
+    /** This function initializes and returns a container of type std::vector,
+     * Vector or FullMatrix. The function does not set the values of the
+     * elements of the container. The container can store data of a HDF5 dataset
+     * or a HDF5 selection. The dimensions parameter holds the dimensions of the
+     * HDF5 dataset or selection.
+     *
+     * In the case of a std::vector, the size of the vector will be the total
+     * size given by dimensions. For example in the case of a dataset of rank 3,
+     * the dimensions are `std::vector<hsize_t>{dim_0,dim_1,dim_2}`. The size of
+     * the returned std::vector will be `dim_0*dim_1*dim_2`.
+     *
+     * In the case of a dealii::Vector, the size of the returned dealii::Vector
+     * will be as well `dim_0*dim_1*dim_2`.
+     *
+     * A FullMatrix can store only data of HDF5 datasets with rank 2. The size
+     * of the FullMatrix will be FullMatrix(dim_0,dim_2)
+     */
+    template <typename Container>
+    typename std::enable_if<
+      std::is_same<Container,
+                   std::vector<typename Container::value_type>>::value,
+      Container>::type
+    initialize_container(const std::vector<hsize_t> &dimensions);
+
+    /** Same as above.
+     */
+    template <typename Container>
+    typename std::enable_if<
+      std::is_same<Container, Vector<typename Container::value_type>>::value,
+      Container>::type
+    initialize_container(const std::vector<hsize_t> &dimensions);
+
+    /** Same as above.
+     */
+    template <typename Container>
+    typename std::enable_if<
+      std::is_same<Container,
+                   FullMatrix<typename Container::value_type>>::value,
+      Container>::type
+    initialize_container(const std::vector<hsize_t> &dimensions);
+
+    /** This helper function sets the property list of the read and write
+     * operations of DataSet. A property list has to be created for the MPI
+     * driver. For the serial driver the default H5P_DEFAULT can be used. In
+     * addition H5Pset_dxpl_mpio is used to set the MPI mode to collective.
+     */
+    inline void
+    set_plist(hid_t &plist, const bool mpi);
+
+    /** This helper function releases the property list handler of the read and
+     * write operations of DataSet. For the serial version there is no need to
+     * release the property list handler because H5P_DEFAULT has been used. If
+     * query_io_mode is True then H5Pget_mpio_actual_io_mode and
+     * H5Pget_mpio_no_collective_cause are used to check if the operation has
+     * been collective.
+     */
+    inline void
+    release_plist(hid_t &                    plist,
+                  H5D_mpio_actual_io_mode_t &io_mode,
+                  uint32_t &                 local_no_collective_cause,
+                  uint32_t &                 global_no_collective_cause,
+                  const bool                 mpi,
+                  const bool                 query_io_mode);
+
+    /** Convert a HDF5 no_collective_cause code to a human readable string.
+     */
+    inline std::string
+    no_collective_cause_to_string(const uint32_t no_collective_cause);
+  } // namespace internal
+
 
 
   // definitions
 
   namespace internal
   {
-    // This function gives the HDF5 datatype corresponding to the C++ type. In
-    // the case of std::complex types the HDF5 handlers are automatically freed
-    // using the destructor of std::shared_ptr.
-    // std::shared_ptr is used instead of std::unique_ptr because the destructor
-    // of std::shared_ptr doesn't have to be defined in the template argument.
-    // In the other hand, the destructor of std::unique has to be defined in the
-    // template argument. Native types such as H5T_NATIVE_DOUBLE do not
-    // require a destructor, but compound types such as std::complex<double>
-    // require a destructor to free the HDF5 resources.
     template <typename number>
     std::shared_ptr<hid_t>
     get_hdf5_datatype()
@@ -1192,15 +1316,6 @@ namespace HDF5
 
 
 
-    // Several HDF5 functions such as H5Screate_simple() require a
-    // one-dimensional array that specifies the size of each dimension of the
-    // container, see:
-    // https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-CreateSimple
-    // The function get_container_dimensions returns a vector with the
-    // dimensions of the container.
-    // For a std::vector the function returns std::vector<hsize_t>{vector_size}
-    // For a Vector the function returns std::vector<hsize_t>{vector_size}
-    // For a FullMatrix the function returns std::vector<hsize_t>{rows, columns}
     template <typename number>
     std::vector<hsize_t>
     get_container_dimensions(const std::vector<number> &data)
@@ -1231,10 +1346,6 @@ namespace HDF5
 
 
 
-    // This function returns the total size of the container.
-    // For a std::vector the function returns int(vector_size)
-    // For a Vector the function returns int(vector_size)
-    // For a FullMatrix the function returns int(rows*columns)
     template <typename number>
     unsigned int
     get_container_size(const std::vector<number> &data)
@@ -1262,22 +1373,6 @@ namespace HDF5
 
 
 
-    // This function initializes and returns a container of type std::vector,
-    // Vector or FullMatrix. The function does not set the values of the
-    // elements of the container. The container can store data of a HDF5 dataset
-    // or a HDF5 selection. The dimensions parameter holds the dimensions of the
-    // HDF5 dataset or selection.
-    //
-    // In the case of a std::vector, the size of the vector will be the total
-    // size given by dimensions. For example in the case of a dataset of rank 3,
-    // the dimensions are std::vector<hsize_t>{dim_0,dim_1,dim_2}. The size of
-    // the returned std::vector will be dim_0*dim_1*dim_2
-    //
-    // In the case of a dealii::Vector, the size of the returned dealii::Vector
-    // will be as well dim_0*dim_1*dim_2
-    //
-    // A FullMatrix can store only data of HDF5 datasets with rank 2. The size
-    // of the FullMatrix will be FullMatrix(dim_0,dim_2)
     template <typename Container>
     typename std::enable_if<
       std::is_same<Container,
@@ -1334,10 +1429,6 @@ namespace HDF5
     }
 
 
-    // This helper function sets the property list of the read and write
-    // operations of DataSet. A property list has to be created for the MPI
-    // driver. For the serial driver the default H5P_DEFAULT can be used. In
-    // addition H5Pset_dxpl_mpio is used to set the MPI mode to collective.
     inline void
     set_plist(hid_t &plist, const bool mpi)
     {
@@ -1363,12 +1454,6 @@ namespace HDF5
     }
 
 
-    // This helper function release the property list handler of the read and
-    // write operations of DataSet. For the serial there is no need to release
-    // the property list handler because H5P_DEFAULT has been used. If
-    // query_io_mode is True then H5Pget_mpio_actual_io_mode and
-    // H5Pget_mpio_no_collective_cause are used to check if the operation has
-    // been collective.
     inline void
     release_plist(hid_t &                    plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
@@ -1408,7 +1493,6 @@ namespace HDF5
     }
 
 
-    // Convert a HDF5 no_collective_cause code to a human readable string
     inline std::string
     no_collective_cause_to_string(const uint32_t no_collective_cause)
     {
