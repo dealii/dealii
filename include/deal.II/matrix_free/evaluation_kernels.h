@@ -2361,9 +2361,34 @@ namespace internal
     {
       const unsigned int cell = cells[0];
 
+
+      // In the case of integration, we do not need to reshuffle the
+      // data at the quadrature points to adjust for the face
+      // orientation if the shape functions are nodal at the cell
+      // boundaries (and we only requested the integration of the
+      // values) or Hermite shape functions are used. These cases are
+      // handled later when the values are written back into the
+      // glrobal vector.
       if (integrate &&
           (face_orientations[0] > 0 &&
-           subface_index < GeometryInfo<dim>::max_children_per_cell))
+           (subface_index < GeometryInfo<dim>::max_children_per_cell ||
+            !(((do_gradients == false &&
+                data.data.front().nodal_at_cell_boundaries == true) ||
+               (data.element_type ==
+                  MatrixFreeFunctions::tensor_symmetric_hermite &&
+                fe_degree > 1)) &&
+              (dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous ||
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous_strided ||
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   interleaved_contiguous_mixed_strides ||
+               dof_info.index_storage_variants[dof_access_index][cell] ==
+                 MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                   contiguous)))))
         {
           AssertDimension(face_orientations.size(), 1);
           adjust_for_face_orientation(face_orientations[0],
