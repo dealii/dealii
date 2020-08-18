@@ -164,6 +164,20 @@ namespace LinearAlgebra
              const std::shared_ptr<const Partitioner> &partitioner);
 
       void
+      reinit(const MPI_Comm comm_all,
+             const MPI_Comm comm_shared,
+             const int      _local_size,
+             const int      _ghost_size)
+      {
+        (void)comm_all;
+        (void)comm_shared;
+        (void)_local_size;
+        (void)_ghost_size;
+
+        AssertThrow(false, dealii::StandardExceptions::ExcNotImplemented())
+      }
+
+      void
       swap(Vector<Number, MemorySpace> &v);
 
       Vector<Number, MemorySpace> &
@@ -355,6 +369,24 @@ namespace LinearAlgebra
       Number *
       begin_sm() const;
 
+      /**
+       * Get const pointers to the beginning of the values of the other
+       * processes of the same shared-memory domain.
+       *
+       * TODO: name of the function?
+       */
+      std::vector<Number *> &
+      other_values();
+
+      /**
+       * Get pointers to the beginning of the values of the other
+       * processes of the same shared-memory domain.
+       *
+       * TODO: name of the function?
+       */
+      const std::vector<Number *> &
+      other_values() const;
+
       iterator
       begin();
 
@@ -519,6 +551,8 @@ namespace LinearAlgebra
 
       template <typename Number2>
       friend class BlockVector;
+
+      std::vector<Number *> data_others;
     };
 
 
@@ -884,6 +918,22 @@ namespace LinearAlgebra
     {
       Assert(false, ExcNotImplemented());
       (void)ghosted;
+    }
+
+    template <typename Number, typename MemorySpace>
+    std::vector<Number *> &
+    Vector<Number, MemorySpace>::other_values()
+    {
+      return data_others;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    const std::vector<Number *> &
+    Vector<Number, MemorySpace>::other_values() const
+    {
+      return data_others;
     }
 
 #endif
