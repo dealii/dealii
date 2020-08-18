@@ -825,37 +825,25 @@ namespace internal
               dofs_per_quad   = fe.n_dofs_per_quad(),   //
               dofs_per_hex    = fe.n_dofs_per_hex();    //
 
-            const unsigned int inner_dofs =
-              structdim == 1 ? dofs_per_line :
-                               (structdim == 2 ? dofs_per_quad : dofs_per_hex);
-
             unsigned int index = 0;
 
             // 1) VERTEX dofs
-            for (const auto vertex : accessor.vertex_indices())
-              {
-                (void)vertex;
-                index += dofs_per_vertex;
-              }
+            index += dofs_per_vertex * accessor.n_vertices();
 
             // 2) LINE dofs
             if (structdim == 2 || structdim == 3)
-              for (const auto line : accessor.line_indices())
-                {
-                  (void)line;
-                  index += dofs_per_line;
-                }
+              index += dofs_per_line * accessor.n_lines();
 
             // 3) FACE dofs
             if (structdim == 3)
-              for (const auto face : accessor.face_indices())
-                {
-                  (void)face;
-                  index += dofs_per_quad;
-                }
+              index += dofs_per_quad * accessor.n_faces();
 
             // 4) INNER dofs
-            index += inner_dofs;
+            const unsigned int interior_dofs =
+              structdim == 1 ? dofs_per_line :
+                               (structdim == 2 ? dofs_per_quad : dofs_per_hex);
+
+            index += interior_dofs;
 
             return index;
           }
