@@ -556,6 +556,8 @@ namespace PETScWrappers
                             PETSC_DEFAULT,
                             &result.petsc_matrix());
           AssertThrow(ierr == 0, ExcPETScError(ierr));
+          ierr = PETScWrappers::destroy_matrix(tmp);
+			    AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
     }
   } // namespace internals
