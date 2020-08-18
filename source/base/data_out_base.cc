@@ -7024,6 +7024,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   (void)comm;
 
   std::ofstream f(filename);
+  AssertThrow(f, ExcFileNotOpen(filename));
   write_vtu(f);
 #else
 
@@ -7038,7 +7039,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
                        MPI_MODE_CREATE | MPI_MODE_WRONLY,
                        info,
                        &fh);
-  AssertThrowMPI(ierr);
+  AssertThrow(ierr == MPI_SUCCESS, ExcFileNotOpen(filename));
 
   ierr = MPI_File_set_size(fh, 0); // delete the file contents
   AssertThrowMPI(ierr);
@@ -7160,6 +7161,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
     {
       // every processor writes one file
       std::ofstream output(filename.c_str());
+      AssertThrow(output, ExcFileNotOpen(filename));
       this->write_vtu(output);
     }
   else if (n_groups == 1)
