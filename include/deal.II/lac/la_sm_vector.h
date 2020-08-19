@@ -564,6 +564,8 @@ namespace LinearAlgebra
 
       std::shared_ptr<const PartitionerBase> partitioner;
 
+      bool setup_ghosts = true;
+
       size_type allocated_size;
 
       mutable MemorySpaceData<Number> data;
@@ -648,7 +650,7 @@ namespace LinearAlgebra
     inline bool
     Vector<Number, MemorySpace>::has_ghost_elements() const
     {
-      return vector_is_ghosted;
+      return vector_is_ghosted && setup_ghosts;
     }
 
 

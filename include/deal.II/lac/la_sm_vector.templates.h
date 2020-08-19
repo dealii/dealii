@@ -21,7 +21,6 @@
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/cuda_size.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_sm_vector.h>
@@ -188,19 +187,26 @@ namespace LinearAlgebra
       // different (check only if the are allocated
       // differently, not if the actual data is
       // different)
-      if (partitioner_old.get() != v.partitioner_old.get())
+      if (partitioner_old.get() != v.partitioner_old.get() ||
+          setup_ghosts != v.setup_ghosts)
         {
           partitioner_old = v.partitioner_old;
           partitioner     = v.partitioner;
+          setup_ghosts    = v.setup_ghosts;
+
+          // AssertThrow(setup_ghosts,
+          // dealii::StandardExceptions::ExcNotImplemented());
+
           const size_type new_allocated_size =
-            partitioner->local_size() + partitioner->n_ghost_indices();
+            partitioner->local_size() +
+            (setup_ghosts ? partitioner->n_ghost_indices() : 0);
           resize_val(new_allocated_size,
                      partitioner->get_sm_mpi_communicator());
         }
 
       if (omit_zeroing_entries == false)
         this->operator=(Number());
-      else
+      else if (setup_ghosts)
         zero_out_ghosts();
 
       // do not reallocate import_data directly, but only upon request. It
@@ -249,17 +255,18 @@ namespace LinearAlgebra
       const std::shared_ptr<const PartitionerBase> &            partitioner,
       const bool                                                setup_ghosts)
     {
-      (void)setup_ghosts;
+      // AssertThrow(setup_ghosts,
+      // dealii::StandardExceptions::ExcNotImplemented());
 
-      AssertThrow(setup_ghosts, dealii::StandardExceptions::ExcNotImplemented())
-
-        clear_mpi_requests();
+      clear_mpi_requests();
       this->partitioner_old = partitioner_old;
       this->partitioner     = partitioner;
+      this->setup_ghosts    = setup_ghosts;
 
       // set vector size and allocate memory
       const size_type new_allocated_size =
-        this->partitioner->local_size() + this->partitioner->n_ghost_indices();
+        this->partitioner->local_size() +
+        (setup_ghosts ? this->partitioner->n_ghost_indices() : 0);
       resize_val(new_allocated_size, partitioner->get_sm_mpi_communicator());
 
       // initialize to zero
@@ -457,10 +464,14 @@ namespace LinearAlgebra
               thread_loop_partitioner, this_size, c.data, data);
         }
 
-      if (must_update_ghost_values)
-        update_ghost_values();
-      else
-        zero_out_ghosts();
+      if (setup_ghosts)
+        {
+          if (must_update_ghost_values)
+            update_ghost_values();
+          else
+            zero_out_ghosts();
+        }
+
       return *this;
     }
 
@@ -507,6 +518,8 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::update_ghost_values() const
     {
+      Assert(setup_ghosts, ExcNotImplemented());
+
       update_ghost_values_start();
       update_ghost_values_finish();
     }
@@ -517,6 +530,8 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::zero_out_ghosts() const
     {
+      Assert(setup_ghosts, ExcNotImplemented());
+
       if (data.values != nullptr)
         std::fill_n(data.values.get() + partitioner->local_size(),
                     partitioner->n_ghost_indices(),
@@ -629,7 +644,7 @@ namespace LinearAlgebra
 
       // if we call Vector::operator=0, we want to zero out all the entries
       // plus ghosts.
-      if (s == Number())
+      if (s == Number() && setup_ghosts)
         zero_out_ghosts();
 
       return *this;
