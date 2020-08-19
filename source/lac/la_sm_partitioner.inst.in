@@ -21,42 +21,6 @@ for (SCALAR : REAL_SCALARS)
     \{
       namespace SharedMPI
       \{
-        template void
-        Partitioner::update_ghost_values_start(
-          SCALAR *                       data_this,
-          std::vector<SCALAR *> &        data_others,
-          dealii::AlignedVector<SCALAR> &buffer,
-          const unsigned int             communication_channel) const;
-
-        template void
-        Partitioner::update_ghost_values_finish(
-          SCALAR *                       data_this,
-          std::vector<SCALAR *> &        data_others,
-          dealii::AlignedVector<SCALAR> &buffer) const;
-
-        template void
-        Partitioner::update_ghost_values(
-          SCALAR *                       data_this,
-          std::vector<SCALAR *> &        data_others,
-          dealii::AlignedVector<SCALAR> &buffer) const;
-
-        template void
-        Partitioner::compress_start(
-          SCALAR *                       data_this,
-          std::vector<SCALAR *> &        data_others,
-          dealii::AlignedVector<SCALAR> &buffer,
-          const unsigned int             communication_channel) const;
-
-        template void
-        Partitioner::compress_finish(
-          SCALAR *                       data_this,
-          std::vector<SCALAR *> &        data_others,
-          dealii::AlignedVector<SCALAR> &buffer) const;
-
-        template void
-        Partitioner::compress(SCALAR *                       data_this,
-                              std::vector<SCALAR *> &        data_others,
-                              dealii::AlignedVector<SCALAR> &buffer) const;
       \}
     \}
   }

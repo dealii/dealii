@@ -76,10 +76,18 @@ namespace LinearAlgebra
 {
   namespace SharedMPI
   {
+    /**
+     * Data for MPI shared memory.
+     */
     template <typename Number>
     struct MemorySpaceData
       : public ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace::Host>
     {
+      /**
+       * Copy the active data (values) to @p begin.
+       *
+       * @note Not implemented yet.
+       */
       void
       copy_to(Number *begin, std::size_t n_elements) override
       {
@@ -88,6 +96,11 @@ namespace LinearAlgebra
         (void)n_elements;
       }
 
+      /**
+       * Copy the data in @p begin to the active data of the structure (values).
+       *
+       * @note Not implemented yet.
+       */
       void
       copy_from(Number *begin, std::size_t n_elements) override
       {
@@ -96,8 +109,39 @@ namespace LinearAlgebra
         (void)n_elements;
       }
 
+      /**
+       * Return memory consumption.
+       *
+       * @note It also includes added memory for alignment.
+       */
+      std::size_t
+      memory_consumption() const
+      {
+        // note: values_win is not accounted for
+        return MemoryConsumption::memory_consumption(others) +
+               MemoryConsumption::memory_consumption(
+                 memory_constumption_values) +
+               memory_constumption_values;
+      }
+
+      /**
+       * Memory consumption of the allocated values (reserved during
+       * MPI_Win_allocate_shared).
+       *
+       * @note It also includes added memory for alignment.
+       */
+      std::size_t memory_constumption_values;
+
+      /**
+       * MPI window. It is connected to the destructor of the values; its
+       * destruction (MPI_Win_free) leads actually to the deallocation of
+       * values.
+       */
       MPI_Win *values_win = nullptr;
 
+      /**
+       * Pointer to all the
+       */
       std::vector<Number *> others;
     };
 
@@ -160,8 +204,9 @@ namespace LinearAlgebra
 
       void
       reinit(const std::shared_ptr<const Utilities::MPI::Partitioner>
-               &                                       partitioner_old,
-             const std::shared_ptr<const Partitioner> &partitioner);
+               &                                           partitioner_old,
+             const std::shared_ptr<const PartitionerBase> &partitioner,
+             const bool                                    setup_ghosts = true);
 
       void
       reinit(const MPI_Comm comm_all,
@@ -517,7 +562,7 @@ namespace LinearAlgebra
 
       std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_old;
 
-      std::shared_ptr<const Partitioner> partitioner;
+      std::shared_ptr<const PartitionerBase> partitioner;
 
       size_type allocated_size;
 
@@ -552,7 +597,7 @@ namespace LinearAlgebra
       template <typename Number2>
       friend class BlockVector;
 
-      std::vector<Number *> data_others;
+      // std::vector<Number *> data_others;
     };
 
 
@@ -622,7 +667,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::local_size() const
     {
-      return partitioner_old->local_size();
+      return partitioner->local_size();
     }
 
 
@@ -731,7 +776,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::end()
     {
       return internal::Policy<Number, MemorySpace>::begin(data) +
-             partitioner_old->local_size();
+             partitioner->local_size();
     }
 
 
@@ -741,7 +786,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::end() const
     {
       return internal::Policy<Number, MemorySpace>::begin(data) +
-             partitioner_old->local_size();
+             partitioner->local_size();
     }
 
 
@@ -795,8 +840,8 @@ namespace LinearAlgebra
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       AssertIndexRange(local_index,
-                       partitioner_old->local_size() +
-                         partitioner_old->n_ghost_indices());
+                       partitioner->local_size() +
+                         partitioner->n_ghost_indices());
       // do not allow reading a vector which is not in ghost mode
       Assert(local_index < local_size() || vector_is_ghosted == true,
              ExcMessage("You tried to read a ghost element of this vector, "
@@ -816,8 +861,8 @@ namespace LinearAlgebra
                "This function is only implemented for the Host memory space"));
 
       AssertIndexRange(local_index,
-                       partitioner_old->local_size() +
-                         partitioner_old->n_ghost_indices());
+                       partitioner->local_size() +
+                         partitioner->n_ghost_indices());
 
       return data.values[local_index];
     }
@@ -898,7 +943,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::get_mpi_communicator() const
     {
       Assert(false, ExcNotImplemented());
-      return partitioner_old->get_mpi_communicator();
+      return partitioner->get_mpi_communicator();
     }
 
 
@@ -924,7 +969,7 @@ namespace LinearAlgebra
     std::vector<Number *> &
     Vector<Number, MemorySpace>::other_values()
     {
-      return data_others;
+      return data.others;
     }
 
 
@@ -933,7 +978,7 @@ namespace LinearAlgebra
     const std::vector<Number *> &
     Vector<Number, MemorySpace>::other_values() const
     {
-      return data_others;
+      return data.others;
     }
 
 #endif

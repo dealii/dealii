@@ -30,7 +30,104 @@ namespace LinearAlgebra
 {
   namespace SharedMPI
   {
-    class Partitioner : public LinearAlgebra::CommunicationPatternBase
+    class PartitionerBase : public LinearAlgebra::CommunicationPatternBase
+    {
+    public:
+      virtual const MPI_Comm &
+      get_mpi_communicator() const override = 0;
+
+      virtual const MPI_Comm &
+      get_sm_mpi_communicator() const = 0;
+
+      // double versions
+
+      virtual void
+      update_ghost_values_start(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer,
+        const unsigned int             communication_channel = 0) const = 0;
+
+      virtual void
+      update_ghost_values_finish(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer) const = 0;
+
+      virtual void
+      update_ghost_values(double *                       data_this,
+                          std::vector<double *> &        data_others,
+                          dealii::AlignedVector<double> &buffer) const = 0;
+
+      virtual void
+      compress_start(double *                       data_this,
+                     std::vector<double *> &        data_others,
+                     dealii::AlignedVector<double> &buffer,
+                     const unsigned int communication_channel = 0) const = 0;
+
+      virtual void
+      compress_finish(double *                       data_this,
+                      std::vector<double *> &        data_others,
+                      dealii::AlignedVector<double> &buffer) const = 0;
+
+      virtual void
+      compress(double *                       data_this,
+               std::vector<double *> &        data_others,
+               dealii::AlignedVector<double> &buffer) const = 0;
+
+      // float versions
+
+      virtual void
+      update_ghost_values_start(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer,
+        const unsigned int            communication_channel = 0) const = 0;
+
+      virtual void
+      update_ghost_values_finish(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer) const = 0;
+
+      virtual void
+      update_ghost_values(float *                       data_this,
+                          std::vector<float *> &        data_others,
+                          dealii::AlignedVector<float> &buffer) const = 0;
+
+      virtual void
+      compress_start(float *                       data_this,
+                     std::vector<float *> &        data_others,
+                     dealii::AlignedVector<float> &buffer,
+                     const unsigned int communication_channel = 0) const = 0;
+
+      virtual void
+      compress_finish(float *                       data_this,
+                      std::vector<float *> &        data_others,
+                      dealii::AlignedVector<float> &buffer) const = 0;
+
+      virtual void
+      compress(float *                       data_this,
+               std::vector<float *> &        data_others,
+               dealii::AlignedVector<float> &buffer) const = 0;
+
+      virtual std::size_t
+      local_size() const = 0;
+
+      virtual std::size_t
+      n_ghost_indices() const = 0;
+
+      virtual std::size_t
+      n_mpi_processes() const = 0;
+
+      virtual std::size_t
+      memory_consumption() const = 0;
+
+      virtual std::vector<unsigned int>
+      get_sm_view() const = 0;
+    };
+
+    class Partitioner : public PartitionerBase
     {
     public:
       Partitioner(const MPI_Comm &comm,
@@ -42,7 +139,7 @@ namespace LinearAlgebra
       get_mpi_communicator() const override;
 
       const MPI_Comm &
-      get_sm_mpi_communicator() const;
+      get_sm_mpi_communicator() const override;
 
       void
       reinit(const IndexSet &is_locally_owned,
@@ -53,9 +150,95 @@ namespace LinearAlgebra
       reinit(const IndexSet &is_locally_owned,
              const IndexSet &is_locally_ghost);
 
-      template <typename Number>
       void
       update_ghost_values_start(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer,
+        const unsigned int communication_channel = 0) const override;
+
+      void
+      update_ghost_values_finish(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer) const override;
+
+      void
+      update_ghost_values(double *                       data_this,
+                          std::vector<double *> &        data_others,
+                          dealii::AlignedVector<double> &buffer) const override;
+
+      void
+      compress_start(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer,
+        const unsigned int communication_channel = 0) const override;
+
+      void
+      compress_finish(double *                       data_this,
+                      std::vector<double *> &        data_others,
+                      dealii::AlignedVector<double> &buffer) const override;
+
+      void
+      compress(double *                       data_this,
+               std::vector<double *> &        data_others,
+               dealii::AlignedVector<double> &buffer) const override;
+
+      void
+      update_ghost_values_start(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer,
+        const unsigned int            communication_channel = 0) const override;
+
+      void
+      update_ghost_values_finish(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer) const override;
+
+      void
+      update_ghost_values(float *                       data_this,
+                          std::vector<float *> &        data_others,
+                          dealii::AlignedVector<float> &buffer) const override;
+
+      void
+      compress_start(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer,
+        const unsigned int            communication_channel = 0) const override;
+
+      void
+      compress_finish(float *                       data_this,
+                      std::vector<float *> &        data_others,
+                      dealii::AlignedVector<float> &buffer) const override;
+
+      void
+      compress(float *                       data_this,
+               std::vector<float *> &        data_others,
+               dealii::AlignedVector<float> &buffer) const override;
+
+      std::size_t
+      local_size() const override;
+
+      std::size_t
+      n_ghost_indices() const override;
+
+      std::size_t
+      n_mpi_processes() const override;
+
+      std::size_t
+      memory_consumption() const override;
+
+      std::vector<unsigned int>
+      get_sm_view() const override;
+
+    private:
+      template <typename Number>
+      void
+      update_ghost_values_start_impl(
         Number *                       data_this,
         std::vector<Number *> &        data_others,
         dealii::AlignedVector<Number> &buffer,
@@ -63,49 +246,35 @@ namespace LinearAlgebra
 
       template <typename Number>
       void
-      update_ghost_values_finish(Number *                       data_this,
-                                 std::vector<Number *> &        data_others,
-                                 dealii::AlignedVector<Number> &buffer) const;
+      update_ghost_values_finish_impl(
+        Number *                       data_this,
+        std::vector<Number *> &        data_others,
+        dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
-      update_ghost_values(Number *                       data_this,
+      update_ghost_values_impl(Number *                       data_this,
+                               std::vector<Number *> &        data_others,
+                               dealii::AlignedVector<Number> &buffer) const;
+
+      template <typename Number>
+      void
+      compress_start_impl(Number *                       data_this,
                           std::vector<Number *> &        data_others,
-                          dealii::AlignedVector<Number> &buffer) const;
+                          dealii::AlignedVector<Number> &buffer,
+                          const unsigned int communication_channel = 0) const;
 
       template <typename Number>
       void
-      compress_start(Number *                       data_this,
-                     std::vector<Number *> &        data_others,
-                     dealii::AlignedVector<Number> &buffer,
-                     const unsigned int communication_channel = 0) const;
+      compress_finish_impl(Number *                       data_this,
+                           std::vector<Number *> &        data_others,
+                           dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
-      compress_finish(Number *                       data_this,
-                      std::vector<Number *> &        data_others,
-                      dealii::AlignedVector<Number> &buffer) const;
-
-      template <typename Number>
-      void
-      compress(Number *                       data_this,
-               std::vector<Number *> &        data_others,
-               dealii::AlignedVector<Number> &buffer) const;
-
-      std::size_t
-      local_size() const;
-
-      std::size_t
-      n_ghost_indices() const;
-
-      std::size_t
-      n_mpi_processes() const;
-
-      std::size_t
-      memory_consumption() const;
-
-      std::vector<unsigned int>
-      get_sm_view() const;
+      compress_impl(Number *                       data_this,
+                    std::vector<Number *> &        data_others,
+                    dealii::AlignedVector<Number> &buffer) const;
 
     private:
       const MPI_Comm &comm;

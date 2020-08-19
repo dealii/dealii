@@ -73,15 +73,14 @@ namespace LinearAlgebra
 
           const std::size_t align_by = 64;
 
-          MPI_Win_allocate_shared(((new_alloc_size * sizeof(Number) + align_by -
-                                    1) /
-                                   sizeof(Number)) *
-                                    sizeof(Number),
-                                  sizeof(Number),
-                                  info,
-                                  comm_shared,
-                                  data_this,
-                                  win);
+          std::size_t s = ((new_alloc_size * sizeof(Number) + align_by - 1) /
+                           sizeof(Number)) *
+                          sizeof(Number);
+
+          data.memory_constumption_values = s;
+
+          MPI_Win_allocate_shared(
+            s, sizeof(Number), info, comm_shared, data_this, win);
 
           for (unsigned int i = 0; i < size_sm; i++)
             {
@@ -91,11 +90,8 @@ namespace LinearAlgebra
                 *win, i, &ssize, &disp_unit, &data.others[i]);
             }
 
-          Number *    ptr_unaligned = data.others[rank_sm];
-          Number *    ptr_aligned   = ptr_unaligned;
-          std::size_t s = ((new_alloc_size * sizeof(Number) + align_by - 1) /
-                           sizeof(Number)) *
-                          sizeof(Number);
+          Number *ptr_unaligned = data.others[rank_sm];
+          Number *ptr_aligned   = ptr_unaligned;
 
           AssertThrow(std::align(align_by,
                                  new_alloc_size * sizeof(Number),
@@ -250,9 +246,14 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_old,
-      const std::shared_ptr<const Partitioner> &                partitioner)
+      const std::shared_ptr<const PartitionerBase> &            partitioner,
+      const bool                                                setup_ghosts)
     {
-      clear_mpi_requests();
+      (void)setup_ghosts;
+
+      AssertThrow(setup_ghosts, dealii::StandardExceptions::ExcNotImplemented())
+
+        clear_mpi_requests();
       this->partitioner_old = partitioner_old;
       this->partitioner     = partitioner;
 
@@ -1179,8 +1180,7 @@ namespace LinearAlgebra
     std::size_t
     Vector<Number, MemorySpaceType>::memory_consumption() const
     {
-      Assert(false, ExcNotImplemented());
-      return 0;
+      return data.memory_consumption();
     }
 
 

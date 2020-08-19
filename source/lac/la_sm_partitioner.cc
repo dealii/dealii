@@ -382,9 +382,126 @@ namespace LinearAlgebra
       //      std::cout << "memory_consumption " << a << " " << b << std::endl;
     }
 
-    template <typename Number>
     void
     Partitioner::update_ghost_values_start(
+      double *                       data_this,
+      std::vector<double *> &        data_others,
+      dealii::AlignedVector<double> &buffer,
+      const unsigned int             communication_channel) const
+    {
+      update_ghost_values_start_impl(data_this,
+                                     data_others,
+                                     buffer,
+                                     communication_channel);
+    }
+
+    void
+    Partitioner::update_ghost_values_finish(
+      double *                       data_this,
+      std::vector<double *> &        data_others,
+      dealii::AlignedVector<double> &buffer) const
+    {
+      update_ghost_values_finish_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::update_ghost_values(
+      double *                       data_this,
+      std::vector<double *> &        data_others,
+      dealii::AlignedVector<double> &buffer) const
+    {
+      update_ghost_values_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::compress_start(double *                       data_this,
+                                std::vector<double *> &        data_others,
+                                dealii::AlignedVector<double> &buffer,
+                                const unsigned int communication_channel) const
+    {
+      compress_start_impl(data_this,
+                          data_others,
+                          buffer,
+                          communication_channel);
+    }
+
+    void
+    Partitioner::compress_finish(double *                       data_this,
+                                 std::vector<double *> &        data_others,
+                                 dealii::AlignedVector<double> &buffer) const
+    {
+      compress_finish_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::compress(double *                       data_this,
+                          std::vector<double *> &        data_others,
+                          dealii::AlignedVector<double> &buffer) const
+    {
+      compress_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::update_ghost_values_start(
+      float *                       data_this,
+      std::vector<float *> &        data_others,
+      dealii::AlignedVector<float> &buffer,
+      const unsigned int            communication_channel) const
+    {
+      update_ghost_values_start_impl(data_this,
+                                     data_others,
+                                     buffer,
+                                     communication_channel);
+    }
+
+    void
+    Partitioner::update_ghost_values_finish(
+      float *                       data_this,
+      std::vector<float *> &        data_others,
+      dealii::AlignedVector<float> &buffer) const
+    {
+      update_ghost_values_finish_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::update_ghost_values(float *                       data_this,
+                                     std::vector<float *> &        data_others,
+                                     dealii::AlignedVector<float> &buffer) const
+    {
+      update_ghost_values_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::compress_start(float *                       data_this,
+                                std::vector<float *> &        data_others,
+                                dealii::AlignedVector<float> &buffer,
+                                const unsigned int communication_channel) const
+    {
+      compress_start_impl(data_this,
+                          data_others,
+                          buffer,
+                          communication_channel);
+    }
+
+    void
+    Partitioner::compress_finish(float *                       data_this,
+                                 std::vector<float *> &        data_others,
+                                 dealii::AlignedVector<float> &buffer) const
+    {
+      compress_finish_impl(data_this, data_others, buffer);
+    }
+
+    void
+    Partitioner::compress(float *                       data_this,
+                          std::vector<float *> &        data_others,
+                          dealii::AlignedVector<float> &buffer) const
+    {
+      compress_impl(data_this, data_others, buffer);
+    }
+
+    template <typename Number>
+    void
+    Partitioner::update_ghost_values_start_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer,
@@ -450,7 +567,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::update_ghost_values_finish(
+    Partitioner::update_ghost_values_finish_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer) const
@@ -494,7 +611,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::update_ghost_values(
+    Partitioner::update_ghost_values_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer) const
@@ -505,10 +622,11 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::compress_start(Number *                       data_this,
-                                std::vector<Number *> &        data_others,
-                                dealii::AlignedVector<Number> &buffer,
-                                const unsigned int communication_channel) const
+    Partitioner::compress_start_impl(
+      Number *                       data_this,
+      std::vector<Number *> &        data_others,
+      dealii::AlignedVector<Number> &buffer,
+      const unsigned int             communication_channel) const
     {
       (void)data_others;
 
@@ -555,9 +673,10 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::compress_finish(Number *                       data_this,
-                                 std::vector<Number *> &        data_others,
-                                 dealii::AlignedVector<Number> &buffer) const
+    Partitioner::compress_finish_impl(
+      Number *                       data_this,
+      std::vector<Number *> &        data_others,
+      dealii::AlignedVector<Number> &buffer) const
     {
       for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
         {
@@ -622,9 +741,9 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::compress(Number *                       data_this,
-                          std::vector<Number *> &        data_others,
-                          dealii::AlignedVector<Number> &buffer) const
+    Partitioner::compress_impl(Number *                       data_this,
+                               std::vector<Number *> &        data_others,
+                               dealii::AlignedVector<Number> &buffer) const
     {
       compress_start(data_this, data_others, buffer);
       compress_finish(data_this, data_others, buffer);
