@@ -70,11 +70,11 @@ namespace MemorySpace
       (void)n_elements;
     }
 
-    void
     /**
      * Copy the data in @p begin to the active data of the structure (values for
      * Host and values_dev for CUDA). The pointer @p begin must be on the host.
      */
+    void
     copy_from(Number *begin, std::size_t n_elements)
     {
       (void)begin;
