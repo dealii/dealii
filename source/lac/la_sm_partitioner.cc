@@ -385,8 +385,8 @@ namespace LinearAlgebra
     void
     Partitioner::export_to_ghosted_array_start(
       const unsigned int             communication_channel,
-      double *                       data_this,
-      std::vector<double *> &        data_others,
+      double *const                  data_this,
+      const std::vector<double *> &  data_others,
       dealii::AlignedVector<double> &buffer) const
     {
       export_to_ghosted_array_start_impl(communication_channel,
@@ -428,8 +428,8 @@ namespace LinearAlgebra
     void
     Partitioner::export_to_ghosted_array_start(
       const unsigned int            communication_channel,
-      float *                       data_this,
-      std::vector<float *> &        data_others,
+      float *const                  data_this,
+      const std::vector<float *> &  data_others,
       dealii::AlignedVector<float> &buffer) const
     {
       export_to_ghosted_array_start_impl(communication_channel,
@@ -472,8 +472,8 @@ namespace LinearAlgebra
     void
     Partitioner::export_to_ghosted_array_start_impl(
       const unsigned int             communication_channel,
-      Number *                       data_this,
-      std::vector<Number *> &        data_others,
+      Number *const                  data_this,
+      const std::vector<Number *> &  data_others,
       dealii::AlignedVector<Number> &buffer) const
     {
       (void)data_others;
