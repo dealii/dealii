@@ -50,23 +50,23 @@ namespace LinearAlgebra
 
       virtual void
       export_to_ghosted_array_finish(
-        double *                       data_this,
-        std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer) const = 0;
+        double *const                        data_this,
+        const std::vector<double *> &        data_others,
+        const dealii::AlignedVector<double> &buffer) const = 0;
 
       virtual void
       import_from_ghosted_array_start(
         const VectorOperation::values  operation,
         const unsigned int             communication_channel,
-        double *                       data_this,
-        std::vector<double *> &        data_others,
+        double *const                  data_this,
+        const std::vector<double *> &  data_others,
         dealii::AlignedVector<double> &buffer) const = 0;
 
       virtual void
       import_from_ghosted_array_finish(
-        double *                       data_this,
-        std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer) const = 0;
+        double *const                        data_this,
+        const std::vector<double *> &        data_others,
+        const dealii::AlignedVector<double> &buffer) const = 0;
 
       // float versions
 
@@ -79,23 +79,23 @@ namespace LinearAlgebra
 
       virtual void
       export_to_ghosted_array_finish(
-        float *                       data_this,
-        std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer) const = 0;
+        float *const                        data_this,
+        const std::vector<float *> &        data_others,
+        const dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual void
       import_from_ghosted_array_start(
         const VectorOperation::values operation,
         const unsigned int            communication_channel,
-        float *                       data_this,
-        std::vector<float *> &        data_others,
+        float *const                  data_this,
+        const std::vector<float *> &  data_others,
         dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual void
       import_from_ghosted_array_finish(
-        float *                       data_this,
-        std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer) const = 0;
+        float *const                        data_this,
+        const std::vector<float *> &        data_others,
+        const dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual std::size_t
       local_size() const = 0;
@@ -145,23 +145,23 @@ namespace LinearAlgebra
 
       void
       export_to_ghosted_array_finish(
-        double *                       data_this,
-        std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer) const override;
+        double *const                        data_this,
+        const std::vector<double *> &        data_others,
+        const dealii::AlignedVector<double> &buffer) const override;
 
       void
       import_from_ghosted_array_start(
         const VectorOperation::values  operation,
         const unsigned int             communication_channel,
-        double *                       data_this,
-        std::vector<double *> &        data_others,
+        double *const                  data_this,
+        const std::vector<double *> &  data_others,
         dealii::AlignedVector<double> &buffer) const override;
 
       void
       import_from_ghosted_array_finish(
-        double *                       data_this,
-        std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer) const override;
+        double *const                        data_this,
+        const std::vector<double *> &        data_others,
+        const dealii::AlignedVector<double> &buffer) const override;
 
       void
       export_to_ghosted_array_start(
@@ -172,23 +172,23 @@ namespace LinearAlgebra
 
       void
       export_to_ghosted_array_finish(
-        float *                       data_this,
-        std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer) const override;
+        float *const                        data_this,
+        const std::vector<float *> &        data_others,
+        const dealii::AlignedVector<float> &buffer) const override;
 
       void
       import_from_ghosted_array_start(
         const VectorOperation::values operation,
         const unsigned int            communication_channel,
-        float *                       data_this,
-        std::vector<float *> &        data_others,
+        float *const                  data_this,
+        const std::vector<float *> &  data_others,
         dealii::AlignedVector<float> &buffer) const override;
 
       void
       import_from_ghosted_array_finish(
-        float *                       data_this,
-        std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer) const override;
+        float *const                        data_this,
+        const std::vector<float *> &        data_others,
+        const dealii::AlignedVector<float> &buffer) const override;
 
       std::size_t
       local_size() const override;
@@ -217,25 +217,25 @@ namespace LinearAlgebra
       template <typename Number>
       void
       export_to_ghosted_array_finish_impl(
-        Number *                       data_this,
-        std::vector<Number *> &        data_others,
-        dealii::AlignedVector<Number> &buffer) const;
+        Number *const                        data_this,
+        const std::vector<Number *> &        data_others,
+        const dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
       import_from_ghosted_array_start_impl(
         const VectorOperation::values  operation,
         const unsigned int             communication_channel,
-        Number *                       data_this,
-        std::vector<Number *> &        data_others,
+        Number *const                  data_this,
+        const std::vector<Number *> &  data_others,
         dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
       import_from_ghosted_array_finish_impl(
-        Number *                       data_this,
-        std::vector<Number *> &        data_others,
-        dealii::AlignedVector<Number> &buffer) const;
+        Number *const                        data_this,
+        const std::vector<Number *> &        data_others,
+        const dealii::AlignedVector<Number> &buffer) const;
 
     private:
       const MPI_Comm &comm;

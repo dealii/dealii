@@ -397,9 +397,9 @@ namespace LinearAlgebra
 
     void
     Partitioner::export_to_ghosted_array_finish(
-      double *                       data_this,
-      std::vector<double *> &        data_others,
-      dealii::AlignedVector<double> &buffer) const
+      double *const                        data_this,
+      const std::vector<double *> &        data_others,
+      const dealii::AlignedVector<double> &buffer) const
     {
       export_to_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
@@ -408,8 +408,8 @@ namespace LinearAlgebra
     Partitioner::import_from_ghosted_array_start(
       const VectorOperation::values  operation,
       const unsigned int             communication_channel,
-      double *                       data_this,
-      std::vector<double *> &        data_others,
+      double *const                  data_this,
+      const std::vector<double *> &  data_others,
       dealii::AlignedVector<double> &buffer) const
     {
       import_from_ghosted_array_start_impl(
@@ -418,9 +418,9 @@ namespace LinearAlgebra
 
     void
     Partitioner::import_from_ghosted_array_finish(
-      double *                       data_this,
-      std::vector<double *> &        data_others,
-      dealii::AlignedVector<double> &buffer) const
+      double *const                        data_this,
+      const std::vector<double *> &        data_others,
+      const dealii::AlignedVector<double> &buffer) const
     {
       import_from_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
@@ -440,9 +440,9 @@ namespace LinearAlgebra
 
     void
     Partitioner::export_to_ghosted_array_finish(
-      float *                       data_this,
-      std::vector<float *> &        data_others,
-      dealii::AlignedVector<float> &buffer) const
+      float *const                        data_this,
+      const std::vector<float *> &        data_others,
+      const dealii::AlignedVector<float> &buffer) const
     {
       export_to_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
@@ -451,8 +451,8 @@ namespace LinearAlgebra
     Partitioner::import_from_ghosted_array_start(
       const VectorOperation::values operation,
       const unsigned int            communication_channel,
-      float *                       data_this,
-      std::vector<float *> &        data_others,
+      float *const                  data_this,
+      const std::vector<float *> &  data_others,
       dealii::AlignedVector<float> &buffer) const
     {
       import_from_ghosted_array_start_impl(
@@ -461,9 +461,9 @@ namespace LinearAlgebra
 
     void
     Partitioner::import_from_ghosted_array_finish(
-      float *                       data_this,
-      std::vector<float *> &        data_others,
-      dealii::AlignedVector<float> &buffer) const
+      float *const                        data_this,
+      const std::vector<float *> &        data_others,
+      const dealii::AlignedVector<float> &buffer) const
     {
       import_from_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
@@ -537,9 +537,9 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Partitioner::export_to_ghosted_array_finish_impl(
-      Number *                       data_this,
-      std::vector<Number *> &        data_others,
-      dealii::AlignedVector<Number> &buffer) const
+      Number *const                        data_this,
+      const std::vector<Number *> &        data_others,
+      const dealii::AlignedVector<Number> &buffer) const
     {
       (void)buffer;
 
@@ -583,8 +583,8 @@ namespace LinearAlgebra
     Partitioner::import_from_ghosted_array_start_impl(
       const VectorOperation::values  operation,
       const unsigned int             communication_channel,
-      Number *                       data_this,
-      std::vector<Number *> &        data_others,
+      Number *const                  data_this,
+      const std::vector<Number *> &  data_others,
       dealii::AlignedVector<Number> &buffer) const
     {
       (void)data_others;
@@ -636,9 +636,9 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Partitioner::import_from_ghosted_array_finish_impl(
-      Number *                       data_this,
-      std::vector<Number *> &        data_others,
-      dealii::AlignedVector<Number> &buffer) const
+      Number *const                        data_this,
+      const std::vector<Number *> &        data_others,
+      const dealii::AlignedVector<Number> &buffer) const
     {
       for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
         {
