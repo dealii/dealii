@@ -383,125 +383,96 @@ namespace LinearAlgebra
     }
 
     void
-    Partitioner::update_ghost_values_start(
+    Partitioner::export_to_ghosted_array_start(
       double *                       data_this,
       std::vector<double *> &        data_others,
       dealii::AlignedVector<double> &buffer,
       const unsigned int             communication_channel) const
     {
-      update_ghost_values_start_impl(data_this,
-                                     data_others,
-                                     buffer,
-                                     communication_channel);
+      export_to_ghosted_array_start_impl(data_this,
+                                         data_others,
+                                         buffer,
+                                         communication_channel);
     }
 
     void
-    Partitioner::update_ghost_values_finish(
+    Partitioner::export_to_ghosted_array_finish(
       double *                       data_this,
       std::vector<double *> &        data_others,
       dealii::AlignedVector<double> &buffer) const
     {
-      update_ghost_values_finish_impl(data_this, data_others, buffer);
+      export_to_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
 
     void
-    Partitioner::update_ghost_values(
+    Partitioner::import_from_ghosted_array_start(
+      double *                       data_this,
+      std::vector<double *> &        data_others,
+      dealii::AlignedVector<double> &buffer,
+      const unsigned int             communication_channel) const
+    {
+      import_from_ghosted_array_start_impl(data_this,
+                                           data_others,
+                                           buffer,
+                                           communication_channel);
+    }
+
+    void
+    Partitioner::import_from_ghosted_array_finish(
       double *                       data_this,
       std::vector<double *> &        data_others,
       dealii::AlignedVector<double> &buffer) const
     {
-      update_ghost_values_impl(data_this, data_others, buffer);
+      import_from_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
 
     void
-    Partitioner::compress_start(double *                       data_this,
-                                std::vector<double *> &        data_others,
-                                dealii::AlignedVector<double> &buffer,
-                                const unsigned int communication_channel) const
-    {
-      compress_start_impl(data_this,
-                          data_others,
-                          buffer,
-                          communication_channel);
-    }
-
-    void
-    Partitioner::compress_finish(double *                       data_this,
-                                 std::vector<double *> &        data_others,
-                                 dealii::AlignedVector<double> &buffer) const
-    {
-      compress_finish_impl(data_this, data_others, buffer);
-    }
-
-    void
-    Partitioner::compress(double *                       data_this,
-                          std::vector<double *> &        data_others,
-                          dealii::AlignedVector<double> &buffer) const
-    {
-      compress_impl(data_this, data_others, buffer);
-    }
-
-    void
-    Partitioner::update_ghost_values_start(
+    Partitioner::export_to_ghosted_array_start(
       float *                       data_this,
       std::vector<float *> &        data_others,
       dealii::AlignedVector<float> &buffer,
       const unsigned int            communication_channel) const
     {
-      update_ghost_values_start_impl(data_this,
-                                     data_others,
-                                     buffer,
-                                     communication_channel);
+      export_to_ghosted_array_start_impl(data_this,
+                                         data_others,
+                                         buffer,
+                                         communication_channel);
     }
 
     void
-    Partitioner::update_ghost_values_finish(
+    Partitioner::export_to_ghosted_array_finish(
       float *                       data_this,
       std::vector<float *> &        data_others,
       dealii::AlignedVector<float> &buffer) const
     {
-      update_ghost_values_finish_impl(data_this, data_others, buffer);
+      export_to_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
 
     void
-    Partitioner::update_ghost_values(float *                       data_this,
-                                     std::vector<float *> &        data_others,
-                                     dealii::AlignedVector<float> &buffer) const
+    Partitioner::import_from_ghosted_array_start(
+      float *                       data_this,
+      std::vector<float *> &        data_others,
+      dealii::AlignedVector<float> &buffer,
+      const unsigned int            communication_channel) const
     {
-      update_ghost_values_impl(data_this, data_others, buffer);
+      import_from_ghosted_array_start_impl(data_this,
+                                           data_others,
+                                           buffer,
+                                           communication_channel);
     }
 
     void
-    Partitioner::compress_start(float *                       data_this,
-                                std::vector<float *> &        data_others,
-                                dealii::AlignedVector<float> &buffer,
-                                const unsigned int communication_channel) const
+    Partitioner::import_from_ghosted_array_finish(
+      float *                       data_this,
+      std::vector<float *> &        data_others,
+      dealii::AlignedVector<float> &buffer) const
     {
-      compress_start_impl(data_this,
-                          data_others,
-                          buffer,
-                          communication_channel);
-    }
-
-    void
-    Partitioner::compress_finish(float *                       data_this,
-                                 std::vector<float *> &        data_others,
-                                 dealii::AlignedVector<float> &buffer) const
-    {
-      compress_finish_impl(data_this, data_others, buffer);
-    }
-
-    void
-    Partitioner::compress(float *                       data_this,
-                          std::vector<float *> &        data_others,
-                          dealii::AlignedVector<float> &buffer) const
-    {
-      compress_impl(data_this, data_others, buffer);
+      import_from_ghosted_array_finish_impl(data_this, data_others, buffer);
     }
 
     template <typename Number>
     void
-    Partitioner::update_ghost_values_start_impl(
+    Partitioner::export_to_ghosted_array_start_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer,
@@ -567,7 +538,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::update_ghost_values_finish_impl(
+    Partitioner::export_to_ghosted_array_finish_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer) const
@@ -611,18 +582,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::update_ghost_values_impl(
-      Number *                       data_this,
-      std::vector<Number *> &        data_others,
-      dealii::AlignedVector<Number> &buffer) const
-    {
-      update_ghost_values_start(data_this, data_others, buffer);
-      update_ghost_values_finish(data_this, data_others, buffer);
-    }
-
-    template <typename Number>
-    void
-    Partitioner::compress_start_impl(
+    Partitioner::import_from_ghosted_array_start_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer,
@@ -673,7 +633,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Partitioner::compress_finish_impl(
+    Partitioner::import_from_ghosted_array_finish_impl(
       Number *                       data_this,
       std::vector<Number *> &        data_others,
       dealii::AlignedVector<Number> &buffer) const
@@ -737,16 +697,6 @@ namespace LinearAlgebra
       MPI_Waitall(recv_remote_req.size(),
                   recv_remote_req.data(),
                   MPI_STATUSES_IGNORE);
-    }
-
-    template <typename Number>
-    void
-    Partitioner::compress_impl(Number *                       data_this,
-                               std::vector<Number *> &        data_others,
-                               dealii::AlignedVector<Number> &buffer) const
-    {
-      compress_start(data_this, data_others, buffer);
-      compress_finish(data_this, data_others, buffer);
     }
 
     std::size_t

@@ -42,74 +42,58 @@ namespace LinearAlgebra
       // double versions
 
       virtual void
-      update_ghost_values_start(
+      export_to_ghosted_array_start(
         double *                       data_this,
         std::vector<double *> &        data_others,
         dealii::AlignedVector<double> &buffer,
         const unsigned int             communication_channel = 0) const = 0;
 
       virtual void
-      update_ghost_values_finish(
+      export_to_ghosted_array_finish(
         double *                       data_this,
         std::vector<double *> &        data_others,
         dealii::AlignedVector<double> &buffer) const = 0;
 
       virtual void
-      update_ghost_values(double *                       data_this,
-                          std::vector<double *> &        data_others,
-                          dealii::AlignedVector<double> &buffer) const = 0;
+      import_from_ghosted_array_start(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer,
+        const unsigned int             communication_channel = 0) const = 0;
 
       virtual void
-      compress_start(double *                       data_this,
-                     std::vector<double *> &        data_others,
-                     dealii::AlignedVector<double> &buffer,
-                     const unsigned int communication_channel = 0) const = 0;
-
-      virtual void
-      compress_finish(double *                       data_this,
-                      std::vector<double *> &        data_others,
-                      dealii::AlignedVector<double> &buffer) const = 0;
-
-      virtual void
-      compress(double *                       data_this,
-               std::vector<double *> &        data_others,
-               dealii::AlignedVector<double> &buffer) const = 0;
+      import_from_ghosted_array_finish(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer) const = 0;
 
       // float versions
 
       virtual void
-      update_ghost_values_start(
+      export_to_ghosted_array_start(
         float *                       data_this,
         std::vector<float *> &        data_others,
         dealii::AlignedVector<float> &buffer,
         const unsigned int            communication_channel = 0) const = 0;
 
       virtual void
-      update_ghost_values_finish(
+      export_to_ghosted_array_finish(
         float *                       data_this,
         std::vector<float *> &        data_others,
         dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual void
-      update_ghost_values(float *                       data_this,
-                          std::vector<float *> &        data_others,
-                          dealii::AlignedVector<float> &buffer) const = 0;
+      import_from_ghosted_array_start(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer,
+        const unsigned int            communication_channel = 0) const = 0;
 
       virtual void
-      compress_start(float *                       data_this,
-                     std::vector<float *> &        data_others,
-                     dealii::AlignedVector<float> &buffer,
-                     const unsigned int communication_channel = 0) const = 0;
-
-      virtual void
-      compress_finish(float *                       data_this,
-                      std::vector<float *> &        data_others,
-                      dealii::AlignedVector<float> &buffer) const = 0;
-
-      virtual void
-      compress(float *                       data_this,
-               std::vector<float *> &        data_others,
-               dealii::AlignedVector<float> &buffer) const = 0;
+      import_from_ghosted_array_finish(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual std::size_t
       local_size() const = 0;
@@ -151,74 +135,56 @@ namespace LinearAlgebra
              const IndexSet &is_locally_ghost);
 
       void
-      update_ghost_values_start(
+      export_to_ghosted_array_start(
         double *                       data_this,
         std::vector<double *> &        data_others,
         dealii::AlignedVector<double> &buffer,
         const unsigned int communication_channel = 0) const override;
 
       void
-      update_ghost_values_finish(
+      export_to_ghosted_array_finish(
         double *                       data_this,
         std::vector<double *> &        data_others,
         dealii::AlignedVector<double> &buffer) const override;
 
       void
-      update_ghost_values(double *                       data_this,
-                          std::vector<double *> &        data_others,
-                          dealii::AlignedVector<double> &buffer) const override;
-
-      void
-      compress_start(
+      import_from_ghosted_array_start(
         double *                       data_this,
         std::vector<double *> &        data_others,
         dealii::AlignedVector<double> &buffer,
         const unsigned int communication_channel = 0) const override;
 
       void
-      compress_finish(double *                       data_this,
-                      std::vector<double *> &        data_others,
-                      dealii::AlignedVector<double> &buffer) const override;
+      import_from_ghosted_array_finish(
+        double *                       data_this,
+        std::vector<double *> &        data_others,
+        dealii::AlignedVector<double> &buffer) const override;
 
       void
-      compress(double *                       data_this,
-               std::vector<double *> &        data_others,
-               dealii::AlignedVector<double> &buffer) const override;
-
-      void
-      update_ghost_values_start(
+      export_to_ghosted_array_start(
         float *                       data_this,
         std::vector<float *> &        data_others,
         dealii::AlignedVector<float> &buffer,
         const unsigned int            communication_channel = 0) const override;
 
       void
-      update_ghost_values_finish(
+      export_to_ghosted_array_finish(
         float *                       data_this,
         std::vector<float *> &        data_others,
         dealii::AlignedVector<float> &buffer) const override;
 
       void
-      update_ghost_values(float *                       data_this,
-                          std::vector<float *> &        data_others,
-                          dealii::AlignedVector<float> &buffer) const override;
-
-      void
-      compress_start(
+      import_from_ghosted_array_start(
         float *                       data_this,
         std::vector<float *> &        data_others,
         dealii::AlignedVector<float> &buffer,
         const unsigned int            communication_channel = 0) const override;
 
       void
-      compress_finish(float *                       data_this,
-                      std::vector<float *> &        data_others,
-                      dealii::AlignedVector<float> &buffer) const override;
-
-      void
-      compress(float *                       data_this,
-               std::vector<float *> &        data_others,
-               dealii::AlignedVector<float> &buffer) const override;
+      import_from_ghosted_array_finish(
+        float *                       data_this,
+        std::vector<float *> &        data_others,
+        dealii::AlignedVector<float> &buffer) const override;
 
       std::size_t
       local_size() const override;
@@ -238,7 +204,7 @@ namespace LinearAlgebra
     private:
       template <typename Number>
       void
-      update_ghost_values_start_impl(
+      export_to_ghosted_array_start_impl(
         Number *                       data_this,
         std::vector<Number *> &        data_others,
         dealii::AlignedVector<Number> &buffer,
@@ -246,35 +212,25 @@ namespace LinearAlgebra
 
       template <typename Number>
       void
-      update_ghost_values_finish_impl(
+      export_to_ghosted_array_finish_impl(
         Number *                       data_this,
         std::vector<Number *> &        data_others,
         dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
-      update_ghost_values_impl(Number *                       data_this,
-                               std::vector<Number *> &        data_others,
-                               dealii::AlignedVector<Number> &buffer) const;
+      import_from_ghosted_array_start_impl(
+        Number *                       data_this,
+        std::vector<Number *> &        data_others,
+        dealii::AlignedVector<Number> &buffer,
+        const unsigned int             communication_channel = 0) const;
 
       template <typename Number>
       void
-      compress_start_impl(Number *                       data_this,
-                          std::vector<Number *> &        data_others,
-                          dealii::AlignedVector<Number> &buffer,
-                          const unsigned int communication_channel = 0) const;
-
-      template <typename Number>
-      void
-      compress_finish_impl(Number *                       data_this,
-                           std::vector<Number *> &        data_others,
-                           dealii::AlignedVector<Number> &buffer) const;
-
-      template <typename Number>
-      void
-      compress_impl(Number *                       data_this,
-                    std::vector<Number *> &        data_others,
-                    dealii::AlignedVector<Number> &buffer) const;
+      import_from_ghosted_array_finish_impl(
+        Number *                       data_this,
+        std::vector<Number *> &        data_others,
+        dealii::AlignedVector<Number> &buffer) const;
 
     private:
       const MPI_Comm &comm;

@@ -555,10 +555,10 @@ namespace LinearAlgebra
              ExcMessage("Cannot call compress() on a ghosted vector"));
 
       if (do_compress)
-        partitioner->compress_start(data.values.get(),
-                                    data.others,
-                                    import_data,
-                                    communication_channel);
+        partitioner->import_from_ghosted_array_start(data.values.get(),
+                                                     data.others,
+                                                     import_data,
+                                                     communication_channel);
     }
 
 
@@ -573,9 +573,9 @@ namespace LinearAlgebra
              ExcNotImplemented());
       vector_is_ghosted = false;
       if (do_compress)
-        partitioner->compress_finish(data.values.get(),
-                                     data.others,
-                                     import_data);
+        partitioner->import_from_ghosted_array_finish(data.values.get(),
+                                                      data.others,
+                                                      import_data);
     }
 
 
@@ -586,10 +586,10 @@ namespace LinearAlgebra
       const unsigned int communication_channel) const
     {
       if (do_ghost_value_update)
-        partitioner->update_ghost_values_start(data.values.get(),
-                                               data.others,
-                                               import_data,
-                                               communication_channel);
+        partitioner->export_to_ghosted_array_start(data.values.get(),
+                                                   data.others,
+                                                   import_data,
+                                                   communication_channel);
     }
 
 
@@ -599,9 +599,9 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::update_ghost_values_finish() const
     {
       if (do_ghost_value_update)
-        partitioner->update_ghost_values_finish(data.values.get(),
-                                                data.others,
-                                                import_data);
+        partitioner->export_to_ghosted_array_finish(data.values.get(),
+                                                    data.others,
+                                                    import_data);
       vector_is_ghosted = true;
     }
 
