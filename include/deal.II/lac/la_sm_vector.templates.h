@@ -569,12 +569,11 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::compress_finish(
       ::dealii::VectorOperation::values operation)
     {
-      (void)operation;
-      Assert(::dealii::VectorOperation::values::add == operation,
-             ExcNotImplemented());
       vector_is_ghosted = false;
+
       if (do_compress)
-        partitioner->import_from_ghosted_array_finish(data.values.get(),
+        partitioner->import_from_ghosted_array_finish(operation,
+                                                      data.values.get(),
                                                       data.others,
                                                       import_data);
     }
@@ -601,8 +600,7 @@ namespace LinearAlgebra
     {
       if (do_ghost_value_update)
         partitioner->export_to_ghosted_array_finish(data.values.get(),
-                                                    data.others,
-                                                    import_data);
+                                                    data.others);
       vector_is_ghosted = true;
     }
 

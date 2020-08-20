@@ -50,9 +50,8 @@ namespace LinearAlgebra
 
       virtual void
       export_to_ghosted_array_finish(
-        double *const                        data_this,
-        const std::vector<double *> &        data_others,
-        const dealii::AlignedVector<double> &buffer) const = 0;
+        double *const                data_this,
+        const std::vector<double *> &data_others) const = 0;
 
       virtual void
       import_from_ghosted_array_start(
@@ -64,6 +63,7 @@ namespace LinearAlgebra
 
       virtual void
       import_from_ghosted_array_finish(
+        const VectorOperation::values        operation,
         double *const                        data_this,
         const std::vector<double *> &        data_others,
         const dealii::AlignedVector<double> &buffer) const = 0;
@@ -79,9 +79,8 @@ namespace LinearAlgebra
 
       virtual void
       export_to_ghosted_array_finish(
-        float *const                        data_this,
-        const std::vector<float *> &        data_others,
-        const dealii::AlignedVector<float> &buffer) const = 0;
+        float *const                data_this,
+        const std::vector<float *> &data_others) const = 0;
 
       virtual void
       import_from_ghosted_array_start(
@@ -93,6 +92,7 @@ namespace LinearAlgebra
 
       virtual void
       import_from_ghosted_array_finish(
+        const VectorOperation::values       operation,
         float *const                        data_this,
         const std::vector<float *> &        data_others,
         const dealii::AlignedVector<float> &buffer) const = 0;
@@ -145,9 +145,8 @@ namespace LinearAlgebra
 
       void
       export_to_ghosted_array_finish(
-        double *const                        data_this,
-        const std::vector<double *> &        data_others,
-        const dealii::AlignedVector<double> &buffer) const override;
+        double *const                data_this,
+        const std::vector<double *> &data_others) const override;
 
       void
       import_from_ghosted_array_start(
@@ -159,6 +158,7 @@ namespace LinearAlgebra
 
       void
       import_from_ghosted_array_finish(
+        const VectorOperation::values        operation,
         double *const                        data_this,
         const std::vector<double *> &        data_others,
         const dealii::AlignedVector<double> &buffer) const override;
@@ -172,9 +172,8 @@ namespace LinearAlgebra
 
       void
       export_to_ghosted_array_finish(
-        float *const                        data_this,
-        const std::vector<float *> &        data_others,
-        const dealii::AlignedVector<float> &buffer) const override;
+        float *const                data_this,
+        const std::vector<float *> &data_others) const override;
 
       void
       import_from_ghosted_array_start(
@@ -186,6 +185,7 @@ namespace LinearAlgebra
 
       void
       import_from_ghosted_array_finish(
+        const VectorOperation::values       operation,
         float *const                        data_this,
         const std::vector<float *> &        data_others,
         const dealii::AlignedVector<float> &buffer) const override;
@@ -217,9 +217,8 @@ namespace LinearAlgebra
       template <typename Number>
       void
       export_to_ghosted_array_finish_impl(
-        Number *const                        data_this,
-        const std::vector<Number *> &        data_others,
-        const dealii::AlignedVector<Number> &buffer) const;
+        Number *const                data_this,
+        const std::vector<Number *> &data_others) const;
 
       template <typename Number>
       void
@@ -233,6 +232,7 @@ namespace LinearAlgebra
       template <typename Number>
       void
       import_from_ghosted_array_finish_impl(
+        const VectorOperation::values        operation,
         Number *const                        data_this,
         const std::vector<Number *> &        data_others,
         const dealii::AlignedVector<Number> &buffer) const;
