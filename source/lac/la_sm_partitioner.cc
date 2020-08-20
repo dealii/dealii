@@ -384,15 +384,15 @@ namespace LinearAlgebra
 
     void
     Partitioner::export_to_ghosted_array_start(
+      const unsigned int             communication_channel,
       double *                       data_this,
       std::vector<double *> &        data_others,
-      dealii::AlignedVector<double> &buffer,
-      const unsigned int             communication_channel) const
+      dealii::AlignedVector<double> &buffer) const
     {
-      export_to_ghosted_array_start_impl(data_this,
+      export_to_ghosted_array_start_impl(communication_channel,
+                                         data_this,
                                          data_others,
-                                         buffer,
-                                         communication_channel);
+                                         buffer);
     }
 
     void
@@ -406,15 +406,14 @@ namespace LinearAlgebra
 
     void
     Partitioner::import_from_ghosted_array_start(
+      const VectorOperation::values  operation,
+      const unsigned int             communication_channel,
       double *                       data_this,
       std::vector<double *> &        data_others,
-      dealii::AlignedVector<double> &buffer,
-      const unsigned int             communication_channel) const
+      dealii::AlignedVector<double> &buffer) const
     {
-      import_from_ghosted_array_start_impl(data_this,
-                                           data_others,
-                                           buffer,
-                                           communication_channel);
+      import_from_ghosted_array_start_impl(
+        operation, communication_channel, data_this, data_others, buffer);
     }
 
     void
@@ -428,15 +427,15 @@ namespace LinearAlgebra
 
     void
     Partitioner::export_to_ghosted_array_start(
+      const unsigned int            communication_channel,
       float *                       data_this,
       std::vector<float *> &        data_others,
-      dealii::AlignedVector<float> &buffer,
-      const unsigned int            communication_channel) const
+      dealii::AlignedVector<float> &buffer) const
     {
-      export_to_ghosted_array_start_impl(data_this,
+      export_to_ghosted_array_start_impl(communication_channel,
+                                         data_this,
                                          data_others,
-                                         buffer,
-                                         communication_channel);
+                                         buffer);
     }
 
     void
@@ -450,15 +449,14 @@ namespace LinearAlgebra
 
     void
     Partitioner::import_from_ghosted_array_start(
+      const VectorOperation::values operation,
+      const unsigned int            communication_channel,
       float *                       data_this,
       std::vector<float *> &        data_others,
-      dealii::AlignedVector<float> &buffer,
-      const unsigned int            communication_channel) const
+      dealii::AlignedVector<float> &buffer) const
     {
-      import_from_ghosted_array_start_impl(data_this,
-                                           data_others,
-                                           buffer,
-                                           communication_channel);
+      import_from_ghosted_array_start_impl(
+        operation, communication_channel, data_this, data_others, buffer);
     }
 
     void
@@ -473,10 +471,10 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Partitioner::export_to_ghosted_array_start_impl(
+      const unsigned int             communication_channel,
       Number *                       data_this,
       std::vector<Number *> &        data_others,
-      dealii::AlignedVector<Number> &buffer,
-      const unsigned int             communication_channel) const
+      dealii::AlignedVector<Number> &buffer) const
     {
       (void)data_others;
 
@@ -583,12 +581,16 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Partitioner::import_from_ghosted_array_start_impl(
+      const VectorOperation::values  operation,
+      const unsigned int             communication_channel,
       Number *                       data_this,
       std::vector<Number *> &        data_others,
-      dealii::AlignedVector<Number> &buffer,
-      const unsigned int             communication_channel) const
+      dealii::AlignedVector<Number> &buffer) const
     {
       (void)data_others;
+      (void)operation;
+
+      Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
 
       if (send_remote_offset.back() != buffer.size())
         buffer.resize(send_remote_offset.back());

@@ -555,10 +555,11 @@ namespace LinearAlgebra
              ExcMessage("Cannot call compress() on a ghosted vector"));
 
       if (do_compress)
-        partitioner->import_from_ghosted_array_start(data.values.get(),
+        partitioner->import_from_ghosted_array_start(operation,
+                                                     communication_channel,
+                                                     data.values.get(),
                                                      data.others,
-                                                     import_data,
-                                                     communication_channel);
+                                                     import_data);
     }
 
 
@@ -586,10 +587,10 @@ namespace LinearAlgebra
       const unsigned int communication_channel) const
     {
       if (do_ghost_value_update)
-        partitioner->export_to_ghosted_array_start(data.values.get(),
+        partitioner->export_to_ghosted_array_start(communication_channel,
+                                                   data.values.get(),
                                                    data.others,
-                                                   import_data,
-                                                   communication_channel);
+                                                   import_data);
     }
 
 

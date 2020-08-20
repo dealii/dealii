@@ -43,10 +43,10 @@ namespace LinearAlgebra
 
       virtual void
       export_to_ghosted_array_start(
+        const unsigned int             communication_channel,
         double *                       data_this,
         std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer,
-        const unsigned int             communication_channel = 0) const = 0;
+        dealii::AlignedVector<double> &buffer) const = 0;
 
       virtual void
       export_to_ghosted_array_finish(
@@ -56,10 +56,11 @@ namespace LinearAlgebra
 
       virtual void
       import_from_ghosted_array_start(
+        const VectorOperation::values  operation,
+        const unsigned int             communication_channel,
         double *                       data_this,
         std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer,
-        const unsigned int             communication_channel = 0) const = 0;
+        dealii::AlignedVector<double> &buffer) const = 0;
 
       virtual void
       import_from_ghosted_array_finish(
@@ -71,10 +72,10 @@ namespace LinearAlgebra
 
       virtual void
       export_to_ghosted_array_start(
+        const unsigned int            communication_channel,
         float *                       data_this,
         std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer,
-        const unsigned int            communication_channel = 0) const = 0;
+        dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual void
       export_to_ghosted_array_finish(
@@ -84,10 +85,11 @@ namespace LinearAlgebra
 
       virtual void
       import_from_ghosted_array_start(
+        const VectorOperation::values operation,
+        const unsigned int            communication_channel,
         float *                       data_this,
         std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer,
-        const unsigned int            communication_channel = 0) const = 0;
+        dealii::AlignedVector<float> &buffer) const = 0;
 
       virtual void
       import_from_ghosted_array_finish(
@@ -136,10 +138,10 @@ namespace LinearAlgebra
 
       void
       export_to_ghosted_array_start(
+        const unsigned int             communication_channel,
         double *                       data_this,
         std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer,
-        const unsigned int communication_channel = 0) const override;
+        dealii::AlignedVector<double> &buffer) const override;
 
       void
       export_to_ghosted_array_finish(
@@ -149,10 +151,11 @@ namespace LinearAlgebra
 
       void
       import_from_ghosted_array_start(
+        const VectorOperation::values  operation,
+        const unsigned int             communication_channel,
         double *                       data_this,
         std::vector<double *> &        data_others,
-        dealii::AlignedVector<double> &buffer,
-        const unsigned int communication_channel = 0) const override;
+        dealii::AlignedVector<double> &buffer) const override;
 
       void
       import_from_ghosted_array_finish(
@@ -162,10 +165,10 @@ namespace LinearAlgebra
 
       void
       export_to_ghosted_array_start(
+        const unsigned int            communication_channel,
         float *                       data_this,
         std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer,
-        const unsigned int            communication_channel = 0) const override;
+        dealii::AlignedVector<float> &buffer) const override;
 
       void
       export_to_ghosted_array_finish(
@@ -175,10 +178,11 @@ namespace LinearAlgebra
 
       void
       import_from_ghosted_array_start(
+        const VectorOperation::values operation,
+        const unsigned int            communication_channel,
         float *                       data_this,
         std::vector<float *> &        data_others,
-        dealii::AlignedVector<float> &buffer,
-        const unsigned int            communication_channel = 0) const override;
+        dealii::AlignedVector<float> &buffer) const override;
 
       void
       import_from_ghosted_array_finish(
@@ -205,10 +209,10 @@ namespace LinearAlgebra
       template <typename Number>
       void
       export_to_ghosted_array_start_impl(
+        const unsigned int             communication_channel,
         Number *                       data_this,
         std::vector<Number *> &        data_others,
-        dealii::AlignedVector<Number> &buffer,
-        const unsigned int             communication_channel = 0) const;
+        dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
@@ -220,10 +224,11 @@ namespace LinearAlgebra
       template <typename Number>
       void
       import_from_ghosted_array_start_impl(
+        const VectorOperation::values  operation,
+        const unsigned int             communication_channel,
         Number *                       data_this,
         std::vector<Number *> &        data_others,
-        dealii::AlignedVector<Number> &buffer,
-        const unsigned int             communication_channel = 0) const;
+        dealii::AlignedVector<Number> &buffer) const;
 
       template <typename Number>
       void
