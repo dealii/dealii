@@ -46,12 +46,14 @@ namespace LinearAlgebra
         const unsigned int             communication_channel,
         double *const                  data_this,
         const std::vector<double *> &  data_others,
-        dealii::AlignedVector<double> &buffer) const = 0;
+        dealii::AlignedVector<double> &buffer,
+        std::vector<MPI_Request> &     requests) const = 0;
 
       virtual void
       export_to_ghosted_array_finish(
         double *const                data_this,
-        const std::vector<double *> &data_others) const = 0;
+        const std::vector<double *> &data_others,
+        std::vector<MPI_Request> &   requests) const = 0;
 
       virtual void
       import_from_ghosted_array_start(
@@ -59,14 +61,16 @@ namespace LinearAlgebra
         const unsigned int             communication_channel,
         double *const                  data_this,
         const std::vector<double *> &  data_others,
-        dealii::AlignedVector<double> &buffer) const = 0;
+        dealii::AlignedVector<double> &buffer,
+        std::vector<MPI_Request> &     requests) const = 0;
 
       virtual void
       import_from_ghosted_array_finish(
         const VectorOperation::values        operation,
         double *const                        data_this,
         const std::vector<double *> &        data_others,
-        const dealii::AlignedVector<double> &buffer) const = 0;
+        const dealii::AlignedVector<double> &buffer,
+        std::vector<MPI_Request> &           requests) const = 0;
 
       // float versions
 
@@ -75,12 +79,14 @@ namespace LinearAlgebra
         const unsigned int            communication_channel,
         float *const                  data_this,
         const std::vector<float *> &  data_others,
-        dealii::AlignedVector<float> &buffer) const = 0;
+        dealii::AlignedVector<float> &buffer,
+        std::vector<MPI_Request> &    requests) const = 0;
 
       virtual void
       export_to_ghosted_array_finish(
         float *const                data_this,
-        const std::vector<float *> &data_others) const = 0;
+        const std::vector<float *> &data_others,
+        std::vector<MPI_Request> &  requests) const = 0;
 
       virtual void
       import_from_ghosted_array_start(
@@ -88,14 +94,16 @@ namespace LinearAlgebra
         const unsigned int            communication_channel,
         float *const                  data_this,
         const std::vector<float *> &  data_others,
-        dealii::AlignedVector<float> &buffer) const = 0;
+        dealii::AlignedVector<float> &buffer,
+        std::vector<MPI_Request> &    requests) const = 0;
 
       virtual void
       import_from_ghosted_array_finish(
         const VectorOperation::values       operation,
         float *const                        data_this,
         const std::vector<float *> &        data_others,
-        const dealii::AlignedVector<float> &buffer) const = 0;
+        const dealii::AlignedVector<float> &buffer,
+        std::vector<MPI_Request> &          requests) const = 0;
 
       virtual std::size_t
       local_size() const = 0;
@@ -141,12 +149,14 @@ namespace LinearAlgebra
         const unsigned int             communication_channel,
         double *const                  data_this,
         const std::vector<double *> &  data_others,
-        dealii::AlignedVector<double> &buffer) const override;
+        dealii::AlignedVector<double> &buffer,
+        std::vector<MPI_Request> &     requests) const override;
 
       void
       export_to_ghosted_array_finish(
         double *const                data_this,
-        const std::vector<double *> &data_others) const override;
+        const std::vector<double *> &data_others,
+        std::vector<MPI_Request> &   requests) const override;
 
       void
       import_from_ghosted_array_start(
@@ -154,26 +164,30 @@ namespace LinearAlgebra
         const unsigned int             communication_channel,
         double *const                  data_this,
         const std::vector<double *> &  data_others,
-        dealii::AlignedVector<double> &buffer) const override;
+        dealii::AlignedVector<double> &buffer,
+        std::vector<MPI_Request> &     requests) const override;
 
       void
       import_from_ghosted_array_finish(
         const VectorOperation::values        operation,
         double *const                        data_this,
         const std::vector<double *> &        data_others,
-        const dealii::AlignedVector<double> &buffer) const override;
+        const dealii::AlignedVector<double> &buffer,
+        std::vector<MPI_Request> &           requests) const override;
 
       void
       export_to_ghosted_array_start(
         const unsigned int            communication_channel,
         float *const                  data_this,
         const std::vector<float *> &  data_others,
-        dealii::AlignedVector<float> &buffer) const override;
+        dealii::AlignedVector<float> &buffer,
+        std::vector<MPI_Request> &    requests) const override;
 
       void
       export_to_ghosted_array_finish(
         float *const                data_this,
-        const std::vector<float *> &data_others) const override;
+        const std::vector<float *> &data_others,
+        std::vector<MPI_Request> &  requests) const override;
 
       void
       import_from_ghosted_array_start(
@@ -181,14 +195,16 @@ namespace LinearAlgebra
         const unsigned int            communication_channel,
         float *const                  data_this,
         const std::vector<float *> &  data_others,
-        dealii::AlignedVector<float> &buffer) const override;
+        dealii::AlignedVector<float> &buffer,
+        std::vector<MPI_Request> &    requests) const override;
 
       void
       import_from_ghosted_array_finish(
         const VectorOperation::values       operation,
         float *const                        data_this,
         const std::vector<float *> &        data_others,
-        const dealii::AlignedVector<float> &buffer) const override;
+        const dealii::AlignedVector<float> &buffer,
+        std::vector<MPI_Request> &          requests) const override;
 
       std::size_t
       local_size() const override;
@@ -212,13 +228,15 @@ namespace LinearAlgebra
         const unsigned int             communication_channel,
         Number *const                  data_this,
         const std::vector<Number *> &  data_others,
-        dealii::AlignedVector<Number> &buffer) const;
+        dealii::AlignedVector<Number> &buffer,
+        std::vector<MPI_Request> &     requests) const;
 
       template <typename Number>
       void
       export_to_ghosted_array_finish_impl(
         Number *const                data_this,
-        const std::vector<Number *> &data_others) const;
+        const std::vector<Number *> &data_others,
+        std::vector<MPI_Request> &   requests) const;
 
       template <typename Number>
       void
@@ -227,7 +245,8 @@ namespace LinearAlgebra
         const unsigned int             communication_channel,
         Number *const                  data_this,
         const std::vector<Number *> &  data_others,
-        dealii::AlignedVector<Number> &buffer) const;
+        dealii::AlignedVector<Number> &buffer,
+        std::vector<MPI_Request> &     requests) const;
 
       template <typename Number>
       void
@@ -235,7 +254,8 @@ namespace LinearAlgebra
         const VectorOperation::values        operation,
         Number *const                        data_this,
         const std::vector<Number *> &        data_others,
-        const dealii::AlignedVector<Number> &buffer) const;
+        const dealii::AlignedVector<Number> &buffer,
+        std::vector<MPI_Request> &           requests) const;
 
     private:
       const MPI_Comm &comm;

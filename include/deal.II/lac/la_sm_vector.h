@@ -585,6 +585,8 @@ namespace LinearAlgebra
       bool do_ghost_value_update = true;
       bool do_compress           = true;
 
+      mutable std::vector<MPI_Request> requests;
+
       mutable std::mutex mutex;
 
       void

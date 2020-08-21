@@ -387,20 +387,20 @@ namespace LinearAlgebra
       const unsigned int             communication_channel,
       double *const                  data_this,
       const std::vector<double *> &  data_others,
-      dealii::AlignedVector<double> &buffer) const
+      dealii::AlignedVector<double> &buffer,
+      std::vector<MPI_Request> &     requests) const
     {
-      export_to_ghosted_array_start_impl(communication_channel,
-                                         data_this,
-                                         data_others,
-                                         buffer);
+      export_to_ghosted_array_start_impl(
+        communication_channel, data_this, data_others, buffer, requests);
     }
 
     void
     Partitioner::export_to_ghosted_array_finish(
       double *const                data_this,
-      const std::vector<double *> &data_others) const
+      const std::vector<double *> &data_others,
+      std::vector<MPI_Request> &   requests) const
     {
-      export_to_ghosted_array_finish_impl(data_this, data_others);
+      export_to_ghosted_array_finish_impl(data_this, data_others, requests);
     }
 
     void
@@ -409,10 +409,15 @@ namespace LinearAlgebra
       const unsigned int             communication_channel,
       double *const                  data_this,
       const std::vector<double *> &  data_others,
-      dealii::AlignedVector<double> &buffer) const
+      dealii::AlignedVector<double> &buffer,
+      std::vector<MPI_Request> &     requests) const
     {
-      import_from_ghosted_array_start_impl(
-        operation, communication_channel, data_this, data_others, buffer);
+      import_from_ghosted_array_start_impl(operation,
+                                           communication_channel,
+                                           data_this,
+                                           data_others,
+                                           buffer,
+                                           requests);
     }
 
     void
@@ -420,12 +425,11 @@ namespace LinearAlgebra
       const VectorOperation::values        operation,
       double *const                        data_this,
       const std::vector<double *> &        data_others,
-      const dealii::AlignedVector<double> &buffer) const
+      const dealii::AlignedVector<double> &buffer,
+      std::vector<MPI_Request> &           requests) const
     {
-      import_from_ghosted_array_finish_impl(operation,
-                                            data_this,
-                                            data_others,
-                                            buffer);
+      import_from_ghosted_array_finish_impl(
+        operation, data_this, data_others, buffer, requests);
     }
 
     void
@@ -433,20 +437,20 @@ namespace LinearAlgebra
       const unsigned int            communication_channel,
       float *const                  data_this,
       const std::vector<float *> &  data_others,
-      dealii::AlignedVector<float> &buffer) const
+      dealii::AlignedVector<float> &buffer,
+      std::vector<MPI_Request> &    requests) const
     {
-      export_to_ghosted_array_start_impl(communication_channel,
-                                         data_this,
-                                         data_others,
-                                         buffer);
+      export_to_ghosted_array_start_impl(
+        communication_channel, data_this, data_others, buffer, requests);
     }
 
     void
     Partitioner::export_to_ghosted_array_finish(
       float *const                data_this,
-      const std::vector<float *> &data_others) const
+      const std::vector<float *> &data_others,
+      std::vector<MPI_Request> &  requests) const
     {
-      export_to_ghosted_array_finish_impl(data_this, data_others);
+      export_to_ghosted_array_finish_impl(data_this, data_others, requests);
     }
 
     void
@@ -455,10 +459,15 @@ namespace LinearAlgebra
       const unsigned int            communication_channel,
       float *const                  data_this,
       const std::vector<float *> &  data_others,
-      dealii::AlignedVector<float> &buffer) const
+      dealii::AlignedVector<float> &buffer,
+      std::vector<MPI_Request> &    requests) const
     {
-      import_from_ghosted_array_start_impl(
-        operation, communication_channel, data_this, data_others, buffer);
+      import_from_ghosted_array_start_impl(operation,
+                                           communication_channel,
+                                           data_this,
+                                           data_others,
+                                           buffer,
+                                           requests);
     }
 
     void
@@ -466,12 +475,11 @@ namespace LinearAlgebra
       const VectorOperation::values       operation,
       float *const                        data_this,
       const std::vector<float *> &        data_others,
-      const dealii::AlignedVector<float> &buffer) const
+      const dealii::AlignedVector<float> &buffer,
+      std::vector<MPI_Request> &          requests) const
     {
-      import_from_ghosted_array_finish_impl(operation,
-                                            data_this,
-                                            data_others,
-                                            buffer);
+      import_from_ghosted_array_finish_impl(
+        operation, data_this, data_others, buffer, requests);
     }
 
     template <typename Number>
@@ -480,9 +488,11 @@ namespace LinearAlgebra
       const unsigned int             communication_channel,
       Number *const                  data_this,
       const std::vector<Number *> &  data_others,
-      dealii::AlignedVector<Number> &buffer) const
+      dealii::AlignedVector<Number> &buffer,
+      std::vector<MPI_Request> &     requests) const
     {
       (void)data_others;
+      (void)requests;
 
       if (send_remote_offset.back() != buffer.size())
         buffer.resize(send_remote_offset.back());
@@ -544,8 +554,11 @@ namespace LinearAlgebra
     void
     Partitioner::export_to_ghosted_array_finish_impl(
       Number *const                data_this,
-      const std::vector<Number *> &data_others) const
+      const std::vector<Number *> &data_others,
+      std::vector<MPI_Request> &   requests) const
     {
+      (void)requests;
+
       for (unsigned int c = 0; c < recv_sm_ranks.size(); c++)
         {
           int i;
@@ -588,10 +601,12 @@ namespace LinearAlgebra
       const unsigned int             communication_channel,
       Number *const                  data_this,
       const std::vector<Number *> &  data_others,
-      dealii::AlignedVector<Number> &buffer) const
+      dealii::AlignedVector<Number> &buffer,
+      std::vector<MPI_Request> &     requests) const
     {
       (void)data_others;
       (void)operation;
+      (void)requests;
 
       Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
 
@@ -642,9 +657,11 @@ namespace LinearAlgebra
       const VectorOperation::values        operation,
       Number *const                        data_this,
       const std::vector<Number *> &        data_others,
-      const dealii::AlignedVector<Number> &buffer) const
+      const dealii::AlignedVector<Number> &buffer,
+      std::vector<MPI_Request> &           requests) const
     {
       (void)operation;
+      (void)requests;
 
       Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
 
