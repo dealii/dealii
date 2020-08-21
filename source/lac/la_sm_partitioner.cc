@@ -492,12 +492,13 @@ namespace LinearAlgebra
       std::vector<MPI_Request> &     requests) const
     {
       (void)data_others;
-      (void)requests;
+      (void)requests; // TODO
 
       if (send_remote_offset.back() != buffer.size())
         buffer.resize(send_remote_offset.back());
 
       int dummy;
+      // receive a signal that relevant sm neighbors are ready
       for (unsigned int i = 0; i < recv_sm_ranks.size(); i++)
         MPI_Irecv(&dummy,
                   0,
@@ -507,6 +508,7 @@ namespace LinearAlgebra
                   comm_sm,
                   recv_sm_req.data() + i);
 
+      // signal to all relevant sm neighbors that this process is ready
       for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
         MPI_Isend(&dummy,
                   0,
@@ -516,6 +518,7 @@ namespace LinearAlgebra
                   comm_sm,
                   send_sm_req.data() + i);
 
+      // receive data from remote processes
       for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
         MPI_Irecv(data_this + recv_remote_ptr[i] + n_local_elements,
                   recv_remote_ptr[i + 1] - recv_remote_ptr[i],
@@ -525,21 +528,19 @@ namespace LinearAlgebra
                   comm,
                   recv_remote_req.data() + i);
 
-#if DO_COMPRESS
+      // send data to remote processes
       for (unsigned int i = 0, k = 0; i < send_remote_ranks.size(); i++)
         {
+          // copy data together
           for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
                j++)
-            for (unsigned int l = 0; l < send_remote_len[j]; l++, k++)
-              buffer[k] = data_this[send_remote_indices[j] + l];
-#else
-      for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
-        {
-          for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
-               j++)
-            buffer[j] = data_this[send_remote_indices[j]];
-#endif
+            if (DO_COMPRESS)
+              for (unsigned int l = 0; l < send_remote_len[j]; l++, k++)
+                buffer[k] = data_this[send_remote_indices[j] + l];
+            else
+              buffer[j] = data_this[send_remote_indices[j]];
 
+          // send data away
           MPI_Isend(buffer.data() + send_remote_offset[i],
                     send_remote_offset[i + 1] - send_remote_offset[i],
                     Utilities::MPI::internal::mpi_type_id(data_this),
@@ -557,7 +558,7 @@ namespace LinearAlgebra
       const std::vector<Number *> &data_others,
       std::vector<MPI_Request> &   requests) const
     {
-      (void)requests;
+      (void)requests; // TODO
 
       for (unsigned int c = 0; c < recv_sm_ranks.size(); c++)
         {
