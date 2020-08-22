@@ -207,6 +207,9 @@ namespace LinearAlgebra
         consensus_algorithm(process, comm);
       consensus_algorithm.run();
 
+      std::vector<MPI_Request> recv_sm_req;
+      std::vector<MPI_Request> send_sm_req;
+
       {
         std::map<unsigned int, std::vector<types::global_dof_index>>
           rank_to_local_indices;
@@ -241,7 +244,6 @@ namespace LinearAlgebra
               }
             offset += rank_and_local_indices.second.size();
           }
-        recv_remote_req.resize(recv_remote_ranks.size());
         recv_sm_req.resize(recv_sm_ranks.size());
 
         recv_sm_indices.resize(recv_sm_ptr.back());
@@ -279,7 +281,6 @@ namespace LinearAlgebra
                 send_sm_ptr.push_back(send_sm_indices.size());
               }
           }
-        send_remote_req.resize(send_remote_ranks.size());
         send_sm_req.resize(send_sm_ranks.size());
       }
 
@@ -492,10 +493,12 @@ namespace LinearAlgebra
       std::vector<MPI_Request> &     requests) const
     {
       (void)data_others;
-      (void)requests; // TODO
 
       if (send_remote_offset.back() != buffer.size())
         buffer.resize(send_remote_offset.back());
+
+      requests.resize(send_sm_ranks.size() + recv_sm_ranks.size() +
+                      recv_remote_ranks.size() + send_remote_ranks.size());
 
       int dummy;
       // receive a signal that relevant sm neighbors are ready
@@ -506,7 +509,7 @@ namespace LinearAlgebra
                   recv_sm_ranks[i],
                   communication_channel + 2,
                   comm_sm,
-                  recv_sm_req.data() + i);
+                  requests.data() + send_sm_ranks.size() + i);
 
       // signal to all relevant sm neighbors that this process is ready
       for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
@@ -516,7 +519,7 @@ namespace LinearAlgebra
                   send_sm_ranks[i],
                   communication_channel + 2,
                   comm_sm,
-                  send_sm_req.data() + i);
+                  requests.data() + i);
 
       // receive data from remote processes
       for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
@@ -526,7 +529,8 @@ namespace LinearAlgebra
                   recv_remote_ranks[i],
                   communication_channel + 3,
                   comm,
-                  recv_remote_req.data() + i);
+                  requests.data() + send_sm_ranks.size() +
+                    recv_sm_ranks.size() + i);
 
         // send data to remote processes
 #if DO_COMPRESS
@@ -551,7 +555,8 @@ namespace LinearAlgebra
                     send_remote_ranks[i],
                     communication_channel + 3,
                     comm,
-                    send_remote_req.data() + i);
+                    requests.data() + send_sm_ranks.size() +
+                      recv_sm_ranks.size() + recv_remote_ranks.size() + i);
         }
     }
 
@@ -562,13 +567,15 @@ namespace LinearAlgebra
       const std::vector<Number *> &data_others,
       std::vector<MPI_Request> &   requests) const
     {
-      (void)requests; // TODO
+      AssertDimension(requests.size(),
+                      send_sm_ranks.size() + recv_sm_ranks.size() +
+                        recv_remote_ranks.size() + send_remote_ranks.size());
 
       for (unsigned int c = 0; c < recv_sm_ranks.size(); c++)
         {
           int i;
-          MPI_Waitany(recv_sm_req.size(),
-                      recv_sm_req.data(),
+          MPI_Waitany(recv_sm_ranks.size(),
+                      requests.data() + send_sm_ranks.size(),
                       &i,
                       MPI_STATUS_IGNORE);
 
@@ -590,13 +597,7 @@ namespace LinearAlgebra
 #endif
         }
 
-      MPI_Waitall(send_sm_req.size(), send_sm_req.data(), MPI_STATUSES_IGNORE);
-      MPI_Waitall(send_remote_req.size(),
-                  send_remote_req.data(),
-                  MPI_STATUSES_IGNORE);
-      MPI_Waitall(recv_remote_req.size(),
-                  recv_remote_req.data(),
-                  MPI_STATUSES_IGNORE);
+      MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
     }
 
     template <typename Number>
@@ -611,9 +612,11 @@ namespace LinearAlgebra
     {
       (void)data_others;
       (void)operation;
-      (void)requests;
 
       Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
+
+      requests.resize(send_sm_ranks.size() + recv_sm_ranks.size() +
+                      recv_remote_ranks.size() + send_remote_ranks.size());
 
       if (send_remote_offset.back() != buffer.size())
         buffer.resize(send_remote_offset.back());
@@ -626,7 +629,7 @@ namespace LinearAlgebra
                   recv_sm_ranks[i],
                   communication_channel + 1,
                   comm_sm,
-                  recv_sm_req.data() + i);
+                  requests.data() + send_sm_ranks.size() + i);
 
       for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
         MPI_Irecv(&dummy,
@@ -635,7 +638,7 @@ namespace LinearAlgebra
                   send_sm_ranks[i],
                   communication_channel + 1,
                   comm_sm,
-                  send_sm_req.data() + i);
+                  requests.data() + i);
 
       for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
         MPI_Isend(data_this + recv_remote_ptr[i] + n_local_elements,
@@ -644,7 +647,8 @@ namespace LinearAlgebra
                   recv_remote_ranks[i],
                   communication_channel + 0,
                   comm,
-                  recv_remote_req.data() + i);
+                  requests.data() + send_sm_ranks.size() +
+                    recv_sm_ranks.size() + i);
 
       for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
         MPI_Irecv(buffer.data() + send_remote_offset[i],
@@ -653,7 +657,8 @@ namespace LinearAlgebra
                   send_remote_ranks[i],
                   communication_channel + 0,
                   comm,
-                  send_remote_req.data() + i);
+                  requests.data() + send_sm_ranks.size() +
+                    recv_sm_ranks.size() + recv_remote_ranks.size() + i);
     }
 
     template <typename Number>
@@ -666,15 +671,18 @@ namespace LinearAlgebra
       std::vector<MPI_Request> &           requests) const
     {
       (void)operation;
-      (void)requests;
 
       Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
+
+      AssertDimension(requests.size(),
+                      send_sm_ranks.size() + recv_sm_ranks.size() +
+                        recv_remote_ranks.size() + send_remote_ranks.size());
 
       for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
         {
           int i;
-          MPI_Waitany(send_sm_req.size(),
-                      send_sm_req.data(),
+          MPI_Waitany(send_sm_ranks.size(),
+                      requests.data(),
                       &i,
                       MPI_STATUS_IGNORE);
 
@@ -706,8 +714,9 @@ namespace LinearAlgebra
       for (unsigned int c = 0; c < send_remote_ranks.size(); c++)
         {
           int i;
-          MPI_Waitany(send_remote_req.size(),
-                      send_remote_req.data(),
+          MPI_Waitany(send_remote_ranks.size(),
+                      requests.data() + send_sm_ranks.size() +
+                        recv_sm_ranks.size() + recv_remote_ranks.size(),
                       &i,
                       MPI_STATUS_IGNORE);
 
@@ -724,11 +733,7 @@ namespace LinearAlgebra
 #endif
         }
 
-      MPI_Waitall(recv_sm_req.size(), recv_sm_req.data(), MPI_STATUSES_IGNORE);
-
-      MPI_Waitall(recv_remote_req.size(),
-                  recv_remote_req.data(),
-                  MPI_STATUSES_IGNORE);
+      MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
 
       for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
         std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
