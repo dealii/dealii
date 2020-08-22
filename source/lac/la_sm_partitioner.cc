@@ -733,13 +733,22 @@ namespace LinearAlgebra
 #endif
         }
 
-      MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      for (unsigned int c = 0; c < recv_remote_ranks.size(); c++)
+        {
+          int i;
+          MPI_Waitany(recv_remote_ranks.size(),
+                      requests.data() + send_sm_ranks.size() +
+                        recv_sm_ranks.size(),
+                      &i,
+                      MPI_STATUS_IGNORE);
 
-      for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
-        std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
-                    0,
-                    (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
-                      sizeof(Number));
+          std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
+                      0,
+                      (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
+                        sizeof(Number));
+        }
+
+      MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
     }
 
     std::size_t
