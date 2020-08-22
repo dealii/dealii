@@ -679,21 +679,19 @@ namespace LinearAlgebra
                         recv_remote_ranks.size() + send_remote_ranks.size());
 
       const auto split = [&](const unsigned int i) {
+        AssertIndexRange(i,
+                         (send_sm_ranks.size() + recv_remote_ranks.size() +
+                          send_remote_ranks.size()));
+
         if (i < send_sm_ranks.size())
           return std::pair<unsigned int, unsigned int>{0, i};
-        else if (i < (send_sm_ranks.size() + send_remote_ranks.size()))
-          return std::pair<unsigned int, unsigned int>{1,
+        else if (i < (send_sm_ranks.size() + recv_remote_ranks.size()))
+          return std::pair<unsigned int, unsigned int>{2,
                                                        i -
                                                          send_sm_ranks.size()};
-        else if (i < (send_sm_ranks.size() + send_remote_ranks.size() +
-                      recv_remote_ranks.size()))
-          return std::pair<unsigned int, unsigned int>{
-            2, i - send_sm_ranks.size() - send_remote_ranks.size()};
         else
-          {
-            AssertThrow(false, ExcNotImplemented());
-            return std::pair<unsigned int, unsigned int>{-1, -1};
-          }
+          return std::pair<unsigned int, unsigned int>{
+            1, i - send_sm_ranks.size() - recv_remote_ranks.size()};
       };
 
       for (unsigned int c = 0;
@@ -755,16 +753,12 @@ namespace LinearAlgebra
                 data_this[send_remote_indices[j]] += buffer[j];
 #endif
             }
-          else if (s.first == 2)
+          else /*if (s.first == 2)*/
             {
               std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
                           0,
                           (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
                             sizeof(Number));
-            }
-          else
-            {
-              AssertThrow(false, ExcNotImplemented());
             }
         }
 
