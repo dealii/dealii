@@ -615,7 +615,7 @@ namespace LinearAlgebra
 
       Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
 
-      requests.resize(send_sm_ranks.size() + recv_sm_ranks.size() +
+      requests.resize(recv_sm_ranks.size() + send_sm_ranks.size() +
                       recv_remote_ranks.size() + send_remote_ranks.size());
 
       if (send_remote_offset.back() != buffer.size())
@@ -629,7 +629,7 @@ namespace LinearAlgebra
                   recv_sm_ranks[i],
                   communication_channel + 1,
                   comm_sm,
-                  requests.data() + send_sm_ranks.size() + i);
+                  requests.data() + i);
 
       for (unsigned int i = 0; i < send_sm_ranks.size(); i++)
         MPI_Irecv(&dummy,
@@ -638,7 +638,7 @@ namespace LinearAlgebra
                   send_sm_ranks[i],
                   communication_channel + 1,
                   comm_sm,
-                  requests.data() + i);
+                  requests.data() + recv_sm_ranks.size() + i);
 
       for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
         MPI_Isend(data_this + recv_remote_ptr[i] + n_local_elements,
@@ -647,8 +647,8 @@ namespace LinearAlgebra
                   recv_remote_ranks[i],
                   communication_channel + 0,
                   comm,
-                  requests.data() + send_sm_ranks.size() +
-                    recv_sm_ranks.size() + i);
+                  requests.data() + recv_sm_ranks.size() +
+                    send_sm_ranks.size() + i);
 
       for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
         MPI_Irecv(buffer.data() + send_remote_offset[i],
@@ -657,8 +657,8 @@ namespace LinearAlgebra
                   send_remote_ranks[i],
                   communication_channel + 0,
                   comm,
-                  requests.data() + send_sm_ranks.size() +
-                    recv_sm_ranks.size() + recv_remote_ranks.size() + i);
+                  requests.data() + recv_sm_ranks.size() +
+                    send_sm_ranks.size() + recv_remote_ranks.size() + i);
     }
 
     template <typename Number>
@@ -675,14 +675,14 @@ namespace LinearAlgebra
       Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
 
       AssertDimension(requests.size(),
-                      send_sm_ranks.size() + recv_sm_ranks.size() +
+                      recv_sm_ranks.size() + send_sm_ranks.size() +
                         recv_remote_ranks.size() + send_remote_ranks.size());
 
       for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
         {
           int i;
           MPI_Waitany(send_sm_ranks.size(),
-                      requests.data(),
+                      requests.data() + recv_sm_ranks.size(),
                       &i,
                       MPI_STATUS_IGNORE);
 
@@ -715,8 +715,8 @@ namespace LinearAlgebra
         {
           int i;
           MPI_Waitany(send_remote_ranks.size(),
-                      requests.data() + send_sm_ranks.size() +
-                        recv_sm_ranks.size() + recv_remote_ranks.size(),
+                      requests.data() + recv_sm_ranks.size() +
+                        send_sm_ranks.size() + recv_remote_ranks.size(),
                       &i,
                       MPI_STATUS_IGNORE);
 
@@ -737,8 +737,8 @@ namespace LinearAlgebra
         {
           int i;
           MPI_Waitany(recv_remote_ranks.size(),
-                      requests.data() + send_sm_ranks.size() +
-                        recv_sm_ranks.size(),
+                      requests.data() + recv_sm_ranks.size() +
+                        send_sm_ranks.size(),
                       &i,
                       MPI_STATUS_IGNORE);
 
