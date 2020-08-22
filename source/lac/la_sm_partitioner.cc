@@ -678,74 +678,94 @@ namespace LinearAlgebra
                       recv_sm_ranks.size() + send_sm_ranks.size() +
                         recv_remote_ranks.size() + send_remote_ranks.size());
 
-      for (unsigned int c = 0; c < send_sm_ranks.size(); c++)
+      const auto split = [&](const unsigned int i) {
+        if (i < send_sm_ranks.size())
+          return std::pair<unsigned int, unsigned int>{0, i};
+        else if (i < (send_sm_ranks.size() + send_remote_ranks.size()))
+          return std::pair<unsigned int, unsigned int>{1,
+                                                       i -
+                                                         send_sm_ranks.size()};
+        else if (i < (send_sm_ranks.size() + send_remote_ranks.size() +
+                      recv_remote_ranks.size()))
+          return std::pair<unsigned int, unsigned int>{
+            2, i - send_sm_ranks.size() - send_remote_ranks.size()};
+        else
+          {
+            AssertThrow(false, ExcNotImplemented());
+            return std::pair<unsigned int, unsigned int>{-1, -1};
+          }
+      };
+
+      for (unsigned int c = 0;
+           c < send_sm_ranks.size() + send_remote_ranks.size() +
+                 recv_remote_ranks.size();
+           c++)
         {
           int i;
-          MPI_Waitany(send_sm_ranks.size(),
+          MPI_Waitany(send_sm_ranks.size() + send_remote_ranks.size() +
+                        recv_remote_ranks.size(),
                       requests.data() + recv_sm_ranks.size(),
                       &i,
                       MPI_STATUS_IGNORE);
 
-          Number *__restrict__ data_others_ptr = data_others[send_sm_ranks[i]];
-          Number *__restrict__ data_this_ptr   = data_this;
+          const auto &s = split(i);
+          i             = s.second;
+
+          if (s.first == 0)
+            {
+              Number *__restrict__ data_others_ptr =
+                data_others[send_sm_ranks[i]];
+              Number *__restrict__ data_this_ptr = data_this;
 
 #if DO_COMPRESS
-          for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
-               j < send_sm_ptr[i + 1];
-               j++)
-            {
-              for (unsigned int l = 0; l < send_sm_len[j]; l++, k++)
+              for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
+                   j < send_sm_ptr[i + 1];
+                   j++)
                 {
-                  data_this_ptr[send_sm_indices[j] + l] += data_others_ptr[k];
+                  for (unsigned int l = 0; l < send_sm_len[j]; l++, k++)
+                    {
+                      data_this_ptr[send_sm_indices[j] + l] +=
+                        data_others_ptr[k];
+                      data_others_ptr[k] = 0.0;
+                    }
+                }
+#else
+              for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
+                   j < send_sm_ptr[i + 1];
+                   j++, k++)
+                {
+                  data_this_ptr[send_sm_indices[j]] += data_others_ptr[k];
                   data_others_ptr[k] = 0.0;
                 }
+#endif
             }
-#else
-          for (unsigned int j = send_sm_ptr[i], k = send_sm_offset[i];
-               j < send_sm_ptr[i + 1];
-               j++, k++)
+          else if (s.first == 1)
             {
-              data_this_ptr[send_sm_indices[j]] += data_others_ptr[k];
-              data_others_ptr[k] = 0.0;
-            }
-#endif
-        }
-
-      for (unsigned int c = 0; c < send_remote_ranks.size(); c++)
-        {
-          int i;
-          MPI_Waitany(send_remote_ranks.size(),
-                      requests.data() + recv_sm_ranks.size() +
-                        send_sm_ranks.size() + recv_remote_ranks.size(),
-                      &i,
-                      MPI_STATUS_IGNORE);
-
 #if DO_COMPRESS
-          for (unsigned int j = send_remote_ptr[i], k = send_remote_offset[i];
-               j < send_remote_ptr[i + 1];
-               j++)
-            for (unsigned int l = 0; l < send_remote_len[j]; l++)
-              data_this[send_remote_indices[j] + l] += buffer[k++];
+              for (unsigned int j = send_remote_ptr[i],
+                                k = send_remote_offset[i];
+                   j < send_remote_ptr[i + 1];
+                   j++)
+                for (unsigned int l = 0; l < send_remote_len[j]; l++)
+                  data_this[send_remote_indices[j] + l] += buffer[k++];
 #else
-          for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
-               j++)
-            data_this[send_remote_indices[j]] += buffer[j];
+              for (unsigned int j = send_remote_ptr[i];
+                   j < send_remote_ptr[i + 1];
+                   j++)
+                data_this[send_remote_indices[j]] += buffer[j];
 #endif
-        }
-
-      for (unsigned int c = 0; c < recv_remote_ranks.size(); c++)
-        {
-          int i;
-          MPI_Waitany(recv_remote_ranks.size(),
-                      requests.data() + recv_sm_ranks.size() +
-                        send_sm_ranks.size(),
-                      &i,
-                      MPI_STATUS_IGNORE);
-
-          std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
-                      0,
-                      (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
-                        sizeof(Number));
+            }
+          else if (s.first == 2)
+            {
+              std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
+                          0,
+                          (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
+                            sizeof(Number));
+            }
+          else
+            {
+              AssertThrow(false, ExcNotImplemented());
+            }
         }
 
       MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
