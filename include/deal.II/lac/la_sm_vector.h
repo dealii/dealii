@@ -965,8 +965,7 @@ namespace LinearAlgebra
     inline void
     Vector<Number, MemorySpace>::set_ghost_state(const bool ghosted) const
     {
-      Assert(false, ExcNotImplemented());
-      (void)ghosted;
+      vector_is_ghosted = ghosted;
     }
 
     template <typename Number, typename MemorySpace>

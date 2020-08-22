@@ -15,7 +15,7 @@
 
 #include <deal.II/lac/la_sm_partitioner.h>
 
-#define DO_COMPRESS true
+#define DO_COMPRESS false
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -528,17 +528,21 @@ namespace LinearAlgebra
                   comm,
                   recv_remote_req.data() + i);
 
-      // send data to remote processes
+        // send data to remote processes
+#if DO_COMPRESS
       for (unsigned int i = 0, k = 0; i < send_remote_ranks.size(); i++)
         {
-          // copy data together
           for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
                j++)
-            if (DO_COMPRESS)
-              for (unsigned int l = 0; l < send_remote_len[j]; l++, k++)
-                buffer[k] = data_this[send_remote_indices[j] + l];
-            else
-              buffer[j] = data_this[send_remote_indices[j]];
+            for (unsigned int l = 0; l < send_remote_len[j]; l++, k++)
+              buffer[k] = data_this[send_remote_indices[j] + l];
+#else
+      for (unsigned int i = 0; i < send_remote_ranks.size(); i++)
+        {
+          for (unsigned int j = send_remote_ptr[i]; j < send_remote_ptr[i + 1];
+               j++)
+            buffer[j] = data_this[send_remote_indices[j]];
+#endif
 
           // send data away
           MPI_Isend(buffer.data() + send_remote_offset[i],
@@ -725,6 +729,12 @@ namespace LinearAlgebra
       MPI_Waitall(recv_remote_req.size(),
                   recv_remote_req.data(),
                   MPI_STATUSES_IGNORE);
+
+      for (unsigned int i = 0; i < recv_remote_ranks.size(); i++)
+        std::memset(data_this + recv_remote_ptr[i] + n_local_elements,
+                    0,
+                    (recv_remote_ptr[i + 1] - recv_remote_ptr[i]) *
+                      sizeof(Number));
     }
 
     std::size_t
