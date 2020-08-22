@@ -15,7 +15,7 @@
 
 #include <deal.II/lac/la_sm_partitioner.h>
 
-//#define DO_COMPRESS true
+#define DO_COMPRESS true
 
 DEAL_II_NAMESPACE_OPEN
 
