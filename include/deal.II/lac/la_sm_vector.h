@@ -132,12 +132,14 @@ namespace LinearAlgebra
        */
       std::size_t memory_constumption_values;
 
+#ifdef DEAL_II_WITH_MPI
       /**
        * MPI window. It is connected to the destructor of the values; its
        * destruction (MPI_Win_free) leads actually to the deallocation of
        * values.
        */
       MPI_Win *values_win = nullptr;
+#endif
 
       /**
        * Pointer to all the

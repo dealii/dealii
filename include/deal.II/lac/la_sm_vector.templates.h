@@ -50,6 +50,14 @@ namespace LinearAlgebra
                    MemorySpaceData<Number> &     data,
                    const MPI_Comm &              comm_shared)
         {
+#ifndef DEAL_II_WITH_MPI
+          Assert(false, ExcNeedsMPI());
+
+          (void)new_alloc_size;
+          (void)allocated_size;
+          (void)data;
+          (void)comm_shared;
+#else
           // TODO: is assert fine?
           Assert(((allocated_size > 0 && data.values != nullptr) ||
                   data.values == nullptr),
@@ -115,6 +123,7 @@ namespace LinearAlgebra
           data.values     = {ptr_aligned,
                          [&data](Number *&) { MPI_Win_free(data.values_win); }};
           data.values_win = win;
+#endif
         }
 
         template <typename RealType>

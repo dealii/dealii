@@ -116,9 +116,6 @@ namespace LinearAlgebra
 
       virtual std::size_t
       memory_consumption() const = 0;
-
-      virtual std::vector<unsigned int>
-      get_sm_view() const = 0;
     };
 
     class Partitioner : public PartitionerBase
@@ -218,9 +215,6 @@ namespace LinearAlgebra
       std::size_t
       memory_consumption() const override;
 
-      std::vector<unsigned int>
-      get_sm_view() const override;
-
     private:
       template <typename Number>
       void
@@ -286,8 +280,6 @@ namespace LinearAlgebra
       std::vector<unsigned int> send_sm_indices;
       std::vector<unsigned int> send_sm_len;
       std::vector<unsigned int> send_sm_offset;
-
-      std::vector<unsigned int> sm_view;
     };
 
   } // end of namespace SharedMPI
