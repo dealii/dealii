@@ -926,6 +926,8 @@ MappingFE<dim, spacedim>::MappingFE(const FiniteElement<dim, spacedim> &fe)
   Assert(polynomial_degree >= 1,
          ExcMessage("It only makes sense to create polynomial mappings "
                     "with a polynomial degree greater or equal to one."));
+  Assert(fe.tensor_degree() == 1, ExcNotImplemented());
+  Assert(fe.n_components() == 1, ExcNotImplemented());
 }
 
 
