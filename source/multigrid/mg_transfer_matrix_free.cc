@@ -413,8 +413,8 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
        cell += vec_size)
     {
       const unsigned int n_lanes =
-        cell + vec_size > n_owned_level_cells[to_level - 1] ?
-          n_owned_level_cells[to_level - 1] - cell :
+        (cell + vec_size > n_owned_level_cells[to_level - 1]) ?
+          (n_owned_level_cells[to_level - 1] - cell) :
           vec_size;
 
       // read from source vector
@@ -528,8 +528,8 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
        cell += vec_size)
     {
       const unsigned int n_lanes =
-        cell + vec_size > n_owned_level_cells[from_level - 1] ?
-          n_owned_level_cells[from_level - 1] - cell :
+        (cell + vec_size > n_owned_level_cells[from_level - 1]) ?
+          (n_owned_level_cells[from_level - 1] - cell) :
           vec_size;
 
       // read from source vector
