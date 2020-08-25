@@ -490,7 +490,7 @@ namespace internal
 
 
     inline TriaObjects::TriaObjects()
-      : structdim(-1)
+      : structdim(static_cast<unsigned int>(-1))
       , next_free_single(numbers::invalid_unsigned_int)
       , next_free_pair(numbers::invalid_unsigned_int)
       , reverse_order_next_free_single(false)

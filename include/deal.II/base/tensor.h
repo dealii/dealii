@@ -1282,7 +1282,9 @@ constexpr DEAL_II_ALWAYS_INLINE
     DEAL_II_CUDA_HOST_DEV const typename Tensor<rank_, dim, Number>::value_type &
     Tensor<rank_, dim, Number>::operator[](const unsigned int i) const
 {
+#  ifndef DEAL_II_COMPILER_CUDA_AWARE
   AssertIndexRange(i, dim);
+#  endif
 
   return values[i];
 }
@@ -1293,8 +1295,10 @@ DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const Number &
                                                      Tensor<rank_, dim, Number>::
                                                      operator[](const TableIndices<rank_> &indices) const
 {
+#  ifndef DEAL_II_COMPILER_CUDA_AWARE
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1305,8 +1309,10 @@ template <int rank_, int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number &
   Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices)
 {
+#  ifndef DEAL_II_COMPILER_CUDA_AWARE
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
