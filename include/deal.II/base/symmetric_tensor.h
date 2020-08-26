@@ -4032,7 +4032,7 @@ constexpr DEAL_II_ALWAYS_INLINE
   operator*(const SymmetricTensor<rank_1, dim, Number> &src1,
             const Tensor<rank_2, dim, OtherNumber> &    src2)
 {
-  return Tensor<rank_2, dim, OtherNumber>(src1) * src2;
+  return Tensor<rank_1, dim, Number>(src1) * src2;
 }
 
 
