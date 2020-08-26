@@ -3198,7 +3198,7 @@ namespace GridTools
       cell = triangulation.begin_active(),
       endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         if (treated_vertices[cell->vertex_index(v)] == false)
           {
             // transform this vertex
@@ -3219,6 +3219,10 @@ namespace GridTools
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
+                Assert(cell->reference_cell_type() ==
+                         ReferenceCell::get_hypercube(dim),
+                       ExcNotImplemented());
+
                 // this line has children
                 cell->face(face)->child(0)->vertex(1) =
                   (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) /
@@ -3235,6 +3239,10 @@ namespace GridTools
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
+                Assert(cell->reference_cell_type() ==
+                         ReferenceCell::get_hypercube(dim),
+                       ExcNotImplemented());
+
                 // this face has hanging nodes
                 cell->face(face)->child(0)->vertex(1) =
                   (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) /
