@@ -315,7 +315,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter()
     : flags(false, true)
     , node_dim(numbers::invalid_unsigned_int)
-    , vertices_per_cell(numbers::invalid_unsigned_int)
+    , num_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -323,7 +323,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
     : flags(flags)
     , node_dim(numbers::invalid_unsigned_int)
-    , vertices_per_cell(numbers::invalid_unsigned_int)
+    , num_cells(numbers::invalid_unsigned_int)
   {}
 
 
@@ -363,6 +363,10 @@ namespace DataOutBase
                                    const unsigned int pt_index)
   {
     filtered_cells[cell_index] = filtered_points[pt_index];
+
+    // (Re)-initialize counter at any first call to this method.
+    if (cell_index == 0)
+      num_cells = 1;
   }
 
 
@@ -432,7 +436,7 @@ namespace DataOutBase
   unsigned int
   DataOutFilter::n_cells() const
   {
-    return filtered_cells.size() / vertices_per_cell;
+    return num_cells;
   }
 
 
@@ -465,9 +469,11 @@ namespace DataOutBase
                             const unsigned int d2,
                             const unsigned int d3)
   {
+    ++num_cells;
+
     const unsigned int base_entry =
       index * GeometryInfo<dim>::vertices_per_cell;
-    vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
+
     internal_add_cell(base_entry + 0, start);
     if (dim >= 1)
       {
@@ -494,11 +500,14 @@ namespace DataOutBase
                                    const unsigned int start,
                                    const unsigned int n_points)
   {
-    (void)index;
-    (void)start;
-    (void)n_points;
+    ++num_cells;
 
-    Assert(false, ExcNotImplemented());
+    const unsigned int base_entry = index * n_points;
+
+    for (unsigned int i = 0; i < n_points; ++i)
+      {
+        internal_add_cell(base_entry + i, start + i);
+      }
   }
 
 
@@ -802,7 +811,7 @@ namespace
     n_cells = 0;
     for (const auto &patch : patches)
       {
-        // The following formula doesn't work for non-tensor products
+        // The following formula doesn't hold for non-tensor products.
         if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
@@ -1493,6 +1502,7 @@ namespace
                         unsigned int d3)
   {
     stream << GeometryInfo<dim>::vertices_per_cell << '\t' << start;
+
     if (dim >= 1)
       stream << '\t' << start + d1;
     {
@@ -2502,7 +2512,7 @@ namespace DataOutBase
           {
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
-            // Length of loops in all dimensons
+            // Length of loops in all dimensions
             const unsigned int n1 = (dim > 0) ? n_subdivisions : 1;
             const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
             const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
@@ -3584,7 +3594,7 @@ namespace DataOutBase
     }
 
     // max. and min. height of solution
-    Assert(patches.size() > 0, ExcInternalError());
+    Assert(patches.size() > 0, ExcNoPatches());
     double hmin = patches[0].data(0, 0);
     double hmax = patches[0].data(0, 0);
 
@@ -4948,14 +4958,8 @@ namespace DataOutBase
 
     for (const auto &patch : patches)
       {
-        // special treatment of simplices since they are not subdivided
-        if (patch.reference_cell_type != ReferenceCell::get_hypercube(dim))
-          {
-            n_nodes += patch.data.n_cols();
-            n_cells += 1;
-            n_points_an_n_cell += patch.data.n_cols() + 1;
-          }
-        else
+        // The following formulas don't hold for non-tensor products.
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
 
@@ -4972,6 +4976,12 @@ namespace DataOutBase
                   Utilities::fixed_power<dim>(patch.n_subdivisions) *
                   (1 + GeometryInfo<dim>::vertices_per_cell);
               }
+          }
+        else
+          {
+            n_nodes += patch.data.n_cols();
+            n_cells += 1;
+            n_points_an_n_cell += patch.data.n_cols() + 1;
           }
       }
 
@@ -7352,8 +7362,13 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
         << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
 
       // Write out all the entries indented
+      const auto &patches = get_patches();
+      Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+
       for (it = entries.begin(); it != entries.end(); ++it)
-        xdmf_file << it->get_xdmf_content(3);
+        {
+          xdmf_file << it->get_xdmf_content(3, patches[0].reference_cell_type);
+        }
 
       xdmf_file << "    </Grid>\n";
       xdmf_file << "  </Domain>\n";
@@ -7544,12 +7559,12 @@ DataOutBase::write_hdf5_parallel(
 template <int dim, int spacedim>
 void
 DataOutBase::write_hdf5_parallel(
-  const std::vector<Patch<dim, spacedim>> & /*patches*/,
-  const DataOutBase::DataOutFilter &data_filter,
-  const bool                        write_mesh_file,
-  const std::string &               mesh_filename,
-  const std::string &               solution_filename,
-  MPI_Comm                          comm)
+  const std::vector<Patch<dim, spacedim>> &patches,
+  const DataOutBase::DataOutFilter &       data_filter,
+  const bool                               write_mesh_file,
+  const std::string &                      mesh_filename,
+  const std::string &                      solution_filename,
+  MPI_Comm                                 comm)
 {
   AssertThrow(
     spacedim >= 2,
@@ -7562,6 +7577,7 @@ DataOutBase::write_hdf5_parallel(
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
   // the now unused function arguments
+  (void)patches;
   (void)data_filter;
   (void)write_mesh_file;
   (void)mesh_filename;
@@ -7570,15 +7586,19 @@ DataOutBase::write_hdf5_parallel(
   AssertThrow(false, ExcMessage("HDF5 support is disabled."));
 #else
 #  ifndef DEAL_II_WITH_MPI
+  (void)comm;
+#  endif
+
   // verify that there are indeed patches to be written out. most of the times,
   // people just forget to call build_patches when there are no patches, so a
   // warning is in order. that said, the assertion is disabled if we support MPI
   // since then it can happen that on the coarsest mesh, a processor simply has
   // no cells it actually owns, and in that case it is legit if there are no
   // patches
-  Assert(data_filter.n_nodes() > 0, ExcNoPatches());
-  (void)comm;
-#  endif
+  Assert(patches.size() > 0, ExcNoPatches());
+
+  const auto &cell_info =
+    ReferenceCell::internal::Info::get_cell(patches[0].reference_cell_type);
 
   hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t node_dataspace, node_dataset, node_file_dataspace,
@@ -7673,7 +7693,7 @@ DataOutBase::write_hdf5_parallel(
       AssertThrow(node_dataspace >= 0, ExcIO());
 
       cell_ds_dim[0] = global_node_cell_count[1];
-      cell_ds_dim[1] = GeometryInfo<dim>::vertices_per_cell;
+      cell_ds_dim[1] = cell_info.n_vertices();
       cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
       AssertThrow(cell_dataspace >= 0, ExcIO());
 
@@ -7734,7 +7754,7 @@ DataOutBase::write_hdf5_parallel(
 
       // And repeat for cells
       count[0] = local_node_cell_count[1];
-      count[1] = GeometryInfo<dim>::vertices_per_cell;
+      count[1] = cell_info.n_vertices();
       offset[0] = global_node_cell_offsets[1];
       offset[1] = 0;
       cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
@@ -8502,6 +8522,17 @@ namespace
 std::string
 XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
 {
+  return get_xdmf_content(indent_level,
+                          ReferenceCell::get_hypercube(dimension));
+}
+
+
+
+std::string
+XDMFEntry::get_xdmf_content(
+  const unsigned int         indent_level,
+  const ReferenceCell::Type &reference_cell_type) const
+{
   if (!valid)
     return "";
 
@@ -8531,17 +8562,51 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
            << "\" NumberOfElements=\"" << num_cells
            << "\" NodesPerElement=\"2\">\n";
       else if (dimension == 2)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Quadrilateral"
-           << "\" NumberOfElements=\"" << num_cells << "\">\n";
-      else if (dimension == 3)
-        ss << indent(indent_level + 1) << "<Topology TopologyType=\""
-           << "Hexahedron"
-           << "\" NumberOfElements=\"" << num_cells << "\">\n";
+        {
+          Assert(reference_cell_type == ReferenceCell::Type::Quad ||
+                   reference_cell_type == ReferenceCell::Type::Tri,
+                 ExcNotImplemented());
 
-      ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_cells
-         << " " << (1 << dimension)
-         << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
+          if (reference_cell_type == ReferenceCell::Type::Quad)
+            {
+              ss << "Quadrilateral"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << (1 << dimension);
+            }
+          else // if (reference_cell_type == ReferenceCell::Type::Tri)
+            {
+              ss << "Triangle"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << 3;
+            }
+        }
+      else if (dimension == 3)
+        {
+          Assert(reference_cell_type == ReferenceCell::Type::Hex ||
+                   reference_cell_type == ReferenceCell::Type::Tet,
+                 ExcNotImplemented());
+
+          ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
+          if (reference_cell_type == ReferenceCell::Type::Hex)
+            {
+              ss << "Hexahedron"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << (1 << dimension);
+            }
+          else // if (reference_cell_type == ReferenceCell::Type::Tet)
+            {
+              ss << "Tetrahedron"
+                 << "\" NumberOfElements=\"" << num_cells << "\">\n"
+                 << indent(indent_level + 2) << "<DataItem Dimensions=\""
+                 << num_cells << " " << 4;
+            }
+        }
+
+      ss << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
       ss << indent(indent_level + 3) << h5_mesh_filename << ":/cells\n";
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Topology>\n";
