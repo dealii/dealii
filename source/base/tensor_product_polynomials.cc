@@ -16,6 +16,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <boost/container/small_vector.hpp>
@@ -522,9 +523,9 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
   // uni-directional derivatives at
   // the given point in each
   // co-ordinate direction
-  std::vector<std::vector<double>> v(dim, std::vector<double>(2));
+  std::array<std::array<double, 2>, dim> v;
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), v[d]);
+    polynomials[d][indices[d]].value(p(d), 1, v[d].data());
 
   Tensor<1, dim> grad;
   for (unsigned int d = 0; d < dim; ++d)
@@ -546,9 +547,9 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
   std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  std::vector<std::vector<double>> v(dim, std::vector<double>(3));
+  std::array<std::array<double, 3>, dim> v;
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), v[d]);
+    polynomials[d][indices[d]].value(p(d), 2, v[d].data());
 
   Tensor<2, dim> grad_grad;
   for (unsigned int d1 = 0; d1 < dim; ++d1)
@@ -621,16 +622,17 @@ AnisotropicPolynomials<dim>::evaluate(
   // derivatives, if necessary) of
   // all polynomials at this
   // evaluation point
-  std::vector<std::vector<std::vector<double>>> v(dim);
+  std::size_t max_n_polynomials = 0;
   for (unsigned int d = 0; d < dim; ++d)
-    {
-      v[d].resize(polynomials[d].size());
-      for (unsigned int i = 0; i < polynomials[d].size(); ++i)
-        {
-          v[d][i].resize(n_values_and_derivatives, 0.);
-          polynomials[d][i].value(p(d), v[d][i]);
-        }
-    }
+    max_n_polynomials = std::max(max_n_polynomials, polynomials[d].size());
+
+  // 5 is enough to store values and derivatives in all supported cases
+  Table<2, std::array<double, 5>> v(dim, max_n_polynomials);
+  for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int i = 0; i < polynomials[d].size(); ++i)
+      polynomials[d][i].value(p(d),
+                              n_values_and_derivatives - 1,
+                              v(d, i).data());
 
   for (unsigned int i = 0; i < this->n(); ++i)
     {
@@ -645,7 +647,7 @@ AnisotropicPolynomials<dim>::evaluate(
         {
           values[i] = 1;
           for (unsigned int x = 0; x < dim; ++x)
-            values[i] *= v[x][indices[x]][0];
+            values[i] *= v(x, indices[x])[0];
         }
 
       if (update_grads)
@@ -653,7 +655,7 @@ AnisotropicPolynomials<dim>::evaluate(
           {
             grads[i][d] = 1.;
             for (unsigned int x = 0; x < dim; ++x)
-              grads[i][d] *= v[x][indices[x]][d == x ? 1 : 0];
+              grads[i][d] *= v(x, indices[x])[d == x ? 1 : 0];
           }
 
       if (update_grad_grads)
@@ -669,7 +671,7 @@ AnisotropicPolynomials<dim>::evaluate(
                   if (d2 == x)
                     ++derivative;
 
-                  grad_grads[i][d1][d2] *= v[x][indices[x]][derivative];
+                  grad_grads[i][d1][d2] *= v(x, indices[x])[derivative];
                 }
             }
 
@@ -690,7 +692,7 @@ AnisotropicPolynomials<dim>::evaluate(
                       ++derivative;
 
                     third_derivatives[i][d1][d2][d3] *=
-                      v[x][indices[x]][derivative];
+                      v(x, indices[x])[derivative];
                   }
               }
 
@@ -714,7 +716,7 @@ AnisotropicPolynomials<dim>::evaluate(
                         ++derivative;
 
                       fourth_derivatives[i][d1][d2][d3][d4] *=
-                        v[x][indices[x]][derivative];
+                        v(x, indices[x])[derivative];
                     }
                 }
     }
