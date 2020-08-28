@@ -19,22 +19,22 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#include <deal.II/base/cuda_size.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/tensor.h>
 
-#  include <deal.II/base/cuda_size.h>
-#  include <deal.II/base/mpi.h>
-#  include <deal.II/base/quadrature.h>
-#  include <deal.II/base/tensor.h>
+#include <deal.II/dofs/dof_handler.h>
 
-#  include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
 
-#  include <deal.II/fe/fe_update_flags.h>
-#  include <deal.II/fe/mapping.h>
-#  include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/filtered_iterator.h>
 
-#  include <deal.II/lac/affine_constraints.h>
-#  include <deal.II/lac/cuda_vector.h>
-#  include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -42,13 +42,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace CUDAWrappers
 {
   // forward declaration
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
   namespace internal
   {
     template <int dim, typename Number>
     class ReinitHelper;
   }
-#  endif
+#endif
 
   /**
    * This class collects all the data that is stored for the matrix free
@@ -82,6 +82,8 @@ namespace CUDAWrappers
   public:
     using jacobian_type = Tensor<2, dim, Tensor<1, dim, Number>>;
     using point_type    = Point<dim, Number>;
+    using CellFilter =
+      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     /**
      * Parallelization scheme used: parallel_in_elem (parallelism at the level
@@ -114,12 +116,12 @@ namespace CUDAWrappers
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
       {
-#  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
+#ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
         AssertThrow(
           overlap_communication_computation == false,
           ExcMessage(
             "Overlapping communication and computation requires CUDA-aware MPI."));
-#  endif
+#endif
         if (overlap_communication_computation == true)
           AssertThrow(
             use_coloring == false || overlap_communication_computation == false,
@@ -338,6 +340,12 @@ namespace CUDAWrappers
     void
     initialize_dof_vector(
       LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const;
+
+    /**
+     * Return the colored graph of locally owned active cells.
+     */
+    const std::vector<std::vector<CellFilter>> &
+    get_colored_graph() const;
 
     /**
      * Return the partitioner that represents the locally owned data and the
@@ -616,6 +624,11 @@ namespace CUDAWrappers
      */
     const DoFHandler<dim> *dof_handler;
 
+    /**
+     * Colored graphed of locally owned active cells.
+     */
+    std::vector<std::vector<CellFilter>> graph;
+
     friend class internal::ReinitHelper<dim, Number>;
   };
 
@@ -654,6 +667,8 @@ namespace CUDAWrappers
   };
 
 
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
 
   // This function determines the number of cells per block, possibly at compile
   // time (by virtue of being 'constexpr')
@@ -735,19 +750,76 @@ namespace CUDAWrappers
   }
 
 
+  /**
+   * This function is the host version of local_q_point_id().
+   *
+   * @relates CUDAWrappers::MatrixFree
+   */
+  template <int dim, typename Number>
+  inline unsigned int
+  local_q_point_id_host(
+    const unsigned int                                                  cell,
+    const typename dealii::CUDAWrappers::MatrixFree<dim, Number>::Data &data,
+    const unsigned int n_q_points,
+    const unsigned int i)
+  {
+    return (data.row_start / data.padding_length + cell) * n_q_points + i;
+  }
+
+
+
+  /**
+   * This function is the host version of get_quadrature_point().
+   *
+   * @relates CUDAWrappers::MatrixFree
+   */
+  template <int dim, typename Number>
+  inline typename dealii::CUDAWrappers::MatrixFree<dim, Number>::point_type
+  get_quadrature_point_host(
+    const unsigned int                                                  cell,
+    const typename dealii::CUDAWrappers::MatrixFree<dim, Number>::Data &data,
+    const unsigned int                                                  i)
+  {
+    using CudaPoint =
+      typename dealii::CUDAWrappers::MatrixFree<dim, Number>::point_type;
+    CudaPoint point_host;
+
+    auto error_code = cudaMemcpy(&point_host,
+                                 data.q_points + data.padding_length * cell + i,
+                                 sizeof(CudaPoint),
+                                 cudaMemcpyDeviceToHost);
+    AssertCuda(error_code);
+
+    return point_host;
+  }
+#endif
+
+
   /*----------------------- Inline functions ---------------------------------*/
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 
   template <int dim, typename Number>
-  const std::shared_ptr<const Utilities::MPI::Partitioner> &
+  inline const std::vector<std::vector<
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>>> &
+  MatrixFree<dim, Number>::get_colored_graph() const
+  {
+    return graph;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
   MatrixFree<dim, Number>::get_vector_partitioner() const
   {
     return partitioner;
   }
 
+
+
   template <int dim, typename Number>
-  const DoFHandler<dim> &
+  inline const DoFHandler<dim> &
   MatrixFree<dim, Number>::get_dof_handler() const
   {
     Assert(dof_handler != nullptr, ExcNotInitialized());
@@ -755,12 +827,10 @@ namespace CUDAWrappers
     return *dof_handler;
   }
 
-#  endif
+#endif
 
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

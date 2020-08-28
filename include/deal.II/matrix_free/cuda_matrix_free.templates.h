@@ -31,8 +31,6 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
-#  include <deal.II/grid/filtered_iterator.h>
-
 #  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
@@ -952,12 +950,9 @@ namespace CUDAWrappers
       this, mapping, fe, quad, shape_info, *dof_handler, update_flags);
 
     // Create a graph coloring
-    using CellFilter =
-      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
     CellFilter begin(IteratorFilters::LocallyOwnedCell(),
                      dof_handler->begin_active());
     CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler->end());
-    std::vector<std::vector<CellFilter>> graph;
 
     if (begin != end)
       {
@@ -971,6 +966,7 @@ namespace CUDAWrappers
           }
         else
           {
+            graph.clear();
             if (additional_data.overlap_communication_computation)
               {
                 // We create one color (1) with the cells on the boundary of the
