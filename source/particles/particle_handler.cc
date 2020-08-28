@@ -480,7 +480,7 @@ namespace Particles
                                                      local_positions[i][p],
                                                      local_start_index +
                                                        index_map[i][p])));
-                                                       
+
             hint->second.set_property_pool(*property_pool);
           }
       }
