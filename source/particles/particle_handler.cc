@@ -149,6 +149,48 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
+  ParticleHandler<dim, spacedim>::copy_from(
+    const ParticleHandler<dim, spacedim> &particle_handler)
+  {
+    // clear and initialize this object before copying particles
+    clear();
+    const unsigned int n_properties =
+      particle_handler.property_pool->n_properties_per_slot();
+    initialize(*particle_handler.triangulation,
+               *particle_handler.mapping,
+               n_properties);
+
+    // copy static members
+    global_number_of_particles = particle_handler.global_number_of_particles;
+    global_max_particles_per_cell =
+      particle_handler.global_max_particles_per_cell;
+    next_free_particle_index = particle_handler.next_free_particle_index;
+    particles                = particle_handler.particles;
+    ghost_particles          = particle_handler.ghost_particles;
+    handle                   = particle_handler.handle;
+
+    // copy dynamic properties
+    auto from_particle = particle_handler.begin();
+    for (auto &particle : *this)
+      {
+        particle.set_property_pool(*property_pool);
+        particle.set_properties(from_particle->get_properties());
+        ++from_particle;
+      }
+
+    auto from_ghost = particle_handler.begin_ghost();
+    for (auto ghost = begin_ghost(); ghost != end_ghost();
+         ++ghost, ++from_ghost)
+      {
+        ghost->set_property_pool(*property_pool);
+        ghost->set_properties(from_ghost->get_properties());
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   ParticleHandler<dim, spacedim>::clear()
   {
     clear_particles();
