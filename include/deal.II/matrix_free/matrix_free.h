@@ -3779,6 +3779,7 @@ namespace internal
     reset_ghost_values(
       const LinearAlgebra::SharedMPI::Vector<Number> &vec) const
     {
+      return;
       if (ghosts_were_set == true)
         return;
 

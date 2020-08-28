@@ -1204,7 +1204,7 @@ namespace LinearAlgebra
     std::size_t
     Vector<Number, MemorySpaceType>::memory_consumption() const
     {
-      return data.memory_consumption();
+      return data.memory_consumption() + import_data.memory_consumption();
     }
 
 
