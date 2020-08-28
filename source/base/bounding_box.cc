@@ -96,8 +96,7 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
         }
 
       // Finding the intersection's dimension
-
-      unsigned int intersect_dim = spacedim;
+      int intersect_dim = spacedim;
       for (unsigned int d = 0; d < spacedim; ++d)
         if (std::abs(intersect_bbox_min[d] - intersect_bbox_max[d]) <=
             std::numeric_limits<Number>::epsilon() *
@@ -105,7 +104,7 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
                std::abs(intersect_bbox_max[d])))
           --intersect_dim;
 
-      if (intersect_dim == 0 || intersect_dim + 2 == spacedim)
+      if (intersect_dim == 0 || intersect_dim == spacedim - 2)
         return NeighborType::simple_neighbors;
 
       // Checking the two mergeable cases: first if the boxes are aligned so
