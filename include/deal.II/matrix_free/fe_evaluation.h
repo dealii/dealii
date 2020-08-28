@@ -29,6 +29,7 @@
 
 #include <deal.II/lac/vector_operation.h>
 
+#include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/evaluation_selector.h>
 #include <deal.II/matrix_free/mapping_data_on_the_fly.h>
@@ -57,105 +58,6 @@ template <int dim,
 class FEEvaluation;
 
 
-/**
- * @brief The namespace for the EvaluationFlags enum
- *
- * This namespace contains the enum EvaluationFlags used in FEEvaluation
- * to control evaluation and integration of values, gradients, etc..
- */
-namespace EvaluationFlags
-{
-  /**
-   * @brief The EvaluationFlags enum
-   *
-   * This enum contains a set of flags used by FEEvaluation::integrate(),
-   * FEEvaluation::evaluate() and others to determine if values, gradients,
-   * hessians, or a combination of them is being used.
-   */
-  enum EvaluationFlags
-  {
-    /**
-     * Do not use or compute anything.
-     */
-    nothing = 0,
-    /**
-     * Use or evaluate values.
-     */
-    values = 0x1,
-    /**
-     * Use or evaluate gradients.
-     */
-    gradients = 0x2,
-    /**
-     * Use or evaluate hessians.
-     */
-    hessians = 0x4
-  };
-
-
-  /**
-   * Global operator which returns an object in which all bits are set which are
-   * either set in the first or the second argument. This operator exists since
-   * if it did not then the result of the bit-or <tt>operator |</tt> would be an
-   * integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type UpdateFlags.
-   *
-   * @ref EvaluationFlags
-   */
-  inline EvaluationFlags
-  operator|(const EvaluationFlags f1, const EvaluationFlags f2)
-  {
-    return static_cast<EvaluationFlags>(static_cast<unsigned int>(f1) |
-                                        static_cast<unsigned int>(f2));
-  }
-
-
-
-  /**
-   * Global operator which sets the bits from the second argument also in the
-   * first one.
-   *
-   * @ref EvaluationFlags
-   */
-  inline EvaluationFlags &
-  operator|=(EvaluationFlags &f1, const EvaluationFlags f2)
-  {
-    f1 = f1 | f2;
-    return f1;
-  }
-
-
-  /**
-   * Global operator which returns an object in which all bits are set which are
-   * set in the first as well as the second argument. This operator exists since
-   * if it did not then the result of the bit-and <tt>operator &</tt> would be
-   * an integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type UpdateFlags.
-   *
-   * @ref EvaluationFlags
-   */
-  inline EvaluationFlags operator&(const EvaluationFlags f1,
-                                   const EvaluationFlags f2)
-  {
-    return static_cast<EvaluationFlags>(static_cast<unsigned int>(f1) &
-                                        static_cast<unsigned int>(f2));
-  }
-
-
-  /**
-   * Global operator which clears all the bits in the first argument if they are
-   * not also set in the second argument.
-   *
-   * @ref EvaluationFlags
-   */
-  inline EvaluationFlags &
-  operator&=(EvaluationFlags &f1, const EvaluationFlags f2)
-  {
-    f1 = f1 & f2;
-    return f1;
-  }
-
-} // namespace EvaluationFlags
 
 /**
  * This is the base class for the FEEvaluation classes. This class is a base
@@ -440,8 +342,9 @@ public:
 
   /**
    * Return the value of a finite element function at quadrature point number
-   * @p q_point after a call to @p evaluate() with EvaluationFlags::value set, or the value that has
-   * been stored there with a call to @p submit_value. If the object is
+   * @p q_point after a call to FEEvaluation::evaluate() with
+   * EvaluationFlags::value set, or the value that has been stored there with
+   * a call to FEEvaluationBase::submit_value(). If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
    * vectorization is enabled, values from several cells are grouped together.
    *
@@ -454,10 +357,11 @@ public:
 
   /**
    * Write a value to the field containing the values on quadrature points
-   * with component @p q_point. Access to the same field as through @p
-   * get_value. If applied before the function @p integrate() with EvaluationFlags::values set is
-   * called, this specifies the value which is tested by all basis function on
-   * the current cell and integrated over.
+   * with component @p q_point. Access to the same field as through
+   * get_value(). If applied before the function FEEvaluation::integrate()
+   * with EvaluationFlags::values set is called, this specifies the value
+   * which is tested by all basis function on the current cell and integrated
+   * over.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
@@ -468,8 +372,9 @@ public:
 
   /**
    * Return the gradient of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate() with EvaluationFlags::gradients, or the value
-   * that has been stored there with a call to @p submit_gradient.
+   * number @p q_point after a call to FEEvaluation::evaluate() with
+   * EvaluationFlags::gradients, or the value that has been stored there with
+   * a call to FEEvaluationBase::submit_gradient().
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
@@ -480,11 +385,12 @@ public:
 
   /**
    * Return the derivative of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true,...) in the
-   * direction normal to the face:
-   * $\boldsymbol \nabla u(\mathbf x_q) \cdot \mathbf n(\mathbf x_q)$
+   * number @p q_point after a call to
+   * FEEvaluation::evaluate(EvaluationFlags::gradients) the direction normal
+   * to the face: $\boldsymbol \nabla u(\mathbf x_q) \cdot \mathbf n(\mathbf
+   * x_q)$
    *
-   * This call is equivalent to calling `get_gradient() * get_normal_vector()`
+   * This call is equivalent to calling get_gradient() * get_normal_vector()
    * but will use a more efficient internal representation of data.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
@@ -497,10 +403,10 @@ public:
   /**
    * Write a contribution that is tested by the gradient to the field
    * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through get_gradient(). If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
-   * tested by all basis function gradients on the current cell and integrated
-   * over.
+   * Access to the same field as through get_gradient(). If applied before the
+   * function FEEvaluation::integrate(EvaluationFlags::gradients) is called,
+   * this specifies what is tested by all basis function gradients on the
+   * current cell and integrated over.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
@@ -513,9 +419,10 @@ public:
    * Write a contribution that is tested by the gradient to the field
    * containing the values on quadrature points with component @p
    * q_point. Access to the same field as through get_gradient() or
-   * get_normal_derivative(). If applied before the function @p
-   * integrate(...,true) is called, this specifies what is tested by all basis
-   * function gradients on the current cell and integrated over.
+   * get_normal_derivative(). If applied before the function
+   * FEEvaluation::integrate(EvaluationFlags::gradients) is called, this
+   * specifies what is tested by all basis function gradients on the current
+   * cell and integrated over.
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -532,9 +439,10 @@ public:
 
   /**
    * Return the Hessian of a finite element function at quadrature point
-   * number @p q_point after a call to @p evaluate(...,true). If only the
-   * diagonal or even the trace of the Hessian, the Laplacian, is needed, use
-   * the other functions below.
+   * number @p q_point after a call to
+   * FEEvaluation::evaluate(EvaluationFlags::hessians). If only the diagonal
+   * or even the trace of the Hessian, the Laplacian, is needed, use the other
+   * functions below.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
@@ -545,7 +453,8 @@ public:
 
   /**
    * Return the diagonal of the Hessian of a finite element function at
-   * quadrature point number @p q_point after a call to @p evaluate(...,true).
+   * quadrature point number @p q_point after a call to
+   * FEEvaluation::evaluate(EvaluationFlags::hessians).
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
@@ -555,10 +464,11 @@ public:
   get_hessian_diagonal(const unsigned int q_point) const;
 
   /**
-   * Return the Laplacian (i.e., the trace of the Hessian) of a finite
-   * element function at quadrature point number @p q_point after a call to @p
-   * evaluate(...,true). Compared to the case when computing the full Hessian,
-   * some operations can be saved when only the Laplacian is requested.
+   * Return the Laplacian (i.e., the trace of the Hessian) of a finite element
+   * function at quadrature point number @p q_point after a call to
+   * FEEvaluation::evaluate(EvaluationFlags::hessians). Compared to the case
+   * when computing the full Hessian, some operations can be saved when only
+   * the Laplacian is requested.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
@@ -7326,30 +7236,14 @@ FEEvaluation<dim,
                                             const bool evaluate_gradients,
                                             const bool evaluate_hessians)
 {
-  SelectEvaluator<
-    dim,
-    fe_degree,
-    n_q_points_1d,
-    n_components,
-    VectorizedArrayType>::evaluate(*this->data,
-                                   const_cast<VectorizedArrayType *>(
-                                     values_array),
-                                   this->values_quad,
-                                   this->gradients_quad,
-                                   this->hessians_quad,
-                                   this->scratch_data,
-                                   evaluate_values,
-                                   evaluate_gradients,
-                                   evaluate_hessians);
+  const EvaluationFlags::EvaluationFlags flag =
+    ((evaluate_values) ? EvaluationFlags::values : EvaluationFlags::nothing) |
+    ((evaluate_gradients) ? EvaluationFlags::gradients :
+                            EvaluationFlags::nothing) |
+    ((evaluate_hessians) ? EvaluationFlags::hessians :
+                           EvaluationFlags::nothing);
 
-#  ifdef DEBUG
-  if (evaluate_values == true)
-    this->values_quad_initialized = true;
-  if (evaluate_gradients == true)
-    this->gradients_quad_initialized = true;
-  if (evaluate_hessians == true)
-    this->hessians_quad_initialized = true;
-#  endif
+  evaluate(values_array, flag);
 }
 
 
@@ -7370,20 +7264,15 @@ FEEvaluation<dim,
   evaluate(const VectorizedArrayType *            values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-  SelectEvaluator<dim,
-                  fe_degree,
-                  n_q_points_1d,
-                  n_components,
-                  VectorizedArrayType>::
-    evaluate(*this->data,
-             const_cast<VectorizedArrayType *>(values_array),
-             this->values_quad,
-             this->gradients_quad,
-             this->hessians_quad,
-             this->scratch_data,
-             evaluation_flags & EvaluationFlags::values,
-             evaluation_flags & EvaluationFlags::gradients,
-             evaluation_flags & EvaluationFlags::hessians);
+  SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::evaluate(
+    n_components,
+    evaluation_flags,
+    *this->data,
+    const_cast<VectorizedArrayType *>(values_array),
+    this->values_quad,
+    this->gradients_quad,
+    this->hessians_quad,
+    this->scratch_data);
 
 #  ifdef DEBUG
   if (evaluation_flags & EvaluationFlags::values)
@@ -7412,10 +7301,9 @@ FEEvaluation<
   n_components_,
   Number,
   VectorizedArrayType>::gather_evaluate(const VectorType &input_vector,
-
-                                        const bool evaluate_values,
-                                        const bool evaluate_gradients,
-                                        const bool evaluate_hessians)
+                                        const bool        evaluate_values,
+                                        const bool        evaluate_gradients,
+                                        const bool        evaluate_hessians)
 {
   const EvaluationFlags::EvaluationFlags flag =
     ((evaluate_values) ? EvaluationFlags::values : EvaluationFlags::nothing) |
@@ -7472,18 +7360,12 @@ FEEvaluation<dim,
                                             [this->first_selected_component] *
             VectorizedArrayType::size());
 
-      evaluate(vec_values,
-               evaluation_flag & EvaluationFlags::values,
-               evaluation_flag & EvaluationFlags::gradients,
-               evaluation_flag & EvaluationFlags::hessians);
+      evaluate(vec_values, evaluation_flag);
     }
   else
     {
       this->read_dof_values(input_vector);
-      evaluate(this->begin_dof_values(),
-               evaluation_flag & EvaluationFlags::values,
-               evaluation_flag & EvaluationFlags::gradients,
-               evaluation_flag & EvaluationFlags::hessians);
+      evaluate(this->begin_dof_values(), evaluation_flag);
     }
 }
 
@@ -7553,34 +7435,11 @@ FEEvaluation<dim,
                                              const bool integrate_gradients,
                                              VectorizedArrayType *values_array)
 {
-#  ifdef DEBUG
-  if (integrate_values == true)
-    Assert(this->values_quad_submitted == true,
-           internal::ExcAccessToUninitializedField());
-  if (integrate_gradients == true)
-    Assert(this->gradients_quad_submitted == true,
-           internal::ExcAccessToUninitializedField());
-#  endif
-  Assert(this->matrix_info != nullptr ||
-           this->mapped_geometry->is_initialized(),
-         ExcNotInitialized());
-
-  SelectEvaluator<dim,
-                  fe_degree,
-                  n_q_points_1d,
-                  n_components,
-                  VectorizedArrayType>::integrate(*this->data,
-                                                  values_array,
-                                                  this->values_quad,
-                                                  this->gradients_quad,
-                                                  this->scratch_data,
-                                                  integrate_values,
-                                                  integrate_gradients,
-                                                  false);
-
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  EvaluationFlags::EvaluationFlags flag =
+    (integrate_values ? EvaluationFlags::values : EvaluationFlags::nothing) |
+    (integrate_gradients ? EvaluationFlags::gradients :
+                           EvaluationFlags::nothing);
+  integrate(flag, values_array);
 }
 
 
@@ -7619,20 +7478,15 @@ FEEvaluation<dim,
     ExcMessage(
       "Only EvaluationFlags::values and EvaluationFlags::gradients are supported."));
 
-  SelectEvaluator<dim,
-                  fe_degree,
-                  n_q_points_1d,
-                  n_components,
-                  VectorizedArrayType>::integrate(*this->data,
-                                                  values_array,
-                                                  this->values_quad,
-                                                  this->gradients_quad,
-                                                  this->scratch_data,
-                                                  integration_flag &
-                                                    EvaluationFlags::values,
-                                                  integration_flag &
-                                                    EvaluationFlags::gradients,
-                                                  false);
+  SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
+    integrate(n_components,
+              integration_flag,
+              *this->data,
+              values_array,
+              this->values_quad,
+              this->gradients_quad,
+              this->scratch_data,
+              false);
 
 #  ifdef DEBUG
   this->dof_values_initialized = true;
@@ -7683,7 +7537,7 @@ FEEvaluation<dim,
              n_components_,
              Number,
              VectorizedArrayType>::
-  integrate_scatter(const EvaluationFlags::EvaluationFlags evaluation_flag,
+  integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
                     VectorType &                           destination)
 {
   // If the index storage is interleaved and contiguous and the vector storage
@@ -7713,27 +7567,19 @@ FEEvaluation<dim,
             ->component_dof_indices_offset[this->active_fe_index]
                                           [this->first_selected_component] *
           VectorizedArrayType::size());
-      SelectEvaluator<
-        dim,
-        fe_degree,
-        n_q_points_1d,
-        n_components,
-        VectorizedArrayType>::integrate(*this->data,
-                                        vec_values,
-                                        this->values_quad,
-                                        this->gradients_quad,
-                                        this->scratch_data,
-                                        evaluation_flag &
-                                          EvaluationFlags::values,
-                                        evaluation_flag &
-                                          EvaluationFlags::gradients,
-                                        true);
+      SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
+        integrate(n_components,
+                  integration_flag,
+                  *this->data,
+                  vec_values,
+                  this->values_quad,
+                  this->gradients_quad,
+                  this->scratch_data,
+                  true);
     }
   else
     {
-      integrate(evaluation_flag & EvaluationFlags::values,
-                evaluation_flag & EvaluationFlags::gradients,
-                this->begin_dof_values());
+      integrate(integration_flag, this->begin_dof_values());
       this->distribute_local_to_global(destination);
     }
 }

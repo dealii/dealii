@@ -462,10 +462,10 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
                                                   dim,
                                                   degree + 1,
                                                   2 * degree + 1,
-                                                  1,
                                                   VectorizedArray<Number>,
                                                   VectorizedArray<Number>>::
-              do_forward(prolongation_matrix_1d,
+              do_forward(1,
+                         prolongation_matrix_1d,
                          evaluation_data.begin() +
                            c * Utilities::fixed_power<dim>(degree_size),
                          evaluation_data.begin() + c * n_scalar_cell_dofs,
@@ -484,10 +484,10 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
                                                   dim,
                                                   degree + 1,
                                                   2 * degree + 2,
-                                                  1,
                                                   VectorizedArray<Number>,
                                                   VectorizedArray<Number>>::
-              do_forward(prolongation_matrix_1d,
+              do_forward(1,
+                         prolongation_matrix_1d,
                          evaluation_data.begin() +
                            c * Utilities::fixed_power<dim>(degree_size),
                          evaluation_data.begin() + c * n_scalar_cell_dofs,
@@ -560,10 +560,10 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
                                                   dim,
                                                   degree + 1,
                                                   2 * degree + 1,
-                                                  1,
                                                   VectorizedArray<Number>,
                                                   VectorizedArray<Number>>::
-              do_backward(prolongation_matrix_1d,
+              do_backward(1,
+                          prolongation_matrix_1d,
                           false,
                           evaluation_data.begin() + c * n_scalar_cell_dofs,
                           evaluation_data.begin() +
@@ -578,10 +578,10 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
                                                   dim,
                                                   degree + 1,
                                                   2 * degree + 2,
-                                                  1,
                                                   VectorizedArray<Number>,
                                                   VectorizedArray<Number>>::
-              do_backward(prolongation_matrix_1d,
+              do_backward(1,
+                          prolongation_matrix_1d,
                           false,
                           evaluation_data.begin() + c * n_scalar_cell_dofs,
                           evaluation_data.begin() +

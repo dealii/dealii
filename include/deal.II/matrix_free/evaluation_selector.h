@@ -48,47 +48,44 @@ namespace internal
      * This class serves as a fallback in case we don't have the appropriate
      * template specialization for the run time and template parameters given.
      */
-    template <int dim, int n_components, typename Number>
+    template <int dim, typename Number>
     struct Default
     {
       static inline void
       evaluate(
+        const unsigned int                                      n_components,
+        const EvaluationFlags::EvaluationFlags                  evaluation_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-        Number *   values_dofs_actual,
-        Number *   values_quad,
-        Number *   gradients_quad,
-        Number *   hessians_quad,
-        Number *   scratch_data,
-        const bool evaluate_values,
-        const bool evaluate_gradients,
-        const bool evaluate_hessians)
+        Number *values_dofs_actual,
+        Number *values_quad,
+        Number *gradients_quad,
+        Number *hessians_quad,
+        Number *scratch_data)
       {
         internal::FEEvaluationImpl<
           internal::MatrixFreeFunctions::tensor_general,
           dim,
           -1,
           0,
-          n_components,
-          Number>::evaluate(shape_info,
+          Number>::evaluate(n_components,
+                            evaluation_flag,
+                            shape_info,
                             values_dofs_actual,
                             values_quad,
                             gradients_quad,
                             hessians_quad,
-                            scratch_data,
-                            evaluate_values,
-                            evaluate_gradients,
-                            evaluate_hessians);
+                            scratch_data);
       }
 
       static inline void
       integrate(
+        const unsigned int                     n_components,
+        const EvaluationFlags::EvaluationFlags integration_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
         Number *   values_dofs_actual,
         Number *   values_quad,
         Number *   gradients_quad,
         Number *   scratch_data,
-        const bool integrate_values,
-        const bool integrate_gradients,
         const bool sum_into_values_array = false)
       {
         internal::FEEvaluationImpl<
@@ -96,14 +93,13 @@ namespace internal
           dim,
           -1,
           0,
-          n_components,
-          Number>::integrate(shape_info,
+          Number>::integrate(n_components,
+                             integration_flag,
+                             shape_info,
                              values_dofs_actual,
                              values_quad,
                              gradients_quad,
                              scratch_data,
-                             integrate_values,
-                             integrate_gradients,
                              sum_into_values_array);
       }
     };
@@ -113,13 +109,12 @@ namespace internal
      * This class implements the actual choice of the template specialization.
      */
     template <int dim,
-              int n_components,
               typename Number,
               int DEPTH         = 0,
               int degree        = 0,
               int n_q_points_1d = 0,
               class Enable      = void>
-    struct Factory : Default<dim, n_components, Number>
+    struct Factory : Default<dim, Number>
     {};
 
     /**
@@ -127,9 +122,8 @@ namespace internal
      * which we want to determine the correct template parameters based at
      * runtime.
      */
-    template <int n_q_points_1d, int dim, int n_components, typename Number>
-    struct Factory<dim, n_components, Number, 0, 10, n_q_points_1d>
-      : Default<dim, n_components, Number>
+    template <int n_q_points_1d, int dim, typename Number>
+    struct Factory<dim, Number, 0, 10, n_q_points_1d> : Default<dim, Number>
     {};
 
     /**
@@ -137,102 +131,90 @@ namespace internal
      * which we want to determine the correct template parameters based at
      * runtime.
      */
-    template <int degree,
-              int n_q_points_1d,
-              int dim,
-              int n_components,
-              typename Number>
+    template <int degree, int n_q_points_1d, int dim, typename Number>
     struct Factory<dim,
-                   n_components,
                    Number,
                    1,
                    degree,
                    n_q_points_1d,
                    typename std::enable_if<n_q_points_1d == degree + 3>::type>
-      : Default<dim, n_components, Number>
+      : Default<dim, Number>
     {};
 
     /**
      * This class chooses the correct template degree.
      */
-    template <int degree,
-              int n_q_points_1d,
-              int dim,
-              int n_components,
-              typename Number>
-    struct Factory<dim, n_components, Number, 0, degree, n_q_points_1d>
+    template <int degree, int n_q_points_1d, int dim, typename Number>
+    struct Factory<dim, Number, 0, degree, n_q_points_1d>
     {
       static inline void
       evaluate(
+        const unsigned int                                      n_components,
+        const EvaluationFlags::EvaluationFlags                  evaluation_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-        Number *   values_dofs_actual,
-        Number *   values_quad,
-        Number *   gradients_quad,
-        Number *   hessians_quad,
-        Number *   scratch_data,
-        const bool evaluate_values,
-        const bool evaluate_gradients,
-        const bool evaluate_hessians)
+        Number *values_dofs_actual,
+        Number *values_quad,
+        Number *gradients_quad,
+        Number *hessians_quad,
+        Number *scratch_data)
       {
         const unsigned int runtime_degree = shape_info.data.front().fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
         if (runtime_degree == degree)
-          Factory<dim, n_components, Number, 1, degree, start_n_q_points>::
-            evaluate(shape_info,
-                     values_dofs_actual,
-                     values_quad,
-                     gradients_quad,
-                     hessians_quad,
-                     scratch_data,
-                     evaluate_values,
-                     evaluate_gradients,
-                     evaluate_hessians);
+          Factory<dim, Number, 1, degree, start_n_q_points>::evaluate(
+            n_components,
+            evaluation_flag,
+            shape_info,
+            values_dofs_actual,
+            values_quad,
+            gradients_quad,
+            hessians_quad,
+            scratch_data);
         else
-          Factory<dim, n_components, Number, 0, degree + 1, n_q_points_1d>::
-            evaluate(shape_info,
-                     values_dofs_actual,
-                     values_quad,
-                     gradients_quad,
-                     hessians_quad,
-                     scratch_data,
-                     evaluate_values,
-                     evaluate_gradients,
-                     evaluate_hessians);
+          Factory<dim, Number, 0, degree + 1, n_q_points_1d>::evaluate(
+            n_components,
+            evaluation_flag,
+            shape_info,
+            values_dofs_actual,
+            values_quad,
+            gradients_quad,
+            hessians_quad,
+            scratch_data);
       }
 
       static inline void
       integrate(
+        const unsigned int                     n_components,
+        const EvaluationFlags::EvaluationFlags integration_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
         Number *   values_dofs_actual,
         Number *   values_quad,
         Number *   gradients_quad,
         Number *   scratch_data,
-        const bool integrate_values,
-        const bool integrate_gradients,
         const bool sum_into_values_array = false)
       {
         const int runtime_degree = shape_info.data.front().fe_degree;
         constexpr unsigned int start_n_q_points = degree + 1;
         if (runtime_degree == degree)
-          Factory<dim, n_components, Number, 1, degree, start_n_q_points>::
-            integrate(shape_info,
-                      values_dofs_actual,
-                      values_quad,
-                      gradients_quad,
-                      scratch_data,
-                      integrate_values,
-                      integrate_gradients,
-                      sum_into_values_array);
+          Factory<dim, Number, 1, degree, start_n_q_points>::integrate(
+            n_components,
+            integration_flag,
+            shape_info,
+            values_dofs_actual,
+            values_quad,
+            gradients_quad,
+            scratch_data,
+            sum_into_values_array);
         else
-          Factory<dim, n_components, Number, 0, degree + 1, n_q_points_1d>::
-            integrate(shape_info,
-                      values_dofs_actual,
-                      values_quad,
-                      gradients_quad,
-                      scratch_data,
-                      integrate_values,
-                      integrate_gradients,
-                      sum_into_values_array);
+          Factory<dim, Number, 0, degree + 1, n_q_points_1d>::integrate(
+            n_components,
+            integration_flag,
+            shape_info,
+            values_dofs_actual,
+            values_quad,
+            gradients_quad,
+            scratch_data,
+            sum_into_values_array);
       }
     };
 
@@ -240,13 +222,8 @@ namespace internal
      * This class chooses the correct template n_q_points_1d after degree was
      * chosen.
      */
-    template <int degree,
-              int n_q_points_1d,
-              int dim,
-              int n_components,
-              typename Number>
+    template <int degree, int n_q_points_1d, int dim, typename Number>
     struct Factory<dim,
-                   n_components,
                    Number,
                    1,
                    degree,
@@ -266,15 +243,14 @@ namespace internal
 
       static inline void
       evaluate(
+        const unsigned int                                      n_components,
+        const EvaluationFlags::EvaluationFlags                  evaluation_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-        Number *   values_dofs_actual,
-        Number *   values_quad,
-        Number *   gradients_quad,
-        Number *   hessians_quad,
-        Number *   scratch_data,
-        const bool evaluate_values,
-        const bool evaluate_gradients,
-        const bool evaluate_hessians)
+        Number *values_dofs_actual,
+        Number *values_quad,
+        Number *gradients_quad,
+        Number *hessians_quad,
+        Number *scratch_data)
       {
         const int runtime_n_q_points_1d = shape_info.data.front().n_q_points_1d;
         if (runtime_n_q_points_1d == n_q_points_1d)
@@ -282,71 +258,64 @@ namespace internal
             if (n_q_points_1d == degree + 1 &&
                 shape_info.element_type ==
                   internal::MatrixFreeFunctions::tensor_symmetric_collocation)
-              internal::
-                FEEvaluationImplCollocation<dim, degree, n_components, Number>::
-                  evaluate(shape_info,
-                           values_dofs_actual,
-                           values_quad,
-                           gradients_quad,
-                           hessians_quad,
-                           scratch_data,
-                           evaluate_values,
-                           evaluate_gradients,
-                           evaluate_hessians);
+              internal::FEEvaluationImplCollocation<dim, degree, Number>::
+                evaluate(n_components,
+                         evaluation_flag,
+                         shape_info,
+                         values_dofs_actual,
+                         values_quad,
+                         gradients_quad,
+                         hessians_quad,
+                         scratch_data);
             else if (use_collocation)
               internal::FEEvaluationImplTransformToCollocation<
                 dim,
                 degree,
                 n_q_points_1d,
-                n_components,
-                Number>::evaluate(shape_info,
+                Number>::evaluate(n_components,
+                                  evaluation_flag,
+                                  shape_info,
                                   values_dofs_actual,
                                   values_quad,
                                   gradients_quad,
                                   hessians_quad,
-                                  scratch_data,
-                                  evaluate_values,
-                                  evaluate_gradients,
-                                  evaluate_hessians);
+                                  scratch_data);
             else
               internal::FEEvaluationImpl<
                 internal::MatrixFreeFunctions::tensor_symmetric,
                 dim,
                 degree,
                 n_q_points_1d,
-                n_components,
-                Number>::evaluate(shape_info,
+                Number>::evaluate(n_components,
+                                  evaluation_flag,
+                                  shape_info,
                                   values_dofs_actual,
                                   values_quad,
                                   gradients_quad,
                                   hessians_quad,
-                                  scratch_data,
-                                  evaluate_values,
-                                  evaluate_gradients,
-                                  evaluate_hessians);
+                                  scratch_data);
           }
         else
-          Factory<dim, n_components, Number, 1, degree, n_q_points_1d + 1>::
-            evaluate(shape_info,
-                     values_dofs_actual,
-                     values_quad,
-                     gradients_quad,
-                     hessians_quad,
-                     scratch_data,
-                     evaluate_values,
-                     evaluate_gradients,
-                     evaluate_hessians);
+          Factory<dim, Number, 1, degree, n_q_points_1d + 1>::evaluate(
+            n_components,
+            evaluation_flag,
+            shape_info,
+            values_dofs_actual,
+            values_quad,
+            gradients_quad,
+            hessians_quad,
+            scratch_data);
       }
 
       static inline void
       integrate(
+        const unsigned int                     n_components,
+        const EvaluationFlags::EvaluationFlags integration_flag,
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
         Number *   values_dofs_actual,
         Number *   values_quad,
         Number *   gradients_quad,
         Number *   scratch_data,
-        const bool integrate_values,
-        const bool integrate_gradients,
         const bool sum_into_values_array)
       {
         const int runtime_n_q_points_1d = shape_info.data.front().n_q_points_1d;
@@ -355,29 +324,27 @@ namespace internal
             if (n_q_points_1d == degree + 1 &&
                 shape_info.element_type ==
                   internal::MatrixFreeFunctions::tensor_symmetric_collocation)
-              internal::
-                FEEvaluationImplCollocation<dim, degree, n_components, Number>::
-                  integrate(shape_info,
-                            values_dofs_actual,
-                            values_quad,
-                            gradients_quad,
-                            scratch_data,
-                            integrate_values,
-                            integrate_gradients,
-                            sum_into_values_array);
+              internal::FEEvaluationImplCollocation<dim, degree, Number>::
+                integrate(n_components,
+                          integration_flag,
+                          shape_info,
+                          values_dofs_actual,
+                          values_quad,
+                          gradients_quad,
+                          scratch_data,
+                          sum_into_values_array);
             else if (use_collocation)
               internal::FEEvaluationImplTransformToCollocation<
                 dim,
                 degree,
                 n_q_points_1d,
-                n_components,
-                Number>::integrate(shape_info,
+                Number>::integrate(n_components,
+                                   integration_flag,
+                                   shape_info,
                                    values_dofs_actual,
                                    values_quad,
                                    gradients_quad,
                                    scratch_data,
-                                   integrate_values,
-                                   integrate_gradients,
                                    sum_into_values_array);
             else
               internal::FEEvaluationImpl<
@@ -385,26 +352,25 @@ namespace internal
                 dim,
                 degree,
                 n_q_points_1d,
-                n_components,
-                Number>::integrate(shape_info,
+                Number>::integrate(n_components,
+                                   integration_flag,
+                                   shape_info,
                                    values_dofs_actual,
                                    values_quad,
                                    gradients_quad,
                                    scratch_data,
-                                   integrate_values,
-                                   integrate_gradients,
                                    sum_into_values_array);
           }
         else
-          Factory<dim, n_components, Number, 1, degree, n_q_points_1d + 1>::
-            integrate(shape_info,
-                      values_dofs_actual,
-                      values_quad,
-                      gradients_quad,
-                      scratch_data,
-                      integrate_values,
-                      integrate_gradients,
-                      sum_into_values_array);
+          Factory<dim, Number, 1, degree, n_q_points_1d + 1>::integrate(
+            n_components,
+            integration_flag,
+            shape_info,
+            values_dofs_actual,
+            values_quad,
+            gradients_quad,
+            scratch_data,
+            sum_into_values_array);
       }
     };
 
@@ -414,31 +380,29 @@ namespace internal
      * This is the entry point for choosing the correct runtime parameters
      * for the 'evaluate' function.
      */
-    template <int dim, int n_components, typename Number>
+    template <int dim, typename Number>
     void
     symmetric_selector_evaluate(
+      const unsigned int                                      n_components,
+      const EvaluationFlags::EvaluationFlags                  evaluation_flag,
       const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-      Number *   values_dofs_actual,
-      Number *   values_quad,
-      Number *   gradients_quad,
-      Number *   hessians_quad,
-      Number *   scratch_data,
-      const bool evaluate_values,
-      const bool evaluate_gradients,
-      const bool evaluate_hessians)
+      Number *values_dofs_actual,
+      Number *values_quad,
+      Number *gradients_quad,
+      Number *hessians_quad,
+      Number *scratch_data)
     {
       Assert(shape_info.element_type <=
                internal::MatrixFreeFunctions::tensor_symmetric,
              ExcInternalError());
-      Factory<dim, n_components, Number>::evaluate(shape_info,
-                                                   values_dofs_actual,
-                                                   values_quad,
-                                                   gradients_quad,
-                                                   hessians_quad,
-                                                   scratch_data,
-                                                   evaluate_values,
-                                                   evaluate_gradients,
-                                                   evaluate_hessians);
+      Factory<dim, Number>::evaluate(n_components,
+                                     evaluation_flag,
+                                     shape_info,
+                                     values_dofs_actual,
+                                     values_quad,
+                                     gradients_quad,
+                                     hessians_quad,
+                                     scratch_data);
     }
 
 
@@ -447,29 +411,29 @@ namespace internal
      * This is the entry point for choosing the correct runtime parameters
      * for the 'integrate' function.
      */
-    template <int dim, int n_components, typename Number>
+    template <int dim, typename Number>
     void
     symmetric_selector_integrate(
+      const unsigned int                                      n_components,
+      const EvaluationFlags::EvaluationFlags                  integration_flag,
       const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
       Number *   values_dofs_actual,
       Number *   values_quad,
       Number *   gradients_quad,
       Number *   scratch_data,
-      const bool integrate_values,
-      const bool integrate_gradients,
       const bool sum_into_values_array = false)
     {
       Assert(shape_info.element_type <=
                internal::MatrixFreeFunctions::tensor_symmetric,
              ExcInternalError());
-      Factory<dim, n_components, Number>::integrate(shape_info,
-                                                    values_dofs_actual,
-                                                    values_quad,
-                                                    gradients_quad,
-                                                    scratch_data,
-                                                    integrate_values,
-                                                    integrate_gradients,
-                                                    sum_into_values_array);
+      Factory<dim, Number>::integrate(n_components,
+                                      integration_flag,
+                                      shape_info,
+                                      values_dofs_actual,
+                                      values_quad,
+                                      gradients_quad,
+                                      scratch_data,
+                                      sum_into_values_array);
     }
   } // namespace EvaluationSelectorImplementation
 } // namespace internal
@@ -487,11 +451,7 @@ namespace internal
  * $0\leq fe\_degree \leq 9$ and $degree+1\leq n\_q\_points\_1d\leq
  * fe\_degree+2$.
  */
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components,
-          typename Number>
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 struct SelectEvaluator
 {
   /**
@@ -513,15 +473,14 @@ struct SelectEvaluator
    * appropriate template parameters.
    */
   static void
-  evaluate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-           Number *   values_dofs_actual,
-           Number *   values_quad,
-           Number *   gradients_quad,
-           Number *   hessians_quad,
-           Number *   scratch_data,
-           const bool evaluate_values,
-           const bool evaluate_gradients,
-           const bool evaluate_hessians);
+  evaluate(const unsigned int                     n_components,
+           const EvaluationFlags::EvaluationFlags evaluation_flag,
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+           Number *values_dofs_actual,
+           Number *values_quad,
+           Number *gradients_quad,
+           Number *hessians_quad,
+           Number *scratch_data);
 
   /**
    * Chooses an appropriate evaluation strategy for the integrate function, i.e.
@@ -531,13 +490,13 @@ struct SelectEvaluator
    * appropriate template parameters.
    */
   static void
-  integrate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+  integrate(const unsigned int                     n_components,
+            const EvaluationFlags::EvaluationFlags integration_flag,
+            const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
             Number *   values_dofs_actual,
             Number *   values_quad,
             Number *   gradients_quad,
             Number *   scratch_data,
-            const bool integrate_values,
-            const bool integrate_gradients,
             const bool sum_into_values_array = false);
 };
 
@@ -551,8 +510,8 @@ struct SelectEvaluator
  * $degree+1\leq n\_q\_points\_1d\leq fe\_degree+2$, a non-optimized fallback
  * is used.
  */
-template <int dim, int n_q_points_1d, int n_components, typename Number>
-struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
+template <int dim, int n_q_points_1d, typename Number>
+struct SelectEvaluator<dim, -1, n_q_points_1d, Number>
 {
   /**
    * Based on the run time parameters stored in @p shape_info this function
@@ -563,15 +522,14 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
    * appropriate template parameters.
    */
   static void
-  evaluate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-           Number *   values_dofs_actual,
-           Number *   values_quad,
-           Number *   gradients_quad,
-           Number *   hessians_quad,
-           Number *   scratch_data,
-           const bool evaluate_values,
-           const bool evaluate_gradients,
-           const bool evaluate_hessians);
+  evaluate(const unsigned int                     n_components,
+           const EvaluationFlags::EvaluationFlags evaluation_flag,
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+           Number *values_dofs_actual,
+           Number *values_quad,
+           Number *gradients_quad,
+           Number *hessians_quad,
+           Number *scratch_data);
 
   /**
    * Based on the run time parameters stored in @p shape_info this function
@@ -582,35 +540,30 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
    * appropriate template parameters.
    */
   static void
-  integrate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+  integrate(const unsigned int                     n_components,
+            const EvaluationFlags::EvaluationFlags integration_flag,
+            const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
             Number *   values_dofs_actual,
             Number *   values_quad,
             Number *   gradients_quad,
             Number *   scratch_data,
-            const bool integrate_values,
-            const bool integrate_gradients,
             const bool sum_into_values_array = false);
 };
 
 //----------------------Implementation for SelectEvaluator---------------------
 #ifndef DOXYGEN
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components,
-          typename Number>
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 inline void
-SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
+SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
+  const unsigned int                                      n_components,
+  const EvaluationFlags::EvaluationFlags                  evaluation_flag,
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
   Number *                                                values_dofs_actual,
   Number *                                                values_quad,
   Number *                                                gradients_quad,
   Number *                                                hessians_quad,
-  Number *                                                scratch_data,
-  const bool                                              evaluate_values,
-  const bool                                              evaluate_gradients,
-  const bool                                              evaluate_hessians)
+  Number *                                                scratch_data)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
@@ -618,17 +571,15 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
       shape_info.element_type ==
         internal::MatrixFreeFunctions::tensor_symmetric_collocation)
     {
-      internal::
-        FEEvaluationImplCollocation<dim, fe_degree, n_components, Number>::
-          evaluate(shape_info,
-                   values_dofs_actual,
-                   values_quad,
-                   gradients_quad,
-                   hessians_quad,
-                   scratch_data,
-                   evaluate_values,
-                   evaluate_gradients,
-                   evaluate_hessians);
+      internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
+        n_components,
+        evaluation_flag,
+        shape_info,
+        values_dofs_actual,
+        values_quad,
+        gradients_quad,
+        hessians_quad,
+        scratch_data);
     }
   // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
   // shape_info.h for more details
@@ -639,16 +590,14 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::evaluate(shape_info,
+        Number>::evaluate(n_components,
+                          evaluation_flag,
+                          shape_info,
                           values_dofs_actual,
                           values_quad,
                           gradients_quad,
                           hessians_quad,
-                          scratch_data,
-                          evaluate_values,
-                          evaluate_gradients,
-                          evaluate_hessians);
+                          scratch_data);
     }
   else if (shape_info.element_type <=
            internal::MatrixFreeFunctions::tensor_symmetric)
@@ -658,16 +607,14 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::evaluate(shape_info,
+        Number>::evaluate(n_components,
+                          evaluation_flag,
+                          shape_info,
                           values_dofs_actual,
                           values_quad,
                           gradients_quad,
                           hessians_quad,
-                          scratch_data,
-                          evaluate_values,
-                          evaluate_gradients,
-                          evaluate_hessians);
+                          scratch_data);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
@@ -677,16 +624,14 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::evaluate(shape_info,
+        Number>::evaluate(n_components,
+                          evaluation_flag,
+                          shape_info,
                           values_dofs_actual,
                           values_quad,
                           gradients_quad,
                           hessians_quad,
-                          scratch_data,
-                          evaluate_values,
-                          evaluate_gradients,
-                          evaluate_hessians);
+                          scratch_data);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::truncated_tensor)
@@ -696,16 +641,14 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::evaluate(shape_info,
+        Number>::evaluate(n_components,
+                          evaluation_flag,
+                          shape_info,
                           values_dofs_actual,
                           values_quad,
                           gradients_quad,
                           hessians_quad,
-                          scratch_data,
-                          evaluate_values,
-                          evaluate_gradients,
-                          evaluate_hessians);
+                          scratch_data);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_general)
@@ -714,16 +657,14 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
                                  dim,
                                  fe_degree,
                                  n_q_points_1d,
-                                 n_components,
-                                 Number>::evaluate(shape_info,
+                                 Number>::evaluate(n_components,
+                                                   evaluation_flag,
+                                                   shape_info,
                                                    values_dofs_actual,
                                                    values_quad,
                                                    gradients_quad,
                                                    hessians_quad,
-                                                   scratch_data,
-                                                   evaluate_values,
-                                                   evaluate_gradients,
-                                                   evaluate_hessians);
+                                                   scratch_data);
     }
   else
     AssertThrow(false, ExcNotImplemented());
@@ -731,20 +672,16 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
 
 
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components,
-          typename Number>
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 inline void
-SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
+SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
+  const unsigned int                                      n_components,
+  const EvaluationFlags::EvaluationFlags                  integration_flag,
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
   Number *                                                values_dofs_actual,
   Number *                                                values_quad,
   Number *                                                gradients_quad,
   Number *                                                scratch_data,
-  const bool                                              integrate_values,
-  const bool                                              integrate_gradients,
   const bool                                              sum_into_values_array)
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
@@ -753,16 +690,15 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
       shape_info.element_type ==
         internal::MatrixFreeFunctions::tensor_symmetric_collocation)
     {
-      internal::
-        FEEvaluationImplCollocation<dim, fe_degree, n_components, Number>::
-          integrate(shape_info,
-                    values_dofs_actual,
-                    values_quad,
-                    gradients_quad,
-                    scratch_data,
-                    integrate_values,
-                    integrate_gradients,
-                    sum_into_values_array);
+      internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::integrate(
+        n_components,
+        integration_flag,
+        shape_info,
+        values_dofs_actual,
+        values_quad,
+        gradients_quad,
+        scratch_data,
+        sum_into_values_array);
     }
   // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
   // shape_info.h for more details
@@ -773,14 +709,13 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::integrate(shape_info,
+        Number>::integrate(n_components,
+                           integration_flag,
+                           shape_info,
                            values_dofs_actual,
                            values_quad,
                            gradients_quad,
                            scratch_data,
-                           integrate_values,
-                           integrate_gradients,
                            sum_into_values_array);
     }
   else if (shape_info.element_type <=
@@ -791,14 +726,13 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::integrate(shape_info,
+        Number>::integrate(n_components,
+                           integration_flag,
+                           shape_info,
                            values_dofs_actual,
                            values_quad,
                            gradients_quad,
                            scratch_data,
-                           integrate_values,
-                           integrate_gradients,
                            sum_into_values_array);
     }
   else if (shape_info.element_type ==
@@ -809,14 +743,13 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::integrate(shape_info,
+        Number>::integrate(n_components,
+                           integration_flag,
+                           shape_info,
                            values_dofs_actual,
                            values_quad,
                            gradients_quad,
                            scratch_data,
-                           integrate_values,
-                           integrate_gradients,
                            sum_into_values_array);
     }
   else if (shape_info.element_type ==
@@ -827,14 +760,13 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
-        Number>::integrate(shape_info,
+        Number>::integrate(n_components,
+                           integration_flag,
+                           shape_info,
                            values_dofs_actual,
                            values_quad,
                            gradients_quad,
                            scratch_data,
-                           integrate_values,
-                           integrate_gradients,
                            sum_into_values_array);
     }
   else if (shape_info.element_type ==
@@ -844,14 +776,13 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                                  dim,
                                  fe_degree,
                                  n_q_points_1d,
-                                 n_components,
-                                 Number>::integrate(shape_info,
+                                 Number>::integrate(n_components,
+                                                    integration_flag,
+                                                    shape_info,
                                                     values_dofs_actual,
                                                     values_quad,
                                                     gradients_quad,
                                                     scratch_data,
-                                                    integrate_values,
-                                                    integrate_gradients,
                                                     sum_into_values_array);
     }
   else
@@ -860,18 +791,17 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
 
 
 
-template <int dim, int dummy, int n_components, typename Number>
+template <int dim, int dummy, typename Number>
 inline void
-SelectEvaluator<dim, -1, dummy, n_components, Number>::evaluate(
+SelectEvaluator<dim, -1, dummy, Number>::evaluate(
+  const unsigned int                                      n_components,
+  const EvaluationFlags::EvaluationFlags                  evaluation_flag,
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
   Number *                                                values_dofs_actual,
   Number *                                                values_quad,
   Number *                                                gradients_quad,
   Number *                                                hessians_quad,
-  Number *                                                scratch_data,
-  const bool                                              evaluate_values,
-  const bool                                              evaluate_gradients,
-  const bool                                              evaluate_hessians)
+  Number *                                                scratch_data)
 {
   if (shape_info.element_type ==
       internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
@@ -881,16 +811,14 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::evaluate(
         dim,
         -1,
         0,
-        n_components,
-        Number>::evaluate(shape_info,
+        Number>::evaluate(n_components,
+                          evaluation_flag,
+                          shape_info,
                           values_dofs_actual,
                           values_quad,
                           gradients_quad,
                           hessians_quad,
-                          scratch_data,
-                          evaluate_values,
-                          evaluate_gradients,
-                          evaluate_hessians);
+                          scratch_data);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::truncated_tensor)
@@ -900,16 +828,14 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::evaluate(
         dim,
         -1,
         0,
-        n_components,
-        Number>::evaluate(shape_info,
+        Number>::evaluate(n_components,
+                          evaluation_flag,
+                          shape_info,
                           values_dofs_actual,
                           values_quad,
                           gradients_quad,
                           hessians_quad,
-                          scratch_data,
-                          evaluate_values,
-                          evaluate_gradients,
-                          evaluate_hessians);
+                          scratch_data);
     }
   else if (shape_info.element_type ==
            internal::MatrixFreeFunctions::tensor_general)
@@ -917,41 +843,38 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::evaluate(
                                dim,
                                -1,
                                0,
-                               n_components,
-                               Number>::evaluate(shape_info,
+                               Number>::evaluate(n_components,
+                                                 evaluation_flag,
+                                                 shape_info,
                                                  values_dofs_actual,
                                                  values_quad,
                                                  gradients_quad,
                                                  hessians_quad,
-                                                 scratch_data,
-                                                 evaluate_values,
-                                                 evaluate_gradients,
-                                                 evaluate_hessians);
+                                                 scratch_data);
   else
     internal::EvaluationSelectorImplementation::
-      symmetric_selector_evaluate<dim, n_components, Number>(shape_info,
-                                                             values_dofs_actual,
-                                                             values_quad,
-                                                             gradients_quad,
-                                                             hessians_quad,
-                                                             scratch_data,
-                                                             evaluate_values,
-                                                             evaluate_gradients,
-                                                             evaluate_hessians);
+      symmetric_selector_evaluate<dim, Number>(n_components,
+                                               evaluation_flag,
+                                               shape_info,
+                                               values_dofs_actual,
+                                               values_quad,
+                                               gradients_quad,
+                                               hessians_quad,
+                                               scratch_data);
 }
 
 
 
-template <int dim, int dummy, int n_components, typename Number>
+template <int dim, int dummy, typename Number>
 inline void
-SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
+SelectEvaluator<dim, -1, dummy, Number>::integrate(
+  const unsigned int                                      n_components,
+  const EvaluationFlags::EvaluationFlags                  integration_flag,
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
   Number *                                                values_dofs_actual,
   Number *                                                values_quad,
   Number *                                                gradients_quad,
   Number *                                                scratch_data,
-  const bool                                              integrate_values,
-  const bool                                              integrate_gradients,
   const bool                                              sum_into_values_array)
 {
   if (shape_info.element_type ==
@@ -962,14 +885,13 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
         dim,
         -1,
         0,
-        n_components,
-        Number>::integrate(shape_info,
+        Number>::integrate(n_components,
+                           integration_flag,
+                           shape_info,
                            values_dofs_actual,
                            values_quad,
                            gradients_quad,
                            scratch_data,
-                           integrate_values,
-                           integrate_gradients,
                            sum_into_values_array);
     }
   else if (shape_info.element_type ==
@@ -980,14 +902,13 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
         dim,
         -1,
         0,
-        n_components,
-        Number>::integrate(shape_info,
+        Number>::integrate(n_components,
+                           integration_flag,
+                           shape_info,
                            values_dofs_actual,
                            values_quad,
                            gradients_quad,
                            scratch_data,
-                           integrate_values,
-                           integrate_gradients,
                            sum_into_values_array);
     }
   else if (shape_info.element_type ==
@@ -996,26 +917,24 @@ SelectEvaluator<dim, -1, dummy, n_components, Number>::integrate(
                                dim,
                                -1,
                                0,
-                               n_components,
-                               Number>::integrate(shape_info,
+                               Number>::integrate(n_components,
+                                                  integration_flag,
+                                                  shape_info,
                                                   values_dofs_actual,
                                                   values_quad,
                                                   gradients_quad,
                                                   scratch_data,
-                                                  integrate_values,
-                                                  integrate_gradients,
                                                   sum_into_values_array);
   else
     internal::EvaluationSelectorImplementation::
-      symmetric_selector_integrate<dim, n_components, Number>(
-        shape_info,
-        values_dofs_actual,
-        values_quad,
-        gradients_quad,
-        scratch_data,
-        integrate_values,
-        integrate_gradients,
-        sum_into_values_array);
+      symmetric_selector_integrate<dim, Number>(n_components,
+                                                integration_flag,
+                                                shape_info,
+                                                values_dofs_actual,
+                                                values_quad,
+                                                gradients_quad,
+                                                scratch_data,
+                                                sum_into_values_array);
 }
 #endif // DOXYGEN
 
