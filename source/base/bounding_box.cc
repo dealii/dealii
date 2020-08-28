@@ -70,12 +70,12 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
     }
   else
     {
-      std::vector<Point<spacedim, Number>> bbox1;
-      bbox1.push_back(this->get_boundary_points().first);
-      bbox1.push_back(this->get_boundary_points().second);
-      std::vector<Point<spacedim, Number>> bbox2;
-      bbox2.push_back(other_bbox.get_boundary_points().first);
-      bbox2.push_back(other_bbox.get_boundary_points().second);
+      std::array<Point<spacedim, Number>, 2> bbox1;
+      bbox1[0] = this->get_boundary_points().first;
+      bbox1[1] = this->get_boundary_points().second;
+      std::array<Point<spacedim, Number>, 2> bbox2;
+      bbox2[0] = other_bbox.get_boundary_points().first;
+      bbox2[1] = other_bbox.get_boundary_points().second;
 
       // Step 1: testing if the boxes are close enough to intersect
       for (unsigned int d = 0; d < spacedim; ++d)
@@ -87,12 +87,12 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
 
       // The boxes intersect: we need to understand now how they intersect.
       // We begin by computing the intersection:
-      std::vector<double> intersect_bbox_min;
-      std::vector<double> intersect_bbox_max;
+      std::array<double, spacedim> intersect_bbox_min;
+      std::array<double, spacedim> intersect_bbox_max;
       for (unsigned int d = 0; d < spacedim; ++d)
         {
-          intersect_bbox_min.push_back(std::max(bbox1[0][d], bbox2[0][d]));
-          intersect_bbox_max.push_back(std::min(bbox1[1][d], bbox2[1][d]));
+          intersect_bbox_min[d] = std::max(bbox1[0][d], bbox2[0][d]);
+          intersect_bbox_max[d] = std::min(bbox1[1][d], bbox2[1][d]);
         }
 
       // Finding the intersection's dimension
