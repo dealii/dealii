@@ -659,6 +659,20 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
 
 
 
+template <>
+template <int order>
+Tensor<order, 0>
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::
+  compute_derivative(const unsigned int, const Point<0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
+}
+
+
+
 template <int dim, typename PolynomialType>
 inline Tensor<1, dim>
 TensorProductPolynomials<dim, PolynomialType>::compute_1st_derivative(
@@ -819,6 +833,20 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
           return derivative;
         }
     }
+}
+
+
+
+template <>
+template <int order>
+Tensor<order, 0>
+AnisotropicPolynomials<0>::compute_derivative(const unsigned int,
+                                              const Point<0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
 }
 
 
