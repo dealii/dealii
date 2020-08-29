@@ -362,19 +362,19 @@ namespace internal
    * dimension to a coordinate index in dim + 1 dimensions.
    *
    * @param locked_coordinate should be in the range [0, dim+1).
-   * @param coordiante_in_dim should be in the range [0, dim).
+   * @param coordinate_in_dim should be in the range [0, dim).
    * @return A coordinate index in the range [0, dim+1)
    *
    * @relates BoundingBox
    */
   template <int dim>
-  inline unsigned int
-  coordinate_to_one_dim_higher(const unsigned int locked_coordinate,
-                               const unsigned int coordiante_in_dim)
+  inline int
+  coordinate_to_one_dim_higher(const int locked_coordinate,
+                               const int coordinate_in_dim)
   {
     AssertIndexRange(locked_coordinate, dim + 1);
-    AssertIndexRange(coordiante_in_dim, dim);
-    return (locked_coordinate + coordiante_in_dim + 1) % (dim + 1);
+    AssertIndexRange(coordinate_in_dim, dim);
+    return (locked_coordinate + coordinate_in_dim + 1) % (dim + 1);
   }
 
 } // namespace internal
