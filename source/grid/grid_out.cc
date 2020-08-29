@@ -4131,8 +4131,8 @@ namespace internal
 
       // If we need to plot curved lines then generate a quadrature formula to
       // place points via the mapping
-      Quadrature<dim> *     q_projector = nullptr;
-      std::vector<Point<1>> boundary_points;
+      std::unique_ptr<Quadrature<dim>> q_projector;
+      std::vector<Point<1>>            boundary_points;
       if (mapping != nullptr)
         {
           boundary_points.resize(n_points);
@@ -4146,7 +4146,7 @@ namespace internal
 
           // tensor product of points, only one copy
           QIterated<dim - 1> quadrature(quadrature1d, 1);
-          q_projector = new Quadrature<dim>(
+          q_projector = std::make_unique<Quadrature<dim>>(
             QProjector<dim>::project_to_all_faces(quadrature));
         }
 
@@ -4303,10 +4303,6 @@ namespace internal
                 }
             }
         }
-
-      if (q_projector != nullptr)
-        delete q_projector;
-
 
       // make sure everything now gets to disk
       out.flush();

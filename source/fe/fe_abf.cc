@@ -177,7 +177,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
   // These might be required when the faces contribution is computed
   // Therefore they will be initialized at this point.
-  std::vector<AnisotropicPolynomials<dim> *> polynomials_abf(dim);
+  std::array<std::unique_ptr<AnisotropicPolynomials<dim>>, dim> polynomials_abf;
 
   // Generate x_1^{i} x_2^{r+1} ...
   for (unsigned int dd = 0; dd < dim; ++dd)
@@ -187,7 +187,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
         poly[d].push_back(Polynomials::Monomial<double>(deg + 1));
       poly[dd] = Polynomials::Monomial<double>::generate_complete_basis(deg);
 
-      polynomials_abf[dd] = new AnisotropicPolynomials<dim>(poly);
+      polynomials_abf[dd] = std::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
 
   // Number of the point being entered
@@ -253,7 +253,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
   // space D_xi Q_k
   if (deg > 0)
     {
-      std::vector<AnisotropicPolynomials<dim> *> polynomials(dim);
+      std::array<std::unique_ptr<AnisotropicPolynomials<dim>>, dim> polynomials;
 
       for (unsigned int dd = 0; dd < dim; ++dd)
         {
@@ -262,7 +262,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
             poly[d] = Polynomials::Legendre::generate_complete_basis(deg);
           poly[dd] = Polynomials::Legendre::generate_complete_basis(deg - 1);
 
-          polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+          polynomials[dd] = std::make_unique<AnisotropicPolynomials<dim>>(poly);
         }
 
       interior_weights.reinit(
@@ -276,9 +276,6 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
                 cell_quadrature.weight(k) *
                 polynomials[d]->compute_value(i, cell_quadrature.point(k));
         }
-
-      for (unsigned int d = 0; d < dim; ++d)
-        delete polynomials[d];
     }
 
 
@@ -310,9 +307,6 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
             interior_weights_abf(k, i, d) = -poly_grad[d];
         }
     }
-
-  for (unsigned int d = 0; d < dim; ++d)
-    delete polynomials_abf[d];
 
   Assert(current == this->generalized_support_points.size(),
          ExcInternalError());
@@ -421,7 +415,7 @@ FE_ABF<dim>::initialize_restriction()
   // Create Legendre basis for the
   // space D_xi Q_k. Here, we cannot
   // use the shape functions
-  std::vector<AnisotropicPolynomials<dim> *> polynomials(dim);
+  std::array<std::unique_ptr<AnisotropicPolynomials<dim>>, dim> polynomials;
   for (unsigned int dd = 0; dd < dim; ++dd)
     {
       std::vector<std::vector<Polynomials::Polynomial<double>>> poly(dim);
@@ -429,7 +423,7 @@ FE_ABF<dim>::initialize_restriction()
         poly[d] = Polynomials::Legendre::generate_complete_basis(rt_order);
       poly[dd] = Polynomials::Legendre::generate_complete_basis(rt_order - 1);
 
-      polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+      polynomials[dd] = std::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -475,9 +469,6 @@ FE_ABF<dim>::initialize_restriction()
                   polynomials[d]->compute_value(i_weight, q_sub.point(k));
               }
     }
-
-  for (unsigned int d = 0; d < dim; ++d)
-    delete polynomials[d];
 }
 
 
