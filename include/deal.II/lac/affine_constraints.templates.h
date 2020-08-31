@@ -3284,19 +3284,33 @@ namespace internal
             {
               const size_type local_row  = global_rows.constraint_origin(i);
               const size_type global_row = local_dof_indices[local_row];
-              const number    new_diagonal =
-                (std::abs(local_matrix(local_row, local_row)) != 0. ?
-                   std::abs(local_matrix(local_row, local_row)) :
-                   average_diagonal);
-              global_matrix.add(global_row, global_row, new_diagonal);
 
-              // if the use_inhomogeneities_for_rhs flag is set to true, the
-              // inhomogeneities are used to create the global vector. instead
-              // of fill in a zero in the ith components with an inhomogeneity,
-              // we set those to: inhomogeneity(i)*global_matrix (i,i).
-              if (use_inhomogeneities_for_rhs == true)
-                global_vector(global_row) +=
-                  new_diagonal * constraints.get_inhomogeneity(global_row);
+              const number current_diagonal =
+                local_matrix(local_row, local_row);
+              if (std::abs(current_diagonal) != 0.)
+                {
+                  global_matrix.add(global_row,
+                                    global_row,
+                                    std::abs(current_diagonal));
+                  // if the use_inhomogeneities_for_rhs flag is set to true, the
+                  // inhomogeneities are used to create the global vector.
+                  // instead of fill in a zero in the ith components with an
+                  // inhomogeneity, we set those to:
+                  // inhomogeneity(i)*global_matrix (i,i).
+                  if (use_inhomogeneities_for_rhs == true)
+                    global_vector(global_row) +=
+                      current_diagonal *
+                      constraints.get_inhomogeneity(global_row);
+                }
+              else
+                {
+                  global_matrix.add(global_row, global_row, average_diagonal);
+
+                  if (use_inhomogeneities_for_rhs == true)
+                    global_vector(global_row) +=
+                      average_diagonal *
+                      constraints.get_inhomogeneity(global_row);
+                }
             }
         }
     }
