@@ -889,7 +889,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       for (const auto &cell : tria.active_cell_iterators())
         {
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (auto f : cell->face_indices())
             {
               typename Triangulation<dim, spacedim>::face_iterator face =
                 cell->face(f);
@@ -1119,7 +1119,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
     {
       out << cell->active_cell_index() + 1 << ' ' << elm_type << ' '
           << cell->material_id() << ' ' << cell->subdomain_id() << ' '
-          << GeometryInfo<dim>::vertices_per_cell << ' ';
+          << cell->n_vertices() << ' ';
 
       // Vertex numbering follows UCD conventions.
 
@@ -2948,10 +2948,11 @@ namespace
     for (; cell != end; ++cell)
       {
         DataOutBase::Patch<dim, spacedim> patch;
-        patch.n_subdivisions = 1;
-        patch.data.reinit(5, GeometryInfo<dim>::vertices_per_cell);
+        patch.reference_cell_type = cell->reference_cell_type();
+        patch.n_subdivisions      = 1;
+        patch.data.reinit(5, cell->n_vertices());
 
-        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int v : cell->vertex_indices())
           {
             patch.vertices[v] = cell->vertex(v);
             patch.data(0, v)  = cell->level();
@@ -4442,9 +4443,7 @@ namespace internal
           case 2:
             {
               for (const auto &cell : tria.active_cell_iterators())
-                for (unsigned int line_no = 0;
-                     line_no < GeometryInfo<dim>::lines_per_cell;
-                     ++line_no)
+                for (const auto &line_no : cell->line_indices())
                   {
                     typename dealii::Triangulation<dim, spacedim>::line_iterator
                       line = cell->line(line_no);
@@ -4614,9 +4613,7 @@ namespace internal
 
 
               for (const auto &cell : tria.active_cell_iterators())
-                for (unsigned int line_no = 0;
-                     line_no < GeometryInfo<dim>::lines_per_cell;
-                     ++line_no)
+                for (const auto &line_no : cell->line_indices())
                   {
                     typename dealii::Triangulation<dim, spacedim>::line_iterator
                       line = cell->line(line_no);
@@ -4805,18 +4802,17 @@ namespace internal
           // doing this multiply
           std::set<unsigned int> treated_vertices;
           for (const auto &cell : tria.active_cell_iterators())
-            for (const unsigned int vertex :
-                 GeometryInfo<dim>::vertex_indices())
-              if (treated_vertices.find(cell->vertex_index(vertex)) ==
+            for (const auto &vertex_no : cell->vertex_indices())
+              if (treated_vertices.find(cell->vertex_index(vertex_no)) ==
                   treated_vertices.end())
                 {
-                  treated_vertices.insert(cell->vertex_index(vertex));
+                  treated_vertices.insert(cell->vertex_index(vertex_no));
 
-                  out << (cell->vertex(vertex)(0) - offset(0)) * scale << ' '
-                      << (cell->vertex(vertex)(1) - offset(1)) * scale << " m"
-                      << '\n'
+                  out << (cell->vertex(vertex_no)(0) - offset(0)) * scale << ' '
+                      << (cell->vertex(vertex_no)(1) - offset(1)) * scale
+                      << " m" << '\n'
                       << "[ [(Helvetica) 10.0 0.0 true true ("
-                      << cell->vertex_index(vertex) << ")] "
+                      << cell->vertex_index(vertex_no) << ")] "
                       << "] -6 MCshow" << '\n';
                 }
         }
