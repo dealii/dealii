@@ -802,8 +802,20 @@ namespace
     n_cells = 0;
     for (const auto &patch : patches)
       {
-        n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
-        n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+        // The following formula doesn't work for non-tensor products
+        if (patch.reference_cell_type == ReferenceCell::get_hypercube(dim))
+          {
+            n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+            n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+          }
+        else
+          {
+            Assert(patch.n_subdivisions == 1, ExcNotImplemented());
+            const auto &info = ReferenceCell::internal::Info::get_cell(
+              patch.reference_cell_type);
+            n_nodes += info.n_vertices();
+            n_cells += 1;
+          }
       }
   }
 
@@ -5352,7 +5364,9 @@ namespace DataOutBase
     // If a user set to output high order cells, we treat n_subdivisions
     // as a cell order and adjust variables accordingly, otherwise
     // each patch is written as a linear cell.
-    unsigned int n_points_per_cell = GeometryInfo<dim>::vertices_per_cell;
+    unsigned int n_points_per_cell =
+      ReferenceCell::internal::Info::get_cell(patches[0].reference_cell_type)
+        .n_vertices();
     if (flags.write_higher_order_cells)
       {
         n_cells           = patches.size();

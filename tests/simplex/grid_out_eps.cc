@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Read a file in the VTK format with (linear) triangular and tetrahedral
+// Write a file in the EPS format with (linear) triangular and tetrahedral
 // elements created by the GMSH program.
 
 #include <deal.II/grid/grid_in.h>
@@ -38,10 +38,10 @@ check_file(const std::string &file_name)
 
   GridOut grid_out;
 #if false
-  std::ofstream out("mesh.out.vtk");
-  grid_out.write_vtk(tria, out);
+  std::ofstream out("mesh-" + std::to_string(spacedim) + ".eps");
+  grid_out.write_eps(tria, out);
 #else
-  grid_out.write_vtk(tria, deallog.get_file_stream());
+  grid_out.write_eps(tria, deallog.get_file_stream());
 #endif
 
   deallog << "OK!" << std::endl;
@@ -57,13 +57,6 @@ main()
   deallog.push("triangluar_elements_dim2_spacedim2: ");
   check_file<2, 2>(std::string(SOURCE_DIR "/grid_in_vtk/tri.vtk"));
   deallog.pop();
-
-  // dim = 2, spacedim = 3
-  deallog.push("triangluar_elements_dim2_spacedim3: ");
-  check_file<2, 3>(std::string(SOURCE_DIR "/grid_in_vtk/tri.vtk"));
-  deallog.pop();
-
-
 
   // TETRAHEDRAL ELEMENTS
   // dim = spacedim = 3
