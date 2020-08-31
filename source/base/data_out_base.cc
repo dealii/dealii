@@ -5364,14 +5364,13 @@ namespace DataOutBase
     // If a user set to output high order cells, we treat n_subdivisions
     // as a cell order and adjust variables accordingly, otherwise
     // each patch is written as a linear cell.
-    unsigned int n_points_per_cell =
-      ReferenceCell::internal::Info::get_cell(patches[0].reference_cell_type)
-        .n_vertices();
+    const unsigned int n_points_per_cell =
+      (flags.write_higher_order_cells == false ?
+         ReferenceCell::internal::Info::get_cell(patches[0].reference_cell_type)
+           .n_vertices() :
+         n_nodes / patches.size());
     if (flags.write_higher_order_cells)
-      {
-        n_cells           = patches.size();
-        n_points_per_cell = n_nodes / n_cells;
-      }
+      n_cells = patches.size();
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;

@@ -889,7 +889,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 
       for (const auto &cell : tria.active_cell_iterators())
         {
-          for (auto f : cell->face_indices())
+          for (const auto f : cell->face_indices())
             {
               typename Triangulation<dim, spacedim>::face_iterator face =
                 cell->face(f);
