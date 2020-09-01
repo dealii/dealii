@@ -37,7 +37,6 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
   # (anymore) which was deprecated for C++11 and removed in the C++17 standard.
   # Older boost versions can't know about this but provide a possibility to
   # circumvent the issue. Hence, we just check ourselves.
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
   IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
   ELSE()
@@ -118,7 +117,6 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
       # Test that Boost.Iostreams is usable.
       #
       RESET_CMAKE_REQUIRED()
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
       LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_LIBRARIES})
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
 
