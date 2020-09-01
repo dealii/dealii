@@ -70,12 +70,12 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
     }
   else
     {
-      std::array<Point<spacedim, Number>, 2> bbox1;
-      bbox1[0] = this->get_boundary_points().first;
-      bbox1[1] = this->get_boundary_points().second;
-      std::array<Point<spacedim, Number>, 2> bbox2;
-      bbox2[0] = other_bbox.get_boundary_points().first;
-      bbox2[1] = other_bbox.get_boundary_points().second;
+      const std::array<Point<spacedim, Number>, 2> bbox1 = {
+        {this->get_boundary_points().first,
+         this->get_boundary_points().second}};
+      const std::array<Point<spacedim, Number>, 2> bbox2 = {
+        {other_bbox.get_boundary_points().first,
+         other_bbox.get_boundary_points().second}};
 
       // Step 1: testing if the boxes are close enough to intersect
       for (unsigned int d = 0; d < spacedim; ++d)
