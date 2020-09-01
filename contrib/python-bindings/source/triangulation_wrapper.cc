@@ -514,23 +514,24 @@ namespace python
 
     template <int dim, int spacedim>
     void
-    merge_triangulations(TriangulationWrapper &triangulation_1,
-                         TriangulationWrapper &triangulation_2,
-                         void *                triangulation)
+    merge_triangulations(boost::python::list &triangulations,
+                         void *               triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
       tria->clear();
-      Triangulation<dim, spacedim> *tria_1 =
-        static_cast<Triangulation<dim, spacedim> *>(
-          triangulation_1.get_triangulation());
-      Triangulation<dim, spacedim> *tria_2 =
-        static_cast<Triangulation<dim, spacedim> *>(
-          triangulation_2.get_triangulation());
-      GridGenerator::merge_triangulations(*tria_1, *tria_2, *tria);
-      // We need to reassign tria to triangulation because tria was cleared
-      // inside merge_triangulations.
-      triangulation = tria;
+
+      std::vector<const Triangulation<dim, spacedim> *> tria_ptrs;
+      size_t n_triangulations = boost::python::len(triangulations);
+      for (size_t i = 0; i < n_triangulations; ++i)
+        {
+          TriangulationWrapper &tria_wrapper =
+            boost::python::extract<TriangulationWrapper &>(triangulations[i]);
+          tria_ptrs.push_back(static_cast<const Triangulation<dim, spacedim> *>(
+            tria_wrapper.get_triangulation()));
+        }
+
+      GridGenerator::merge_triangulations(tria_ptrs, *tria);
     }
 
 
@@ -545,6 +546,30 @@ namespace python
         static_cast<Triangulation<dim, spacedim_2> *>(
           tria_out.get_triangulation());
       GridGenerator::flatten_triangulation(*tria, *tria_2);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    replicate_triangulation(TriangulationWrapper &     tria_in,
+                            const boost::python::list &extents,
+                            void *                     tria_out)
+    {
+      Triangulation<dim, spacedim> *replicated_triangulation =
+        static_cast<Triangulation<dim, spacedim> *>(tria_out);
+      const Triangulation<dim, spacedim> *triangulation =
+        static_cast<Triangulation<dim, spacedim> *>(
+          tria_in.get_triangulation());
+      replicated_triangulation->clear();
+
+      std::vector<unsigned int> extents_vector(dim);
+      for (int d = 0; d < dim; ++d)
+        extents_vector[d] = boost::python::extract<unsigned>(extents[d]);
+
+      GridGenerator::replicate_triangulation(*triangulation,
+                                             extents_vector,
+                                             *replicated_triangulation);
     }
 
 
@@ -1411,40 +1436,32 @@ namespace python
 
   void
   TriangulationWrapper::merge_triangulations(
-    TriangulationWrapper &triangulation_1,
-    TriangulationWrapper &triangulation_2)
+    boost::python::list &triangulations)
   {
-    AssertThrow(
-      triangulation_1.get_dim() == triangulation_2.get_dim(),
-      ExcMessage(
-        "Triangulation_1 and Triangulation_2 should have the same dimension."));
-    AssertThrow(
-      dim == triangulation_2.get_dim(),
-      ExcMessage(
-        "Triangulation and Triangulation_2 should have the same dimension."));
-    AssertThrow(
-      triangulation_1.get_spacedim() == triangulation_2.get_spacedim(),
-      ExcMessage(
-        "Triangulation_1 and Triangulation_2 should have the same space dimension."));
-    AssertThrow(
-      spacedim == triangulation_2.get_spacedim(),
-      ExcMessage(
-        "Triangulation and Triangulation_2 should have the same space dimension."));
+    AssertThrow(boost::python::len(triangulations) >= 2,
+                ExcMessage(
+                  "You must provide at least two triangulations to merge."));
 
-    if ((triangulation_1.get_dim() == 2) &&
-        (triangulation_1.get_spacedim() == 2))
-      internal::merge_triangulations<2, 2>(triangulation_1,
-                                           triangulation_2,
-                                           triangulation);
-    else if ((triangulation_1.get_dim() == 2) &&
-             (triangulation_1.get_spacedim() == 3))
-      internal::merge_triangulations<2, 3>(triangulation_1,
-                                           triangulation_2,
-                                           triangulation);
+    size_t n_triangulations = boost::python::len(triangulations);
+    for (size_t i = 0; i < n_triangulations; ++i)
+      {
+        TriangulationWrapper &tria_wrapper =
+          boost::python::extract<TriangulationWrapper &>(triangulations[i]);
+
+        AssertThrow(dim == tria_wrapper.get_dim(),
+                    ExcMessage(
+                      "All triangulations must have the same dimension."));
+        AssertThrow(
+          spacedim == tria_wrapper.get_spacedim(),
+          ExcMessage("All triangulations must have the same space dimension."));
+      }
+
+    if ((dim == 2) && (spacedim == 2))
+      internal::merge_triangulations<2, 2>(triangulations, triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::merge_triangulations<2, 3>(triangulations, triangulation);
     else
-      internal::merge_triangulations<3, 3>(triangulation_1,
-                                           triangulation_2,
-                                           triangulation);
+      internal::merge_triangulations<3, 3>(triangulations, triangulation);
   }
 
 
@@ -1491,6 +1508,38 @@ namespace python
     Triangulation<3, 3> *tria_out =
       static_cast<Triangulation<3, 3> *>(triangulation_out.get_triangulation());
     GridGenerator::extrude_triangulation(*tria, n_slices, height, *tria_out);
+  }
+
+
+
+  void
+  TriangulationWrapper::replicate_triangulation(
+    TriangulationWrapper &triangulation_in,
+    boost::python::list & extents)
+  {
+    AssertThrow(
+      boost::python::len(extents) == dim,
+      ExcMessage(
+        "Size of the extents list must be equal to the triangulation dimension."));
+
+    AssertThrow((triangulation_in.get_dim() == dim) &&
+                  (triangulation_in.get_spacedim() == spacedim),
+                ExcMessage(
+                  "The input Triangulation must be of the same dimension"));
+
+
+    if ((dim == 2) && (spacedim == 2))
+      internal::replicate_triangulation<2, 2>(triangulation_in,
+                                              extents,
+                                              triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::replicate_triangulation<2, 3>(triangulation_in,
+                                              extents,
+                                              triangulation);
+    else
+      internal::replicate_triangulation<3, 3>(triangulation_in,
+                                              extents,
+                                              triangulation);
   }
 
 
