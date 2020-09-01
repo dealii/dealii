@@ -762,7 +762,5 @@ namespace LinearAlgebra
   } // end of namespace SharedMPI
 } // end of namespace LinearAlgebra
 
-#include "la_sm_partitioner.inst"
-
 
 DEAL_II_NAMESPACE_CLOSE

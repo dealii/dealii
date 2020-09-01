@@ -81,7 +81,6 @@ SET(_inst
   la_vector.inst.in
   la_parallel_vector.inst.in
   la_parallel_block_vector.inst.in
-  la_sm_partitioner.inst.in
   la_sm_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in

@@ -34,44 +34,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Forward declarations
-#ifndef DOXYGEN
-namespace LinearAlgebra
-{
-  /**
-   * A namespace for parallel implementations of vectors.
-   */
-  namespace SharedMPI
-  {
-    template <typename>
-    class BlockVector;
-  }
-
-  template <typename>
-  class ReadWriteVector;
-} // namespace LinearAlgebra
-
-#  ifdef DEAL_II_WITH_PETSC
-namespace PETScWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-} // namespace PETScWrappers
-#  endif
-
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-} // namespace TrilinosWrappers
-#  endif
-#endif
-
 namespace LinearAlgebra
 {
   namespace SharedMPI

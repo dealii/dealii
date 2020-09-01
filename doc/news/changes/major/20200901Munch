@@ -1,0 +1,4 @@
+New: A new vector class `LinearAlgebra::SharedMPI::Vector` class 
+that is built around MPI 3.0 shared-memory features has been added.
+<br>
+(Peter Munch, Martin Kronbichler, 2020/09/01)

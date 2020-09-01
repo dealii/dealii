@@ -3779,7 +3779,10 @@ namespace internal
     reset_ghost_values(
       const LinearAlgebra::SharedMPI::Vector<Number> &vec) const
     {
-      return;
+      return; // TODO: why do we need this function?
+              // I am reseting the ghost_values during compression
+
+
       if (ghosts_were_set == true)
         return;
 
