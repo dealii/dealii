@@ -236,8 +236,13 @@ namespace python
     /*! @copydoc GridGenerator::merge_triangulations
      */
     void
-    merge_triangulations(TriangulationWrapper &triangulation_1,
-                         TriangulationWrapper &triangulation_2);
+    merge_triangulations(boost::python::list &triangulations);
+
+    /*! @copydoc GridGenerator::replicate_triangulation
+     */
+    void
+    replicate_triangulation(TriangulationWrapper &tria_in,
+                            boost::python::list & extents);
 
     /*! @copydoc GridGenerator::flatten_triangulation
      */

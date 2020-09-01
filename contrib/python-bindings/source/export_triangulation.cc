@@ -320,8 +320,8 @@ namespace python
 
 
   const char merge_docstring[] =
-    "Given two triangulations, create the triangulation that contains       \n"
-    "the cells of both triangulations.                                      \n";
+    "Given two or more triangulations, create the triangulation that        \n"
+    "contains the cells of given triangulations.                            \n";
 
 
 
@@ -354,6 +354,13 @@ namespace python
 
 
 
+  const char replicate_docstring[] =
+    "Replicate a given triangulation in multiple coordinate axes.          \n"
+    "This function creates a new Triangulation equal to a dim-dimensional  \n"
+    "array of copies of input.                                             \n";
+
+
+
   const char distort_random_docstring[] =
     "Distort the given triangulation by randomly moving around all the      \n"
     "vertices of the grid. The direction of movement of each vertex is      \n"
@@ -370,6 +377,7 @@ namespace python
 
   const char execute_coarsening_and_refinement_docstring[] =
     "Execute both refinement and coarsening of the Triangulation.           \n";
+
 
 
   const char active_cells_docstring[] =
@@ -615,7 +623,7 @@ namespace python
       .def("merge_triangulations",
            &TriangulationWrapper::merge_triangulations,
            merge_docstring,
-           boost::python::args("self", "triangulation_1", "triangulation_2"))
+           boost::python::args("self", "triangulations"))
       .def("extrude_triangulation",
            &TriangulationWrapper::extrude_triangulation,
            extrude_docstring,
@@ -624,6 +632,10 @@ namespace python
            &TriangulationWrapper::flatten_triangulation,
            flatten_triangulation_docstring,
            boost::python::args("self", "tria_out"))
+      .def("replicate_triangulation",
+           &TriangulationWrapper::replicate_triangulation,
+           replicate_docstring,
+           boost::python::args("self", "tria_in", "extents"))
       .def("distort_random",
            &TriangulationWrapper::distort_random,
            distort_random_overloads(
