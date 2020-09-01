@@ -1687,23 +1687,76 @@ namespace internal
                 const bool                                    do_gradients,
                 const unsigned int                            face_no)
     {
+      Assert(static_cast<unsigned int>(fe_degree) ==
+                 data.data.front().fe_degree ||
+               fe_degree == -1,
+             ExcInternalError());
+
+      interpolate_generic<do_evaluate, add_into_output>(
+        input,
+        output,
+        do_gradients,
+        face_no,
+        data.data.front().fe_degree + 1,
+        data.data.front().shape_data_on_face,
+        data.dofs_per_component_on_cell,
+        2 * data.dofs_per_component_on_face);
+    }
+
+    /**
+     * Interpolate the values on the cell quadrature points onto a face.
+     */
+    template <bool do_evaluate, bool add_into_output>
+    static void
+    interpolate_quadrature(const MatrixFreeFunctions::ShapeInfo<Number> &data,
+                           const Number *                                input,
+                           Number *                                      output,
+                           const bool         do_gradients,
+                           const unsigned int face_no)
+    {
+      Assert(static_cast<unsigned int>(fe_degree + 1) ==
+                 data.data.front().quadrature.size() ||
+               fe_degree == -1,
+             ExcInternalError());
+
+      interpolate_generic<do_evaluate, add_into_output>(
+        input,
+        output,
+        do_gradients,
+        face_no,
+        data.data.front().quadrature.size(),
+        data.data.front().quadrature_data_on_face,
+        data.n_q_points,
+        data.n_q_points_face);
+    }
+
+  private:
+    template <bool do_evaluate, bool add_into_output>
+    static void
+    interpolate_generic(const Number *               input,
+                        Number *                     output,
+                        const bool                   do_gradients,
+                        const unsigned int           face_no,
+                        const unsigned int           n_points_1d,
+                        const AlignedVector<Number> *shape_data,
+                        const unsigned int           dofs_per_component_on_cell,
+                        const unsigned int           dofs_per_component_on_face)
+    {
       internal::EvaluatorTensorProduct<internal::evaluate_general,
                                        dim,
                                        fe_degree + 1,
                                        0,
                                        Number>
-        evalf(data.data.front().shape_data_on_face[face_no % 2],
+        evalf(shape_data[face_no % 2],
               AlignedVector<Number>(),
               AlignedVector<Number>(),
-              data.data.front().fe_degree + 1,
+              n_points_1d,
               0);
 
-      const unsigned int in_stride = do_evaluate ?
-                                       data.dofs_per_component_on_cell :
-                                       2 * data.dofs_per_component_on_face;
-      const unsigned int out_stride = do_evaluate ?
-                                        2 * data.dofs_per_component_on_face :
-                                        data.dofs_per_component_on_cell;
+      const unsigned int in_stride =
+        do_evaluate ? dofs_per_component_on_cell : dofs_per_component_on_face;
+      const unsigned int out_stride =
+        do_evaluate ? dofs_per_component_on_face : dofs_per_component_on_cell;
       const unsigned int face_direction = face_no / 2;
       for (unsigned int c = 0; c < n_components; c++)
         {

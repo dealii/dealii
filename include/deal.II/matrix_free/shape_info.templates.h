@@ -112,8 +112,10 @@ namespace internal
         univariate_shape_data.shape_gradients_collocation;
       auto &shape_hessians_collocation =
         univariate_shape_data.shape_hessians_collocation;
-      auto &inverse_shape_values  = univariate_shape_data.inverse_shape_values;
-      auto &shape_data_on_face    = univariate_shape_data.shape_data_on_face;
+      auto &inverse_shape_values = univariate_shape_data.inverse_shape_values;
+      auto &shape_data_on_face   = univariate_shape_data.shape_data_on_face;
+      auto &quadrature_data_on_face =
+        univariate_shape_data.quadrature_data_on_face;
       auto &values_within_subface = univariate_shape_data.values_within_subface;
       auto &gradients_within_subface =
         univariate_shape_data.gradients_within_subface;
@@ -296,6 +298,23 @@ namespace internal
             fe->shape_grad(my_i, q_point)[0];
           shape_data_on_face[1][i + 2 * n_dofs_1d] =
             fe->shape_grad_grad(my_i, q_point)[0][0];
+        }
+
+      if (n_q_points_1d < 200)
+        {
+          quadrature_data_on_face[0].resize(quad.size() * 3);
+          quadrature_data_on_face[1].resize(quad.size() * 3);
+
+          dealii::FE_DGQArbitraryNodes<1> fe_quad(quad);
+
+          for (unsigned int i = 0; i < quad.size(); ++i)
+            {
+              Point<1> q_point;
+              q_point[0]                    = 0;
+              quadrature_data_on_face[0][i] = fe_quad.shape_value(i, q_point);
+              q_point[0]                    = 1;
+              quadrature_data_on_face[1][i] = fe_quad.shape_value(i, q_point);
+            }
         }
 
       // get gradient and Hessian transformation matrix for the polynomial
@@ -772,6 +791,8 @@ namespace internal
         {
           memory +=
             MemoryConsumption::memory_consumption(shape_data_on_face[i]);
+          memory +=
+            MemoryConsumption::memory_consumption(quadrature_data_on_face[i]);
           memory +=
             MemoryConsumption::memory_consumption(values_within_subface[i]);
           memory +=

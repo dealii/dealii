@@ -230,6 +230,18 @@ namespace internal
       AlignedVector<Number> shape_data_on_face[2];
 
       /**
+       * Collects all data of 1D nodal shape values (defined by the Lagrange
+       * polynomials in the points of the quadrature rule) evaluated at the
+       * point 0 and 1 (the vertices) in one data structure.
+       *
+       * This data structure can be used to interpolate from the cell to the
+       * face quadrature points.
+       *
+       * @note In contrast to shape_data_on_face, only the vales are evaluated.
+       */
+      AlignedVector<Number> quadrature_data_on_face[2];
+
+      /**
        * Stores one-dimensional values of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
