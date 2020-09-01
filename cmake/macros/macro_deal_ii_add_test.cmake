@@ -206,7 +206,25 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           "$<TARGET_FILE:${_target}>"
           "${_prm_file}"
           )
+      ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json")
+        # the same as above but for json files
+        SET(_json_file "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json")
 
+        IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
+          SET(_target ${TEST_TARGET_${_build}})
+        ELSEIF(NOT "${TEST_TARGET}" STREQUAL "")
+          SET(_target ${TEST_TARGET})
+        ELSE()
+          MESSAGE(FATAL_ERROR
+            "\nFor ${_comparison_file}: \"${_test_name}.json\" provided, "
+            "but neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
+            "\" is defined.\n\n"
+            )
+        ENDIF()
+        SET(_run_args
+          "$<TARGET_FILE:${_target}>"
+          "${_json_file}"
+          )
       ELSE()
         MESSAGE(FATAL_ERROR
           "\nFor ${_comparison_file}: Neither \"${_test_name}.cc\", "
