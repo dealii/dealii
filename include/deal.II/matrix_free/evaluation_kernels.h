@@ -892,6 +892,107 @@ namespace internal
     }
 
     /**
+     * Same as above but with hessians.
+     */
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+    static void
+    do_backward_hessians(
+      const unsigned int                    n_components,
+      const dealii::AlignedVector<Number2> &transformation_matrix,
+      const bool                            add_into_result,
+      Number *                              values_in,
+      Number *                              values_out,
+      const unsigned int                    basis_size_1_variable =
+        dealii::numbers::invalid_unsigned_int,
+      const unsigned int basis_size_2_variable =
+        dealii::numbers::invalid_unsigned_int)
+    {
+      Assert(basis_size_1 != 0 ||
+               basis_size_1_variable <= basis_size_2_variable,
+             dealii::ExcMessage(
+               "The second dimension must not be smaller than the first"));
+      Assert(add_into_result == false || values_in != values_out,
+             dealii::ExcMessage(
+               "Input and output cannot alias with each other when "
+               "adding the result of the basis change to existing data"));
+
+      constexpr int next_dim =
+        (dim > 2 ||
+         ((basis_size_1 == 0 || basis_size_2 > basis_size_1) && dim > 1)) ?
+          dim - 1 :
+          dim;
+      dealii::internal::EvaluatorTensorProduct<
+        variant,
+        dim,
+        basis_size_1,
+        (basis_size_1 == 0 ? 0 : basis_size_2),
+        Number,
+        Number2>
+                         eval_val(dealii::AlignedVector<Number2>(),
+                 dealii::AlignedVector<Number2>(),
+                 transformation_matrix,
+                 basis_size_1_variable,
+                 basis_size_2_variable);
+      const unsigned int np_1 =
+        basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
+      const unsigned int np_2 =
+        basis_size_1 > 0 ? basis_size_2 : basis_size_2_variable;
+      Assert(np_1 > 0 && np_1 != dealii::numbers::invalid_unsigned_int,
+             dealii::ExcMessage("Cannot transform with 0-point basis"));
+      Assert(np_2 > 0 && np_2 != dealii::numbers::invalid_unsigned_int,
+             dealii::ExcMessage("Cannot transform with 0-point basis"));
+
+      for (unsigned int c = 0; c < n_components; ++c)
+        {
+          if (basis_size_1 > 0 && basis_size_2 == basis_size_1 && dim == 2)
+            {
+              eval_val.template hessians<1, false, false>(values_in, values_in);
+              if (add_into_result)
+                eval_val.template hessians<0, false, true>(values_in,
+                                                           values_out);
+              else
+                eval_val.template hessians<0, false, false>(values_in,
+                                                            values_out);
+            }
+          else
+            {
+              if (dim == 1 && add_into_result)
+                eval_val.template hessians<0, false, true>(values_in,
+                                                           values_out);
+              else if (dim == 1)
+                eval_val.template hessians<0, false, false>(values_in,
+                                                            values_out);
+              else
+                eval_val.template hessians<dim - 1, false, false>(values_in,
+                                                                  values_in);
+            }
+          if (next_dim < dim)
+            for (unsigned int q = 0; q < np_1; ++q)
+              FEEvaluationImplBasisChange<variant,
+                                          next_dim,
+                                          basis_size_1,
+                                          basis_size_2,
+                                          Number,
+                                          Number2>::
+                do_backward_hessians(
+                  1,
+                  transformation_matrix,
+                  add_into_result,
+                  values_in +
+                    q * dealii::Utilities::fixed_power<next_dim>(np_2),
+                  values_out +
+                    q * dealii::Utilities::fixed_power<next_dim>(np_1),
+                  basis_size_1_variable,
+                  basis_size_2_variable);
+
+          values_in += dealii::Utilities::fixed_power<dim>(np_2);
+          values_out += dealii::Utilities::fixed_power<dim>(np_1);
+        }
+    }
+
+    /**
      * This operation applies a mass-matrix-like operation, consisting of a
      * do_forward() operation, multiplication by the coefficients in the
      * quadrature points, and the do_backward() operation.
