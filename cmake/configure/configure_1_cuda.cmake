@@ -173,11 +173,6 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_LIBRARIES 0)
   SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS 0)
 
-  #
-  # Set up cuda flags:
-  #
-  ADD_FLAGS(DEAL_II_CUDA_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
-
   # We cannot use -pedantic as compiler flags. nvcc generates code that
   # produces a lot of warnings when pedantic is enabled. So filter out the
   # flag:
