@@ -60,7 +60,7 @@ namespace internal
       /**
        * Constructor for a specific dimension.
        */
-      TriaObjects(unsigned int structdim);
+      TriaObjects(const unsigned int structdim);
 
       unsigned int structdim;
 
@@ -490,7 +490,7 @@ namespace internal
 
 
     inline TriaObjects::TriaObjects()
-      : structdim(static_cast<unsigned int>(-1))
+      : structdim(numbers::invalid_unsigned_int)
       , next_free_single(numbers::invalid_unsigned_int)
       , next_free_pair(numbers::invalid_unsigned_int)
       , reverse_order_next_free_single(false)
