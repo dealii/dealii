@@ -2209,10 +2209,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   if (partitioner_sm[comp][comm_sm] == nullptr)
     partitioner_sm[comp][comm_sm] =
       std::make_shared<LinearAlgebra::SharedMPI::Partitioner>(
-        part->get_mpi_communicator(),
-        comm_sm,
         part->locally_owned_range(),
-        part->ghost_indices());
+        part->ghost_indices(),
+        part->get_mpi_communicator(),
+        comm_sm);
 
   vec.reinit(part, partitioner_sm[comp][comm_sm]);
 }

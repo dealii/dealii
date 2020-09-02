@@ -65,24 +65,27 @@ namespace LinearAlgebra
       }
     } // namespace internal
 
-    Partitioner::Partitioner(const MPI_Comm &comm,
-                             const MPI_Comm &comm_sm,
-                             const IndexSet &is_locally_owned,
-                             const IndexSet &is_locally_ghost)
-      : comm(comm)
-      , comm_sm(comm_sm)
+    PartitionerBase::PartitionerBase(const bool contiguous_allocation)
+      : contiguous_allocation(contiguous_allocation)
+    {}
+
+    Partitioner::Partitioner(const IndexSet &is_locally_owned,
+                             const IndexSet &is_locally_ghost,
+                             const MPI_Comm &comm,
+                             const MPI_Comm &comm_sm)
+      : PartitionerBase(false)
     {
-      reinit(is_locally_owned, is_locally_ghost);
+      reinit(is_locally_owned, is_locally_ghost, comm, comm_sm);
     }
 
     const MPI_Comm &
-    Partitioner::get_mpi_communicator() const
+    PartitionerBase::get_mpi_communicator() const
     {
       return comm;
     }
 
     const MPI_Comm &
-    Partitioner::get_sm_mpi_communicator() const
+    PartitionerBase::get_sm_mpi_communicator() const
     {
       return comm_sm;
     }
@@ -100,8 +103,13 @@ namespace LinearAlgebra
 
     void
     Partitioner::reinit(const IndexSet &is_locally_owned,
-                        const IndexSet &is_locally_ghost)
+                        const IndexSet &is_locally_ghost,
+                        const MPI_Comm &communicator,
+                        const MPI_Comm &communicator_sm)
     {
+      this->comm    = communicator;
+      this->comm_sm = communicator_sm;
+
 #ifndef DEAL_II_WITH_MPI
       Assert(false, ExcNeedsMPI());
 
@@ -719,19 +727,19 @@ namespace LinearAlgebra
     }
 
     std::size_t
-    Partitioner::local_size() const
+    PartitionerBase::local_size() const
     {
       return n_local_elements;
     }
 
     std::size_t
-    Partitioner::n_ghost_indices() const
+    PartitionerBase::n_ghost_indices() const
     {
       return n_ghost_elements;
     }
 
     std::size_t
-    Partitioner::n_mpi_processes() const
+    PartitionerBase::n_mpi_processes() const
     {
       return n_mpi_processes_;
     }

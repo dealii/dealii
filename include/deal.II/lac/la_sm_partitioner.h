@@ -30,17 +30,65 @@ namespace LinearAlgebra
 {
   namespace SharedMPI
   {
+    /**
+     * Partitioner base class to be used in context of
+     * LinearAlgebra::SharedMPI::Vector.
+     */
     class PartitionerBase : public LinearAlgebra::CommunicationPatternBase
     {
     public:
+      /**
+       * Constructor.
+       */
+      PartitionerBase(const bool contiguous_allocation);
+
+      /**
+       * Return global communicator.
+       */
       virtual const MPI_Comm &
-      get_mpi_communicator() const override = 0;
+      get_mpi_communicator() const override final;
 
+      /**
+       * Return shared-memory communicator.
+       */
       virtual const MPI_Comm &
-      get_sm_mpi_communicator() const = 0;
+      get_sm_mpi_communicator() const final;
 
-      // double versions
+      /**
+       * Return if the partitioner implementation has been enabled with
+       * contiguous or non-noncontiguous shared-memory allocation.
+       */
+      bool
+      contiguous_allocation_enabled() const;
 
+      /**
+       * Return number of locally-owned vector entries.
+       */
+      virtual std::size_t
+      local_size() const final;
+
+      /**
+       * Return number of ghost vector entries.
+       */
+      virtual std::size_t
+      n_ghost_indices() const final;
+
+      /**
+       * Return number of processes in the global communicator.
+       */
+      virtual std::size_t
+      n_mpi_processes() const final;
+
+      /**
+       * Return an estimate for the memory consumption, in bytes, of this
+       * object.
+       */
+      virtual std::size_t
+      memory_consumption() const = 0;
+
+      /**
+       * Start to export to ghost array.
+       */
       virtual void
       export_to_ghosted_array_start(
         const unsigned int             communication_channel,
@@ -49,12 +97,18 @@ namespace LinearAlgebra
         dealii::AlignedVector<double> &buffer,
         std::vector<MPI_Request> &     requests) const = 0;
 
+      /**
+       * Finish to export to ghost array.
+       */
       virtual void
       export_to_ghosted_array_finish(
         double *const                data_this,
         const std::vector<double *> &data_others,
         std::vector<MPI_Request> &   requests) const = 0;
 
+      /**
+       * Start to import from ghost array.
+       */
       virtual void
       import_from_ghosted_array_start(
         const VectorOperation::values  operation,
@@ -64,6 +118,9 @@ namespace LinearAlgebra
         dealii::AlignedVector<double> &buffer,
         std::vector<MPI_Request> &     requests) const = 0;
 
+      /**
+       * Finish to import from ghost array.
+       */
       virtual void
       import_from_ghosted_array_finish(
         const VectorOperation::values        operation,
@@ -72,8 +129,9 @@ namespace LinearAlgebra
         const dealii::AlignedVector<double> &buffer,
         std::vector<MPI_Request> &           requests) const = 0;
 
-      // float versions
-
+      /**
+       * Start to export to ghost array.
+       */
       virtual void
       export_to_ghosted_array_start(
         const unsigned int            communication_channel,
@@ -82,12 +140,18 @@ namespace LinearAlgebra
         dealii::AlignedVector<float> &buffer,
         std::vector<MPI_Request> &    requests) const = 0;
 
+      /**
+       * Finish to export to ghost array.
+       */
       virtual void
       export_to_ghosted_array_finish(
         float *const                data_this,
         const std::vector<float *> &data_others,
         std::vector<MPI_Request> &  requests) const = 0;
 
+      /**
+       * Start to import from ghost array.
+       */
       virtual void
       import_from_ghosted_array_start(
         const VectorOperation::values operation,
@@ -97,6 +161,9 @@ namespace LinearAlgebra
         dealii::AlignedVector<float> &buffer,
         std::vector<MPI_Request> &    requests) const = 0;
 
+      /**
+       * Finish to import from ghost array.
+       */
       virtual void
       import_from_ghosted_array_finish(
         const VectorOperation::values       operation,
@@ -105,42 +172,79 @@ namespace LinearAlgebra
         const dealii::AlignedVector<float> &buffer,
         std::vector<MPI_Request> &          requests) const = 0;
 
-      virtual std::size_t
-      local_size() const = 0;
+    private:
+      /**
+       * Flag indicating if the partitioner implementation has been enabled
+       * with contiguous or non-noncontiguous shared-memory allocation.
+       */
+      bool contiguous_allocation;
 
-      virtual std::size_t
-      n_ghost_indices() const = 0;
+    protected:
+      /**
+       * Global communicator.
+       */
+      MPI_Comm comm;
 
-      virtual std::size_t
-      n_mpi_processes() const = 0;
+      /**
+       * Shared-memory sub-communicator.
+       */
+      MPI_Comm comm_sm;
 
-      virtual std::size_t
-      memory_consumption() const = 0;
+      /**
+       * Number of processes in comm.
+       */
+      unsigned int n_mpi_processes_;
+
+      /**
+       * Number of locally-owned vector entries.
+       */
+      unsigned int n_local_elements;
+
+      /**
+       * Number of ghost vector entries.
+       */
+      unsigned int n_ghost_elements;
     };
 
+    /**
+     * Partitioner implementation that is built around index-sets similar to
+     * Utilities::MPI::Partitioner, however, distinguishes between remote and
+     * shared ghost vector entries.
+     */
     class Partitioner : public PartitionerBase
     {
     public:
-      Partitioner(const MPI_Comm &comm,
-                  const MPI_Comm &comm_sm,
-                  const IndexSet &is_locally_owned,
-                  const IndexSet &is_locally_ghost);
+      /**
+       * Constructor.
+       */
+      Partitioner(const IndexSet &is_locally_owned,
+                  const IndexSet &is_locally_ghost,
+                  const MPI_Comm &comm,
+                  const MPI_Comm &comm_sm);
 
-      const MPI_Comm &
-      get_mpi_communicator() const override;
-
-      const MPI_Comm &
-      get_sm_mpi_communicator() const override;
-
+      /**
+       * Set up internal data structures.
+       *
+       * @note Not implemented. Be explicit and use the other one.
+       */
       void
       reinit(const IndexSet &is_locally_owned,
              const IndexSet &is_locally_ghost,
              const MPI_Comm &communicator) override;
 
+      /**
+       * Set up internal data structures with a global and a shared-memory
+       * communicator.
+       */
       void
       reinit(const IndexSet &is_locally_owned,
-             const IndexSet &is_locally_ghost);
+             const IndexSet &is_locally_ghost,
+             const MPI_Comm &communicator,
+             const MPI_Comm &communicator_sm);
 
+      /**
+       * @copydoc PartitionerBase::export_to_ghosted_array_start()
+       */
       void
       export_to_ghosted_array_start(
         const unsigned int             communication_channel,
@@ -149,12 +253,18 @@ namespace LinearAlgebra
         dealii::AlignedVector<double> &buffer,
         std::vector<MPI_Request> &     requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::export_to_ghosted_array_finish()
+       */
       void
       export_to_ghosted_array_finish(
         double *const                data_this,
         const std::vector<double *> &data_others,
         std::vector<MPI_Request> &   requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::import_from_ghosted_array_start()
+       */
       void
       import_from_ghosted_array_start(
         const VectorOperation::values  operation,
@@ -164,6 +274,9 @@ namespace LinearAlgebra
         dealii::AlignedVector<double> &buffer,
         std::vector<MPI_Request> &     requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::import_from_ghosted_array_finish()
+       */
       void
       import_from_ghosted_array_finish(
         const VectorOperation::values        operation,
@@ -172,6 +285,9 @@ namespace LinearAlgebra
         const dealii::AlignedVector<double> &buffer,
         std::vector<MPI_Request> &           requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::export_to_ghosted_array_start()
+       */
       void
       export_to_ghosted_array_start(
         const unsigned int            communication_channel,
@@ -180,12 +296,18 @@ namespace LinearAlgebra
         dealii::AlignedVector<float> &buffer,
         std::vector<MPI_Request> &    requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::export_to_ghosted_array_finish()
+       */
       void
       export_to_ghosted_array_finish(
         float *const                data_this,
         const std::vector<float *> &data_others,
         std::vector<MPI_Request> &  requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::import_from_ghosted_array_start()
+       */
       void
       import_from_ghosted_array_start(
         const VectorOperation::values operation,
@@ -195,6 +317,9 @@ namespace LinearAlgebra
         dealii::AlignedVector<float> &buffer,
         std::vector<MPI_Request> &    requests) const override;
 
+      /**
+       * @copydoc PartitionerBase::import_from_ghosted_array_finish()
+       */
       void
       import_from_ghosted_array_finish(
         const VectorOperation::values       operation,
@@ -203,19 +328,17 @@ namespace LinearAlgebra
         const dealii::AlignedVector<float> &buffer,
         std::vector<MPI_Request> &          requests) const override;
 
-      std::size_t
-      local_size() const override;
-
-      std::size_t
-      n_ghost_indices() const override;
-
-      std::size_t
-      n_mpi_processes() const override;
-
+      /**
+       * @copydoc PartitionerBase::memory_consumption()
+       */
       std::size_t
       memory_consumption() const override;
 
     private:
+      /**
+       * Actual type-independent implementation of
+       * export_to_ghosted_array_start().
+       */
       template <typename Number>
       void
       export_to_ghosted_array_start_impl(
@@ -225,6 +348,10 @@ namespace LinearAlgebra
         dealii::AlignedVector<Number> &buffer,
         std::vector<MPI_Request> &     requests) const;
 
+      /**
+       * Actual type-independent implementation of
+       * export_to_ghosted_array_finish().
+       */
       template <typename Number>
       void
       export_to_ghosted_array_finish_impl(
@@ -232,6 +359,10 @@ namespace LinearAlgebra
         const std::vector<Number *> &data_others,
         std::vector<MPI_Request> &   requests) const;
 
+      /**
+       * Actual type-independent implementation of
+       * import_from_ghosted_array_start().
+       */
       template <typename Number>
       void
       import_from_ghosted_array_start_impl(
@@ -242,6 +373,10 @@ namespace LinearAlgebra
         dealii::AlignedVector<Number> &buffer,
         std::vector<MPI_Request> &     requests) const;
 
+      /**
+       * Actual type-independent implementation of
+       * import_from_ghosted_array_finish().
+       */
       template <typename Number>
       void
       import_from_ghosted_array_finish_impl(
@@ -252,33 +387,89 @@ namespace LinearAlgebra
         std::vector<MPI_Request> &           requests) const;
 
     private:
-      const MPI_Comm &comm;
-      const MPI_Comm &comm_sm;
+      /**
+       * TODO
+       */
+      std::vector<unsigned int> recv_remote_ranks;
 
-      unsigned int n_mpi_processes_;
-
-      unsigned int n_local_elements;
-      unsigned int n_ghost_elements;
-
-      std::vector<unsigned int>            recv_remote_ranks;
+      /**
+       * TODO
+       */
       std::vector<types::global_dof_index> recv_remote_ptr = {0};
 
+      /**
+       * TODO
+       */
       std::vector<unsigned int> recv_sm_ranks;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> recv_sm_ptr = {0};
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> recv_sm_indices;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> recv_sm_len;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> recv_sm_offset;
 
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_remote_ranks;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_remote_ptr = {0};
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_remote_indices;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_remote_len;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_remote_offset;
 
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_sm_ranks;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_sm_ptr = {0};
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_sm_indices;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_sm_len;
+
+      /**
+       * TODO
+       */
       std::vector<unsigned int> send_sm_offset;
     };
 
