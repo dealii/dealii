@@ -1496,12 +1496,9 @@ namespace DataOutBase
     unsigned int node_dim;
 
     /**
-     * The number of vertices per cell. Equal to
-     * GeometryInfo<node_dim>::vertices_per_cell. We need to store
-     * it as a run-time variable here because the dimension
-     * node_dim is also a run-time variable.
+     * The number of cells stored in @ref filtered_cells.
      */
-    unsigned int vertices_per_cell;
+    unsigned int num_cells;
 
     /**
      * Map of points to an internal index.
@@ -3331,9 +3328,20 @@ public:
   /**
    * Get the XDMF content associated with this entry.
    * If the entry is not valid, this returns an empty string.
+   *
+   * @deprecated Use @ref get_xdmf_content(const unsigned int, const ReferenceCell::Type &) instead.
    */
+  DEAL_II_DEPRECATED
   std::string
   get_xdmf_content(const unsigned int indent_level) const;
+
+  /**
+   * Get the XDMF content associated with this entry.
+   * If the entry is not valid, this returns an empty string.
+   */
+  std::string
+  get_xdmf_content(const unsigned int         indent_level,
+                   const ReferenceCell::Type &reference_cell_type) const;
 
 private:
   /**
