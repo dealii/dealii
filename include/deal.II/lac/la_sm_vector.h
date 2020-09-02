@@ -141,15 +141,28 @@ namespace LinearAlgebra
        */
       virtual ~Vector() override;
 
+      /**
+       * Change the dimension to that of the vector @p V. The elements of V are not
+       * copied.
+       *
+       * @note Not implemented yet.
+       */
       virtual void
       reinit(const VectorSpaceVector<Number> &V,
              const bool omit_zeroing_entries = false) override;
 
+      /**
+       * Change the dimension to that of the vector @p V. The elements of V are not
+       * copied.
+       */
       template <typename Number2>
       void
-      reinit(const Vector<Number2, MemorySpace> &in_vector,
+      reinit(const Vector<Number2, MemorySpace> &v,
              const bool                          omit_zeroing_entries = false);
 
+      /**
+       * Set up internal data structures based on the given partitioner.
+       */
       void
       reinit(const std::shared_ptr<const Utilities::MPI::Partitioner> &,
              const std::shared_ptr<const PartitionerBase> &partitioner,

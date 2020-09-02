@@ -150,10 +150,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
-    {
-      // TODO: what is the use of this?
-      // it should probably delegated to partitioner_old
-    }
+    {}
 
 
 
