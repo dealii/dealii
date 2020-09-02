@@ -131,11 +131,10 @@ namespace LinearAlgebra
           std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
         "MemorySpace should be Host or CUDA");
 
+      /**
+       * Empty constructor. To be used together with a reinit() function call.
+       */
       Vector();
-
-      Vector(const bool do_ghost_value_update, const bool do_compress);
-
-      Vector(const Vector<Number, MemorySpace> &in_vector);
 
       Vector(const size_type size);
 
@@ -148,6 +147,9 @@ namespace LinearAlgebra
       Vector(const std::shared_ptr<const Utilities::MPI::Partitioner>
                &partitioner_old);
 
+      /**
+       * Destructor. Clear all MPI_Requests.
+       */
       virtual ~Vector() override;
 
       void
@@ -171,20 +173,6 @@ namespace LinearAlgebra
                &                                           partitioner_old,
              const std::shared_ptr<const PartitionerBase> &partitioner,
              const bool                                    setup_ghosts = true);
-
-      void
-      reinit(const MPI_Comm comm_all,
-             const MPI_Comm comm_shared,
-             const int      _local_size,
-             const int      _ghost_size)
-      {
-        (void)comm_all;
-        (void)comm_shared;
-        (void)_local_size;
-        (void)_ghost_size;
-
-        AssertThrow(false, dealii::StandardExceptions::ExcNotImplemented())
-      }
 
       void
       swap(Vector<Number, MemorySpace> &v);
@@ -334,43 +322,8 @@ namespace LinearAlgebra
       void
       sadd(const Number s, const Vector<Number, MemorySpace> &V);
 
-      DEAL_II_DEPRECATED
-      void
-      sadd(const Number                       s,
-           const Number                       a,
-           const Vector<Number, MemorySpace> &V,
-           const Number                       b,
-           const Vector<Number, MemorySpace> &W);
-
-      DEAL_II_DEPRECATED
-      void
-      equ(const Number                       a,
-          const Vector<Number, MemorySpace> &u,
-          const Number                       b,
-          const Vector<Number, MemorySpace> &v);
-
       size_type
       local_size() const;
-
-      DEAL_II_DEPRECATED
-      std::pair<size_type, size_type>
-      local_range() const;
-
-      DEAL_II_DEPRECATED
-      bool
-      in_local_range(const size_type global_index) const;
-
-      DEAL_II_DEPRECATED
-      size_type
-      n_ghost_entries() const;
-
-      DEAL_II_DEPRECATED
-      const IndexSet &
-      ghost_elements() const;
-
-      DEAL_II_DEPRECATED
-      bool
-      is_ghost_entry(const types::global_dof_index global_index) const;
 
       Number *
       begin_sm();
@@ -546,9 +499,6 @@ namespace LinearAlgebra
 
       mutable bool vector_is_ghosted;
 
-      bool do_ghost_value_update = true;
-      bool do_compress           = true;
-
       mutable std::vector<MPI_Request> requests;
 
       mutable std::mutex mutex;
@@ -641,29 +591,6 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline std::pair<typename Vector<Number, MemorySpace>::size_type,
-                     typename Vector<Number, MemorySpace>::size_type>
-    Vector<Number, MemorySpace>::local_range() const
-    {
-      Assert(false, ExcNotImplemented());
-      return {0, 0};
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline bool
-    Vector<Number, MemorySpace>::in_local_range(
-      const size_type global_index) const
-    {
-      Assert(false, ExcNotImplemented());
-      (void)global_index;
-      return true;
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
     inline IndexSet
     Vector<Number, MemorySpace>::locally_owned_elements() const
     {
@@ -674,36 +601,6 @@ namespace LinearAlgebra
     }
 
 
-
-    template <typename Number, typename MemorySpace>
-    inline typename Vector<Number, MemorySpace>::size_type
-    Vector<Number, MemorySpace>::n_ghost_entries() const
-    {
-      Assert(false, ExcNotImplemented());
-      return 0;
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline const IndexSet &
-    Vector<Number, MemorySpace>::ghost_elements() const
-    {
-      Assert(false, ExcNotImplemented());
-      return partitioner_old->ghost_indices();
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline bool
-    Vector<Number, MemorySpace>::is_ghost_entry(
-      const size_type global_index) const
-    {
-      Assert(false, ExcNotImplemented());
-      (void)global_index;
-      return false;
-    }
 
     template <typename Number, typename MemorySpace>
     Number *
