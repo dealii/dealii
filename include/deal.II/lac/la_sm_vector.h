@@ -141,8 +141,9 @@ namespace LinearAlgebra
        */
       virtual ~Vector() override;
 
-      void
-      reinit(const size_type size, const bool omit_zeroing_entries = false);
+      virtual void
+      reinit(const VectorSpaceVector<Number> &V,
+             const bool omit_zeroing_entries = false) override;
 
       template <typename Number2>
       void
@@ -150,22 +151,9 @@ namespace LinearAlgebra
              const bool                          omit_zeroing_entries = false);
 
       void
-      reinit(const IndexSet &local_range,
-             const IndexSet &ghost_indices,
-             const MPI_Comm  communicator);
-
-      void
-      reinit(const IndexSet &local_range, const MPI_Comm communicator);
-
-      void
-      reinit(const std::shared_ptr<const Utilities::MPI::Partitioner>
-               &                                           partitioner_old,
+      reinit(const std::shared_ptr<const Utilities::MPI::Partitioner> &,
              const std::shared_ptr<const PartitionerBase> &partitioner,
              const bool                                    setup_ghosts = true);
-
-      virtual void
-      reinit(const VectorSpaceVector<Number> &V,
-             const bool omit_zeroing_entries = false) override;
 
       /**
        * Get pointers to the beginning of the values of the other

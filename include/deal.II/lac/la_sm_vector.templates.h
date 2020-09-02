@@ -178,11 +178,11 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::reinit(const size_type size,
+    Vector<Number, MemorySpaceType>::reinit(const VectorSpaceVector<Number> &V,
                                             const bool omit_zeroing_entries)
     {
       Assert(false, ExcNotImplemented());
-      (void)size;
+      (void)V;
       (void)omit_zeroing_entries;
     }
 
@@ -231,34 +231,6 @@ namespace LinearAlgebra
       import_data.clear(); // TODO
 
       thread_loop_partitioner = v.thread_loop_partitioner;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::reinit(
-      const IndexSet &locally_owned_indices,
-      const IndexSet &ghost_indices,
-      const MPI_Comm  communicator)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)locally_owned_indices;
-      (void)ghost_indices;
-      (void)communicator;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::reinit(
-      const IndexSet &locally_owned_indices,
-      const MPI_Comm  communicator)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)locally_owned_indices;
-      (void)communicator;
     }
 
 
@@ -578,18 +550,6 @@ namespace LinearAlgebra
         zero_out_ghosts();
 
       return *this;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::reinit(const VectorSpaceVector<Number> &V,
-                                            const bool omit_zeroing_entries)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)V;
-      (void)omit_zeroing_entries;
     }
 
 
