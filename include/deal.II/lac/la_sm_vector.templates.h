@@ -490,7 +490,7 @@ namespace LinearAlgebra
                                                    data.values.get(),
                                                    data.others,
                                                    import_data,
-                                                   requests);
+                                                   compress_requests);
     }
 
 
@@ -502,8 +502,11 @@ namespace LinearAlgebra
     {
       vector_is_ghosted = false;
 
-      partitioner->import_from_ghosted_array_finish(
-        operation, data.values.get(), data.others, import_data, requests);
+      partitioner->import_from_ghosted_array_finish(operation,
+                                                    data.values.get(),
+                                                    data.others,
+                                                    import_data,
+                                                    compress_requests);
     }
 
 
@@ -517,7 +520,7 @@ namespace LinearAlgebra
                                                  data.values.get(),
                                                  data.others,
                                                  import_data,
-                                                 requests);
+                                                 update_ghost_values_requests);
     }
 
 
@@ -528,7 +531,7 @@ namespace LinearAlgebra
     {
       partitioner->export_to_ghosted_array_finish(data.values.get(),
                                                   data.others,
-                                                  requests);
+                                                  update_ghost_values_requests);
       vector_is_ghosted = true;
     }
 
