@@ -121,7 +121,7 @@ namespace LinearAlgebra
             data.others[i] += n_align_sm[i];
 
           data.values     = {ptr_aligned,
-                         [&data](Number *&) { MPI_Win_free(data.values_win); }};
+                         [&data](Number *) { MPI_Win_free(data.values_win); }};
           data.values_win = win;
 #endif
         }
