@@ -60,16 +60,6 @@ namespace internal
 
 
 
-  template <typename Number>
-  inline Number &
-  vector_access(LinearAlgebra::SharedMPI::Vector<Number> &vec,
-                const unsigned int                        entry)
-  {
-    return vec.begin_sm()[entry];
-  }
-
-
-
   // access to distributed MPI vectors that have a local_element(uint)
   // method to access data in local index space, which is what we use in
   // DoFInfo and hence in read_dof_values etc.
@@ -92,16 +82,6 @@ namespace internal
   vector_access(const VectorType &vec, const unsigned int entry)
   {
     return vec.local_element(entry);
-  }
-
-
-
-  template <typename Number>
-  inline Number &
-  vector_access(const LinearAlgebra::SharedMPI::Vector<Number> &vec,
-                const unsigned int                              entry)
-  {
-    return vec.begin_sm()[entry];
   }
 
 
@@ -132,17 +112,6 @@ namespace internal
 
 
 
-  template <typename Number>
-  inline void
-  vector_access_add(const LinearAlgebra::SharedMPI::Vector<Number> &vec,
-                    const unsigned int                              entry,
-                    const Number &                                  val)
-  {
-    vec.begin_sm()[entry] += val;
-  }
-
-
-
   template <typename VectorType,
             typename std::enable_if<has_add_local_element<VectorType>::value,
                                     VectorType>::type * = nullptr>
@@ -169,17 +138,6 @@ namespace internal
 
 
 
-  template <typename Number>
-  inline void
-  vector_access_add_global(const LinearAlgebra::SharedMPI::Vector<Number> &vec,
-                           const types::global_dof_index entry,
-                           const Number &                val)
-  {
-    vec.begin_sm()[entry] += val;
-  }
-
-
-
   template <typename VectorType,
             typename std::enable_if<has_set_local_element<VectorType>::value,
                                     VectorType>::type * = nullptr>
@@ -202,17 +160,6 @@ namespace internal
                     const typename VectorType::value_type &val)
   {
     vector_access(vec, entry) = val;
-  }
-
-
-
-  template <typename Number>
-  inline void
-  vector_access_set(const LinearAlgebra::SharedMPI::Vector<Number> &vec,
-                    const unsigned int                              entry,
-                    const Number &                                  val)
-  {
-    vec.begin_sm()[entry] = val;
   }
 
 

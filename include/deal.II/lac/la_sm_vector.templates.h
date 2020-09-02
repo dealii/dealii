@@ -308,57 +308,6 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
-                                            const IndexSet &ghost_indices,
-                                            const MPI_Comm  communicator)
-      : allocated_size(0)
-      , vector_is_ghosted(false)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)local_range;
-      (void)ghost_indices;
-      (void)communicator;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
-                                            const MPI_Comm  communicator)
-      : allocated_size(0)
-      , vector_is_ghosted(false)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)local_range;
-      (void)communicator;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType>::Vector(const size_type size)
-      : allocated_size(0)
-      , vector_is_ghosted(false)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)size;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    Vector<Number, MemorySpaceType>::Vector(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_old)
-      : allocated_size(0)
-      , vector_is_ghosted(false)
-    {
-      Assert(false, ExcNotImplemented());
-      (void)partitioner_old;
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
     inline Vector<Number, MemorySpaceType>::~Vector()
     {
       try

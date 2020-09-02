@@ -136,17 +136,6 @@ namespace LinearAlgebra
        */
       Vector();
 
-      Vector(const size_type size);
-
-      Vector(const IndexSet &local_range,
-             const IndexSet &ghost_indices,
-             const MPI_Comm  communicator);
-
-      Vector(const IndexSet &local_range, const MPI_Comm communicator);
-
-      Vector(const std::shared_ptr<const Utilities::MPI::Partitioner>
-               &partitioner_old);
-
       /**
        * Destructor. Clear all MPI_Requests.
        */
@@ -173,6 +162,24 @@ namespace LinearAlgebra
                &                                           partitioner_old,
              const std::shared_ptr<const PartitionerBase> &partitioner,
              const bool                                    setup_ghosts = true);
+
+      /**
+       * Get const pointers to the beginning of the values of the other
+       * processes of the same shared-memory domain.
+       *
+       * TODO: name of the function?
+       */
+      std::vector<Number *> &
+      other_values();
+
+      /**
+       * Get pointers to the beginning of the values of the other
+       * processes of the same shared-memory domain.
+       *
+       * TODO: name of the function?
+       */
+      const std::vector<Number *> &
+      other_values() const;
 
       void
       swap(Vector<Number, MemorySpace> &v);
@@ -325,30 +332,6 @@ namespace LinearAlgebra
       size_type
       local_size() const;
 
-      Number *
-      begin_sm();
-
-      Number *
-      begin_sm() const;
-
-      /**
-       * Get const pointers to the beginning of the values of the other
-       * processes of the same shared-memory domain.
-       *
-       * TODO: name of the function?
-       */
-      std::vector<Number *> &
-      other_values();
-
-      /**
-       * Get pointers to the beginning of the values of the other
-       * processes of the same shared-memory domain.
-       *
-       * TODO: name of the function?
-       */
-      const std::vector<Number *> &
-      other_values() const;
-
       iterator
       begin();
 
@@ -418,31 +401,6 @@ namespace LinearAlgebra
       set_ghost_state(const bool ghosted) const;
 
       DeclException0(ExcVectorTypeNotCompatible);
-
-      DeclException0(ExcNotAllowedForCuda);
-
-      DeclException3(ExcNonMatchingElements,
-                     Number,
-                     Number,
-                     unsigned int,
-                     << "Called compress(VectorOperation::insert), but"
-                     << " the element received from a remote processor, value "
-                     << std::setprecision(16) << arg1
-                     << ", does not match with the value "
-                     << std::setprecision(16) << arg2
-                     << " on the owner processor " << arg3);
-
-      DeclException4(ExcAccessToNonLocalElement,
-                     size_type,
-                     size_type,
-                     size_type,
-                     size_type,
-                     << "You tried to access element " << arg1
-                     << " of a SharedMPI vector, but this element is not "
-                     << "stored on the current processor. Note: The range of "
-                     << "locally owned elements is " << arg2 << " to " << arg3
-                     << ", and there are " << arg4 << " ghost elements "
-                     << "that this vector can access.");
 
     private:
       void
@@ -541,18 +499,6 @@ namespace LinearAlgebra
         }
 
         static inline Number *
-        begin_sm(MemorySpaceData<Number> &data)
-        {
-          return data.others[0];
-        }
-
-        static inline Number *
-        begin_sm(const MemorySpaceData<Number> &data)
-        {
-          return data.others[0];
-        }
-
-        static inline Number *
         get_values(MemorySpaceData<Number> &)
         {
           Assert(false, ExcNotImplemented());
@@ -598,22 +544,6 @@ namespace LinearAlgebra
       IndexSet is;
 
       return is;
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    Number *
-    Vector<Number, MemorySpace>::begin_sm()
-    {
-      return internal::Policy<Number, MemorySpace>::begin_sm(data);
-    }
-
-    template <typename Number, typename MemorySpace>
-    Number *
-    Vector<Number, MemorySpace>::begin_sm() const
-    {
-      return internal::Policy<Number, MemorySpace>::begin_sm(data);
     }
 
 
