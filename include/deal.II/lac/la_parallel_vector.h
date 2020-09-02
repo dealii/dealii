@@ -372,9 +372,6 @@ namespace LinearAlgebra
        * standard containers. Also, there is a global function
        * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
        * analogy to standard functions.
-       *
-       * This function is virtual in order to allow for derived classes to
-       * handle memory separately.
        */
       void
       swap(Vector<Number, MemorySpace> &v);
