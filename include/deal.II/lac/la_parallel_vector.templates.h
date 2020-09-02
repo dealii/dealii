@@ -141,7 +141,7 @@ namespace LinearAlgebra
                 reinterpret_cast<void **>(&new_val),
                 64,
                 sizeof(Number) * new_alloc_size);
-              data.values.reset(new_val);
+              data.values = {new_val, [](Number *data) { std::free(data); }};
 
               allocated_size = new_alloc_size;
             }
@@ -852,7 +852,7 @@ namespace LinearAlgebra
                                             64,
                                             sizeof(Number) * allocated_size);
 
-          data.values.reset(new_val);
+          data.values = {new_val, [](Number *data) { std::free(data); }};
 
           cudaError_t cuda_error_code =
             cudaMemcpy(data.values.get(),
@@ -1030,7 +1030,7 @@ namespace LinearAlgebra
                                         64,
                                         sizeof(Number) * allocated_size);
 
-      data.values.reset(new_val);
+      data.values = {new_val, [](Number *data) { std::free(data); }};
 
       cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
                                                data.values_dev.get(),
