@@ -254,6 +254,8 @@ namespace LinearAlgebra
       /**
        * This method copies the data in the locally owned range from another
        * distributed vector @p src into the calling vector.
+       *
+       * @note Not implemented yet.
        */
       template <typename Number2>
       void
@@ -261,6 +263,8 @@ namespace LinearAlgebra
 
       /**
        * Import all the elements present in the distributed vector @p src.
+       *
+       * @note Not implemented yet.
        */
       template <typename MemorySpace2>
       void
@@ -269,24 +273,32 @@ namespace LinearAlgebra
 
       /**
        * Multiply the entire vector by a fixed factor.
+       *
+       * @note Not implemented yet.
        */
       virtual Vector<Number, MemorySpace> &
       operator*=(const Number factor) override;
 
       /**
        * Divide the entire vector by a fixed factor.
+       *
+       * @note Not implemented yet.
        */
       virtual Vector<Number, MemorySpace> &
       operator/=(const Number factor) override;
 
       /**
        * Add the vector @p V to the present one.
+       *
+       * @note Not implemented yet.
        */
       virtual Vector<Number, MemorySpace> &
       operator+=(const VectorSpaceVector<Number> &V) override;
 
       /**
        * Subtract the vector @p V from the present one.
+       *
+       * @note Not implemented yet.
        */
       virtual Vector<Number, MemorySpace> &
       operator-=(const VectorSpaceVector<Number> &V) override;
@@ -312,18 +324,24 @@ namespace LinearAlgebra
 
       /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
+       *
+       * @note Not implemented yet.
        */
       virtual void
       add(const Number a) override;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
+       *
+       * @note Not implemented yet.
        */
       virtual void
       add(const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
        * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
+       *
+       * @note Not implemented yet.
        */
       virtual void
       add(const Number                     a,
@@ -334,6 +352,8 @@ namespace LinearAlgebra
       /**
        * A collective add operation: This function adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
+       *
+       * @note Not implemented yet.
        */
       virtual void
       add(const std::vector<size_type> &indices,
@@ -364,6 +384,8 @@ namespace LinearAlgebra
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
+       *
+       * @note Not implemented yet.
        */
       virtual real_type
       l1_norm() const override;
@@ -582,6 +604,8 @@ namespace LinearAlgebra
 
       /**
        * Compute the mean value of all the entries in the vector.
+       *
+       * @note Not implemented yet.
        */
       virtual Number
       mean_value() const override;
@@ -589,6 +613,8 @@ namespace LinearAlgebra
       /**
        * $l_p$-norm of the vector. The pth root of the sum of the pth powers
        * of the absolute values of the elements.
+       *
+       * @note Not implemented yet.
        */
       real_type
       lp_norm(const real_type p) const;

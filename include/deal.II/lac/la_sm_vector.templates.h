@@ -853,7 +853,6 @@ namespace LinearAlgebra
     {
       real_type sum;
 
-
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::norm_2(
           thread_loop_partitioner, partitioner->local_size(), sum, data);
