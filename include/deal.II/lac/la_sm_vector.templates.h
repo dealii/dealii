@@ -48,7 +48,8 @@ namespace LinearAlgebra
         resize_val(const types::global_dof_index new_alloc_size,
                    types::global_dof_index &     allocated_size,
                    MemorySpaceData<Number> &     data,
-                   const MPI_Comm &              comm_shared)
+                   const MPI_Comm &              comm_shared,
+                   const bool                    contiguous_allocation_enabled)
         {
 #ifndef DEAL_II_WITH_MPI
           Assert(false, ExcNeedsMPI());
@@ -76,7 +77,11 @@ namespace LinearAlgebra
 
           MPI_Info info;
           MPI_Info_create(&info);
-          MPI_Info_set(info, "alloc_shared_noncontig", "false");
+
+          if (contiguous_allocation_enabled)
+            MPI_Info_set(info, "alloc_shared_noncontig", "false");
+          else
+            MPI_Info_set(info, "alloc_shared_noncontig", "true");
 
           const std::size_t align_by = 64;
 
@@ -157,12 +162,13 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size,
                                                 const MPI_Comm &comm_sm)
     {
-      internal::la_parallel_vector_templates_functions<
-        Number,
-        MemorySpaceType>::resize_val(new_alloc_size,
-                                     allocated_size,
-                                     data,
-                                     comm_sm);
+      internal::la_parallel_vector_templates_functions<Number,
+                                                       MemorySpaceType>::
+        resize_val(new_alloc_size,
+                   allocated_size,
+                   data,
+                   comm_sm,
+                   this->partitioner->contiguous_allocation_enabled());
 
       thread_loop_partitioner =
         std::make_shared<::dealii::parallel::internal::TBBPartitioner>();

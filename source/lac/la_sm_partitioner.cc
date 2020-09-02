@@ -69,6 +69,12 @@ namespace LinearAlgebra
       : contiguous_allocation(contiguous_allocation)
     {}
 
+    bool
+    PartitionerBase::contiguous_allocation_enabled() const
+    {
+      return contiguous_allocation;
+    }
+
     Partitioner::Partitioner(const IndexSet &is_locally_owned,
                              const IndexSet &is_locally_ghost,
                              const MPI_Comm &comm,
