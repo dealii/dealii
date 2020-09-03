@@ -725,6 +725,24 @@ namespace python
 
 
     template <int dim, int spacedim>
+    boost::python::list
+    cells(TriangulationWrapper &triangulation_wrapper)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(
+          triangulation_wrapper.get_triangulation());
+      boost::python::list cells_list;
+      for (auto &cell : tria->cell_iterators())
+        cells_list.append(CellAccessorWrapper(triangulation_wrapper,
+                                              cell->level(),
+                                              cell->index()));
+
+      return cells_list;
+    }
+
+
+
+    template <int dim, int spacedim>
     double
     maximal_cell_diameter(const void *triangulation)
     {
@@ -885,6 +903,19 @@ namespace python
     else
       return (*static_cast<Triangulation<3, 3> *>(triangulation))
         .n_active_cells();
+  }
+
+
+
+  unsigned int
+  TriangulationWrapper::n_cells() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return (*static_cast<Triangulation<2, 2> *>(triangulation)).n_cells();
+    else if ((dim == 2) && (spacedim == 3))
+      return (*static_cast<Triangulation<2, 3> *>(triangulation)).n_cells();
+    else
+      return (*static_cast<Triangulation<3, 3> *>(triangulation)).n_cells();
   }
 
 
@@ -1828,6 +1859,19 @@ namespace python
       return internal::active_cells<2, 3>(*this);
     else
       return internal::active_cells<3, 3>(*this);
+  }
+
+
+
+  boost::python::list
+  TriangulationWrapper::cells()
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cells<2, 2>(*this);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cells<2, 3>(*this);
+    else
+      return internal::cells<3, 3>(*this);
   }
 
 

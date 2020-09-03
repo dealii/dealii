@@ -121,6 +121,11 @@ namespace python
 
 
 
+  const char n_cells_docstring[] =
+    "Return the number of cells.                                            \n";
+
+
+
   const char dim_docstring[] =
     "Return the dimension of the Triangulation                              \n";
 
@@ -389,6 +394,11 @@ namespace python
 
 
 
+  const char cells_docstring[] =
+    "Return the list of cell accessors of the Triangulation.                \n";
+
+
+
   const char write_docstring[] =
     "Write the mesh to the output file according to the given data format.  \n"
     "The possible formats are:                                              \n"
@@ -492,6 +502,10 @@ namespace python
       .def("n_active_cells",
            &TriangulationWrapper::n_active_cells,
            n_active_cells_docstring,
+           boost::python::args("self"))
+      .def("n_cells",
+           &TriangulationWrapper::n_cells,
+           n_cells_docstring,
            boost::python::args("self"))
       .def("minimal_cell_diameter",
            &TriangulationWrapper::minimal_cell_diameter,
@@ -675,6 +689,10 @@ namespace python
       .def("active_cells",
            &TriangulationWrapper::active_cells,
            active_cells_docstring,
+           boost::python::args("self"))
+      .def("cells",
+           &TriangulationWrapper::cells,
+           cells_docstring,
            boost::python::args("self"))
       .def("write",
            &TriangulationWrapper::write,

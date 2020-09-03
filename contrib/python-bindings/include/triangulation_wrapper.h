@@ -72,6 +72,12 @@ namespace python
     unsigned int
     n_active_cells() const;
 
+    /**
+     * Return the number of cells.
+     */
+    unsigned int
+    n_cells() const;
+
     /*! @copydoc GridGenerator::hyper_cube
      */
     void
@@ -306,6 +312,13 @@ namespace python
      */
     boost::python::list
     active_cells();
+
+    /**
+     * Return the list of cell accessors associated to the underlying
+     * Triangulation.
+     */
+    boost::python::list
+    cells();
 
     /*! @copydoc GridTools::minimal_cell_diameter
      */
