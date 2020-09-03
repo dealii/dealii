@@ -58,6 +58,7 @@ namespace LinearAlgebra
           (void)allocated_size;
           (void)data;
           (void)comm_shared;
+          (void)contiguous_allocation_enabled;
 #else
           // TODO: is assert fine?
           Assert(((allocated_size > 0 && data.values != nullptr) ||
@@ -151,7 +152,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
     {
-#ifndef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
       MPI_Waitall(compress_requests.size(),
                   compress_requests.data(),
                   MPI_STATUSES_IGNORE);
