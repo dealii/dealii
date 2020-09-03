@@ -111,6 +111,10 @@ namespace python
     find_active_cell_around_point,
     1,
     2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(merge_triangulations_overloads,
+                                         merge_triangulations,
+                                         1,
+                                         3)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells.                                     \n";
@@ -319,7 +323,7 @@ namespace python
 
 
 
-  const char merge_docstring[] =
+  const char merge_triangulations_docstring[] =
     "Given two or more triangulations, create the triangulation that        \n"
     "contains the cells of given triangulations.                            \n";
 
@@ -622,8 +626,10 @@ namespace python
            boost::python::args("self", "scaling_factor"))
       .def("merge_triangulations",
            &TriangulationWrapper::merge_triangulations,
-           merge_docstring,
-           boost::python::args("self", "triangulations"))
+           merge_triangulations_overloads(
+             boost::python::args(
+               "self", "triangulations", "vertex_tolerance", "copy_manifolds"),
+             merge_triangulations_docstring))
       .def("extrude_triangulation",
            &TriangulationWrapper::extrude_triangulation,
            extrude_docstring,

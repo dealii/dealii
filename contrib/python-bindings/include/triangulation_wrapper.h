@@ -236,7 +236,9 @@ namespace python
     /*! @copydoc GridGenerator::merge_triangulations
      */
     void
-    merge_triangulations(boost::python::list &triangulations);
+    merge_triangulations(boost::python::list &triangulations,
+                         const double duplicated_vertex_tolerance = 1.0e-12,
+                         const bool   copy_manifold_ids           = false);
 
     /*! @copydoc GridGenerator::replicate_triangulation
      */
