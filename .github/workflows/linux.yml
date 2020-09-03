@@ -62,6 +62,7 @@ jobs:
               -D DEAL_II_WITH_TRILINOS="ON" \
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_METIS="ON" \
+              -D DEAL_II_WITH_HDF5="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               .
     - name: archive

@@ -17,7 +17,12 @@
 
 // Test DataOut with HDF5 for simplex meshes.
 
+#include <deal.II/base/mpi.h>
+
+#include <deal.II/distributed/fully_distributed_tria.h>
+
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_fe.h>
@@ -55,14 +60,34 @@ template <int dim, int spacedim = dim>
 void
 test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 {
-  Triangulation<dim, spacedim> tria;
-  GridGenerator::subdivided_hyper_cube_with_simplices(tria, dim == 2 ? 4 : 2);
+  MPI_Comm comm = MPI_COMM_WORLD;
+
+  parallel::fullydistributed::Triangulation<dim, spacedim> tria(comm);
+
+  {
+    Triangulation<dim, spacedim> tria_serial;
+    GridGenerator::subdivided_hyper_cube_with_simplices(tria_serial,
+                                                        dim == 2 ? 4 : 2);
+
+    GridTools::partition_triangulation(Utilities::MPI::n_mpi_processes(comm),
+                                       tria_serial);
+
+    auto construction_data = TriangulationDescription::Utilities::
+      create_description_from_triangulation(tria_serial, comm);
+
+    tria.create_triangulation(construction_data);
+  }
 
   DoFHandler<dim> dof_handler(tria);
-
   dof_handler.distribute_dofs(fe);
 
-  Vector<double> solution(dof_handler.n_dofs());
+  IndexSet owned_dofs = dof_handler.locally_owned_dofs();
+  IndexSet locally_relevant_dofs;
+  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+
+  LinearAlgebra::distributed::Vector<double> solution;
+
+  solution.reinit(owned_dofs, locally_relevant_dofs, comm);
 
   MappingFE<dim> mapping(Simplex::FE_P<dim>(1));
 
@@ -70,6 +95,7 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
                            dof_handler,
                            RightHandSideFunction<dim>(n_components),
                            solution);
+  solution.update_ghost_values();
 
   static unsigned int counter = 0;
 
@@ -88,31 +114,30 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
       DataOutBase::DataOutFilter data_filter(
         DataOutBase::DataOutFilterFlags(true, true));
       data_out.write_filtered_data(data_filter);
-      data_out.write_hdf5_parallel(data_filter,
-                                   output_basename + ".h5",
-                                   MPI_COMM_SELF);
+      data_out.write_hdf5_parallel(data_filter, output_basename + ".h5", comm);
 
       std::vector<XDMFEntry> xdmf_entries({data_out.create_xdmf_entry(
-        data_filter, output_basename + ".h5", 0, MPI_COMM_SELF)});
+        data_filter, output_basename + ".h5", 0, comm)});
 
-      data_out.write_xdmf_file(xdmf_entries,
-                               output_basename + ".xdmf",
-                               MPI_COMM_SELF);
+      data_out.write_xdmf_file(xdmf_entries, output_basename + ".xdmf", comm);
 
       data_out.clear();
 
-      // Sadly hdf5 is binary and we can not use hd5dump because it might
-      // not be in the path. At least we can make sure that both the xdmf and
-      // the h5 file are created.
-      std::ifstream h5((output_basename + ".h5").c_str());
-      AssertThrow(h5.good(), ExcIO());
+      // Sadly HDF5 is binary and we can not use hd5dump because it might not be
+      // in the path. At least we can make sure that both the .xdmf and the .h5
+      // files are created.
+      if (Utilities::MPI::this_mpi_process(comm) == 0)
+        {
+          std::ifstream h5((output_basename + ".h5").c_str());
+          AssertThrow(h5.good(), ExcIO());
 
-      std::ifstream xdmf((output_basename + ".xdmf").c_str());
-      AssertThrow(h5.good(), ExcIO());
+          std::ifstream xdmf((output_basename + ".xdmf").c_str());
+          AssertThrow(h5.good(), ExcIO());
 
-      deallog << "Files " << output_basename + ".h5"
-              << " and " << output_basename + ".xdmf"
-              << " created succesfully!" << std::endl;
+          deallog << "Files " << output_basename + ".h5"
+                  << " and " << output_basename + ".xdmf"
+                  << " created succesfully!" << std::endl;
+        }
     }
 }
 
@@ -125,22 +150,18 @@ main(int argc, char **argv)
 
   {
     const unsigned int dim = 2;
-    test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim), dim);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
-                            dim,
-                            Simplex::FE_P<dim>(1 /*=degree*/),
-                            1),
-              dim + 1);
+    test<dim>(Simplex::FE_P<dim>(2), 1);
+    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2), dim), dim);
+    test<dim>(
+      FESystem<dim>(Simplex::FE_P<dim>(2), dim, Simplex::FE_P<dim>(1), 1),
+      dim + 1);
   }
   {
     const unsigned int dim = 3;
-    test<dim>(Simplex::FE_P<dim>(2) /*=degree*/, 1);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/), dim), dim);
-    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2 /*=degree*/),
-                            dim,
-                            Simplex::FE_P<dim>(1 /*=degree*/),
-                            1),
-              dim + 1);
+    test<dim>(Simplex::FE_P<dim>(2), 1);
+    test<dim>(FESystem<dim>(Simplex::FE_P<dim>(2), dim), dim);
+    test<dim>(
+      FESystem<dim>(Simplex::FE_P<dim>(2), dim, Simplex::FE_P<dim>(1), 1),
+      dim + 1);
   }
 }

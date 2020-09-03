@@ -819,10 +819,7 @@ namespace
           }
         else
           {
-            Assert(patch.n_subdivisions == 1, ExcNotImplemented());
-            const auto &info = ReferenceCell::internal::Info::get_cell(
-              patch.reference_cell_type);
-            n_nodes += info.n_vertices();
+            n_nodes += patch.data.n_cols();
             n_cells += 1;
           }
       }
