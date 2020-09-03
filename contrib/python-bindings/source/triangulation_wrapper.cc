@@ -515,7 +515,9 @@ namespace python
     template <int dim, int spacedim>
     void
     merge_triangulations(boost::python::list &triangulations,
-                         void *               triangulation)
+                         void *               triangulation,
+                         const double         duplicated_vertex_tolerance,
+                         const bool           copy_manifold_ids)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -531,7 +533,10 @@ namespace python
             tria_wrapper.get_triangulation()));
         }
 
-      GridGenerator::merge_triangulations(tria_ptrs, *tria);
+      GridGenerator::merge_triangulations(tria_ptrs,
+                                          *tria,
+                                          duplicated_vertex_tolerance,
+                                          copy_manifold_ids);
     }
 
 
@@ -1436,7 +1441,9 @@ namespace python
 
   void
   TriangulationWrapper::merge_triangulations(
-    boost::python::list &triangulations)
+    boost::python::list &triangulations,
+    const double         duplicated_vertex_tolerance,
+    const bool           copy_manifold_ids)
   {
     AssertThrow(boost::python::len(triangulations) >= 2,
                 ExcMessage(
@@ -1457,11 +1464,20 @@ namespace python
       }
 
     if ((dim == 2) && (spacedim == 2))
-      internal::merge_triangulations<2, 2>(triangulations, triangulation);
+      internal::merge_triangulations<2, 2>(triangulations,
+                                           triangulation,
+                                           duplicated_vertex_tolerance,
+                                           copy_manifold_ids);
     else if ((dim == 2) && (spacedim == 3))
-      internal::merge_triangulations<2, 3>(triangulations, triangulation);
+      internal::merge_triangulations<2, 3>(triangulations,
+                                           triangulation,
+                                           duplicated_vertex_tolerance,
+                                           copy_manifold_ids);
     else
-      internal::merge_triangulations<3, 3>(triangulations, triangulation);
+      internal::merge_triangulations<3, 3>(triangulations,
+                                           triangulation,
+                                           duplicated_vertex_tolerance,
+                                           copy_manifold_ids);
   }
 
 
