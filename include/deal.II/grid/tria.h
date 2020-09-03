@@ -1868,17 +1868,25 @@ public:
   set_all_refine_flags();
 
   /**
-   * Refine all cells @p times times, by alternatingly calling
-   * set_all_refine_flags and execute_coarsening_and_refinement.
+   * Refine all cells @p times times. In other words, in each one of
+   * the @p times iterations, loop over all cells and refine each cell
+   * uniformly into $2^\text{dim}$ children. In practice, this
+   * function repeats the following operations @p times times: call
+   * set_all_refine_flags() followed by
+   * execute_coarsening_and_refinement(). The end result is that the
+   * number of cells increases by a factor of
+   * $(2^\text{dim})^\text{times}=2^{\text{dim} \times \text{times}}$.
    *
-   * The latter function may throw an exception if it creates cells that are
-   * distorted (see its documentation for an explanation). This exception will
-   * be propagated through this function if that happens, and you may not get
-   * the actual number of refinement steps in that case.
+   * The execute_coarsening_and_refinement() function called in this
+   * loop may throw an exception if it creates cells that are
+   * distorted (see its documentation for an explanation). This
+   * exception will be propagated through this function if that
+   * happens, and you may not get the actual number of refinement
+   * steps in that case.
    *
    * @note This function triggers the pre- and post-refinement signals before
    * and after doing each individual refinement cycle (i.e. more than once if
-   * times > 1) . See the section on signals in the general documentation of
+   * `times > 1`) . See the section on signals in the general documentation of
    * this class.
    */
   void
