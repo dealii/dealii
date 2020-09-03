@@ -456,47 +456,22 @@ namespace DoFTools
              dof.get_fe_collection().n_components())
       return dof.locally_owned_dofs();
 
-    // If we have to deal with a partial component mask, then
-    // set up a table for the degrees of freedom on the reference cell (for
-    // each element in the collection) to see whether it belongs to one of the
-    // desired components.
-    const auto &                   fe_collection = dof.get_fe_collection();
-    std::vector<std::vector<bool>> local_selected_dofs;
-    Assert(fe_collection.n_components() < 256, ExcNotImplemented());
-    for (unsigned int f = 0; f < fe_collection.size(); ++f)
-      {
-        // First get the component for each shape function
-        const std::vector<unsigned char> local_component_association =
-          internal::get_local_component_association(fe_collection[f],
-                                                    component_mask);
+    // get the component association of each DoF and then select the ones
+    // that match the given set of components
+    std::vector<unsigned char> dofs_by_component(dof.n_locally_owned_dofs());
+    internal::get_component_association(dof, component_mask, dofs_by_component);
 
-        // Check which dofs were selected
-        std::vector<bool> this_selected_dofs(
-          fe_collection[f].n_dofs_per_cell());
-        for (unsigned int i = 0; i < fe_collection[f].n_dofs_per_cell(); ++i)
-          this_selected_dofs[i] =
-            component_mask[local_component_association[i]];
+    // fill the selected components in a vector
+    std::vector<types::global_dof_index> selected_dofs;
+    selected_dofs.reserve(dof.n_locally_owned_dofs());
+    for (types::global_dof_index i = 0; i < dofs_by_component.size(); ++i)
+      if (component_mask[dofs_by_component[i]] == true)
+        selected_dofs.push_back(dof.locally_owned_dofs().nth_index_in_set(i));
 
-        local_selected_dofs.emplace_back(std::move(this_selected_dofs));
-      }
-
-    // Then loop over all cells and do the work
-    IndexSet                             selected_dofs(dof.n_dofs());
-    std::vector<types::global_dof_index> local_dof_indices;
-    for (const auto &c : dof.active_cell_iterators())
-      if (c->is_locally_owned())
-        {
-          const unsigned int fe_index      = c->active_fe_index();
-          const unsigned int dofs_per_cell = c->get_fe().n_dofs_per_cell();
-          local_dof_indices.resize(dofs_per_cell);
-          c->get_dof_indices(local_dof_indices);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            if (dof.locally_owned_dofs().is_element(local_dof_indices[i]) &&
-                local_selected_dofs[fe_index][i])
-              selected_dofs.add_index(local_dof_indices[i]);
-        }
-
-    return selected_dofs;
+    // fill vector of indices to return argument
+    IndexSet result(dof.n_dofs());
+    result.add_indices(selected_dofs.begin(), selected_dofs.end());
+    return result;
   }
 
 
