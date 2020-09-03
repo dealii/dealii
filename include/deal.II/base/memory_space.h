@@ -117,6 +117,13 @@ namespace MemorySpace
       : values(nullptr, &std::free)
     {}
 
+    virtual ~MemorySpaceData() = default;
+
+    MemorySpaceData(MemorySpaceData &&) noexcept = default;
+
+    MemorySpaceData &
+    operator=(MemorySpaceData &&) noexcept = default;
+
     virtual void
     copy_to(Number *begin, std::size_t n_elements)
     {
@@ -156,6 +163,13 @@ namespace MemorySpace
       : values(nullptr, &std::free)
       , values_dev(nullptr, Utilities::CUDA::delete_device_data<Number>)
     {}
+
+    virtual ~MemorySpaceData() = default;
+
+    MemorySpaceData(MemorySpaceData &&) noexcept = default;
+
+    MemorySpaceData &
+    operator=(MemorySpaceData &&) noexcept = default;
 
     virtual void
     copy_to(Number *begin, std::size_t n_elements)
