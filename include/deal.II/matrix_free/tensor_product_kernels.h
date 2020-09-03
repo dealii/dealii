@@ -68,6 +68,27 @@ namespace internal
 
 
   /**
+   * Determine which quantity should be computed via the tensor product kernels.
+   */
+  enum class EvaluatorQuantity
+  {
+    /**
+     * Evaluate/integrate by shape functions.
+     */
+    value,
+    /**
+     * Evaluate/integrate by gradients of the shape functions.
+     */
+    gradient,
+    /**
+     * Evaluate/integrate by hessians of the shape functions.
+     */
+    hessian
+  };
+
+
+
+  /**
    * Generic evaluator framework that valuates the given shape data in general
    * dimensions using the tensor product form. Depending on the particular
    * layout in the matrix entries, this corresponds to a usual matrix-matrix
