@@ -1044,6 +1044,7 @@ namespace LinearAlgebra
       const ::dealii::Vector<OtherNumber> &values)
     {
       Assert(false, ExcNotImplemented());
+      (void)indices;
       (void)values;
     }
 
