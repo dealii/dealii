@@ -7499,6 +7499,44 @@ namespace internal
   {
     return false;
   }
+
+  template <typename Number,
+            typename VectorType,
+            typename std::enable_if<
+              internal::has_begin<VectorType>::value &&
+                (std::is_same<decltype(std::declval<VectorType>().begin()),
+                              const double *>::value ||
+                 std::is_same<decltype(std::declval<VectorType>().begin()),
+                              double *>::value ||
+                 std::is_same<decltype(std::declval<VectorType>().begin()),
+                              const float *>::value ||
+                 std::is_same<decltype(std::declval<VectorType>().begin()),
+                              float *>::value),
+              VectorType>::type * = nullptr>
+  decltype(std::declval<VectorType>().begin())
+  get_beginning(VectorType &vec)
+  {
+    return vec.begin();
+  }
+
+  template <typename Number,
+            typename VectorType,
+            typename std::enable_if<
+              !internal::has_begin<VectorType>::value ||
+                !(std::is_same<decltype(std::declval<VectorType>().begin()),
+                               const double *>::value ||
+                  std::is_same<decltype(std::declval<VectorType>().begin()),
+                               double *>::value ||
+                  std::is_same<decltype(std::declval<VectorType>().begin()),
+                               const float *>::value ||
+                  std::is_same<decltype(std::declval<VectorType>().begin()),
+                               float *>::value),
+              VectorType>::type * = nullptr>
+  typename VectorType::value_type *
+  get_beginning(VectorType &)
+  {
+    return nullptr;
+  }
 } // namespace internal
 
 template <int dim,
@@ -8227,7 +8265,7 @@ FEFaceEvaluation<dim,
                                                   n_components,
                                                   Number,
                                                   VectorizedArrayType>::
-          gather_evaluate(input_vector,
+          gather_evaluate(internal::get_beginning<Number>(input_vector),
                           *this->data,
                           *this->dof_info,
                           this->begin_values(),
@@ -8253,7 +8291,7 @@ FEFaceEvaluation<dim,
                                                   n_components,
                                                   Number,
                                                   VectorizedArrayType>::
-          gather_evaluate(input_vector,
+          gather_evaluate(internal::get_beginning<Number>(input_vector),
                           *this->data,
                           *this->dof_info,
                           this->begin_values(),
@@ -8345,7 +8383,7 @@ FEFaceEvaluation<dim,
                                           n_components,
                                           Number,
                                           VectorizedArrayType>::
-        integrate_scatter(destination,
+        integrate_scatter(internal::get_beginning<Number>(destination),
                           *this->data,
                           *this->dof_info,
                           this->begin_dof_values(),
