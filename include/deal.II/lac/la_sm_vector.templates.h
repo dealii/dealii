@@ -151,12 +151,14 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::clear_mpi_requests()
     {
+#ifndef DEAL_II_WITH_MPI
       MPI_Waitall(compress_requests.size(),
                   compress_requests.data(),
                   MPI_STATUSES_IGNORE);
       MPI_Waitall(update_ghost_values_requests.size(),
                   update_ghost_values_requests.data(),
                   MPI_STATUSES_IGNORE);
+#endif
     }
 
 
