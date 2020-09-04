@@ -960,6 +960,16 @@ namespace internal
     const unsigned int         n_lanes = task_info.vectorization_length;
     std::vector<unsigned int>  renumbering;
     std::vector<unsigned char> irregular_cells;
+
+    Assert(
+      task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none ||
+        cell_vectorization_category.empty(),
+      ExcMessage(
+        "You explicitly requested re-categorization of cells; however, this "
+        "feature is not available if threading is enabled. Please disable "
+        "threading in MatrixFree by setting "
+        "MatrixFree::Additional_data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none."));
+
     if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none)
       {
         const bool strict_categories =
@@ -1009,7 +1019,6 @@ namespace internal
         // indices in order to overlap communication in MPI with computations:
         // Place all cells with ghost indices into one chunk. Also reorder cells
         // so that we can parallelize by threads
-        Assert(cell_vectorization_category.empty(), ExcNotImplemented());
         task_info.initial_setup_blocks_tasks(subdomain_boundary_cells,
                                              renumbering,
                                              irregular_cells);
