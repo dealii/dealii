@@ -293,15 +293,16 @@ FE_Poly<dim, spacedim>::fill_fe_values(
   // transform gradients and higher derivatives. there is nothing to do
   // for values since we already emplaced them into output_data when
   // we were in get_data()
-  if (flags & update_gradients &&
-      cell_similarity != CellSimilarity::translation)
+  if ((flags & update_gradients) &&
+      (cell_similarity != CellSimilarity::translation))
     for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(make_array_view(fe_data.shape_gradients, k),
                         mapping_covariant,
                         mapping_internal,
                         make_array_view(output_data.shape_gradients, k));
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+  if ((flags & update_hessians) &&
+      (cell_similarity != CellSimilarity::translation))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(make_array_view(fe_data.shape_hessians, k),
@@ -313,8 +314,8 @@ FE_Poly<dim, spacedim>::fill_fe_values(
         correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
-  if (flags & update_3rd_derivatives &&
-      cell_similarity != CellSimilarity::translation)
+  if ((flags & update_3rd_derivatives) &&
+      (cell_similarity != CellSimilarity::translation))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(make_array_view(fe_data.shape_3rd_derivatives, k),
