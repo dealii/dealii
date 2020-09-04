@@ -1782,7 +1782,7 @@ namespace internal
     }
 
   private:
-    template <bool do_evaluate, bool add_into_output>
+    template <bool do_evaluate, bool add_into_output, int face_direction = 0>
     static void
     interpolate_generic(const Number *               input,
                         Number *                     output,
@@ -1793,50 +1793,55 @@ namespace internal
                         const unsigned int           dofs_per_component_on_cell,
                         const unsigned int           dofs_per_component_on_face)
     {
-      internal::EvaluatorTensorProduct<internal::evaluate_general,
-                                       dim,
-                                       fe_degree + 1,
-                                       0,
-                                       Number>
-        evalf(shape_data[face_no % 2],
-              AlignedVector<Number>(),
-              AlignedVector<Number>(),
-              n_points_1d,
-              0);
-
-      const unsigned int in_stride =
-        do_evaluate ? dofs_per_component_on_cell : dofs_per_component_on_face;
-      const unsigned int out_stride =
-        do_evaluate ? dofs_per_component_on_face : dofs_per_component_on_cell;
-      const unsigned int face_direction = face_no / 2;
-      for (unsigned int c = 0; c < n_components; c++)
+      if (face_direction == face_no / 2)
         {
-          if (do_gradients)
+          internal::EvaluatorTensorProduct<internal::evaluate_general,
+                                           dim,
+                                           fe_degree + 1,
+                                           0,
+                                           Number>
+            evalf(shape_data[face_no % 2],
+                  AlignedVector<Number>(),
+                  AlignedVector<Number>(),
+                  n_points_1d,
+                  0);
+
+          const unsigned int in_stride = do_evaluate ?
+                                           dofs_per_component_on_cell :
+                                           dofs_per_component_on_face;
+          const unsigned int out_stride = do_evaluate ?
+                                            dofs_per_component_on_face :
+                                            dofs_per_component_on_cell;
+
+          for (unsigned int c = 0; c < n_components; c++)
             {
-              if (face_direction == 0)
-                evalf.template apply_face<0, do_evaluate, add_into_output, 1>(
-                  input, output);
-              else if (face_direction == 1)
-                evalf.template apply_face<1, do_evaluate, add_into_output, 1>(
-                  input, output);
+              if (do_gradients)
+                evalf.template apply_face<face_direction,
+                                          do_evaluate,
+                                          add_into_output,
+                                          1>(input, output);
               else
-                evalf.template apply_face<2, do_evaluate, add_into_output, 1>(
-                  input, output);
+                evalf.template apply_face<face_direction,
+                                          do_evaluate,
+                                          add_into_output,
+                                          0>(input, output);
+              input += in_stride;
+              output += out_stride;
             }
-          else
-            {
-              if (face_direction == 0)
-                evalf.template apply_face<0, do_evaluate, add_into_output, 0>(
-                  input, output);
-              else if (face_direction == 1)
-                evalf.template apply_face<1, do_evaluate, add_into_output, 0>(
-                  input, output);
-              else
-                evalf.template apply_face<2, do_evaluate, add_into_output, 0>(
-                  input, output);
-            }
-          input += in_stride;
-          output += out_stride;
+        }
+      else if (face_direction < dim)
+        {
+          interpolate_generic<do_evaluate,
+                              add_into_output,
+                              std::min(face_direction + 1, dim - 1)>(
+            input,
+            output,
+            do_gradients,
+            face_no,
+            n_points_1d,
+            shape_data,
+            dofs_per_component_on_cell,
+            dofs_per_component_on_face);
         }
     }
   };
