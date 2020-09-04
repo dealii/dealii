@@ -649,10 +649,11 @@ namespace internal
    * This class allows for dimension-independent application of the operation,
    * implemented by template recursion. It has been tested up to 6D.
    */
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              basis_size_1,
-            int              basis_size_2,
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            int               dim,
+            int               basis_size_1,
+            int               basis_size_2,
             typename Number,
             typename Number2>
   struct FEEvaluationImplBasisChange
@@ -697,6 +698,8 @@ namespace internal
         basis_size_1 != 0 || basis_size_1_variable <= basis_size_2_variable,
         ExcMessage("The second dimension must not be smaller than the first"));
 
+      Assert(quantity == EvaluatorQuantity::value, ExcInternalError());
+
       // we do recursion until dim==1 or dim==2 and we have
       // basis_size_1==basis_size_2. The latter optimization increases
       // optimization possibilities for the compiler but does only work for
@@ -740,6 +743,7 @@ namespace internal
             for (unsigned int q = np_1; q != 0; --q)
               FEEvaluationImplBasisChange<
                 variant,
+                quantity,
                 next_dim,
                 basis_size_1,
                 basis_size_2,
@@ -822,6 +826,10 @@ namespace internal
                "Input and output cannot alias with each other when "
                "adding the result of the basis change to existing data"));
 
+      Assert(quantity == EvaluatorQuantity::value ||
+               quantity == EvaluatorQuantity::hessian,
+             ExcInternalError());
+
       constexpr int next_dim =
         (dim > 2 ||
          ((basis_size_1 == 0 || basis_size_2 > basis_size_1) && dim > 1)) ?
@@ -834,8 +842,8 @@ namespace internal
                              Number,
                              Number2>
                          eval_val(transformation_matrix,
-                 AlignedVector<Number2>(),
-                 AlignedVector<Number2>(),
+                 transformation_matrix,
+                 transformation_matrix,
                  basis_size_1_variable,
                  basis_size_2_variable);
       const unsigned int np_1 =
@@ -851,27 +859,65 @@ namespace internal
         {
           if (basis_size_1 > 0 && basis_size_2 == basis_size_1 && dim == 2)
             {
-              eval_val.template values<1, false, false>(values_in, values_in);
-              if (add_into_result)
-                eval_val.template values<0, false, true>(values_in, values_out);
+              if (quantity == EvaluatorQuantity::value)
+                eval_val.template values<1, false, false>(values_in, values_in);
               else
-                eval_val.template values<0, false, false>(values_in,
-                                                          values_out);
+                eval_val.template hessians<1, false, false>(values_in,
+                                                            values_in);
+
+              if (add_into_result)
+                {
+                  if (quantity == EvaluatorQuantity::value)
+                    eval_val.template values<0, false, true>(values_in,
+                                                             values_out);
+                  else
+                    eval_val.template hessians<0, false, true>(values_in,
+                                                               values_out);
+                }
+              else
+                {
+                  if (quantity == EvaluatorQuantity::value)
+                    eval_val.template values<0, false, false>(values_in,
+                                                              values_out);
+                  else
+                    eval_val.template hessians<0, false, false>(values_in,
+                                                                values_out);
+                }
             }
           else
             {
               if (dim == 1 && add_into_result)
-                eval_val.template values<0, false, true>(values_in, values_out);
+                {
+                  if (quantity == EvaluatorQuantity::value)
+                    eval_val.template values<0, false, true>(values_in,
+                                                             values_out);
+                  else
+                    eval_val.template hessians<0, false, true>(values_in,
+                                                               values_out);
+                }
               else if (dim == 1)
-                eval_val.template values<0, false, false>(values_in,
-                                                          values_out);
+                {
+                  if (quantity == EvaluatorQuantity::value)
+                    eval_val.template values<0, false, false>(values_in,
+                                                              values_out);
+                  else
+                    eval_val.template hessians<0, false, false>(values_in,
+                                                                values_out);
+                }
               else
-                eval_val.template values<dim - 1, false, false>(values_in,
-                                                                values_in);
+                {
+                  if (quantity == EvaluatorQuantity::value)
+                    eval_val.template values<dim - 1, false, false>(values_in,
+                                                                    values_in);
+                  else
+                    eval_val.template hessians<dim - 1, false, false>(
+                      values_in, values_in);
+                }
             }
           if (next_dim < dim)
             for (unsigned int q = 0; q < np_1; ++q)
               FEEvaluationImplBasisChange<variant,
+                                          quantity,
                                           next_dim,
                                           basis_size_1,
                                           basis_size_2,
@@ -933,6 +979,7 @@ namespace internal
       for (unsigned int q = basis_size_1; q != 0; --q)
         FEEvaluationImplBasisChange<
           variant,
+          EvaluatorQuantity::value,
           next_dim,
           basis_size_1,
           basis_size_2,
@@ -973,6 +1020,7 @@ namespace internal
       for (unsigned int q = 0; q < basis_size_1; ++q)
         FEEvaluationImplBasisChange<
           variant,
+          EvaluatorQuantity::value,
           next_dim,
           basis_size_1,
           basis_size_2,
@@ -1230,6 +1278,7 @@ namespace internal
       {
         FEEvaluationImplBasisChange<
           evaluate_evenodd,
+          EvaluatorQuantity::value,
           dim,
           (fe_degree >= n_q_points_1d ? n_q_points_1d : fe_degree + 1),
           n_q_points_1d,
@@ -1305,6 +1354,7 @@ namespace internal
         // transform back to the original space
         FEEvaluationImplBasisChange<
           evaluate_evenodd,
+          EvaluatorQuantity::value,
           dim,
           (fe_degree >= n_q_points_1d ? n_q_points_1d : fe_degree + 1),
           n_q_points_1d,
