@@ -2145,44 +2145,10 @@ namespace internal
           data, temp1, values_array, integrate_gradients, face_no);
     }
 
-    template <std::size_t n_face_orientations,
-              typename VectorType,
-              typename std::enable_if<
-                !internal::has_begin<VectorType>::value ||
-                  !std::is_same<decltype(std::declval<VectorType>().begin()),
-                                Number2 *>::value,
-                VectorType>::type * = nullptr>
-    static bool
-    gather_evaluate(const VectorType &,
-                    const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &,
-                    const MatrixFreeFunctions::DoFInfo &,
-                    VectorizedArrayType *,
-                    VectorizedArrayType *,
-                    VectorizedArrayType *,
-                    const bool,
-                    const bool,
-                    const unsigned int,
-                    const unsigned int,
-                    const std::array<unsigned int, n_face_orientations>,
-                    const std::array<unsigned int, n_face_orientations>,
-                    const unsigned int,
-                    const MatrixFreeFunctions::DoFInfo::DoFAccessIndex,
-                    const std::array<unsigned int, n_face_orientations>,
-                    const Table<2, unsigned int> &)
-    {
-      return false;
-    }
-
-    template <std::size_t n_face_orientations,
-              typename VectorType,
-              typename std::enable_if<
-                internal::has_begin<VectorType>::value &&
-                  std::is_same<decltype(std::declval<VectorType>().begin()),
-                               Number2 *>::value,
-                VectorType>::type * = nullptr>
+    template <std::size_t n_face_orientations>
     static bool
     gather_evaluate(
-      const VectorType &                                         src,
+      const Number2 *                                            src_ptr,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
       const MatrixFreeFunctions::DoFInfo &                       dof_info,
       VectorizedArrayType *                                      values_quad,
@@ -2199,13 +2165,14 @@ namespace internal
       const std::array<unsigned int, n_face_orientations> face_orientations,
       const Table<2, unsigned int> &                      orientation_map)
     {
-      static_assert((std::is_same<decltype(std::declval<VectorType>().begin()),
-                                  Number2 *>::value),
-                    "Types do not match.");
+      if (src_ptr == nullptr)
+        {
+          return false;
+        }
 
       return process_and_io( //
         false /*=evaluate*/,
-        src.begin(),
+        src_ptr,
         data,
         dof_info,
         values_quad,
@@ -2307,63 +2274,10 @@ namespace internal
         });
     }
 
-    template <std::size_t n_face_orientations,
-              typename VectorType,
-              typename std::enable_if<
-                !internal::has_begin<VectorType>::value ||
-                  !std::is_same<decltype(std::declval<VectorType>().begin()),
-                                Number2 *>::value,
-                VectorType>::type * = nullptr>
+    template <std::size_t n_face_orientations>
     static bool
     integrate_scatter(
-      VectorType &,
-      const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
-      const MatrixFreeFunctions::DoFInfo &,
-      VectorizedArrayType *values_array,
-      VectorizedArrayType *values_quad,
-      VectorizedArrayType *gradients_quad,
-      VectorizedArrayType *scratch_data,
-      const bool           integrate_values,
-      const bool           integrate_gradients,
-      const unsigned int,
-      const unsigned int,
-      const std::array<unsigned int, n_face_orientations>,
-      const std::array<unsigned int, n_face_orientations> face_nos,
-      const unsigned int                                  subface_index,
-      const MatrixFreeFunctions::DoFInfo::DoFAccessIndex,
-      const std::array<unsigned int, n_face_orientations> face_orientations,
-      const Table<2, unsigned int> &                      orientation_map)
-    {
-      AssertDimension(face_nos.size(), 1);
-      AssertDimension(face_orientations.size(), 1);
-
-      // for block vectors simply integrate
-      integrate(data,
-                values_array,
-                values_quad,
-                gradients_quad,
-                scratch_data,
-                integrate_values,
-                integrate_gradients,
-                face_nos[0],
-                subface_index,
-                face_orientations[0],
-                orientation_map);
-
-      // default vector access
-      return false;
-    }
-
-    template <std::size_t n_face_orientations,
-              typename VectorType,
-              typename std::enable_if<
-                internal::has_begin<VectorType>::value &&
-                  std::is_same<decltype(std::declval<VectorType>().begin()),
-                               Number2 *>::value,
-                VectorType>::type * = nullptr>
-    static bool
-    integrate_scatter(
-      VectorType &                                               dst,
+      Number2 *                                                  dst_ptr,
       const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &data,
       const MatrixFreeFunctions::DoFInfo &                       dof_info,
       VectorizedArrayType *                                      values_array,
@@ -2381,13 +2295,31 @@ namespace internal
       const std::array<unsigned int, n_face_orientations> face_orientations,
       const Table<2, unsigned int> &                      orientation_map)
     {
-      static_assert((std::is_same<decltype(std::declval<VectorType>().begin()),
-                                  Number2 *>::value),
-                    "Types do not match.");
+      if (dst_ptr == nullptr)
+        {
+          AssertDimension(face_nos.size(), 1);
+          AssertDimension(face_orientations.size(), 1);
+
+          // for block vectors simply integrate
+          integrate(data,
+                    values_array,
+                    values_quad,
+                    gradients_quad,
+                    scratch_data,
+                    integrate_values,
+                    integrate_gradients,
+                    face_nos[0],
+                    subface_index,
+                    face_orientations[0],
+                    orientation_map);
+
+          // default vector access
+          return false;
+        }
 
       return process_and_io( //
         true /*=integrate*/,
-        dst.begin(),
+        dst_ptr,
         data,
         dof_info,
         values_quad,
