@@ -4442,20 +4442,19 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   // intermediate data used across calls to reinit. we can do this in parallel
   Threads::Task<
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>>
-    fe_get_data = Threads::new_task(&FiniteElement<dim, spacedim>::get_data,
-                                    *this->fe,
-                                    flags,
-                                    *this->mapping,
-                                    quadrature,
-                                    this->finite_element_output);
+    fe_get_data = Threads::new_task([&]() {
+      return this->fe->get_data(flags,
+                                *this->mapping,
+                                quadrature,
+                                this->finite_element_output);
+    });
+
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
   if (flags & update_mapping)
-    mapping_get_data = Threads::new_task(&Mapping<dim, spacedim>::get_data,
-                                         *this->mapping,
-                                         flags,
-                                         quadrature);
+    mapping_get_data = Threads::new_task(
+      [&]() { return this->mapping->get_data(flags, quadrature); });
 
   this->update_flags = flags;
 
