@@ -296,6 +296,11 @@ namespace internal
      *             derivatives, 2 second derivates. Note that all the
      *             derivatives access the data in @p shape_values passed to
      *             the constructor of the class
+     * @tparam lex_faces Sets how the evaluation points on the faces should be
+     *                   sorted: lexicographically or right-hand-system number
+     *                   (special treatment of orientation 1 in 3D). Per default
+     *                   right-hand-system number is enabled, which is only
+     *                   working for dimensions up to 3.
      *
      * @param in address of the input data vector
      * @param out address of the output data vector
@@ -303,7 +308,8 @@ namespace internal
     template <int  face_direction,
               bool contract_onto_face,
               bool add,
-              int  max_derivative>
+              int  max_derivative,
+              bool lex_faces = false>
     void
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT out) const;
@@ -403,7 +409,8 @@ namespace internal
   template <int  face_direction,
             bool contract_onto_face,
             bool add,
-            int  max_derivative>
+            int  max_derivative,
+            bool lex_faces>
   inline void
   EvaluatorTensorProduct<evaluate_general,
                          dim,
@@ -414,15 +421,21 @@ namespace internal
                                               Number *DEAL_II_RESTRICT
                                                       out) const
   {
-    static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
+    Assert(dim > 0 && (lex_faces || dim < 4),
+           ExcMessage("Only dim=1,2,3 supported"));
     static_assert(max_derivative >= 0 && max_derivative < 3,
                   "Only derivative orders 0-2 implemented");
     Assert(shape_values != nullptr,
            ExcMessage(
              "The given array shape_values must not be the null pointer."));
 
-    constexpr int n_blocks1 = dim > 1 ? n_rows : 1;
-    constexpr int n_blocks2 = dim > 2 ? n_rows : 1;
+    constexpr int n_blocks1 =
+      lex_faces ? dealii::Utilities::pow<unsigned int>(n_rows, face_direction) :
+                  (dim > 1 ? n_rows : 1);
+    constexpr int n_blocks2 =
+      lex_faces ? dealii::Utilities::pow<unsigned int>(
+                    n_rows, std::max(dim - face_direction - 1, 0)) :
+                  (dim > 2 ? n_rows : 1);
 
     AssertIndexRange(face_direction, dim);
     constexpr int stride     = Utilities::pow(n_rows, face_direction);
@@ -483,38 +496,53 @@ namespace internal
                   }
               }
 
-            // increment: in regular case, just go to the next point in
-            // x-direction. If we are at the end of one chunk in x-dir, need
-            // to jump over to the next layer in z-direction
-            switch (face_direction)
+            if (lex_faces)
               {
-                case 0:
-                  in += contract_onto_face ? n_rows : 1;
-                  out += contract_onto_face ? 1 : n_rows;
-                  break;
-                case 1:
-                  ++in;
-                  ++out;
-                  // faces 2 and 3 in 3D use local coordinate system zx, which
-                  // is the other way around compared to the tensor
-                  // product. Need to take that into account.
-                  if (dim == 3)
-                    {
-                      if (contract_onto_face)
-                        out += n_rows - 1;
-                      else
-                        in += n_rows - 1;
-                    }
-                  break;
-                case 2:
-                  ++in;
-                  ++out;
-                  break;
-                default:
-                  Assert(false, ExcNotImplemented());
+                ++out;
+                ++in;
               }
+            else
+              // increment: in regular case, just go to the next point in
+              // x-direction. If we are at the end of one chunk in x-dir, need
+              // to jump over to the next layer in z-direction
+              switch (face_direction)
+                {
+                  case 0:
+                    in += contract_onto_face ? n_rows : 1;
+                    out += contract_onto_face ? 1 : n_rows;
+                    break;
+                  case 1:
+                    ++in;
+                    ++out;
+                    // faces 2 and 3 in 3D use local coordinate system zx, which
+                    // is the other way around compared to the tensor
+                    // product. Need to take that into account.
+                    if (dim == 3)
+                      {
+                        if (contract_onto_face)
+                          out += n_rows - 1;
+                        else
+                          in += n_rows - 1;
+                      }
+                    break;
+                  case 2:
+                    ++in;
+                    ++out;
+                    break;
+                  default:
+                    Assert(false, ExcNotImplemented());
+                }
           }
-        if (face_direction == 1 && dim == 3)
+        if (lex_faces)
+          {
+            if (contract_onto_face)
+              in += (dealii::Utilities::pow(n_rows, face_direction + 1) -
+                     n_blocks1);
+            else
+              out += (dealii::Utilities::pow(n_rows, face_direction + 1) -
+                      n_blocks1);
+          }
+        else if (face_direction == 1 && dim == 3)
           {
             // adjust for local coordinate system zx
             if (contract_onto_face)
@@ -653,7 +681,8 @@ namespace internal
     template <int  face_direction,
               bool contract_onto_face,
               bool add,
-              int  max_derivative>
+              int  max_derivative,
+              bool lex_faces = false>
     void
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT out) const;
@@ -817,12 +846,15 @@ namespace internal
   template <int  face_direction,
             bool contract_onto_face,
             bool add,
-            int  max_derivative>
+            int  max_derivative,
+            bool lex_faces>
   inline void
   EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>::
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT out) const
   {
+    static_assert(lex_faces == false, "Not implemented yet.");
+
     Assert(shape_values != nullptr,
            ExcMessage(
              "The given array shape_data must not be the null pointer!"));
