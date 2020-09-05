@@ -373,17 +373,21 @@ namespace Euler_DG
     // skip the computation of the vector $\mathbf{r}_{s+1}$ as there is no
     // coefficient $a_s$ available (nor will it be used).
     template <typename VectorType, typename Operator>
-    void perform_time_step(const Operator &pde_operator,
-                           const double    current_time,
-                           const double    time_step,
-                           VectorType &    solution,
-                           VectorType &    vec_Ti,
-                           VectorType &    vec_Ki) const
+    void perform_time_step(const Operator &   pde_operator,
+                           const double       current_time,
+                           const double       time_step,
+                           const unsigned int timestep_number,
+                           VectorType &       solution,
+                           VectorType &       vec_Ti,
+                           VectorType &       vec_Ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
       if (use_ecl)
         {
+          if (timestep_number == 1)
+            vec_Ki = solution; // TODO
+
           double sum_previous_bi = 0;
           for (unsigned int stage = 0; stage < bi.size(); ++stage)
             {
@@ -395,16 +399,16 @@ namespace Euler_DG
                 current_time + c_i * time_step,
                 bi[stage] * time_step,
                 (stage == bi.size() - 1 ? 0 : ai[stage] * time_step),
-                ((stage + sw) % 2 == 0 ? vec_Ki : vec_Ti),
-                ((stage + sw) % 2 == 0 ? vec_Ti : vec_Ki),
+                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_Ki :
+                                                                 vec_Ti),
+                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_Ti :
+                                                                 vec_Ki),
                 solution,
                 vec_Ti /*dummy*/);
 
               if (stage > 0)
                 sum_previous_bi += bi[stage - 1];
             }
-          // Switch for odd stages
-          sw = sw == 0;
         }
       else
         {
@@ -436,8 +440,6 @@ namespace Euler_DG
   private:
     std::vector<double> bi;
     std::vector<double> ai;
-
-    mutable unsigned int sw = 0;
   };
 
 
@@ -2566,8 +2568,6 @@ namespace Euler_DG
 
     euler_operator.project(ExactSolution<dim>(time), solution);
 
-    if (use_ecl)
-      rk_register_2 = solution;
 
     double min_vertex_distance = std::numeric_limits<double>::max();
     for (const auto &cell : triangulation.active_cell_iterators())
@@ -2619,6 +2619,7 @@ namespace Euler_DG
           integrator.perform_time_step(euler_operator,
                                        time,
                                        time_step,
+                                       timestep_number,
                                        solution,
                                        rk_register_1,
                                        rk_register_2);
