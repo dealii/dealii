@@ -56,6 +56,8 @@
 #include <deal.II/matrix_free/operators.h>
 #include <deal.II/matrix_free/tools.h>
 
+
+
 namespace Euler_DG
 {
   using namespace dealii;
@@ -376,15 +378,15 @@ namespace Euler_DG
                            const double       time_step,
                            const unsigned int timestep_number,
                            VectorType &       solution,
-                           VectorType &       vec_Ti,
-                           VectorType &       vec_Ki) const
+                           VectorType &       vec_ri,
+                           VectorType &       vec_ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
       if (use_ecl)
         {
           if (timestep_number == 1)
-            vec_Ki = solution; // TODO
+            vec_ki = solution; // TODO
 
           double sum_previous_bi = 0;
           for (unsigned int stage = 0; stage < bi.size(); ++stage)
@@ -397,12 +399,12 @@ namespace Euler_DG
                 current_time + c_i * time_step,
                 bi[stage] * time_step,
                 (stage == bi.size() - 1 ? 0 : ai[stage] * time_step),
-                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_Ki :
-                                                                 vec_Ti),
-                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_Ti :
-                                                                 vec_Ki),
+                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_ki :
+                                                                 vec_ri),
+                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_ri :
+                                                                 vec_ki),
                 solution,
-                vec_Ti /*dummy*/);
+                vec_ri /*dummy*/);
 
               if (stage > 0)
                 sum_previous_bi += bi[stage - 1];
@@ -414,9 +416,9 @@ namespace Euler_DG
                                      bi[0] * time_step,
                                      ai[0] * time_step,
                                      solution,
-                                     vec_Ti,
+                                     vec_ri,
                                      solution,
-                                     vec_Ti);
+                                     vec_ri);
           double sum_previous_bi = 0;
           for (unsigned int stage = 1; stage < bi.size(); ++stage)
             {
@@ -426,10 +428,10 @@ namespace Euler_DG
                                          (stage == bi.size() - 1 ?
                                             0 :
                                             ai[stage] * time_step),
-                                         vec_Ti,
-                                         vec_Ki,
+                                         vec_ri,
+                                         vec_ki,
                                          solution,
-                                         vec_Ti);
+                                         vec_ri);
               sum_previous_bi += bi[stage - 1];
             }
         }
@@ -1000,6 +1002,8 @@ namespace Euler_DG
 
     this->body_force = std::move(body_force);
   }
+
+
 
   // @sect4{Local evaluators}
 
