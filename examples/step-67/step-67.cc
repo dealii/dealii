@@ -56,8 +56,6 @@
 #include <deal.II/matrix_free/operators.h>
 #include <deal.II/matrix_free/tools.h>
 
-#define USE_ECL
-
 namespace Euler_DG
 {
   using namespace dealii;
