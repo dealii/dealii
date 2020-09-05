@@ -361,6 +361,23 @@ namespace parallel
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
+
+    virtual unsigned int
+    register_data_attach(
+      const std::function<std::vector<char>(
+        const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+        const typename dealii::Triangulation<dim, spacedim>::CellStatus)>
+        &        pack_callback,
+      const bool returns_variable_size_data) = 0;
+
+    virtual void
+    notify_ready_to_unpack(
+      const unsigned int handle,
+      const std::function<void(
+        const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
+        const typename dealii::Triangulation<dim, spacedim>::CellStatus,
+        const boost::iterator_range<std::vector<char>::const_iterator> &)>
+        &unpack_callback) = 0;
   };
 
 } // namespace parallel

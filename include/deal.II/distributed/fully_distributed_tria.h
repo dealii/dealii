@@ -231,6 +231,28 @@ namespace parallel
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
 
+      void
+      save(const std::string &filename) const;
+
+
+      void
+      load(const std::string &filename, const bool autopartition = true);
+
+      virtual unsigned int
+      register_data_attach(
+        const std::function<std::vector<char>(const cell_iterator &,
+                                              const CellStatus)> &pack_callback,
+        const bool returns_variable_size_data) override;
+
+      virtual void
+      notify_ready_to_unpack(
+        const unsigned int handle,
+        const std::function<void(
+          const cell_iterator &,
+          const CellStatus,
+          const boost::iterator_range<std::vector<char>::const_iterator> &)>
+          &unpack_callback) override;
+
     private:
       virtual unsigned int
       coarse_cell_id_to_coarse_cell_index(

@@ -748,7 +748,7 @@ namespace parallel
       register_data_attach(
         const std::function<std::vector<char>(const cell_iterator &,
                                               const CellStatus)> &pack_callback,
-        const bool returns_variable_size_data);
+        const bool returns_variable_size_data) override;
 
       /**
        * This function is the opposite of register_data_attach(). It is called
@@ -805,7 +805,7 @@ namespace parallel
           const cell_iterator &,
           const CellStatus,
           const boost::iterator_range<std::vector<char>::const_iterator> &)>
-          &unpack_callback);
+          &unpack_callback) override;
 
       /**
        * Return a permutation vector for the order the coarse cells are handed
@@ -1330,7 +1330,7 @@ namespace parallel
           const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
           const typename dealii::Triangulation<1, spacedim>::CellStatus)>
           &        pack_callback,
-        const bool returns_variable_size_data);
+        const bool returns_variable_size_data) override;
 
       /**
        * This function is not implemented, but needs to be present for the
@@ -1343,7 +1343,7 @@ namespace parallel
           const typename dealii::Triangulation<1, spacedim>::cell_iterator &,
           const typename dealii::Triangulation<1, spacedim>::CellStatus,
           const boost::iterator_range<std::vector<char>::const_iterator> &)>
-          &unpack_callback);
+          &unpack_callback) override;
 
       /**
        * Dummy arrays. This class isn't usable but the compiler wants to see

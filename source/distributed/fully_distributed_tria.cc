@@ -391,6 +391,65 @@ namespace parallel
 
 
 
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::save(const std::string &filename) const
+    {
+      (void)filename;
+
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(const std::string &filename,
+                                       const bool         autopartition)
+    {
+      (void)filename;
+      (void)autopartition;
+
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+
+
+    template <int dim, int spacedim>
+    unsigned int
+    Triangulation<dim, spacedim>::register_data_attach(
+      const std::function<std::vector<char>(const cell_iterator &,
+                                            const CellStatus)> &pack_callback,
+      const bool returns_variable_size_data)
+    {
+      (void)pack_callback;
+      (void)returns_variable_size_data;
+
+      AssertThrow(false, ExcNotImplemented());
+
+      return 0;
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::notify_ready_to_unpack(
+      const unsigned int handle,
+      const std::function<
+        void(const cell_iterator &,
+             const CellStatus,
+             const boost::iterator_range<std::vector<char>::const_iterator> &)>
+        &unpack_callback)
+    {
+      (void)handle;
+      (void)unpack_callback;
+
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+
+
   } // namespace fullydistributed
 } // namespace parallel
 
