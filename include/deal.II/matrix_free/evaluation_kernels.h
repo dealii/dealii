@@ -1784,14 +1784,14 @@ namespace internal
   private:
     template <bool do_evaluate, bool add_into_output, int face_direction = 0>
     static void
-    interpolate_generic(const Number *               input,
-                        Number *                     output,
-                        const bool                   do_gradients,
-                        const unsigned int           face_no,
-                        const unsigned int           n_points_1d,
-                        const AlignedVector<Number> *shape_data,
-                        const unsigned int           dofs_per_component_on_cell,
-                        const unsigned int           dofs_per_component_on_face)
+    interpolate_generic(const Number *     input,
+                        Number *           output,
+                        const bool         do_gradients,
+                        const unsigned int face_no,
+                        const unsigned int n_points_1d,
+                        const std::array<AlignedVector<Number>, 2> &shape_data,
+                        const unsigned int dofs_per_component_on_cell,
+                        const unsigned int dofs_per_component_on_face)
     {
       if (face_direction == face_no / 2)
         {

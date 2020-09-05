@@ -1066,7 +1066,8 @@ namespace internal
       for (unsigned int face = 0; face < faces.size(); ++face)
         {
           auto face_computation = [&](const DoFAccessIndex face_index,
-                                      const unsigned int * cell_indices_face) {
+                                      const std::array<unsigned int, length>
+                                        &cell_indices_face) {
             bool is_contiguous      = false;
             bool is_interleaved     = false;
             bool needs_full_storage = false;
