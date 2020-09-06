@@ -80,7 +80,7 @@ namespace Euler_DG
   constexpr unsigned int fe_degree            = 5;
   constexpr unsigned int n_q_points_1d        = fe_degree + 2;
 
-  constexpr bool use_ecl = true;
+  constexpr bool use_ecl = false;
 
   using Number = double;
 
@@ -1505,8 +1505,6 @@ namespace Euler_DG
   {
     if (use_ecl)
       {
-        (void)next_ri; // not needed in the case of ECL
-
         TimerOutput::Scope t(timer, "rk_stage - integrals L_h");
 
         for (auto &i : inflow_boundaries)
@@ -1515,7 +1513,7 @@ namespace Euler_DG
           i.second->set_time(current_time);
 
         FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data);
-        FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_(data);
+        FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_temp(data);
 
         FEFaceEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_m(data,
                                                                           true);
@@ -1752,18 +1750,18 @@ namespace Euler_DG
                   const Number ai = factor_ai;
                   const Number bi = factor_solution;
 
-                  phi_.reinit(cell);
-                  phi_.read_dof_values(solution);
+                  phi_temp.reinit(cell);
+                  phi_temp.read_dof_values(solution);
 
                   if (ai == Number())
                     {
                       for (unsigned int q = 0; q < phi.static_dofs_per_cell;
                            ++q)
                         {
-                          phi_.begin_dof_values()[q] +=
+                          phi_temp.begin_dof_values()[q] +=
                             bi * phi.begin_dof_values()[q];
                           phi.begin_dof_values()[q] =
-                            phi_.begin_dof_values()[q];
+                            phi_temp.begin_dof_values()[q];
                         }
                     }
                   else
@@ -1774,14 +1772,14 @@ namespace Euler_DG
                           const auto K_i = phi.begin_dof_values()[q];
 
                           phi.begin_dof_values()[q] =
-                            phi_.begin_dof_values()[q] + (ai * K_i);
+                            phi_temp.begin_dof_values()[q] + (ai * K_i);
 
-                          phi_.begin_dof_values()[q] += bi * K_i;
+                          phi_temp.begin_dof_values()[q] += bi * K_i;
                         }
                     }
 
                   phi.set_dof_values(dst);
-                  phi_.set_dof_values(solution);
+                  phi_temp.set_dof_values(solution);
                 }
               }
           },
