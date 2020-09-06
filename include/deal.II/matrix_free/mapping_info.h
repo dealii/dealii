@@ -220,7 +220,8 @@ namespace internal
        * but the default case (cell integrals or boundary integrals) only
        * fills the zeroth component and ignores the first one.
        */
-      AlignedVector<Tensor<2, spacedim, VectorizedArrayType>> jacobians[2];
+      std::array<AlignedVector<Tensor<2, spacedim, VectorizedArrayType>>, 2>
+        jacobians;
 
       /**
        * The storage of the gradients of the inverse Jacobian
@@ -237,10 +238,12 @@ namespace internal
        * but the default case (cell integrals or boundary integrals) only
        * fills the zeroth component and ignores the first one.
        */
-      AlignedVector<Tensor<1,
-                           spacedim *(spacedim + 1) / 2,
-                           Tensor<1, spacedim, VectorizedArrayType>>>
-        jacobian_gradients[2];
+      std::array<
+        AlignedVector<Tensor<1,
+                             spacedim *(spacedim + 1) / 2,
+                             Tensor<1, spacedim, VectorizedArrayType>>>,
+        2>
+        jacobian_gradients;
 
       /**
        * Stores the Jacobian transformations times the normal vector (this
@@ -249,8 +252,8 @@ namespace internal
        *
        * Indexed by @p data_index_offsets.
        */
-      AlignedVector<Tensor<1, spacedim, VectorizedArrayType>>
-        normals_times_jacobians[2];
+      std::array<AlignedVector<Tensor<1, spacedim, VectorizedArrayType>>, 2>
+        normals_times_jacobians;
 
       /**
        * Stores the index offset of a particular cell into the quadrature

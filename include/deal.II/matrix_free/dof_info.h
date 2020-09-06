@@ -433,7 +433,7 @@ namespace internal
        * as interior (0), the faces decorated with as exterior (1), and the
        * cells (2) according to CellOrFaceAccess.
        */
-      std::vector<IndexStorageVariants> index_storage_variants[3];
+      std::array<std::vector<IndexStorageVariants>, 3> index_storage_variants;
 
       /**
        * Stores the rowstart indices of the compressed row storage in the @p
@@ -485,7 +485,7 @@ namespace internal
        * as interior (0), the faces decorated with as exterior (1), and the
        * cells (2) according to CellOrFaceAccess.
        */
-      std::vector<unsigned int> dof_indices_contiguous[3];
+      std::array<std::vector<unsigned int>, 3> dof_indices_contiguous;
 
       /**
        * Compressed index storage for faster access than through @p
@@ -495,7 +495,7 @@ namespace internal
        * as minus (0), the faces decorated with as plus (1), and the cells
        * (2).
        */
-      std::vector<unsigned int> dof_indices_interleave_strides[3];
+      std::array<std::vector<unsigned int>, 3> dof_indices_interleave_strides;
 
       /**
        * Caches the number of indices filled when vectorizing. This
@@ -506,7 +506,7 @@ namespace internal
        * as interior (0), the faces decorated with as exterior (1), and the
        * cells (2) according to CellOrFaceAccess.
        */
-      std::vector<unsigned char> n_vectorization_lanes_filled[3];
+      std::array<std::vector<unsigned char>, 3> n_vectorization_lanes_filled;
 
       /**
        * This stores the parallel partitioning that can be used to set up

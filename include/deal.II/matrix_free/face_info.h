@@ -58,7 +58,7 @@ namespace internal
        * numbers of the cells on the logical "interior" side of the face which
        * is aligned to the direction of FEEvaluation::get_normal_vector().
        */
-      unsigned int cells_interior[vectorization_width];
+      std::array<unsigned int, vectorization_width> cells_interior;
 
       /**
        * Indices of the faces in the current face batch as compared to the
@@ -73,7 +73,7 @@ namespace internal
        * For boundary faces, the numbers are set to
        * `numbers::invalid_unsigned_int`.
        */
-      unsigned int cells_exterior[vectorization_width];
+      std::array<unsigned int, vectorization_width> cells_exterior;
 
       /**
        * Index of the face between 0 and GeometryInfo::faces_per_cell within
