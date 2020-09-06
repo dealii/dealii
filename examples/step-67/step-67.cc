@@ -80,7 +80,7 @@ namespace Euler_DG
   constexpr unsigned int fe_degree            = 5;
   constexpr unsigned int n_q_points_1d        = fe_degree + 2;
 
-  constexpr bool use_ecl = false;
+  constexpr bool use_ecl = true;
 
   using Number = double;
 
@@ -386,7 +386,7 @@ namespace Euler_DG
       if (use_ecl)
         {
           if (timestep_number == 1)
-            vec_ki = solution; // TODO
+            vec_ki.copy_locally_owned_data_from(solution); // TODO
 
           double sum_previous_bi = 0;
           for (unsigned int stage = 0; stage < bi.size(); ++stage)
