@@ -1727,7 +1727,11 @@ namespace internal
 
 
 
-  template <int dim, int fe_degree, int n_components, typename Number>
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            bool lex_faces = false>
   struct FEFaceNormalEvaluationImpl
   {
     template <bool do_evaluate, bool add_into_output>
@@ -1819,12 +1823,14 @@ namespace internal
                 evalf.template apply_face<face_direction,
                                           do_evaluate,
                                           add_into_output,
-                                          1>(input, output);
+                                          1,
+                                          lex_faces>(input, output);
               else
                 evalf.template apply_face<face_direction,
                                           do_evaluate,
                                           add_into_output,
-                                          0>(input, output);
+                                          0,
+                                          lex_faces>(input, output);
               input += in_stride;
               output += out_stride;
             }
