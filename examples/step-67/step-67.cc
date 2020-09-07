@@ -385,8 +385,7 @@ namespace Euler_DG
 
       if (use_ecl)
         {
-          if (timestep_number == 1)
-            vec_ki.copy_locally_owned_data_from(solution); // TODO
+          vec_ki.copy_locally_owned_data_from(solution);
 
           double sum_previous_bi = 0;
           for (unsigned int stage = 0; stage < bi.size(); ++stage)
@@ -395,16 +394,15 @@ namespace Euler_DG
                 stage == 0 ? 0 : sum_previous_bi + ai[stage - 1];
 
               // Source and destination registers are swapped after each stage
-              pde_operator.perform_stage(
-                current_time + c_i * time_step,
-                bi[stage] * time_step,
-                (stage == bi.size() - 1 ? 0 : ai[stage] * time_step),
-                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_ki :
-                                                                 vec_ri),
-                ((stage + (timestep_number % 2 == 0)) % 2 == 0 ? vec_ri :
-                                                                 vec_ki),
-                solution,
-                vec_ri /*dummy*/);
+              pde_operator.perform_stage(current_time + c_i * time_step,
+                                         bi[stage] * time_step,
+                                         (stage == bi.size() - 1 ?
+                                            0 :
+                                            ai[stage] * time_step),
+                                         (stage % 2 == 0 ? vec_ki : vec_ri),
+                                         (stage % 2 == 0 ? vec_ri : vec_ki),
+                                         solution,
+                                         vec_ri /*dummy*/);
 
               if (stage > 0)
                 sum_previous_bi += bi[stage - 1];
@@ -1760,9 +1758,11 @@ namespace Euler_DG
                         {
                           phi_temp.begin_dof_values()[q] +=
                             bi * phi.begin_dof_values()[q];
-                          phi.begin_dof_values()[q] =
-                            phi_temp.begin_dof_values()[q];
+                          // phi.begin_dof_values()[q] =
+                          //  phi_temp.begin_dof_values()[q];
                         }
+                      // phi.set_dof_values(dst);
+                      phi_temp.set_dof_values(solution);
                     }
                   else
                     {
@@ -1776,10 +1776,9 @@ namespace Euler_DG
 
                           phi_temp.begin_dof_values()[q] += bi * K_i;
                         }
+                      phi.set_dof_values(dst);
+                      phi_temp.set_dof_values(solution);
                     }
-
-                  phi.set_dof_values(dst);
-                  phi_temp.set_dof_values(solution);
                 }
               }
           },
