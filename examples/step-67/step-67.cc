@@ -1748,24 +1748,18 @@ namespace Euler_DG
                   const Number ai = factor_ai;
                   const Number bi = factor_solution;
 
-                  phi_temp.reinit(cell);
-                  phi_temp.read_dof_values(solution);
-
                   if (ai == Number())
                     {
                       for (unsigned int q = 0; q < phi.static_dofs_per_cell;
                            ++q)
-                        {
-                          phi_temp.begin_dof_values()[q] +=
-                            bi * phi.begin_dof_values()[q];
-                          // phi.begin_dof_values()[q] =
-                          //  phi_temp.begin_dof_values()[q];
-                        }
-                      // phi.set_dof_values(dst);
-                      phi_temp.set_dof_values(solution);
+                        phi.begin_dof_values()[q] =
+                          bi * phi.begin_dof_values()[q];
+                      phi.distribute_local_to_global(solution);
                     }
                   else
                     {
+                      phi_temp.reinit(cell);
+                      phi_temp.read_dof_values(solution);
                       for (unsigned int q = 0; q < phi.static_dofs_per_cell;
                            ++q)
                         {
@@ -1774,10 +1768,10 @@ namespace Euler_DG
                           phi.begin_dof_values()[q] =
                             phi_temp.begin_dof_values()[q] + (ai * K_i);
 
-                          phi_temp.begin_dof_values()[q] += bi * K_i;
+                          phi_temp.begin_dof_values()[q] = bi * K_i;
                         }
                       phi.set_dof_values(dst);
-                      phi_temp.set_dof_values(solution);
+                      phi_temp.distribute_local_to_global(solution);
                     }
                 }
               }
