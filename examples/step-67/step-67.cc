@@ -373,19 +373,18 @@ namespace Euler_DG
     // skip the computation of the vector $\mathbf{r}_{s+1}$ as there is no
     // coefficient $a_s$ available (nor will it be used).
     template <typename VectorType, typename Operator>
-    void perform_time_step(const Operator &   pde_operator,
-                           const double       current_time,
-                           const double       time_step,
-                           const unsigned int timestep_number,
-                           VectorType &       solution,
-                           VectorType &       vec_ri,
-                           VectorType &       vec_ki) const
+    void perform_time_step(const Operator &pde_operator,
+                           const double    current_time,
+                           const double    time_step,
+                           VectorType &    solution,
+                           VectorType &    vec_ri,
+                           VectorType &    vec_ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
       if (use_ecl)
         {
-          vec_ki.copy_locally_owned_data_from(solution);
+          vec_ki.swap(solution);
 
           double sum_previous_bi = 0;
           for (unsigned int stage = 0; stage < bi.size(); ++stage)
@@ -394,7 +393,8 @@ namespace Euler_DG
                 stage == 0 ? 0 : sum_previous_bi + ai[stage - 1];
 
               // Source and destination registers are swapped after each stage
-              pde_operator.perform_stage(current_time + c_i * time_step,
+              pde_operator.perform_stage(stage,
+                                         current_time + c_i * time_step,
                                          bi[stage] * time_step,
                                          (stage == bi.size() - 1 ?
                                             0 :
@@ -410,7 +410,8 @@ namespace Euler_DG
         }
       else
         {
-          pde_operator.perform_stage(current_time,
+          pde_operator.perform_stage(0,
+                                     current_time,
                                      bi[0] * time_step,
                                      ai[0] * time_step,
                                      solution,
@@ -421,7 +422,8 @@ namespace Euler_DG
           for (unsigned int stage = 1; stage < bi.size(); ++stage)
             {
               const double c_i = sum_previous_bi + ai[stage - 1];
-              pde_operator.perform_stage(current_time + c_i * time_step,
+              pde_operator.perform_stage(stage,
+                                         current_time + c_i * time_step,
                                          bi[stage] * time_step,
                                          (stage == bi.size() - 1 ?
                                             0 :
@@ -788,9 +790,10 @@ namespace Euler_DG
                LinearAlgebra::distributed::Vector<Number> &      dst) const;
 
     void
-    perform_stage(const Number cur_time,
-                  const Number factor_solution,
-                  const Number factor_ai,
+    perform_stage(const unsigned int stage,
+                  const Number       cur_time,
+                  const Number       factor_solution,
+                  const Number       factor_ai,
                   const LinearAlgebra::distributed::Vector<Number> &current_ri,
                   LinearAlgebra::distributed::Vector<Number> &      vec_ki,
                   LinearAlgebra::distributed::Vector<Number> &      solution,
@@ -1493,6 +1496,7 @@ namespace Euler_DG
   // speedup of around a third.
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::perform_stage(
+    const unsigned int                                stage,
     const Number                                      current_time,
     const Number                                      factor_solution,
     const Number                                      factor_ai,
@@ -1547,7 +1551,26 @@ namespace Euler_DG
                  ++cell)
               {
                 phi.reinit(cell);
-                phi.gather_evaluate(src, EvaluationFlags::values);
+
+                if (factor_ai != Number())
+                  phi_temp.reinit(cell);
+
+                if (factor_ai != Number() && stage == 0)
+                  {
+                    phi.read_dof_values(src);
+
+                    for (unsigned int i = 0;
+                         i < phi.static_dofs_per_component * (dim + 2);
+                         ++i)
+                      phi_temp.begin_dof_values()[i] =
+                        phi.begin_dof_values()[i];
+
+                    phi.evaluate(EvaluationFlags::values);
+                  }
+                else
+                  {
+                    phi.gather_evaluate(src, EvaluationFlags::values);
+                  }
 
                 for (unsigned int i = 0; i < phi.static_n_q_points * (dim + 2);
                      ++i)
@@ -1758,8 +1781,9 @@ namespace Euler_DG
                     }
                   else
                     {
-                      phi_temp.reinit(cell);
-                      phi_temp.read_dof_values(solution);
+                      if (stage != 0)
+                        phi_temp.read_dof_values(solution);
+
                       for (unsigned int q = 0; q < phi.static_dofs_per_cell;
                            ++q)
                         {
@@ -1768,10 +1792,10 @@ namespace Euler_DG
                           phi.begin_dof_values()[q] =
                             phi_temp.begin_dof_values()[q] + (ai * K_i);
 
-                          phi_temp.begin_dof_values()[q] = bi * K_i;
+                          phi_temp.begin_dof_values()[q] += bi * K_i;
                         }
                       phi.set_dof_values(dst);
-                      phi_temp.distribute_local_to_global(solution);
+                      phi_temp.set_dof_values(solution);
                     }
                 }
               }
@@ -2612,7 +2636,6 @@ namespace Euler_DG
           integrator.perform_time_step(euler_operator,
                                        time,
                                        time_step,
-                                       timestep_number,
                                        solution,
                                        rk_register_1,
                                        rk_register_2);
