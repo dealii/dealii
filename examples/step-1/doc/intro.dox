@@ -188,7 +188,7 @@ are worthwhile browsing through before you start any large-scale programming:
 - You will benefit from becoming a better programmer. An excellent
   resource to this end is the book "<a
   href="https://en.wikipedia.org/wiki/Code_Complete">Code
-  Complete</a>" by Steve McConnell (ISBN 978-0735619678). It's already
+  Complete</a>" by Steve McConnell @code CodeComplete . It's already
   a few years old, with the last edition published in 2004, but it has
   lost none of its appeal as a guide to good programming practices,
   and some of the principal developers use it as a group reading

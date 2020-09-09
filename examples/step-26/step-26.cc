@@ -648,10 +648,10 @@ namespace Step26
 // state that there may be occasions where they can help avoid code
 // duplication and awkward control flow. This may be one of these
 // places, and it matches the position Steve McConnell takes in his
-// excellent book "Code Complete" about good programming practices
-// (see the mention of this book in the introduction of step-1) that
-// spends a surprising ten pages on the question of <code>goto</code>
-// in general.
+// excellent book "Code Complete" @cite CodeComplete about good
+// programming practices (see the mention of this book in the
+// introduction of step-1) that spends a surprising ten pages on the
+// question of <code>goto</code> in general.
 
 
 // @sect3{The <code>main</code> function}
