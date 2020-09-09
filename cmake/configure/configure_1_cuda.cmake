@@ -173,6 +173,13 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_LIBRARIES 0)
   SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS 0)
 
+  #
+  # Disable CUDA_ARCHITECTURES target properties
+  #
+  IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+    SET(CMAKE_CUDA_ARCHITECTURES OFF)
+  ENDIF()
+
   # We cannot use -pedantic as compiler flags. nvcc generates code that
   # produces a lot of warnings when pedantic is enabled. So filter out the
   # flag:
