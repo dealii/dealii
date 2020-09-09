@@ -111,6 +111,10 @@ namespace ReferenceCell
        {{X, X, X, Type::Tri, Type::Quad, X, X, X, X}},
        // dim 3
        {{X, X, X, X, Type::Tet, Type::Pyramid, Type::Wedge, X, Type::Hex}}}};
+    Assert(table[dim][n_vertices] != Type::Invalid,
+           ExcMessage("The combination of dim = " + std::to_string(dim) +
+                      " and n_vertices = " + std::to_string(n_vertices) +
+                      " does not correspond to a known reference cell type."));
     return table[dim][n_vertices];
   }
 
@@ -347,6 +351,30 @@ namespace ReferenceCell
 
           return 0;
         }
+
+        /**
+         * Map an ExodusII vertex number to a deal.II vertex number.
+         */
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const
+        {
+          Assert(false, ExcNotImplemented());
+          (void)vertex_n;
+
+          return 0;
+        }
+
+        /**
+         * Map an ExodusII face number to a deal.II face number.
+         */
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const
+        {
+          Assert(false, ExcNotImplemented());
+          (void)face_n;
+
+          return 0;
+        }
       };
 
 
@@ -415,6 +443,15 @@ namespace ReferenceCell
           (void)face_no;
           return ReferenceCell::Type::Invalid;
         }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          (void)face_n;
+          AssertIndexRange(face_n, n_faces());
+
+          return 0;
+        }
       };
 
 
@@ -429,6 +466,21 @@ namespace ReferenceCell
         {
           (void)face_no;
           return ReferenceCell::Type::Vertex;
+        }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          return vertex_n;
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          return face_n;
         }
       };
 
@@ -518,6 +570,21 @@ namespace ReferenceCell
 
           return table[face][face_orientation ? vertex : (1 - vertex)];
         }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          return vertex_n;
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          return face_n;
+        }
       };
 
 
@@ -552,6 +619,23 @@ namespace ReferenceCell
         {
           (void)face_no;
           return ReferenceCell::Type::Line;
+        }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          constexpr std::array<unsigned int, 4> exodus_to_deal{{0, 1, 3, 2}};
+          return exodus_to_deal[vertex_n];
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          constexpr std::array<unsigned int, 4> exodus_to_deal{{2, 1, 3, 0}};
+          return exodus_to_deal[face_n];
         }
       };
 
@@ -690,6 +774,22 @@ namespace ReferenceCell
 
           return table[face][standard_to_real_face_vertex(
             vertex, face, face_orientation)];
+        }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          return vertex_n;
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          constexpr std::array<unsigned int, 4> exodus_to_deal{{1, 3, 2, 0}};
+          return exodus_to_deal[face_n];
         }
       };
 
@@ -838,6 +938,23 @@ namespace ReferenceCell
           return table[face][standard_to_real_face_vertex(
             vertex, face, face_orientation)];
         }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          constexpr std::array<unsigned int, 5> exodus_to_deal{{0, 1, 3, 2, 4}};
+          return exodus_to_deal[vertex_n];
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          constexpr std::array<unsigned int, 5> exodus_to_deal{{3, 2, 4, 1, 0}};
+          return exodus_to_deal[face_n];
+        }
       };
 
 
@@ -985,6 +1102,24 @@ namespace ReferenceCell
           return table[face][standard_to_real_face_vertex(
             vertex, face, face_orientation)];
         }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          constexpr std::array<unsigned int, 6> exodus_to_deal{
+            {2, 1, 0, 5, 4, 3}};
+          return exodus_to_deal[vertex_n];
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          constexpr std::array<unsigned int, 6> exodus_to_deal{{3, 4, 2, 0, 1}};
+          return exodus_to_deal[face_n];
+        }
       };
 
 
@@ -1073,6 +1208,25 @@ namespace ReferenceCell
         {
           (void)face_no;
           return ReferenceCell::Type::Quad;
+        }
+
+        virtual unsigned int
+        exodusii_vertex_to_deal_vertex(
+          const unsigned int vertex_n) const override
+        {
+          AssertIndexRange(vertex_n, n_vertices());
+          constexpr std::array<unsigned int, 8> exodus_to_deal{
+            {0, 1, 3, 2, 4, 5, 7, 6}};
+          return exodus_to_deal[vertex_n];
+        }
+
+        virtual unsigned int
+        exodusii_face_to_deal_face(const unsigned int face_n) const override
+        {
+          AssertIndexRange(face_n, n_faces());
+          constexpr std::array<unsigned int, 6> exodus_to_deal{
+            {2, 1, 3, 0, 4, 5}};
+          return exodus_to_deal[face_n];
         }
       };
 

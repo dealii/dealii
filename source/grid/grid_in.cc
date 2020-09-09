@@ -41,6 +41,10 @@
 #  include <assimp/scene.h>       // Output data structure
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+#  include <exodusII.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2820,6 +2824,364 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
 #endif
 }
 
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+// Namespace containing some extra functions for reading ExodusII files
+namespace
+{
+  // Convert ExodusII strings to cell types. Use the number of nodes per element
+  // to disambiguate some cases.
+  ReferenceCell::Type
+  exodusii_name_to_type(const std::string &type_name,
+                        const int          n_nodes_per_element)
+  {
+    Assert(type_name.size() > 0, ExcInternalError());
+    // Try to canonify the name by switching to upper case and removing trailing
+    // numbers. This makes, e.g., pyramid, PYRAMID, PYRAMID5, and PYRAMID13 all
+    // equal.
+    std::string type_name_2 = type_name;
+    std::transform(type_name_2.begin(),
+                   type_name_2.end(),
+                   type_name_2.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+    const std::string numbers = "0123456789";
+    type_name_2.erase(std::find_first_of(type_name_2.begin(),
+                                         type_name_2.end(),
+                                         numbers.begin(),
+                                         numbers.end()),
+                      type_name_2.end());
+
+    if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
+      return ReferenceCell::Type::Tri;
+    else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
+      return ReferenceCell::Type::Quad;
+    else if (type_name_2 == "SHELL")
+      {
+        if (n_nodes_per_element == 3)
+          return ReferenceCell::Type::Tri;
+        else
+          return ReferenceCell::Type::Quad;
+      }
+    else if (type_name_2 == "TET" || type_name_2 == "TETRA" ||
+             type_name_2 == "TETRAHEDRON")
+      return ReferenceCell::Type::Tet;
+    else if (type_name_2 == "PYRA" || type_name_2 == "PYRAMID")
+      return ReferenceCell::Type::Pyramid;
+    else if (type_name_2 == "WEDGE")
+      return ReferenceCell::Type::Wedge;
+    else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
+      return ReferenceCell::Type::Hex;
+
+    Assert(false, ExcNotImplemented());
+    return ReferenceCell::Type::Invalid;
+  }
+
+  // Associate deal.II boundary ids with sidesets (a face can be in multiple
+  // sidesets - to translate we assign each set of side set ids to a
+  // boundary_id or manifold_id)
+  template <int dim, int spacedim = dim>
+  std::pair<SubCellData, std::vector<std::vector<int>>>
+  read_exodusii_sidesets(const int                         ex_id,
+                         const int                         n_side_sets,
+                         const std::vector<CellData<dim>> &cells,
+                         const bool apply_all_indicators_to_manifolds)
+  {
+    SubCellData                   subcelldata;
+    std::vector<std::vector<int>> b_or_m_id_to_sideset_ids;
+    // boundary id 0 is the default
+    b_or_m_id_to_sideset_ids.emplace_back();
+    // deal.II does not support assigning boundary ids with nonzero codimension
+    // meshes so completely skip this information in that case.
+    //
+    // Exodus prints warnings if we try to get empty sets so always check first
+    if (dim == spacedim && n_side_sets > 0)
+      {
+        std::vector<int> side_set_ids(n_side_sets);
+        int ierr = ex_get_ids(ex_id, EX_SIDE_SET, side_set_ids.data());
+        AssertThrowExodusII(ierr);
+
+        // First collect all side sets on all boundary faces (indexed here as
+        // max_faces_per_cell * cell_n + face_n). We then sort and uniquify the
+        // side sets so that we can convert a set of side set indices into a
+        // single deal.II boundary or manifold id (and save the correspondence).
+        constexpr auto max_faces_per_cell = GeometryInfo<dim>::faces_per_cell;
+        std::map<std::size_t, std::vector<int>> face_side_sets;
+        for (const int side_set_id : side_set_ids)
+          {
+            int n_sides                = -1;
+            int n_distribution_factors = -1;
+
+            ierr = ex_get_set_param(ex_id,
+                                    EX_SIDE_SET,
+                                    side_set_id,
+                                    &n_sides,
+                                    &n_distribution_factors);
+            AssertThrowExodusII(ierr);
+            if (n_sides > 0)
+              {
+                std::vector<int> elements(n_sides);
+                std::vector<int> faces(n_sides);
+                ierr = ex_get_set(ex_id,
+                                  EX_SIDE_SET,
+                                  side_set_id,
+                                  elements.data(),
+                                  faces.data());
+                AssertThrowExodusII(ierr);
+
+                // According to the manual (subsection 4.8): "The internal
+                // number of an element numbering is defined implicitly by the
+                // order in which it appears in the file. Elements are numbered
+                // internally (beginning with 1) consecutively across all
+                // element blocks." Hence element i in Exodus numbering is entry
+                // i - 1 in the cells array.
+                for (int side_n = 0; side_n < n_sides; ++side_n)
+                  {
+                    const long        element_n = elements[side_n] - 1;
+                    const long        face_n    = faces[side_n] - 1;
+                    const std::size_t face_id =
+                      element_n * max_faces_per_cell + face_n;
+                    face_side_sets[face_id].push_back(side_set_id);
+                  }
+              }
+          }
+
+        // Collect into a sortable data structure:
+        std::vector<std::pair<std::size_t, std::vector<int>>>
+          face_id_to_side_sets;
+        for (auto &pair : face_side_sets)
+          {
+            Assert(pair.second.size() > 0, ExcInternalError());
+            face_id_to_side_sets.push_back(std::move(pair));
+          }
+
+        // sort by side sets:
+        std::sort(face_id_to_side_sets.begin(),
+                  face_id_to_side_sets.end(),
+                  [](const auto &a, const auto &b) {
+                    return std::lexicographical_compare(a.second.begin(),
+                                                        a.second.end(),
+                                                        b.second.begin(),
+                                                        b.second.end());
+                  });
+
+        types::boundary_id current_b_or_m_id = 0;
+        for (const auto &pair : face_id_to_side_sets)
+          {
+            const std::size_t       face_id          = pair.first;
+            const std::vector<int> &face_sideset_ids = pair.second;
+            if (face_sideset_ids != b_or_m_id_to_sideset_ids.back())
+              {
+                // Since we sorted by sideset ids we are guaranteed that if this
+                // doesn't match the last set then it has not yet been seen
+                ++current_b_or_m_id;
+                b_or_m_id_to_sideset_ids.push_back(face_sideset_ids);
+                Assert(current_b_or_m_id == b_or_m_id_to_sideset_ids.size() - 1,
+                       ExcInternalError());
+              }
+            // Record the b_or_m_id of the current face.
+            const unsigned int   local_face_n = face_id % max_faces_per_cell;
+            const CellData<dim> &cell = cells[face_id / max_faces_per_cell];
+            const ReferenceCell::Type cell_type =
+              ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
+            const ReferenceCell::internal::Info::Base &info =
+              ReferenceCell::internal::Info::get_cell(cell_type);
+            const unsigned int deal_face_n =
+              info.exodusii_face_to_deal_face(local_face_n);
+            const ReferenceCell::internal::Info::Base &face_info =
+              ReferenceCell::internal::Info::get_face(cell_type, deal_face_n);
+
+            // The orientation we pick doesn't matter here since when we create
+            // the Triangulation we will sort the vertices for each CellData
+            // object created here.
+            if (dim == 2)
+              {
+                CellData<1> boundary_line(face_info.n_vertices());
+                if (apply_all_indicators_to_manifolds)
+                  boundary_line.manifold_id = current_b_or_m_id;
+                else
+                  boundary_line.boundary_id = current_b_or_m_id;
+                for (unsigned int j = 0; j < face_info.n_vertices(); ++j)
+                  boundary_line.vertices[j] =
+                    cell
+                      .vertices[info.face_to_cell_vertices(deal_face_n, j, 0)];
+
+                subcelldata.boundary_lines.push_back(std::move(boundary_line));
+              }
+            else if (dim == 3)
+              {
+                CellData<2> boundary_quad(face_info.n_vertices());
+                if (apply_all_indicators_to_manifolds)
+                  boundary_quad.manifold_id = current_b_or_m_id;
+                else
+                  boundary_quad.boundary_id = current_b_or_m_id;
+                for (unsigned int j = 0; j < face_info.n_vertices(); ++j)
+                  boundary_quad.vertices[j] =
+                    cell
+                      .vertices[info.face_to_cell_vertices(deal_face_n, j, 0)];
+
+                subcelldata.boundary_quads.push_back(std::move(boundary_quad));
+              }
+          }
+      }
+
+    return std::make_pair(std::move(subcelldata),
+                          std::move(b_or_m_id_to_sideset_ids));
+  }
+} // namespace
+#endif
+
+template <int dim, int spacedim>
+typename GridIn<dim, spacedim>::ExodusIIData
+GridIn<dim, spacedim>::read_exodusii(
+  const std::string &filename,
+  const bool         apply_all_indicators_to_manifolds)
+{
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  // deal.II always uses double precision numbers for geometry
+  int component_word_size = sizeof(double);
+  // setting to zero uses the stored word size
+  int   floating_point_word_size = 0;
+  float ex_version               = 0.0;
+
+  const int ex_id = ex_open(filename.c_str(),
+                            EX_READ,
+                            &component_word_size,
+                            &floating_point_word_size,
+                            &ex_version);
+  AssertThrow(ex_id > 0,
+              ExcMessage("ExodusII failed to open the specified input file."));
+
+  // Read basic mesh information:
+  std::vector<char> string_temp(MAX_LINE_LENGTH + 1, '\0');
+  int               mesh_dimension   = 0;
+  int               n_nodes          = 0;
+  int               n_elements       = 0;
+  int               n_element_blocks = 0;
+  int               n_node_sets      = 0;
+  int               n_side_sets      = 0;
+
+  int ierr = ex_get_init(ex_id,
+                         string_temp.data(),
+                         &mesh_dimension,
+                         &n_nodes,
+                         &n_elements,
+                         &n_element_blocks,
+                         &n_node_sets,
+                         &n_side_sets);
+  AssertThrowExodusII(ierr);
+  AssertDimension(mesh_dimension, spacedim);
+
+  // Read nodes:
+  std::vector<double> xs(n_nodes);
+  std::vector<double> ys(n_nodes);
+  std::vector<double> zs(n_nodes);
+
+  ierr = ex_get_coord(ex_id, xs.data(), ys.data(), zs.data());
+  AssertThrowExodusII(ierr);
+
+  // Even if there is a node numbering array the values stored inside the
+  // ExodusII file must use the contiguous, internal ordering (see Section 4.5
+  // of the manual - "Internal (contiguously numbered) node and element IDs must
+  // be used for all data structures that contain node or element numbers (IDs),
+  // including node set node lists, side set element lists, and element
+  // connectivity.")
+  std::vector<Point<spacedim>> vertices;
+  vertices.reserve(n_nodes);
+  for (int vertex_n = 0; vertex_n < n_nodes; ++vertex_n)
+    {
+      switch (spacedim)
+        {
+          case 1:
+            vertices.emplace_back(xs[vertex_n]);
+            break;
+          case 2:
+            vertices.emplace_back(xs[vertex_n], ys[vertex_n]);
+            break;
+          case 3:
+            vertices.emplace_back(xs[vertex_n], ys[vertex_n], zs[vertex_n]);
+            break;
+          default:
+            Assert(spacedim <= 3, ExcNotImplemented());
+        }
+    }
+
+  std::vector<int> element_block_ids(n_element_blocks);
+  ierr = ex_get_ids(ex_id, EX_ELEM_BLOCK, element_block_ids.data());
+  AssertThrowExodusII(ierr);
+
+  std::vector<CellData<dim>> cells;
+  // Elements are grouped together by same reference cell type in element
+  // blocks. There may be multiple blocks for a single reference cell type,
+  // but "each element block may contain only one element type".
+  for (const int element_block_id : element_block_ids)
+    {
+      std::fill(string_temp.begin(), string_temp.end(), '\0');
+      int n_block_elements         = 0;
+      int n_nodes_per_element      = 0;
+      int n_edges_per_element      = 0;
+      int n_faces_per_element      = 0;
+      int n_attributes_per_element = 0;
+
+      // Extract element data.
+      ierr = ex_get_block(ex_id,
+                          EX_ELEM_BLOCK,
+                          element_block_id,
+                          string_temp.data(),
+                          &n_block_elements,
+                          &n_nodes_per_element,
+                          &n_edges_per_element,
+                          &n_faces_per_element,
+                          &n_attributes_per_element);
+      AssertThrowExodusII(ierr);
+      const ReferenceCell::Type type =
+        exodusii_name_to_type(string_temp.data(), n_nodes_per_element);
+      const ReferenceCell::internal::Info::Base &info =
+        ReferenceCell::internal::Info::get_cell(type);
+      // The number of nodes per element may be larger than what we want to
+      // read - for example, if the Exodus file contains a QUAD9 element, we
+      // only want to read the first four values and ignore the rest.
+      Assert(int(info.n_vertices()) <= n_nodes_per_element, ExcInternalError());
+
+      std::vector<int> connection(n_nodes_per_element * n_block_elements);
+      ierr = ex_get_conn(ex_id,
+                         EX_ELEM_BLOCK,
+                         element_block_id,
+                         connection.data(),
+                         nullptr,
+                         nullptr);
+      AssertThrowExodusII(ierr);
+
+      for (unsigned int elem_n = 0; elem_n < connection.size();
+           elem_n += n_nodes_per_element)
+        {
+          CellData<dim> cell(info.n_vertices());
+          for (unsigned int i : info.vertex_indices())
+            {
+              cell.vertices[info.exodusii_vertex_to_deal_vertex(i)] =
+                connection[elem_n + i] - 1;
+            }
+          cell.material_id = element_block_id;
+          cells.push_back(cell);
+        }
+    }
+
+  // Extract boundary data.
+  auto pair = read_exodusii_sidesets<dim, spacedim>(
+    ex_id, n_side_sets, cells, apply_all_indicators_to_manifolds);
+  ierr = ex_close(ex_id);
+  AssertThrowExodusII(ierr);
+
+  tria->create_triangulation(vertices, cells, pair.first);
+  ExodusIIData out;
+  out.id_to_sideset_ids = std::move(pair.second);
+  return out;
+#else
+  (void)filename;
+  (void)apply_all_indicators_to_manifolds;
+  AssertThrow(false, ExcNeedsExodusII());
+  return {};
+#endif
+}
+
 
 template <int dim, int spacedim>
 void
@@ -3053,6 +3415,10 @@ GridIn<dim, spacedim>::read(const std::string &filename, Format format)
     {
       read_assimp(name);
     }
+  else if (format == exodusii)
+    {
+      read_exodusii(name);
+    }
   else
     {
       std::ifstream in(name.c_str());
@@ -3113,6 +3479,13 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
                           "functions, instead."));
         return;
 
+      case exodusii:
+        Assert(false,
+               ExcMessage("There is no read_exodusii(istream &) function. "
+                          "Use the read_exodusii(string &filename, ...) "
+                          "function, instead."));
+        return;
+
       case Default:
         break;
     }
@@ -3129,6 +3502,8 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
     {
       case dbmesh:
         return ".dbmesh";
+      case exodusii:
+        return ".e";
       case msh:
         return ".msh";
       case vtk:
@@ -3160,6 +3535,9 @@ GridIn<dim, spacedim>::parse_format(const std::string &format_name)
 {
   if (format_name == "dbmesh")
     return dbmesh;
+
+  if (format_name == "exodusii")
+    return exodusii;
 
   if (format_name == "msh")
     return msh;
@@ -3212,7 +3590,7 @@ template <int dim, int spacedim>
 std::string
 GridIn<dim, spacedim>::get_format_names()
 {
-  return "dbmesh|msh|unv|vtk|vtu|ucd|abaqus|xda|tecplot|assimp";
+  return "dbmesh|exodusii|msh|unv|vtk|vtu|ucd|abaqus|xda|tecplot|assimp";
 }
 
 

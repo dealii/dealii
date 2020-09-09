@@ -82,6 +82,10 @@
 #  undef AssertThrowMPI
 #endif // #ifdef AssertThrowMPI
 
+#ifdef AssertThrowExodusII
+#  undef AssertThrowExodusII
+#endif // #ifdef AssertThrowExodusII
+
 #ifdef AssertVectorVectorDimension
 #  undef AssertVectorVectorDimension
 #endif // #ifdef AssertVectorVectorDimension
